@@ -1,0 +1,228 @@
+buildscript {
+
+    repositories {
+
+        jcenter()
+        mavenCentral()
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://repo.spongepowered.org/maven' }
+    }
+
+    dependencies {
+
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+    }
+}
+
+plugins {
+
+    id "com.wynprice.cursemaven" version "2.1.5"
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'java-library'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+apply plugin: 'eclipse'
+apply plugin: 'org.spongepowered.mixin'
+
+version = "v${mod_version}-${forge_version.replaceAll("-.*", "")}"
+group = "${mod_group}"
+ext.id = "${mod_id}"
+ext.modversion = "${mod_version}"
+ext.author = "${mod_author}"
+ext.loader = "${loader_version.replaceAll("\\..*", "")}"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+
+minecraft {
+
+    mappings channel: "${mappings_channel}", version: "${mappings_version}"
+
+    runs {
+
+        client {
+
+            workingDirectory project.file('run')
+            jvmArgs '-ea'
+//            arg "-mixin.config=META-INF/${project.id}.mixins.json".toString()
+//            properties 'mixin.env.remapRefMap': 'true'
+//            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
+        }
+
+        server {
+
+            workingDirectory project.file('run')
+            jvmArgs '-ea'
+//            arg "-mixin.config=META-INF/${project.id}.mixins.json".toString()
+//            properties 'mixin.env.remapRefMap': 'true'
+//            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
+        }
+    }
+
+}
+
+repositories {
+
+    mavenLocal()
+}
+
+dependencies {
+
+    minecraft "net.minecraftforge:forge:${forge_version}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+//    compile "com.fuzs.puzzleslib:PuzzlesLib:v1.0-1.16.5"
+    // compile fg.deobf("curse.maven:puzzles-lib:XXXXXXX")
+}
+
+mixin {
+
+    add sourceSets.main, "${project.id}.refmap.json"
+}
+
+processResources {
+
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "mod_id", project.id
+    inputs.property "mod_name", "${mod_name}"
+    inputs.property "mod_version", project.modversion
+    inputs.property "mod_group", project.group
+    inputs.property "mod_url", "${mod_url}"
+    inputs.property "mod_issue", "${mod_issue}"
+    inputs.property "mod_description", "${mod_description}"
+    inputs.property "mod_author", project.author
+    inputs.property "loader_version", project.loader
+    inputs.property "forge_version", "${loader_version}"
+    inputs.property "mc_version", "${mc_version}"
+    inputs.property "next_mc_version", "${next_mc_version}"
+//    inputs.property "puzzles_version", "${puzzles_version}"
+    inputs.property "pack_format", "${pack_format}"
+
+    // replace stuff in mods.toml and pack.mcmeta
+    from(sourceSets.main.resources.srcDirs) {
+
+        include 'META-INF/mods.toml', 'META-INF/MANIFEST.MF', 'pack.mcmeta'
+
+        expand (
+
+                'mod_id': project.id,
+                'mod_name': "${mod_name}",
+                'mod_version': project.modversion,
+                'mod_group': project.group,
+                'mod_url': "${mod_url}",
+                'mod_issue': "${mod_issue}",
+                'mod_description': "${mod_description}",
+                'mod_author': project.author,
+                'loader_version': project.loader,
+                'forge_version': "${loader_version}",
+                'mc_version': "${mc_version}",
+                "next_mc_version": "${next_mc_version}",
+//                "puzzles_version": "${puzzles_version}",
+                "pack_format": "${pack_format}"
+        )
+    }
+
+    // copy everything else except mods.toml and pack.mcmeta
+    from(sourceSets.main.resources.srcDirs) {
+
+        exclude 'META-INF/mods.toml', 'META-INF/MANIFEST.MF', 'pack.mcmeta'
+    }
+}
+
+ext.jarAttributes = [
+
+        "Specification-Title"       : project.id,
+        "Specification-Version"     : project.modversion,
+        "Specification-Vendor"      : project.author.toLowerCase(),
+        "Implementation-Title"      : project.id,
+        "Implementation-Version"    : project.modversion,
+        "Implementation-Vendor"     : project.author.toLowerCase(),
+        "Implementation-Vendor-Id"  : project.group,
+        "Implementation-URL"        : "${mod_url}",
+        "Implementation-Timestamp"  : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+//        "MixinConfigs"              : "META-INF/${project.id}.mixins.json"
+]
+
+def createJarTask(def name, def type, def sources) {
+
+    return tasks.create(name, Jar) {
+
+        from sources
+        classifier = type
+
+        manifest { attributes(project.jarAttributes) }
+        dependsOn classes
+        group 'jar'
+    }
+}
+
+def createSignJarTask(def name, def jarTask) {
+
+    return tasks.create(name, net.minecraftforge.gradle.common.task.SignJar) {
+
+        onlyIf {
+
+            project.hasProperty('keyStore')
+        }
+
+        keyStore = project.findProperty('keyStore')
+        alias = project.findProperty('keyStoreAlias')
+        storePass = project.findProperty('keyStorePass')
+        keyPass = project.findProperty('keyStoreKeyPass')
+        inputFile = jarTask.archivePath
+        outputFile = jarTask.archivePath
+        dependsOn jarTask
+        group 'jar'
+    }
+}
+
+jar {
+
+    from sourceSets.main.output.classesDirs
+    from sourceSets.main.output.resourcesDir
+
+    manifest { attributes(project.jarAttributes) }
+    group 'jar'
+}
+
+createJarTask("deobfJar", "deobf", [sourceSets.main.output])
+createJarTask("sourceJar", "sources", sourceSets.main.allSource)
+createJarTask("javadocJar", "javadoc", javadoc)
+
+createSignJarTask("signJar", jar)
+createSignJarTask("signDeobfJar", deobfJar)
+createSignJarTask("signSourceJar", sourceJar)
+createSignJarTask("signJavadocJar", javadocJar)
+
+// finalize all jar build tasks with a signing task
+def jarTasks = tasks.findAll { task -> !task.name.startsWith('sign') && task.name.toLowerCase().contains("jar")}
+jarTasks.each { task -> task.finalizedBy tasks.getByPath("sign" + task.name.substring(0, 1).toUpperCase() + task.name.substring(1))}
+
+artifacts {
+
+//    archives deobfJar
+//    archives sourceJar
+//    archives javadocJar
+}
+
+publishing {
+
+    publications {
+
+        mavenJava (MavenPublication) {
+
+            artifact deobfJar
+            artifact sourceJar
+            artifact javadocJar
+            from components.java
+        }
+    }
+}
+
+signing { sign publishing.publications.mavenJava }
+
+// general signing task runs before sources jar is signed otherwise
+signMavenJavaPublication.dependsOn signSourceJar
+// jar is otherwise signed before reobfuscating
+build.finalizedBy signJar

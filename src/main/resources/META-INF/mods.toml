@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[${loader_version},)"
+license="Mozilla Public License 2.0"
+issueTrackerURL="${mod_issue}"
+
+[[mods]]
+    modId="${mod_id}"
+    displayName="${mod_name}"
+    description="${mod_description}"
+    version="${mod_version}"
+    authors="${mod_author}"
+    displayURL="${mod_url}"
+
+[[dependencies.${mod_id}]]
+    modId="forge"
+    mandatory=true
+    versionRange="[${forge_version},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[${mc_version},${next_mc_version})"
+    ordering="NONE"
+    side="BOTH"
