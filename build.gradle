@@ -18,6 +18,7 @@ buildscript {
 plugins {
 
     id "com.wynprice.cursemaven" version "2.1.5"
+    id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -102,7 +103,7 @@ processResources {
     // replace stuff in mods.toml and pack.mcmeta
     from(sourceSets.main.resources.srcDirs) {
 
-        include 'META-INF/mods.toml', 'META-INF/MANIFEST.MF', 'pack.mcmeta'
+        include 'META-INF/mods.toml', 'pack.mcmeta'
 
         expand (
 
@@ -126,7 +127,7 @@ processResources {
     // copy everything else except mods.toml and pack.mcmeta
     from(sourceSets.main.resources.srcDirs) {
 
-        exclude 'META-INF/mods.toml', 'META-INF/MANIFEST.MF', 'pack.mcmeta'
+        exclude 'META-INF/mods.toml', 'pack.mcmeta'
     }
 }
 
@@ -170,8 +171,7 @@ def createSignJarTask(def name, def jarTask) {
         alias = project.findProperty('keyStoreAlias')
         storePass = project.findProperty('keyStorePass')
         keyPass = project.findProperty('keyStoreKeyPass')
-        inputFile = jarTask.archivePath
-        outputFile = jarTask.archivePath
+        inputFile = outputFile = jarTask.archivePath
         dependsOn jarTask
         group 'jar'
     }
@@ -182,7 +182,7 @@ jar {
     from sourceSets.main.output.classesDirs
     from sourceSets.main.output.resourcesDir
 
-    manifest { attributes(project.jarAttributes) }
+    manifest { attributes(jarAttributes) }
     group 'jar'
 }
 
@@ -217,6 +217,39 @@ publishing {
             artifact javadocJar
             from components.java
         }
+    }
+}
+
+curseforge {
+
+    def changelogFile = file('CHANGELOG.md')
+    if (!changelogFile.getText("UTF-8").find(modversion)) {
+
+        println("ERROR: Aborting upload to CurseForge: No changelog specified for version " + modversion)
+        return
+    }
+
+    apiKey = project.findProperty('curseApiKey')
+    project {
+
+        id = project.findProperty('curseProjectId')
+        releaseType = project.findProperty('curseReleaseType')
+        changelogType = 'markdown'
+        changelog = changelogFile
+        project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each {version -> addGameVersion version}
+        mainArtifact jar
+        addArtifact sourceJar
+//        relations {
+//
+//            requiredDependency 'puzzleslib'
+//        }
+    }
+
+    options {
+
+//        debug = true
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
     }
 }
 
