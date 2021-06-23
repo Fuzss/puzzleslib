@@ -223,9 +223,9 @@ publishing {
 curseforge {
 
     def changelogFile = file('CHANGELOG.md')
-    if (!changelogFile.getText("UTF-8").find(modversion)) {
+    if (!changelogFile.getText("UTF-8").find(version)) {
 
-        println("ERROR: Aborting upload to CurseForge: No changelog specified for version " + modversion)
+        println("ERROR: Aborting upload to CurseForge: No changelog specified for version " + version)
         return
     }
 
