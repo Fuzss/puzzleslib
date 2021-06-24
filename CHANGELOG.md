@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.2-1.16.5] - 2021-06-24
+### Added
+- Elements can now be made persistent, removing the user's ability to disable them
+
 ## [v1.0.1-1.16.5] - 2021-06-23
 ### Changed
 - Moved package location to `fuzs.puzzleslib`

@@ -41,7 +41,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      * is this element enabled (are events registered)
      * 1 and 0 for enable / disable, -1 for force disable where reloading the config doesn't have any effect
      */
-    private int enabled = this.getDefaultState() ? 1 : 0;
+    private int enabled = this.isEnabledByDefault() ? 1 : 0;
     /**
      * all events registered by this element
      */
@@ -73,7 +73,6 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         }
 
         this.name = name;
-
         return this;
     }
 
@@ -84,7 +83,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     }
 
     @Override
-    public boolean getDefaultState() {
+    public boolean isEnabledByDefault() {
 
         return true;
     }
@@ -92,7 +91,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * @return mods whose presence prevent this element from loading
      */
-    protected String[] isIncompatibleWith() {
+    protected String[] getIncompatibleMods() {
 
         return new String[0];
     }
@@ -100,15 +99,19 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * @return has an incompatible mod been found
      */
-    protected final boolean isIncompatibilityPresent() {
+    protected final boolean isIncompatibleModPresent() {
 
-        return Stream.of(this.isIncompatibleWith()).anyMatch(modId -> ModList.get().isLoaded(modId));
+        return Stream.of(this.getIncompatibleMods()).anyMatch(modId -> ModList.get().isLoaded(modId));
     }
 
     @Override
     public final void setupGeneralConfig(OptionsBuilder builder) {
 
-        builder.define(this.getDisplayName(), this.getDefaultState()).comment(this.getDescription()).sync(this::setEnabled);
+        // persistent elements cannot be disabled by the user
+        if (!this.isPersistent()) {
+
+            builder.define(this.getDisplayName(), this.isEnabledByDefault()).comment(this.getDescription()).sync(this::setEnabled);
+        }
     }
 
     /**
@@ -127,7 +130,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     public final void load(ParallelDispatchEvent evt) {
 
         // don't load anything if an incompatible mod is detected
-        if (this.isIncompatibilityPresent()) {
+        if (this.isIncompatibleModPresent()) {
 
             this.enabled = -1;
             return;
@@ -152,7 +155,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      */
     private void reload(boolean enabled, boolean firstLoad) {
 
-        if (enabled || this.isAlwaysEnabled()) {
+        if (enabled) {
 
             this.reloadEventListeners(true);
         } else if (!firstLoad) {
@@ -177,19 +180,20 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         }
     }
 
+    /**
+     * skip creating option to disable this in general config section
+     * {@link #isEnabled()} and {@link #disable()} still work as usual
+     * @return is always enabled
+     */
+    protected boolean isPersistent() {
+
+        return false;
+    }
+
     @Override
     public final boolean isEnabled() {
 
         return this.enabled == 1;
-    }
-
-    /**
-     * are contents from this element always active
-     * @return is always enabled
-     */
-    protected boolean isAlwaysEnabled() {
-
-        return false;
     }
 
     /**
@@ -217,10 +221,14 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * something went wrong using this element, disable until game is restarted
      */
-    protected final void setDisabled() {
+    protected final void disable() {
 
         this.setEnabled(-1);
         PuzzlesLib.LOGGER.warn("Detected issue in {} element: {}", this.getDisplayName(), "Disabling until game restart");
+        if (this.isPersistent()) {
+
+            PuzzlesLib.LOGGER.warn("{} is a persistent element", this.getDisplayName());
+        }
     }
 
     @Override
@@ -245,7 +253,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
             return Optional.of(option);
         }
 
-        PuzzlesLib.LOGGER.error("Unable to get option at path \"" + singlePath + "\": " + "Option not found");
+        PuzzlesLib.LOGGER.error("Unable to get option at path {}: {}", singlePath, "Option not found");
         return Optional.empty();
     }
 
@@ -271,6 +279,9 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         return new EmptyElement(name);
     }
 
+    /**
+     * almost an anonymous class, but needs to implement {@link ISidedElement}
+     */
     private static class EmptyElement extends AbstractElement implements ISidedElement {
 
         public EmptyElement(ResourceLocation name) {

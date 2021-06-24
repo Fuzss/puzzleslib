@@ -18,7 +18,7 @@ public interface IConfigurableElement {
     /**
      * @return is the element enabled by default
      */
-    boolean getDefaultState();
+    boolean isEnabledByDefault();
 
     /**
      * @return name of this element
