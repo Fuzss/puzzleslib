@@ -9,6 +9,7 @@ import fuzs.puzzleslib.proxy.IProxy;
 import fuzs.puzzleslib.recipe.ElementConfigCondition;
 import fuzs.puzzleslib.registry.RegistryManager;
 import fuzs.puzzleslib.util.PuzzlesUtil;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -119,38 +120,39 @@ public class PuzzlesLib {
 
     /**
      * register an element
+     * @param modId parent mod id
      * @param key identifier for this element
      * @param supplier supplier for element to be registered
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String key, Supplier<T> supplier) {
+    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String key, Supplier<T> supplier) {
 
-        return ElementRegistry.register(key, supplier);
+        return ElementRegistry.register(new ResourceLocation(modId, key), supplier);
     }
 
     /**
      * register an element
+     * @param modId parent mod id
      * @param key identifier for this element
      * @param supplier supplier for element to be registered
      * @param dist physical side to register on
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String key, Supplier<T> supplier, Dist dist) {
+    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String key, Supplier<T> supplier, Dist dist) {
 
-        return ElementRegistry.register(key, supplier, dist);
+        return ElementRegistry.register(new ResourceLocation(modId, key), supplier, dist);
     }
 
     /**
      * load all elements registered during the current mod's construction
-     * @param modId mod id of active mod
      * @param config should config files be created
      * @param path optional config directory inside of main config dir
      */
-    public static void setup(String modId, boolean config, String... path) {
+    public static void setup(boolean config, String... path) {
 
-        ElementRegistry.setup(modId, config, path);
+        ElementRegistry.setup(config, path);
     }
 
 }

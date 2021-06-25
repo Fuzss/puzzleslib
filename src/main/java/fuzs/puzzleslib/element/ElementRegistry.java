@@ -1,17 +1,15 @@
 package fuzs.puzzleslib.element;
 
+import com.google.common.collect.*;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.ConfigManager;
 import fuzs.puzzleslib.element.side.IClientElement;
 import fuzs.puzzleslib.element.side.ICommonElement;
 import fuzs.puzzleslib.element.side.IServerElement;
 import fuzs.puzzleslib.element.side.ISidedElement;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -33,35 +31,35 @@ public class ElementRegistry {
     /**
      * general storage for elements of all mods for performing actions on all of them
      */
-    private static final BiMap<ResourceLocation, AbstractElement> ELEMENTS = HashBiMap.create();
+    private static final BiMap<ResourceLocation, AbstractElement> LOADED_ELEMENTS = HashBiMap.create();
     /**
-     * all elements belonging to the active mod, will be cleared after those elements have been added to {@link #ELEMENTS}
+     * all elements belonging to the active mod, will be cleared after those elements have been added to {@link #LOADED_ELEMENTS}
      * use tree map for alphabetical sorting cause why not
      */
-    private static final TreeMap<String, AbstractElement> MOD_ELEMENTS = Maps.newTreeMap();
+    private static final TreeMap<ResourceLocation, AbstractElement> REGISTERED_ELEMENTS = Maps.newTreeMap();
 
     /**
      * register an element
-     * @param key identifier for this element
+     * @param elementName identifier for this element
      * @param supplier supplier for element to be registered
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String key, Supplier<T> supplier) {
+    public static <T extends AbstractElement & ISidedElement> AbstractElement register(ResourceLocation elementName, Supplier<T> supplier) {
 
-        return register(key, supplier, FMLEnvironment.dist);
+        return register(elementName, supplier, FMLEnvironment.dist);
     }
 
     /**
      * register an element
-     * @param key identifier for this element
+     * @param elementName identifier for this element
      * @param supplier supplier for element to be registered
      * @param dist physical side to register on
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
     @Nullable
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String key, Supplier<T> supplier, Dist dist) {
+    public static <T extends AbstractElement & ISidedElement> AbstractElement register(ResourceLocation elementName, Supplier<T> supplier, Dist dist) {
 
         if (dist == FMLEnvironment.dist) {
 
@@ -70,8 +68,7 @@ public class ElementRegistry {
             assert element instanceof ICommonElement || FMLEnvironment.dist.isClient() || element instanceof IServerElement : "Unable to register element: " + "Trying to register client element for server side";
             assert element instanceof ICommonElement || FMLEnvironment.dist.isDedicatedServer() || element instanceof IClientElement : "Unable to register element: " + "Trying to register server element for client side";
 
-            MOD_ELEMENTS.put(key, element);
-
+            REGISTERED_ELEMENTS.put(elementName, element);
             return element;
         }
 
@@ -96,7 +93,7 @@ public class ElementRegistry {
      */
     public static Optional<AbstractElement> get(ResourceLocation name) {
 
-        return Optional.ofNullable(ELEMENTS.get(name));
+        return Optional.ofNullable(LOADED_ELEMENTS.get(name));
     }
 
     /**
@@ -105,7 +102,7 @@ public class ElementRegistry {
      */
     public static Set<AbstractElement> getAllElements(String namespace) {
 
-        return ELEMENTS.entrySet().stream()
+        return LOADED_ELEMENTS.entrySet().stream()
                 .filter(entry -> entry.getKey().getNamespace().equals(namespace))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
@@ -157,34 +154,34 @@ public class ElementRegistry {
 
     /**
      * generate general config section for controlling elements, setup individual config sections and collect events to be registered in {@link #load}
-     * @param modId mod id of active mod
      * @param config should config files be created
      * @param path optional config directory inside of main config dir
      */
-    public static void setup(String modId, boolean config, String... path) {
+    public static void setup(boolean config, String... path) {
 
-        if (!MOD_ELEMENTS.isEmpty()) {
+        String activeNamespace = ModLoadingContext.get().getActiveNamespace();
+        Set<AbstractElement> activeElements = Sets.newHashSet();
+        for (Map.Entry<ResourceLocation, AbstractElement> entry : REGISTERED_ELEMENTS.entrySet()) {
 
-            // add to main elements storage
-            for (Map.Entry<String, AbstractElement> entry : MOD_ELEMENTS.entrySet()) {
+            ResourceLocation elementName = entry.getKey();
+            if (elementName.getNamespace().equals(activeNamespace)) {
 
-                ResourceLocation elementName = new ResourceLocation(modId, entry.getKey());
-                ELEMENTS.put(elementName, entry.getValue().setRegistryName(elementName));
+                AbstractElement element = entry.getValue();
+                LOADED_ELEMENTS.put(elementName, element.setRegistryName(elementName));
+                activeElements.add(element);
             }
-
-            if (config) {
-
-                // create dummy element for general config section
-                AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(modId, "general"));
-                ConfigManager.load(generalElement, ImmutableSet.copyOf(MOD_ELEMENTS.values()), type -> ConfigManager.getFileName(modId, type, path));
-                // add general option to storage so it can be reloaded during load phase
-                ELEMENTS.put(generalElement.getRegistryName(), generalElement);
-            }
-
-            MOD_ELEMENTS.values().forEach(AbstractElement::setup);
-            MOD_ELEMENTS.clear();
         }
 
+        if (config) {
+
+            // create dummy element for general config section
+            AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeNamespace, "general"));
+            ConfigManager.load(generalElement, ImmutableSet.copyOf(activeElements), type -> ConfigManager.getFileName(activeNamespace, type, path));
+            // add general option to storage so it can be reloaded during load phase
+            LOADED_ELEMENTS.put(generalElement.getRegistryName(), generalElement);
+        }
+
+        activeElements.forEach(AbstractElement::setup);
     }
 
     /**
@@ -196,7 +193,8 @@ public class ElementRegistry {
      */
     public static void load(ParallelDispatchEvent evt, ModConfig.Type syncType) {
 
-        Set<AbstractElement> elements = ELEMENTS.values();
+        REGISTERED_ELEMENTS.clear();
+        Set<AbstractElement> elements = LOADED_ELEMENTS.values();
         ConfigManager.syncOptions(elements, syncType);
         elements.forEach(element -> element.load(evt));
     }

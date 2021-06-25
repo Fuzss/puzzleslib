@@ -33,13 +33,15 @@ group = "${mod_group}"
 ext.id = "${mod_id}"
 ext.modversion = "${mod_version}"
 ext.author = "${mod_author}"
-ext.loader = "${loader_version.replaceAll("\\..*", "")}"
+ext.loader = "${loader_version}"
+//ext.puzzles = "${puzzles_version.substring(1, puzzles_version.indexOf("-"))}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
 minecraft {
 
     mappings channel: "${mappings_channel}", version: "${mappings_version}"
+//    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
     runs {
 
@@ -73,8 +75,12 @@ dependencies {
 
     minecraft "net.minecraftforge:forge:${forge_version}"
     annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
-//    compile "com.fuzs.puzzleslib:PuzzlesLib:v1.0-1.16.5"
-    // compile fg.deobf("curse.maven:puzzles-lib:XXXXXXX")
+
+    // local maven
+//    compile "fuzs.puzzleslib:PuzzlesLib:${puzzles_version}"
+    // try use curse maven when local maven is not available
+    // file id is end of url (7 digits usually) when on file details page on curse
+//    compile fg.deobf("curse.maven:puzzles-lib:<file-id>")
 }
 
 mixin {
@@ -94,10 +100,10 @@ processResources {
     inputs.property "mod_description", "${mod_description}"
     inputs.property "mod_author", project.author
     inputs.property "loader_version", project.loader
-    inputs.property "forge_version", "${loader_version}"
+    inputs.property "forge_version", project.loader
     inputs.property "mc_version", "${mc_version}"
     inputs.property "next_mc_version", "${next_mc_version}"
-//    inputs.property "puzzles_version", "${puzzles_version}"
+//    inputs.property "puzzles_version", project.puzzles
     inputs.property "pack_format", "${pack_format}"
 
     // replace stuff in mods.toml and pack.mcmeta
@@ -116,10 +122,10 @@ processResources {
                 'mod_description': "${mod_description}",
                 'mod_author': project.author,
                 'loader_version': project.loader,
-                'forge_version': "${loader_version}",
+                'forge_version': project.loader,
                 'mc_version': "${mc_version}",
                 "next_mc_version": "${next_mc_version}",
-//                "puzzles_version": "${puzzles_version}",
+//                "puzzles_version": project.puzzles,
                 "pack_format": "${pack_format}"
         )
     }
@@ -182,7 +188,7 @@ jar {
     from sourceSets.main.output.classesDirs
     from sourceSets.main.output.resourcesDir
 
-    manifest { attributes(jarAttributes) }
+    manifest { attributes(project.jarAttributes) }
     group 'jar'
 }
 
@@ -225,7 +231,7 @@ curseforge {
     def changelogFile = file('CHANGELOG.md')
     if (!changelogFile.getText("UTF-8").find(version)) {
 
-        println("ERROR: Aborting upload to CurseForge: No changelog specified for version " + version)
+//        println("ERROR: Aborting upload to CurseForge: No changelog specified for version " + version)
         return
     }
 
@@ -247,6 +253,7 @@ curseforge {
 
     options {
 
+        // doesn't upload, only prints json to console
 //        debug = true
         javaVersionAutoDetect = false
         forgeGradleIntegration = false

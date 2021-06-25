@@ -42,11 +42,6 @@ public interface ISidedElement {
         }
     }
 
-    static void unload(ISidedElement element) {
-
-        runForSides(element, ICommonElement::unloadCommon, IClientElement::unloadClient, IServerElement::unloadServer);
-    }
-
     /**
      * run code depending on element side type
      * @param element this element

@@ -50,6 +50,10 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      * config options for this element
      */
     private final Map<String, ConfigOption<?>> configOptions = Maps.newHashMap();
+    /**
+     * has {@link #load} been called
+     */
+    private boolean isLoaded;
 
     @Nonnull
     @Override
@@ -69,7 +73,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
 
         if (this.name != null) {
 
-            throw new UnsupportedOperationException("Cannot set name for element: " + "Name already set");
+            throw new UnsupportedOperationException("Cannot set name \"" + name + "\" for element: " + "Name already set as \"" + this.name + "\"");
         }
 
         this.name = name;
@@ -129,6 +133,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      */
     public final void load(ParallelDispatchEvent evt) {
 
+        this.isLoaded = true;
         // don't load anything if an incompatible mod is detected
         if (this.isIncompatibleModPresent()) {
 
@@ -136,32 +141,38 @@ public abstract class AbstractElement extends EventListener implements IConfigur
             return;
         }
 
-        ISidedElement.loadSide((ISidedElement) this, evt);
+        boolean load = false;
         if (this instanceof ICommonElement) {
 
             if (evt instanceof FMLCommonSetupEvent) {
 
-                this.reload(this.isEnabled(), true);
+                load = true;
             }
         } else if (this instanceof IClientElement && evt instanceof FMLClientSetupEvent || this instanceof IServerElement && evt instanceof FMLDedicatedServerSetupEvent) {
 
-            this.reload(this.isEnabled(), true);
+            load = true;
+        }
+
+        if (load && this.isEnabled()) {
+
+            this.reloadEventListeners(true);
+            ISidedElement.loadSide((ISidedElement) this, evt);
         }
     }
 
     /**
      * update status of all reloadable components such as events and everything specified in sided load methods
-     * @param firstLoad should unregistering not happen, as nothing has been loaded yet anyways
      */
-    private void reload(boolean enabled, boolean firstLoad) {
+    private void reload(boolean enable) {
 
-        if (enabled) {
+        if (enable) {
 
             this.reloadEventListeners(true);
-        } else if (!firstLoad) {
+            ISidedElement.runForSides((ISidedElement) this, ICommonElement::loadCommon, IClientElement::loadClient, IServerElement::loadServer);
+        } else {
 
             this.reloadEventListeners(false);
-            ISidedElement.unload((ISidedElement) this);
+            ISidedElement.runForSides((ISidedElement) this, ICommonElement::unloadCommon, IClientElement::unloadClient, IServerElement::unloadServer);
         }
     }
 
@@ -213,8 +224,12 @@ public abstract class AbstractElement extends EventListener implements IConfigur
 
         if (this.enabled != -1 && this.enabled != enabled) {
 
-            this.reload(enabled == 1, false);
             this.enabled = enabled;
+            // prevent things from changing due to config reloading when the element hasn't even been loaded yet
+            if (this.isLoaded) {
+
+                this.reload(enabled == 1);
+            }
         }
     }
 
