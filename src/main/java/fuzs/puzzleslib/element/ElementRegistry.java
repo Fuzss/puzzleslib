@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.element;
 
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.ConfigManager;
 import fuzs.puzzleslib.element.side.IClientElement;
@@ -15,10 +16,10 @@ import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -31,12 +32,12 @@ public class ElementRegistry {
     /**
      * general storage for elements of all mods for performing actions on all of them
      */
-    private static final BiMap<ResourceLocation, AbstractElement> LOADED_ELEMENTS = HashBiMap.create();
+    private static final Map<ResourceLocation, AbstractElement> LOADED_ELEMENTS = Maps.newConcurrentMap();
     /**
      * all elements belonging to the active mod, will be cleared after those elements have been added to {@link #LOADED_ELEMENTS}
      * use tree map for alphabetical sorting cause why not
      */
-    private static final TreeMap<ResourceLocation, AbstractElement> REGISTERED_ELEMENTS = Maps.newTreeMap();
+    private static final Map<ResourceLocation, AbstractElement> REGISTERED_ELEMENTS = Maps.newConcurrentMap();
 
     /**
      * register an element
@@ -68,6 +69,7 @@ public class ElementRegistry {
             assert element instanceof ICommonElement || FMLEnvironment.dist.isClient() || element instanceof IServerElement : "Unable to register element: " + "Trying to register client element for server side";
             assert element instanceof ICommonElement || FMLEnvironment.dist.isDedicatedServer() || element instanceof IClientElement : "Unable to register element: " + "Trying to register server element for client side";
 
+            PuzzlesLib.LOGGER.info("Registering element {}", elementName);
             REGISTERED_ELEMENTS.put(elementName, element);
             return element;
         }
@@ -100,12 +102,26 @@ public class ElementRegistry {
      * @param namespace modid to get elements for
      * @return elements for <code>namespace</code> as set
      */
-    public static Set<AbstractElement> getAllElements(String namespace) {
+    @SuppressWarnings("UnstableApiUsage")
+    public static Collection<AbstractElement> getAllElements(String namespace) {
 
         return LOADED_ELEMENTS.entrySet().stream()
                 .filter(entry -> entry.getKey().getNamespace().equals(namespace))
                 .map(Map.Entry::getValue)
-                .collect(Collectors.toSet());
+                .collect(ImmutableSet.toImmutableSet());
+    }
+
+    /**
+     * maps given <code>elements</code> to registry name and joins everything into a string
+     * @param elements elements to join
+     * @return joined string
+     */
+    public static String joinElementNames(Collection<AbstractElement> elements) {
+
+        return elements.stream()
+                .map(AbstractElement::getRegistryName)
+                .map(ResourceLocation::toString)
+                .collect(Collectors.joining(", "));
     }
 
     /**
@@ -154,13 +170,12 @@ public class ElementRegistry {
 
     /**
      * generate general config section for controlling elements, setup individual config sections and collect events to be registered in {@link #load}
-     * @param config should config files be created
-     * @param path optional config directory inside of main config dir
+     * @param shouldCreateConfig should config files be created
+     * @param configSubPath optional config directory inside of main config dir
      */
-    public static void setup(boolean config, String... path) {
+    public static void setup(boolean shouldCreateConfig, String... configSubPath) {
 
         String activeNamespace = ModLoadingContext.get().getActiveNamespace();
-        Set<AbstractElement> activeElements = Sets.newHashSet();
         for (Map.Entry<ResourceLocation, AbstractElement> entry : REGISTERED_ELEMENTS.entrySet()) {
 
             ResourceLocation elementName = entry.getKey();
@@ -168,20 +183,34 @@ public class ElementRegistry {
 
                 AbstractElement element = entry.getValue();
                 LOADED_ELEMENTS.put(elementName, element.setRegistryName(elementName));
-                activeElements.add(element);
             }
         }
 
-        if (config) {
+        Collection<AbstractElement> activeElements = getAllElements(activeNamespace);
+        PuzzlesLib.LOGGER.info("Setting up mod {} with elements {}", activeNamespace, joinElementNames(activeElements));
+        createConfig(shouldCreateConfig, activeElements, activeNamespace, configSubPath);
+        activeElements.forEach(AbstractElement::setup);
+    }
 
-            // create dummy element for general config section
-            AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeNamespace, "general"));
-            ConfigManager.load(generalElement, ImmutableSet.copyOf(activeElements), type -> ConfigManager.getFileName(activeNamespace, type, path));
-            // add general option to storage so it can be reloaded during load phase
-            LOADED_ELEMENTS.put(generalElement.getRegistryName(), generalElement);
+    /**
+     * @param shouldCreate should a config be created for this mod
+     * @param activeElements registered elements in this mod
+     * @param activeNamespace the mod
+     * @param configSubPath optional config directory inside of main config dir
+     */
+    private static void createConfig(boolean shouldCreate, Collection<AbstractElement> activeElements, String activeNamespace, String[] configSubPath) {
+
+        if (!shouldCreate) {
+
+            return;
         }
 
-        activeElements.forEach(AbstractElement::setup);
+        PuzzlesLib.LOGGER.info("Creating config for mod {}", activeNamespace);
+        // create dummy element for general config section
+        AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeNamespace, "general"));
+        ConfigManager.load(generalElement, activeElements, type -> ConfigManager.getFileName(activeNamespace, type, configSubPath));
+        // add general option to storage so it can be reloaded during load phase
+        LOADED_ELEMENTS.put(generalElement.getRegistryName(), generalElement);
     }
 
     /**
@@ -193,8 +222,8 @@ public class ElementRegistry {
      */
     public static void load(ParallelDispatchEvent evt, ModConfig.Type syncType) {
 
-        REGISTERED_ELEMENTS.clear();
-        Set<AbstractElement> elements = LOADED_ELEMENTS.values();
+        PuzzlesLib.LOGGER.info("Loading {} elements...", syncType.extension());
+        Collection<AbstractElement> elements = LOADED_ELEMENTS.values();
         ConfigManager.syncOptions(elements, syncType);
         elements.forEach(element -> element.load(evt));
     }

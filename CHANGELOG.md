@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.4-1.16.5] - 2021-06-27
+### Changed
+- Added more console output while mod elements are being registered and loaded
+### Fixed
+- Fixed concurrency issues when loading mod elements
+
 ## [v1.0.3-1.16.5] - 2021-06-25
 ### Removed
 - Removed some methods which would work without providing a parent mod id when it's really required actually

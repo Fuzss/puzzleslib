@@ -5,6 +5,7 @@ import fuzs.puzzleslib.config.option.ConfigOption;
 import fuzs.puzzleslib.config.option.OptionsBuilder;
 import fuzs.puzzleslib.config.serialization.EntryCollectionBuilder;
 import fuzs.puzzleslib.element.AbstractElement;
+import fuzs.puzzleslib.element.ElementRegistry;
 import fuzs.puzzleslib.element.side.ISidedElement;
 import fuzs.puzzleslib.json.JsonConfigFileUtil;
 import com.google.common.collect.ImmutableSet;
@@ -106,8 +107,9 @@ public class ConfigManager {
      * call listeners for type as the config has somehow been loaded
      * @param allElements all allElements for relevant mod
      * @param type config type for this listener
+     * @param printLog print reloaded elements to console
      */
-    private static void syncOptions(Collection<AbstractElement> allElements, ModConfig.Type type, boolean log) {
+    private static void syncOptions(Collection<AbstractElement> allElements, ModConfig.Type type, boolean printLog) {
 
         Collection<ConfigOption<?>> options = getAllOptions(allElements, type, true);
         if (!options.isEmpty()) {
@@ -115,15 +117,9 @@ public class ConfigManager {
             options.forEach(ConfigOption::sync);
         }
 
-        if (log) {
+        if (printLog) {
 
-            String elementsString = allElements.stream()
-                    .filter(AbstractElement::isEnabled)
-                    .map(AbstractElement::getRegistryName)
-                    .map(ResourceLocation::toString)
-                    .collect(Collectors.joining(", "));
-
-            PuzzlesLib.LOGGER.info("Reloaded " + type.extension() + " config options for " + (options.isEmpty() ? "no elements" : elementsString));
+            PuzzlesLib.LOGGER.info("Reloaded " + type.extension() + " config options for " + (options.isEmpty() ? "no elements" : ElementRegistry.joinElementNames(allElements)));
         }
     }
 
