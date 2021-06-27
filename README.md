@@ -2,4 +2,4 @@
 
 A Minecraft mod. Downloads can be found on CurseForge.
 
-![](https://i.imgur.com/nLy1uGC.png)
+![](https://i.imgur.com/4htIK3r.png)
