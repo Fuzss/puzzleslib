@@ -35,10 +35,10 @@ public class ConfigManager {
      */
     private static void onModConfig(final ModConfig.ModConfigEvent evt, Collection<AbstractElement> generalElement, Collection<AbstractElement> allElements) {
 
-        // separate general element so we don't sync when element has been disabled just now
         ModConfig.Type type = evt.getConfig().getType();
-        getAllOptions(generalElement, type, false).forEach(ConfigOption::sync);
         syncOptions(allElements, type, evt instanceof ModConfig.Reloading);
+        // separate general element so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
+        getAllOptions(generalElement, type).forEach(ConfigOption::sync);
     }
 
     /**
@@ -110,7 +110,7 @@ public class ConfigManager {
      */
     private static void syncOptions(Collection<AbstractElement> allElements, ModConfig.Type type, boolean printLog) {
 
-        Collection<ConfigOption<?>> options = getAllOptions(allElements, type, true);
+        Collection<ConfigOption<?>> options = getAllOptions(allElements, type);
         if (!options.isEmpty()) {
 
             options.forEach(ConfigOption::sync);
@@ -125,13 +125,12 @@ public class ConfigManager {
     /**
      * @param elements all elements for relevant mod
      * @param type config type for this listener
-     * @param onlyEnabled only get options from enabled elements
      * @return collection of enabled entries only for this mod and type
      */
-    public static Collection<ConfigOption<?>> getAllOptions(Collection<AbstractElement> elements, ModConfig.Type type, boolean onlyEnabled) {
+    public static Collection<ConfigOption<?>> getAllOptions(Collection<AbstractElement> elements, ModConfig.Type type) {
 
+        // sync all elements, even disabled ones
         return elements.stream()
-                .filter(entry -> !onlyEnabled || entry.isEnabled())
                 .flatMap(element -> element.getOptions().stream())
                 .filter(option -> option.isType(type))
                 .collect(Collectors.toSet());

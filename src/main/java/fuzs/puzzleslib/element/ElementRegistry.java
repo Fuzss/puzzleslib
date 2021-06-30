@@ -223,6 +223,8 @@ public class ElementRegistry {
 
         PuzzlesLib.LOGGER.info("Loading {} elements...", syncType.extension());
         Collection<AbstractElement> elements = LOADED_ELEMENTS.values();
+        // sync options so all fields will have a non-default value
+        // elements won't be loaded or unloaded, the call below does that
         ConfigManager.syncOptions(elements, syncType);
         elements.forEach(element -> element.load(evt));
     }

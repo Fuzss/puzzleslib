@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.6-1.16.5] - 2021-06-30
+### Changed
+- All elements are now reloaded when the config changes, not just the ones that are enabled 
+
 ## [v1.0.5-1.16.5] - 2021-06-29
 ### Changed
 - Switched string option builder to generic builder
