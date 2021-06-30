@@ -27,7 +27,6 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 @Mod(PuzzlesLib.MODID)
 public class PuzzlesLib {
 

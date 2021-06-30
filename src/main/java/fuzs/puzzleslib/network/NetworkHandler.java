@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 /**
  * handler for network communications of all puzzles lib mods
  */
-@SuppressWarnings("unused")
 public class NetworkHandler {
 
     /**

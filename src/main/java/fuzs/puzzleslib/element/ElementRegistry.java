@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 /**
  * registry for elements
  */
-@SuppressWarnings("unused")
 public class ElementRegistry {
 
     /**

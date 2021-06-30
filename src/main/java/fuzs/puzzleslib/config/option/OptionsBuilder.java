@@ -67,9 +67,9 @@ public class OptionsBuilder {
         return this.useCounter > 0 ? Optional.of(this.builder.build()) : Optional.empty();
     }
 
-    public StringOption.StringOptionBuilder define(String optionName, String defaultValue) {
+    public <T> GenericOption.GenericOptionBuilder<T> define(String optionName, T defaultValue) {
 
-        return this.setBuilder(new StringOption.StringOptionBuilder(optionName, defaultValue));
+        return this.setBuilder(new GenericOption.GenericOptionBuilder<>(optionName, defaultValue));
     }
 
     public BooleanOption.BooleanOptionBuilder define(String optionName, boolean defaultValue) {

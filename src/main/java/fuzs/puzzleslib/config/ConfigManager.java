@@ -27,7 +27,6 @@ import java.util.stream.Stream;
 /**
  * main config manager for all mods
  */
-@SuppressWarnings("unused")
 public class ConfigManager {
 
     /**

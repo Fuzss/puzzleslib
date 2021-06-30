@@ -8,7 +8,6 @@ import net.minecraftforge.fml.ModLoadingContext;
 /**
  * helper for namespace related things
  */
-@SuppressWarnings("unused")
 public class NamespaceUtil {
 
     /**

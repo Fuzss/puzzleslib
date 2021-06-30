@@ -8,7 +8,6 @@ import net.minecraft.item.ItemStack;
 /**
  * a basic enchantment extension which can be unloaded depending on a configuration state
  */
-@SuppressWarnings("NullableProblems")
 public abstract class LoadableEnchantment extends Enchantment {
 
     /**

@@ -9,10 +9,21 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import java.lang.reflect.Type;
 import java.util.Optional;
 
+/**
+ * a json adapter for generic regsitry entries
+ * @param <T> registry data type
+ */
 public class RegistryEntryAdapter<T extends IForgeRegistryEntry<T>> implements JsonDeserializer<T>, JsonSerializer<T> {
 
+    /**
+     * forge registry
+     */
     private final IForgeRegistry<T> registry;
 
+    /**
+     * initialize by providing registry
+     * @param registry forge registry
+     */
     public RegistryEntryAdapter(IForgeRegistry<T> registry) {
 
         this.registry = registry;
@@ -36,11 +47,19 @@ public class RegistryEntryAdapter<T extends IForgeRegistryEntry<T>> implements J
         throw new IllegalArgumentException("Can't serialize unknown entry " + src);
     }
 
+    /**
+     * @return type (name) of registry
+     */
     private String getType() {
 
         return this.registry.getRegistryName().getPath();
     }
 
+    /**
+     * @param json json element source
+     * @param memberName member to get
+     * @return member converted to registry entry
+     */
     private T getRegistryEntry(JsonObject json, String memberName) {
 
         if (json.has(memberName)) {
@@ -52,6 +71,11 @@ public class RegistryEntryAdapter<T extends IForgeRegistryEntry<T>> implements J
         }
     }
 
+    /**
+     * @param json json element source
+     * @param memberName member to get
+     * @return member converted to registry entry
+     */
     private T getRegistryEntry(JsonElement json, String memberName) {
 
         if (json.isJsonPrimitive()) {
@@ -67,6 +91,10 @@ public class RegistryEntryAdapter<T extends IForgeRegistryEntry<T>> implements J
         }
     }
 
+    /**
+     * @param registryKey key to get
+     * @return optional key from registry
+     */
     private Optional<T> getOptional(ResourceLocation registryKey) {
 
         if (this.registry.containsKey(registryKey)) {

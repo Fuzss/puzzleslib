@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.5-1.16.5] - 2021-06-29
+### Changed
+- Switched string option builder to generic builder
+- Removed a bunch of unneeded annotations
+
 ## [v1.0.4-1.16.5] - 2021-06-27
 ### Changed
 - Added more console output while mod elements are being registered and loaded

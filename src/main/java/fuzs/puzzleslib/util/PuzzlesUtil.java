@@ -12,7 +12,6 @@ import java.util.function.Supplier;
 /**
  * small helper methods
  */
-@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class PuzzlesUtil {
 
     /**

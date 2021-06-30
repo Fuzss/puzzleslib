@@ -19,7 +19,6 @@ import java.util.function.Consumer;
 /**
  * create a command for reloading a json config file from in-game
  */
-@SuppressWarnings("unused")
 public class JsonCommandUtil {
 
     /**

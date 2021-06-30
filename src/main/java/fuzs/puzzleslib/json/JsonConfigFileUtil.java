@@ -15,7 +15,6 @@ import java.util.function.Predicate;
 /**
  * handles loading and saving of json config files
  */
-@SuppressWarnings({"ResultOfMethodCallIgnored", "UnusedReturnValue", "unused"})
 public class JsonConfigFileUtil {
 
     /**

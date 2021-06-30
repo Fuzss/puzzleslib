@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 /**
  * add ability to listen to Forge events
  */
-@SuppressWarnings("unused")
 public abstract class EventListener {
 
     /**

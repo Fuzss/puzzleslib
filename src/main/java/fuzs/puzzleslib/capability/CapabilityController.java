@@ -29,7 +29,6 @@ import java.util.function.Function;
 /**
  * helper object for registering and attaching mod capabilities, needs to be extended by every mod individually
  */
-@SuppressWarnings("unused")
 public class CapabilityController {
 
     /**

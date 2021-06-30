@@ -30,7 +30,6 @@ import java.util.stream.Stream;
 /**
  * all features a mod adds are structured into elements which are then registered, this is an abstract version
  */
-@SuppressWarnings("unused")
 public abstract class AbstractElement extends EventListener implements IConfigurableElement, IRegistryElement<AbstractElement> {
 
     /**
