@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.7-1.16.5] - 2021-07-02
+### Fixed
+- Fixed elements for common and a logical side not fully loading on that side
+
 ## [v1.0.6-1.16.5] - 2021-06-30
 ### Changed
 - All elements are now reloaded when the config changes, not just the ones that are enabled 

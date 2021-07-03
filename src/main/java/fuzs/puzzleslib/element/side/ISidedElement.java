@@ -30,13 +30,13 @@ public interface ISidedElement {
      */
     static void loadSide(ISidedElement element, ParallelDispatchEvent evt) {
 
-        if (evt instanceof FMLCommonSetupEvent && element instanceof ICommonElement) {
+        if (element instanceof ICommonElement && evt instanceof FMLCommonSetupEvent) {
 
             ((ICommonElement) element).loadCommon();
-        } else if (evt instanceof FMLClientSetupEvent && element instanceof IClientElement) {
+        } else if (element instanceof IClientElement && evt instanceof FMLClientSetupEvent) {
 
             ((IClientElement) element).loadClient();
-        } else if (evt instanceof FMLDedicatedServerSetupEvent && element instanceof IServerElement) {
+        } else if (element instanceof IServerElement && evt instanceof FMLDedicatedServerSetupEvent) {
 
             ((IServerElement) element).loadServer();
         }

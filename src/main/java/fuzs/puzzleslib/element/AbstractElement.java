@@ -133,30 +133,24 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     public final void load(ParallelDispatchEvent evt) {
 
         this.isLoaded = true;
+
         // don't load anything if an incompatible mod is detected
         if (this.isIncompatibleModPresent()) {
 
             this.enabled = -1;
+        }
+
+        if (!this.isEnabled()) {
+
             return;
         }
 
-        boolean load = false;
-        if (this instanceof ICommonElement) {
-
-            if (evt instanceof FMLCommonSetupEvent) {
-
-                load = true;
-            }
-        } else if (this instanceof IClientElement && evt instanceof FMLClientSetupEvent || this instanceof IServerElement && evt instanceof FMLDedicatedServerSetupEvent) {
-
-            load = true;
-        }
-
-        if (load && this.isEnabled()) {
+        if (evt instanceof FMLCommonSetupEvent) {
 
             this.reloadEventListeners(true);
-            ISidedElement.loadSide((ISidedElement) this, evt);
         }
+
+        ISidedElement.loadSide((ISidedElement) this, evt);
     }
 
     /**
