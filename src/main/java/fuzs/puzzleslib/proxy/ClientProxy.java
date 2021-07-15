@@ -13,8 +13,15 @@ import javax.annotation.Nullable;
  */
 public class ClientProxy implements IProxy<Minecraft> {
 
+    /**
+     * private singleton constructor
+     */
+    private ClientProxy() {
+
+    }
+
     @Override
-    public Minecraft getInstance() {
+    public Minecraft getGameInstance() {
 
         return LogicalSidedProvider.INSTANCE.get(LogicalSide.CLIENT);
     }
@@ -24,7 +31,25 @@ public class ClientProxy implements IProxy<Minecraft> {
     @Override
     public PlayerEntity getPlayer(@Nullable PlayerEntity player) {
 
-        return player != null ? player : this.getInstance().player;
+        return player != null ? player : this.getGameInstance().player;
+    }
+
+    /**
+     * TODO rename this back to #getInstance
+     * @return {@link ClientProxy} instance
+     */
+    public static ClientProxy getInstance2() {
+
+        return ClientProxy.ClientProxyHolder.INSTANCE;
+    }
+
+    /**
+     * instance holder class for lazy and thread-safe initialization
+     */
+    private static class ClientProxyHolder {
+
+        private static final ClientProxy INSTANCE = new ClientProxy();
+
     }
 
 }

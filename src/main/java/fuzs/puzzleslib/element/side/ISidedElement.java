@@ -18,27 +18,25 @@ import java.util.function.Predicate;
  */
 public interface ISidedElement {
 
-    static void setup(ISidedElement element) {
-
-        runForSides(element, ICommonElement::setupCommon, IClientElement::setupClient, IServerElement::setupServer);
-    }
-
     /**
      * initialize sided content, this will always happen, even when the element is not loaded
      * @param element this element
      * @param evt setup event this is called from
+     * @param common consumer if implements {@link ICommonElement}
+     * @param client consumer if implements {@link IClientElement}
+     * @param server consumer if implements {@link IServerElement}
      */
-    static void loadSide(ISidedElement element, ParallelDispatchEvent evt) {
+    static void loadSide(ISidedElement element, ParallelDispatchEvent evt, Consumer<ICommonElement> common, Consumer<IClientElement> client, Consumer<IServerElement> server) {
 
         if (element instanceof ICommonElement && evt instanceof FMLCommonSetupEvent) {
 
-            ((ICommonElement) element).loadCommon();
+            common.accept(((ICommonElement) element));
         } else if (element instanceof IClientElement && evt instanceof FMLClientSetupEvent) {
 
-            ((IClientElement) element).loadClient();
+            client.accept(((IClientElement) element));
         } else if (element instanceof IServerElement && evt instanceof FMLDedicatedServerSetupEvent) {
 
-            ((IServerElement) element).loadServer();
+            server.accept(((IServerElement) element));
         }
     }
 
@@ -49,7 +47,7 @@ public interface ISidedElement {
      * @param client consumer if implements {@link IClientElement}
      * @param server consumer if implements {@link IServerElement}
      */
-    static void runForSides(ISidedElement element, Consumer<ICommonElement> common, Consumer<IClientElement> client, Consumer<IServerElement> server) {
+    static void runSide(ISidedElement element, Consumer<ICommonElement> common, Consumer<IClientElement> client, Consumer<IServerElement> server) {
 
         if (element instanceof ICommonElement) {
 
@@ -67,6 +65,10 @@ public interface ISidedElement {
         }
     }
 
+    /**
+     * @param type config type
+     * @return filter for element type
+     */
     static Predicate<Object> getGeneralFilter(ModConfig.Type type) {
 
         switch (type) {
@@ -85,6 +87,12 @@ public interface ISidedElement {
         throw new IllegalStateException();
     }
 
+    /**
+     * create config for side
+     * @param optionsBuilder builder associated with this side
+     * @param type side
+     * @param element mod element
+     */
     static void setupConfig(OptionsBuilder optionsBuilder, ModConfig.Type type, AbstractElement element) {
 
         switch (type) {

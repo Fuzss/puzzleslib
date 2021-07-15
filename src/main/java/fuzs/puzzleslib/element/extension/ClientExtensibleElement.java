@@ -18,9 +18,15 @@ public abstract class ClientExtensibleElement<T extends ElementExtension<?> & IC
     }
 
     @Override
-    public final void setupClient() {
+    public final void constructClient() {
 
-        this.extension.setupClient();
+        this.extension.constructClient();
+    }
+
+    @Override
+    public final void setupClient2() {
+
+        this.extension.setupClient2();
     }
 
     @Override

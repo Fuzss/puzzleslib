@@ -21,9 +21,15 @@ public abstract class ServerExtensibleElement<T extends ElementExtension<?> & IS
     }
 
     @Override
-    public final void setupServer() {
+    public final void constructServer() {
 
-        this.extension.setupServer();
+        this.extension.constructServer();
+    }
+
+    @Override
+    public final void setupServer2() {
+
+        this.extension.setupServer2();
     }
 
     @Override

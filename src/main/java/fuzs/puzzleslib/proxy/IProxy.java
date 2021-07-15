@@ -15,15 +15,26 @@ public interface IProxy<T extends RecursiveEventLoop<?>> {
     /**
      * @return proxy for current physical side
      */
+    @SuppressWarnings("Convert2MethodRef")
     static IProxy<?> getProxy() {
 
-        return DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> ServerProxy::new);
+        return DistExecutor.safeRunForDist(() -> () -> ClientProxy.getInstance2(), () -> () -> ServerProxy.getInstance2());
+    }
+
+    /**
+     * use {@link #getGameInstance()} instead
+     * @return Minecraft client or server instance
+     */
+    @Deprecated
+    default T getInstance() {
+
+        return this.getGameInstance();
     }
 
     /**
      * @return Minecraft client or server instance
      */
-    T getInstance();
+    T getGameInstance();
 
     /**
      * @param player the player

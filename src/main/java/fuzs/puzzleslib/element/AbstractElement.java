@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.element;
 
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.ConfigManager;
 import fuzs.puzzleslib.config.option.ConfigOption;
@@ -8,14 +10,10 @@ import fuzs.puzzleslib.element.side.IClientElement;
 import fuzs.puzzleslib.element.side.ICommonElement;
 import fuzs.puzzleslib.element.side.IServerElement;
 import fuzs.puzzleslib.element.side.ISidedElement;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import org.apache.commons.lang3.StringUtils;
 
@@ -122,7 +120,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      */
     public final void setup() {
 
-        ISidedElement.setup((ISidedElement) this);
+        ISidedElement.runSide((ISidedElement) this, ICommonElement::constructCommon, IClientElement::constructClient, IServerElement::constructServer);
     }
 
     /**
@@ -138,8 +136,11 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         if (this.isIncompatibleModPresent()) {
 
             this.enabled = -1;
+            return;
         }
 
+        // this is always called, even when the element is disabled
+        ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::setupCommon2, IClientElement::setupClient2, IServerElement::setupServer2);
         if (!this.isEnabled()) {
 
             return;
@@ -150,7 +151,8 @@ public abstract class AbstractElement extends EventListener implements IConfigur
             this.reloadEventListeners(true);
         }
 
-        ISidedElement.loadSide((ISidedElement) this, evt);
+        // this is only called when the element is enabled, or later on when it is re-enabled
+        ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::loadCommon, IClientElement::loadClient, IServerElement::loadServer);
     }
 
     /**
@@ -161,11 +163,11 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         if (enable) {
 
             this.reloadEventListeners(true);
-            ISidedElement.runForSides((ISidedElement) this, ICommonElement::loadCommon, IClientElement::loadClient, IServerElement::loadServer);
+            ISidedElement.runSide((ISidedElement) this, ICommonElement::loadCommon, IClientElement::loadClient, IServerElement::loadServer);
         } else {
 
             this.reloadEventListeners(false);
-            ISidedElement.runForSides((ISidedElement) this, ICommonElement::unloadCommon, IClientElement::unloadClient, IServerElement::unloadServer);
+            ISidedElement.runSide((ISidedElement) this, ICommonElement::unloadCommon, IClientElement::unloadClient, IServerElement::unloadServer);
         }
     }
 
@@ -272,9 +274,20 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         return (Optional<T>) this.getOption().map(ConfigOption::get);
     }
 
+    /**
+     * @return config options
+     */
     public Collection<ConfigOption<?>> getOptions() {
 
         return this.configOptions.values();
+    }
+
+    /**
+     * @return has {@link #load} been called for this
+     */
+    public boolean isLoaded() {
+
+        return this.isLoaded;
     }
 
     /**

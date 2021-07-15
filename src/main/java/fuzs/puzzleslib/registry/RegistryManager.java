@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.registry;
 
-import fuzs.puzzleslib.util.NamespaceUtil;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
+import fuzs.puzzleslib.util.NamespaceUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -18,8 +20,16 @@ public class RegistryManager {
 
     /**
      * internal storage for collecting and registering registry entries
+     * make this synchronized just in case
      */
-    private final ArrayListMultimap<Class<?>, IForgeRegistryEntry<?>> registryEntries = ArrayListMultimap.create();
+    private final Multimap<Class<?>, IForgeRegistryEntry<?>> registryEntries = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+
+    /**
+     * private singleton constructor
+     */
+    private RegistryManager() {
+
+    }
 
     /**
      * listener is added in main mod class so it's always puzzles lib itself and not the first mod registering something
@@ -81,6 +91,23 @@ public class RegistryManager {
         }
 
         this.registryEntries.put(entry.getRegistryType(), entry);
+    }
+
+    /**
+     * @return {@link RegistryManager} instance
+     */
+    public static RegistryManager getInstance() {
+
+        return RegistryManager.RegistryManagerHolder.INSTANCE;
+    }
+
+    /**
+     * instance holder class for lazy and thread-safe initialization
+     */
+    private static class RegistryManagerHolder {
+
+        private static final RegistryManager INSTANCE = new RegistryManager();
+
     }
 
 }

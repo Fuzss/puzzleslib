@@ -10,20 +10,37 @@ public interface ICommonElement extends ISidedElement {
     /**
      * register common events and registry entry objects (blocks, items, etc.)
      */
+    default void constructCommon() {
+
+        this.setupCommon();
+    }
+
+    /**
+     * register common events and registry entry objects (blocks, items, etc.)
+     */
+    @Deprecated
     default void setupCommon() {
 
     }
 
     /**
+     * TODO rename to #setupCommon
      * setup for {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}
      * is always loaded no matter the element's state
+     */
+    default void setupCommon2() {
+
+    }
+
+    /**
+     * called when the element is enabled and on launch
      */
     default void loadCommon() {
 
     }
 
     /**
-     * should basically clean up changes made by this element
+     * called when the element is disabled
      */
     default void unloadCommon() {
 

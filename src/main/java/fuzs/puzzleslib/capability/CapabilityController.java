@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.capability;
 
+import com.google.common.collect.ArrayListMultimap;
 import fuzs.puzzleslib.capability.core.CapabilityDispatcher;
 import fuzs.puzzleslib.capability.core.CapabilityStorage;
-import com.google.common.collect.ArrayListMultimap;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -37,9 +37,10 @@ public class CapabilityController {
     private final ArrayListMultimap<Class<?>, Pair<ResourceLocation, Function<Object, CapabilityDispatcher<?>>>> capabilityEntries = ArrayListMultimap.create();
 
     /**
+     * private singleton constructor
      * create new object just for registering and adding listeners
      */
-    public CapabilityController() {
+    private CapabilityController() {
 
         MinecraftForge.EVENT_BUS.register(this);
     }
@@ -158,6 +159,23 @@ public class CapabilityController {
     public static <T> LazyOptional<T> getCapability(ICapabilityProvider provider, Capability<T> cap) {
 
         return provider.getCapability(cap);
+    }
+
+    /**
+     * @return {@link CapabilityController} instance
+     */
+    public static CapabilityController getInstance() {
+
+        return CapabilityController.CapabilityControllerHolder.INSTANCE;
+    }
+
+    /**
+     * instance holder class for lazy and thread-safe initialization
+     */
+    private static class CapabilityControllerHolder {
+
+        private static final CapabilityController INSTANCE = new CapabilityController();
+
     }
 
 }

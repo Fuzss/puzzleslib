@@ -17,7 +17,6 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -30,13 +29,28 @@ public class ElementRegistry {
 
     /**
      * general storage for elements of all mods for performing actions on all of them
+     * concurrent map just in case
      */
     private static final Map<ResourceLocation, AbstractElement> LOADED_ELEMENTS = Maps.newConcurrentMap();
     /**
      * all elements belonging to the active mod, will be cleared after those elements have been added to {@link #LOADED_ELEMENTS}
-     * use tree map for alphabetical sorting cause why not
+     * concurrent map just in case
      */
     private static final Map<ResourceLocation, AbstractElement> REGISTERED_ELEMENTS = Maps.newConcurrentMap();
+
+    /**
+     * mod id of current mod
+     */
+    private final String modId;
+
+    /**
+     * create this as an object so we don't have to supply a mod id every time
+     * @param modId mod id of current mod
+     */
+    public ElementRegistry(String modId) {
+
+        this.modId = modId;
+    }
 
     /**
      * register an element
@@ -45,9 +59,9 @@ public class ElementRegistry {
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(ResourceLocation elementName, Supplier<T> supplier) {
+    public <T extends AbstractElement & ISidedElement> AbstractElement register(String elementName, Supplier<T> supplier) {
 
-        return register(elementName, supplier, FMLEnvironment.dist);
+        return this.register(elementName, supplier, FMLEnvironment.dist);
     }
 
     /**
@@ -59,7 +73,7 @@ public class ElementRegistry {
      * @param <T> make sure element also extends ISidedElement
      */
     @Nullable
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(ResourceLocation elementName, Supplier<T> supplier, Dist dist) {
+    public <T extends AbstractElement & ISidedElement> AbstractElement register(String elementName, Supplier<T> supplier, Dist dist) {
 
         if (dist == FMLEnvironment.dist) {
 
@@ -68,8 +82,9 @@ public class ElementRegistry {
             assert element instanceof ICommonElement || FMLEnvironment.dist.isClient() || element instanceof IServerElement : "Unable to register element: " + "Trying to register client element for server side";
             assert element instanceof ICommonElement || FMLEnvironment.dist.isDedicatedServer() || element instanceof IClientElement : "Unable to register element: " + "Trying to register server element for client side";
 
-            PuzzlesLib.LOGGER.info("Registering element {}", elementName);
-            REGISTERED_ELEMENTS.put(elementName, element);
+            ResourceLocation elementLocation = new ResourceLocation(this.modId, elementName);
+            PuzzlesLib.LOGGER.info("Registering element {}", elementLocation);
+            REGISTERED_ELEMENTS.put(elementLocation, element);
             return element;
         }
 

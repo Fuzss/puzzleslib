@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.8-1.16.5] - 2021-07-15
+### Added
+- New method for sided elements which is always called on element load (even when element is disabled)
+- Added getter for AbstractElement#isLoaded
+### Changed
+- Registering elements now requires an ElementRegistry instance to be created first
+- Renamed a few methods
+### Fixed
+- Shared library objects are now thread-safe
+
 ## [v1.0.7-1.16.5] - 2021-07-02
 ### Fixed
 - Fixed elements for common and a logical side not fully loading on that side

@@ -1,5 +1,6 @@
 package fuzs.puzzleslib;
 
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.capability.CapabilityController;
 import fuzs.puzzleslib.element.AbstractElement;
 import fuzs.puzzleslib.element.ElementRegistry;
@@ -9,7 +10,6 @@ import fuzs.puzzleslib.proxy.IProxy;
 import fuzs.puzzleslib.recipe.ElementConfigCondition;
 import fuzs.puzzleslib.registry.RegistryManager;
 import fuzs.puzzleslib.util.PuzzlesUtil;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -25,6 +25,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.util.Map;
 import java.util.function.Supplier;
 
 @Mod(PuzzlesLib.MODID)
@@ -34,13 +35,25 @@ public class PuzzlesLib {
     public static final String NAME = "Puzzles Lib";
     public static final Logger LOGGER = LogManager.getLogger(PuzzlesLib.NAME);
 
-    private static IProxy<?> sidedProxy;
-    private static RegistryManager registryManager;
-    private static NetworkHandler networkHandler;
-    private static CapabilityController capabilityController;
+    /**
+     * temporary {@link ElementRegistry} storage for backwards compatibility
+     * use {@link #create} instead
+     */
+    @Deprecated
+    private static final Map<String, ElementRegistry> ELEMENT_REGISTRIES = Maps.newHashMap();
 
-    private static boolean isConditionLoaded;
+    /**
+     * sided proxy depending on physical side
+     */
+    private static IProxy<?> proxy;
+    /**
+     * has config recipe condition been loaded via {@link #loadRecipeCondition()}
+     */
+    private static boolean isRecipeConditionLoaded;
 
+    /**
+     * add listeners to setup methods
+     */
     public PuzzlesLib() {
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
@@ -75,12 +88,22 @@ public class PuzzlesLib {
 
     /**
      * load {@link ElementConfigCondition} in case this element is adding any configurable recipes
+     * use {@link #loadRecipeCondition()} instead
      */
+    @Deprecated
     public static void loadConfigCondition() {
 
-        if (!isConditionLoaded) {
+        loadRecipeCondition();
+    }
 
-            isConditionLoaded = true;
+    /**
+     * load {@link ElementConfigCondition} in case this element is adding any configurable recipes
+     */
+    public static void loadRecipeCondition() {
+
+        if (!isRecipeConditionLoaded) {
+
+            isRecipeConditionLoaded = true;
             CraftingHelper.register(new ElementConfigCondition.Serializer());
         }
     }
@@ -90,7 +113,7 @@ public class PuzzlesLib {
      */
     public static IProxy<?> getProxy() {
 
-        return PuzzlesUtil.getOrElse(sidedProxy, IProxy::getProxy, instance -> sidedProxy = instance);
+        return PuzzlesUtil.getOrElse(proxy, IProxy::getProxy, instance -> proxy = instance);
     }
 
     /**
@@ -98,7 +121,7 @@ public class PuzzlesLib {
      */
     public static RegistryManager getRegistryManager() {
 
-        return PuzzlesUtil.getOrElse(registryManager, RegistryManager::new, instance -> registryManager = instance);
+        return RegistryManager.getInstance();
     }
 
     /**
@@ -106,7 +129,7 @@ public class PuzzlesLib {
      */
     public static NetworkHandler getNetworkHandler() {
 
-        return PuzzlesUtil.getOrElse(networkHandler, NetworkHandler::new, instance -> networkHandler = instance);
+        return NetworkHandler.getInstance();
     }
 
     /**
@@ -114,44 +137,60 @@ public class PuzzlesLib {
      */
     public static CapabilityController getCapabilityController() {
 
-        return PuzzlesUtil.getOrElse(capabilityController, CapabilityController::new, instance -> capabilityController = instance);
+        return CapabilityController.getInstance();
     }
 
     /**
      * register an element
+     * use {@link #create} instead
+     *
      * @param modId parent mod id
-     * @param key identifier for this element
+     * @param elementName identifier for this element
      * @param supplier supplier for element to be registered
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String key, Supplier<T> supplier) {
+    @Deprecated
+    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String elementName, Supplier<T> supplier) {
 
-        return ElementRegistry.register(new ResourceLocation(modId, key), supplier);
+        return ELEMENT_REGISTRIES.computeIfAbsent(modId, ElementRegistry::new).register(elementName, supplier);
     }
 
     /**
      * register an element
+     * use {@link #create} instead
+     *
      * @param modId parent mod id
-     * @param key identifier for this element
+     * @param elementName identifier for this element
      * @param supplier supplier for element to be registered
      * @param dist physical side to register on
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String key, Supplier<T> supplier, Dist dist) {
+    @Deprecated
+    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String elementName, Supplier<T> supplier, Dist dist) {
 
-        return ElementRegistry.register(new ResourceLocation(modId, key), supplier, dist);
+        return ELEMENT_REGISTRIES.computeIfAbsent(modId, ElementRegistry::new).register(elementName, supplier);
+    }
+
+    /**
+     * create {@link ElementRegistry} with preset mod id
+     * @param modId mod id
+     * @return {@link ElementRegistry}
+     */
+    public static ElementRegistry create(String modId) {
+
+        return new ElementRegistry(modId);
     }
 
     /**
      * load all elements registered during the current mod's construction
-     * @param config should config files be created
-     * @param path optional config directory inside of main config dir
+     * @param shouldCreateConfig should config files be created
+     * @param configSubPath optional config directory inside of main config dir
      */
-    public static void setup(boolean config, String... path) {
+    public static void setup(boolean shouldCreateConfig, String... configSubPath) {
 
-        ElementRegistry.setup(config, path);
+        ElementRegistry.setup(shouldCreateConfig, configSubPath);
     }
 
 }

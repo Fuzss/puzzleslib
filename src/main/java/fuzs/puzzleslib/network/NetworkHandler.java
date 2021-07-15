@@ -38,6 +38,13 @@ public class NetworkHandler {
     private static final AtomicInteger DISCRIMINATOR = new AtomicInteger();
 
     /**
+     * private singleton constructor
+     */
+    private NetworkHandler() {
+
+    }
+
+    /**
      * register a message for a side
      * @param supplier supplier for message (called when receiving at executing end)
      * @param executionSide side this message is to be executed at
@@ -126,6 +133,23 @@ public class NetworkHandler {
     public void sendToDimension(Message message, RegistryKey<World> dimension) {
 
         MAIN_CHANNEL.send(PacketDistributor.DIMENSION.with(() -> dimension), message);
+    }
+
+    /**
+     * @return {@link NetworkHandler} instance
+     */
+    public static NetworkHandler getInstance() {
+
+        return NetworkHandlerHolder.INSTANCE;
+    }
+
+    /**
+     * instance holder class for lazy and thread-safe initialization
+     */
+    private static class NetworkHandlerHolder {
+
+        private static final NetworkHandler INSTANCE = new NetworkHandler();
+
     }
 
 }

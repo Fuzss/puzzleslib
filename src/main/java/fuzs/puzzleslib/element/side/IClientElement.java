@@ -11,20 +11,37 @@ public interface IClientElement extends ISidedElement {
     /**
      * register client events
      */
+    default void constructClient() {
+
+        this.setupClient();
+    }
+
+    /**
+     * register client events
+     */
+    @Deprecated
     default void setupClient() {
 
     }
 
     /**
+     * TODO rename to #setupClient
      * setup for {@link net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent}
-     * is always loaded no matter the element's state
+     * is always called no matter the element's state
+     */
+    default void setupClient2() {
+
+    }
+
+    /**
+     * called when the element is enabled and on launch
      */
     default void loadClient() {
 
     }
 
     /**
-     * should basically clean up changes made by this element
+     * called when the element is disabled
      */
     default void unloadClient() {
 
