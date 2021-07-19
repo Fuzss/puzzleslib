@@ -9,7 +9,8 @@ The format is based on [Keep a Changelog].
 - Added getter for AbstractElement#isLoaded
 ### Changed
 - Registering elements now requires an ElementRegistry instance to be created first
-- Renamed a few methods
+- Made registering entries to RegistryManager lazy
+- Renamed and deprecated a few methods
 ### Fixed
 - Shared library objects are now thread-safe
 

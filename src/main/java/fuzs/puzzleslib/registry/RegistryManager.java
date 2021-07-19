@@ -4,13 +4,25 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.util.NamespaceUtil;
+import net.minecraft.block.Block;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EntityType;
+import net.minecraft.fluid.Fluid;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.item.Item;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.Potion;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 /**
  * handles registering to forge registries
@@ -22,7 +34,7 @@ public class RegistryManager {
      * internal storage for collecting and registering registry entries
      * make this synchronized just in case
      */
-    private final Multimap<Class<?>, IForgeRegistryEntry<?>> registryEntries = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+    private final Multimap<Class<?>, Pair<ResourceLocation, Supplier<IForgeRegistryEntry<?>>>> registryEntryPairs = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
 
     /**
      * private singleton constructor
@@ -51,46 +63,176 @@ public class RegistryManager {
     private <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
 
         Class<T> type = registry.getRegistrySuperType();
-        if (this.registryEntries.containsKey(type)) {
+        if (this.registryEntryPairs.containsKey(type)) {
 
-            for (IForgeRegistryEntry<?> entry : this.registryEntries.get(type)) {
+            for (Pair<ResourceLocation, Supplier<IForgeRegistryEntry<?>>> registryPair : this.registryEntryPairs.get(type)) {
+
+                ResourceLocation name = registryPair.getLeft();
+                IForgeRegistryEntry<?> entry = registryPair.getRight().get();
+                if (entry == null) {
+
+                    throw new IllegalArgumentException("Can't register null object.");
+                }
+
+                if (entry.getRegistryName() == null) {
+
+                    assert name != null;
+                    entry.setRegistryName(name);
+                }
 
                 registry.register((T) entry);
             }
 
-            this.registryEntries.removeAll(type);
+            this.registryEntryPairs.removeAll(type);
         }
     }
 
     /**
-     * register any type of registry entry with a path
+     * register any type of registry entry with a preset path
      * @param entry entry to register
      */
+    @Deprecated
     public void register(IForgeRegistryEntry<?> entry) {
 
-        assert entry.getRegistryName() != null;
         this.register(null, entry);
     }
 
     /**
-     * register any type of registry entry with a path
-     * @param path path for new entry
+     * register any type of registry entry
+     * @param path optional path for new entry
      * @param entry entry to register
      */
+    @Deprecated
     public void register(@Nullable String path, IForgeRegistryEntry<?> entry) {
 
-        if (entry == null) {
+        this.register(entry.getRegistryType(), path, () -> entry);
+    }
 
-            throw new IllegalArgumentException("Can't register null object.");
+    /**
+     * register any type of registry entry with a preset path
+     * @param registryType type for this registry entry
+     * @param entry supplier for entry to register
+     */
+    public void register(Class<?> registryType, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(registryType, null, entry);
+    }
+
+    /**
+     * register any type of registry entry with a path
+     * @param registryType type for this registry entry
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void register(Class<?> registryType, @Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        ResourceLocation name = null;
+        if (path != null) {
+
+            name = new ResourceLocation(NamespaceUtil.getActiveNamespace(), path);
         }
 
-        if (entry.getRegistryName() == null) {
+        this.registryEntryPairs.put(registryType, Pair.of(name, entry));
+    }
 
-            assert path != null;
-            entry.setRegistryName(new ResourceLocation(NamespaceUtil.getActiveNamespace(), path));
-        }
+    /**
+     * register block entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerBlock(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
 
-        this.registryEntries.put(entry.getRegistryType(), entry);
+        this.register(Block.class, path, entry);
+    }
+
+    /**
+     * register fluid entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerFluid(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(Fluid.class, path, entry);
+    }
+
+    /**
+     * register item entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerItem(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(Item.class, path, entry);
+    }
+
+    /**
+     * register effect entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerEffect(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(Effect.class, path, entry);
+    }
+
+    /**
+     * register sound event entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerSoundEvent(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(SoundEvent.class, path, entry);
+    }
+
+    /**
+     * register potion entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerPotion(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(Potion.class, path, entry);
+    }
+
+    /**
+     * register enchantment entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerEnchantment(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(Enchantment.class, path, entry);
+    }
+
+    /**
+     * register entity type entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerEntityType(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(EntityType.class, path, entry);
+    }
+
+    /**
+     * register tile entity type entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerTileEntityType(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(TileEntityType.class, path, entry);
+    }
+
+    /**
+     * register container type entry with a path
+     * @param path optional path for new entry
+     * @param entry supplier for entry to register
+     */
+    public void registerContainerType(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+
+        this.register(ContainerType.class, path, entry);
     }
 
     /**

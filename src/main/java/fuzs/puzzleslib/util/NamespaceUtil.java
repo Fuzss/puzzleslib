@@ -19,7 +19,7 @@ public class NamespaceUtil {
         String namespace = ModLoadingContext.get().getActiveNamespace();
         if (namespace.equals("minecraft")) {
 
-            PuzzlesLib.LOGGER.warn("minecraft ius active namespace");
+            PuzzlesLib.LOGGER.warn("minecraft is active namespace, this is not good");
         }
 
         return namespace;
