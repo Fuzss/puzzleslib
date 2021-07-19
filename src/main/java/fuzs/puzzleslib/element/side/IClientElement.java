@@ -66,6 +66,7 @@ public interface IClientElement extends ISidedElement {
     /**
      * @return Minecraft client instance
      */
+    @Deprecated
     static Minecraft getMc() {
 
         return Minecraft.getInstance();
