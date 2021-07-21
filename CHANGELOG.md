@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.9-1.16.5] - 2021-07-22
+### Changed
+- Exceptions are now caught during element setup and loading
+- More precise methods for checking if an element has already been loaded during an fml setup event
+
 ## [v1.0.8-1.16.5] - 2021-07-19
 ### Added
 - New method for sided elements which is always called on element load (even when element is disabled)

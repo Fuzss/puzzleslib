@@ -13,15 +13,16 @@ import fuzs.puzzleslib.element.side.ISidedElement;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,9 +49,10 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      */
     private final Map<String, ConfigOption<?>> configOptions = Maps.newHashMap();
     /**
-     * has {@link #load} been called
+     * has {@link #load} been called for the specific side
      */
-    private boolean isLoaded;
+    private final Map<ModConfig.Type, Boolean> typeToIsLoaded = Stream.of(ModConfig.Type.values())
+            .collect(Collectors.toMap(Function.identity(), value -> false, (key1, key2) -> key1, () -> new EnumMap<>(ModConfig.Type.class)));
 
     @Nonnull
     @Override
@@ -120,7 +122,13 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      */
     public final void setup() {
 
-        ISidedElement.runSide((ISidedElement) this, ICommonElement::constructCommon, IClientElement::constructClient, IServerElement::constructServer);
+         try {
+
+             ISidedElement.runSide((ISidedElement) this, ICommonElement::constructCommon, IClientElement::constructClient, IServerElement::constructServer);
+         } catch (Exception e) {
+
+             PuzzlesLib.LOGGER.error("Error during setup of element {}", this.getRegistryName(), e);
+         }
     }
 
     /**
@@ -130,7 +138,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      */
     public final void load(ParallelDispatchEvent evt) {
 
-        this.isLoaded = true;
+        this.typeToIsLoaded.put(evt instanceof FMLClientSetupEvent ? ModConfig.Type.CLIENT : (evt instanceof FMLDedicatedServerSetupEvent ? ModConfig.Type.SERVER : ModConfig.Type.COMMON), true);
 
         // don't load anything if an incompatible mod is detected
         if (this.isIncompatibleModPresent()) {
@@ -139,20 +147,26 @@ public abstract class AbstractElement extends EventListener implements IConfigur
             return;
         }
 
-        // this is always called, even when the element is disabled
-        ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::setupCommon2, IClientElement::setupClient2, IServerElement::setupServer2);
-        if (!this.isEnabled()) {
+        try {
 
-            return;
+            // this is always called, even when the element is disabled
+            ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::setupCommon2, IClientElement::setupClient2, IServerElement::setupServer2);
+            if (!this.isEnabled()) {
+
+                return;
+            }
+
+            if (evt instanceof FMLCommonSetupEvent) {
+
+                this.reloadEventListeners(true);
+            }
+
+            // this is only called when the element is enabled, or later on when it is re-enabled
+            ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::loadCommon, IClientElement::loadClient, IServerElement::loadServer);
+        } catch (Exception e) {
+
+            PuzzlesLib.LOGGER.error("Error during loading of element {}", this.getRegistryName(), e);
         }
-
-        if (evt instanceof FMLCommonSetupEvent) {
-
-            this.reloadEventListeners(true);
-        }
-
-        // this is only called when the element is enabled, or later on when it is re-enabled
-        ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::loadCommon, IClientElement::loadClient, IServerElement::loadServer);
     }
 
     /**
@@ -221,7 +235,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
 
             this.enabled = enabled;
             // prevent things from changing due to config reloading when the element hasn't even been loaded yet
-            if (this.isLoaded) {
+            if (this.isFullyLoaded()) {
 
                 this.reload(enabled == 1);
             }
@@ -285,9 +299,27 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * @return has {@link #load} been called for this
      */
+    @Deprecated
     public boolean isLoaded() {
 
-        return this.isLoaded;
+        return this.isFullyLoaded();
+    }
+
+    /**
+     * @return has {@link #load} been called during all fml setup events
+     */
+    public boolean isFullyLoaded() {
+
+        return this.isTypeLoaded(ModConfig.Type.COMMON) && (this.isTypeLoaded(ModConfig.Type.CLIENT) || this.isTypeLoaded(ModConfig.Type.SERVER));
+    }
+
+    /**
+     * @param type type to check loaded status for
+     * @return has {@link #load} been called for this during equivalent fml setup event
+     */
+    public boolean isTypeLoaded(ModConfig.Type type) {
+
+        return this.typeToIsLoaded.get(type);
     }
 
     /**
