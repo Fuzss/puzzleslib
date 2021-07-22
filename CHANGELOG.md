@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.10-1.16.5] - 2021-07-22
+### Changed
+- Improved log output
+
 ## [v1.0.9-1.16.5] - 2021-07-22
 ### Changed
 - Exceptions are now caught during element setup and loading

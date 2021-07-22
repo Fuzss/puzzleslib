@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.config;
 
+import com.google.common.collect.Lists;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.option.ConfigOption;
 import fuzs.puzzleslib.config.option.OptionsBuilder;
@@ -46,9 +47,11 @@ public class ConfigManager {
      * @param generalElement separate dummy element for managing all other elements
      * @param allElements all elements for relevant <code>modId</code>
      * @param fileName file name possibly inside of directory without type
+     * @return {@link ModConfig.Type} constants for config types created
      */
-    public static void load(AbstractElement generalElement, Collection<AbstractElement> allElements, Function<ModConfig.Type, String> fileName) {
+    public static List<ModConfig.Type> load(AbstractElement generalElement, Collection<AbstractElement> allElements, Function<ModConfig.Type, String> fileName) {
 
+        List<ModConfig.Type> createdConfigTypes = Lists.newArrayListWithCapacity(ModConfig.Type.values().length);
         for (ModConfig.Type type : ModConfig.Type.values()) {
 
             if (type == ModConfig.Type.CLIENT && FMLEnvironment.dist.isDedicatedServer() || type == ModConfig.Type.SERVER && FMLEnvironment.dist.isClient()) {
@@ -66,10 +69,15 @@ public class ConfigManager {
                 ISidedElement.setupConfig(optionsBuilder, type, element);
             }
 
-            optionsBuilder.build().ifPresent(spec -> ModLoadingContext.get().registerConfig(type, spec, fileName.apply(type)));
+            optionsBuilder.build().ifPresent(spec -> {
+
+                createdConfigTypes.add(type);
+                ModLoadingContext.get().registerConfig(type, spec, fileName.apply(type));
+            });
         }
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfig.ModConfigEvent evt) -> onModConfig(evt, ImmutableSet.of(generalElement), allElements));
+        return createdConfigTypes;
     }
 
     /**
