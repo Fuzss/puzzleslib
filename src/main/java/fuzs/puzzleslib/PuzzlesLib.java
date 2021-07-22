@@ -170,7 +170,7 @@ public class PuzzlesLib {
     @Deprecated
     public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String elementName, Supplier<T> supplier, Dist dist) {
 
-        return ELEMENT_REGISTRIES.computeIfAbsent(modId, ElementRegistry::new).register(elementName, supplier);
+        return ELEMENT_REGISTRIES.computeIfAbsent(modId, ElementRegistry::new).register(elementName, supplier, dist);
     }
 
     /**
