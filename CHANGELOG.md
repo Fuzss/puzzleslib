@@ -3,9 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v1.0.11-1.16.5] - 2021-07-22
+## [v1.0.11-1.16.5] - 2021-07-23
 ### Changed
-- Load configs during construct so they can be used in registry events
+- Optionally load configs during construct so they can be used in registry events
 - More minor log output changes
 
 ## [v1.0.10-1.16.5] - 2021-07-22

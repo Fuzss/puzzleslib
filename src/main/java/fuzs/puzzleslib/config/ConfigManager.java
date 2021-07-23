@@ -16,7 +16,6 @@ import fuzs.puzzleslib.json.JsonConfigFileUtil;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -41,11 +40,12 @@ public class ConfigManager {
      * @param modConfig      mod config object
      * @param generalElement separate dummy element for managing all other elements
      * @param allElements all elements for current modId
+     * @param isReloading print reloaded elements to console
      */
-    private static void onModConfig(ModConfig modConfig, AbstractElement generalElement, Collection<AbstractElement> allElements) {
+    private static void onModConfig(ModConfig modConfig, AbstractElement generalElement, Collection<AbstractElement> allElements, boolean isReloading) {
 
         ModConfig.Type type = modConfig.getType();
-        syncOptions(allElements, type, true);
+        syncOptions(allElements, type, isReloading);
         // separate general element so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
         getAllOptions(ImmutableSet.of(generalElement), type).forEach(ConfigOption::sync);
     }
@@ -54,11 +54,11 @@ public class ConfigManager {
      * register configs from non-empty builders and add listener from active mod container to {@link #onModConfig}
      * @param generalElement separate dummy element for managing all other elements
      * @param allElements all elements for relevant <code>modId</code>
-     * @param activeNamespace the mod
+     * @param activeContainer the mod
      * @param configSubPath optional config directory inside of main config dir
      * @return was any config created
      */
-    public static boolean load(AbstractElement generalElement, Collection<AbstractElement> allElements, String activeNamespace, String[] configSubPath) {
+    public static boolean load(AbstractElement generalElement, Collection<AbstractElement> allElements, boolean loadConfigEarly, ModContainer activeContainer, String[] configSubPath) {
 
         boolean successful = false;
         for (ModConfig.Type type : ModConfig.Type.values()) {
@@ -82,26 +82,25 @@ public class ConfigManager {
             if (optionalSpec.isPresent()) {
 
                 successful = true;
-                PuzzlesLib.LOGGER.info("Loading config type {} for mod {}...", type.extension(), activeNamespace);
+                PuzzlesLib.LOGGER.info("Loading config type {} for mod {}...", type.extension(), activeContainer.getNamespace());
 
                 ForgeConfigSpec spec = optionalSpec.get();
-                ModContainer activeContainer = ModLoadingContext.get().getActiveContainer();
-                ModConfig modConfig = new ModConfig(type, spec, activeContainer, getFileName(activeNamespace, type, configSubPath));
+                ModConfig modConfig = new ModConfig(type, spec, activeContainer, getFileName(activeContainer.getNamespace(), type, configSubPath));
                 activeContainer.addConfig(modConfig);
 
                 // server config uses a world specific path which doesn't exist at this point
-                if (type != ModConfig.Type.SERVER) {
+                if (loadConfigEarly && type != ModConfig.Type.SERVER) {
 
-                    preLoadConfig(modConfig, allElements);
+                    loadConfigEarly(modConfig, allElements);
                 }
             }
         }
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfig.ModConfigEvent evt) -> {
 
-            if (evt instanceof ModConfig.Reloading) {
+            if (!loadConfigEarly || evt instanceof ModConfig.Reloading) {
 
-                onModConfig(evt.getConfig(), generalElement, allElements);
+                onModConfig(evt.getConfig(), generalElement, allElements, evt instanceof ModConfig.Reloading);
             }
         });
 
@@ -114,7 +113,7 @@ public class ConfigManager {
      * @param modConfig mod config object
      * @param allElements all elements for current modId
      */
-    private static void preLoadConfig(ModConfig modConfig, Collection<AbstractElement> allElements) {
+    private static void loadConfigEarly(ModConfig modConfig, Collection<AbstractElement> allElements) {
 
         final Path configPath = FMLPaths.CONFIGDIR.get().resolve(modConfig.getFileName());
         final CommentedFileConfig configData = CommentedFileConfig.builder(configPath).sync()
@@ -124,6 +123,7 @@ public class ConfigManager {
                 .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
                 .writingMode(WritingMode.REPLACE)
                 .build();
+
         try {
 
             configData.load();

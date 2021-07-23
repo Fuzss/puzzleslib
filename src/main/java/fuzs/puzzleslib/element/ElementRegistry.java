@@ -10,6 +10,7 @@ import fuzs.puzzleslib.element.side.IServerElement;
 import fuzs.puzzleslib.element.side.ISidedElement;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
@@ -185,11 +186,13 @@ public class ElementRegistry {
     /**
      * generate general config section for controlling elements, setup individual config sections and collect events to be registered in {@link #load}
      * @param shouldCreateConfig should config files be created
+     * @param loadConfigEarly    load configs during construct so they can be used in registry events
      * @param configSubPath optional config directory inside of main config dir
      */
-    public static void setup(boolean shouldCreateConfig, String... configSubPath) {
+    public static void setup(boolean shouldCreateConfig, boolean loadConfigEarly, String... configSubPath) {
 
-        String activeNamespace = ModLoadingContext.get().getActiveNamespace();
+        ModContainer activeContainer = ModLoadingContext.get().getActiveContainer();
+        String activeNamespace = activeContainer.getNamespace();
         for (Map.Entry<ResourceLocation, AbstractElement> entry : REGISTERED_ELEMENTS.entrySet()) {
 
             ResourceLocation elementName = entry.getKey();
@@ -206,26 +209,24 @@ public class ElementRegistry {
             PuzzlesLib.LOGGER.info("Setting up mod {} with elements {}", activeNamespace, joinElementNames(activeElements));
         }
 
-        createConfig(shouldCreateConfig, activeElements, activeNamespace, configSubPath);
+        if (shouldCreateConfig) {
+
+            createConfig(activeElements, loadConfigEarly, activeContainer, configSubPath);
+        }
+
         activeElements.forEach(AbstractElement::setup);
     }
 
     /**
-     * @param shouldCreate should a config be created for this mod
      * @param activeElements registered elements in this mod
-     * @param activeNamespace the mod
+     * @param activeContainer the mod
      * @param configSubPath optional config directory inside of main config dir
      */
-    private static void createConfig(boolean shouldCreate, Collection<AbstractElement> activeElements, String activeNamespace, String[] configSubPath) {
-
-        if (!shouldCreate) {
-
-            return;
-        }
+    private static void createConfig(Collection<AbstractElement> activeElements, boolean loadConfigEarly, ModContainer activeContainer, String[] configSubPath) {
 
         // create dummy element for general config section
-        AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeNamespace, "general"));
-        if (ConfigManager.load(generalElement, activeElements, activeNamespace, configSubPath)) {
+        AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeContainer.getNamespace(), "general"));
+        if (ConfigManager.load(generalElement, activeElements, loadConfigEarly, activeContainer, configSubPath)) {
 
             // add general option to storage so it can be reloaded during load phase
             // only do this when any other elements are present

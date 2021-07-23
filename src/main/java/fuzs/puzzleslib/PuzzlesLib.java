@@ -190,7 +190,18 @@ public class PuzzlesLib {
      */
     public static void setup(boolean shouldCreateConfig, String... configSubPath) {
 
-        ElementRegistry.setup(shouldCreateConfig, configSubPath);
+        ElementRegistry.setup(shouldCreateConfig, false, configSubPath);
+    }
+
+    /**
+     * load all elements registered during the current mod's construction
+     * @param shouldCreateConfig should config files be created
+     * @param loadConfigEarly    load configs during construct so they can be used in registry events
+     * @param configSubPath optional config directory inside of main config dir
+     */
+    public static void setup(boolean shouldCreateConfig, boolean loadConfigEarly, String... configSubPath) {
+
+        ElementRegistry.setup(shouldCreateConfig, loadConfigEarly, configSubPath);
     }
 
 }
