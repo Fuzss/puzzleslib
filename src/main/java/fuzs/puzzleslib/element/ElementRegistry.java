@@ -17,7 +17,6 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -202,12 +201,13 @@ public class ElementRegistry {
         }
 
         Collection<AbstractElement> activeElements = getAllElements(activeNamespace);
-        createConfig(shouldCreateConfig, activeElements, activeNamespace, configSubPath);
-        activeElements.forEach(AbstractElement::setup);
         if (!activeElements.isEmpty()) {
 
             PuzzlesLib.LOGGER.info("Setting up mod {} with elements {}", activeNamespace, joinElementNames(activeElements));
         }
+
+        createConfig(shouldCreateConfig, activeElements, activeNamespace, configSubPath);
+        activeElements.forEach(AbstractElement::setup);
     }
 
     /**
@@ -225,15 +225,11 @@ public class ElementRegistry {
 
         // create dummy element for general config section
         AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeNamespace, "general"));
-        List<ModConfig.Type> createdConfigTypes = ConfigManager.load(generalElement, activeElements, type -> ConfigManager.getFileName(activeNamespace, type, configSubPath));
-        if (!createdConfigTypes.isEmpty()) {
+        if (ConfigManager.load(generalElement, activeElements, activeNamespace, configSubPath)) {
 
             // add general option to storage so it can be reloaded during load phase
             // only do this when any other elements are present
             LOADED_ELEMENTS.put(generalElement.getRegistryName(), generalElement);
-            PuzzlesLib.LOGGER.info("Creating config type{} {} for mod {}...", createdConfigTypes.size() == 1 ? "" : "s", createdConfigTypes.stream()
-                    .map(ModConfig.Type::extension)
-                    .collect(Collectors.joining(", ")), activeNamespace);
         }
     }
 
@@ -247,14 +243,15 @@ public class ElementRegistry {
     public static void load(ParallelDispatchEvent evt, ModConfig.Type syncType) {
 
         Collection<AbstractElement> elements = LOADED_ELEMENTS.values();
-        // sync options so all fields will have a non-default value
-        // elements won't be loaded or unloaded, method call below does that
-        ConfigManager.syncOptions(elements, syncType);
-        elements.forEach(element -> element.load(evt));
         if (!elements.isEmpty()) {
 
             PuzzlesLib.LOGGER.info("Loading {} element{} during {} setup...", elements.size(), elements.size() == 1 ? "" : "s", syncType.extension());
         }
+
+        // sync options so all fields will have a non-default value
+        // elements won't be loaded or unloaded, method call below does that
+        ConfigManager.syncOptions(elements, syncType, false);
+        elements.forEach(element -> element.load(evt));
     }
 
 }

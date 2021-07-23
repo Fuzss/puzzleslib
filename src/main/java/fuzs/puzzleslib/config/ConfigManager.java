@@ -1,6 +1,10 @@
 package fuzs.puzzleslib.config;
 
-import com.google.common.collect.Lists;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.file.FileNotFoundAction;
+import com.electronwill.nightconfig.core.io.ParsingException;
+import com.electronwill.nightconfig.core.io.WritingMode;
+import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.option.ConfigOption;
 import fuzs.puzzleslib.config.option.OptionsBuilder;
@@ -9,19 +13,21 @@ import fuzs.puzzleslib.element.AbstractElement;
 import fuzs.puzzleslib.element.ElementRegistry;
 import fuzs.puzzleslib.element.side.ISidedElement;
 import fuzs.puzzleslib.json.JsonConfigFileUtil;
-import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -32,26 +38,29 @@ public class ConfigManager {
 
     /**
      * fires on both loading and reloading, loading phase is required for initial setup
-     * @param evt event provided by Forge
+     * @param modConfig      mod config object
+     * @param generalElement separate dummy element for managing all other elements
+     * @param allElements all elements for current modId
      */
-    private static void onModConfig(final ModConfig.ModConfigEvent evt, Collection<AbstractElement> generalElement, Collection<AbstractElement> allElements) {
+    private static void onModConfig(ModConfig modConfig, AbstractElement generalElement, Collection<AbstractElement> allElements) {
 
-        ModConfig.Type type = evt.getConfig().getType();
-        syncOptions(allElements, type, evt instanceof ModConfig.Reloading);
+        ModConfig.Type type = modConfig.getType();
+        syncOptions(allElements, type, true);
         // separate general element so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
-        getAllOptions(generalElement, type).forEach(ConfigOption::sync);
+        getAllOptions(ImmutableSet.of(generalElement), type).forEach(ConfigOption::sync);
     }
 
     /**
      * register configs from non-empty builders and add listener from active mod container to {@link #onModConfig}
      * @param generalElement separate dummy element for managing all other elements
      * @param allElements all elements for relevant <code>modId</code>
-     * @param fileName file name possibly inside of directory without type
-     * @return {@link ModConfig.Type} constants for config types created
+     * @param activeNamespace the mod
+     * @param configSubPath optional config directory inside of main config dir
+     * @return was any config created
      */
-    public static List<ModConfig.Type> load(AbstractElement generalElement, Collection<AbstractElement> allElements, Function<ModConfig.Type, String> fileName) {
+    public static boolean load(AbstractElement generalElement, Collection<AbstractElement> allElements, String activeNamespace, String[] configSubPath) {
 
-        List<ModConfig.Type> createdConfigTypes = Lists.newArrayListWithCapacity(ModConfig.Type.values().length);
+        boolean successful = false;
         for (ModConfig.Type type : ModConfig.Type.values()) {
 
             if (type == ModConfig.Type.CLIENT && FMLEnvironment.dist.isDedicatedServer() || type == ModConfig.Type.SERVER && FMLEnvironment.dist.isClient()) {
@@ -69,15 +78,63 @@ public class ConfigManager {
                 ISidedElement.setupConfig(optionsBuilder, type, element);
             }
 
-            optionsBuilder.build().ifPresent(spec -> {
+            Optional<ForgeConfigSpec> optionalSpec = optionsBuilder.build();
+            if (optionalSpec.isPresent()) {
 
-                createdConfigTypes.add(type);
-                ModLoadingContext.get().registerConfig(type, spec, fileName.apply(type));
-            });
+                successful = true;
+                PuzzlesLib.LOGGER.info("Loading config type {} for mod {}...", type.extension(), activeNamespace);
+
+                ForgeConfigSpec spec = optionalSpec.get();
+                ModContainer activeContainer = ModLoadingContext.get().getActiveContainer();
+                ModConfig modConfig = new ModConfig(type, spec, activeContainer, getFileName(activeNamespace, type, configSubPath));
+                activeContainer.addConfig(modConfig);
+
+                // server config uses a world specific path which doesn't exist at this point
+                if (type != ModConfig.Type.SERVER) {
+
+                    preLoadConfig(modConfig, allElements);
+                }
+            }
         }
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfig.ModConfigEvent evt) -> onModConfig(evt, ImmutableSet.of(generalElement), allElements));
-        return createdConfigTypes;
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((ModConfig.ModConfigEvent evt) -> {
+
+            if (evt instanceof ModConfig.Reloading) {
+
+                onModConfig(evt.getConfig(), generalElement, allElements);
+            }
+        });
+
+        return successful;
+    }
+
+    /**
+     * load configs during construct so they can be used in registry events
+     * mostly copied from {@link net.minecraftforge.fml.config.ConfigFileTypeHandler}
+     * @param modConfig mod config object
+     * @param allElements all elements for current modId
+     */
+    private static void preLoadConfig(ModConfig modConfig, Collection<AbstractElement> allElements) {
+
+        final Path configPath = FMLPaths.CONFIGDIR.get().resolve(modConfig.getFileName());
+        final CommentedFileConfig configData = CommentedFileConfig.builder(configPath).sync()
+                .preserveInsertionOrder()
+                .autosave()
+                // forge also looks for default configs, which only works for server config file though which we don't handle here
+                .onFileNotFound(FileNotFoundAction.CREATE_EMPTY)
+                .writingMode(WritingMode.REPLACE)
+                .build();
+        try {
+
+            configData.load();
+        } catch (ParsingException e) {
+
+            throw new RuntimeException("Failed loading config file " + modConfig.getFileName() + " of type " + modConfig.getType() + " for modid " + modConfig.getModId(), e);
+        }
+
+        modConfig.getSpec().setConfig(configData);
+        syncOptions(allElements, modConfig.getType(), false);
+        configData.save();
     }
 
     /**
@@ -100,33 +157,23 @@ public class ConfigManager {
     }
 
     /**
-     * sync all config entries and notify all listeners
-     * @param elements all elements for relevant mod
-     * @param type config type for this listener
-     */
-    public static void syncOptions(Collection<AbstractElement> elements, ModConfig.Type type) {
-
-        syncOptions(elements, type, false);
-    }
-
-    /**
      * sync config entries for specific type of config
      * call listeners for type as the config has somehow been loaded
      * @param allElements all allElements for relevant mod
      * @param type config type for this listener
-     * @param printLog print reloaded elements to console
+     * @param isReloading print reloaded elements to console
      */
-    private static void syncOptions(Collection<AbstractElement> allElements, ModConfig.Type type, boolean printLog) {
+    public static void syncOptions(Collection<AbstractElement> allElements, ModConfig.Type type, boolean isReloading) {
 
         Collection<ConfigOption<?>> options = getAllOptions(allElements, type);
         if (!options.isEmpty()) {
 
+            if (isReloading) {
+
+                PuzzlesLib.LOGGER.info("Reloading {} config options for {}", type.extension(),  ElementRegistry.joinElementNames(allElements));
+            }
+
             options.forEach(ConfigOption::sync);
-        }
-
-        if (printLog) {
-
-            PuzzlesLib.LOGGER.info("Reloaded " + type.extension() + " config options for " + (options.isEmpty() ? "no elements" : ElementRegistry.joinElementNames(allElements)));
         }
     }
 

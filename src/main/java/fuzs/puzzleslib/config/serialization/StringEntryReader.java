@@ -163,7 +163,7 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      */
     protected static void log(String entry, String message) {
 
-        PuzzlesLib.LOGGER.warn("Unable to parse entry \"{}\": {}", entry, message);
+        PuzzlesLib.LOGGER.warn("Unable to parse entry {}: {}", entry, message);
     }
     
 }
