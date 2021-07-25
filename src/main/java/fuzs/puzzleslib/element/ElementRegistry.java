@@ -16,7 +16,6 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -73,9 +72,9 @@ public class ElementRegistry {
      * @return <code>element</code>
      * @param <T> make sure element also extends ISidedElement
      */
-    @Nullable
     public <T extends AbstractElement & ISidedElement> AbstractElement register(String elementName, Supplier<T> supplier, Dist dist) {
 
+        ResourceLocation elementLocation = new ResourceLocation(this.modId, elementName);
         if (dist == FMLEnvironment.dist) {
 
             AbstractElement element = supplier.get();
@@ -83,13 +82,12 @@ public class ElementRegistry {
             assert element instanceof ICommonElement || FMLEnvironment.dist.isClient() || element instanceof IServerElement : "Unable to register element: " + "Trying to register client element for server side";
             assert element instanceof ICommonElement || FMLEnvironment.dist.isDedicatedServer() || element instanceof IClientElement : "Unable to register element: " + "Trying to register server element for client side";
 
-            ResourceLocation elementLocation = new ResourceLocation(this.modId, elementName);
             PuzzlesLib.LOGGER.info("Registering element {}", elementLocation);
             REGISTERED_ELEMENTS.put(elementLocation, element);
             return element;
         }
 
-        return null;
+        return AbstractElement.fake(elementLocation);
     }
 
     /**
@@ -219,13 +217,14 @@ public class ElementRegistry {
 
     /**
      * @param activeElements registered elements in this mod
+     * @param loadConfigEarly    load configs during construct so they can be used in registry events
      * @param activeContainer the mod
      * @param configSubPath optional config directory inside of main config dir
      */
     private static void createConfig(Collection<AbstractElement> activeElements, boolean loadConfigEarly, ModContainer activeContainer, String[] configSubPath) {
 
         // create dummy element for general config section
-        AbstractElement generalElement = AbstractElement.createEmpty(new ResourceLocation(activeContainer.getNamespace(), "general"));
+        AbstractElement generalElement = AbstractElement.fake(new ResourceLocation(activeContainer.getNamespace(), "general"));
         if (ConfigManager.load(generalElement, activeElements, loadConfigEarly, activeContainer, configSubPath)) {
 
             // add general option to storage so it can be reloaded during load phase

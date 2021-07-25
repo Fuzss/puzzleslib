@@ -327,17 +327,17 @@ public abstract class AbstractElement extends EventListener implements IConfigur
      * @param name element name
      * @return dummy element
      */
-    public static AbstractElement createEmpty(ResourceLocation name) {
+    public static AbstractElement fake(ResourceLocation name) {
 
-        return new EmptyElement(name);
+        return new FakeElement(name);
     }
 
     /**
      * almost an anonymous class, but needs to implement {@link ISidedElement}
      */
-    private static class EmptyElement extends AbstractElement implements ISidedElement {
+    private static class FakeElement extends AbstractElement implements ISidedElement {
 
-        public EmptyElement(ResourceLocation name) {
+        public FakeElement(ResourceLocation name) {
 
             this.setRegistryName(name);
         }

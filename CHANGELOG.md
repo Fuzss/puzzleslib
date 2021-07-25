@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog].
 ### Changed
 - Optionally load configs during construct so they can be used in registry events
 - More minor log output changes
+- Use empty elements instead of null values
 
 ## [v1.0.10-1.16.5] - 2021-07-22
 ### Changed

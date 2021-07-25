@@ -54,6 +54,7 @@ public class ConfigManager {
      * register configs from non-empty builders and add listener from active mod container to {@link #onModConfig}
      * @param generalElement separate dummy element for managing all other elements
      * @param allElements all elements for relevant <code>modId</code>
+     * @param loadConfigEarly    load configs during construct so they can be used in registry events
      * @param activeContainer the mod
      * @param configSubPath optional config directory inside of main config dir
      * @return was any config created
