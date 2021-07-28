@@ -4,6 +4,8 @@ import fuzs.puzzleslib.element.AbstractElement;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
@@ -70,6 +72,14 @@ public class OptionsBuilder {
     public <T> GenericOption.GenericOptionBuilder<T> define(String optionName, T defaultValue) {
 
         return this.setBuilder(new GenericOption.GenericOptionBuilder<>(optionName, defaultValue));
+    }
+
+    public <T> GenericOption.GenericOptionBuilder<List<T>> define(String optionName, List<T> defaultValue) {
+
+        // forge really has a problem with some list types, especially immutable list
+        // the config manager thingy keeps thinking something is not correct and creates a new config all the time, filling up the config directory with backup config files
+        // simply wrapping a list inside a new one seems to solve this
+        return this.setBuilder(new GenericOption.GenericOptionBuilder<>(optionName, new ArrayList<>(defaultValue)));
     }
 
     public BooleanOption.BooleanOptionBuilder define(String optionName, boolean defaultValue) {

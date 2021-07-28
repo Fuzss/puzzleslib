@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog].
 
 ## [v1.0.11-1.16.5] - 2021-07-23
+### Added
+- Added LoadedLocationList for filtering registry entries depending on whether the mod is loaded or not
 ### Changed
 - Optionally load configs during construct so they can be used in registry events
 - More minor log output changes
