@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog].
 - Optionally load configs during construct so they can be used in registry events
 - More minor log output changes
 - Use empty elements instead of null values
+- Made restart config option actually do something
 
 ## [v1.0.10-1.16.5] - 2021-07-22
 ### Changed

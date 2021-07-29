@@ -9,7 +9,6 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-@SuppressWarnings("unused")
 public abstract class ConfigOption<T> {
 
     private final ForgeConfigSpec.ConfigValue<T> value;
@@ -98,7 +97,7 @@ public abstract class ConfigOption<T> {
         final String name;
         final T defaultValue;
         String[] comment = new String[0];
-        private boolean restart;
+        boolean restart;
         private final List<Consumer<T>> syncConsumers = Lists.newArrayList();
         private final List<Runnable> reloadListeners = Lists.newArrayList();
 

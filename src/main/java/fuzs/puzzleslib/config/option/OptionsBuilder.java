@@ -3,13 +3,13 @@ package fuzs.puzzleslib.config.option;
 import fuzs.puzzleslib.element.AbstractElement;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-@SuppressWarnings({"UnusedReturnValue", "unused"})
 public class OptionsBuilder {
 
     private final ForgeConfigSpec.Builder builder;
@@ -126,6 +126,12 @@ public class OptionsBuilder {
     }
 
     private <T> void createOption(ConfigOption.ConfigOptionBuilder<T> builder) {
+
+        if (builder.restart) {
+
+            String restart = "This option will only change after the game has been restarted.";
+            builder.comment = ArrayUtils.addAll(builder.comment, restart);
+        }
 
         if (builder.comment.length != 0) {
 
