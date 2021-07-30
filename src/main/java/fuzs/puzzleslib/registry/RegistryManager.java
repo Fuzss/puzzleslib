@@ -9,7 +9,9 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.Potion;
 import net.minecraft.tileentity.TileEntityType;
@@ -17,6 +19,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,7 +29,7 @@ import java.util.function.Supplier;
 
 /**
  * handles registering to forge registries
- * heavily inspired by RegistryHelper found in Vazkii's AutoRegLib
+ * heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
  */
 public class RegistryManager {
 
@@ -129,10 +132,21 @@ public class RegistryManager {
         ResourceLocation name = null;
         if (path != null) {
 
-            name = new ResourceLocation(NamespaceUtil.getActiveNamespace(), path);
+            name = NamespaceUtil.locate(path);
         }
 
         this.registryEntryPairs.put(registryType, Pair.of(name, entry));
+    }
+
+    public void registerBlockWithItem(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry, ItemGroup creativeTab) {
+
+        this.registerBlockWithItem(path, entry, new Item.Properties().tab(creativeTab));
+    }
+
+    public void registerBlockWithItem(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry, Item.Properties properties) {
+
+        this.registerBlock(path, entry);
+        this.registerItem(path, () -> new BlockItem(path != null ? ForgeRegistries.BLOCKS.getValue(NamespaceUtil.locate(path)) : (Block) entry.get(), properties));
     }
 
     /**

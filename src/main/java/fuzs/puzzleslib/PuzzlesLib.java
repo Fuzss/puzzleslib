@@ -8,9 +8,11 @@ import fuzs.puzzleslib.element.side.ISidedElement;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.IProxy;
 import fuzs.puzzleslib.recipe.ElementConfigCondition;
+import fuzs.puzzleslib.registry.FuelManager;
 import fuzs.puzzleslib.registry.RegistryManager;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -56,25 +58,27 @@ public class PuzzlesLib {
      */
     public PuzzlesLib() {
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onCommonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onServerSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((final FMLCommonSetupEvent evt) -> evt.enqueueWork(() -> this.onCommonSetup(evt)));
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((final FMLClientSetupEvent evt) -> evt.enqueueWork(() -> this.onClientSetup(evt)));
+        FMLJavaModLoadingContext.get().getModEventBus().addListener((final FMLDedicatedServerSetupEvent evt) -> evt.enqueueWork(() -> this.onDedicatedServerSetup(evt)));
         FMLJavaModLoadingContext.get().getModEventBus().register(getRegistryManager());
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent evt) {
 
-        evt.enqueueWork(() -> ElementRegistry.load(evt, ModConfig.Type.COMMON));
+        ElementRegistry.load(evt, ModConfig.Type.COMMON);
+        // do this here as it's fired on normal event bus
+        MinecraftForge.EVENT_BUS.addListener(getFuelManager()::onFurnaceFuelBurnTime);
     }
 
     private void onClientSetup(final FMLClientSetupEvent evt) {
 
-        evt.enqueueWork(() -> ElementRegistry.load(evt, ModConfig.Type.CLIENT));
+        ElementRegistry.load(evt, ModConfig.Type.CLIENT);
     }
 
-    private void onServerSetup(final FMLDedicatedServerSetupEvent evt) {
+    private void onDedicatedServerSetup(final FMLDedicatedServerSetupEvent evt) {
 
-        evt.enqueueWork(() -> ElementRegistry.load(evt, ModConfig.Type.SERVER));
+        ElementRegistry.load(evt, ModConfig.Type.SERVER);
     }
 
     /**
@@ -122,6 +126,14 @@ public class PuzzlesLib {
     public static RegistryManager getRegistryManager() {
 
         return RegistryManager.getInstance();
+    }
+
+    /**
+     * @return fuel manager for puzzles lib mods
+     */
+    public static FuelManager getFuelManager() {
+
+        return FuelManager.getInstance();
     }
 
     /**

@@ -14,7 +14,17 @@ public class NamespaceUtil {
      * get active modid so entries can still be associated with the mod
      * @return active modid
      */
+    @Deprecated
     public static String getActiveNamespace() {
+
+        return namespace();
+    }
+
+    /**
+     * get active modid so entries can still be associated with the mod
+     * @return active modid
+     */
+    public static String namespace() {
 
         String namespace = ModLoadingContext.get().getActiveNamespace();
         if (namespace.equals("minecraft")) {
@@ -29,9 +39,19 @@ public class NamespaceUtil {
      * @param path path to create location for
      * @return resource location for active modid
      */
+    @Deprecated
     public static ResourceLocation getLocation(String path) {
 
-        return new ResourceLocation(getActiveNamespace(), path);
+        return locate(path);
+    }
+
+    /**
+     * @param path path to create location for
+     * @return resource location for active modid
+     */
+    public static ResourceLocation locate(String path) {
+
+        return new ResourceLocation(namespace(), path);
     }
 
     /**

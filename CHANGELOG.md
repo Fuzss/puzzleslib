@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.12-1.16.5] - 2021-07-30
+### Added
+- Added FuelManager for registering item burn times
+### Changed
+- RegistryManager can now directly register items for block
+- Small NamespaceUtil cleanup
+
 ## [v1.0.11-1.16.5] - 2021-07-23
 ### Added
 - Added LoadedLocationList for filtering registry entries depending on whether the mod is loaded or not
@@ -19,7 +26,7 @@ The format is based on [Keep a Changelog].
 ## [v1.0.9-1.16.5] - 2021-07-22
 ### Changed
 - Exceptions are now caught during element setup and loading
-- More precise methods for checking if an element has already been loaded during an fml setup event
+- More precise methods for checking if an element has already been loaded during a fml setup event
 
 ## [v1.0.8-1.16.5] - 2021-07-19
 ### Added
