@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.13-1.16.5] - 2021-07-30
+### Added
+- Added ability to render custom dev capes
+
 ## [v1.0.12-1.16.5] - 2021-07-30
 ### Added
 - Added FuelManager for registering item burn times

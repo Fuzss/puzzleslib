@@ -2,6 +2,7 @@ package fuzs.puzzleslib;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.capability.CapabilityController;
+import fuzs.puzzleslib.client.CapeInfoLoader;
 import fuzs.puzzleslib.element.AbstractElement;
 import fuzs.puzzleslib.element.ElementRegistry;
 import fuzs.puzzleslib.element.side.ISidedElement;
@@ -74,6 +75,7 @@ public class PuzzlesLib {
     private void onClientSetup(final FMLClientSetupEvent evt) {
 
         ElementRegistry.load(evt, ModConfig.Type.CLIENT);
+        MinecraftForge.EVENT_BUS.addListener(new CapeInfoLoader()::onRenderPlayer);
     }
 
     private void onDedicatedServerSetup(final FMLDedicatedServerSetupEvent evt) {
