@@ -18,7 +18,7 @@ public interface IProxy<T extends RecursiveEventLoop<?>> {
     @SuppressWarnings("Convert2MethodRef")
     static IProxy<?> getProxy() {
 
-        return DistExecutor.safeRunForDist(() -> () -> ClientProxy.getInstance2(), () -> () -> ServerProxy.getInstance2());
+        return DistExecutor.unsafeRunForDist(() -> () -> ClientProxy.getInstance2(), () -> () -> ServerProxy.getInstance2());
     }
 
     /**

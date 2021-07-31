@@ -47,6 +47,13 @@ public abstract class NumberOption<T extends Number> extends ConfigOption<T> {
             return this;
         }
 
+        public NumberOptionBuilder<T> range(T minValue, T maxValue) {
+
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            return this;
+        }
+
     }
 
 }

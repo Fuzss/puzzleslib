@@ -146,7 +146,13 @@ public class RegistryManager {
     public void registerBlockWithItem(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry, Item.Properties properties) {
 
         this.registerBlock(path, entry);
-        this.registerItem(path, () -> new BlockItem(path != null ? ForgeRegistries.BLOCKS.getValue(NamespaceUtil.locate(path)) : (Block) entry.get(), properties));
+        // store this, will be puzzles when supplier is executed
+        final ResourceLocation location = NamespaceUtil.locate(path);
+        this.registerItem(path, () -> {
+
+            Block block = path != null ? ForgeRegistries.BLOCKS.getValue(location) : (Block) entry.get();
+            return block != null ? new BlockItem(block, properties) : null;
+        });
     }
 
     /**
