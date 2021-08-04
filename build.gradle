@@ -331,13 +331,29 @@ task refreshUpdateJson {
         if (updateFile.exists() && updateFile.canRead()) {
 
             updateJson = new JsonSlurper().parseText(updateFile.text)
-            project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version -> updateJson['promos']["${version}-latest"] = project.modversion }
+            project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
+
+                updateJson['promos']["${version}-latest"] = project.modversion
+                // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
+                if (project.modversion.matches("[^a-zA-Z]+")) {
+
+                    updateJson['promos']["${version}-recommended"] = project.modversion
+                }
+            }
         } else {
 
             def builder = new JsonBuilder()
             updateJson = builder {
                 homepage "${modPageUrl}"
-                promos { project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version -> "${version}-latest" project.modversion } }
+                promos { project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
+
+                    "${version}-latest" project.modversion
+                    // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
+                    if (project.modversion.matches("[^a-zA-Z]+")) {
+
+                        "${version}-recommended" project.modversion
+                    }
+                } }
             }
         }
 
