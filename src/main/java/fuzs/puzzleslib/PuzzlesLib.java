@@ -85,7 +85,17 @@ public class PuzzlesLib {
      * set mod to only be required on one side, server or client
      * works like <code>clientSideOnly</code> back in 1.12
      */
+    @Deprecated
     public static void setSideSideOnly() {
+
+        setSideOnly();
+    }
+
+    /**
+     * set mod to only be required on one side, server or client
+     * works like <code>clientSideOnly</code> back in 1.12
+     */
+    public static void setSideOnly() {
 
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
     }
