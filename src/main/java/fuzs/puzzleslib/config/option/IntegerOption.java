@@ -3,8 +3,6 @@ package fuzs.puzzleslib.config.option;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.function.BiFunction;
-
 public class IntegerOption extends NumberOption<Integer> {
 
     IntegerOption(ForgeConfigSpec.ConfigValue<Integer> value, ModConfig.Type type, IntegerOptionBuilder builder) {
@@ -22,9 +20,9 @@ public class IntegerOption extends NumberOption<Integer> {
         }
 
         @Override
-        BiFunction<ForgeConfigSpec.ConfigValue<Integer>, ModConfig.Type, ConfigOption<Integer>> getFactory() {
+        SimpleConfigOption<Integer> createOption(ForgeConfigSpec.ConfigValue<Integer> value, ModConfig.Type type) {
 
-            return (value, type) -> new IntegerOption(value, type, this);
+            return new IntegerOption(value, type, this);
         }
 
         @Override

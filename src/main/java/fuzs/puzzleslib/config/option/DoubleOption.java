@@ -3,8 +3,6 @@ package fuzs.puzzleslib.config.option;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.function.BiFunction;
-
 public class DoubleOption extends NumberOption<Double> {
 
     DoubleOption(ForgeConfigSpec.ConfigValue<Double> value, ModConfig.Type type, DoubleOptionBuilder builder) {
@@ -22,9 +20,9 @@ public class DoubleOption extends NumberOption<Double> {
         }
 
         @Override
-        BiFunction<ForgeConfigSpec.ConfigValue<Double>, ModConfig.Type, ConfigOption<Double>> getFactory() {
+        SimpleConfigOption<Double> createOption(ForgeConfigSpec.ConfigValue<Double> value, ModConfig.Type type) {
 
-            return (value, type) -> new DoubleOption(value, type, this);
+            return new DoubleOption(value, type, this);
         }
 
         @Override

@@ -40,14 +40,14 @@ public interface IConfigurableElement {
      * add config option from inside {@link OptionsBuilder}
      * @param option config option to store
      */
-    void addOption(ConfigOption<?> option);
+    void addOption(ConfigOption<?, ?> option);
 
     /**
      * get an option from this element
      * @param path  path to get option at
      * @return      found option or empty
      */
-    Optional<ConfigOption<?>> getOption(String... path);
+    Optional<ConfigOption<?, ?>> getOption(String... path);
 
     /**
      * get the value from an option found by {@link #getOption}

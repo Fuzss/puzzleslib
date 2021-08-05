@@ -74,12 +74,16 @@ public class RegistryManager {
                 IForgeRegistryEntry<?> entry = registryPair.getRight().get();
                 if (entry == null) {
 
-                    throw new IllegalArgumentException("Can't register null object.");
+                    throw new IllegalArgumentException("Can't register null object with name " + name);
                 }
 
                 if (entry.getRegistryName() == null) {
 
-                    assert name != null;
+                    if (name == null) {
+
+                        throw new IllegalArgumentException("No registry name provided for " + entry);
+                    }
+
                     entry.setRegistryName(name);
                 }
 

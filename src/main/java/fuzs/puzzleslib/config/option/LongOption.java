@@ -3,8 +3,6 @@ package fuzs.puzzleslib.config.option;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.function.BiFunction;
-
 public class LongOption extends NumberOption<Long> {
 
     LongOption(ForgeConfigSpec.ConfigValue<Long> value, ModConfig.Type type, LongOptionBuilder builder) {
@@ -22,9 +20,9 @@ public class LongOption extends NumberOption<Long> {
         }
 
         @Override
-        BiFunction<ForgeConfigSpec.ConfigValue<Long>, ModConfig.Type, ConfigOption<Long>> getFactory() {
+        SimpleConfigOption<Long> createOption(ForgeConfigSpec.ConfigValue<Long> value, ModConfig.Type type) {
 
-            return (value, type) -> new LongOption(value, type, this);
+            return new LongOption(value, type, this);
         }
 
         @Override

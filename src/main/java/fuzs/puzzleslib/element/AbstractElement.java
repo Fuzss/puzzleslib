@@ -47,7 +47,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * config options for this element
      */
-    private final Map<String, ConfigOption<?>> configOptions = Maps.newHashMap();
+    private final Map<String, ConfigOption<?, ?>> configOptions = Maps.newHashMap();
     /**
      * has {@link #load} been called for the specific side
      */
@@ -262,16 +262,16 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     }
 
     @Override
-    public final void addOption(ConfigOption<?> option) {
+    public final void addOption(ConfigOption<?, ?> option) {
 
         this.configOptions.put(String.join(".", option.getPath()), option);
     }
 
     @Override
-    public final Optional<ConfigOption<?>> getOption(String... path) {
+    public final Optional<ConfigOption<?, ?>> getOption(String... path) {
 
         String singlePath = String.join(".", path);
-        ConfigOption<?> option = this.configOptions.get(singlePath);
+        ConfigOption<?, ?> option = this.configOptions.get(singlePath);
         if (option != null) {
 
             return Optional.of(option);
@@ -291,7 +291,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * @return config options
      */
-    public Collection<ConfigOption<?>> getOptions() {
+    public Collection<ConfigOption<?, ?>> getOptions() {
 
         return this.configOptions.values();
     }

@@ -3,9 +3,7 @@ package fuzs.puzzleslib.config.option;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
-import java.util.function.BiFunction;
-
-public class EnumOption<T extends Enum<T>> extends ConfigOption<T> {
+public class EnumOption<T extends Enum<T>> extends SimpleConfigOption<T> {
 
     private final Class<?> clazz;
     private final T[] acceptableValues;
@@ -27,7 +25,7 @@ public class EnumOption<T extends Enum<T>> extends ConfigOption<T> {
         return this.acceptableValues;
     }
 
-    public static class EnumOptionBuilder<T extends Enum<T>> extends ConfigOptionBuilder<T> {
+    public static class EnumOptionBuilder<T extends Enum<T>> extends SimpleConfigOptionBuilder<T> {
 
         private final Class<?> clazz;
         private T[] acceptableValues;
@@ -48,9 +46,9 @@ public class EnumOption<T extends Enum<T>> extends ConfigOption<T> {
         }
 
         @Override
-        BiFunction<ForgeConfigSpec.ConfigValue<T>, ModConfig.Type, ConfigOption<T>> getFactory() {
-
-            return (value, type) -> new EnumOption<>(value, type, this);
+        SimpleConfigOption<T> createOption(ForgeConfigSpec.ConfigValue<T> value, ModConfig.Type type) {
+            
+            return new EnumOption<>(value, type, this);
         }
 
         @Override

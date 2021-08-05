@@ -46,7 +46,7 @@ public class ConfigManager {
 
         ModConfig.Type type = modConfig.getType();
         syncOptions(allElements, type, isReloading);
-        // separate general element so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
+        // separate general element, so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
         getAllOptions(ImmutableSet.of(generalElement), type).forEach(ConfigOption::sync);
     }
 
@@ -54,7 +54,7 @@ public class ConfigManager {
      * register configs from non-empty builders and add listener from active mod container to {@link #onModConfig}
      * @param generalElement separate dummy element for managing all other elements
      * @param allElements all elements for relevant <code>modId</code>
-     * @param loadConfigEarly    load configs during construct so they can be used in registry events
+     * @param loadConfigEarly    load configs during construct, so they can be used in registry events
      * @param activeContainer the mod
      * @param configSubPath optional config directory inside of main config dir
      * @return was any config created
@@ -109,7 +109,7 @@ public class ConfigManager {
     }
 
     /**
-     * load configs during construct so they can be used in registry events
+     * load configs during construct, so they can be used in registry events
      * mostly copied from {@link net.minecraftforge.fml.config.ConfigFileTypeHandler}
      * @param modConfig mod config object
      * @param allElements all elements for current modId
@@ -166,7 +166,7 @@ public class ConfigManager {
      */
     public static void syncOptions(Collection<AbstractElement> allElements, ModConfig.Type type, boolean isReloading) {
 
-        Collection<ConfigOption<?>> options = getAllOptions(allElements, type);
+        Collection<ConfigOption<?, ?>> options = getAllOptions(allElements, type);
         if (!options.isEmpty()) {
 
             if (isReloading) {
@@ -183,7 +183,7 @@ public class ConfigManager {
      * @param type config type for this listener
      * @return collection of enabled entries only for this mod and type
      */
-    public static Collection<ConfigOption<?>> getAllOptions(Collection<AbstractElement> elements, ModConfig.Type type) {
+    public static Collection<ConfigOption<?, ?>> getAllOptions(Collection<AbstractElement> elements, ModConfig.Type type) {
 
         // sync all elements, even disabled ones
         return elements.stream()
@@ -203,7 +203,7 @@ public class ConfigManager {
     }
 
     /**
-     * put config into it's own folder when there are multiples
+     * put config into own folder when there are multiples
      * @param modId mod id this config belongs to
      * @param type type of config
      * @param path path inside of main config directory

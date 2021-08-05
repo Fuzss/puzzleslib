@@ -5,17 +5,15 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 public class OptionsBuilder {
 
     private final ForgeConfigSpec.Builder builder;
     private final ModConfig.Type type;
     private AbstractElement activeElement;
-    private ConfigOption.ConfigOptionBuilder<?> activeOptionBuilder;
+    private ConfigOption.ConfigOptionBuilder<?, ?> activeOptionBuilder;
     private int useCounter;
 
     public OptionsBuilder(ModConfig.Type type) {
@@ -26,6 +24,8 @@ public class OptionsBuilder {
 
     public OptionsBuilder comment(String... comment) {
 
+        assert comment.length != 0 : "Unable to set comment on builder: " + "Empty comments not allowed";
+
         this.builder.comment(comment);
         return this;
     }
@@ -33,9 +33,9 @@ public class OptionsBuilder {
     public OptionsBuilder push(AbstractElement element) {
 
         assert this.activeElement == null : "Unable to push element on builder: " + "Element already set";
+
         this.activeElement = element;
         this.builder.push(element.getRegistryName().getPath());
-
         return this;
     }
 
@@ -52,7 +52,6 @@ public class OptionsBuilder {
 
         this.pop();
         this.activeElement = null;
-
         return this;
     }
 
@@ -74,12 +73,9 @@ public class OptionsBuilder {
         return this.setBuilder(new GenericOption.GenericOptionBuilder<>(optionName, defaultValue));
     }
 
-    public <T> GenericOption.GenericOptionBuilder<List<T>> define(String optionName, List<T> defaultValue) {
+    public <T> ListOption.ListOptionBuilder<T> define(String optionName, List<T> defaultValue) {
 
-        // forge really has a problem with some list types, especially immutable list
-        // the config manager thingy keeps thinking something is not correct and creates a new config all the time, filling up the config directory with backup config files
-        // simply wrapping a list inside a new one seems to solve this
-        return this.setBuilder(new GenericOption.GenericOptionBuilder<>(optionName, new ArrayList<>(defaultValue)));
+        return this.setBuilder(new ListOption.ListOptionBuilder<>(optionName, defaultValue));
     }
 
     public BooleanOption.BooleanOptionBuilder define(String optionName, boolean defaultValue) {
@@ -97,6 +93,11 @@ public class OptionsBuilder {
         return this.setBuilder(new LongOption.LongOptionBuilder(optionName, defaultValue));
     }
 
+    public FloatOption.FloatOptionBuilder define(String optionName, float defaultValue) {
+
+        return this.setBuilder(new FloatOption.FloatOptionBuilder(optionName, defaultValue));
+    }
+
     public DoubleOption.DoubleOptionBuilder define(String optionName, double defaultValue) {
 
         return this.setBuilder(new DoubleOption.DoubleOptionBuilder(optionName, defaultValue));
@@ -107,7 +108,7 @@ public class OptionsBuilder {
         return this.setBuilder(new EnumOption.EnumOptionBuilder<>(optionName, defaultValue));
     }
 
-    private <T extends ConfigOption.ConfigOptionBuilder<?>> T setBuilder(T optionBuilder) {
+    private <T extends ConfigOption.ConfigOptionBuilder<?, ?>> T setBuilder(T optionBuilder) {
 
         this.tryCreateLast();
         this.useCounter++;
@@ -125,12 +126,11 @@ public class OptionsBuilder {
         }
     }
 
-    private <T> void createOption(ConfigOption.ConfigOptionBuilder<T> builder) {
+    private <T, S> void createOption(ConfigOption.ConfigOptionBuilder<T, S> builder) {
 
         if (builder.restart) {
 
-            String restart = "This option will only change after the game has been restarted.";
-            builder.comment = ArrayUtils.addAll(builder.comment, restart);
+            builder.comment = ArrayUtils.addAll(builder.comment, "This option will only change after the game has been restarted.");
         }
 
         if (builder.comment.length != 0) {
@@ -138,10 +138,7 @@ public class OptionsBuilder {
             this.builder.comment(builder.comment);
         }
 
-        BiFunction<ForgeConfigSpec.ConfigValue<T>, ModConfig.Type, ConfigOption<T>> factory = builder.getFactory();
-        ForgeConfigSpec.ConfigValue<T> configValue = builder.getConfigValue(this.builder);
-        ConfigOption<T> option = factory.apply(configValue, this.type);
-        this.activeElement.addOption(option);
+        this.activeElement.addOption(builder.createOption(builder.getConfigValue(this.builder), this.type));
     }
 
 }

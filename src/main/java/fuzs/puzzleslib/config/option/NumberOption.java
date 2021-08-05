@@ -3,7 +3,7 @@ package fuzs.puzzleslib.config.option;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
-public abstract class NumberOption<T extends Number> extends ConfigOption<T> {
+public abstract class NumberOption<T extends Number> extends SimpleConfigOption<T> {
 
     private final T minValue;
     private final T maxValue;
@@ -25,7 +25,7 @@ public abstract class NumberOption<T extends Number> extends ConfigOption<T> {
         return this.maxValue;
     }
 
-    public static abstract class NumberOptionBuilder<T extends Number> extends ConfigOption.ConfigOptionBuilder<T> {
+    public static abstract class NumberOptionBuilder<T extends Number> extends SimpleConfigOption.SimpleConfigOptionBuilder<T> {
 
         T minValue;
         T maxValue;
