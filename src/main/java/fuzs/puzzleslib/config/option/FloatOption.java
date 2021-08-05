@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.config.option;
 
+import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -56,7 +57,8 @@ public class FloatOption extends ConfigOption<Float, Double> {
         @Override
         ForgeConfigSpec.ConfigValue<Double> getConfigValue(ForgeConfigSpec.Builder builder) {
 
-            return builder.defineInRange(this.name, this.defaultValue, this.minValue, this.maxValue);
+            // will generate weird values when not rounded
+            return builder.defineInRange(this.name, PuzzlesUtil.round(this.defaultValue, 6), PuzzlesUtil.round(this.minValue, 6), PuzzlesUtil.round(this.maxValue, 6));
         }
 
     }

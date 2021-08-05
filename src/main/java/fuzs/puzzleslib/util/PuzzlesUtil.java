@@ -113,5 +113,16 @@ public class PuzzlesUtil {
 
         return null;
     }
+
+    /**
+     * @param toRound number to round
+     * @param decimalPlaces amount of decimal places
+     * @return rounded number
+     */
+    public static double round(double toRound, int decimalPlaces) {
+
+        final double power = Math.pow(10, decimalPlaces);
+        return  Math.round(toRound * power) / power;
+    }
     
 }
