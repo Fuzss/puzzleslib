@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.element.side;
 
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 
 /**
  * implement this for elements with common capabilities
@@ -12,23 +12,13 @@ public interface ICommonElement extends ISidedElement {
      */
     default void constructCommon() {
 
-        this.setupCommon();
     }
 
     /**
-     * register common events and registry entry objects (blocks, items, etc.)
-     */
-    @Deprecated
-    default void setupCommon() {
-
-    }
-
-    /**
-     * TODO rename to #setupCommon
      * setup for {@link net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent}
      * is always loaded no matter the element's state
      */
-    default void setupCommon2() {
+    default void setupCommon() {
 
     }
 
@@ -50,7 +40,7 @@ public interface ICommonElement extends ISidedElement {
      * build common config
      * @param builder builder for common config
      */
-    default void setupCommonConfig(OptionsBuilder builder) {
+    default void setupCommonConfig(OptionBuilder builder) {
 
     }
 

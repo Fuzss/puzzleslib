@@ -35,10 +35,9 @@ public class ClientProxy implements IProxy<Minecraft> {
     }
 
     /**
-     * TODO rename this back to #getInstance
      * @return {@link ClientProxy} instance
      */
-    public static ClientProxy getInstance2() {
+    public static ClientProxy getInstance() {
 
         return ClientProxy.ClientProxyHolder.INSTANCE;
     }

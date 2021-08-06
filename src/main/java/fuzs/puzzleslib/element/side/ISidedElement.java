@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.element.side;
 
 import fuzs.puzzleslib.config.ConfigManager;
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 import fuzs.puzzleslib.element.AbstractElement;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -89,11 +89,11 @@ public interface ISidedElement {
 
     /**
      * create config for side
-     * @param optionsBuilder builder associated with this side
+     * @param optionBuilder builder associated with this side
      * @param type side
      * @param element mod element
      */
-    static void setupConfig(OptionsBuilder optionsBuilder, ModConfig.Type type, AbstractElement element) {
+    static void setupConfig(OptionBuilder optionBuilder, ModConfig.Type type, AbstractElement element) {
 
         switch (type) {
 
@@ -101,7 +101,7 @@ public interface ISidedElement {
 
                 if (element instanceof ICommonElement) {
 
-                    ConfigManager.create(optionsBuilder, element, ((ICommonElement) element)::setupCommonConfig, ((ICommonElement) element).getCommonDescription());
+                    ConfigManager.create(optionBuilder, element, ((ICommonElement) element)::setupCommonConfig, ((ICommonElement) element).getCommonDescription());
                 }
 
                 break;
@@ -109,7 +109,7 @@ public interface ISidedElement {
 
                 if (element instanceof IClientElement) {
 
-                    ConfigManager.create(optionsBuilder, element, ((IClientElement) element)::setupClientConfig, ((IClientElement) element).getClientDescription());
+                    ConfigManager.create(optionBuilder, element, ((IClientElement) element)::setupClientConfig, ((IClientElement) element).getClientDescription());
                 }
 
                 break;
@@ -117,7 +117,7 @@ public interface ISidedElement {
 
                 if (element instanceof IServerElement) {
 
-                    ConfigManager.create(optionsBuilder, element, ((IServerElement) element)::setupServerConfig, ((IServerElement) element).getServerDescription());
+                    ConfigManager.create(optionBuilder, element, ((IServerElement) element)::setupServerConfig, ((IServerElement) element).getServerDescription());
                 }
 
                 break;

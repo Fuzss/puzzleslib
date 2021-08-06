@@ -109,19 +109,31 @@ public abstract class ConfigOption<T, S> {
         return Lists.newArrayList(DOT_SPLITTER.split(path));
     }
 
-    public static abstract class ConfigOptionBuilder<T, S> {
+    public static abstract class ConfigOptionBuilder<T, S> extends OptionBuilder {
 
         final String name;
         final T defaultValue;
-        String[] comment = new String[0];
-        boolean restart;
+        private String[] comment = new String[0];
+        private boolean restart;
         private final List<Consumer<T>> syncConsumers = Lists.newArrayList();
         private final List<Runnable> reloadListeners = Lists.newArrayList();
 
-        ConfigOptionBuilder(String name, T defaultValue) {
+        ConfigOptionBuilder(OptionBuilder previous, String name, T defaultValue) {
 
+            super(previous);
             this.name = name;
             this.defaultValue = defaultValue;
+        }
+
+        protected List<String> getComment() {
+
+            List<String> comment = Lists.newArrayList(this.comment);
+            if (this.restart) {
+
+                comment.add("This option requires a game restart to update.");
+            }
+
+            return comment;
         }
 
         public ConfigOptionBuilder<T, S> comment(String... comment) {

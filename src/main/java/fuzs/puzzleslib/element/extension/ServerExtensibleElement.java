@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.element.extension;
 
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 import fuzs.puzzleslib.element.side.IServerElement;
 import net.minecraftforge.api.distmarker.Dist;
 
@@ -27,9 +27,9 @@ public abstract class ServerExtensibleElement<T extends ElementExtension<?> & IS
     }
 
     @Override
-    public final void setupServer2() {
+    public final void setupServer() {
 
-        this.extension.setupServer2();
+        this.extension.setupServer();
     }
 
     @Override
@@ -45,7 +45,7 @@ public abstract class ServerExtensibleElement<T extends ElementExtension<?> & IS
     }
 
     @Override
-    public final void setupServerConfig(OptionsBuilder builder) {
+    public final void setupServerConfig(OptionBuilder builder) {
 
         this.extension.setupServerConfig(builder);
     }

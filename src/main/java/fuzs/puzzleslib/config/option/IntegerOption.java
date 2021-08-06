@@ -12,9 +12,9 @@ public class IntegerOption extends NumberOption<Integer> {
 
     public static class IntegerOptionBuilder extends NumberOption.NumberOptionBuilder<Integer> {
 
-        IntegerOptionBuilder(String name, Integer defaultValue) {
+        IntegerOptionBuilder(OptionBuilder previous, String name, Integer defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
             this.minValue = Integer.MIN_VALUE;
             this.maxValue = Integer.MAX_VALUE;
         }

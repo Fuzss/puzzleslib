@@ -30,9 +30,9 @@ public abstract class NumberOption<T extends Number> extends SimpleConfigOption<
         T minValue;
         T maxValue;
 
-        NumberOptionBuilder(String name, T defaultValue) {
+        NumberOptionBuilder(OptionBuilder previous, String name, T defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
         }
 
         public NumberOptionBuilder<T> min(T minValue) {

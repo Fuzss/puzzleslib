@@ -18,17 +18,7 @@ public interface IProxy<T extends RecursiveEventLoop<?>> {
     @SuppressWarnings("Convert2MethodRef")
     static IProxy<?> getProxy() {
 
-        return DistExecutor.unsafeRunForDist(() -> () -> ClientProxy.getInstance2(), () -> () -> ServerProxy.getInstance2());
-    }
-
-    /**
-     * use {@link #getGameInstance()} instead
-     * @return Minecraft client or server instance
-     */
-    @Deprecated
-    default T getInstance() {
-
-        return this.getGameInstance();
+        return DistExecutor.unsafeRunForDist(() -> () -> ClientProxy.getInstance(), () -> () -> ServerProxy.getInstance());
     }
 
     /**

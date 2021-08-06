@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.element.extension;
 
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 import fuzs.puzzleslib.element.side.IClientElement;
 import net.minecraftforge.api.distmarker.Dist;
 
@@ -24,9 +24,9 @@ public abstract class ClientExtensibleElement<T extends ElementExtension<?> & IC
     }
 
     @Override
-    public final void setupClient2() {
+    public final void setupClient() {
 
-        this.extension.setupClient2();
+        this.extension.setupClient();
     }
 
     @Override
@@ -42,7 +42,7 @@ public abstract class ClientExtensibleElement<T extends ElementExtension<?> & IC
     }
 
     @Override
-    public final void setupClientConfig(OptionsBuilder builder) {
+    public final void setupClientConfig(OptionBuilder builder) {
 
         this.extension.setupClientConfig(builder);
     }

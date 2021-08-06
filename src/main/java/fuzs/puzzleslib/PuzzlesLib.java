@@ -1,17 +1,13 @@
 package fuzs.puzzleslib;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.capability.CapabilityController;
-import fuzs.puzzleslib.element.AbstractElement;
 import fuzs.puzzleslib.element.ElementRegistry;
-import fuzs.puzzleslib.element.side.ISidedElement;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.IProxy;
 import fuzs.puzzleslib.recipe.ElementConfigCondition;
 import fuzs.puzzleslib.registry.FuelManager;
 import fuzs.puzzleslib.registry.RegistryManager;
 import fuzs.puzzleslib.util.PuzzlesUtil;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -27,22 +23,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.Map;
-import java.util.function.Supplier;
-
 @Mod(PuzzlesLib.MODID)
 public class PuzzlesLib {
 
     public static final String MODID = "puzzleslib";
     public static final String NAME = "Puzzles Lib";
     public static final Logger LOGGER = LogManager.getLogger(PuzzlesLib.NAME);
-
-    /**
-     * temporary {@link ElementRegistry} storage for backwards compatibility
-     * use {@link #create} instead
-     */
-    @Deprecated
-    private static final Map<String, ElementRegistry> ELEMENT_REGISTRIES = Maps.newHashMap();
 
     /**
      * sided proxy depending on physical side
@@ -85,29 +71,9 @@ public class PuzzlesLib {
      * set mod to only be required on one side, server or client
      * works like <code>clientSideOnly</code> back in 1.12
      */
-    @Deprecated
-    public static void setSideSideOnly() {
-
-        setSideOnly();
-    }
-
-    /**
-     * set mod to only be required on one side, server or client
-     * works like <code>clientSideOnly</code> back in 1.12
-     */
     public static void setSideOnly() {
 
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
-    }
-
-    /**
-     * load {@link ElementConfigCondition} in case this element is adding any configurable recipes
-     * use {@link #loadRecipeCondition()} instead
-     */
-    @Deprecated
-    public static void loadConfigCondition() {
-
-        loadRecipeCondition();
     }
 
     /**
@@ -160,39 +126,6 @@ public class PuzzlesLib {
     public static CapabilityController getCapabilityController() {
 
         return CapabilityController.getInstance();
-    }
-
-    /**
-     * register an element
-     * use {@link #create} instead
-     *
-     * @param modId parent mod id
-     * @param elementName identifier for this element
-     * @param supplier supplier for element to be registered
-     * @return <code>element</code>
-     * @param <T> make sure element also extends ISidedElement
-     */
-    @Deprecated
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String elementName, Supplier<T> supplier) {
-
-        return ELEMENT_REGISTRIES.computeIfAbsent(modId, ElementRegistry::new).register(elementName, supplier);
-    }
-
-    /**
-     * register an element
-     * use {@link #create} instead
-     *
-     * @param modId parent mod id
-     * @param elementName identifier for this element
-     * @param supplier supplier for element to be registered
-     * @param dist physical side to register on
-     * @return <code>element</code>
-     * @param <T> make sure element also extends ISidedElement
-     */
-    @Deprecated
-    public static <T extends AbstractElement & ISidedElement> AbstractElement register(String modId, String elementName, Supplier<T> supplier, Dist dist) {
-
-        return ELEMENT_REGISTRIES.computeIfAbsent(modId, ElementRegistry::new).register(elementName, supplier, dist);
     }
 
     /**

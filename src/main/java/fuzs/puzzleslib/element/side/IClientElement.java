@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.element.side;
 
-import fuzs.puzzleslib.config.option.OptionsBuilder;
-import net.minecraft.client.Minecraft;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 
 /**
  * implement this for elements with client-side capabilities
@@ -13,23 +12,13 @@ public interface IClientElement extends ISidedElement {
      */
     default void constructClient() {
 
-        this.setupClient();
     }
 
     /**
-     * register client events
-     */
-    @Deprecated
-    default void setupClient() {
-
-    }
-
-    /**
-     * TODO rename to #setupClient
      * setup for {@link net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent}
      * is always called no matter the element's state
      */
-    default void setupClient2() {
+    default void setupClient() {
 
     }
 
@@ -51,7 +40,7 @@ public interface IClientElement extends ISidedElement {
      * build client config
      * @param builder builder for client config
      */
-    default void setupClientConfig(OptionsBuilder builder) {
+    default void setupClientConfig(OptionBuilder builder) {
 
     }
 
@@ -61,15 +50,6 @@ public interface IClientElement extends ISidedElement {
     default String[] getClientDescription() {
 
         return new String[0];
-    }
-
-    /**
-     * @return Minecraft client instance
-     */
-    @Deprecated
-    static Minecraft getMc() {
-
-        return Minecraft.getInstance();
     }
 
 }

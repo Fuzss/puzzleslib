@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.element;
 
 import fuzs.puzzleslib.config.option.ConfigOption;
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 
 import java.util.Optional;
 
@@ -34,10 +34,10 @@ public interface IConfigurableElement {
      * add an entry for controlling this element in the general config section
      * @param builder active config builder
      */
-    void setupGeneralConfig(OptionsBuilder builder);
+    void setupGeneralConfig(OptionBuilder builder);
 
     /**
-     * add config option from inside {@link OptionsBuilder}
+     * add config option from inside {@link OptionBuilder}
      * @param option config option to store
      */
     void addOption(ConfigOption<?, ?> option);

@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v1.0.13-1.16.5] - 2021-08-04
+## [v1.1-1.16.5] - 2021-08-06
 ### Added
 - Added FloatOption and FloatOptionBuilder
 - Added proper ListOption and ListOptionBuilder

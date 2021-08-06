@@ -33,10 +33,9 @@ public class ServerProxy implements IProxy<MinecraftServer> {
     }
 
     /**
-     * TODO rename this back to #getInstance
      * @return {@link ServerProxy} instance
      */
-    public static ServerProxy getInstance2() {
+    public static ServerProxy getInstance() {
 
         return ServerProxy.ServerProxyHolder.INSTANCE;
     }

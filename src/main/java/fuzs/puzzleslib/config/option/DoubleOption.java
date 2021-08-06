@@ -12,9 +12,9 @@ public class DoubleOption extends NumberOption<Double> {
 
     public static class DoubleOptionBuilder extends NumberOptionBuilder<Double> {
 
-        DoubleOptionBuilder(String name, Double defaultValue) {
+        DoubleOptionBuilder(OptionBuilder previous, String name, Double defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
             this.minValue = Double.MIN_VALUE;
             this.maxValue = Double.MAX_VALUE;
         }

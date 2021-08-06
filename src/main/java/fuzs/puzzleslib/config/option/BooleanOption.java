@@ -12,9 +12,9 @@ public class BooleanOption extends SimpleConfigOption<Boolean> {
 
     public static class BooleanOptionBuilder extends SimpleConfigOptionBuilder<Boolean> {
 
-        BooleanOptionBuilder(String name, Boolean defaultValue) {
+        BooleanOptionBuilder(OptionBuilder previous, String name, Boolean defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
         }
 
         @Override

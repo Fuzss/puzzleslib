@@ -12,9 +12,9 @@ public class LongOption extends NumberOption<Long> {
 
     public static class LongOptionBuilder extends NumberOptionBuilder<Long> {
 
-        LongOptionBuilder(String name, Long defaultValue) {
+        LongOptionBuilder(OptionBuilder previous, String name, Long defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
             this.minValue = Long.MIN_VALUE;
             this.maxValue = Long.MAX_VALUE;
         }

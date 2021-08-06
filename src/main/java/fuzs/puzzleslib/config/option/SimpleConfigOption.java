@@ -18,11 +18,12 @@ public abstract class SimpleConfigOption<T> extends ConfigOption<T, T> {
 
     public static abstract class SimpleConfigOptionBuilder<T> extends ConfigOption.ConfigOptionBuilder<T, T> {
 
-        SimpleConfigOptionBuilder(String name, T defaultValue) {
+        SimpleConfigOptionBuilder(OptionBuilder previous, String name, T defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
         }
 
+        @Override
         abstract SimpleConfigOption<T> createOption(ForgeConfigSpec.ConfigValue<T> value, ModConfig.Type type);
 
     }

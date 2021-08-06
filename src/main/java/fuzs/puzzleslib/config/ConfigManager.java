@@ -7,7 +7,7 @@ import com.electronwill.nightconfig.core.io.WritingMode;
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.option.ConfigOption;
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 import fuzs.puzzleslib.config.serialization.EntryCollectionBuilder;
 import fuzs.puzzleslib.element.AbstractElement;
 import fuzs.puzzleslib.element.ElementRegistry;
@@ -69,17 +69,17 @@ public class ConfigManager {
                 continue;
             }
 
-            OptionsBuilder optionsBuilder = new OptionsBuilder(type);
-            create(optionsBuilder, generalElement, builder -> allElements.stream()
+            OptionBuilder optionBuilder = new OptionBuilder(type);
+            create(optionBuilder, generalElement, builder -> allElements.stream()
                     .filter(ISidedElement.getGeneralFilter(type))
                     .forEach(element -> element.setupGeneralConfig(builder)));
 
             for (AbstractElement element : allElements) {
 
-                ISidedElement.setupConfig(optionsBuilder, type, element);
+                ISidedElement.setupConfig(optionBuilder, type, element);
             }
 
-            Optional<ForgeConfigSpec> optionalSpec = optionsBuilder.build();
+            Optional<ForgeConfigSpec> optionalSpec = optionBuilder.build();
             if (optionalSpec.isPresent()) {
 
                 successful = true;
@@ -143,13 +143,13 @@ public class ConfigManager {
      * @param builder       builder for config type
      * @param element       element for this new category
      * @param setupConfig   builder for category
-     * @param comment       comments to add to category
+     * @param description       description to add to category
      */
-    public static void create(OptionsBuilder builder, AbstractElement element, Consumer<OptionsBuilder> setupConfig, String... comment) {
+    public static void create(OptionBuilder builder, AbstractElement element, Consumer<OptionBuilder> setupConfig, String... description) {
 
-        if (comment.length != 0) {
+        if (description.length != 0) {
 
-            builder.comment(comment);
+            builder.description(description);
         }
 
         builder.push(element);

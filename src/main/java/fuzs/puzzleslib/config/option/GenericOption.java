@@ -2,11 +2,12 @@ package fuzs.puzzleslib.config.option;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
-import org.apache.commons.lang3.ArrayUtils;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -44,9 +45,21 @@ public class GenericOption<T> extends SimpleConfigOption<T> {
         private Predicate<Object> validator;
         private Collection<T> acceptableValues;
 
-        GenericOptionBuilder(String name, T defaultValue) {
+        GenericOptionBuilder(OptionBuilder previous, String name, T defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
+        }
+
+        @Override
+        protected List<String> getComment() {
+
+            List<String> comment = super.getComment();
+            if (this.acceptableValues != null) {
+
+                comment.add("Allowed Values: " + this.acceptableValues.stream().map(Objects::toString).collect(Collectors.joining(", ")));
+            }
+
+            return comment;
         }
 
         public GenericOptionBuilder<T> validate(Predicate<Object> validator) {
@@ -70,10 +83,12 @@ public class GenericOption<T> extends SimpleConfigOption<T> {
         @Override
         ForgeConfigSpec.ConfigValue<T> getConfigValue(ForgeConfigSpec.Builder builder) {
 
-            if (this.acceptableValues != null && !this.acceptableValues.isEmpty()) {
+            assert this.acceptableValues == null || !this.acceptableValues.isEmpty() : "Empty acceptable values collection";
 
-                this.comment = ArrayUtils.addAll(this.comment, "Allowed Values: " + this.acceptableValues.stream().map(Objects::toString).collect(Collectors.joining(", ")));
-                this.validator = this.validator.and(this.acceptableValues::contains);
+            if (this.acceptableValues != null) {
+
+                Set<String> acceptableToString = this.acceptableValues.stream().map(Objects::toString).collect(Collectors.toSet());
+                this.validator = this.validator.and(acceptableToString::contains);
             }
 
             if (this.validator != null) {

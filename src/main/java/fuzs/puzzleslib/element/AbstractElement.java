@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.ConfigManager;
 import fuzs.puzzleslib.config.option.ConfigOption;
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 import fuzs.puzzleslib.element.side.IClientElement;
 import fuzs.puzzleslib.element.side.ICommonElement;
 import fuzs.puzzleslib.element.side.IServerElement;
@@ -108,7 +108,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     }
 
     @Override
-    public final void setupGeneralConfig(OptionsBuilder builder) {
+    public final void setupGeneralConfig(OptionBuilder builder) {
 
         // persistent elements cannot be disabled by the user
         if (!this.isPersistent()) {
@@ -150,7 +150,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
         try {
 
             // this is always called, even when the element is disabled
-            ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::setupCommon2, IClientElement::setupClient2, IServerElement::setupServer2);
+            ISidedElement.loadSide((ISidedElement) this, evt, ICommonElement::setupCommon, IClientElement::setupClient, IServerElement::setupServer);
             if (!this.isEnabled()) {
 
                 return;
@@ -245,7 +245,7 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     /**
      * something went wrong using this element, disable until game is restarted
      */
-    protected final void disable() {
+    public final void disable() {
 
         this.setEnabled(-1);
         PuzzlesLib.LOGGER.warn("Detected issue in {} element: {}", this.getDisplayName(), "Disabling until game restart");
@@ -294,15 +294,6 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     public Collection<ConfigOption<?, ?>> getOptions() {
 
         return this.configOptions.values();
-    }
-
-    /**
-     * @return has {@link #load} been called for this
-     */
-    @Deprecated
-    public boolean isLoaded() {
-
-        return this.isFullyLoaded();
     }
 
     /**

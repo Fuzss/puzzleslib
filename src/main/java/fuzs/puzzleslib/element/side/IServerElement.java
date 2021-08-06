@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.element.side;
 
-import fuzs.puzzleslib.config.option.OptionsBuilder;
+import fuzs.puzzleslib.config.option.OptionBuilder;
 
 /**
  * implement this for elements with server-side capabilities
@@ -12,23 +12,13 @@ public interface IServerElement extends ISidedElement {
      */
     default void constructServer() {
 
-        this.setupServer();
     }
 
     /**
-     * register server events
-     */
-    @Deprecated
-    default void setupServer() {
-
-    }
-
-    /**
-     * TODO rename to #setupServer
      * setup for {@link net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent}
      * is always loaded no matter the element's state
      */
-    default void setupServer2() {
+    default void setupServer() {
 
     }
 
@@ -50,7 +40,7 @@ public interface IServerElement extends ISidedElement {
      * build server config
      * @param builder builder for server config
      */
-    default void setupServerConfig(OptionsBuilder builder) {
+    default void setupServerConfig(OptionBuilder builder) {
 
     }
 

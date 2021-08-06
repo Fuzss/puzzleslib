@@ -22,9 +22,9 @@ public class FloatOption extends ConfigOption<Float, Double> {
         private Float minValue;
         private Float maxValue;
 
-        FloatOptionBuilder(String name, Float defaultValue) {
+        FloatOptionBuilder(OptionBuilder previous, String name, Float defaultValue) {
 
-            super(name, defaultValue);
+            super(previous, name, defaultValue);
             this.minValue = Float.MIN_VALUE;
             this.maxValue = Float.MAX_VALUE;
         }

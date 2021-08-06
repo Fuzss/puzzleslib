@@ -36,7 +36,9 @@ ext.mcversion = "${forgeVersion.replaceAll("-.*", "")}"
 ext.modid = "${modId}"
 ext.modversion = "${modVersion}"
 ext.modauthor = "${modAuthor}"
+ext.nextmcversion = getNextVersion("${minMcVersion}")
 //ext.puzzlesversion = "${puzzlesVersion.substring(1, puzzlesVersion.indexOf("-"))}"
+//ext.nextpuzzlesversion = getNextVersion("${minPuzzlesVersion}")
 version = "v${project.modversion}-${project.mcversion}"
 group = "${modGroup}"
 
@@ -119,8 +121,9 @@ processResources {
     inputs.property "modAuthor", project.modauthor
     inputs.property "minForgeVersion", "${minForgeVersion}"
     inputs.property "minMcVersion", "${minMcVersion}"
-    inputs.property "nextMcVersion", "${nextMcVersion}"
-//    inputs.property "puzzlesVersion", project.puzzlesversion
+    inputs.property "nextMcVersion", project.nextmcversion
+//    inputs.property "minPuzzlesVersion", "${minPuzzlesVersion}"
+//    inputs.property "nextPuzzlesVersion", project.nextpuzzlesversion
     inputs.property "packFormat", "${packFormat}"
 
     // replace stuff in mods.toml and pack.mcmeta
@@ -141,8 +144,8 @@ processResources {
                 'modAuthor': project.modauthor,
                 'minForgeVersion': "${minForgeVersion}",
                 'minMcVersion': "${minMcVersion}",
-                "nextMcVersion": "${nextMcVersion}",
-//                "puzzlesVersion": project.puzzlesversion,
+//                "minPuzzlesVersion": "${minPuzzlesVersion}",
+//                "nextPuzzlesVersion": project.nextpuzzlesversion,
                 "packFormat": "${packFormat}"
         )
     }
@@ -360,6 +363,14 @@ task refreshUpdateJson {
         def output = new JsonOutput()
         updateFile.write(output.prettyPrint(output.toJson(updateJson)))
     }
+}
+
+def static getNextVersion(String puzzlesVersion) {
+
+    def puzzlesVersionMatcher = Pattern.compile("(\\d+\\.\\d+)").matcher(puzzlesVersion)
+    puzzlesVersionMatcher.find()
+    def currentVersion = puzzlesVersionMatcher.group(1)
+    return currentVersion.substring(0, currentVersion.indexOf(".") + 1).concat(String.valueOf(Integer.parseInt(currentVersion.substring(currentVersion.indexOf(".") + 1, currentVersion.size())) + 1))
 }
 
 signing {
