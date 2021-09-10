@@ -4,11 +4,14 @@ import com.google.common.collect.Sets;
 import fuzs.puzzleslib.element.AbstractElement;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.lang3.mutable.MutableObject;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class OptionBuilder {
 
@@ -116,9 +119,14 @@ public class OptionBuilder {
         return this.getNext(new GenericOption.GenericOptionBuilder<>(this, optionName, defaultValue));
     }
 
-    public <T> SetOption.SetOptionBuilder<T> define(String optionName, Collection<T> defaultValue) {
+    public <T> SetOption.SetOptionBuilder<T> define(String optionName, Collection<T> defaultValue, Function<T, String> valueToName, Function<String, T> nameToValue) {
 
-        return this.getNext(new SetOption.SetOptionBuilder<>(this, optionName, Sets.newHashSet(defaultValue)));
+        return this.getNext(new SetOption.SetOptionBuilder<>(this, optionName, Sets.newHashSet(defaultValue), valueToName, nameToValue));
+    }
+
+    public <T extends IForgeRegistryEntry<T>> RegistrySetOption.RegistrySetOptionBuilder<T> define(String optionName, Collection<T> defaultValue, IForgeRegistry<T> registry) {
+
+        return this.getNext(new RegistrySetOption.RegistrySetOptionBuilder<>(this, optionName, Sets.newHashSet(defaultValue), registry));
     }
 
     public BooleanOption.BooleanOptionBuilder define(String optionName, boolean defaultValue) {
@@ -175,7 +183,7 @@ public class OptionBuilder {
 
     private <T, S> void createOption(ConfigOption.ConfigOptionBuilder<T, S> builder) {
 
-        List<String> comment = builder.getComment();
+        List<String> comment = builder.buildComment();
         if (!comment.isEmpty()) {
 
             this.builder.comment(comment.toArray(new String[0]));

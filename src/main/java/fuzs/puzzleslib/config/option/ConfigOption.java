@@ -7,7 +7,6 @@ import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public abstract class ConfigOption<T, S> {
 
@@ -20,7 +19,7 @@ public abstract class ConfigOption<T, S> {
     private final ModConfig.Type type;
     private final List<String> path;
     private final String name;
-    private final Supplier<T> defaultValue;
+    private final T defaultValue;
     private final boolean restart;
     private final String[] comment;
     private final List<Consumer<T>> syncConsumers;
@@ -32,7 +31,7 @@ public abstract class ConfigOption<T, S> {
         this.type = type;
         this.path = value.getPath();
         this.name = builder.name;
-        this.defaultValue = () -> builder.defaultValue;
+        this.defaultValue = builder.defaultValue;
         this.restart = builder.restart;
         this.comment = builder.comment;
         this.syncConsumers = builder.syncConsumers;
@@ -44,7 +43,7 @@ public abstract class ConfigOption<T, S> {
         return this.convertValue(this.value.get());
     }
 
-    protected abstract T convertValue(S value);
+    abstract T convertValue(S value);
 
     public boolean isType(ModConfig.Type type) {
 
@@ -63,7 +62,7 @@ public abstract class ConfigOption<T, S> {
 
     public T getDefault() {
 
-        return this.defaultValue.get();
+        return this.defaultValue;
     }
 
     public boolean isRestartRequired() {
@@ -104,7 +103,7 @@ public abstract class ConfigOption<T, S> {
      * @param path path to split
      * @return split path as list
      */
-    protected static List<String> split(String path) {
+    static List<String> split(String path) {
 
         return Lists.newArrayList(DOT_SPLITTER.split(path));
     }
@@ -125,7 +124,7 @@ public abstract class ConfigOption<T, S> {
             this.defaultValue = defaultValue;
         }
 
-        protected List<String> getComment() {
+        List<String> buildComment() {
 
             List<String> comment = Lists.newArrayList(this.comment);
             if (this.restart) {

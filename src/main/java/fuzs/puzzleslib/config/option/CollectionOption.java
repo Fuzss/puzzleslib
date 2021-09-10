@@ -9,19 +9,34 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public abstract class CollectionOption<T, S extends Collection<T>> extends ConfigOption<S, List<? extends T>> {
+public abstract class CollectionOption<T, S extends Collection<T>> extends ConfigOption<S, List<? extends String>> {
 
     private final boolean disallowEmpty;
     private final Collection<T> acceptableValues;
+    private final Function<String, T> nameToValue;
 
-    CollectionOption(ForgeConfigSpec.ConfigValue<List<? extends T>> value, ModConfig.Type type, CollectionOptionBuilder<T, S> builder) {
+    CollectionOption(ForgeConfigSpec.ConfigValue<List<? extends String>> value, ModConfig.Type type, CollectionOptionBuilder<T, S> builder) {
 
         super(value, type, builder);
         this.disallowEmpty = builder.disallowEmpty;
         this.acceptableValues = builder.acceptableValues;
+        this.nameToValue = builder::nameToValue;
     }
+
+    @Override
+    S convertValue(List<? extends String> value) {
+
+        return value.stream()
+                .map(this.nameToValue)
+                .filter(Objects::nonNull)
+                .collect(this.collect());
+    }
+
+    abstract Collector<? super T, ?, S> collect();
 
     public boolean isAllowedEmpty() {
 
@@ -33,7 +48,7 @@ public abstract class CollectionOption<T, S extends Collection<T>> extends Confi
         return this.acceptableValues;
     }
 
-    public static abstract class CollectionOptionBuilder<T, S extends Collection<T>> extends ConfigOptionBuilder<S, List<? extends T>> {
+    public static abstract class CollectionOptionBuilder<T, S extends Collection<T>> extends ConfigOptionBuilder<S, List<? extends String>> {
 
         private boolean disallowEmpty;
         protected Collection<T> acceptableValues;
@@ -45,9 +60,9 @@ public abstract class CollectionOption<T, S extends Collection<T>> extends Confi
         }
 
         @Override
-        protected List<String> getComment() {
+        List<String> buildComment() {
 
-            List<String> comment = super.getComment();
+            List<String> comment = super.buildComment();
             if (this.disallowEmpty) {
 
                 comment.add("This option is not allowed to be empty.");
@@ -80,18 +95,18 @@ public abstract class CollectionOption<T, S extends Collection<T>> extends Confi
         }
 
         @Override
-        abstract CollectionOption<T, S> createOption(ForgeConfigSpec.ConfigValue<List<? extends T>> value, ModConfig.Type type);
+        abstract CollectionOption<T, S> createOption(ForgeConfigSpec.ConfigValue<List<? extends String>> value, ModConfig.Type type);
 
         @Override
-        ForgeConfigSpec.ConfigValue<List<? extends T>> getConfigValue(ForgeConfigSpec.Builder builder) {
+        ForgeConfigSpec.ConfigValue<List<? extends String>> getConfigValue(ForgeConfigSpec.Builder builder) {
 
             assert !this.disallowEmpty || !this.defaultValue.isEmpty() : "Empty default collection on non-empty CollectionOptionBuilder";
             assert this.acceptableValues == null || !this.acceptableValues.isEmpty() : "Empty acceptable values collection";
 
-            List<T> defaultAsList = Lists.newArrayList(this.defaultValue);
+            List<String> defaultAsList = this.defaultValue.stream().map(this::valueToName).filter(Objects::nonNull).collect(Collectors.toList());
             if (this.acceptableValues != null) {
 
-                Set<String> acceptableToString = this.acceptableValues.stream().map(Objects::toString).collect(Collectors.toSet());
+                Set<String> acceptableToString = this.acceptableValues.stream().map(this::valueToName).filter(Objects::nonNull).collect(Collectors.toSet());
                 if (this.disallowEmpty) {
 
                     return builder.defineList(split(this.name), () -> defaultAsList, acceptableToString::contains);
@@ -102,6 +117,10 @@ public abstract class CollectionOption<T, S extends Collection<T>> extends Confi
 
             return builder.define(this.name, defaultAsList, o -> !this.disallowEmpty || !(o instanceof List<?>) || !((List<?>) o).isEmpty());
         }
+
+        abstract String valueToName(T value);
+
+        abstract T nameToValue(String name);
 
     }
 

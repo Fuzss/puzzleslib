@@ -6,15 +6,24 @@ import net.minecraftforge.fml.config.ModConfig;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class EnumsOption<T extends Enum<T>> extends SetOption<T> {
+public class EnumsOption<T extends Enum<T>> extends CollectionOption<T, Set<T>> {
 
     private final Class<T> declaringClazz;
 
-    EnumsOption(ForgeConfigSpec.ConfigValue<List<? extends T>> value, ModConfig.Type type, EnumsOptionBuilder<T> builder) {
+    EnumsOption(ForgeConfigSpec.ConfigValue<List<? extends String>> value, ModConfig.Type type, EnumsOptionBuilder<T> builder) {
 
         super(value, type, builder);
         this.declaringClazz = builder.declaringClazz;
+    }
+
+    @Override
+    Collector<? super T, ?, Set<T>> collect() {
+        
+        return Collectors.toSet();
     }
 
     public Class<T> getDeclaringClass() {
@@ -22,7 +31,7 @@ public class EnumsOption<T extends Enum<T>> extends SetOption<T> {
         return this.declaringClazz;
     }
 
-    public static class EnumsOptionBuilder<T extends Enum<T>> extends SetOptionBuilder<T> {
+    public static class EnumsOptionBuilder<T extends Enum<T>> extends CollectionOptionBuilder<T, Set<T>> {
 
         private final Class<T> declaringClazz;
 
@@ -34,10 +43,26 @@ public class EnumsOption<T extends Enum<T>> extends SetOption<T> {
         }
 
         @Override
-        CollectionOption<T, Set<T>> createOption(ForgeConfigSpec.ConfigValue<List<? extends T>> value, ModConfig.Type type) {
+        CollectionOption<T, Set<T>> createOption(ForgeConfigSpec.ConfigValue<List<? extends String>> value, ModConfig.Type type) {
 
             return new EnumsOption<>(value, type, this);
         }
+
+        @Override
+        String valueToName(T value) {
+            
+            return value.name();
+        }
+
+        @Override
+        T nameToValue(String name) {
+            
+            return Stream.of(this.declaringClazz.getEnumConstants())
+                    .filter(value -> value.name().equals(name))
+                    .findFirst()
+                    .orElse(null);
+        }
+        
     }
 
 }

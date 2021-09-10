@@ -144,6 +144,7 @@ processResources {
                 'modAuthor': project.modauthor,
                 'minForgeVersion': "${minForgeVersion}",
                 'minMcVersion': "${minMcVersion}",
+                "nextMcVersion": project.nextmcversion,
 //                "minPuzzlesVersion": "${minPuzzlesVersion}",
 //                "nextPuzzlesVersion": project.nextpuzzlesversion,
                 "packFormat": "${packFormat}"

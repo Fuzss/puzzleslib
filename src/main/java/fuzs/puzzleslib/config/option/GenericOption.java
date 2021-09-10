@@ -51,9 +51,9 @@ public class GenericOption<T> extends SimpleConfigOption<T> {
         }
 
         @Override
-        protected List<String> getComment() {
+        List<String> buildComment() {
 
-            List<String> comment = super.getComment();
+            List<String> comment = super.buildComment();
             if (this.acceptableValues != null) {
 
                 comment.add("Allowed Values: " + this.acceptableValues.stream().map(Objects::toString).collect(Collectors.joining(", ")));
