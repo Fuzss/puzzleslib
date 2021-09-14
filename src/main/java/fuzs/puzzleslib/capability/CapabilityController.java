@@ -151,14 +151,14 @@ public class CapabilityController {
     /**
      * overload to avoid always null problems
      * @param provider provider object
-     * @param cap capability to get
+     * @param capability capability to get
      * @param <T> capability type
      * @return capability object
      */
     @Nonnull
-    public static <T> LazyOptional<T> getCapability(ICapabilityProvider provider, Capability<T> cap) {
+    public static <T> LazyOptional<T> getCapability(ICapabilityProvider provider, Capability<T> capability) {
 
-        return provider.getCapability(cap);
+        return provider.getCapability(capability);
     }
 
     /**

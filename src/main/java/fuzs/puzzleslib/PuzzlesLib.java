@@ -14,6 +14,7 @@ import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.CraftingHelper;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -58,17 +59,22 @@ public class PuzzlesLib {
      */
     public PuzzlesLib() {
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((final FMLCommonSetupEvent evt) -> evt.enqueueWork(() -> this.onCommonSetup(evt)));
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((final FMLClientSetupEvent evt) -> evt.enqueueWork(() -> this.onClientSetup(evt)));
-        FMLJavaModLoadingContext.get().getModEventBus().addListener((final FMLDedicatedServerSetupEvent evt) -> evt.enqueueWork(() -> this.onDedicatedServerSetup(evt)));
-        FMLJavaModLoadingContext.get().getModEventBus().register(getRegistryManager());
+        this.addListeners(FMLJavaModLoadingContext.get().getModEventBus());
+    }
+
+    /**
+     * add listeners to setup methods
+     */
+    private void addListeners(IEventBus bus) {
+
+        bus.addListener((final FMLCommonSetupEvent evt) -> evt.enqueueWork(() -> this.onCommonSetup(evt)));
+        bus.addListener((final FMLClientSetupEvent evt) -> evt.enqueueWork(() -> this.onClientSetup(evt)));
+        bus.addListener((final FMLDedicatedServerSetupEvent evt) -> evt.enqueueWork(() -> this.onDedicatedServerSetup(evt)));
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent evt) {
 
         ElementRegistry.load(evt, ModConfig.Type.COMMON);
-        // do this here as it's fired on normal event bus
-        MinecraftForge.EVENT_BUS.addListener(getFuelManager()::onFurnaceFuelBurnTime);
     }
 
     private void onClientSetup(final FMLClientSetupEvent evt) {
@@ -82,8 +88,7 @@ public class PuzzlesLib {
     }
 
     /**
-     * set mod to only be required on one side, server or client
-     * works like <code>clientSideOnly</code> back in 1.12
+     * @deprecated renamed to {@link #setSideOnly()}
      */
     @Deprecated
     public static void setSideSideOnly() {
@@ -115,11 +120,7 @@ public class PuzzlesLib {
      */
     public static void loadRecipeCondition() {
 
-        if (!isRecipeConditionLoaded) {
-
-            isRecipeConditionLoaded = true;
-            CraftingHelper.register(new ElementConfigCondition.Serializer());
-        }
+        ElementConfigCondition.loadRecipeCondition();
     }
 
     /**
@@ -143,7 +144,7 @@ public class PuzzlesLib {
      */
     public static FuelManager getFuelManager() {
 
-        return FuelManager.getInstance();
+        return FuelManager.INSTANCE;
     }
 
     /**

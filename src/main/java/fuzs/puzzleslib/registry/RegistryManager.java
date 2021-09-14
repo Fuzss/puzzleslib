@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.registry;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
+import com.google.common.collect.*;
 import fuzs.puzzleslib.util.NamespaceUtil;
 import net.minecraft.block.Block;
 import net.minecraft.enchantment.Enchantment;
@@ -25,24 +23,32 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 import java.util.function.Supplier;
 
 /**
  * handles registering to forge registries
  * heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
  */
-public class RegistryManager {
+public enum RegistryManager {
+
+    /**
+     * instance holder for lazy and thread-safe initialization
+     */
+    INSTANCE;
+
+    private final Map<String, ModRegistry> modToRegistry = Maps.newConcurrentMap();
 
     /**
      * internal storage for collecting and registering registry entries
      * make this synchronized just in case
      */
-    private final Multimap<Class<?>, Pair<ResourceLocation, Supplier<IForgeRegistryEntry<?>>>> registryEntryPairs = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
+    private final Multimap<Class<IForgeRegistryEntry<?>>, Pair<ResourceLocation, Supplier<IForgeRegistryEntry<?>>>> registryEntryPairs = Multimaps.synchronizedListMultimap(ArrayListMultimap.create());
 
     /**
      * private singleton constructor
      */
-    private RegistryManager() {
+    RegistryManager() {
 
     }
 
@@ -127,7 +133,7 @@ public class RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void register(Class<?> registryType, @Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+    public <T extends IForgeRegistryEntry<T>> void register(Class<T> registryType, @Nullable String path, Supplier<T> entry) {
 
         ResourceLocation name = null;
         if (path != null) {
@@ -135,7 +141,7 @@ public class RegistryManager {
             name = NamespaceUtil.locate(path);
         }
 
-        this.registryEntryPairs.put(registryType, Pair.of(name, entry));
+        this.registryEntryPairs.put((Class<IForgeRegistryEntry<?>>) registryType, Pair.of(name, (Supplier<IForgeRegistryEntry<?>>) entry));
     }
 
     public void registerBlockWithItem(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry, ItemGroup creativeTab) {
@@ -180,7 +186,7 @@ public class RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerItem(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+    public void registerItem(@Nullable String path, Supplier<Item> entry) {
 
         this.register(Item.class, path, entry);
     }
@@ -230,7 +236,7 @@ public class RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerEntityType(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+    public void registerEntityType(@Nullable String path, Supplier<EntityType<?>> entry) {
 
         this.register(EntityType.class, path, entry);
     }
@@ -240,7 +246,7 @@ public class RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerTileEntityType(@Nullable String path, Supplier<IForgeRegistryEntry<?>> entry) {
+    public void registerTileEntityType(@Nullable String path, Supplier<TileEntityType> entry) {
 
         this.register(TileEntityType.class, path, entry);
     }
@@ -255,20 +261,14 @@ public class RegistryManager {
         this.register(ContainerType.class, path, entry);
     }
 
-    /**
-     * @return {@link RegistryManager} instance
-     */
-    public static RegistryManager getInstance() {
+    private static class ModRegistry {
 
-        return RegistryManager.RegistryManagerHolder.INSTANCE;
-    }
+        private final Multimap<Class<?>, Pair<String, Supplier<IForgeRegistryEntry<?>>>> registryToEntryData = HashMultimap.create();
 
-    /**
-     * instance holder class for lazy and thread-safe initialization
-     */
-    private static class RegistryManagerHolder {
+        public static ModRegistry addListenerAndCreate() {
 
-        private static final RegistryManager INSTANCE = new RegistryManager();
+
+        }
 
     }
 

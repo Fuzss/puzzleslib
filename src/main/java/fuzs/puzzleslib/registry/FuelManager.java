@@ -4,13 +4,19 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.item.Item;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 /**
  * applies fuel burn times instead of implementing this on the item side
  * heavily inspired by FuelHandler found in Vazkii's Quark mod
  */
-public class FuelManager {
+public enum FuelManager {
+
+    /**
+     * instance holder for lazy and thread-safe initialization
+     */
+    INSTANCE;
 
     /**
      * stored burn times
@@ -20,8 +26,9 @@ public class FuelManager {
     /**
      * private singleton constructor
      */
-    private FuelManager() {
+    FuelManager() {
 
+        MinecraftForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);
     }
 
     /**
@@ -30,7 +37,7 @@ public class FuelManager {
      */
     public void addItem(Item item, int fuelPower) {
 
-        if(fuelPower > 0 && item != null) {
+        if (fuelPower > 0 && item != null) {
 
             this.fuelValues.put(item, fuelPower);
         }
@@ -58,30 +65,13 @@ public class FuelManager {
      * forge event handler registered in main mod class
      * @param evt forge event
      */
-    public void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
+    private void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
 
         Item item = evt.getItemStack().getItem();
-        if(this.fuelValues.containsKey(item)) {
+        if (this.fuelValues.containsKey(item)) {
 
             evt.setBurnTime(this.fuelValues.getInt(item));
         }
-    }
-
-    /**
-     * @return {@link FuelManager} instance
-     */
-    public static FuelManager getInstance() {
-
-        return FuelManager.FuelManagerHolder.INSTANCE;
-    }
-
-    /**
-     * instance holder class for lazy and thread-safe initialization
-     */
-    private static class FuelManagerHolder {
-
-        private static final FuelManager INSTANCE = new FuelManager();
-
     }
 
 }
