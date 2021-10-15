@@ -9,11 +9,9 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.IProxy;
 import fuzs.puzzleslib.recipe.ElementConfigCondition;
 import fuzs.puzzleslib.registry.FuelManager;
-import fuzs.puzzleslib.registry.RegistryManager;
+import fuzs.puzzleslib.registry.v2.RegistryManager;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -49,10 +47,6 @@ public class PuzzlesLib {
      * sided proxy depending on physical side
      */
     private static IProxy<?> proxy;
-    /**
-     * has config recipe condition been loaded via {@link #loadRecipeCondition()}
-     */
-    private static boolean isRecipeConditionLoaded;
 
     /**
      * add listeners to setup methods
@@ -133,10 +127,20 @@ public class PuzzlesLib {
 
     /**
      * @return registry manager for puzzles lib mods
+     * @deprecated use {@link #getRegistryManagerV2()}
      */
-    public static RegistryManager getRegistryManager() {
+    @Deprecated
+    public static fuzs.puzzleslib.registry.RegistryManager getRegistryManager() {
 
-        return RegistryManager.getInstance();
+        return fuzs.puzzleslib.registry.RegistryManager.getInstance();
+    }
+
+    /**
+     * @return registry manager for puzzles lib mods
+     */
+    public static RegistryManager getRegistryManagerV2() {
+
+        return RegistryManager.INSTANCE;
     }
 
     /**
