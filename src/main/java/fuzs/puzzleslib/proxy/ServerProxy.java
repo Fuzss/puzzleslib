@@ -5,49 +5,27 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.LogicalSidedProvider;
 
-import javax.annotation.Nonnull;
-
 /**
  * server proxy class
  */
-public class ServerProxy implements IProxy<MinecraftServer> {
+public class ServerProxy implements IProxy {
 
-    /**
-     * private singleton constructor
-     */
-    private ServerProxy() {
+    @Override
+    public PlayerEntity getClientPlayer() {
 
+        return null;
     }
 
     @Override
-    public MinecraftServer getGameInstance() {
+    public Object getClientInstance() {
+
+        return null;
+    }
+
+    @Override
+    public MinecraftServer getGameServer() {
 
         return LogicalSidedProvider.INSTANCE.get(LogicalSide.SERVER);
-    }
-
-    @Nonnull
-    @Override
-    public PlayerEntity getPlayer(PlayerEntity player) {
-
-        return player;
-    }
-
-    /**
-     * TODO rename this back to #getInstance
-     * @return {@link ServerProxy} instance
-     */
-    public static ServerProxy getInstance2() {
-
-        return ServerProxy.ServerProxyHolder.INSTANCE;
-    }
-
-    /**
-     * instance holder class for lazy and thread-safe initialization
-     */
-    private static class ServerProxyHolder {
-
-        private static final ServerProxy INSTANCE = new ServerProxy();
-
     }
 
 }

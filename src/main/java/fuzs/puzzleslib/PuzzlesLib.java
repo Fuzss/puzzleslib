@@ -2,15 +2,17 @@ package fuzs.puzzleslib;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.capability.CapabilityController;
+import fuzs.puzzleslib.core.EnvTypeExecutor;
 import fuzs.puzzleslib.element.AbstractElement;
 import fuzs.puzzleslib.element.ElementRegistry;
 import fuzs.puzzleslib.element.side.ISidedElement;
-import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.network.v2.NetworkHandler;
+import fuzs.puzzleslib.proxy.ClientProxy;
 import fuzs.puzzleslib.proxy.IProxy;
+import fuzs.puzzleslib.proxy.ServerProxy;
 import fuzs.puzzleslib.recipe.ElementConfigCondition;
 import fuzs.puzzleslib.registry.FuelManager;
 import fuzs.puzzleslib.registry.v2.RegistryManager;
-import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ExtensionPoint;
@@ -35,6 +37,11 @@ public class PuzzlesLib {
     public static final String MODID = "puzzleslib";
     public static final String NAME = "Puzzles Lib";
     public static final Logger LOGGER = LogManager.getLogger(PuzzlesLib.NAME);
+    /**
+     * sided proxy depending on physical side
+     */
+    @SuppressWarnings("Convert2MethodRef")
+    public static final IProxy PROXY = EnvTypeExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
 
     /**
      * temporary {@link ElementRegistry} storage for backwards compatibility
@@ -42,11 +49,6 @@ public class PuzzlesLib {
      */
     @Deprecated
     private static final Map<String, ElementRegistry> ELEMENT_REGISTRIES = Maps.newHashMap();
-
-    /**
-     * sided proxy depending on physical side
-     */
-    private static IProxy<?> proxy;
 
     /**
      * add listeners to setup methods
@@ -82,6 +84,15 @@ public class PuzzlesLib {
     }
 
     /**
+     * set mod to only be required on one side, server or client
+     * works like <code>clientSideOnly</code> back in 1.12
+     */
+    public static void setSideOnly() {
+
+        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
+    }
+
+    /**
      * @deprecated renamed to {@link #setSideOnly()}
      */
     @Deprecated
@@ -91,12 +102,11 @@ public class PuzzlesLib {
     }
 
     /**
-     * set mod to only be required on one side, server or client
-     * works like <code>clientSideOnly</code> back in 1.12
+     * load {@link ElementConfigCondition} in case this element is adding any configurable recipes
      */
-    public static void setSideOnly() {
+    public static void loadRecipeCondition() {
 
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (remote, isServer) -> true));
+        ElementConfigCondition.loadRecipeCondition();
     }
 
     /**
@@ -110,19 +120,21 @@ public class PuzzlesLib {
     }
 
     /**
-     * load {@link ElementConfigCondition} in case this element is adding any configurable recipes
+     * @return proxy for getting physical side specific objects
+     * @deprecated access field directly
      */
-    public static void loadRecipeCondition() {
+    @Deprecated
+    public static IProxy getProxy() {
 
-        ElementConfigCondition.loadRecipeCondition();
+        return PROXY;
     }
 
     /**
-     * @return proxy for getting physical side specific objects
+     * @return registry manager for puzzles lib mods
      */
-    public static IProxy<?> getProxy() {
+    public static RegistryManager getRegistryManagerV2() {
 
-        return PuzzlesUtil.getOrElse(proxy, IProxy::getProxy, instance -> proxy = instance);
+        return RegistryManager.INSTANCE;
     }
 
     /**
@@ -136,14 +148,6 @@ public class PuzzlesLib {
     }
 
     /**
-     * @return registry manager for puzzles lib mods
-     */
-    public static RegistryManager getRegistryManagerV2() {
-
-        return RegistryManager.INSTANCE;
-    }
-
-    /**
      * @return fuel manager for puzzles lib mods
      */
     public static FuelManager getFuelManager() {
@@ -154,9 +158,19 @@ public class PuzzlesLib {
     /**
      * @return network handler for puzzles lib mods
      */
-    public static NetworkHandler getNetworkHandler() {
+    public static NetworkHandler getNetworkHandlerV2() {
 
-        return NetworkHandler.getInstance();
+        return NetworkHandler.INSTANCE;
+    }
+
+    /**
+     * @return network handler for puzzles lib mods
+     * @deprecated use {@link #getNetworkHandlerV2()}
+     */
+    @Deprecated
+    public static fuzs.puzzleslib.network.NetworkHandler getNetworkHandler() {
+
+        return fuzs.puzzleslib.network.NetworkHandler.getInstance();
     }
 
     /**

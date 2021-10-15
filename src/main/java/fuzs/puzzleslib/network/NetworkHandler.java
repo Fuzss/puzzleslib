@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 /**
  * handler for network communications of all puzzles lib mods
  */
+@Deprecated
 public class NetworkHandler {
 
     /**
@@ -56,7 +57,12 @@ public class NetworkHandler {
             NetworkEvent.Context ctx = context.get();
             assert executionSide == ctx.getDirection().getReceptionSide() : "Unable to handle " + message.getClass().getSimpleName() + " message: " + "Received at wrong side";
 
-            PlayerEntity player = PuzzlesLib.getProxy().getPlayer(ctx.getSender());
+            PlayerEntity player;
+            if (executionSide.isClient()) {
+                player = PuzzlesLib.PROXY.getClientPlayer();
+            } else {
+                player = ctx.getSender();
+            }
             // https://stackoverflow.com/questions/15722184/method-in-is-defined-in-inaccessible-class-or-interface-compilation
             ctx.enqueueWork(() -> message.process(player));
             ctx.setPacketHandled(true);

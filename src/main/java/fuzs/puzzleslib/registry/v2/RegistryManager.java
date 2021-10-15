@@ -18,6 +18,7 @@ import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -62,44 +63,23 @@ public enum RegistryManager {
 
     /**
      * register any type of registry entry with a preset path
-     * @param entry entry to register
-     */
-    @Deprecated
-    public <T extends IForgeRegistryEntry<T>> void register(T entry) {
-
-        this.register(null, entry);
-    }
-
-    /**
-     * register any type of registry entry
-     * @param path optional path for new entry
-     * @param entry entry to register
-     */
-    @Deprecated
-    public <T extends IForgeRegistryEntry<T>> void register(@Nullable String path, T entry) {
-
-        this.register(entry.getRegistryType(), path, () -> entry);
-    }
-
-    /**
-     * register any type of registry entry with a preset path
-     * @param registryType type for this registry entry
+     * @param registry type for this registry entry
      * @param entry supplier for entry to register
      */
-    public <T extends IForgeRegistryEntry<T>> void register(Class<? extends T> registryType, Supplier<T> entry) {
+    public <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, Supplier<T> entry) {
 
-        this.register(registryType, null, entry);
+        this.register(registry, null, entry);
     }
 
     /**
      * register any type of registry entry with a path
-     * @param registryType type for this registry entry
+     * @param registry type for this registry entry
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      * @param <T>          registry entry type
      */
-    public <T extends IForgeRegistryEntry<T>> void register(Class<? extends T> registryType, @Nullable String path, Supplier<T> entry) {
-        this.getCurrentModRegistry().register(registryType, () -> {
+    public <T extends IForgeRegistryEntry<T>> RegistryObject<T> register(IForgeRegistry<T> registry, @Nullable String path, Supplier<T> entry) {
+        this.getCurrentModRegistry().register(registry, () -> {
             T e = entry.get();
             Objects.requireNonNull(e, "Can't register null object");
             if (e.getRegistryName() == null) {
@@ -108,6 +88,10 @@ public enum RegistryManager {
             }
             return e;
         });
+        if (path != null) {
+            return RegistryObject.of(NamespaceUtil.locate(path), registry);
+        }
+        return null;
     }
 
     /**
@@ -133,8 +117,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerBlock(@Nullable String path, Supplier<Block> entry) {
-        this.register(Block.class, path, entry);
+    public RegistryObject<Block> registerBlock(@Nullable String path, Supplier<Block> entry) {
+        return this.register(ForgeRegistries.BLOCKS, path, entry);
     }
 
     /**
@@ -163,8 +147,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerFluid(@Nullable String path, Supplier<Fluid> entry) {
-        this.register(Fluid.class, path, entry);
+    public RegistryObject<Fluid> registerFluid(@Nullable String path, Supplier<Fluid> entry) {
+        return this.register(ForgeRegistries.FLUIDS, path, entry);
     }
 
     /**
@@ -172,8 +156,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerItem(@Nullable String path, Supplier<Item> entry) {
-        this.register(Item.class, path, entry);
+    public RegistryObject<Item> registerItem(@Nullable String path, Supplier<Item> entry) {
+        return this.register(ForgeRegistries.ITEMS, path, entry);
     }
 
     /**
@@ -181,8 +165,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param creativeTab creative tab for item
      */
-    public void registerBlockItem(@Nonnull String path, ItemGroup creativeTab) {
-        this.registerBlockItem(path, new Item.Properties().tab(creativeTab));
+    public RegistryObject<Item> registerBlockItem(@Nonnull String path, ItemGroup creativeTab) {
+        return this.registerBlockItem(path, new Item.Properties().tab(creativeTab));
     }
 
     /**
@@ -190,8 +174,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param properties properties for item, should include tab
      */
-    public void registerBlockItem(@Nonnull String path, Item.Properties properties) {
-        this.registerItem(path, () -> {
+    public RegistryObject<Item> registerBlockItem(@Nonnull String path, Item.Properties properties) {
+        return this.registerItem(path, () -> {
             Block block = ForgeRegistries.BLOCKS.getValue(NamespaceUtil.locate(path));
             Objects.requireNonNull(block, "Can't register item for null block");
             return new BlockItem(block, properties);
@@ -203,9 +187,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerEffect(@Nullable String path, Supplier<Effect> entry) {
-
-        this.register(Effect.class, path, entry);
+    public RegistryObject<Effect> registerEffect(@Nullable String path, Supplier<Effect> entry) {
+        return this.register(ForgeRegistries.POTIONS, path, entry);
     }
 
     /**
@@ -213,9 +196,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerSoundEvent(@Nullable String path, Supplier<SoundEvent> entry) {
-
-        this.register(SoundEvent.class, path, entry);
+    public RegistryObject<SoundEvent> registerSoundEvent(@Nullable String path, Supplier<SoundEvent> entry) {
+        return this.register(ForgeRegistries.SOUND_EVENTS, path, entry);
     }
 
     /**
@@ -223,9 +205,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerPotion(@Nullable String path, Supplier<Potion> entry) {
-
-        this.register(Potion.class, path, entry);
+    public RegistryObject<Potion> registerPotion(@Nullable String path, Supplier<Potion> entry) {
+        return this.register(ForgeRegistries.POTION_TYPES, path, entry);
     }
 
     /**
@@ -233,9 +214,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerEnchantment(@Nullable String path, Supplier<Enchantment> entry) {
-
-        this.register(Enchantment.class, path, entry);
+    public RegistryObject<Enchantment> registerEnchantment(@Nullable String path, Supplier<Enchantment> entry) {
+        return this.register(ForgeRegistries.ENCHANTMENTS, path, entry);
     }
 
     /**
@@ -243,9 +223,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerEntityTypeBuilder(@Nonnull String path, Supplier<EntityType.Builder<?>> entry) {
-
-        this.register(EntityType.class, path, () -> entry.get().build(path));
+    public RegistryObject<EntityType<?>> registerEntityTypeBuilder(@Nonnull String path, Supplier<EntityType.Builder<?>> entry) {
+        return this.registerEntityType(path, () -> entry.get().build(path));
     }
 
     /**
@@ -253,9 +232,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerEntityType(@Nullable String path, Supplier<EntityType<?>> entry) {
-
-        this.register(EntityType.class, path, entry);
+    public RegistryObject<EntityType<?>> registerEntityType(@Nullable String path, Supplier<EntityType<?>> entry) {
+        return this.register(ForgeRegistries.ENTITIES, path, entry);
     }
 
     /**
@@ -264,9 +242,8 @@ public enum RegistryManager {
      * @param entry supplier for entry to register
      */
     @SuppressWarnings("ConstantConditions")
-    public void registerTileEntityTypeBuilder(@Nullable String path, Supplier<TileEntityType.Builder<?>> entry) {
-
-        this.registerTileEntityType(path, () -> entry.get().build(null));
+    public RegistryObject<TileEntityType<?>> registerTileEntityTypeBuilder(@Nullable String path, Supplier<TileEntityType.Builder<?>> entry) {
+        return this.registerTileEntityType(path, () -> entry.get().build(null));
     }
 
     /**
@@ -274,9 +251,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerTileEntityType(@Nullable String path, Supplier<TileEntityType<?>> entry) {
-
-        this.register(TileEntityType.class, path, entry);
+    public RegistryObject<TileEntityType<?>> registerTileEntityType(@Nullable String path, Supplier<TileEntityType<?>> entry) {
+        return this.register(ForgeRegistries.TILE_ENTITIES, path, entry);
     }
 
     /**
@@ -284,9 +260,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerContainer(@Nullable String path, ContainerType.IFactory<?> entry) {
-
-        this.registerContainerType(path, () -> new ContainerType<>(entry));
+    public RegistryObject<ContainerType<?>> registerContainer(@Nullable String path, ContainerType.IFactory<?> entry) {
+        return this.registerContainerType(path, () -> new ContainerType<>(entry));
     }
 
     /**
@@ -294,9 +269,8 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      */
-    public void registerContainerType(@Nullable String path, Supplier<ContainerType<?>> entry) {
-
-        this.register(ContainerType.class, path, entry);
+    public RegistryObject<ContainerType<?>> registerContainerType(@Nullable String path, Supplier<ContainerType<?>> entry) {
+        return this.register(ForgeRegistries.CONTAINERS, path, entry);
     }
 
     /**
@@ -307,16 +281,16 @@ public enum RegistryManager {
         /**
          * internal storage for collecting and registering registry entries
          */
-        private final Multimap<Class<? extends IForgeRegistryEntry<?>>, Supplier<? extends IForgeRegistryEntry<?>>> registryToFactory = ArrayListMultimap.create();
+        private final Multimap<IForgeRegistry<? extends IForgeRegistryEntry<?>>, Supplier<? extends IForgeRegistryEntry<?>>> registryToFactory = ArrayListMultimap.create();
 
         /**
          * register any type of registry entry with a path
-         * @param registryType type for this registry entry
+         * @param registry type for this registry entry
          * @param entry supplier for entry to register
          * @param <T>          registry entry type
          */
-        public <T extends IForgeRegistryEntry<T>> void register(Class<? extends T> registryType, Supplier<T> entry) {
-            this.registryToFactory.put(registryType, entry);
+        public <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, Supplier<T> entry) {
+            this.registryToFactory.put(registry, entry);
         }
 
         /**
@@ -325,8 +299,7 @@ public enum RegistryManager {
          * @param <T> type of registry entry
          */
         public <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
-            Class<T> type = registry.getRegistrySuperType();
-            this.registryToFactory.get(type).forEach(entry -> {
+            this.registryToFactory.get(registry).forEach(entry -> {
                 registry.register((T) entry.get());
             });
         }
