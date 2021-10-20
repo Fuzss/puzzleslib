@@ -98,6 +98,7 @@ public class ModEntryList extends ArrayList<String> {
     /**
      * create list with registry entries
      * @param elements elements to add
+     * @return list with elements
      */
     public static ModEntryList of(IForgeRegistryEntry<?>... elements) {
 
@@ -107,6 +108,7 @@ public class ModEntryList extends ArrayList<String> {
     /**
      * create list with strings in pairs of two
      * @param elements elements to add
+     * @return list with elements
      */
     public static ModEntryList of(String... elements) {
 
@@ -116,6 +118,7 @@ public class ModEntryList extends ArrayList<String> {
     /**
      * create list with resource locations
      * @param elements elements to add
+     * @return list with elements
      */
     public static ModEntryList of(ResourceLocation... elements) {
 

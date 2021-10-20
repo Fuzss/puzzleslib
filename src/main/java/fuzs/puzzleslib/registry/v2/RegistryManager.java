@@ -64,6 +64,7 @@ public enum RegistryManager {
      * register any type of registry entry with a preset path
      * @param registry type for this registry entry
      * @param entry supplier for entry to register
+     * @param <T>      entry type
      */
     public <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, Supplier<T> entry) {
 
@@ -76,6 +77,7 @@ public enum RegistryManager {
      * @param path optional path for new entry
      * @param entry supplier for entry to register
      * @param <T>          registry entry type
+     * @return registry object for <code>entry</code>
      */
     public <T extends IForgeRegistryEntry<T>> RegistryObject<T> register(IForgeRegistry<T> registry, @Nullable String path, Supplier<T> entry) {
         this.getCurrentModRegistry().register(registry, () -> {
@@ -115,6 +117,7 @@ public enum RegistryManager {
      * register block entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Block> registerBlock(@Nullable String path, Supplier<Block> entry) {
         return this.register(ForgeRegistries.BLOCKS, path, entry);
@@ -145,6 +148,7 @@ public enum RegistryManager {
      * register fluid entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Fluid> registerFluid(@Nullable String path, Supplier<Fluid> entry) {
         return this.register(ForgeRegistries.FLUIDS, path, entry);
@@ -154,6 +158,7 @@ public enum RegistryManager {
      * register item entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Item> registerItem(@Nullable String path, Supplier<Item> entry) {
         return this.register(ForgeRegistries.ITEMS, path, entry);
@@ -163,6 +168,7 @@ public enum RegistryManager {
      * register block entry with a path
      * @param path optional path for new entry
      * @param creativeTab creative tab for item
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Item> registerBlockItem(@Nonnull String path, ItemGroup creativeTab) {
         return this.registerBlockItem(path, new Item.Properties().tab(creativeTab));
@@ -172,6 +178,7 @@ public enum RegistryManager {
      * register block entry with a path
      * @param path optional path for new entry
      * @param properties properties for item, should include tab
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Item> registerBlockItem(@Nonnull String path, Item.Properties properties) {
         return this.registerItem(path, () -> {
@@ -185,6 +192,7 @@ public enum RegistryManager {
      * register effect entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Effect> registerEffect(@Nullable String path, Supplier<Effect> entry) {
         return this.register(ForgeRegistries.POTIONS, path, entry);
@@ -194,6 +202,7 @@ public enum RegistryManager {
      * register sound event entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<SoundEvent> registerSoundEvent(@Nullable String path, Supplier<SoundEvent> entry) {
         return this.register(ForgeRegistries.SOUND_EVENTS, path, entry);
@@ -203,6 +212,7 @@ public enum RegistryManager {
      * register potion entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Potion> registerPotion(@Nullable String path, Supplier<Potion> entry) {
         return this.register(ForgeRegistries.POTION_TYPES, path, entry);
@@ -212,6 +222,7 @@ public enum RegistryManager {
      * register enchantment entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<Enchantment> registerEnchantment(@Nullable String path, Supplier<Enchantment> entry) {
         return this.register(ForgeRegistries.ENCHANTMENTS, path, entry);
@@ -221,6 +232,7 @@ public enum RegistryManager {
      * register entity type entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<EntityType<?>> registerEntityTypeBuilder(@Nonnull String path, Supplier<EntityType.Builder<?>> entry) {
         return this.registerEntityType(path, () -> entry.get().build(path));
@@ -230,6 +242,7 @@ public enum RegistryManager {
      * register entity type entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<EntityType<?>> registerEntityType(@Nullable String path, Supplier<EntityType<?>> entry) {
         return this.register(ForgeRegistries.ENTITIES, path, entry);
@@ -239,6 +252,7 @@ public enum RegistryManager {
      * register tile entity type entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     @SuppressWarnings("ConstantConditions")
     public RegistryObject<TileEntityType<?>> registerTileEntityTypeBuilder(@Nullable String path, Supplier<TileEntityType.Builder<?>> entry) {
@@ -249,6 +263,7 @@ public enum RegistryManager {
      * register tile entity type entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<TileEntityType<?>> registerTileEntityType(@Nullable String path, Supplier<TileEntityType<?>> entry) {
         return this.register(ForgeRegistries.TILE_ENTITIES, path, entry);
@@ -258,6 +273,7 @@ public enum RegistryManager {
      * register container type entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<ContainerType<?>> registerContainer(@Nullable String path, ContainerType.IFactory<?> entry) {
         return this.registerContainerType(path, () -> new ContainerType<>(entry));
@@ -267,6 +283,7 @@ public enum RegistryManager {
      * register container type entry with a path
      * @param path optional path for new entry
      * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
      */
     public RegistryObject<ContainerType<?>> registerContainerType(@Nullable String path, Supplier<ContainerType<?>> entry) {
         return this.register(ForgeRegistries.CONTAINERS, path, entry);
