@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.13-1.16.5] - 2021-10-20
+### Added
+- Added new ModEntryList for managing resource locations from other mods
+- Added new NetworkHandler and message base for cleaner message registration and handling
+- Added new RegistryManager for letting mods register their objects themselves, a few utility methods and easy registry object creation
+- Added custom EnvTypeExecutor, based on Forge's DistExecutor
+- Added ModLoadingEnvironment helper class for easy access to common resources on different mod loaders
+### Changed
+- Proxy clean-up
+- Deprecated old NetworkHandler, RegistryManager and LoadedLocationList
+
 ## [v1.0.12-1.16.5] - 2021-07-30
 ### Added
 - Added FuelManager for registering item burn times

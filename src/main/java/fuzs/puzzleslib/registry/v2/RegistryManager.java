@@ -55,7 +55,6 @@ public enum RegistryManager {
      * listener is added in main mod class so it's always puzzles lib itself and not the first mod registering something
      * @param evt all forge registry events
      */
-    @SuppressWarnings("unused")
     @SubscribeEvent
     public void onRegistryRegister(RegistryEvent.Register<?> evt) {
         this.getCurrentModRegistry().addAllToRegistry(evt.getRegistry());
@@ -298,6 +297,7 @@ public enum RegistryManager {
          * @param registry active registry
          * @param <T> type of registry entry
          */
+        @SuppressWarnings("unchecked")
         public <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
             this.registryToFactory.get(registry).forEach(entry -> {
                 registry.register((T) entry.get());

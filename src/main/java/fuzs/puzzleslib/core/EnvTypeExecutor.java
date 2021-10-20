@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.core.ModLoaderEnvironment;
 import net.minecraftforge.api.distmarker.Dist;
 
 import javax.annotation.Nullable;

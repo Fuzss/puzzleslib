@@ -38,8 +38,9 @@ public enum NetworkHandler {
     private static final String PROTOCOL_VERSION = Integer.toString(1);
     /**
      * channel for sending messages
+     * TODO make private when old handler is removed
      */
-    private static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
+    public static final SimpleChannel CHANNEL = NetworkRegistry.ChannelBuilder
             .named(new ResourceLocation(PuzzlesLib.MODID, "main"))
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)

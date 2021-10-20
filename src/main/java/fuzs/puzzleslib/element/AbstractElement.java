@@ -57,24 +57,16 @@ public abstract class AbstractElement extends EventListener implements IConfigur
     @Nonnull
     @Override
     public final ResourceLocation getRegistryName() {
-
-        if (this.name == null) {
-
-            throw new UnsupportedOperationException("Cannot get name for element: " + "Name not set");
-        }
-
+        Objects.requireNonNull(this.name, "Cannot get name for element, name not set");
         return this.name;
     }
 
     @Nonnull
     @Override
     public final AbstractElement setRegistryName(@Nonnull ResourceLocation name) {
-
         if (this.name != null) {
-
-            throw new UnsupportedOperationException("Cannot set name \"" + name + "\" for element: " + "Name already set as \"" + this.name + "\"");
+            throw new UnsupportedOperationException(String.format("Cannot set name %s for element, name already set as %s", name, this.name));
         }
-
         this.name = name;
         return this;
     }

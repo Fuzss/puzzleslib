@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry.entry;
+package fuzs.puzzleslib.registry.v2.entry;
 
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentType;

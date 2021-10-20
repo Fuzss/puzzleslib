@@ -1,10 +1,8 @@
 package fuzs.puzzleslib.registry.loadable;
 
-import fuzs.puzzleslib.registry.entry.ModEnchantment;
-import net.minecraft.enchantment.Enchantment;
+import fuzs.puzzleslib.registry.v2.entry.ModEnchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
 
 /**
  * @deprecated renamed to {@link ModEnchantment}
