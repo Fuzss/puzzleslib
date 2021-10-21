@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v1.0.13-1.16.5] - 2021-10-20
+## [v1.0.13-1.16.5] - 2021-10-21
 ### Added
 - Added new ModEntryList for managing resource locations from other mods
 - Added new NetworkHandler and message base for cleaner message registration and handling

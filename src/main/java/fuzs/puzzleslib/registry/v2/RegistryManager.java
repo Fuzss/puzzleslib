@@ -234,7 +234,7 @@ public enum RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<EntityType<?>> registerEntityTypeBuilder(@Nonnull String path, Supplier<EntityType.Builder<?>> entry) {
+    public RegistryObject<EntityType<?>> registerRawEntityType(@Nonnull String path, Supplier<EntityType.Builder<?>> entry) {
         return this.registerEntityType(path, () -> entry.get().build(path));
     }
 
@@ -255,7 +255,7 @@ public enum RegistryManager {
      * @return registry object for <code>entry</code>
      */
     @SuppressWarnings("ConstantConditions")
-    public RegistryObject<TileEntityType<?>> registerTileEntityTypeBuilder(@Nullable String path, Supplier<TileEntityType.Builder<?>> entry) {
+    public RegistryObject<TileEntityType<?>> registerRawTileEntityType(@Nullable String path, Supplier<TileEntityType.Builder<?>> entry) {
         return this.registerTileEntityType(path, () -> entry.get().build(null));
     }
 
@@ -275,8 +275,8 @@ public enum RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<ContainerType<?>> registerContainer(@Nullable String path, ContainerType.IFactory<?> entry) {
-        return this.registerContainerType(path, () -> new ContainerType<>(entry));
+    public RegistryObject<ContainerType<?>> registerRawContainerType(@Nullable String path, Supplier<ContainerType.IFactory<?>> entry) {
+        return this.registerContainerType(path, () -> new ContainerType<>(entry.get()));
     }
 
     /**

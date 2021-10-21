@@ -51,7 +51,6 @@ public class RegistryManager {
      * listener is added in main mod class so it's always puzzles lib itself and not the first mod registering something
      * @param evt all forge registry events
      */
-    @SuppressWarnings("unused")
     @SubscribeEvent
     public void onRegistryRegister(RegistryEvent.Register<?> evt) {
 

@@ -49,7 +49,7 @@ public interface Message {
          * @param player       server or client player
          * @param gameInstance  server or client instance
          */
-        abstract void handle(T packet, PlayerEntity player, Object gameInstance);
+        public abstract void handle(T packet, PlayerEntity player, Object gameInstance);
 
     }
 

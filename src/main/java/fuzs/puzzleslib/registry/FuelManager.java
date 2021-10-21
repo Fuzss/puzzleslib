@@ -23,9 +23,6 @@ public enum FuelManager {
      */
     private final Object2IntOpenHashMap<Item> fuelValues = new Object2IntOpenHashMap<>();
 
-    /**
-     * private singleton constructor
-     */
     FuelManager() {
 
         MinecraftForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);

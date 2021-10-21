@@ -66,6 +66,7 @@ public class PuzzlesLib {
         bus.addListener((final FMLCommonSetupEvent evt) -> evt.enqueueWork(() -> this.onCommonSetup(evt)));
         bus.addListener((final FMLClientSetupEvent evt) -> evt.enqueueWork(() -> this.onClientSetup(evt)));
         bus.addListener((final FMLDedicatedServerSetupEvent evt) -> evt.enqueueWork(() -> this.onDedicatedServerSetup(evt)));
+        bus.register(getRegistryManager());
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent evt) {

@@ -8,6 +8,7 @@ import java.util.function.Consumer;
 /**
  * network message template
  */
+@Deprecated
 public abstract class Message {
 
     /**
