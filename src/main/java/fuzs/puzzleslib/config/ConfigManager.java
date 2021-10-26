@@ -46,7 +46,7 @@ public class ConfigManager {
 
         ModConfig.Type type = modConfig.getType();
         syncOptions(allElements, type, isReloading);
-        // separate general element so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
+        // separate general element, so we can sync after everything else has been reloaded as syncing might rely on config values that have just been updated
         getAllOptions(ImmutableSet.of(generalElement), type).forEach(ConfigOption::sync);
     }
 

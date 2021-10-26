@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.registry.loadable;
 
-import fuzs.puzzleslib.registry.v2.entry.ModEnchantment;
+import fuzs.puzzleslib.registry.v2.registryentry.ModEnchantment;
 import net.minecraft.enchantment.EnchantmentType;
 import net.minecraft.inventory.EquipmentSlotType;
 

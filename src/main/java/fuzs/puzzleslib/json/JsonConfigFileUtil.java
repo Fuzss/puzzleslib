@@ -24,7 +24,7 @@ public class JsonConfigFileUtil {
     /**
      * how many layers deep recursive file locators are allowed to dig
      */
-    private static final int SEARCH_LAYERS = 3;
+    private static final int SEARCH_DEPTH = 3;
 
     /**
      * make a new directory for this mod in the main config directory
@@ -99,7 +99,7 @@ public class JsonConfigFileUtil {
     private static void createAllIfAbsent(File jsonDir, Consumer<File> serializer, List<File> files) {
 
         mkdirs(jsonDir);
-        getAllFilesInDir(jsonDir, SEARCH_LAYERS, files, name -> name.endsWith(".json"));
+        getAllFilesInDir(jsonDir, SEARCH_DEPTH, files, name -> name.endsWith(".json"));
         if (files.isEmpty()) {
 
             serializer.accept(jsonDir);
@@ -116,7 +116,7 @@ public class JsonConfigFileUtil {
 
         if (files.isEmpty()) {
 
-            getAllFilesInDir(jsonDir, SEARCH_LAYERS, files, name -> name.endsWith(".json"));
+            getAllFilesInDir(jsonDir, SEARCH_DEPTH, files, name -> name.endsWith(".json"));
         }
 
         prepareForLoad.run();
