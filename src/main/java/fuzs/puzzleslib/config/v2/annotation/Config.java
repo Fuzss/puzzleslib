@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * config annotation for individual config fields
- * a file containing these annotations needs to be registered via a {@link fuzs.bettermodsbutton.config.core.ConfigHolder}
+ * a file containing these annotations needs to be registered via a {@link fuzs.puzzleslib.config.v2.ConfigHolder}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
