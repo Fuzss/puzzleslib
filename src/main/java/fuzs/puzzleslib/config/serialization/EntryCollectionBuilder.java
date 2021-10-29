@@ -19,7 +19,13 @@ import java.util.stream.Stream;
  */
 public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends StringEntryReader<T> {
 
+    /**
+     * config description string supporting custom format
+     */
     public static final Function<String, String> CONFIG_STRING_BUILDER = s -> "Format for every entry is \"<namespace>:<path>" + s + "\". Path may use asterisk as wildcard parameter. Tags are not supported.";
+    /**
+     * config description string for default format <namespace>:<path>
+     */
     public static final String CONFIG_STRING = CONFIG_STRING_BUILDER.apply("");
 
     /**
