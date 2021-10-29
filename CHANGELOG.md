@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.14-1.16.5] - 2021-10-29
+### Added
+- Added annotation based config system
+
 ## [v1.0.13-1.16.5] - 2021-10-21
 ### Added
 - Added new ModEntryList for managing resource locations from other mods
