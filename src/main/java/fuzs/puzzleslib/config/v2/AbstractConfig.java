@@ -46,6 +46,12 @@ public abstract class AbstractConfig {
     }
 
     /**
+     * transform config options to proper type after reload, e.g. strings to registry entries
+     */
+    protected void afterConfigReload() {
+    }
+
+    /**
      * @param comment comment for this category
      */
     protected final void addComment(String... comment) {

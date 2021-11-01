@@ -92,7 +92,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param save action to perform when value changes (is reloaded)
      * @param <T> type for value
      */
-    private  <T> void saveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
+    private  <T> void addSaveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
         switch (type) {
             case CLIENT:
                 this.clientCallbacks.add(() -> save.accept(entry.get()));
@@ -110,6 +110,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param modId modId to register for
      */
     public void addConfigs(String modId) {
+        this.addConfigs(ModLoadingContext.get());
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener((final ModConfig.ModConfigEvent evt) -> this.onModConfig(evt, modId));
         // ModConfigEvent sometimes doesn't fire on start-up, resulting in config values not being synced, so we force it once
@@ -118,7 +119,6 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
 //            this.clientCallbacks.forEach(Runnable::run);
 //            this.serverCallbacks.forEach(Runnable::run);
 //        });
-        this.addConfigs(ModLoadingContext.get());
     }
 
     /**
@@ -131,7 +131,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
             final ConfigCallback saveCallback = new ConfigCallback() {
                 @Override
                 public <T> void accept(ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
-                    ConfigHolderImpl.this.saveCallback(ModConfig.Type.CLIENT, entry, save);
+                    ConfigHolderImpl.this.addSaveCallback(ModConfig.Type.CLIENT, entry, save);
                 }
             };
             if (this.clientFileName.isEmpty()) {
@@ -139,12 +139,13 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
             } else {
                 context.registerConfig(ModConfig.Type.CLIENT, this.buildSpec(this.client, saveCallback), this.clientFileName);
             }
+            this.addClientCallback(this.client::afterConfigReload);
         }
         if (this.server != null) {
             final ConfigCallback saveCallback = new ConfigCallback() {
                 @Override
                 public <T> void accept(ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
-                    ConfigHolderImpl.this.saveCallback(ModConfig.Type.SERVER, entry, save);
+                    ConfigHolderImpl.this.addSaveCallback(ModConfig.Type.SERVER, entry, save);
                 }
             };
             if (this.serverFileName.isEmpty()) {
@@ -152,6 +153,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
             } else {
                 context.registerConfig(ModConfig.Type.SERVER, this.buildSpec(this.server, saveCallback), this.serverFileName);
             }
+            this.addServerCallback(this.server::afterConfigReload);
         }
     }
 
