@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v1.0.15-1.16.5] - 2021-11-06
+### Changed
+- Updated to ForgeGradle 5
+### Fixed
+- Fixed ModEntryList calling a field on ModList when it might not have been set yet
+
 ## [v1.0.14-1.16.5] - 2021-10-29
 ### Added
 - Added annotation based config system

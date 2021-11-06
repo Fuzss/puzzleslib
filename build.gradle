@@ -1,27 +1,24 @@
-import groovy.json.*
-
-import java.util.regex.Pattern
-
 buildscript {
 
     repositories {
 
-        jcenter()
         mavenCentral()
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
 //        maven { url = 'https://repo.spongepowered.org/maven' }
+        maven { url = 'https://maven.parchmentmc.org' }
+        maven { url = "https://cursemaven.com" }
     }
 
     dependencies {
 
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
 //        classpath group: 'org.spongepowered', name: 'mixingradle', version: '0.7-SNAPSHOT'
+        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
     }
 }
 
 plugins {
 
-    id "com.wynprice.cursemaven" version "2.1.5"
     id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
@@ -31,16 +28,19 @@ apply plugin: 'maven-publish'
 apply plugin: 'signing'
 apply plugin: 'eclipse'
 //apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
-ext.mcversion = "${forgeVersion.replaceAll("-.*", "")}"
-ext.modid = "${modId}"
+ext.mcversion = "${minecraftVersion}"
 ext.modversion = "${modVersion}"
-ext.modauthor = "${modAuthor}"
-//ext.puzzlesversion = "${puzzlesVersion.substring(1, puzzlesVersion.indexOf("-"))}"
-version = "v${project.modversion}-${project.mcversion}"
+version = "v${project.modversion}-${project.mcversion}-${project.projectLoader}"
 group = "${modGroup}"
+ext.modid = "${modId}"
+ext.modauthor = "${modAuthor}"
+ext.nextmcversion = getNextVersion(project.mcversion)
+//ext.puzzlesversion = "${puzzlesVersion.substring(1, puzzlesVersion.indexOf("-"))}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
 
@@ -49,10 +49,6 @@ minecraft {
     runs {
 
         client {
-
-            // default values
-//            workingDirectory project.file('run')
-//            ideaModule "${project.name}.main"
 
             // https://forums.minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/
             if (project.hasProperty('hotswapAgent') && project.findProperty('enableHotswap').toBoolean()) {
@@ -63,41 +59,50 @@ minecraft {
                 jvmArgs '-ea', '-Xms1G', '-Xmx4G'
             }
 
-//            args '--mixin.config', "META-INF/${project.modid}.mixins.json".toString()
-//            property 'mixin.env.remapRefMap', 'true'
-//            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
+//            arg '--mixin.config': "META-INF/${project.modid}.mixins.json".toString()
+            property 'fml.earlyprogresswindow', 'false'
+//            properties 'mixin.env.remapRefMap': 'true', 'mixin.env.refMapRemappingFile': "${project.projectDir}/build/createSrgToMcp/output.srg".toString()
         }
 
         server {
 
-            // default values
-//            workingDirectory project.file('run')
-//            ideaModule "${project.name}.main"
-
             jvmArgs '-ea', '-Xms1G', '-Xmx4G'
-            args 'nogui'
-//            property 'mixin.env.remapRefMap', 'true'
-//            property 'mixin.env.refMapRemappingFile', "${project.projectDir}/build/createSrgToMcp/output.srg"
+            arg 'nogui'
+//            arg '--mixin.config': "META-INF/${project.modid}.mixins.json".toString()
+//            properties 'mixin.env.remapRefMap': 'true', 'mixin.env.refMapRemappingFile': "${project.projectDir}/build/createSrgToMcp/output.srg".toString()
         }
     }
-
 }
+
+//configurations {
+//
+//    shade
+//}
 
 repositories {
 
     mavenLocal()
+    maven { url = "https://cursemaven.com" }
 }
 
 dependencies {
 
     minecraft "net.minecraftforge:forge:${forgeVersion}"
-//    annotationProcessor 'org.spongepowered:mixin:0.8.2:processor'
+//    annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
+
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399554")
+    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516099")
+    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516671")
+
+    // shadow demo
+//    implementation "com.github.Ocelot5836:Sonar:ef5b90d"
+//    shade "com.github.Ocelot5836:Sonar:ef5b90d"
 
     // local maven
-//    compile "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"
+//    implementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"
     // try use curse maven when local maven is not available
     // file id is end of url (7 digits usually) when on file details page on curse
-//    compile fg.deobf("curse.maven:puzzles-lib:<file-id>")
+//    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
 }
 
 //mixin {
@@ -106,6 +111,8 @@ dependencies {
 //}
 
 processResources {
+
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when the versions change.
     inputs.property "modId", project.modid
@@ -118,44 +125,39 @@ processResources {
     inputs.property "modDescription", "${modDescription}"
     inputs.property "modAuthor", project.modauthor
     inputs.property "minForgeVersion", "${minForgeVersion}"
-    inputs.property "minMcVersion", "${minMcVersion}"
-    inputs.property "nextMcVersion", "${nextMcVersion}"
-//    inputs.property "puzzlesVersion", project.puzzlesversion
+    inputs.property "minMinecraftVersion", "${minMinecraftVersion}"
+    inputs.property "nextMinecraftVersion", project.nextmcversion
+//    inputs.property "minPuzzlesVersion", "${minPuzzlesVersion}"
     inputs.property "packFormat", "${packFormat}"
 
     // replace stuff in mods.toml and pack.mcmeta
-    from (sourceSets.main.resources.srcDirs) {
-
-        include 'META-INF/mods.toml', 'pack.mcmeta'
-
+    filesMatching ('META-INF/mods.toml') {
         expand (
-
-                'modId': project.modid,
-                'modName': "${modName}",
-                'modVersion': project.modversion,
-                'modGroup': project.group,
-                'modPageUrl': "${modPageUrl}",
-                'modUpdateUrl': "${modUpdateUrl}",
-                'modIssueUrl': "${modIssueUrl}",
-                'modDescription': "${modDescription}",
-                'modAuthor': project.modauthor,
-                'minForgeVersion': "${minForgeVersion}",
-                'minMcVersion': "${minMcVersion}",
-                "nextMcVersion": "${nextMcVersion}",
-//                "puzzlesVersion": project.puzzlesversion,
-                "packFormat": "${packFormat}"
+                'modId':                project.modid,
+                'modName':              "${modName}",
+                'modVersion':           project.modversion,
+                'modGroup':             project.group,
+                'modPageUrl':           "${modPageUrl}",
+                'modUpdateUrl':         "${modUpdateUrl}",
+                'modIssueUrl':          "${modIssueUrl}",
+                'modDescription':       "${modDescription}",
+                'modAuthor':            project.modauthor,
+                'minForgeVersion':      "${minForgeVersion}",
+                'minMinecraftVersion':  "${minMinecraftVersion}",
+                "nextMinecraftVersion": project.nextmcversion,
+//                "minPuzzlesVersion":    "${minPuzzlesVersion}"
         )
     }
 
-    // copy everything else except mods.toml and pack.mcmeta
-    from (sourceSets.main.resources.srcDirs) {
-
-        exclude 'META-INF/mods.toml', 'pack.mcmeta'
+    filesMatching ('pack.mcmeta') {
+        expand (
+                'modDescription':       "${modDescription}",
+                "packFormat":           "${packFormat}"
+        )
     }
 }
 
 ext.jarAttributes = [
-
         "Specification-Title"       : project.modid,
         "Specification-Version"     : project.modversion,
         "Specification-Vendor"      : project.modauthor.toLowerCase(),
@@ -168,11 +170,39 @@ ext.jarAttributes = [
 //        "MixinConfigs"              : "META-INF/${project.modid}.mixins.json"
 ]
 
+//import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
+//
+//task relocateShadowJar(type: ConfigureShadowRelocation) {
+//
+//    // Configure Auto Relocation
+//    target = tasks.shadowJar
+//}
+//
+//tasks.shadowJar.dependsOn tasks.relocateShadowJar
+//
+//shadowJar {
+//
+//    from rootProject.file("LICENSE")
+//    configurations = [project.configurations.shade]
+//    // relocation is done via ConfigureShadowRelocation task
+//    // make this main jar without any classifier if it exists
+//    classifier ""
+//}
+//
+//reobf {
+//
+//    shadowJar {}
+//}
+//
+//build.dependsOn reobfShadowJar
+
 def createJarTask(def name, def type, def sources) {
 
     return tasks.create(name, Jar) {
 
         from sources
+        from rootProject.file("LICENSE")
+        from rootProject.file("CHANGELOG.md")
         classifier = type
 
         manifest { attributes(project.jarAttributes) }
@@ -183,7 +213,7 @@ def createJarTask(def name, def type, def sources) {
 
 def createSignJarTask(def name, def jarTask) {
 
-    return tasks.create(name, net.minecraftforge.gradle.common.task.SignJar) {
+    return tasks.create(name, net.minecraftforge.gradle.common.tasks.SignJar) {
 
         onlyIf {
 
@@ -204,6 +234,8 @@ jar {
 
     from sourceSets.main.output.classesDirs
     from sourceSets.main.output.resourcesDir
+    from rootProject.file("LICENSE")
+    from rootProject.file("CHANGELOG.md")
     manifest { attributes(project.jarAttributes) }
     group 'jar'
 }
@@ -213,16 +245,23 @@ createJarTask("sourceJar", "sources", sourceSets.main.allSource)
 createJarTask("javadocJar", "javadoc", javadoc)
 
 createSignJarTask("signJar", jar)
+//createSignJarTask("signShadowJar", shadowJar)
 createSignJarTask("signDeobfJar", deobfJar)
 createSignJarTask("signSourceJar", sourceJar)
 createSignJarTask("signJavadocJar", javadocJar)
 
 // finalize all jar build tasks with a signing task
-def jarTasks = tasks.findAll { task -> !task.name.startsWith('sign') && task.name.toLowerCase().contains("jar")}
-jarTasks.each { task -> task.finalizedBy tasks.getByPath("sign" + task.name.substring(0, 1).toUpperCase() + task.name.substring(1))}
+def jarTasks = [jar, deobfJar, sourceJar, javadocJar]
+//def jarTasks = [jar, shadowJar, deobfJar, sourceJar, javadocJar]
+jarTasks.each { task -> task.finalizedBy tasks.findByName("sign" + task.name.substring(0, 1).toUpperCase() + task.name.substring(1))}
+
+signJar.mustRunAfter 'reobfJar'
+//signShadowJar.mustRunAfter 'reobfShadowJar'
 
 artifacts {
 
+    archives jar
+//    archives shadowJar
 //    archives deobfJar
 //    archives sourceJar
 //    archives javadocJar
@@ -258,17 +297,18 @@ curseforge {
         changelogType = 'markdown'
         changelog = changelogFile
         releaseType = project.findProperty('curseReleaseType')
-        addGameVersion project.findProperty('curseModloader')
+        addGameVersion project.findProperty('projectLoader')
         project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version -> addGameVersion version }
         mainArtifact jar
+//        mainArtifact shadowJar
         addArtifact sourceJar
-        relations { requiredDependency 'puzzles-lib' }
+//        relations { requiredDependency 'puzzles-lib' }
     }
 
     options {
 
         // doesn't upload, only prints json to console
-        debug = false
+//        debug = true
         javaVersionAutoDetect = false
         forgeGradleIntegration = false
     }
@@ -285,10 +325,11 @@ task copyJarToDir(type: Copy) {
 
         // shortcut for jar.outputs.files
         from jar
+//        from shadowJar
         into project.findProperty('buildJarOutputDir')
         // add build number to be able to distinguish jars when testing thorough official launcher
         // build number is stored in global gradle.properties
-        rename { fileName -> fileName.replace("v${project.modversion}", "v${project.modversion}-build${uniqueBuildNumber}") }
+        rename { fileName -> fileName.replace("v${project.modversion}", "v${project.modversion}.${uniqueBuildNumber}") }
     }
 }
 
@@ -362,6 +403,17 @@ task refreshUpdateJson {
     }
 }
 
+import groovy.json.*
+import java.util.regex.Pattern
+
+def static getNextVersion(String puzzlesVersion) {
+
+    def puzzlesVersionMatcher = Pattern.compile("(\\d+\\.\\d+)").matcher(puzzlesVersion)
+    puzzlesVersionMatcher.find()
+    def currentVersion = puzzlesVersionMatcher.group(1)
+    return currentVersion.substring(0, currentVersion.indexOf(".") + 1).concat(String.valueOf(Integer.parseInt(currentVersion.substring(currentVersion.indexOf(".") + 1, currentVersion.size())) + 1))
+}
+
 signing {
 
     sign publishing.publications.mavenJava
@@ -369,8 +421,9 @@ signing {
 
 // general signing task runs before sources jar is signed otherwise
 signMavenJavaPublication.dependsOn project.signSourceJar
-// jar is otherwise signed before reobfJar task runs
-assemble.finalizedBy project.signJar
-// only copy when building manually
-build.finalizedBy project.copyJarToDir, project.incrementBuildNumber
+
 tasks.getByPath('curseforge').finalizedBy project.refreshUpdateJson
+// only copy when building manually
+project.copyJarToDir.dependsOn signJar
+//project.copyJarToDir.dependsOn signShadowJar
+build.finalizedBy project.copyJarToDir, project.incrementBuildNumber

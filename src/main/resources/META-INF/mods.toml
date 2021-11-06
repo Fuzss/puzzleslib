@@ -9,7 +9,7 @@ issueTrackerURL="${modIssueUrl}"
     description="${modDescription}"
     version="${modVersion}"
     authors="${modAuthor}"
-    logoFile="logo.png"
+    logoFile="mod_banner.png"
     logoBlur=false
     displayURL="${modPageUrl}"
     updateJSONURL="${modUpdateUrl}"
@@ -24,10 +24,10 @@ issueTrackerURL="${modIssueUrl}"
 [[dependencies.${modId}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[${minMcVersion},${nextMcVersion})"
+    versionRange="[${minMinecraftVersion},${nextMinecraftVersion})"
     ordering="NONE"
     side="BOTH"
 
 [modproperties.${modId}]
-    catalogueImageIcon="avatar.png"
-    configuredBackground="minecraft:textures/block/honeycomb_block.png"
+    catalogueImageIcon="mod_logo.png"
+    configuredBackground="minecraft:textures/block/cobblestone.png"

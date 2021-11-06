@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.util;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -63,27 +62,8 @@ public class ModEntryList extends ArrayList<String> {
      * @param element element to add
      */
     public void add(ResourceLocation element) {
-
-        boolean mayAdd = false;
-        if (ModList.get() != null) {
-
-            if (ModList.get().isLoaded(element.getNamespace())) {
-
-                mayAdd = true;
-            }
-        } else if (FMLLoader.getLoadingModList() != null) {
-
-            if (FMLLoader.getLoadingModList().getModFileById(element.getNamespace()) != null) {
-
-                mayAdd = true;
-            }
-        } else {
-
-            mayAdd = true;
-        }
-
-        if (mayAdd) {
-
+        // don't use ModList at all, indexedMods field might still be null, even though the list isn't
+        if (FMLLoader.getLoadingModList() == null || FMLLoader.getLoadingModList().getModFileById(element.getNamespace()) != null) {
             this.add(element.toString());
         }
     }
