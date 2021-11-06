@@ -1,8 +1,8 @@
-package fuzs.puzzleslib.config.v2;
+package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.config.v2.annotation.ConfigBuilder;
+import fuzs.puzzleslib.config.annotation.ConfigBuilder;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import java.util.List;

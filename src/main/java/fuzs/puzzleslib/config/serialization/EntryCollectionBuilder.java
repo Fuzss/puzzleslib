@@ -18,21 +18,19 @@ import java.util.stream.Stream;
  * @param <T> content type of collection to build
  */
 public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends StringEntryReader<T> {
-
     /**
-     * config description string supporting custom format
+     * config builder comment with custom data after path, usually comma separated
      */
     public static final Function<String, String> CONFIG_STRING_BUILDER = s -> "Format for every entry is \"<namespace>:<path>" + s + "\". Path may use asterisk as wildcard parameter. Tags are not supported.";
     /**
-     * config description string for default format namespace:path
+     * default entry builder config comment
      */
     public static final String CONFIG_STRING = CONFIG_STRING_BUILDER.apply("");
 
     /**
      * @param registry registry entries the to be created collections contain
      */
-    public EntryCollectionBuilder(IForgeRegistry<T> registry) {
-
+    private EntryCollectionBuilder(IForgeRegistry<T> registry) {
         super(registry);
     }
 
@@ -40,18 +38,16 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
      * @param locations resource locations to build set from
      * @return entry set associated with given resource locations in active registry
      */
-    public Set<T> buildEntrySet(List<String> locations) {
-
-        return this.buildEntrySet(locations, flag -> true, "");
+    public Set<T> buildSet(List<String> locations) {
+        return this.buildSet(locations, flag -> true, "");
     }
 
     /**
      * @param locations resource locations to build set from
      * @return entry map associated with given resource locations in active registry paired with a given double value
      */
-    public Map<T, double[]> buildEntryMap(List<String> locations) {
-
-        return this.buildEntryMap(locations, (entry, value) -> true, "");
+    public Map<T, double[]> buildMap(List<String> locations) {
+        return this.buildMap(locations, (entry, value) -> true, "");
     }
 
     /**
@@ -60,26 +56,19 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
      * @param errorMessage message to be logged when condition is not met
      * @return entry set associated with given resource locations in active registry
      */
-    public Set<T> buildEntrySet(List<String> locations, Predicate<T> condition, String errorMessage) {
-
+    public Set<T> buildSet(List<String> locations, Predicate<T> condition, String errorMessage) {
         Set<T> set = Sets.newHashSet();
         for (String source : locations) {
-
             this.getEntriesFromRegistry(source.trim()).forEach(entry -> {
-
                 if (condition.test(entry)) {
-
                     if (this.isNotPresent(set, entry)) {
-
                         set.add(entry);
                     }
                 } else {
-
                     log(source, errorMessage);
                 }
             });
         }
-
         return set;
     }
 
@@ -89,40 +78,29 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
      * @param errorMessage message to be logged when condition is not met
      * @return entry map associated with given resource locations in active registry paired with a given double value
      */
-    public Map<T, double[]> buildEntryMap(List<String> locations, BiPredicate<T, double[]> condition, String errorMessage) {
-
+    public Map<T, double[]> buildMap(List<String> locations, BiPredicate<T, double[]> condition, String errorMessage) {
         Map<T, double[]> map = Maps.newHashMap();
         for (String source : locations) {
-
             String[] splitSource = Stream.of(source.split(",")).map(String::trim).toArray(String[]::new);
             if (splitSource.length == 0) {
-
                 log(source, "Wrong number of arguments");
                 continue;
             }
-
             List<T> entries = this.getEntriesFromRegistry(splitSource[0]);
             if (entries.isEmpty()) {
-
                 continue;
             }
-
             double[] values = Stream.of(splitSource).skip(1).mapToDouble(value -> parseDouble(value, source)).toArray();
             for (T entry : entries) {
-
                 if (condition.test(entry, values)) {
-
                     if (this.isNotPresent(map.keySet(), entry)) {
-
                         map.put(entry, values);
                     }
                 } else {
-
                     log(source, errorMessage);
                 }
             }
         }
-
         return map;
     }
 
@@ -132,24 +110,25 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
      * @return parsed double
      */
     private static double parseDouble(String value, String source) {
-
-        if (value.equalsIgnoreCase(Boolean.TRUE.toString())) {
-
+        if (value.equalsIgnoreCase("true")) {
             return 1.0;
-        } else if (value.equalsIgnoreCase(Boolean.FALSE.toString())) {
-
+        } else if (value.equalsIgnoreCase("false")) {
             return 0.0;
         }
-
         try {
-
             return Double.parseDouble(value);
         } catch (NumberFormatException ignored) {
-
             log(source, "Invalid number format");
         }
-
         return 0.0;
     }
 
+    /**
+     * @param registry registry for type
+     * @param <T> registry type
+     * @return builder backed by <code>registry</code>
+     */
+    public static <T extends IForgeRegistryEntry<T>> EntryCollectionBuilder<T> of(IForgeRegistry<T> registry) {
+        return new EntryCollectionBuilder<>(registry);
+    }
 }

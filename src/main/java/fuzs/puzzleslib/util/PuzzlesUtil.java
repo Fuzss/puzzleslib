@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.util;
 
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.core.PuzzlesLibMod;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -21,7 +21,6 @@ public class PuzzlesUtil {
      * @return the object
      */
     public static <T> T make(T object, Consumer<T> consumer) {
-
         consumer.accept(object);
         return object;
     }
@@ -35,18 +34,13 @@ public class PuzzlesUtil {
      * @return was there an exception
      */
     public static <T> boolean runOrElse(@Nonnull T object, Consumer<T> action, Consumer<T> orElse) {
-
         try {
-
             action.accept(object);
         } catch (Exception e) {
-
-            PuzzlesLib.LOGGER.error("Unable to handle object {}: {}", object.getClass().getSimpleName(), e.getMessage());
+            PuzzlesLibMod.LOGGER.error("Unable to handle object {}: {}", object.getClass().getSimpleName(), e.getMessage());
             orElse.accept(object);
-
             return false;
         }
-
         return true;
     }
 
@@ -58,14 +52,10 @@ public class PuzzlesUtil {
      * @return was <code>object</code> null
      */
     public static <T> boolean acceptIfPresent(@Nullable T object, Consumer<T> action) {
-
         if (object != null) {
-
             action.accept(object);
-
             return true;
         }
-
         return false;
     }
 
@@ -78,13 +68,10 @@ public class PuzzlesUtil {
      * @return the instance
      */
     public static <T> T getOrElse(@Nullable T instance, Supplier<T> supplier, Consumer<T> consumer) {
-
         if (instance == null) {
-
             instance = supplier.get();
             consumer.accept(instance);
         }
-
         return instance;
     }
 
@@ -97,20 +84,15 @@ public class PuzzlesUtil {
      */
     @Nullable
     public static <T> T getRandomEntry(Collection<T> collection, Function<T, Integer> weight) {
-
         if (!collection.isEmpty()) {
-
             int totalWeight = (int) (collection.stream().map(weight).mapToInt(Integer::intValue).sum() * Math.random());
             for (T entry : collection) {
-
                 totalWeight -= weight.apply(entry);
                 if (totalWeight < 0) {
-
                     return entry;
                 }
             }
         }
-
         return null;
     }
     

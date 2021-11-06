@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.proxy;
 
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.LogicalSidedProvider;
+import net.minecraftforge.fmllegacy.LogicalSidedProvider;
 
 /**
  * server proxy class
@@ -11,21 +11,17 @@ import net.minecraftforge.fml.LogicalSidedProvider;
 public class ServerProxy implements IProxy {
 
     @Override
-    public PlayerEntity getClientPlayer() {
-
+    public Player getClientPlayer() {
         return null;
     }
 
     @Override
     public Object getClientInstance() {
-
         return null;
     }
 
     @Override
     public MinecraftServer getGameServer() {
-
         return LogicalSidedProvider.INSTANCE.get(LogicalSide.SERVER);
     }
-
 }

@@ -1,6 +1,7 @@
-package fuzs.puzzleslib.util;
+package fuzs.puzzleslib.config.serialization;
 
-import net.minecraft.util.ResourceLocation;
+import fuzs.puzzleslib.util.PuzzlesUtil;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -19,7 +20,6 @@ public class ModEntryList extends ArrayList<String> {
      * @param elements elements to add
      */
     public void add(IForgeRegistryEntry<?>... elements) {
-
         Stream.of(elements).forEach(this::add);
     }
 
@@ -28,7 +28,6 @@ public class ModEntryList extends ArrayList<String> {
      * @param element element to add
      */
     public void add(IForgeRegistryEntry<?> element) {
-
         this.add(element.getRegistryName());
     }
 
@@ -37,14 +36,8 @@ public class ModEntryList extends ArrayList<String> {
      * @param elements elements to add
      */
     public void add(String... elements) {
-
-        if (elements.length % 2 != 0) {
-
-            throw new IllegalStateException("Odd number of elements, needs pairs of two for namespace and path");
-        }
-
+        if (elements.length % 2 != 0) throw new IllegalStateException("Odd number of elements, needs pairs of two for namespace and path");
         for (int i = 0; i < elements.length; i++) {
-
             this.add(new ResourceLocation(elements[i], elements[++i]));
         }
     }
@@ -53,7 +46,6 @@ public class ModEntryList extends ArrayList<String> {
      * @param elements elements to add
      */
     public void add(ResourceLocation... elements) {
-
         Stream.of(elements).forEach(this::add);
     }
 
@@ -71,7 +63,6 @@ public class ModEntryList extends ArrayList<String> {
     @Deprecated
     @Override
     public boolean add(String s) {
-
         return super.add(s);
     }
 
@@ -81,7 +72,6 @@ public class ModEntryList extends ArrayList<String> {
      * @return list with elements
      */
     public static ModEntryList of(IForgeRegistryEntry<?>... elements) {
-
         return PuzzlesUtil.make(new ModEntryList(), list -> list.add(elements));
     }
 
@@ -91,7 +81,6 @@ public class ModEntryList extends ArrayList<String> {
      * @return list with elements
      */
     public static ModEntryList of(String... elements) {
-
         return PuzzlesUtil.make(new ModEntryList(), list -> list.add(elements));
     }
 
@@ -101,8 +90,6 @@ public class ModEntryList extends ArrayList<String> {
      * @return list with elements
      */
     public static ModEntryList of(ResourceLocation... elements) {
-
         return PuzzlesUtil.make(new ModEntryList(), list -> list.add(elements));
     }
-
 }

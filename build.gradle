@@ -39,7 +39,7 @@ ext.modauthor = "${modAuthor}"
 ext.nextmcversion = getNextVersion(project.mcversion)
 //ext.puzzlesversion = "${puzzlesVersion.substring(1, puzzlesVersion.indexOf("-"))}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
@@ -74,11 +74,6 @@ minecraft {
     }
 }
 
-//configurations {
-//
-//    shade
-//}
-
 repositories {
 
     mavenLocal()
@@ -90,15 +85,11 @@ dependencies {
     minecraft "net.minecraftforge:forge:${forgeVersion}"
 //    annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
 
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399554")
-    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516099")
-    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516671")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399552")
+    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
+    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-544048:3516528")
 
-    // shadow demo
-//    implementation "com.github.Ocelot5836:Sonar:ef5b90d"
-//    shade "com.github.Ocelot5836:Sonar:ef5b90d"
-
-    // local maven
+    // from local maven, those builds are not obfuscated
 //    implementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"
     // try use curse maven when local maven is not available
     // file id is end of url (7 digits usually) when on file details page on curse
@@ -170,41 +161,12 @@ ext.jarAttributes = [
 //        "MixinConfigs"              : "META-INF/${project.modid}.mixins.json"
 ]
 
-//import com.github.jengelman.gradle.plugins.shadow.tasks.ConfigureShadowRelocation
-//
-//task relocateShadowJar(type: ConfigureShadowRelocation) {
-//
-//    // Configure Auto Relocation
-//    target = tasks.shadowJar
-//}
-//
-//tasks.shadowJar.dependsOn tasks.relocateShadowJar
-//
-//shadowJar {
-//
-//    from rootProject.file("LICENSE")
-//    configurations = [project.configurations.shade]
-//    // relocation is done via ConfigureShadowRelocation task
-//    // make this main jar without any classifier if it exists
-//    classifier ""
-//}
-//
-//reobf {
-//
-//    shadowJar {}
-//}
-//
-//build.dependsOn reobfShadowJar
-
 def createJarTask(def name, def type, def sources) {
-
     return tasks.create(name, Jar) {
-
         from sources
         from rootProject.file("LICENSE")
         from rootProject.file("CHANGELOG.md")
         classifier = type
-
         manifest { attributes(project.jarAttributes) }
         dependsOn classes
         group 'jar'
@@ -212,14 +174,8 @@ def createJarTask(def name, def type, def sources) {
 }
 
 def createSignJarTask(def name, def jarTask) {
-
     return tasks.create(name, net.minecraftforge.gradle.common.tasks.SignJar) {
-
-        onlyIf {
-
-            project.hasProperty('keyStore')
-        }
-
+        onlyIf { project.hasProperty('keyStore') }
         keyStore = project.findProperty('keyStore')
         alias = project.findProperty('keyStoreAlias')
         storePass = project.findProperty('keyStorePass')
@@ -231,7 +187,6 @@ def createSignJarTask(def name, def jarTask) {
 }
 
 jar {
-
     from sourceSets.main.output.classesDirs
     from sourceSets.main.output.resourcesDir
     from rootProject.file("LICENSE")
@@ -243,36 +198,27 @@ jar {
 createJarTask("deobfJar", "deobf", [sourceSets.main.output])
 createJarTask("sourceJar", "sources", sourceSets.main.allSource)
 createJarTask("javadocJar", "javadoc", javadoc)
-
 createSignJarTask("signJar", jar)
-//createSignJarTask("signShadowJar", shadowJar)
 createSignJarTask("signDeobfJar", deobfJar)
 createSignJarTask("signSourceJar", sourceJar)
 createSignJarTask("signJavadocJar", javadocJar)
 
 // finalize all jar build tasks with a signing task
 def jarTasks = [jar, deobfJar, sourceJar, javadocJar]
-//def jarTasks = [jar, shadowJar, deobfJar, sourceJar, javadocJar]
 jarTasks.each { task -> task.finalizedBy tasks.findByName("sign" + task.name.substring(0, 1).toUpperCase() + task.name.substring(1))}
 
 signJar.mustRunAfter 'reobfJar'
-//signShadowJar.mustRunAfter 'reobfShadowJar'
 
 artifacts {
-
     archives jar
-//    archives shadowJar
 //    archives deobfJar
 //    archives sourceJar
 //    archives javadocJar
 }
 
 publishing {
-
     publications {
-
         mavenJava (MavenPublication) {
-
             artifact deobfJar
             artifact sourceJar
             artifact javadocJar
@@ -282,17 +228,11 @@ publishing {
 }
 
 curseforge {
-
     def changelogName = 'CHANGELOG.md'
     def changelogFile = file(changelogName)
-    if (!changelogFile.canRead()) {
-
-        throw new FileNotFoundException("Could not read file ".concat(changelogName))
-    }
-
+    if (!changelogFile.canRead()) { throw new FileNotFoundException("Could not read file ".concat(changelogName)) }
     apiKey = project.findProperty('curseApiToken')
     project {
-
         id = project.findProperty('curseProjectId')
         changelogType = 'markdown'
         changelog = changelogFile
@@ -300,13 +240,10 @@ curseforge {
         addGameVersion project.findProperty('projectLoader')
         project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version -> addGameVersion version }
         mainArtifact jar
-//        mainArtifact shadowJar
         addArtifact sourceJar
 //        relations { requiredDependency 'puzzles-lib' }
     }
-
     options {
-
         // doesn't upload, only prints json to console
 //        debug = true
         javaVersionAutoDetect = false
@@ -315,17 +252,10 @@ curseforge {
 }
 
 task copyJarToDir(type: Copy) {
-
-    onlyIf {
-
-        project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber')
-    }
-
+    onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
     if (project.findProperty('copyBuildJar').toBoolean()) {
-
         // shortcut for jar.outputs.files
         from jar
-//        from shadowJar
         into project.findProperty('buildJarOutputDir')
         // add build number to be able to distinguish jars when testing thorough official launcher
         // build number is stored in global gradle.properties
@@ -334,22 +264,12 @@ task copyJarToDir(type: Copy) {
 }
 
 task incrementBuildNumber {
-
-    onlyIf {
-
-        project.hasProperty('uniqueBuildNumber')
-    }
-
+    onlyIf { project.hasProperty('uniqueBuildNumber') }
     doLast {
-
         def propertiesName = 'gradle.properties'
         // build number is stored in global gradle.properties
         def propertiesFile = new File(project.gradle.gradleUserHomeDir, propertiesName)
-        if (!propertiesFile.canRead()) {
-
-            throw new FileNotFoundException("Could not read file ".concat(propertiesName))
-        }
-
+        if (!propertiesFile.canRead()) { throw new FileNotFoundException("Could not read file ".concat(propertiesName)) }
         def buildNumberMatcher = Pattern.compile("uniqueBuildNumber=(\\d+)").matcher(propertiesFile.getText())
         buildNumberMatcher.find()
         def versionCode = Integer.parseInt(buildNumberMatcher.group(1))
@@ -407,7 +327,6 @@ import groovy.json.*
 import java.util.regex.Pattern
 
 def static getNextVersion(String puzzlesVersion) {
-
     def puzzlesVersionMatcher = Pattern.compile("(\\d+\\.\\d+)").matcher(puzzlesVersion)
     puzzlesVersionMatcher.find()
     def currentVersion = puzzlesVersionMatcher.group(1)
@@ -415,7 +334,6 @@ def static getNextVersion(String puzzlesVersion) {
 }
 
 signing {
-
     sign publishing.publications.mavenJava
 }
 
@@ -425,5 +343,4 @@ signMavenJavaPublication.dependsOn project.signSourceJar
 tasks.getByPath('curseforge').finalizedBy project.refreshUpdateJson
 // only copy when building manually
 project.copyJarToDir.dependsOn signJar
-//project.copyJarToDir.dependsOn signShadowJar
 build.finalizedBy project.copyJarToDir, project.incrementBuildNumber

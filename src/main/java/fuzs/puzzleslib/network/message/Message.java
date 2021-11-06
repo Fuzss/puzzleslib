@@ -1,61 +1,53 @@
 package fuzs.puzzleslib.network.message;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketBuffer;
-
-import java.util.function.Consumer;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * network message template
  */
-@Deprecated
-public abstract class Message {
+public interface Message {
 
     /**
      * writes message data to buffer
      * @param buf network data byte buffer
      */
-    public abstract void write(final PacketBuffer buf);
+    void write(final FriendlyByteBuf buf);
 
     /**
      * reads message data from buffer
      * @param buf network data byte buffer
      */
-    public abstract void read(final PacketBuffer buf);
-
-    /**
-     * call {@link #read} and return this
-     * @param buf network data byte buffer
-     * @param <T> this
-     * @return instance of this
-     */
-    @SuppressWarnings("unchecked")
-    public final <T extends Message> T getMessage(PacketBuffer buf) {
-
-        this.read(buf);
-        return (T) this;
-    }
+    void read(final FriendlyByteBuf buf);
 
     /**
      * handles message on receiving side
-     * @param player server player when sent from client
+     * @param player       server or client player
+     * @param gameInstance  server or client instance
      */
-    public final void process(PlayerEntity player) {
-
-        this.createProcessor().accept(player);
+    default void handle(Player player, Object gameInstance) {
+        this.makeHandler().handle(this, player, gameInstance);
     }
 
     /**
-     * @return message processor to run when received
+     * @param <T> this message
+     * @return packet handler for message
      */
-    protected abstract MessageProcessor createProcessor();
+    <T extends Message> PacketHandler<T> makeHandler();
 
     /**
-     * separate class for executing message when received to work around sided limitations
+     * this is a class, so it cannot be implemented as a functional interface to avoid client only calls somehow running into problems on a dedicated server
+     * @param <T> this message
      */
-    @FunctionalInterface
-    protected interface MessageProcessor extends Consumer<PlayerEntity> {
+    abstract class PacketHandler<T extends Message> {
 
+        /**
+         * handle given packet
+         * handler implemented as separate class to hopefully avoid invoking client class on the server
+         * @param packet packet to handle
+         * @param player       server or client player
+         * @param gameInstance  server or client instance
+         */
+        public abstract void handle(T packet, Player player, Object gameInstance);
     }
-
 }

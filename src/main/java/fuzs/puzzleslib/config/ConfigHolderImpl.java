@@ -1,12 +1,13 @@
-package fuzs.puzzleslib.config.v2;
+package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.core.PuzzlesLibMod;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 
@@ -64,23 +65,18 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param modId mod id for this config holder
      */
     @SubscribeEvent
-    public void onModConfig(final ModConfig.ModConfigEvent evt, String modId) {
+    public void onModConfig(final ModConfigEvent evt, String modId) {
         // this is fired on ModEventBus, so mod id check is not necessary here
         // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
         if (evt.getConfig().getModId().equals(modId)) {
             final ModConfig.Type type = evt.getConfig().getType();
             switch (type) {
-                case CLIENT:
-                    this.clientCallbacks.forEach(Runnable::run);
-                    break;
-                case SERVER:
-                    this.serverCallbacks.forEach(Runnable::run);
-                    break;
-                case COMMON:
-                    throw new RuntimeException("Common config type not supported");
+                case CLIENT -> this.clientCallbacks.forEach(Runnable::run);
+                case SERVER -> this.serverCallbacks.forEach(Runnable::run);
+                case COMMON -> throw new RuntimeException("Common config type not supported");
             }
-            if (evt instanceof ModConfig.Reloading) {
-                PuzzlesLib.LOGGER.info("Reloading {} config for {}", type.extension(), modId);
+            if (evt instanceof ModConfigEvent.Reloading) {
+                PuzzlesLibMod.LOGGER.info("Reloading {} config for {}", type.extension(), modId);
             }
         }
     }
@@ -94,14 +90,9 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      */
     private  <T> void addSaveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
         switch (type) {
-            case CLIENT:
-                this.clientCallbacks.add(() -> save.accept(entry.get()));
-                break;
-            case SERVER:
-                this.serverCallbacks.add(() -> save.accept(entry.get()));
-                break;
-            case COMMON:
-                throw new RuntimeException("Common config type not supported");
+            case CLIENT -> this.clientCallbacks.add(() -> save.accept(entry.get()));
+            case SERVER -> this.serverCallbacks.add(() -> save.accept(entry.get()));
+            case COMMON -> throw new RuntimeException("Common config type not supported");
         }
     }
 
@@ -112,7 +103,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
     public void addConfigs(String modId) {
         this.addConfigs(ModLoadingContext.get());
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modBus.addListener((final ModConfig.ModConfigEvent evt) -> this.onModConfig(evt, modId));
+        modBus.addListener((final ModConfigEvent evt) -> this.onModConfig(evt, modId));
         // ModConfigEvent sometimes doesn't fire on start-up, resulting in config values not being synced, so we force it once
         // not sure if this is still an issue though
 //        modBus.addListener((final FMLLoadCompleteEvent evt) -> {

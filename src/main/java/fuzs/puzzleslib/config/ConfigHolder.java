@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.config.v2;
+package fuzs.puzzleslib.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;

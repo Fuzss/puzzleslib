@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.proxy;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * client proxy class
@@ -9,15 +9,12 @@ import net.minecraft.entity.player.PlayerEntity;
 public class ClientProxy extends ServerProxy {
 
     @Override
-    public PlayerEntity getClientPlayer() {
-
+    public Player getClientPlayer() {
         return Minecraft.getInstance().player;
     }
 
     @Override
     public Object getClientInstance() {
-
         return Minecraft.getInstance();
     }
-
 }

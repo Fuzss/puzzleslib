@@ -18,7 +18,6 @@ public class ModLoaderEnvironment {
      * @return current physical environment
      */
     public static Dist getEnvironmentType() {
-
         return FMLEnvironment.dist;
     }
 
@@ -27,7 +26,6 @@ public class ModLoaderEnvironment {
      * @return is this the current physical environment
      */
     public static boolean isEnvironmentType(Dist envType) {
-
         return getEnvironmentType() == envType;
     }
 
@@ -35,7 +33,6 @@ public class ModLoaderEnvironment {
      * @return is physical environment client
      */
     public static boolean isClient() {
-
         return getEnvironmentType().isClient();
     }
 
@@ -43,7 +40,6 @@ public class ModLoaderEnvironment {
      * @return is physical environment server
      */
     public static boolean isServer() {
-
         return !isClient();
     }
 
@@ -51,7 +47,6 @@ public class ModLoaderEnvironment {
      * @return main minecraft game dir
      */
     public static Path getGameDir() {
-
         return FMLPaths.GAMEDIR.get();
     }
 
@@ -59,7 +54,6 @@ public class ModLoaderEnvironment {
      * @return forge config dir within game dir
      */
     public static Path getConfigDir() {
-
         return FMLPaths.CONFIGDIR.get();
     }
 
@@ -67,8 +61,7 @@ public class ModLoaderEnvironment {
      * @return is this running in a development environment
      */
     public static boolean isDevelopmentEnvironment() {
-
-        return FMLEnvironment.production;
+        return !FMLEnvironment.production;
     }
 
     /**
@@ -76,7 +69,6 @@ public class ModLoaderEnvironment {
      * @return is this mod loaded
      */
     public static boolean isModLoaded(String modId) {
-
         return ModList.get().isLoaded(modId);
     }
 
@@ -85,8 +77,6 @@ public class ModLoaderEnvironment {
      * @return container for mod, empty if mod not present
      */
     public static Optional<? extends ModContainer> getModContainer(String modId) {
-
         return ModList.get().getModContainerById(modId);
     }
-
 }

@@ -1,9 +1,9 @@
-package fuzs.puzzleslib.config.v2.annotation;
+package fuzs.puzzleslib.config.annotation;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.*;
-import fuzs.puzzleslib.config.v2.AbstractConfig;
-import fuzs.puzzleslib.config.v2.ConfigHolder;
+import fuzs.puzzleslib.config.AbstractConfig;
+import fuzs.puzzleslib.config.ConfigHolder;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 import javax.annotation.Nonnull;

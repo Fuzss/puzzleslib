@@ -46,13 +46,9 @@ public class EnvTypeExecutor {
      * @return value
      */
     public static <T> T runForDist(Supplier<Supplier<T>> clientTarget, Supplier<Supplier<T>> serverTarget) {
-        switch (ModLoaderEnvironment.getEnvironmentType()) {
-            case CLIENT:
-                return clientTarget.get().get();
-            case DEDICATED_SERVER:
-                return serverTarget.get().get();
-            default:
-                throw new IllegalArgumentException();
-        }
+        return switch (ModLoaderEnvironment.getEnvironmentType()) {
+            case CLIENT -> clientTarget.get().get();
+            case DEDICATED_SERVER -> serverTarget.get().get();
+        };
     }
 }
