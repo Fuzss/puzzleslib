@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.util;
 
-import fuzs.puzzleslib.core.PuzzlesLibMod;
+import fuzs.puzzleslib.PuzzlesLib;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -37,7 +37,7 @@ public class PuzzlesUtil {
         try {
             action.accept(object);
         } catch (Exception e) {
-            PuzzlesLibMod.LOGGER.error("Unable to handle object {}: {}", object.getClass().getSimpleName(), e.getMessage());
+            PuzzlesLib.LOGGER.error("Unable to handle object {}: {}", object.getClass().getSimpleName(), e.getMessage());
             orElse.accept(object);
             return false;
         }

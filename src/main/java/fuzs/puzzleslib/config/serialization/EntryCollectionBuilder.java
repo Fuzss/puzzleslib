@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -19,13 +18,10 @@ import java.util.stream.Stream;
  */
 public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends StringEntryReader<T> {
     /**
-     * config builder comment with custom data after path, usually comma separated
+     * default entry builder config comment, same as {@link #buildConfigDescription} with empty string
+     * can't use {@link #buildConfigDescription} to be usable in annotations
      */
-    public static final Function<String, String> CONFIG_STRING_BUILDER = s -> "Format for every entry is \"<namespace>:<path>" + s + "\". Path may use asterisk as wildcard parameter. Tags are not supported.";
-    /**
-     * default entry builder config comment
-     */
-    public static final String CONFIG_STRING = CONFIG_STRING_BUILDER.apply("");
+    public static final String CONFIG_DESCRIPTION = "Format for every entry is \"<namespace>:<path>\". Path may use asterisk as wildcard parameter. Tags are not supported.";
 
     /**
      * @param registry registry entries the to be created collections contain
@@ -130,5 +126,14 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
      */
     public static <T extends IForgeRegistryEntry<T>> EntryCollectionBuilder<T> of(IForgeRegistry<T> registry) {
         return new EntryCollectionBuilder<>(registry);
+    }
+
+    /**
+     * config builder comment with custom data after path, usually comma separated
+     * @param additionalData data to insert
+     * @return description string for config option
+     */
+    public static String buildConfigDescription(String additionalData) {
+        return String.format("Format for every entry is \"<namespace>:<path>%s\". Path may use asterisk as wildcard parameter. Tags are not supported.", additionalData);
     }
 }

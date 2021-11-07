@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.config.serialization;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.core.PuzzlesLibMod;
+import fuzs.puzzleslib.PuzzlesLib;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
@@ -137,7 +137,7 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @param message message to print
      */
     protected static void log(String entry, String message) {
-        PuzzlesLibMod.LOGGER.warn("Unable to parse entry {}: {}", entry, message);
+        PuzzlesLib.LOGGER.warn("Unable to parse entry {}: {}", entry, message);
     }
     
 }

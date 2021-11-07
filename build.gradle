@@ -43,32 +43,25 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
-
     mappings channel: "${mappingsChannel}", version: "${mappingsVersion}"
-
     runs {
-
         client {
-
             // https://forums.minecraftforge.net/topic/82228-1152-3110-intellij-and-gradlew-forge-hotswap-and-dcevm-tutorial/
             if (project.hasProperty('hotswapAgent') && project.findProperty('enableHotswap').toBoolean()) {
-
                 jvmArgs '-ea', '-Xms1G', '-Xmx4G', '-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5010', '-XXaltjvm=dcevm', '-XX:+UnlockExperimentalVMOptions', "-javaagent:${hotswapAgent}"
             } else {
-
                 jvmArgs '-ea', '-Xms1G', '-Xmx4G'
             }
-
-//            arg '--mixin.config': "META-INF/${project.modid}.mixins.json".toString()
             property 'fml.earlyprogresswindow', 'false'
+            // mixin properties
+//            args '--mixin.config', "META-INF/${project.modid}.mixins.json".toString()
 //            properties 'mixin.env.remapRefMap': 'true', 'mixin.env.refMapRemappingFile': "${project.projectDir}/build/createSrgToMcp/output.srg".toString()
         }
-
         server {
-
             jvmArgs '-ea', '-Xms1G', '-Xmx4G'
             arg 'nogui'
-//            arg '--mixin.config': "META-INF/${project.modid}.mixins.json".toString()
+            // mixin properties
+//            args '--mixin.config', "META-INF/${project.modid}.mixins.json".toString()
 //            properties 'mixin.env.remapRefMap': 'true', 'mixin.env.refMapRemappingFile': "${project.projectDir}/build/createSrgToMcp/output.srg".toString()
         }
     }
@@ -83,11 +76,12 @@ repositories {
 dependencies {
 
     minecraft "net.minecraftforge:forge:${forgeVersion}"
-//    annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
+//    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
 
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399552")
-    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
-    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-544048:3516528")
+    // don't enable these for puzzles, they'll be forced upon all dependencies then via maven
+//    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399552")
+//    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
+//    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516528")
 
     // from local maven, those builds are not obfuscated
 //    implementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.core.PuzzlesLibMod;
+import fuzs.puzzleslib.PuzzlesLib;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -65,6 +65,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param modId mod id for this config holder
      */
     @SubscribeEvent
+    @Deprecated
     public void onModConfig(final ModConfigEvent evt, String modId) {
         // this is fired on ModEventBus, so mod id check is not necessary here
         // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
@@ -76,7 +77,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
                 case COMMON -> throw new RuntimeException("Common config type not supported");
             }
             if (evt instanceof ModConfigEvent.Reloading) {
-                PuzzlesLibMod.LOGGER.info("Reloading {} config for {}", type.extension(), modId);
+                PuzzlesLib.LOGGER.info("Reloading {} config for {}", type.extension(), modId);
             }
         }
     }
