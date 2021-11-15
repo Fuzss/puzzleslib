@@ -27,8 +27,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -85,16 +83,6 @@ public class RegistryManager {
     }
 
     /**
-     * register any type of registry entry with a preset path
-     * @param registry type for this registry entry
-     * @param entry supplier for entry to register
-     * @param <T>      entry type
-     */
-    public <T extends IForgeRegistryEntry<T>> void register(IForgeRegistry<T> registry, Supplier<T> entry) {
-        this.register(registry, null, entry);
-    }
-
-    /**
      * register any type of registry entry with a path
      * @param registry type for this registry entry
      * @param path optional path for new entry
@@ -103,20 +91,14 @@ public class RegistryManager {
      * @param <T> registry type
      * @param <U> entry type
      */
-    public <T extends IForgeRegistryEntry<T>, U extends T> RegistryObject<U> register(IForgeRegistry<T> registry, @Nullable String path, Supplier<U> entry) {
+    public <T extends IForgeRegistryEntry<T>, U extends T> RegistryObject<U> register(IForgeRegistry<T> registry, String path, Supplier<U> entry) {
         this.registryToFactory.put(registry, () -> {
             T e = entry.get();
             Objects.requireNonNull(e, "Can't register null object");
-            if (e.getRegistryName() == null) {
-                Objects.requireNonNull(path, "Can't register object without name");
-                e.setRegistryName(this.locate(path));
-            }
+            e.setRegistryName(this.locate(path));
             return e;
         });
-        if (path != null) {
-            return RegistryObject.of(this.locate(path), registry);
-        }
-        return null;
+        return RegistryObject.of(this.locate(path), registry);
     }
 
     /**
@@ -125,7 +107,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Block> registerBlock(@Nullable String path, Supplier<Block> entry) {
+    public RegistryObject<Block> registerBlock(String path, Supplier<Block> entry) {
         return this.register(ForgeRegistries.BLOCKS, path, entry);
     }
 
@@ -136,7 +118,7 @@ public class RegistryManager {
      * @param creativeTab creative tab for item
      * @return registry object for <code>entry</code> block
      */
-    public RegistryObject<Block> registerBlockWithItem(@Nonnull String path, Supplier<Block> entry, CreativeModeTab creativeTab) {
+    public RegistryObject<Block> registerBlockWithItem(String path, Supplier<Block> entry, CreativeModeTab creativeTab) {
         return this.registerBlockWithItem(path, entry, new Item.Properties().tab(creativeTab));
     }
 
@@ -147,7 +129,7 @@ public class RegistryManager {
      * @param properties properties for item, should include tab
      * @return registry object for <code>entry</code> block
      */
-    public RegistryObject<Block> registerBlockWithItem(@Nonnull String path, Supplier<Block> entry, Item.Properties properties) {
+    public RegistryObject<Block> registerBlockWithItem(String path, Supplier<Block> entry, Item.Properties properties) {
         // order doesn't matter on Forge, but will do on Fabric
         final RegistryObject<Block> block = this.registerBlock(path, entry);
         this.registerBlockItem(path, properties);
@@ -160,7 +142,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Fluid> registerFluid(@Nullable String path, Supplier<Fluid> entry) {
+    public RegistryObject<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
         return this.register(ForgeRegistries.FLUIDS, path, entry);
     }
 
@@ -170,7 +152,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Item> registerItem(@Nullable String path, Supplier<Item> entry) {
+    public RegistryObject<Item> registerItem(String path, Supplier<Item> entry) {
         return this.register(ForgeRegistries.ITEMS, path, entry);
     }
 
@@ -180,7 +162,7 @@ public class RegistryManager {
      * @param creativeTab creative tab for item
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Item> registerBlockItem(@Nonnull String path, CreativeModeTab creativeTab) {
+    public RegistryObject<Item> registerBlockItem(String path, CreativeModeTab creativeTab) {
         return this.registerBlockItem(path, new Item.Properties().tab(creativeTab));
     }
 
@@ -190,7 +172,7 @@ public class RegistryManager {
      * @param properties properties for item, should include tab
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Item> registerBlockItem(@Nonnull String path, Item.Properties properties) {
+    public RegistryObject<Item> registerBlockItem(String path, Item.Properties properties) {
         return this.registerItem(path, () -> {
             Block block = ForgeRegistries.BLOCKS.getValue(this.locate(path));
             Objects.requireNonNull(block, "Can't register item for null block");
@@ -204,7 +186,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<MobEffect> registerMobEffect(@Nullable String path, Supplier<MobEffect> entry) {
+    public RegistryObject<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
         return this.register(ForgeRegistries.MOB_EFFECTS, path, entry);
     }
 
@@ -214,7 +196,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<SoundEvent> registerSoundEvent(@Nullable String path, Supplier<SoundEvent> entry) {
+    public RegistryObject<SoundEvent> registerSoundEvent(String path, Supplier<SoundEvent> entry) {
         return this.register(ForgeRegistries.SOUND_EVENTS, path, entry);
     }
 
@@ -224,7 +206,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Potion> registerPotion(@Nullable String path, Supplier<Potion> entry) {
+    public RegistryObject<Potion> registerPotion(String path, Supplier<Potion> entry) {
         return this.register(ForgeRegistries.POTIONS, path, entry);
     }
 
@@ -234,7 +216,7 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public RegistryObject<Enchantment> registerEnchantment(@Nullable String path, Supplier<Enchantment> entry) {
+    public RegistryObject<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
         return this.register(ForgeRegistries.ENCHANTMENTS, path, entry);
     }
 
@@ -245,7 +227,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
-    public <T extends Entity> RegistryObject<EntityType<T>> registerRawEntityType(@Nonnull String path, Supplier<EntityType.Builder<T>> entry) {
+    public <T extends Entity> RegistryObject<EntityType<T>> registerRawEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
         return this.registerEntityType(path, () -> entry.get().build(path));
     }
 
@@ -256,7 +238,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
-    public <T extends Entity> RegistryObject<EntityType<T>> registerEntityType(@Nullable String path, Supplier<EntityType<T>> entry) {
+    public <T extends Entity> RegistryObject<EntityType<T>> registerEntityType(String path, Supplier<EntityType<T>> entry) {
         return this.register(ForgeRegistries.ENTITIES, path, entry);
     }
 
@@ -268,7 +250,7 @@ public class RegistryManager {
      * @param <T> block entity type
      */
     @SuppressWarnings("ConstantConditions")
-    public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerRawBlockEntityType(@Nullable String path, Supplier<BlockEntityType.Builder<T>> entry) {
+    public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerRawBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
         return this.registerBlockEntityType(path, () -> entry.get().build(null));
     }
 
@@ -279,7 +261,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> block entity type
      */
-    public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBlockEntityType(@Nullable String path, Supplier<BlockEntityType<T>> entry) {
+    public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType<T>> entry) {
         return this.register(ForgeRegistries.BLOCK_ENTITIES, path, entry);
     }
 
@@ -290,7 +272,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> container menu type
      */
-    public <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerRawMenuType(@Nullable String path, Supplier<MenuType.MenuSupplier<T>> entry) {
+    public <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerRawMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
         return this.registerMenuType(path, () -> new MenuType<>(entry.get()));
     }
 
@@ -301,7 +283,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> container menu type
      */
-    public <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(@Nullable String path, Supplier<MenuType<T>> entry) {
+    public <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String path, Supplier<MenuType<T>> entry) {
         return this.register(ForgeRegistries.CONTAINERS, path, entry);
     }
 
@@ -310,6 +292,7 @@ public class RegistryManager {
      * @return resource location for {@link #namespace}
      */
     private ResourceLocation locate(String path) {
+        if (path.isEmpty()) throw new IllegalArgumentException("Can't register object without name");
         return new ResourceLocation(this.namespace, path);
     }
 

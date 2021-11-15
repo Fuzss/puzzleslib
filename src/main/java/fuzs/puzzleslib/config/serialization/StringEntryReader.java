@@ -125,7 +125,7 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      */
     protected final boolean isNotPresent(Collection<T> collection, T entry) {
         if (collection.contains(entry)) {
-            log(Objects.requireNonNull(entry.getRegistryName()).toString(), "Already present");
+            log(entry.getRegistryName().toString(), "Already present");
             return false;
         }
         return true;
@@ -139,5 +139,4 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
     protected static void log(String entry, String message) {
         PuzzlesLib.LOGGER.warn("Unable to parse entry {}: {}", entry, message);
     }
-    
 }

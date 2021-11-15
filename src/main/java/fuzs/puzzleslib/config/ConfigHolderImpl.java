@@ -2,14 +2,13 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.core.ModLoaderEnvironment;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,27 +55,26 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param server server config factory
      */
     ConfigHolderImpl(@Nonnull Supplier<C> client, @Nonnull Supplier<S> server) {
-        this.client = FMLEnvironment.dist.isClient() ? client.get() : null;
+        this.client = ModLoaderEnvironment.isClient() ? client.get() : null;
         this.server = server.get();
     }
 
     /**
-     * @param evt forge config event
+     * @param config    config instance
      * @param modId mod id for this config holder
+     * @param reloading is the config being reloaded (only for log message)
      */
-    @SubscribeEvent
-    @Deprecated
-    public void onModConfig(final ModConfigEvent evt, String modId) {
+    private void onModConfig(ModConfig config, String modId, boolean reloading) {
         // this is fired on ModEventBus, so mod id check is not necessary here
         // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
-        if (evt.getConfig().getModId().equals(modId)) {
-            final ModConfig.Type type = evt.getConfig().getType();
+        if (config.getModId().equals(modId)) {
+            final ModConfig.Type type = config.getType();
             switch (type) {
                 case CLIENT -> this.clientCallbacks.forEach(Runnable::run);
                 case SERVER -> this.serverCallbacks.forEach(Runnable::run);
                 case COMMON -> throw new RuntimeException("Common config type not supported");
             }
-            if (evt instanceof ModConfigEvent.Reloading) {
+            if (reloading) {
                 PuzzlesLib.LOGGER.info("Reloading {} config for {}", type.extension(), modId);
             }
         }
@@ -89,7 +87,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param save action to perform when value changes (is reloaded)
      * @param <T> type for value
      */
-    private  <T> void addSaveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
+    private <T> void addSaveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
         switch (type) {
             case CLIENT -> this.clientCallbacks.add(() -> save.accept(entry.get()));
             case SERVER -> this.serverCallbacks.add(() -> save.accept(entry.get()));
@@ -102,22 +100,16 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param modId modId to register for
      */
     public void addConfigs(String modId) {
-        this.addConfigs(ModLoadingContext.get());
+        this.registerConfigs(ModLoadingContext.get());
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modBus.addListener((final ModConfigEvent evt) -> this.onModConfig(evt, modId));
-        // ModConfigEvent sometimes doesn't fire on start-up, resulting in config values not being synced, so we force it once
-        // not sure if this is still an issue though
-//        modBus.addListener((final FMLLoadCompleteEvent evt) -> {
-//            this.clientCallbacks.forEach(Runnable::run);
-//            this.serverCallbacks.forEach(Runnable::run);
-//        });
+        modBus.addListener((final ModConfigEvent evt) -> this.onModConfig(evt.getConfig(), modId, evt instanceof ModConfigEvent.Reloading));
     }
 
     /**
      * register configs
      * @param context mod context to register to
      */
-    private void addConfigs(ModLoadingContext context) {
+    private void registerConfigs(ModLoadingContext context) {
         if (this.client != null) {
             // can't use a lambda expression for a functional interface, if the method in the functional interface has type parameters
             final ConfigCallback saveCallback = new ConfigCallback() {

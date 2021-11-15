@@ -13,7 +13,6 @@ import java.util.function.Supplier;
  * small helper methods
  */
 public class PuzzlesUtil {
-
     /**
      * @param object object to consume
      * @param consumer action

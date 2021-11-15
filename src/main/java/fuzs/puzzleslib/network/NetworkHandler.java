@@ -61,7 +61,7 @@ public class NetworkHandler {
      * @param direction side this message is to be executed at
      * @param <T> message implementation
      */
-    public <T extends Message> void register(Class<T> clazz, Supplier<T> supplier, NetworkDirection direction) {
+    public <T extends Message> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction) {
         BiConsumer<T, FriendlyByteBuf> encode = Message::write;
         Function<FriendlyByteBuf, T> decode = buf -> {
             T message = supplier.get();
@@ -202,7 +202,7 @@ public class NetworkHandler {
      */
     public static NetworkHandler of(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         final SimpleChannel channel = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(modId, "main"))
+                .named(new ResourceLocation(modId, "play"))
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
                 .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)

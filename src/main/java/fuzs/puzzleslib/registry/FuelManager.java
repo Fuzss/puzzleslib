@@ -57,9 +57,7 @@ public enum FuelManager {
      * forge event handler registered in main mod class
      * @param evt forge event
      */
-    @SubscribeEvent
-    @Deprecated
-    public void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
+    private void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
         Item item = evt.getItemStack().getItem();
         if (this.fuelValues.containsKey(item)) {
             evt.setBurnTime(this.fuelValues.getInt(item));
