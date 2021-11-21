@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v2.0.1-1.17.1] - 2021-11-22
+- Added ModelLayerRegistry for creating ModelLayerLocation's with a specific namespace
+
 ## [v2.0.0-1.17.1] - 2021-11-15
 - Ported to Minecraft 1.17
 
