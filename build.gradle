@@ -90,9 +90,10 @@ dependencies {
     minecraft "net.minecraftforge:forge:${forgeVersion}"
 //    annotationProcessor 'org.spongepowered:mixin:0.8.3:processor'
 
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399554")
-    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516099")
-    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516671")
+    // don't enable these for puzzles, they'll be forced upon all dependencies then via maven
+//    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399554")
+//    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516099")
+//    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516671")
 
     // shadow demo
 //    implementation "com.github.Ocelot5836:Sonar:ef5b90d"
