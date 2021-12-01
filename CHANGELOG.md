@@ -3,7 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v2.0.2-1.17.1] - 2021-11-28
+### Added
+- Added utility classes for working with json files
+
 ## [v2.0.1-1.17.1] - 2021-11-22
+### Added
 - Added ModelLayerRegistry for creating ModelLayerLocation's with a specific namespace
 
 ## [v2.0.0-1.17.1] - 2021-11-15
