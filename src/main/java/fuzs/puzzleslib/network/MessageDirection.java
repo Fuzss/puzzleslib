@@ -3,7 +3,7 @@ package fuzs.puzzleslib.network;
 import net.minecraftforge.fml.LogicalSide;
 
 /**
- * just like {@link net.minecraftforge.fmllegacy.network.NetworkDirection}, only for registering messages
+ * just like {@link net.minecraftforge.network.NetworkDirection}, only for registering messages
  * we use this because the naming is very intuitive, and it stores some useful information
  */
 public enum MessageDirection {

@@ -2,8 +2,8 @@ package fuzs.puzzleslib.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraftforge.client.ConfigGuiHandler;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fmlclient.ConfigGuiHandler;
 
 import java.util.function.BiFunction;
 

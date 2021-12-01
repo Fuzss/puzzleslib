@@ -11,12 +11,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fmllegacy.LogicalSidedProvider;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
-import net.minecraftforge.fmllegacy.network.NetworkRegistry;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 
 import javax.annotation.Nullable;
 import java.util.Objects;
@@ -80,7 +80,7 @@ public class NetworkHandler {
             } else {
                 player = ctx.getSender();
             }
-            ctx.enqueueWork(() -> msg.handle(player, LogicalSidedProvider.INSTANCE.get(receptionSide)));
+            ctx.enqueueWork(() -> msg.handle(player, LogicalSidedProvider.WORKQUEUE.get(receptionSide)));
             ctx.setPacketHandled(true);
         };
         this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle);
