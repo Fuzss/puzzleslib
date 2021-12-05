@@ -74,9 +74,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
                 case SERVER -> this.serverCallbacks.forEach(Runnable::run);
                 case COMMON -> throw new RuntimeException("Common config type not supported");
             }
-            if (reloading) {
-                PuzzlesLib.LOGGER.info("Reloading {} config for {}", type.extension(), modId);
-            }
+            PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", type.extension(), modId);
         }
     }
 
@@ -100,9 +98,10 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param modId modId to register for
      */
     public void addConfigs(String modId) {
-        this.registerConfigs(ModLoadingContext.get());
+        // register events before registering configs
         final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
         modBus.addListener((final ModConfigEvent evt) -> this.onModConfig(evt.getConfig(), modId, evt instanceof ModConfigEvent.Reloading));
+        this.registerConfigs(ModLoadingContext.get());
     }
 
     /**
