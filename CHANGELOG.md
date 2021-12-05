@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.0.1-1.18] - 2021-12-05
+### Added
+- Added utility classes for working with json files
+### Fixed
+- Fixed a rare case where configs wouldn't load properly on start-up
+
 ## [v3.0.0-1.18] - 2021-12-01
 - Ported to Minecraft 1.18
 
