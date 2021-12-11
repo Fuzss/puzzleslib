@@ -2,6 +2,7 @@ package fuzs.puzzleslib.config.serialization;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -135,5 +137,20 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
      */
     public static String buildConfigDescription(String additionalData) {
         return String.format("Format for every entry is \"<namespace>:<path>%s\". Path may use asterisk as wildcard parameter. Tags are not supported.", additionalData);
+    }
+
+    /**
+     * @param registry registry to get entry keys from
+     * @param entries entries to convert to string
+     * @param <T> registry element type
+     * @return entries as string list
+     */
+    @SafeVarargs
+    public static <T extends IForgeRegistryEntry<T>> List<String> getKeyList(IForgeRegistry<T> registry, T... entries) {
+        return Stream.of(entries)
+                .filter(registry::containsValue)
+                .map(registry::getKey)
+                .map(ResourceLocation::toString)
+                .collect(Collectors.toList());
     }
 }

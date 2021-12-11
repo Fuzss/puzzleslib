@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.0.2-1.18] - 2021-12-10
+### Added
+- Added a helper method for converting a list of registry entries to string
+
 ## [v3.0.1-1.18] - 2021-12-05
 ### Added
 - Added utility classes for working with json files
