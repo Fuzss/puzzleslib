@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.1.0-1.18.1] - 2021-12-13
+- Compiled for Minecraft 1.18.1
+
 ## [v3.0.2-1.18] - 2021-12-10
 ### Added
 - Added a helper method for converting a list of registry entries to string
