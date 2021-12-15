@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.1.1-1.18.1] - 2021-12-15
+### Added
+- Added more helper methods for registering sound events and items
+
 ## [v3.1.0-1.18.1] - 2021-12-13
 - Compiled for Minecraft 1.18.1
 
