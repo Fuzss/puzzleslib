@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.1.3-1.18.1] - 2021-12-28
+### Fixed
+- Fixed an ordering issue when loading configs
+
 ## [v3.1.2-1.18.1] - 2021-12-24
 ### Added
 - Added helper class for accessing hidden fields on screen instances
