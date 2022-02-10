@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.1.5-1.18.1] - 2022-02-10
+### Fixed
+- Made it more clear when category comments in a config are not supported
+
 ## [v3.1.4-1.18.1] - 2022-02-09
 ### Fixed
 - Hopefully fixed an issue where registry entries rarely wouldn't load properly, also added a bunch more log output for debugging in case something goes wrong registering content in the future

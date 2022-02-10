@@ -2,8 +2,10 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.config.annotation.Config;
 import fuzs.puzzleslib.config.annotation.ConfigBuilder;
 import net.minecraftforge.common.ForgeConfigSpec;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +66,7 @@ public abstract class AbstractConfig {
      * @param comment comment
      */
     protected final void addComment(List<String> path, String... comment) {
+        if (StringUtils.isEmpty(this.name)) throw new IllegalStateException("Cannot set comment on base config");
         this.categoryComments.put(path, comment);
     }
 
@@ -75,7 +78,7 @@ public abstract class AbstractConfig {
      */
     public static void setupConfig(AbstractConfig config, ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback) {
         final HashMap<List<String>, String[]> categoryComments = Maps.newHashMap(config.categoryComments);
-        final boolean withCategory = config.name != null && !config.name.isEmpty();
+        final boolean withCategory = !StringUtils.isEmpty(config.name);
         if (withCategory) {
             final String[] comment = categoryComments.remove(Lists.<String>newArrayList());
             if (comment != null && comment.length != 0) builder.comment(comment);
