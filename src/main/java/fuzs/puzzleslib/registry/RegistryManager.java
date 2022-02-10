@@ -3,6 +3,7 @@ package fuzs.puzzleslib.registry;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.PuzzlesLib;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -21,12 +22,15 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -51,7 +55,7 @@ public class RegistryManager {
     /**
      * internal storage for collecting and registering registry entries
      */
-    private final Multimap<IForgeRegistry<? extends IForgeRegistryEntry<?>>, Supplier<? extends IForgeRegistryEntry<?>>> registryToFactory = ArrayListMultimap.create();
+    private final Multimap<Class<? extends IForgeRegistryEntry<?>>, Supplier<? extends IForgeRegistryEntry<?>>> registryToFactory = ArrayListMultimap.create();
 
     /**
      * private constructor
@@ -62,7 +66,7 @@ public class RegistryManager {
     }
 
     /**
-     * listener is added in main mod class so it's always puzzles lib itself and not the first mod registering something
+     * listener is added in main mod class, so it's always puzzles lib itself and not the first mod registering something
      * @param evt all forge registry events
      */
     @SubscribeEvent
@@ -78,9 +82,13 @@ public class RegistryManager {
      */
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
-        this.registryToFactory.get(registry).forEach(entry -> {
-            registry.register((T) entry.get());
-        });
+        final Collection<Supplier<? extends IForgeRegistryEntry<?>>> suppliers = this.registryToFactory.get(registry.getRegistrySuperType());
+        if (!suppliers.isEmpty()) {
+            PuzzlesLib.LOGGER.info("registering {} elements to registry of type {}", suppliers.size(), registry.getRegistryName());
+            suppliers.forEach(entry -> {
+                registry.register((T) entry.get());
+            });
+        }
     }
 
     /**
@@ -91,15 +99,30 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> registry type
      * @param <U> entry type
+     * @deprecated use method with class argument instead
      */
+    @Deprecated
     public <T extends IForgeRegistryEntry<T>, U extends T> RegistryObject<U> register(IForgeRegistry<T> registry, String path, Supplier<U> entry) {
-        this.registryToFactory.put(registry, () -> {
+        return this.register(registry.getRegistrySuperType(), path, entry);
+    }
+
+    /**
+     * register any type of registry entry with a path
+     * @param baseType type for this registry entry
+     * @param path path for new entry
+     * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
+     * @param <T> registry type
+     * @param <U> entry type
+     */
+    public <T extends IForgeRegistryEntry<T>, U extends T> RegistryObject<U> register(Class<T> baseType, String path, Supplier<U> entry) {
+        this.registryToFactory.put(baseType, () -> {
             T e = entry.get();
             Objects.requireNonNull(e, "Can't register null object");
             e.setRegistryName(this.locate(path));
             return e;
         });
-        return RegistryObject.of(this.locate(path), registry);
+        return RegistryObject.of(this.locate(path), baseType, this.namespace);
     }
 
     /**
@@ -109,7 +132,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<Block> registerBlock(String path, Supplier<Block> entry) {
-        return this.register(ForgeRegistries.BLOCKS, path, entry);
+        return this.register(Block.class, path, entry);
     }
 
     /**
@@ -144,7 +167,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
-        return this.register(ForgeRegistries.FLUIDS, path, entry);
+        return this.register(Fluid.class, path, entry);
     }
 
     /**
@@ -154,7 +177,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<Item> registerItem(String path, Supplier<Item> entry) {
-        return this.register(ForgeRegistries.ITEMS, path, entry);
+        return this.register(Item.class, path, entry);
     }
 
     /**
@@ -199,7 +222,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
-        return this.register(ForgeRegistries.MOB_EFFECTS, path, entry);
+        return this.register(MobEffect.class, path, entry);
     }
 
     /**
@@ -218,7 +241,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<SoundEvent> registerSoundEvent(String path, Supplier<SoundEvent> entry) {
-        return this.register(ForgeRegistries.SOUND_EVENTS, path, entry);
+        return this.register(SoundEvent.class, path, entry);
     }
 
     /**
@@ -228,7 +251,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<Potion> registerPotion(String path, Supplier<Potion> entry) {
-        return this.register(ForgeRegistries.POTIONS, path, entry);
+        return this.register(Potion.class, path, entry);
     }
 
     /**
@@ -238,7 +261,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      */
     public RegistryObject<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
-        return this.register(ForgeRegistries.ENCHANTMENTS, path, entry);
+        return this.register(Enchantment.class, path, entry);
     }
 
     /**
@@ -260,7 +283,7 @@ public class RegistryManager {
      * @param <T> entity type type
      */
     public <T extends Entity> RegistryObject<EntityType<T>> registerEntityType(String path, Supplier<EntityType<T>> entry) {
-        return this.register(ForgeRegistries.ENTITIES, path, entry);
+        return this.register((Class<EntityType<?>>) (Class<?>) EntityType.class, path, entry);
     }
 
     /**
@@ -283,7 +306,7 @@ public class RegistryManager {
      * @param <T> block entity type
      */
     public <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType<T>> entry) {
-        return this.register(ForgeRegistries.BLOCK_ENTITIES, path, entry);
+        return this.register((Class<BlockEntityType<?>>) (Class<?>) BlockEntityType.class, path, entry);
     }
 
     /**
@@ -305,7 +328,7 @@ public class RegistryManager {
      * @param <T> container menu type
      */
     public <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String path, Supplier<MenuType<T>> entry) {
-        return this.register(ForgeRegistries.CONTAINERS, path, entry);
+        return this.register((Class<MenuType<?>>) (Class<?>) MenuType.class, path, entry);
     }
 
     /**
@@ -313,7 +336,7 @@ public class RegistryManager {
      * @return resource location for {@link #namespace}
      */
     private ResourceLocation locate(String path) {
-        if (path.isEmpty()) throw new IllegalArgumentException("Can't register object without name");
+        if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("Can't register object without name");
         return new ResourceLocation(this.namespace, path);
     }
 
@@ -322,10 +345,15 @@ public class RegistryManager {
      * @param namespace namespace used for registration
      * @return new mod specific registry manager
      */
-    public static RegistryManager of(String namespace) {
+    public static synchronized RegistryManager of(String namespace) {
         return MOD_TO_REGISTRY.computeIfAbsent(namespace, key -> {
+            PuzzlesLib.LOGGER.info("creating registry manager for mod {}", namespace);
             final RegistryManager manager = new RegistryManager(namespace);
             FMLJavaModLoadingContext.get().getModEventBus().register(manager);
+            final String activeNamespace = ModLoadingContext.get().getActiveNamespace();
+            if (!activeNamespace.equals(namespace)) {
+                PuzzlesLib.LOGGER.error("registering registry manager for wrong mod loading context! expected: {}, but got {} instead", namespace, activeNamespace);
+            }
             return manager;
         });
     }

@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.1.4-1.18.1] - 2022-02-09
+### Fixed
+- Hopefully fixed an issue where registry entries rarely wouldn't load properly, also added a bunch more log output for debugging in case something goes wrong registering content in the future
+- Fixed an issue with some category comments being unable to apply
+
 ## [v3.1.3-1.18.1] - 2021-12-28
 ### Fixed
 - Fixed an ordering issue when loading configs
@@ -30,7 +35,5 @@ The format is based on [Keep a Changelog].
 
 ## [v3.0.0-1.18] - 2021-12-01
 - Ported to Minecraft 1.18
-
-**NOTE:** This is a slimmed down version, mainly the elements structure is missing. It'll be ported when mods that depend on it are ported as well.
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/

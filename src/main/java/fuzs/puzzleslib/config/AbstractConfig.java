@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.config.annotation.ConfigBuilder;
 import net.minecraftforge.common.ForgeConfigSpec;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,14 +74,15 @@ public abstract class AbstractConfig {
      * @param saveCallback register save callback
      */
     public static void setupConfig(AbstractConfig config, ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback) {
+        final HashMap<List<String>, String[]> categoryComments = Maps.newHashMap(config.categoryComments);
         final boolean withCategory = config.name != null && !config.name.isEmpty();
         if (withCategory) {
-            final String[] comment = config.categoryComments.get(Lists.<String>newArrayList());
+            final String[] comment = categoryComments.remove(Lists.<String>newArrayList());
             if (comment != null && comment.length != 0) builder.comment(comment);
             builder.push(config.name);
         }
         // currently, supports both registering via annotation system and builder method
-        ConfigBuilder.serialize(builder, saveCallback, Maps.newHashMap(config.categoryComments), config);
+        ConfigBuilder.serialize(builder, saveCallback, categoryComments, config);
         // legacy method, kept for now for types unsupported by annotation system
         config.addToBuilder(builder, saveCallback);
         if (withCategory) {

@@ -12,7 +12,7 @@ import java.util.Objects;
  * a helper class for accessing encapsulated fields on a screen
  * on Forge those are all exposed, but Fabric requires special accessors
  *
- * for adding buttons, those are handled very different on both mod loads:
+ * for adding buttons, those are handled very different on both mod loaders:
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */

@@ -77,7 +77,8 @@ public class ConfigBuilder {
             List<String> currentPath = Lists.newArrayList();
             for (String category : path) {
                 currentPath.add(category);
-                Optional.ofNullable(categoryComments.remove(currentPath)).ifPresent(builder::comment);
+                final String[] comment = categoryComments.remove(currentPath);
+                if (comment != null && comment.length != 0) builder.comment(comment);
                 builder.push(category);
             }
             for (Field field : entry.getValue()) {
