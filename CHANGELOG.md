@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.2.0-1.18.1] - 2022-02-22
+### Added
+- Added system for managing Forge's capabilities
+
 ## [v3.1.5-1.18.1] - 2022-02-10
 ### Fixed
 - Made it more clear when category comments in a config are not supported

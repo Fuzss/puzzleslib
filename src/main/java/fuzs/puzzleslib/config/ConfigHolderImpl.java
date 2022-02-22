@@ -110,7 +110,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param context mod context to register to
      */
     private void registerConfigs(ModLoadingContext context) {
-        // add config reload callback first as it's called when initially loading configs
+        // add config reload callback first to make sure it's called when initially loading configs (since on some systems reload event doesn't trigger during startup, resulting in configs only being loaded here)
         if (this.client != null) {
             this.addClientCallback(this.client::afterConfigReload);
             this.registerConfig(context, ModConfig.Type.CLIENT, this.client, this.clientFileName);
