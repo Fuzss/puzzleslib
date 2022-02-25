@@ -28,4 +28,22 @@ public interface IProxy {
      * @return current game server, null when not in a world
      */
     MinecraftServer getGameServer();
+
+    /**
+     * useful for item tooltips
+     * @return is the control key (command on mac) pressed
+     */
+    boolean hasControlDown();
+
+    /**
+     * useful for item tooltips
+     * @return is the shift key pressed
+     */
+    boolean hasShiftDown();
+
+    /**
+     * useful for item tooltips
+     * @return is the alt key pressed
+     */
+    boolean hasAltDown();
 }

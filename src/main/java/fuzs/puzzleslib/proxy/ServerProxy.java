@@ -25,4 +25,19 @@ public class ServerProxy implements IProxy {
     public MinecraftServer getGameServer() {
         return ServerLifecycleHooks.getCurrentServer();
     }
+
+    @Override
+    public boolean hasControlDown() {
+        return false;
+    }
+
+    @Override
+    public boolean hasShiftDown() {
+        return false;
+    }
+
+    @Override
+    public boolean hasAltDown() {
+        return false;
+    }
 }

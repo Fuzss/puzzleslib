@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.proxy;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -16,5 +17,20 @@ public class ClientProxy extends ServerProxy {
     @Override
     public Object getClientInstance() {
         return Minecraft.getInstance();
+    }
+
+    @Override
+    public boolean hasControlDown() {
+        return Screen.hasControlDown();
+    }
+
+    @Override
+    public boolean hasShiftDown() {
+        return Screen.hasShiftDown();
+    }
+
+    @Override
+    public boolean hasAltDown() {
+        return Screen.hasAltDown();
     }
 }
