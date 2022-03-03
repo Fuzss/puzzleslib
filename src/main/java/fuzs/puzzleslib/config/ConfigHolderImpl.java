@@ -10,9 +10,9 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -81,7 +81,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param client client config factory
      * @param server server config factory
      */
-    ConfigHolderImpl(@Nonnull Supplier<C> client, @Nonnull Supplier<S> server) {
+    ConfigHolderImpl(@NotNull Supplier<C> client, @NotNull Supplier<S> server) {
         this.client = ModLoaderEnvironment.isClient() ? client.get() : null;
         this.server = server.get();
     }
@@ -100,13 +100,13 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
                 case CLIENT -> {
                     this.clientConfigValueCallbacks.forEach(Runnable::run);
                     // call this before running callbacks, so they may use the config already
-                    this.makeClientAvailable();
+                    this.makeClientAvailable(config);
                     this.clientCallbacks.forEach(Runnable::run);
                 }
                 case SERVER -> {
                     this.serverConfigValueCallbacks.forEach(Runnable::run);
                     // call this before running callbacks, so they may use the config already
-                    this.makeServerAvailable();
+                    this.makeServerAvailable(config);
                     this.serverCallbacks.forEach(Runnable::run);
                 }
                 case COMMON -> throw new RuntimeException("Common config type not supported");
@@ -199,9 +199,10 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
 
     /**
      * tries to set client loading stage to {@link ConfigLoadingStage#AVAILABLE}
+     * @param modConfig the mod config object to check, do not use global field as it might not have been set yet since the loading event is called inside the ModConfig constructor on Fabric
      */
-    private void makeClientAvailable() {
-        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.client, this.clientModConfig);
+    private void makeClientAvailable(@Nullable ModConfig modConfig) {
+        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.client, modConfig);
         if (currentLoadingStage == ConfigLoadingStage.LOADED) {
             currentLoadingStage = ConfigLoadingStage.AVAILABLE;
         }
@@ -210,9 +211,10 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
 
     /**
      * tries to set server loading stage to {@link ConfigLoadingStage#AVAILABLE}
+     * @param modConfig the mod config object to check, do not use global field as it might not have been set yet since the loading event is called inside the ModConfig constructor on Fabric
      */
-    private void makeServerAvailable() {
-        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.server, this.serverModConfig);
+    private void makeServerAvailable(@Nullable ModConfig modConfig) {
+        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.server, modConfig);
         if (currentLoadingStage == ConfigLoadingStage.LOADED) {
             currentLoadingStage = ConfigLoadingStage.AVAILABLE;
         }
