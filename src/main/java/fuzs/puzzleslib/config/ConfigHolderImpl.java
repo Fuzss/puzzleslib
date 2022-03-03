@@ -34,9 +34,17 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
     @Nullable
     private final S server;
     /**
+     * client callbacks for annotated config values, separate from {@link #clientCallbacks} to guarantee they run before those
+     */
+    private final List<Runnable> clientConfigValueCallbacks = Lists.newArrayList();
+    /**
      * sync value field when client config reloads
      */
     private final List<Runnable> clientCallbacks = Lists.newArrayList();
+    /**
+     * server callbacks for annotated config values, separate from {@link #serverCallbacks} to guarantee they run before those
+     */
+    private final List<Runnable> serverConfigValueCallbacks = Lists.newArrayList();
     /**
      * sync value field when server config reloads
      */
@@ -49,6 +57,24 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * server config file name, empty for default name
      */
     private String serverFileName = "";
+    /**
+     * the client mod config object for checking if config data is available
+     */
+    @Nullable
+    private ModConfig clientModConfig;
+    /**
+     * the server mod config object for checking if config data is available
+     */
+    @Nullable
+    private ModConfig serverModConfig;
+    /**
+     * loading stage of client config
+     */
+    private ConfigLoadingStage clientLoadingStage = ConfigLoadingStage.NOT_PRESENT;
+    /**
+     * loading stage of server config
+     */
+    private ConfigLoadingStage serverLoadingStage = ConfigLoadingStage.NOT_PRESENT;
 
     /**
      * client config will only be created on physical client
@@ -71,8 +97,18 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
         if (config.getModId().equals(modId)) {
             final ModConfig.Type type = config.getType();
             switch (type) {
-                case CLIENT -> this.clientCallbacks.forEach(Runnable::run);
-                case SERVER -> this.serverCallbacks.forEach(Runnable::run);
+                case CLIENT -> {
+                    this.clientConfigValueCallbacks.forEach(Runnable::run);
+                    // call this before running callbacks, so they may use the config already
+                    this.makeClientAvailable();
+                    this.clientCallbacks.forEach(Runnable::run);
+                }
+                case SERVER -> {
+                    this.serverConfigValueCallbacks.forEach(Runnable::run);
+                    // call this before running callbacks, so they may use the config already
+                    this.makeServerAvailable();
+                    this.serverCallbacks.forEach(Runnable::run);
+                }
                 case COMMON -> throw new RuntimeException("Common config type not supported");
             }
             PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", type.extension(), modId);
@@ -88,8 +124,8 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      */
     private <T> void addSaveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
         switch (type) {
-            case CLIENT -> this.clientCallbacks.add(() -> save.accept(entry.get()));
-            case SERVER -> this.serverCallbacks.add(() -> save.accept(entry.get()));
+            case CLIENT -> this.clientConfigValueCallbacks.add(() -> save.accept(entry.get()));
+            case SERVER -> this.serverConfigValueCallbacks.add(() -> save.accept(entry.get()));
             case COMMON -> throw new RuntimeException("Common config type not supported");
         }
     }
@@ -136,10 +172,17 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
                 ConfigHolderImpl.this.addSaveCallback(type, entry, save);
             }
         };
+        ModConfig modConfig;
         if (StringUtils.isEmpty(fileName)) {
-            context.registerConfig(type, this.buildSpec(config, saveCallback));
+            modConfig = new ModConfig(type, this.buildSpec(config, saveCallback), context.getActiveContainer());
         } else {
-            context.registerConfig(type, this.buildSpec(config, saveCallback), fileName);
+            modConfig = new ModConfig(type, this.buildSpec(config, saveCallback), context.getActiveContainer(), fileName);
+        }
+        context.getActiveContainer().addConfig(modConfig);
+        switch (type) {
+            case CLIENT -> this.clientModConfig = modConfig;
+            case SERVER -> this.serverModConfig = modConfig;
+            case COMMON -> throw new RuntimeException("Common config type not supported");
         }
     }
 
@@ -152,6 +195,44 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         config.setupConfig(builder, saveCallback);
         return builder.build();
+    }
+
+    /**
+     * tries to set client loading stage to {@link ConfigLoadingStage#AVAILABLE}
+     */
+    private void makeClientAvailable() {
+        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.client, this.clientModConfig);
+        if (currentLoadingStage == ConfigLoadingStage.LOADED) {
+            currentLoadingStage = ConfigLoadingStage.AVAILABLE;
+        }
+        this.clientLoadingStage = currentLoadingStage;
+    }
+
+    /**
+     * tries to set server loading stage to {@link ConfigLoadingStage#AVAILABLE}
+     */
+    private void makeServerAvailable() {
+        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.server, this.serverModConfig);
+        if (currentLoadingStage == ConfigLoadingStage.LOADED) {
+            currentLoadingStage = ConfigLoadingStage.AVAILABLE;
+        }
+        this.serverLoadingStage = currentLoadingStage;
+    }
+
+    /**
+     * @param config config object for this config type
+     * @param modConfig mod config object for this config type
+     * @return loading stage corresponding to state of <code>config</code> and <code>modConfig</code>
+     */
+    private ConfigLoadingStage currentLoadingStage(@Nullable AbstractConfig config, @Nullable ModConfig modConfig) {
+        if (config == null) {
+            return ConfigLoadingStage.NOT_PRESENT;
+        } else if (modConfig == null) {
+            return ConfigLoadingStage.INITIALIZED;
+        } else if (modConfig.getConfigData() == null) {
+            return ConfigLoadingStage.MISSING_DATA;
+        }
+        return ConfigLoadingStage.LOADED;
     }
 
     /**
@@ -174,12 +255,38 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
 
     @Override
     public C client() {
+        if (!this.isClientAvailable()) {
+            PuzzlesLib.LOGGER.error("Calling client config when it is not yet available! This is a bug! Current loading stage: {}", this.clientLoadingStage, new Exception("Client config not yet available"));
+        }
         return this.client;
     }
 
     @Override
     public S server() {
+        if (!this.isServerAvailable()) {
+            PuzzlesLib.LOGGER.error("Calling server config when it is not yet available! This is a bug! Current loading stage: {}", this.serverLoadingStage, new Exception("Server config not yet available"));
+        }
         return this.server;
+    }
+
+    @Override
+    public boolean isClientAvailable() {
+        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.client, this.clientModConfig);
+        if (currentLoadingStage != ConfigLoadingStage.LOADED || this.clientLoadingStage != ConfigLoadingStage.AVAILABLE) {
+            this.clientLoadingStage = currentLoadingStage;
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isServerAvailable() {
+        ConfigLoadingStage currentLoadingStage = this.currentLoadingStage(this.server, this.serverModConfig);
+        if (currentLoadingStage != ConfigLoadingStage.LOADED || this.serverLoadingStage != ConfigLoadingStage.AVAILABLE) {
+            this.serverLoadingStage = currentLoadingStage;
+            return false;
+        }
+        return true;
     }
 
     @Override

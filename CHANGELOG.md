@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.3.0-1.18.2] - 2022-03-03
+- Updated to Minecraft 1.18.2
+### Changed
+- Made config system more aware of what parts have been loaded yet to avoid accidentally accessing data too early
+
 ## [v3.2.1-1.18.1] - 2022-02-25
 ### Added
 - Added tooltip utility methods for checking if certain modifier keys are pressed

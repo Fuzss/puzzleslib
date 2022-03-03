@@ -76,7 +76,7 @@ repositories {
 dependencies {
 
     minecraft "net.minecraftforge:forge:${forgeVersion}"
-//    annotationProcessor 'org.spongepowered:mixin:0.8.4:processor'
+//    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // don't enable these for puzzles, they'll be forced upon all dependencies then via maven
 //    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399552")
@@ -84,7 +84,7 @@ dependencies {
 //    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516528")
 
     // from local maven, those builds are not obfuscated
-//    implementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"
+//    implementation fg.deobf("fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}")
     // try use curse maven when local maven is not available
     // file id is end of url (7 digits usually) when on file details page on curse
 //    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
@@ -189,19 +189,20 @@ jar {
     group 'jar'
 }
 
-createJarTask("deobfJar", "deobf", [sourceSets.main.output])
+//createJarTask("deobfJar", "deobf", [sourceSets.main.output])
 createJarTask("sourceJar", "sources", sourceSets.main.allSource)
 createJarTask("javadocJar", "javadoc", javadoc)
 createSignJarTask("signJar", jar)
-createSignJarTask("signDeobfJar", deobfJar)
+//createSignJarTask("signDeobfJar", deobfJar)
 createSignJarTask("signSourceJar", sourceJar)
 createSignJarTask("signJavadocJar", javadocJar)
 
 // finalize all jar build tasks with a signing task
-def jarTasks = [jar, deobfJar, sourceJar, javadocJar]
+def jarTasks = [jar, sourceJar, javadocJar]
 jarTasks.each { task -> task.finalizedBy tasks.findByName("sign" + task.name.substring(0, 1).toUpperCase() + task.name.substring(1))}
 
 signJar.mustRunAfter 'reobfJar'
+jar.finalizedBy 'reobfJar'
 
 artifacts {
     archives jar
@@ -213,10 +214,10 @@ artifacts {
 publishing {
     publications {
         mavenJava (MavenPublication) {
-            artifact deobfJar
+//            artifact deobfJar
+            artifact jar
             artifact sourceJar
             artifact javadocJar
-            from components.java
         }
     }
 }

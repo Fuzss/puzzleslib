@@ -62,6 +62,9 @@ public class CapabilityController {
         }
     }
 
+    /**
+     * @param evt forge event
+     */
     @Deprecated
     @SubscribeEvent
     public void onAttachCapabilities(final AttachCapabilitiesEvent<?> evt) {
@@ -72,6 +75,9 @@ public class CapabilityController {
         }
     }
 
+    /**
+     * @param evt forge event
+     */
     @Deprecated
     @SubscribeEvent
     public void onPlayerClone(final PlayerEvent.Clone evt) {

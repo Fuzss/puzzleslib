@@ -4,8 +4,8 @@ import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkConstants;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * utility class for common helper methods
@@ -13,9 +13,18 @@ import org.apache.logging.log4j.Logger;
  */
 @Mod(PuzzlesLib.MOD_ID)
 public class PuzzlesLib {
+    /**
+     * puzzles lib mod id
+     */
     public static final String MOD_ID = "puzzleslib";
+    /**
+     * puzzles lib mod name
+     */
     public static final String MOD_NAME = "Puzzles Lib";
-    public static final Logger LOGGER = LogManager.getLogger(PuzzlesLib.MOD_NAME);
+    /**
+     * puzzles lib logger
+     */
+    public static final Logger LOGGER = LoggerFactory.getLogger(PuzzlesLib.MOD_NAME);
 
     /**
      * set mod to only be required on one side, server or client

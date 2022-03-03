@@ -84,7 +84,7 @@ public class RegistryManager {
     public <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
         final Collection<Supplier<? extends IForgeRegistryEntry<?>>> suppliers = this.registryToFactory.get(registry.getRegistrySuperType());
         if (!suppliers.isEmpty()) {
-            PuzzlesLib.LOGGER.info("Registering {} element(s) to registry of type {}", suppliers.size(), registry.getRegistryName());
+            PuzzlesLib.LOGGER.info("Registering {} element(s) to registry of type {} for mod id {}", suppliers.size(), registry.getRegistryName(), this.namespace);
             suppliers.forEach(entry -> {
                 registry.register((T) entry.get());
             });
@@ -352,7 +352,7 @@ public class RegistryManager {
             FMLJavaModLoadingContext.get().getModEventBus().register(manager);
             final String activeNamespace = ModLoadingContext.get().getActiveNamespace();
             if (!activeNamespace.equals(namespace)) {
-                PuzzlesLib.LOGGER.error("Registering registry manager for wrong mod loading context! Expected: {}, but got {} instead", namespace, activeNamespace);
+                PuzzlesLib.LOGGER.error("Registering registry manager for wrong mod loading context! Expected {}, but received {} instead", namespace, activeNamespace);
             }
             return manager;
         });

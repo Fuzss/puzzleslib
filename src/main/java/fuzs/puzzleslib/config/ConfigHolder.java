@@ -26,6 +26,16 @@ public interface ConfigHolder<C extends AbstractConfig, S extends AbstractConfig
     S server();
 
     /**
+     * @return is the client config full loaded and ready to be used
+     */
+    boolean isClientAvailable();
+
+    /**
+     * @return is the server config full loaded and ready to be used
+     */
+    boolean isServerAvailable();
+
+    /**
      * @param callback callback for this client config
      */
     void addClientCallback(Runnable callback);
