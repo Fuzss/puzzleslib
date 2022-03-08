@@ -132,7 +132,7 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<Entity> entityType, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> Capability<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends Entity> entityType, CapabilityToken<C> token) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, entityType::isInstance, token);
     }
 
@@ -160,10 +160,9 @@ public class CapabilityController {
      * @param blockEntityType   block entity class to match
      * @param token capability token required to get capability instance from capability manager
      * @return capability instance from capability manager
-     * @param <T> block entity type
      * @param <C> capability type
      */
-    public <T extends BlockEntity, C extends CapabilityComponent> Capability<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<T> blockEntityType, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> Capability<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends BlockEntity> blockEntityType, CapabilityToken<C> token) {
         return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, capabilityFactory, blockEntityType::isInstance, token);
     }
 
