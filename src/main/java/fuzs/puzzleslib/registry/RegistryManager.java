@@ -4,6 +4,8 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.core.ReflectionHelper;
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -30,9 +32,12 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -55,7 +60,7 @@ public class RegistryManager {
     /**
      * internal storage for collecting and registering registry entries
      */
-    private final Multimap<Class<? extends IForgeRegistryEntry<?>>, Supplier<? extends IForgeRegistryEntry<?>>> registryToFactory = ArrayListMultimap.create();
+    private final Multimap<Class<? extends IForgeRegistryEntry<?>>, Pair<Supplier<? extends IForgeRegistryEntry<?>>, Consumer<IForgeRegistry<? extends IForgeRegistryEntry<?>>>>> registryToFactory = ArrayListMultimap.create();
 
     /**
      * private constructor
@@ -82,11 +87,12 @@ public class RegistryManager {
      */
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
-        final Collection<Supplier<? extends IForgeRegistryEntry<?>>> suppliers = this.registryToFactory.get(registry.getRegistrySuperType());
+        final Collection<Pair<Supplier<? extends IForgeRegistryEntry<?>>, Consumer<IForgeRegistry<? extends IForgeRegistryEntry<?>>>>> suppliers = this.registryToFactory.get(registry.getRegistrySuperType());
         if (!suppliers.isEmpty()) {
             PuzzlesLib.LOGGER.info("Registering {} element(s) to registry of type {} for mod id {}", suppliers.size(), registry.getRegistryName(), this.namespace);
             suppliers.forEach(entry -> {
-                registry.register((T) entry.get());
+                registry.register((T) entry.left().get());
+                entry.right().accept(registry);
             });
         }
     }
@@ -116,13 +122,22 @@ public class RegistryManager {
      * @param <U> entry type
      */
     public <T extends IForgeRegistryEntry<T>, U extends T> RegistryObject<U> register(Class<T> baseType, String path, Supplier<U> entry) {
-        this.registryToFactory.put(baseType, () -> {
+        RegistryObject<U> registryObject = RegistryObject.of(this.locate(path), baseType, this.namespace);
+        this.registryToFactory.put(baseType, Pair.of(() -> {
             T e = entry.get();
             Objects.requireNonNull(e, "Can't register null object");
             e.setRegistryName(this.locate(path));
             return e;
-        });
-        return RegistryObject.of(this.locate(path), baseType, this.namespace);
+        }, registry -> {
+            try {
+                Method method = ReflectionHelper.getDeclaredMethod(RegistryObject.class, "updateReference", IForgeRegistry.class);
+                method.invoke(registryObject, registry);
+                PuzzlesLib.LOGGER.info("Successfully updated registry object reference for {}", registryObject.getId());
+            } catch (IllegalAccessException | InvocationTargetException | NullPointerException e) {
+                PuzzlesLib.LOGGER.warn("Unable to update registry object reference for {}", registryObject.getId(), e);
+            }
+        }));
+        return registryObject;
     }
 
     /**
@@ -328,7 +343,7 @@ public class RegistryManager {
      * @param <T> container menu type
      */
     public <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(String path, Supplier<MenuType<T>> entry) {
-        return this.register((Class<MenuType<?>>) (Class<?>) MenuType.class, path, entry);
+        return this.register(ForgeRegistries.CONTAINERS.getRegistrySuperType(), path, entry);
     }
 
     /**
