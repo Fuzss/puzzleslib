@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v3.3.3-1.18.2] - 2022-04-05
+## [v3.2.2-1.18.1] - 2022-04-05
 ### Fixed
 - Hopefully fixed crash on start-up due to some registry objects not having been updated
 
