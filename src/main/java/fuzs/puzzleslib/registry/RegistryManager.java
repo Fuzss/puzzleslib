@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.core.ReflectionHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -22,7 +23,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -30,9 +30,12 @@ import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -55,7 +58,11 @@ public class RegistryManager {
     /**
      * internal storage for collecting and registering registry entries
      */
-    private final Multimap<Class<? extends IForgeRegistryEntry<?>>, Supplier<? extends IForgeRegistryEntry<?>>> registryToFactory = ArrayListMultimap.create();
+    private final Multimap<Class<?>, RegistryEntryHolder<?>> registryToFactory = ArrayListMultimap.create();
+    /**
+     * reference method for {@link #tryUpdateRegistryReference}
+     */
+    private static final Method UPDATE_REFERENCE_METHOD = ReflectionHelper.getDeclaredMethod(RegistryObject.class, "updateReference", IForgeRegistry.class);
 
     /**
      * private constructor
@@ -82,11 +89,13 @@ public class RegistryManager {
      */
     @SuppressWarnings("unchecked")
     public <T extends IForgeRegistryEntry<T>> void addAllToRegistry(IForgeRegistry<T> registry) {
-        final Collection<Supplier<? extends IForgeRegistryEntry<?>>> suppliers = this.registryToFactory.get(registry.getRegistrySuperType());
+        final Collection<RegistryEntryHolder<?>> suppliers = this.registryToFactory.get(registry.getRegistrySuperType());
         if (!suppliers.isEmpty()) {
             PuzzlesLib.LOGGER.info("Registering {} element(s) to registry of type {} for mod id {}", suppliers.size(), registry.getRegistryName(), this.namespace);
             suppliers.forEach(entry -> {
-                registry.register((T) entry.get());
+                RegistryEntryHolder<T> holder = (RegistryEntryHolder<T>) entry;
+                registry.register(holder.factory().get());
+                holder.updateReference().accept(registry);
             });
         }
     }
@@ -116,13 +125,33 @@ public class RegistryManager {
      * @param <U> entry type
      */
     public <T extends IForgeRegistryEntry<T>, U extends T> RegistryObject<U> register(Class<T> baseType, String path, Supplier<U> entry) {
-        this.registryToFactory.put(baseType, () -> {
-            T e = entry.get();
+        RegistryObject<U> registryObject = RegistryObject.of(this.locate(path), baseType, this.namespace);
+        this.registryToFactory.put(baseType, RegistryEntryHolder.of(() -> {
+            U e = entry.get();
             Objects.requireNonNull(e, "Can't register null object");
             e.setRegistryName(this.locate(path));
             return e;
-        });
-        return RegistryObject.of(this.locate(path), baseType, this.namespace);
+        }, registry -> {
+            tryUpdateRegistryReference(registryObject, registry);
+        }));
+        return registryObject;
+    }
+
+    /**
+     * we manually call updateReference here to make sure our <code>registryObject</code> has a valid reference
+     * forge should do this for us, but it does not seem to work reliably and sometimes leads to the reference not having been updated when it is used on the client (e.g. when registering menu provider/block entity renderer)
+     * we use reflection as the required method is marked to go package private in the future
+     * @param registryObject registry object to call updateReference method on
+     * @param registry the registry the object belongs to
+     * @param <T> registry type
+     * @param <U> entry type
+     */
+    private static <T extends IForgeRegistryEntry<T>, U extends T> void tryUpdateRegistryReference(RegistryObject<U> registryObject, IForgeRegistry<T> registry) {
+        try {
+            UPDATE_REFERENCE_METHOD.invoke(registryObject, registry);
+        } catch (IllegalAccessException | InvocationTargetException | NullPointerException e) {
+            PuzzlesLib.LOGGER.warn("Unable to update registry object reference for {}. This might cause a start-up crash!", registryObject.getId(), e);
+        }
     }
 
     /**
@@ -347,14 +376,17 @@ public class RegistryManager {
      */
     public static synchronized RegistryManager of(String namespace) {
         return MOD_TO_REGISTRY.computeIfAbsent(namespace, key -> {
-            PuzzlesLib.LOGGER.info("Creating registry manager for mod id {}", namespace);
+//            PuzzlesLib.LOGGER.info("Creating registry manager for mod id {}", namespace);
             final RegistryManager manager = new RegistryManager(namespace);
             FMLJavaModLoadingContext.get().getModEventBus().register(manager);
-            final String activeNamespace = ModLoadingContext.get().getActiveNamespace();
-            if (!activeNamespace.equals(namespace)) {
-                PuzzlesLib.LOGGER.error("Registering registry manager for wrong mod loading context! Expected {}, but received {} instead", namespace, activeNamespace);
-            }
             return manager;
         });
+    }
+
+    private static record RegistryEntryHolder<T extends IForgeRegistryEntry<T>>(Supplier<T> factory, Consumer<IForgeRegistry<T>> updateReference) {
+
+        public static <T extends IForgeRegistryEntry<T>> RegistryEntryHolder<T> of(Supplier<T> factory, Consumer<IForgeRegistry<T>> updateReference) {
+            return new RegistryEntryHolder<>(factory, updateReference);
+        }
     }
 }

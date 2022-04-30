@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.3.3-1.18.2] - 2022-04-30
+### Fixed
+- Hopefully fixed rare crash on start-up due to some registry objects not having been updated
+
 ## [v3.3.2-1.18.2] - 2022-03-08
 ### Fixed
 - Fixed a small issue that prevented registering entity based capabilities
