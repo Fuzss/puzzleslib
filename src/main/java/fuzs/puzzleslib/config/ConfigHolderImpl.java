@@ -95,23 +95,25 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
         // this is fired on ModEventBus, so mod id check is not necessary here
         // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
         if (config.getModId().equals(modId)) {
-            final ModConfig.Type type = config.getType();
-            switch (type) {
+            switch (config.getType()) {
                 case CLIENT -> {
-                    this.clientConfigValueCallbacks.forEach(Runnable::run);
-                    // call this before running callbacks, so they may use the config already
-                    this.makeClientAvailable(config);
-                    this.clientCallbacks.forEach(Runnable::run);
+                    if (config == this.clientModConfig) {
+                        this.clientConfigValueCallbacks.forEach(Runnable::run);
+                        // call this before running callbacks, so they may use the config already
+                        this.makeClientAvailable(config);
+                        this.clientCallbacks.forEach(Runnable::run);
+                    }
                 }
                 case SERVER -> {
-                    this.serverConfigValueCallbacks.forEach(Runnable::run);
-                    // call this before running callbacks, so they may use the config already
-                    this.makeServerAvailable(config);
-                    this.serverCallbacks.forEach(Runnable::run);
+                    if (config == this.serverModConfig) {
+                        this.serverConfigValueCallbacks.forEach(Runnable::run);
+                        // call this before running callbacks, so they may use the config already
+                        this.makeServerAvailable(config);
+                        this.serverCallbacks.forEach(Runnable::run);
+                    }
                 }
-                case COMMON -> throw new RuntimeException("Common config type not supported");
             }
-            PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", type.extension(), modId);
+            PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", config.getType().extension(), modId);
         }
     }
 
