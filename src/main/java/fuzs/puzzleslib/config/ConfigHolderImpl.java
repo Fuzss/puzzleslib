@@ -97,7 +97,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
         if (config.getModId().equals(modId)) {
             switch (config.getType()) {
                 case CLIENT -> {
-                    if (config == this.clientModConfig) {
+                    if (config == this.clientModConfig || this.clientModConfig == null) {
                         this.clientConfigValueCallbacks.forEach(Runnable::run);
                         // call this before running callbacks, so they may use the config already
                         this.makeClientAvailable(config);
@@ -105,7 +105,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
                     }
                 }
                 case SERVER -> {
-                    if (config == this.serverModConfig) {
+                    if (config == this.serverModConfig || this.serverModConfig == null) {
                         this.serverConfigValueCallbacks.forEach(Runnable::run);
                         // call this before running callbacks, so they may use the config already
                         this.makeServerAvailable(config);
