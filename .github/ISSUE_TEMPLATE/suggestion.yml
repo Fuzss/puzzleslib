@@ -10,5 +10,9 @@ body:
     id: suggestion
     attributes:
       label: Suggestion
+      placeholder: >-
+        Example:
+
+        Here is my very awesome suggestion for your mod. It would be some much better if you could add that!
     validations:
       required: true

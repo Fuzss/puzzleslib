@@ -1,4 +1,4 @@
-name: Bug report
+name: Bug Report
 description: >-
   Please use this template when you have encountered a bug in this mod.
 title: '[Bug]: '
@@ -54,7 +54,7 @@ body:
   - type: textarea
     id: expected_behavior
     attributes:
-      label: Expected Behavior
+      label: Expected Behavior (Required)
       description: >-
         Please explain what should happen when you follow the steps, if the bug
         were fixed.
@@ -67,7 +67,7 @@ body:
   - type: textarea
     id: actual_behavior
     attributes:
-      label: Actual Behavior
+      label: Actual Behavior (Required)
       description: >-
         Please briefly explain what actually happens when you follow the steps,
         because of the bug.
@@ -114,6 +114,6 @@ body:
   - type: input
     id: latest-log
     attributes:
-      label: latest.log
+      label: latest.log (Optional)
       description: Please paste the url to the gist containing your `latest.log` file.
       placeholder: https://gist.github.com/<your_user_name>/<gist_id>

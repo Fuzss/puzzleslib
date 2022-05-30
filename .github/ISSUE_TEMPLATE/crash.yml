@@ -1,4 +1,4 @@
-name: Crash report
+name: Crash Report
 description: >-
   Please use this template when this mod has caused your game to crash.
 title: '[Crash]: '
@@ -122,6 +122,6 @@ body:
   - type: input
     id: latest-log
     attributes:
-      label: latest.log
+      label: latest.log (Optional)
       description: Please paste the url to the gist containing your `latest.log` file.
       placeholder: https://gist.github.com/<your_user_name>/<gist_id>
