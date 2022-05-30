@@ -1,0 +1,14 @@
+name: Suggestion
+description: >-
+  Please use this template when you want to suggest a feature.
+title: '[Suggestion]: '
+labels: ["enhancement"]
+assignees:
+  - Fuzss
+body:
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggestion
+    validations:
+      required: true

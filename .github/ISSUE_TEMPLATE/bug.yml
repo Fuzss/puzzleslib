@@ -1,0 +1,119 @@
+name: Bug report
+description: >-
+  Please use this template when you have encountered a bug in this mod.
+title: '[Bug]: '
+labels: ["bug"]
+assignees:
+  - Fuzss
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this issue report!
+  - type: dropdown
+    id: loader
+    attributes:
+      label: Mod Loader (Required)
+      description: What mod loader are you using the mod on?
+      multiple: false
+      options:
+        - Forge
+        - Fabric
+        - Quilt
+    validations:
+      required: true
+  - type: input
+    id: minecraft
+    attributes:
+      label: Minecraft Version (Required)
+      description: What is the Minecraft version you are playing with?
+      placeholder: ex. 1.19
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Mod Version (Required)
+      description: What version of the mod are you playing with?
+      placeholder: ex. v4.0.0
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to Reproduce the Bug (Required)
+      description: Please explain what we need to do to cause the bug.
+      placeholder: >-
+        Example:  
+
+        1. Open the furnace screen.
+
+        2. Attempt to shift-click a fuel item into the fuel slot.
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: >-
+        Please explain what should happen when you follow the steps, if the bug
+        were fixed.
+      placeholder: >-
+        Example:
+
+        Following the steps to reproduce the bug, the fuel item should be moved into the furnace fuel slot.
+    validations:
+      required: true
+  - type: textarea
+    id: actual_behavior
+    attributes:
+      label: Actual Behavior
+      description: >-
+        Please briefly explain what actually happens when you follow the steps,
+        because of the bug.
+      placeholder: >-
+        Example:
+
+        Nothing happens, the fuel item is not moved.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes (Optional)
+      description: >-
+        Optionally, please include anything else you'd like to say about the bug.
+      placeholder: >-
+        Example:
+
+        You can work around this bug for now by avoiding holding shift.
+    validations:
+      required: false
+  - type: markdown
+    attributes:
+      value: >-
+        ## Sharing your `latest.log`
+
+        In order to diagnose a bug, we will need to see your `latest.log`.  
+
+        To share your `latest.log` here, please follow these steps:
+
+
+        1. If you don't have it already, find your `latest.log` file.  
+
+        a. [Find your minecraft
+        folder](https://minecraft.fandom.com/wiki/.minecraft)
+
+        b. In the minecraft folder, go into the `logs` folder and find the
+        `latest.log` file.
+
+        1. Create a Gist from the `latest.log` and copy the url.
+
+        [Click here for instructions on creating a
+        Gist](https://gist.github.com/Fuzss/bb307f86159b0011fcc2e10364a1b0a7)
+  - type: input
+    id: latest-log
+    attributes:
+      label: latest.log
+      description: Please paste the url to the gist containing your `latest.log` file.
+      placeholder: https://gist.github.com/<your_user_name>/<gist_id>
