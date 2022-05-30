@@ -1,0 +1,262 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven { url = 'https://maven.minecraftforge.net' }
+        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
+        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
+    }
+}
+
+plugins {
+    id 'me.hypherionmc.cursegradle' version '2.+'
+}
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
+
+version = "v${modVersion}-${minecraftVersion}-Forge"
+group = modMavenGroup
+
+minecraft {
+    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${minecraftVersion}"
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            jvmArgs '-Xms1G', '-Xmx4G'
+            property 'fml.earlyprogresswindow', 'false'
+            args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Client'
+            property 'terminal.ansi', 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modClientRun {
+                    source sourceSets.main
+                    source project(":Common").sourceSets.main
+                }
+            }
+        }
+
+        server {
+            workingDirectory project.file('run')
+            jvmArgs '-Xms1G', '-Xmx4G'
+            arg 'nogui'
+            args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Server'
+            property 'terminal.ansi', 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modServerRun {
+                    source sourceSets.main
+                    source project(":Common").sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            jvmArgs '-Xms1G', '-Xmx4G'
+            args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
+            args '--mod', modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Data'
+            property 'terminal.ansi', 'true'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modDataRun {
+                    source sourceSets.main
+                    source project(":Common").sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+dependencies {
+    // Minecraft
+    minecraft "net.minecraftforge:forge:${forgeVersion}"
+    annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
+    // Quality of Life Mods
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399552")
+    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
+    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516528")
+
+    // Puzzles Lib
+    // from local maven
+//    implementation fg.deobf("fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}")
+    // try use curse maven when local maven is not available
+    // file id is end of url (7 digits usually) when on file details page on curse
+//    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
+
+    // Others
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    compileOnly project(":Common")
+}
+
+if (project.file("src/main/resources/${modId}.forge.mixins.json").exists() || project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
+    mixin {
+        add project(":Common").sourceSets.main, "${modId}.refmap.json"
+        config "${modId}.common.mixins.json"
+        config "${modId}.forge.mixins.json"
+    }
+}
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
+
+    // this will ensure that this task is redone when a values changes
+    inputs.property "modId", "${modId}"
+    inputs.property "modName", "${modName}"
+    inputs.property "modVersion", "${modVersion}"
+    inputs.property "modDescription", "${modDescription}"
+    inputs.property "modGroup", project.group
+    inputs.property "modPageUrl", "${modForgePageUrl}"
+    inputs.property "modUpdateUrl", "${modUpdateUrl}"
+    inputs.property "modIssueUrl", "${modIssueUrl}"
+    inputs.property "modAuthor", "${modAuthor}"
+    inputs.property "minForgeVersion", "${minForgeVersion}"
+    inputs.property "minMinecraftVersion", "${minMinecraftVersion}"
+    inputs.property "nextMinecraftVersion", rootProject.getNextVersion("${minMinecraftVersion}")
+//    inputs.property "minPuzzlesVersion", "${minPuzzlesVersion}"
+    inputs.property "packFormat", "${packFormat}"
+
+    // replace stuff in mods.toml and pack.mcmeta
+    filesMatching ('META-INF/mods.toml') {
+        expand (
+                'modId':                "${modId}",
+                'modName':              "${modName}",
+                'modVersion':           "${modVersion}",
+                'modDescription':       "${modDescription}",
+                'modGroup':             project.group,
+                'modPageUrl':           "${modForgePageUrl}",
+                'modUpdateUrl':         "${modUpdateUrl}",
+                'modIssueUrl':          "${modIssueUrl}",
+                'modAuthor':            "${modAuthor}",
+                'minForgeVersion':      "${minForgeVersion}",
+                'minMinecraftVersion':  "${minMinecraftVersion}",
+                "nextMinecraftVersion": rootProject.getNextVersion("${minMinecraftVersion}"),
+//                "minPuzzlesVersion":    "${minPuzzlesVersion}"
+        )
+    }
+
+    filesMatching ('pack.mcmeta') {
+        expand (
+                'modDescription':       "${modDescription}",
+                "packFormat":           "${packFormat}"
+        )
+    }
+}
+
+compileJava {
+    source project(":Common").sourceSets.main.allSource
+}
+
+sourcesJar {
+    from project(":Common").sourceSets.main.allJava
+}
+
+sourceSets.main.resources {
+    srcDir 'src/generated/resources'
+}
+
+task apiJar(type: Jar, dependsOn: classes) {
+    // Sources included because of MinecraftForge/ForgeGradle#369
+    from project(":Common").sourceSets.main.allJava
+    from(sourceSets.main.allJava)
+    from(sourceSets.main.output)
+
+    include project.group.replace('.', '/')
+
+    archiveClassifier = 'api'
+}
+
+jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            artifact jar
+            artifact sourcesJar
+            artifact apiJar
+            pom.withXml {
+                def node = asNode()
+                if(node.dependencies.size() > 0)
+                    node.remove(node.dependencies) // Remove deps, as they are all mappings-dependent and/or forge
+            }
+        }
+    }
+    repositories {
+        maven {
+            url "file://" + System.getenv("local_maven")
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+import groovy.json.*
+
+task copyJarToDir(type: Copy) {
+    onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
+    if (project.findProperty('copyBuildJar').toBoolean()) {
+        // shortcut for jar.outputs.files
+        from jar
+        into project.findProperty('buildJarOutputDir')
+        // add build number to be able to distinguish jars when testing thorough official launcher
+        // build number is stored in global gradle.properties
+        rename { fileName -> fileName.replace("v${modVersion}", "v${modVersion}.${uniqueBuildNumber}") }
+    }
+}
+
+task refreshUpdateJson {
+    onlyIf { project.hasProperty('modResources') }
+    doLast {
+        def updateFile = file(project.findProperty('modResources').concat(File.separator).concat('update').concat(File.separator).concat(project.modid).concat('.json'))
+        def updateJson
+        if (updateFile.exists() && updateFile.canRead()) {
+            updateJson = new JsonSlurper().parseText(updateFile.text)
+            project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
+                updateJson['promos']["${version}-latest"] = project.modversion
+                // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
+                if (project.modversion.matches("[^a-zA-Z]+")) {
+                    updateJson['promos']["${version}-recommended"] = project.modversion
+                }
+            }
+        } else {
+            def builder = new JsonBuilder()
+            updateJson = builder {
+                homepage "${modPageUrl}"
+                promos { project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
+                    "${version}-latest" project.modversion
+                    // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
+                    if (project.modversion.matches("[^a-zA-Z]+")) {
+                        "${version}-recommended" project.modversion
+                    }
+                } }
+            }
+        }
+        def output = new JsonOutput()
+        updateFile.write(output.prettyPrint(output.toJson(updateJson)))
+    }
+}
+
+build.finalizedBy project.tasks.copyJarToDir, rootProject.tasks.incrementBuildNumber
+//tasks.getByPath('curseforge').finalizedBy project.refreshUpdateJson

@@ -1,0 +1,18 @@
+plugins {
+    id 'org.quiltmc.loom' version '0.12.+'
+}
+
+version = "v${modVersion}-${minecraftVersion}-Common"
+group = modMavenGroup
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+    }
+    modImplementation "org.quiltmc:quilt-loader:${quiltVersion}"
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+//    modImplementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}-Common"
+}

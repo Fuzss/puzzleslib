@@ -30,4 +30,4 @@ issueTrackerURL="${modIssueUrl}"
 
 [modproperties.${modId}]
     catalogueImageIcon="mod_logo.png"
-    configuredBackground="minecraft:textures/block/cobblestone.png"
+    configuredBackground="minecraft:textures/block/coarse_dirt.png"

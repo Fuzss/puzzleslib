@@ -1,5 +1,5 @@
 # Puzzles Lib
 
-A Minecraft mod. Downloads can be found on CurseForge.
+A Minecraft mod. Downloads can be found on CurseForge and Modrinth.
 
 ![](https://i.imgur.com/4htIK3r.png)

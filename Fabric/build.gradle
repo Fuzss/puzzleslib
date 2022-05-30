@@ -1,0 +1,189 @@
+plugins {
+    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
+    // this depends on an older version of guava, which loom is incompatible with, so make sure to apply this plugin after loom
+    id 'me.hypherionmc.cursegradle' version '2.+'
+}
+
+version = "v${modVersion}-${minecraftVersion}-Fabric"
+group = modMavenGroup
+
+repositories {
+    maven {
+        name = "Modmuss"
+        url = "https://maven.modmuss50.me/"
+    }
+    maven {
+        name = 'Terraformers'
+        url = "https://maven.terraformersmc.com/"
+    }
+    maven {
+        name = "ladysnake"
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
+    }
+    maven {
+        name = "jamieswhiteshirt"
+        url = "https://maven.jamieswhiteshirt.com/libs-release/"
+    }
+}
+
+dependencies {
+    // Minecraft
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    mappings loom.layered() {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+    }
+
+    // Fabric
+    modImplementation "net.fabricmc:fabric-loader:${fabricVersion}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+
+    // Forge Configs
+    implementation 'com.electronwill.night-config:core:3.6.5'
+    implementation 'com.electronwill.night-config:toml:3.6.5'
+    modImplementation "net.minecraftforge:ForgeConfigAPIPort:v3.2.0-1.18.2-Fabric"
+
+    // Mod Menu
+    modImplementation "com.terraformersmc:modmenu:3.1.0"
+
+    // Cardinal Components
+    // only entity module is used, and we'll probably only ever need that single one
+    // but just in case all the others can easily be enabled (the code for supporting them is also there)
+    // also since those are included better keep jar size small
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.1.4"))
+//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-item:4.1.4"))
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.1.4"))
+//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:4.1.4"))
+//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:4.1.4"))
+//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.1.4"))
+
+    // Puzzles Lib
+    // from local maven
+//    modImplementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"
+    // try use curse maven when local maven is not available
+    // file id is end of url (7 digits usually) when on file details page on curse
+//    modImplementation "curse.maven:puzzleslib-<project-id>:<file-id>"
+
+    // Others
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
+    compileOnly project(":Common")
+}
+
+loom {
+    mixin.defaultRefmapName = "${modId}.refmap.json"
+
+    runs {
+        client {
+            client()
+            setConfigName("Fabric Client")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+        server {
+            server()
+            setConfigName("Fabric Server")
+            ideConfigGenerated(true)
+            runDir("run")
+        }
+    }
+}
+
+processResources {
+    from project(":Common").sourceSets.main.resources
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
+
+    // this will ensure that this task is redone when a values changes
+    inputs.property "modId", 					"${modId}"
+    inputs.property "modName", 					"${modName}"
+    inputs.property "modVersion", 				"${modVersion}"
+    inputs.property "modDescription", 			"${modDescription}"
+    inputs.property "modGroup", 				project.group
+    inputs.property "modPageUrl", 				"${modFabricPageUrl}"
+    inputs.property "modIssueUrl", 				"${modIssueUrl}"
+    inputs.property "modSourceUrl", 			"${modSourceUrl}"
+    inputs.property "modAuthor", 				"${modAuthor}"
+    inputs.property "minFabricVersion", 		"${minFabricVersion}"
+    inputs.property "minFabricApiVersion", 		"${minFabricApiVersion}"
+    inputs.property "minMinecraftVersion", 		"${minMinecraftVersion}"
+    inputs.property "nextMinecraftVersion", 	rootProject.getNextVersion("${minMinecraftVersion}")
+//	inputs.property "minPuzzlesVersion", 		"${minPuzzlesVersion}"
+    inputs.property "packFormat", 				"${packFormat}"
+	inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}"
+	inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}Client"
+    inputs.property "capabilityController", 	"${project.group}.capability.CapabilityController"
+
+    // replace stuff in fabric.mod.json and pack.mcmeta
+    filesMatching ('fabric.mod.json') {
+        expand (
+                'modId':                	"${modId}",
+                'modName':              	"${modName}",
+                'modVersion':           	"${modVersion}",
+                'modDescription':       	"${modDescription}",
+                'modGroup':             	project.group,
+                'modPageUrl':           	"${modFabricPageUrl}",
+                'modIssueUrl':          	"${modIssueUrl}",
+                'modSourceUrl':         	"${modSourceUrl}",
+                'modAuthor':            	"${modAuthor}",
+                'minFabricVersion':     	"${minFabricVersion}",
+                'minFabricApiVersion':  	"${minFabricApiVersion}",
+                'minMinecraftVersion':  	"${minMinecraftVersion}",
+                "nextMinecraftVersion": 	rootProject.getNextVersion("${minMinecraftVersion}"),
+//				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
+				"mainEntryPoint": 			"${project.group}.${rootProject.name}",
+				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}Client",
+                "capabilityController": 	"${project.group}.capability.CapabilityController"
+        )
+    }
+
+    filesMatching ('pack.mcmeta') {
+        expand (
+                'modDescription':       "${modDescription}",
+                "packFormat":           "${packFormat}"
+        )
+    }
+}
+
+compileJava {
+    source project(":Common").sourceSets.main.allSource
+}
+
+sourcesJar {
+    from project(":Common").sourceSets.main.allJava
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            url "file://" + System.getenv("local_maven")
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+import groovy.json.*
+
+task copyJarToDir(type: Copy) {
+    onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
+    if (project.findProperty('copyBuildJar').toBoolean()) {
+        from remapJar
+        into project.findProperty('buildJarOutputDir')
+        // add build number to be able to distinguish jars when testing thorough official launcher
+        // build number is stored in global gradle.properties
+        rename { fileName -> fileName.replace("v${modVersion}", "v${modVersion}.${uniqueBuildNumber}") }
+    }
+}
+
+build.finalizedBy project.tasks.copyJarToDir, rootProject.tasks.incrementBuildNumber

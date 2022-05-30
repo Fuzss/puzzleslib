@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "id": "${modId}",
+  "version": "${modVersion}",
+
+  "name": "${modName}",
+  "description": "${modDescription}",
+  "authors": [
+    "${modAuthor}"
+  ],
+  "contact": {
+    "homepage": "${modPageUrl}",
+    "issues": "${modIssueUrl}",
+    "sources": "${modSourceUrl}"
+  },
+
+  "license": "Mozilla Public License 2.0",
+  "icon": "mod_logo.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "${mainEntryPoint}"
+    ],
+    "client": [
+      "${clientEntryPoint}"
+    ],
+    "cardinal-components": [
+      "${capabilityController}"
+    ]
+  },
+  "mixins": [
+    "${modId}.common.mixins.json",
+    "${modId}.fabric.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=${minFabricVersion}",
+    "fabric": ">=${minFabricApiVersion}",
+    "forgeconfigapiport": ">=3.2.0",
+    "minecraft": ">=${minMinecraftVersion} <${nextMinecraftVersion}",
+    "java": ">=17",
+    "cardinal-components-base": ">=4.1.4",
+    "cardinal-components-entity": ">=4.1.4"
+  },
+
+  "custom": {
+    "modmenu": {
+      "badges": [
+        "library"
+      ]
+    }
+  }
+}
