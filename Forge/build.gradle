@@ -84,6 +84,9 @@ minecraft {
 }
 
 dependencies {
+    // Include Common Project
+    compileOnly project(":Common")
+
     // Minecraft
     minecraft "net.minecraftforge:forge:${forgeVersion}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
@@ -99,10 +102,6 @@ dependencies {
     // try use curse maven when local maven is not available
     // file id is end of url (7 digits usually) when on file details page on curse
 //    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
-
-    // Others
-    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
-    compileOnly project(":Common")
 }
 
 if (project.file("src/main/resources/${modId}.forge.mixins.json").exists() || project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
@@ -117,7 +116,7 @@ processResources {
     from project(":Common").sourceSets.main.resources
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
-    // this will ensure that this task is redone when a values changes
+    // this will ensure that this task is redone when a value changes
     inputs.property "modId", "${modId}"
     inputs.property "modName", "${modName}"
     inputs.property "modVersion", "${modVersion}"

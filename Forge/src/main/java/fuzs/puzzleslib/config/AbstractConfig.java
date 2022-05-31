@@ -2,7 +2,6 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.config.annotation.Config;
 import fuzs.puzzleslib.config.annotation.ConfigBuilder;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.StringUtils;

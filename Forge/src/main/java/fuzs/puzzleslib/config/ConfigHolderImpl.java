@@ -2,7 +2,8 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.PuzzlesLib;
-import fuzs.puzzleslib.core.ModLoaderEnvironment;
+import fuzs.puzzleslib.core.DistType;
+import fuzs.puzzleslib.core.DistTypeExecutor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -82,7 +83,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param server server config factory
      */
     ConfigHolderImpl(@NotNull Supplier<C> client, @NotNull Supplier<S> server) {
-        this.client = ModLoaderEnvironment.isClient() ? client.get() : null;
+        this.client = DistTypeExecutor.getWhenOn(DistType.CLIENT, () -> client);
         this.server = server.get();
     }
 
