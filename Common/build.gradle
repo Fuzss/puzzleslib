@@ -13,26 +13,13 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
-    // Quilt
-    // we only need this for dependencies so mixins compile properly, otherwise it fails due to NoClassDefFoundError
-    // manually including org.ow2.asm:asm doesn't seem to do the trick
-    // just make sure to not use any classes from this, therefore runtimeOnly
-//    implementation "org.quiltmc:quilt-loader:${quiltVersion}"
-
-    // Forge Configs
-//    implementation 'com.electronwill.night-config:core:3.6.5'
-//    implementation 'com.electronwill.night-config:toml:3.6.5'
-//    modImplementation "net.minecraftforge:ForgeConfigAPIPort:v3.2.0-1.18.2-Fabric"
-
-//    implementation "org.ow2.asm:asm-commons:9.2"
-//    implementation "org.ow2.asm:asm-tree:9.2"
-//    implementation "org.ow2.asm:asm-util:9.2"
+    // Common Dependencies
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    compileOnly 'com.electronwill.night-config:core:3.6.5'
+    compileOnly 'com.electronwill.night-config:toml:3.6.5'
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}-Common"
-
-    // Others
-//    implementation group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
 }
 
 processResources {
@@ -40,6 +27,7 @@ processResources {
 
     // this will ensure that this task is redone when a value changes
     inputs.property "modDescription", 			"${modDescription}"
+    inputs.property "packFormat", 				"${packFormat}"
 
     // replace stuff in pack.mcmeta
     filesMatching ('pack.mcmeta') {

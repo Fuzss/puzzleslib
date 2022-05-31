@@ -2,6 +2,7 @@ package fuzs.puzzleslib.core;
 
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
@@ -31,5 +32,10 @@ public class ForgeEnvironment implements ModLoaderEnvironment {
     @Override
     public boolean isModLoaded(String modId) {
         return ModList.get().isLoaded(modId);
+    }
+
+    @Override
+    public boolean isModLoadedSafe(String modId) {
+        return FMLLoader.getLoadingModList() == null || FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 }

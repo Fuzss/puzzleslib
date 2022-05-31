@@ -2,8 +2,8 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.config.annotation.ConfigBuilder;
-import net.minecraftforge.common.ForgeConfigSpec;
+import fuzs.puzzleslib.config.annotation.AnnotatedConfigBuilder;
+import fuzs.puzzleslib.config.core.AbstractConfigBuilder;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -35,7 +35,7 @@ public abstract class AbstractConfig {
      * @param builder builder to add entries to
      * @param saveCallback register save callback
      */
-    public final void setupConfig(ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback) {
+    public final void setupConfig(AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback) {
         setupConfig(this, builder, saveCallback);
     }
 
@@ -44,7 +44,7 @@ public abstract class AbstractConfig {
      * @param builder builder to add entries to
      * @param saveCallback register save callback
      */
-    protected void addToBuilder(ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback) {
+    protected void addToBuilder(AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback) {
     }
 
     /**
@@ -75,7 +75,7 @@ public abstract class AbstractConfig {
      * @param builder builder to add entries to
      * @param saveCallback register save callback
      */
-    public static void setupConfig(AbstractConfig config, ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback) {
+    public static void setupConfig(AbstractConfig config, AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback) {
         final HashMap<List<String>, String[]> categoryComments = Maps.newHashMap(config.categoryComments);
         final boolean withCategory = !StringUtils.isEmpty(config.name);
         if (withCategory) {
@@ -84,7 +84,7 @@ public abstract class AbstractConfig {
             builder.push(config.name);
         }
         // currently, supports both registering via annotation system and builder method
-        ConfigBuilder.serialize(builder, saveCallback, categoryComments, config);
+        AnnotatedConfigBuilder.serialize(builder, saveCallback, categoryComments, config);
         // legacy method, kept for now for types unsupported by annotation system
         config.addToBuilder(builder, saveCallback);
         if (withCategory) {

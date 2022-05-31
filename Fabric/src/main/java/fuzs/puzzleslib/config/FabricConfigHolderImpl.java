@@ -2,6 +2,7 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.config.core.FabricConfigBuilderWrapper;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import net.minecraftforge.api.ModLoadingContext;
@@ -18,10 +19,11 @@ import java.util.function.Supplier;
 
 /**
  * implementation of {@link ConfigHolder} for building configs and handling config creation depending on physical side
+ * heavily depends on mod loader, therefore not very much is worth abstracting
  * @param <C> client config type
  * @param <S> server config type
  */
-public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig> implements ConfigHolder<C, S> {
+public class FabricConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig> implements ConfigHolder<C, S> {
     /**
      * client config
      */
@@ -80,7 +82,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param client client config factory
      * @param server server config factory
      */
-    ConfigHolderImpl(@NotNull Supplier<C> client, @NotNull Supplier<S> server) {
+    public FabricConfigHolderImpl(@NotNull Supplier<C> client, @NotNull Supplier<S> server) {
         this.client = DistTypeExecutor.getWhenOn(DistType.CLIENT, () -> client);
         this.server = server.get();
     }
@@ -123,7 +125,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param save action to perform when value changes (is reloaded)
      * @param <T> type for value
      */
-    private <T> void addSaveCallback(ModConfig.Type type, ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
+    private <T> void addSaveCallback(ModConfig.Type type, Supplier<T> entry, Consumer<T> save) {
         switch (type) {
             case CLIENT -> this.clientConfigValueCallbacks.add(() -> save.accept(entry.get()));
             case SERVER -> this.serverConfigValueCallbacks.add(() -> save.accept(entry.get()));
@@ -131,11 +133,8 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
         }
     }
 
-    /**
-     * register config event {@link #onModConfig} and configs themselves for <code>modId</code>
-     * @param modId modId to register for
-     */
-    public void addConfigs(String modId) {
+    @Override
+    public void loadConfigs(String modId) {
         // register events before registering configs
         ModConfigEvent.LOADING.register((ModConfig config) -> this.onModConfig(config, modId, false));
         ModConfigEvent.RELOADING.register((ModConfig config) -> this.onModConfig(config, modId, true));
@@ -169,8 +168,8 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
         // can't use a lambda expression for a functional interface, if the method in the functional interface has type parameters
         final ConfigCallback saveCallback = new ConfigCallback() {
             @Override
-            public <T> void accept(ForgeConfigSpec.ConfigValue<T> entry, Consumer<T> save) {
-                ConfigHolderImpl.this.addSaveCallback(type, entry, save);
+            public <T> void accept(Supplier<T> entry, Consumer<T> save) {
+                FabricConfigHolderImpl.this.addSaveCallback(type, entry, save);
             }
         };
         ModConfig modConfig;
@@ -193,7 +192,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      */
     private ForgeConfigSpec buildSpec(AbstractConfig config, ConfigCallback saveCallback) {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        config.setupConfig(builder, saveCallback);
+        config.setupConfig(new FabricConfigBuilderWrapper(builder), saveCallback);
         return builder.build();
     }
 
@@ -241,7 +240,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param fileName file name for client
      * @return this
      */
-    public ConfigHolderImpl<C, S> setClientFileName(String fileName) {
+    public FabricConfigHolderImpl<C, S> setClientFileName(String fileName) {
         this.clientFileName = fileName;
         return this;
     }
@@ -250,7 +249,7 @@ public class ConfigHolderImpl<C extends AbstractConfig, S extends AbstractConfig
      * @param fileName file name for server
      * @return this
      */
-    public ConfigHolderImpl<C, S> setServerFileName(String fileName) {
+    public FabricConfigHolderImpl<C, S> setServerFileName(String fileName) {
         this.serverFileName = fileName;
         return this;
     }

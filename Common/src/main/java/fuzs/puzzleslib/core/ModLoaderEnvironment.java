@@ -54,4 +54,13 @@ public interface ModLoaderEnvironment {
      * @return is this mod loaded
      */
     boolean isModLoaded(String modId);
+
+    /**
+     * safe version of {@link #isModLoaded} on fml
+     * @param modId mod id to check
+     * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
+     */
+    default boolean isModLoadedSafe(String modId) {
+        return this.isModLoaded(modId);
+    }
 }

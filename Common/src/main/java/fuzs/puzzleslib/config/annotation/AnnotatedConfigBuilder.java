@@ -4,26 +4,27 @@ import com.google.common.base.CaseFormat;
 import com.google.common.collect.*;
 import fuzs.puzzleslib.config.AbstractConfig;
 import fuzs.puzzleslib.config.ConfigHolder;
-import net.minecraftforge.common.ForgeConfigSpec;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import fuzs.puzzleslib.config.core.AbstractConfigBuilder;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * build config values from given class, values are marked via {@link Config} annotation
  * large based upon Quark's (https://github.com/VazkiiMods/Quark) vazkii.quark.base.module.config.ConfigObjectSerializer class
  */
-public class ConfigBuilder {
+public class AnnotatedConfigBuilder {
 
     /**
      * @param builder forge builder for creating forge config values, setting comments, etc.
      * @param saveCallback callback
      * @param target object instance
      */
-    public static void serialize(ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback, @NotNull Object target) {
+    public static void serialize(AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback, @Nonnull Object target) {
         serialize(builder, saveCallback, Maps.newHashMap(), target.getClass(), target);
     }
 
@@ -32,7 +33,7 @@ public class ConfigBuilder {
      * @param saveCallback callback
      * @param target target class
      */
-    public static void serialize(ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback, Class<?> target) {
+    public static void serialize(AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback, Class<?> target) {
         serialize(builder, saveCallback, Maps.newHashMap(), target, null);
     }
 
@@ -42,7 +43,7 @@ public class ConfigBuilder {
      * @param categoryComments level comments for categories
      * @param target object instance
      */
-    public static void serialize(ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback, Map<List<String>, String[]> categoryComments, @NotNull Object target) {
+    public static void serialize(AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback, Map<List<String>, String[]> categoryComments, @Nonnull Object target) {
         serialize(builder, saveCallback, categoryComments, target.getClass(), target);
     }
 
@@ -52,7 +53,7 @@ public class ConfigBuilder {
      * @param categoryComments level comments for categories
      * @param target target class
      */
-    public static void serialize(ForgeConfigSpec.Builder builder, ConfigHolder.ConfigCallback saveCallback, Map<List<String>, String[]> categoryComments, Class<?> target) {
+    public static void serialize(AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback, Map<List<String>, String[]> categoryComments, Class<?> target) {
         serialize(builder, saveCallback, categoryComments, target, null);
     }
 
@@ -64,7 +65,7 @@ public class ConfigBuilder {
      * @param instance object instance, null when static
      * @param <T> <code>instance</code> type
      */
-    public static <T> void serialize(final ForgeConfigSpec.Builder builder, final ConfigHolder.ConfigCallback saveCallback, Map<List<String>, String[]> categoryComments, Class<? extends T> target, @Nullable T instance) {
+    public static <T> void serialize(final AbstractConfigBuilder builder, final ConfigHolder.ConfigCallback saveCallback, Map<List<String>, String[]> categoryComments, Class<? extends T> target, @Nullable T instance) {
         Multimap<List<String>, Field> pathToField = HashMultimap.create();
         for (Field field : getAllFields(target)) {
             Config annotation = field.getDeclaredAnnotation(Config.class);
@@ -116,7 +117,7 @@ public class ConfigBuilder {
      * @param annotation config annotation for config value data
      */
     @SuppressWarnings("rawtypes")
-    private static void buildConfig(final ForgeConfigSpec.Builder builder, final ConfigHolder.ConfigCallback saveCallback, @Nullable Object instance, Field field, Config annotation) {
+    private static void buildConfig(final AbstractConfigBuilder builder, final ConfigHolder.ConfigCallback saveCallback, @Nullable Object instance, Field field, Config annotation) {
         String name = annotation.name();
         if (name.isEmpty()) {
             // transform lower camel case to normal words from https://stackoverflow.com/a/46945726
@@ -138,7 +139,7 @@ public class ConfigBuilder {
             } else {
                 if (description.length != 0) builder.comment(description);
                 builder.push(name);
-                ConfigBuilder.serialize(builder, saveCallback, type);
+                AnnotatedConfigBuilder.serialize(builder, saveCallback, type);
                 builder.pop();
             }
             return;
@@ -174,7 +175,7 @@ public class ConfigBuilder {
                 min = floatRange.min();
                 max = floatRange.max();
             }
-            final ForgeConfigSpec.DoubleValue configValue = builder.defineInRange(name, (float) defaultValue, min, max);
+            final Supplier<Double> configValue = builder.defineInRange(name, (float) defaultValue, min, max);
             saveCallback.accept(configValue, v -> {
                 try {
                     field.set(instance, configValue.get().floatValue());
@@ -242,7 +243,7 @@ public class ConfigBuilder {
      * @param field field to save to
      * @param instance object instance, null when static
      */
-    private static void addCallback(ConfigHolder.ConfigCallback saveCallback, ForgeConfigSpec.ConfigValue<?> configValue, Field field, @Nullable Object instance) {
+    private static void addCallback(ConfigHolder.ConfigCallback saveCallback, Supplier<?> configValue, Field field, @Nullable Object instance) {
         saveCallback.accept(configValue, v -> {
             try {
                 field.set(instance, configValue.get());
