@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
  * dispatcher for this serializable capability
  * @param <T> capability class
  */
-public class CapabilityDispatcher<T extends CapabilityComponent> implements ICapabilityProvider, CapabilityComponent {
+public class CapabilityHolder<T extends CapabilityComponent> implements ICapabilityProvider, CapabilityComponent {
     /**
      * capability wrapper for object
      */
@@ -27,7 +27,7 @@ public class CapabilityDispatcher<T extends CapabilityComponent> implements ICap
      * @param storage object
      * @param capability wrapper
      */
-    public CapabilityDispatcher(Capability<T> capability, T storage) {
+    public CapabilityHolder(Capability<T> capability, T storage) {
         this.capability = capability;
         this.storage = storage;
     }

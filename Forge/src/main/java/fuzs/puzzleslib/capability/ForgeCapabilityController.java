@@ -4,8 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.capability.data.CapabilityComponent;
-import fuzs.puzzleslib.capability.data.CapabilityDispatcher;
-import fuzs.puzzleslib.capability.data.CapabilityFactory;
+import fuzs.puzzleslib.capability.data.CapabilityHolder;
 import fuzs.puzzleslib.capability.data.PlayerRespawnStrategy;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -30,11 +29,11 @@ import java.util.function.Predicate;
  * helper object for registering and attaching mod capabilities, needs to be extended by every mod individually
  * this basically is the same as {@link fuzs.puzzleslib.registry.RegistryManager}
  */
-public class CapabilityController {
+public class ForgeCapabilityController implements CapabilityController {
     /**
      * capability controllers are stored for each mod separately to avoid concurrency issues, might not be need though
      */
-    private static final Map<String, CapabilityController> MOD_TO_CAPABILITIES = Maps.newConcurrentMap();
+    private static final Map<String, ForgeCapabilityController> MOD_TO_CAPABILITIES = Maps.newConcurrentMap();
 
     /**
      * namespace for this instance
@@ -49,7 +48,7 @@ public class CapabilityController {
      * private constructor
      * @param namespace namespace for this instance
      */
-    private CapabilityController(String namespace) {
+    private ForgeCapabilityController(String namespace) {
         this.namespace = namespace;
     }
 
@@ -104,7 +103,7 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerItemCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Item item, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerItemCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Item item, CapabilityToken<C> token) {
         return this.registerItemCapability(capabilityKey, capabilityType, capabilityFactory, o -> o == item, token);
     }
 
@@ -118,7 +117,7 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerItemCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Item> itemFilter, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerItemCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Item> itemFilter, CapabilityToken<C> token) {
         return this.registerCapability(ItemStack.class, capabilityKey, capabilityType, capabilityFactory, o -> o instanceof Item item && itemFilter.test(item), token);
     }
 
@@ -132,7 +131,7 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends Entity> entityType, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends Entity> entityType, CapabilityToken<C> token) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, entityType::isInstance, token);
     }
 
@@ -146,10 +145,11 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, CapabilityToken<C> token) {
         final Capability<C> capability = CapabilityManager.get(token);
-        this.typeToData.put(Entity.class, new PlayerCapabilityData<>(this.locate(capabilityKey), capability, capabilityType, provider -> new CapabilityDispatcher<>(capability, capabilityFactory.createComponent(provider)), Player.class::isInstance, respawnStrategy));
-        return capability;
+        ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
+        this.typeToData.put(Entity.class, new PlayerCapabilityData<>(key, capability, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), Player.class::isInstance, respawnStrategy));
+        return new ForgeCapabilityKey<>(key, capabilityType, capability);
     }
 
     /**
@@ -162,7 +162,7 @@ public class CapabilityController {
      * @return capability instance from capability manager
      * @param <C> capability type
      */
-    public <C extends CapabilityComponent> Capability<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends BlockEntity> blockEntityType, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends BlockEntity> blockEntityType, CapabilityToken<C> token) {
         return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, capabilityFactory, blockEntityType::isInstance, token);
     }
 
@@ -175,7 +175,7 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, CapabilityToken<C> token) {
         return this.registerCapability(LevelChunk.class, capabilityKey, capabilityType, capabilityFactory, o -> true, token);
     }
 
@@ -188,7 +188,7 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    public <C extends CapabilityComponent> Capability<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, CapabilityToken<C> token) {
+    public <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, CapabilityToken<C> token) {
         return this.registerCapability(Level.class, capabilityKey, capabilityType, capabilityFactory, o -> true, token);
     }
 
@@ -203,19 +203,11 @@ public class CapabilityController {
      * @param <C> capability type
      * @return capability instance from capability manager
      */
-    private <C extends CapabilityComponent> Capability<C> registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Object> filter, CapabilityToken<C> token) {
+    private <C extends CapabilityComponent> CapabilityKey<C> registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Object> filter, CapabilityToken<C> token) {
         final Capability<C> capability = CapabilityManager.get(token);
-        this.typeToData.put(providerType, new DefaultCapabilityData<>(this.locate(capabilityKey), capability, capabilityType, provider -> new CapabilityDispatcher<>(capability, capabilityFactory.createComponent(provider)), filter));
-        return capability;
-    }
-
-    /**
-     * @param path path for capabilityKey
-     * @return resource capabilityKey for {@link #namespace}
-     */
-    private ResourceLocation locate(String path) {
-        if (path.isEmpty()) throw new IllegalArgumentException("Can't register object without name");
-        return new ResourceLocation(this.namespace, path);
+        ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
+        this.typeToData.put(providerType, new DefaultCapabilityData<>(key, capability, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), filter));
+        return new ForgeCapabilityKey<>(key, capabilityType, capability);
     }
 
     /**
@@ -223,9 +215,9 @@ public class CapabilityController {
      * @param namespace namespace used for registration
      * @return new mod specific capability controller
      */
-    public static synchronized CapabilityController of(String namespace) {
+    public static synchronized ForgeCapabilityController of(String namespace) {
         return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
-            final CapabilityController manager = new CapabilityController(namespace);
+            final ForgeCapabilityController manager = new ForgeCapabilityController(namespace);
             // for registering capabilities
             FMLJavaModLoadingContext.get().getModEventBus().addListener(manager::onRegisterCapabilities);
             // for attaching capabilities
@@ -257,7 +249,7 @@ public class CapabilityController {
         /**
          * @return capability factory called when attaching to an object
          */
-        CapabilityFactory<CapabilityDispatcher<C>> capabilityFactory();
+        CapabilityFactory<CapabilityHolder<C>> capabilityFactory();
 
         /**
          * @return filter for provider type
@@ -268,14 +260,14 @@ public class CapabilityController {
     /**
      * just a data class for all the things we need when registering capabilities...
      */
-    private static record DefaultCapabilityData<C extends CapabilityComponent>(ResourceLocation capabilityKey, Capability<C> capability, Class<C> capabilityType, CapabilityFactory<CapabilityDispatcher<C>> capabilityFactory, Predicate<Object> filter) implements CapabilityData<C> {
+    private static record DefaultCapabilityData<C extends CapabilityComponent>(ResourceLocation capabilityKey, Capability<C> capability, Class<C> capabilityType, CapabilityFactory<CapabilityHolder<C>> capabilityFactory, Predicate<Object> filter) implements CapabilityData<C> {
 
     }
 
     /**
      * just a data class for all the things we need when registering capabilities...
      */
-    private static record PlayerCapabilityData<C extends CapabilityComponent>(ResourceLocation capabilityKey, Capability<C> capability, Class<C> capabilityType, CapabilityFactory<CapabilityDispatcher<C>> capabilityFactory, Predicate<Object> filter, PlayerRespawnStrategy respawnStrategy) implements CapabilityData<C> {
+    private static record PlayerCapabilityData<C extends CapabilityComponent>(ResourceLocation capabilityKey, Capability<C> capability, Class<C> capabilityType, CapabilityFactory<CapabilityHolder<C>> capabilityFactory, Predicate<Object> filter, PlayerRespawnStrategy respawnStrategy) implements CapabilityData<C> {
 
     }
 }

@@ -56,11 +56,11 @@ dependencies {
     // but just in case all the others can easily be enabled (the code for supporting them is also there)
     // also since those are included better keep jar size small
     modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.1.4"))
-//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-item:4.1.4"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-item:4.1.4"))
     modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.1.4"))
-//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:4.1.4"))
-//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:4.1.4"))
-//	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.1.4"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:4.1.4"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:4.1.4"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.1.4"))
 
     // Puzzles Lib
     // from local maven
