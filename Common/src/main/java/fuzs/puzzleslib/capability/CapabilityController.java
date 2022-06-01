@@ -1,115 +1,85 @@
 package fuzs.puzzleslib.capability;
 
-import fuzs.puzzleslib.capability.data.CapabilityComponent;
-import fuzs.puzzleslib.capability.data.PlayerRespawnStrategy;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.LevelChunk;
+import com.google.common.collect.Maps;
+import fuzs.puzzleslib.capability.data.CapabilityKey;
+import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Predicate;
+import java.util.Map;
+import java.util.Optional;
 
 /**
- * helper object for registering and attaching mod capabilities, needs to be extended by every mod individually
- * this basically is the same as {@link fuzs.puzzleslib.registry.RegistryManager}
+ * it does not seem possible to register capabilities in the common project, the whole structure is there,
+ * the only problem is Forge's CapabilityToken which cannot be extended or wrapped or whatever
+ *
+ * so instead we in common we create placeholders of {@link CapabilityKey} which will need to be registered again in the mod loader specific projects
+ * the placeholder will then update itself with the correct implementation when it is used
+ *
+ * this class shouldn't need one instance per mod, as no registering using events (which would need to be registered to a specific mod) takes place
  */
-public interface CapabilityController {
+public class CapabilityController {
+    /**
+     * all actual capabilities implemented by mod loader specific projects
+     * duplicates shouldn't be able to happen as only one mod loader implementation can run at once adding its data
+     */
+    private static final Map<ResourceLocation, CapabilityKey<?>> CAPABILITY_KEY_REGISTRY = Maps.newConcurrentMap();
 
     /**
-     * register capability to {@link ItemStack} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param item              item to apply capability to
-     * @param token capability token required to get capability instance from capability manager
-     * @param <C> capability type
-     * @return capability instance from capability manager
+     * called from constructors of mod loader specific {@link fuzs.puzzleslib.capability.data.CapabilityComponent} implementations
+     * @param capabilityKey a proper mod loader specific implementation of {@link CapabilityKey}
+     * @param <T>           capability type
      */
-    <C extends CapabilityComponent> CapabilityKey<C> registerItemCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Item item, CapabilityToken<C> token);
+    public static synchronized <T> void submit(CapabilityKey<T> capabilityKey) {
+        if (CAPABILITY_KEY_REGISTRY.put(capabilityKey.getId(), capabilityKey) != null) {
+            throw new IllegalStateException(String.format("Duplicate capability %s", capabilityKey.getId()));
+        }
+    }
 
     /**
-     * register capability to {@link ItemStack} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param itemFilter filter for item, can be used for matching class and instanceof
-     * @param token capability token required to get capability instance from capability manager
-     * @param <C> capability type
-     * @return capability instance from capability manager
+     * creates a placeholder key which will update itself when used for the first time
+     * @param id capability id
+     * @param componentClass capability type
+     * @param <T> capability type
+     * @return the placeholder key
      */
-    <C extends CapabilityComponent> CapabilityKey<C> registerItemCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Item> itemFilter, CapabilityToken<C> token);
+    public static <T> CapabilityKey<T> makeCapabilityKey(ResourceLocation id, Class<T> componentClass) {
+        return new CapabilityKey<>() {
+            private CapabilityKey<T> holder;
 
-    /**
-     * register capability to {@link Entity} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param entityType        entity class to match
-     * @param token capability token required to get capability instance from capability manager
-     * @param <C> capability type
-     * @return capability instance from capability manager
-     */
-    <C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends Entity> entityType, CapabilityToken<C> token);
+            @Override
+            public ResourceLocation getId() {
+                return id;
+            }
 
-    /**
-     * register capability to {@link Entity} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param respawnStrategy   strategy to use when returning from the end dimension or after dying
-     * @param token capability token required to get capability instance from capability manager
-     * @param <C> capability type
-     * @return capability instance from capability manager
-     */
-    <C extends CapabilityComponent> CapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, CapabilityToken<C> token);
+            @Override
+            public Class<T> getComponentClass() {
+                return componentClass;
+            }
 
-    /**
-     * register capability to {@link BlockEntity} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param blockEntityType   block entity class to match
-     * @param token capability token required to get capability instance from capability manager
-     * @return capability instance from capability manager
-     * @param <C> capability type
-     */
-    <C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<? extends BlockEntity> blockEntityType, CapabilityToken<C> token);
+            @Override
+            public <V> @Nullable T get(@Nullable V provider) {
+                this.validateHolder();
+                return this.holder.get(provider);
+            }
 
-    /**
-     * register capability to {@link LevelChunk} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param token capability token required to get capability instance from capability manager
-     * @param <C> capability type
-     * @return capability instance from capability manager
-     */
-    <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, CapabilityToken<C> token);
+            @Override
+            public <V> Optional<T> maybeGet(@Nullable V provider) {
+                this.validateHolder();
+                return this.holder.maybeGet(provider);
+            }
 
-    /**
-     * register capability to {@link Level} objects
-     * @param capabilityKey path for internal name of this capability, will be used for serialization
-     * @param capabilityType interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param token capability token required to get capability instance from capability manager
-     * @param <C> capability type
-     * @return capability instance from capability manager
-     */
-    <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, CapabilityToken<C> token);
-
-    /**
-     * helper interface for creating capability factories
-     * @param <C> serializable capability type
-     */
-    @FunctionalInterface
-    interface CapabilityFactory<C extends CapabilityComponent> {
-
-        /**
-         * @param t object to create capability from, mostly unused
-         * @return the capability component
-         */
-        C createComponent(Object t);
+            private void validateHolder() {
+                if (this.holder == null) {
+                    if (CAPABILITY_KEY_REGISTRY.containsKey(id)) {
+                        CapabilityKey<?> capabilityKey = CAPABILITY_KEY_REGISTRY.get(id);
+                        if (capabilityKey.getComponentClass() == componentClass) {
+                            this.holder = (CapabilityKey<T>) capabilityKey;
+                            return;
+                        }
+                    }
+                    throw new IllegalStateException(String.format("No valid capability implementation registered for %s", id));
+                }
+            }
+        };
     }
 }

@@ -3,9 +3,7 @@ package fuzs.puzzleslib.capability;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import fuzs.puzzleslib.capability.data.CapabilityComponent;
-import fuzs.puzzleslib.capability.data.CapabilityHolder;
-import fuzs.puzzleslib.capability.data.PlayerRespawnStrategy;
+import fuzs.puzzleslib.capability.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -26,10 +24,18 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 /**
- * helper object for registering and attaching mod capabilities, needs to be extended by every mod individually
- * this basically is the same as {@link fuzs.puzzleslib.registry.RegistryManager}
+ * class for registering and attaching mod capabilities, every mod gets their own instance,
+ * mostly due to Forge requiring to register some events which should be done on a per mod basis
+ * the structure of this is similar to {@link fuzs.puzzleslib.registry.RegistryManager}
+ *
+ * public facing methods in this class are basically the same for Forge and Fabric,
+ * only difference is Forge requires an additional CapabilityToken which cannot be used in the common project,
+ * therefore capabilities need to be created separately for each mod loader
+ *
+ * capabilities may be used inside the common project by calling {@link CapabilityController#makeCapabilityKey}
+ * which will provide a placeholder which updates itself with the mod specific implementation once it is used
  */
-public class ForgeCapabilityController implements CapabilityController {
+public class ForgeCapabilityController {
     /**
      * capability controllers are stored for each mod separately to avoid concurrency issues, might not be need though
      */
@@ -149,7 +155,7 @@ public class ForgeCapabilityController implements CapabilityController {
         final Capability<C> capability = CapabilityManager.get(token);
         ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
         this.typeToData.put(Entity.class, new PlayerCapabilityData<>(key, capability, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), Player.class::isInstance, respawnStrategy));
-        return new ForgeCapabilityKey<>(key, capabilityType, capability);
+        return new ForgeCapabilityKey<>(capability, key, capabilityType);
     }
 
     /**
@@ -207,7 +213,7 @@ public class ForgeCapabilityController implements CapabilityController {
         final Capability<C> capability = CapabilityManager.get(token);
         ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
         this.typeToData.put(providerType, new DefaultCapabilityData<>(key, capability, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), filter));
-        return new ForgeCapabilityKey<>(key, capabilityType, capability);
+        return new ForgeCapabilityKey<>(capability, key, capabilityType);
     }
 
     /**

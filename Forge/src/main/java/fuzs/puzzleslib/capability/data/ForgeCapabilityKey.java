@@ -1,5 +1,7 @@
-package fuzs.puzzleslib.capability;
+package fuzs.puzzleslib.capability.data;
 
+import fuzs.puzzleslib.capability.CapabilityController;
+import fuzs.puzzleslib.capability.data.CapabilityKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityProvider;
@@ -8,15 +10,29 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+/**
+ * implementation of {@link CapabilityKey} for the Forge mod loader
+ * @param <T> capability type
+ */
 public class ForgeCapabilityKey<T> implements CapabilityKey<T> {
-    private final ResourceLocation id;
-    private final Class<T> componentClass;
+    /**
+     * the wrapped {@link Capability}
+     */
     private final Capability<T> capability;
+    /**
+     * id just like ComponentKey on Fabric has it stored directly in the key
+     */
+    private final ResourceLocation id;
+    /**
+     * capability type class just like ComponentKey on Fabric has it stored directly in the key
+     */
+    private final Class<T> componentClass;
 
-    public ForgeCapabilityKey(ResourceLocation id, Class<T> componentClass, Capability<T> capability) {
+    public ForgeCapabilityKey(Capability<T> capability, ResourceLocation id, Class<T> componentClass) {
+        this.capability = capability;
         this.id = id;
         this.componentClass = componentClass;
-        this.capability = capability;
+        CapabilityController.submit(this);
     }
 
     @Override

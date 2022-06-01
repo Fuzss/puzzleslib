@@ -111,7 +111,6 @@ processResources {
     inputs.property "packFormat", 				"${packFormat}"
 	inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}"
 	inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}Client"
-    inputs.property "capabilityController", 	"${project.group}.capability.CapabilityController"
 
     // replace stuff in fabric.mod.json and pack.mcmeta
     filesMatching ('fabric.mod.json') {
@@ -131,8 +130,7 @@ processResources {
                 "nextMinecraftVersion": 	rootProject.getNextVersion("${minMinecraftVersion}"),
 //				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
 				"mainEntryPoint": 			"${project.group}.${rootProject.name}",
-				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}Client",
-                "capabilityController": 	"${project.group}.capability.CapabilityController"
+				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}Client"
         )
     }
 

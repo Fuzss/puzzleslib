@@ -9,17 +9,17 @@ enum ConfigLoadingStage {
      */
     NOT_PRESENT,
     /**
-     * config exists, but corresponding {@link net.minecraftforge.fml.config.ModConfig} has not yet been created
+     * config exists, but corresponding ModConfig has not yet been created
      */
     INITIALIZED,
     /**
-     * {@link net.minecraftforge.fml.config.ModConfig} is present, but config data within it is not loaded
+     * ModConfig is present, but config data within it is not loaded
      *
      * for server configs after a world save is unloaded {@link #AVAILABLE} should be returned to this
      */
     MISSING_DATA,
     /**
-     * config data is present in {@link net.minecraftforge.fml.config.ModConfig}, but our callbacks have not been loaded,
+     * config data is present in ModConfig, but our callbacks have not been loaded,
      * therefore config values are not safe to use yet
      */
     LOADED,

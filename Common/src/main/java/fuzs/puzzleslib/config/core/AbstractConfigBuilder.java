@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 
 /**
  * an abstraction of ForgeConfigSpec.Builder to make it usable in a common project without any attached mod loader
- * probably easier than attaching the whole forge config api to the project and having to worry about loader dependent classes
+ * probably easier than attaching the whole forge config api to the project and having to worry about loader dependent classes...
  */
 public interface AbstractConfigBuilder {
     
