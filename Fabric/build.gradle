@@ -26,6 +26,10 @@ repositories {
         name = "jamieswhiteshirt"
         url = "https://maven.jamieswhiteshirt.com/libs-release/"
     }
+    maven {
+        name = "Fuzs Mod Resources"
+        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+    }
 }
 
 dependencies {
@@ -36,7 +40,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
     // Fabric
@@ -44,23 +48,21 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 
     // Forge Configs
-    implementation 'com.electronwill.night-config:core:3.6.5'
-    implementation 'com.electronwill.night-config:toml:3.6.5'
-    modImplementation "net.minecraftforge:ForgeConfigAPIPort:v3.2.0-1.18.2-Fabric"
+    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.0.0"
 
     // Mod Menu
-    modImplementation "com.terraformersmc:modmenu:3.1.0"
+    modImplementation "com.terraformersmc:modmenu:4.0.0"
 
     // Cardinal Components
     // only entity module is used, and we'll probably only ever need that single one
     // but just in case all the others can easily be enabled (the code for supporting them is also there)
     // also since those are included better keep jar size small
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.1.4"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-item:4.1.4"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.1.4"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:4.1.4"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:4.1.4"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.1.4"))
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.0-beta.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.0.0-beta.1"))
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.0-beta.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.0-beta.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.0-beta.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.0-beta.1"))
 
     // Puzzles Lib
     // from local maven

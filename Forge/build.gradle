@@ -24,7 +24,8 @@ version = "v${modVersion}-${minecraftVersion}-Forge"
 group = modMavenGroup
 
 minecraft {
-    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${minecraftVersion}"
+//    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${minecraftVersion}"
+    mappings channel: 'official', version: "${minecraftVersion}"
 
     runs {
         client {
@@ -33,7 +34,6 @@ minecraft {
             property 'fml.earlyprogresswindow', 'false'
             args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Client'
             property 'terminal.ansi', 'true'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -51,7 +51,6 @@ minecraft {
             arg 'nogui'
             args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Server'
             property 'terminal.ansi', 'true'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -69,7 +68,6 @@ minecraft {
             args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
             args '--mod', modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             ideaModule "${rootProject.name}.${project.name}.main"
-            taskName 'Data'
             property 'terminal.ansi', 'true'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -177,7 +175,7 @@ task apiJar(type: Jar, dependsOn: classes) {
     from(sourceSets.main.allJava)
     from(sourceSets.main.output)
 
-    include project.group.replace('.', '/')
+    include "${project.group}/api".replace('.', '/')
 
     archiveClassifier = 'api'
 }

@@ -10,13 +10,13 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
     // Common Dependencies
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
-    compileOnly 'com.electronwill.night-config:core:3.6.5'
-    compileOnly 'com.electronwill.night-config:toml:3.6.5'
+//    compileOnly 'com.electronwill.night-config:core:3.6.5'
+//    compileOnly 'com.electronwill.night-config:toml:3.6.5'
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}-Common"
