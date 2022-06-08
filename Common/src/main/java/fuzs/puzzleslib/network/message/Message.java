@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
  * network message template
  */
 public interface Message {
+
     /**
      * writes message data to buffer
      * @param buf network data byte buffer
@@ -39,6 +40,7 @@ public interface Message {
      * @param <T> this message
      */
     abstract class PacketHandler<T extends Message> {
+
         /**
          * handle given packet
          * handler implemented as separate class to hopefully avoid invoking client class on the server

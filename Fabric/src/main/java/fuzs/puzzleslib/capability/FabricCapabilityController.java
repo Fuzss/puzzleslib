@@ -88,7 +88,7 @@ public class FabricCapabilityController implements EntityComponentInitializer {
     }
 
 //    /**
-//     * TODO make this work as the component needs to extend {@link dev.onyxstudios.cca.api.v3.item.ItemComponent}
+//     * WARNING make this work as the component needs to extend {@link dev.onyxstudios.cca.api.v3.item.ItemComponent}
 //     *  (or not as it's supposed to get removed and using the item stack tag directly is perfectly fine)
 //     * register capability to {@link ItemStack} objects
 //     * @param capabilityKey path for internal name of this capability, will be used for serialization
@@ -105,7 +105,7 @@ public class FabricCapabilityController implements EntityComponentInitializer {
 //    }
 //
 //    /**
-//     * TODO make this work as the component needs to extend {@link dev.onyxstudios.cca.api.v3.item.ItemComponent}
+//     * WARNING make this work as the component needs to extend {@link dev.onyxstudios.cca.api.v3.item.ItemComponent}
 //     *  (or not as it's supposed to get removed and using the item stack tag directly is perfectly fine)
 //     * register capability to {@link ItemStack} objects
 //     * @param capabilityKey path for internal name of this capability, will be used for serialization

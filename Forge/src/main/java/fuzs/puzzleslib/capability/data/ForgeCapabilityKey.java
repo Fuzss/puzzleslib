@@ -28,6 +28,11 @@ public class ForgeCapabilityKey<T> implements CapabilityKey<T> {
      */
     private final Class<T> componentClass;
 
+    /**
+     * @param capability the wrapped {@link Capability}
+     * @param id capability id
+     * @param componentClass capability type class
+     */
     public ForgeCapabilityKey(Capability<T> capability, ResourceLocation id, Class<T> componentClass) {
         this.capability = capability;
         this.id = id;

@@ -9,11 +9,28 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-
+/**
+ * implementation of {@link CapabilityKey} for the Fabric mod loader
+ * due to how a {@link ComponentKey} is forced to have the same type parameters as the component instance provided by the corresponding factory,
+ * this has to work with our {@link ComponentHolder} wrapper instead of the component directly
+ * therefore this class also includes a (safe) unchecked cast when retrieving the component
+ * @param <T> capability type
+ */
 public class FabricCapabilityKey<T extends CapabilityComponent> implements CapabilityKey<T> {
+    /**
+     * the wrapped {@link ComponentKey}, which is always for a {@link ComponentHolder}
+     */
     private final ComponentKey<ComponentHolder> capability;
+    /**
+     * the component class, so we can get the actual class from {@link #getComponentClass()}
+     * also used to set type parameter to enable casting in getters
+     */
     private final Class<T> componentClass;
 
+    /**
+     * @param capability the wrapped {@link ComponentKey}
+     * @param componentClass capability type class for setting type parameter
+     */
     public FabricCapabilityKey(ComponentKey<ComponentHolder> capability, Class<T> componentClass) {
         this.capability = capability;
         this.componentClass = componentClass;
