@@ -1,10 +1,8 @@
 package fuzs.puzzleslib.registry;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.PuzzlesLib;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.fabricmc.fabric.api.screenhandler.v1.ScreenHandlerRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
@@ -31,40 +29,29 @@ import java.util.function.Supplier;
 /**
  * handles registering to forge registries
  * this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
- * heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
+ * originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
  */
-public class RegistryManager {
+public interface RegistryManager {
     /**
      * registry data is stored for each mod separately so when registry events are fired every mod is responsible for registering their own stuff
      * this is important so that entries are registered for the proper namespace
      */
-    private static final Map<String, RegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
+    Map<String, RegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
+
     /**
      * namespace for this instance
      */
-    private final String namespace;
-
-    /**
-     * private constructor
-     * @param namespace namespace for this instance
-     */
-    private RegistryManager(String namespace) {
-        this.namespace = namespace;
-    }
+    String namespace();
 
     /**
      * register any type of registry entry with a path
-     * @param registry type for this registry entry
+     * @param registryKey key for registry to register to
      * @param path path for new entry
-     * @param entry supplier for entry to register
+     * @param supplier supplier for entry to register
      * @return registry object for <code>entry</code>
      * @param <T> registry type
      */
-    public <T> T register(Registry<? super T> registry, String path, Supplier<T> entry) {
-        T e = entry.get();
-        Objects.requireNonNull(e, "Can't register null object");
-        return Registry.register(registry, this.locate(path), e);
-    }
+    <T> RegistryReference<T> register(final ResourceKey<? extends Registry<T>> registryKey, String path, Supplier<T> supplier);
 
     /**
      * register block entry with a path
@@ -72,8 +59,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public Block registerBlock(String path, Supplier<Block> entry) {
-        return this.register(Registry.BLOCK, path, entry);
+    default RegistryReference<Block> registerBlock(String path, Supplier<Block> entry) {
+        return this.register(Registry.BLOCK_REGISTRY, path, entry);
     }
 
     /**
@@ -83,7 +70,7 @@ public class RegistryManager {
      * @param creativeTab creative tab for item
      * @return registry object for <code>entry</code> block
      */
-    public Block registerBlockWithItem(String path, Supplier<Block> entry, CreativeModeTab creativeTab) {
+    default RegistryReference<Block> registerBlockWithItem(String path, Supplier<Block> entry, CreativeModeTab creativeTab) {
         return this.registerBlockWithItem(path, entry, new Item.Properties().tab(creativeTab));
     }
 
@@ -94,9 +81,9 @@ public class RegistryManager {
      * @param properties properties for item, should include tab
      * @return registry object for <code>entry</code> block
      */
-    public Block registerBlockWithItem(String path, Supplier<Block> entry, Item.Properties properties) {
+    default RegistryReference<Block> registerBlockWithItem(String path, Supplier<Block> entry, Item.Properties properties) {
         // order doesn't matter on Forge, but will do on Fabric
-        final Block block = this.registerBlock(path, entry);
+        final RegistryReference<Block> block = this.registerBlock(path, entry);
         this.registerBlockItem(path, properties);
         return block;
     }
@@ -107,8 +94,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public Fluid registerFluid(String path, Supplier<Fluid> entry) {
-        return this.register(Registry.FLUID, path, entry);
+    default RegistryReference<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
+        return this.register(Registry.FLUID_REGISTRY, path, entry);
     }
 
     /**
@@ -118,7 +105,7 @@ public class RegistryManager {
      * @param creativeTab creative tab for item
      * @return registry object for <code>entry</code>
      */
-    public Item registerItem(String path, Function<Item.Properties, Item> entry, CreativeModeTab creativeTab) {
+    default RegistryReference<Item> registerItem(String path, Function<Item.Properties, Item> entry, CreativeModeTab creativeTab) {
         return this.registerItem(path, () -> entry.apply(new Item.Properties().tab(creativeTab)));
     }
 
@@ -128,8 +115,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public Item registerItem(String path, Supplier<Item> entry) {
-        return this.register(Registry.ITEM, path, entry);
+    default RegistryReference<Item> registerItem(String path, Supplier<Item> entry) {
+        return this.register(Registry.ITEM_REGISTRY, path, entry);
     }
 
     /**
@@ -138,7 +125,7 @@ public class RegistryManager {
      * @param creativeTab creative tab for item
      * @return registry object for <code>entry</code>
      */
-    public Item registerBlockItem(String path, CreativeModeTab creativeTab) {
+    default RegistryReference<Item> registerBlockItem(String path, CreativeModeTab creativeTab) {
         return this.registerBlockItem(path, new Item.Properties().tab(creativeTab));
     }
 
@@ -148,7 +135,7 @@ public class RegistryManager {
      * @param properties properties for item, should include tab
      * @return registry object for <code>entry</code>
      */
-    public Item registerBlockItem(String path, Item.Properties properties) {
+    default RegistryReference<Item> registerBlockItem(String path, Item.Properties properties) {
         return this.registerItem(path, () -> {
             Block block = Registry.BLOCK.get(this.locate(path));
             Objects.requireNonNull(block, "Can't register item for null block");
@@ -162,8 +149,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public MobEffect registerMobEffect(String path, Supplier<MobEffect> entry) {
-        return this.register(Registry.MOB_EFFECT, path, entry);
+    default RegistryReference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
+        return this.register(Registry.MOB_EFFECT_REGISTRY, path, entry);
     }
 
     /**
@@ -171,7 +158,7 @@ public class RegistryManager {
      * @param path path for new entry
      * @return registry object for <code>entry</code>
      */
-    public SoundEvent registerRawSoundEvent(String path) {
+    default RegistryReference<SoundEvent> registerRawSoundEvent(String path) {
         return this.registerSoundEvent(path, () -> new SoundEvent(this.locate(path)));
     }
 
@@ -181,8 +168,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public SoundEvent registerSoundEvent(String path, Supplier<SoundEvent> entry) {
-        return this.register(Registry.SOUND_EVENT, path, entry);
+    default RegistryReference<SoundEvent> registerSoundEvent(String path, Supplier<SoundEvent> entry) {
+        return this.register(Registry.SOUND_EVENT_REGISTRY, path, entry);
     }
 
     /**
@@ -191,8 +178,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public Potion registerPotion(String path, Supplier<Potion> entry) {
-        return this.register(Registry.POTION, path, entry);
+    default RegistryReference<Potion> registerPotion(String path, Supplier<Potion> entry) {
+        return this.register(Registry.POTION_REGISTRY, path, entry);
     }
 
     /**
@@ -201,8 +188,8 @@ public class RegistryManager {
      * @param entry supplier for entry to register
      * @return registry object for <code>entry</code>
      */
-    public Enchantment registerEnchantment(String path, Supplier<Enchantment> entry) {
-        return this.register(Registry.ENCHANTMENT, path, entry);
+    default RegistryReference<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
+        return this.register(Registry.ENCHANTMENT_REGISTRY, path, entry);
     }
 
     /**
@@ -212,7 +199,7 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
-    public <T extends Entity> EntityType<T> registerRawEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
+    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityTypeBuilder(String path, Supplier<EntityType.Builder<T>> entry) {
         return this.registerEntityType(path, () -> entry.get().build(path));
     }
 
@@ -223,8 +210,8 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
-    public <T extends Entity> EntityType<T> registerEntityType(String path, Supplier<EntityType<T>> entry) {
-        return this.register(Registry.ENTITY_TYPE, path, entry);
+    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityType(String path, Supplier<EntityType<T>> entry) {
+        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registry.ENTITY_TYPE_REGISTRY, path, entry);
     }
 
     /**
@@ -234,19 +221,8 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> block entity type
      */
-    public <T extends BlockEntity> BlockEntityType<T> registerRawBlockEntityType(String path, Supplier<FabricBlockEntityTypeBuilder<T>> entry) {
-        return this.registerBlockEntityType(path, () -> entry.get().build());
-    }
-
-    /**
-     * register tile entity type entry with a path
-     * @param path path for new entry
-     * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
-     * @param <T> block entity type
-     */
-    public <T extends BlockEntity> BlockEntityType<T> registerBlockEntityType(String path, Supplier<BlockEntityType<T>> entry) {
-        return this.register(Registry.BLOCK_ENTITY_TYPE, path, entry);
+    default <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType<T>> entry) {
+        return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registry.BLOCK_ENTITY_TYPE_REGISTRY, path, entry);
     }
 
     /**
@@ -256,41 +232,16 @@ public class RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> container menu type
      */
-    public <T extends AbstractContainerMenu> MenuType<T> registerRawMenuType(String path, Supplier<ScreenHandlerRegistry.SimpleClientHandlerFactory<T>> entry) {
-        final ScreenHandlerRegistry.SimpleClientHandlerFactory<T> e = entry.get();
-        Objects.requireNonNull(e, "Can't register null object");
-        return ScreenHandlerRegistry.registerSimple(this.locate(path), e);
-    }
-
-    /**
-     * register container type entry with a path
-     * @param path path for new entry
-     * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
-     * @param <T> container menu type
-     */
-    public <T extends AbstractContainerMenu> MenuType<T> registerMenuType(String path, Supplier<MenuType<T>> entry) {
-        return this.register(Registry.MENU, path, entry);
+    default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType<T>> entry) {
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registry.MENU_REGISTRY, path, entry);
     }
 
     /**
      * @param path path for location
      * @return resource location for {@link #namespace}
      */
-    private ResourceLocation locate(String path) {
+    default ResourceLocation locate(String path) {
         if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("Can't register object without name");
-        return new ResourceLocation(this.namespace, path);
-    }
-
-    /**
-     * creates a new registry manager for <code>namespace</code> or returns an existing one
-     * @param namespace namespace used for registration
-     * @return new mod specific registry manager
-     */
-    public static RegistryManager of(String namespace) {
-        return MOD_TO_REGISTRY.computeIfAbsent(namespace, namespace1 -> {
-            PuzzlesLib.LOGGER.info("Creating registry manager for mod id {}", namespace);
-            return new RegistryManager(namespace1);
-        });
+        return new ResourceLocation(this.namespace(), path);
     }
 }

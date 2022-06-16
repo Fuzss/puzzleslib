@@ -8,6 +8,8 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.ForgeClientProxy;
 import fuzs.puzzleslib.proxy.ForgeServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
+import fuzs.puzzleslib.registry.ForgeRegistryManager;
+import fuzs.puzzleslib.registry.RegistryManager;
 
 import java.util.function.Supplier;
 
@@ -41,5 +43,10 @@ public class ForgeFactories implements CommonFactories {
     @Override
     public <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server) {
         return new ForgeConfigHolderImpl<>(() -> null, server);
+    }
+
+    @Override
+    public RegistryManager registry(String namespace) {
+        return ForgeRegistryManager.of(namespace);
     }
 }

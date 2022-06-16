@@ -115,8 +115,8 @@ task cleanAll(type: GradleBuild) {
     tasks = [
             ':Common:clean',
             ':Forge:clean',
-            ':Quilt:clean',
-            ':Fabric:clean'
+            ':Fabric:clean',
+//            ':Quilt:clean'
     ]
 }
 
@@ -126,7 +126,7 @@ task buildAll(type: GradleBuild) {
             'cleanAll',
             ':Forge:build',
             ':Fabric:build',
-            ':Quilt:build'
+//            ':Quilt:build'
     ]
 }
 
@@ -138,8 +138,8 @@ task uploadAll(type: GradleBuild) {
             ':Forge:modrinth',
             ':Fabric:curseforge',
             ':Fabric:modrinth',
-            ':Quilt:curseforge',
-            ':Quilt:modrinth'
+//            ':Quilt:curseforge',
+//            ':Quilt:modrinth'
     ]
 }
 
@@ -157,12 +157,12 @@ task fabricClient(type: GradleBuild) {
     ]
 }
 
-task quiltClient(type: GradleBuild) {
-    group = '_main'
-    tasks = [
-            ':Quilt:runClient'
-    ]
-}
+//task quiltClient(type: GradleBuild) {
+//    group = '_main'
+//    tasks = [
+//            ':Quilt:runClient'
+//    ]
+//}
 
 task forgeServer(type: GradleBuild) {
     group = '_main'
@@ -178,9 +178,9 @@ task fabricServer(type: GradleBuild) {
     ]
 }
 
-task quiltServer(type: GradleBuild) {
-    group = '_main'
-    tasks = [
-            ':Quilt:runServer'
-    ]
-}
+//task quiltServer(type: GradleBuild) {
+//    group = '_main'
+//    tasks = [
+//            ':Quilt:runServer'
+//    ]
+//}

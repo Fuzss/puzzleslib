@@ -37,11 +37,11 @@
   "depends": {
     "fabricloader": ">=${minFabricVersion}",
     "fabric": ">=${minFabricApiVersion}",
-    "forgeconfigapiport": ">=3.2.0",
+    "forgeconfigapiport": ">=4.0.0",
     "minecraft": ">=${minMinecraftVersion} <${nextMinecraftVersion}",
     "java": ">=17",
-    "cardinal-components-base": ">=4.1.4",
-    "cardinal-components-entity": ">=4.1.4"
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*"
   },
 
   "custom": {

@@ -4,6 +4,7 @@ import fuzs.puzzleslib.config.AbstractConfig;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
+import fuzs.puzzleslib.registry.RegistryManager;
 
 import java.util.function.Supplier;
 
@@ -62,4 +63,11 @@ public interface CommonFactories {
      * @return a config holder which only holds a server config
      */
     <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server);
+
+    /**
+     * creates a new registry manager for <code>namespace</code> or returns an existing one
+     * @param namespace namespace used for registration
+     * @return new mod specific registry manager
+     */
+    RegistryManager registry(String namespace);
 }

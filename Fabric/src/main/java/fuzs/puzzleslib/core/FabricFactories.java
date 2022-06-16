@@ -8,6 +8,8 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
+import fuzs.puzzleslib.registry.FabricRegistryManager;
+import fuzs.puzzleslib.registry.RegistryManager;
 
 import java.util.function.Supplier;
 
@@ -41,5 +43,10 @@ public class FabricFactories implements CommonFactories {
     @Override
     public <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server) {
         return new FabricConfigHolderImpl<>(() -> null, server);
+    }
+
+    @Override
+    public RegistryManager registry(String namespace) {
+        return FabricRegistryManager.of(namespace);
     }
 }

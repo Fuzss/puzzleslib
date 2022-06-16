@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.capability.data.*;
+import fuzs.puzzleslib.registry.ForgeRegistryManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +27,7 @@ import java.util.function.Predicate;
 /**
  * class for registering and attaching mod capabilities, every mod gets their own instance,
  * mostly due to Forge requiring to register some events which should be done on a per mod basis
- * the structure of this is similar to {@link fuzs.puzzleslib.registry.RegistryManager}
+ * the structure of this is similar to {@link ForgeRegistryManager}
  *
  * public facing methods in this class are basically the same for Forge and Fabric,
  * only difference is Forge requires an additional CapabilityToken which cannot be used in the common project,
