@@ -39,7 +39,7 @@ public interface RegistryManager {
     Map<String, RegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
 
     /**
-     * namespace for this instance
+     * @return namespace for this instance
      */
     String namespace();
 

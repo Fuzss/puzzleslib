@@ -3,6 +3,9 @@ package fuzs.puzzleslib.registry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.world.item.Item;
 
+/**
+ * define fuel burn times on Fabric
+ */
 public class FabricFuelManager implements FuelManager {
 
     @Override

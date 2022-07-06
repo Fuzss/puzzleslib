@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.registry;
 
-import fuzs.puzzleslib.PuzzlesLib;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;

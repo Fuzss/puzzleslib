@@ -41,6 +41,8 @@ public class DistTypeExecutor {
     /**
      * @param envType env type to run on
      * @param toGet to get
+     * @return      supplier result or null
+     * @param <T>   return type
      */
     @Nullable
     public static <T> T getWhenOn(DistType envType, Supplier<Supplier<T>> toGet) {

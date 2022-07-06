@@ -6,6 +6,7 @@ plugins {
     id 'me.hypherionmc.cursegradle' version '2.+'
 }
 
+archivesBaseName = rootProject.name
 version = "v${modVersion}-${minecraftVersion}-Fabric"
 group = modMavenGroup
 
@@ -57,12 +58,12 @@ dependencies {
     // only entity module is used, and we'll probably only ever need that single one
     // but just in case all the others can easily be enabled (the code for supporting them is also there)
     // also since those are included better keep jar size small
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.0-beta.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.0.0-beta.1"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.0-beta.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.0-beta.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.0-beta.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.0-beta.1"))
+    modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.1")
+//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.0.1")
+    modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1")
+//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.1")
+//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.1")
+//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1")
 
     // Puzzles Lib
     // from local maven
@@ -101,9 +102,8 @@ processResources {
     inputs.property "modVersion", 				"${modVersion}"
     inputs.property "modDescription", 			"${modDescription}"
     inputs.property "modGroup", 				project.group
-    inputs.property "modPageUrl", 				"${modFabricPageUrl}"
+    inputs.property "modPageUrl", 				"${modPageUrl}"
     inputs.property "modIssueUrl", 				"${modIssueUrl}"
-    inputs.property "modSourceUrl", 			"${modSourceUrl}"
     inputs.property "modAuthor", 				"${modAuthor}"
     inputs.property "minFabricVersion", 		"${minFabricVersion}"
     inputs.property "minFabricApiVersion", 		"${minFabricApiVersion}"
@@ -122,9 +122,8 @@ processResources {
                 'modVersion':           	"${modVersion}",
                 'modDescription':       	"${modDescription}",
                 'modGroup':             	project.group,
-                'modPageUrl':           	"${modFabricPageUrl}",
+                'modPageUrl':           	"${modPageUrl}",
                 'modIssueUrl':          	"${modIssueUrl}",
-                'modSourceUrl':         	"${modSourceUrl}",
                 'modAuthor':            	"${modAuthor}",
                 'minFabricVersion':     	"${minFabricVersion}",
                 'minFabricApiVersion':  	"${minFabricApiVersion}",
@@ -150,6 +149,10 @@ compileJava {
 
 sourcesJar {
     from project(":Common").sourceSets.main.allJava
+}
+
+javadoc {
+    source project(":Common").sourceSets.main.allJava
 }
 
 publishing {

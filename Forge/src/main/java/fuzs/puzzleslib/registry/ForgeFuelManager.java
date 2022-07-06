@@ -5,12 +5,18 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
+/**
+ * define fuel burn times on Forge
+ */
 public class ForgeFuelManager implements FuelManager {
     /**
      * stored burn times
      */
     private final Object2IntOpenHashMap<Item> fuelValues = new Object2IntOpenHashMap<>();
 
+    /**
+     * constructor also registers event bus, this is not on the mod bus, so doesn't matter which mod calls it
+     */
     public ForgeFuelManager() {
         MinecraftForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);
     }

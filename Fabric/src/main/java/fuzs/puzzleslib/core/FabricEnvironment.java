@@ -4,6 +4,9 @@ import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;
 
+/**
+ * implementation of {@link ModLoaderEnvironment} for Fabric
+ */
 public class FabricEnvironment implements ModLoaderEnvironment {
 
     @Override

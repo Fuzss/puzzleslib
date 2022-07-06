@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.PuzzlesLibBase;
 import fuzs.puzzleslib.config.core.FabricConfigBuilderWrapper;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
@@ -114,7 +114,7 @@ public class FabricConfigHolderImpl<C extends AbstractConfig, S extends Abstract
                     }
                 }
             }
-            PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", config.getType().extension(), modId);
+            PuzzlesLibBase.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", config.getType().extension(), modId);
         }
     }
 
@@ -257,7 +257,7 @@ public class FabricConfigHolderImpl<C extends AbstractConfig, S extends Abstract
     @Override
     public C client() {
         if (!this.isClientAvailable()) {
-            PuzzlesLib.LOGGER.error("Calling client config when it is not yet available! This is a bug! Current loading stage: {}", this.clientLoadingStage, new Exception("Client config not yet available"));
+            PuzzlesLibBase.LOGGER.error("Calling client config when it is not yet available! This is a bug! Current loading stage: {}", this.clientLoadingStage, new Exception("Client config not yet available"));
         }
         return this.client;
     }
@@ -265,7 +265,7 @@ public class FabricConfigHolderImpl<C extends AbstractConfig, S extends Abstract
     @Override
     public S server() {
         if (!this.isServerAvailable()) {
-            PuzzlesLib.LOGGER.error("Calling server config when it is not yet available! This is a bug! Current loading stage: {}", this.serverLoadingStage, new Exception("Server config not yet available"));
+            PuzzlesLibBase.LOGGER.error("Calling server config when it is not yet available! This is a bug! Current loading stage: {}", this.serverLoadingStage, new Exception("Server config not yet available"));
         }
         return this.server;
     }

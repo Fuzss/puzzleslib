@@ -2,6 +2,7 @@ plugins {
     id 'org.quiltmc.loom' version '0.12.+'
 }
 
+archivesBaseName = rootProject.name
 version = "v${modVersion}-${minecraftVersion}-Common"
 group = modMavenGroup
 
@@ -12,6 +13,9 @@ dependencies {
         officialMojangMappings()
 //        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
+
+    // ASM dependencies do not seem to be applying correctly without this for Mixins (manually adding those didn't help). Do not use anything from this!
+    modImplementation "org.quiltmc:quilt-loader:${quiltVersion}"
 
     // Common Dependencies
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'

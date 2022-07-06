@@ -12,6 +12,8 @@ subprojects {
     java.toolchain.languageVersion = JavaLanguageVersion.of(17)
     java.withSourcesJar()
     java.withJavadocJar()
+    // silence missing javadoc comments, we just don't care
+    javadoc.options.addStringOption('Xdoclint:none', '-quiet')
 
     repositories {
         mavenCentral()
@@ -45,7 +47,7 @@ subprojects {
         }
     }
 
-        tasks.withType(JavaCompile).configureEach {
+    tasks.withType(JavaCompile).configureEach {
         // ensure that the encoding is set to UTF-8, no matter what the system default is
         // this fixes some edge cases with special characters not displaying correctly
         // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
@@ -67,7 +69,7 @@ subprojects {
                 'Implementation-Vendor'             : modAuthor,
                 'Implementation-Timestamp'          : new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
                 'Implementation-Timestamp-Milli'    : System.currentTimeMillis(),
-                'Implementation-URL'                : modSourceUrl,
+                'Implementation-URL'                : modPageUrl,
                 'Built-On-Java'                     : "${System.getProperty('java.vm.version')} (${System.getProperty('java.vm.vendor')})",
                 'Built-On-Minecraft'                : minecraftVersion
             ])
@@ -124,11 +126,39 @@ task buildAll(type: GradleBuild) {
     group = '_main'
     tasks = [
             'cleanAll',
+            ':Common:build',
             ':Forge:build',
             ':Fabric:build',
 //            ':Quilt:build'
     ]
 }
+
+task buildForge(type: GradleBuild) {
+    group = '_main'
+    tasks = [
+            ':Common:clean',
+            ':Forge:clean',
+            ':Forge:build'
+    ]
+}
+
+task buildFabric(type: GradleBuild) {
+    group = '_main'
+    tasks = [
+            ':Common:clean',
+            ':Fabric:clean',
+            ':Fabric:build'
+    ]
+}
+
+//task buildQuilt(type: GradleBuild) {
+//    group = '_main'
+//    tasks = [
+//            ':Common:clean',
+//            ':Quilt:clean',
+//            ':Quilt:build'
+//    ]
+//}
 
 task uploadAll(type: GradleBuild) {
     group = '_main'

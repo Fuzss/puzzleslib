@@ -20,6 +20,7 @@ apply plugin: 'eclipse'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 
+archivesBaseName = rootProject.name
 version = "v${modVersion}-${minecraftVersion}-Forge"
 group = modMavenGroup
 
@@ -90,9 +91,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3399552")
-    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
-    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3516528")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3822882")
+//    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
+    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
 
     // Puzzles Lib
     // from local maven
@@ -120,7 +121,7 @@ processResources {
     inputs.property "modVersion", "${modVersion}"
     inputs.property "modDescription", "${modDescription}"
     inputs.property "modGroup", project.group
-    inputs.property "modPageUrl", "${modForgePageUrl}"
+    inputs.property "modPageUrl", "${modPageUrl}"
     inputs.property "modUpdateUrl", "${modUpdateUrl}"
     inputs.property "modIssueUrl", "${modIssueUrl}"
     inputs.property "modAuthor", "${modAuthor}"
@@ -138,7 +139,7 @@ processResources {
                 'modVersion':           "${modVersion}",
                 'modDescription':       "${modDescription}",
                 'modGroup':             project.group,
-                'modPageUrl':           "${modForgePageUrl}",
+                'modPageUrl':           "${modPageUrl}",
                 'modUpdateUrl':         "${modUpdateUrl}",
                 'modIssueUrl':          "${modIssueUrl}",
                 'modAuthor':            "${modAuthor}",
@@ -163,6 +164,10 @@ compileJava {
 
 sourcesJar {
     from project(":Common").sourceSets.main.allJava
+}
+
+javadoc {
+    source project(":Common").sourceSets.main.allJava
 }
 
 sourceSets.main.resources {

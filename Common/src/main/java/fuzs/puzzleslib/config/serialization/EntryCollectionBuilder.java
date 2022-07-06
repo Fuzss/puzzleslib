@@ -2,12 +2,14 @@ package fuzs.puzzleslib.config.serialization;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
 import java.util.function.Predicate;
@@ -18,7 +20,7 @@ import java.util.stream.Stream;
  * builds a collection for a given type of registry from a list of strings
  * @param <T> content type of collection to build
  */
-public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends StringEntryReader<T> {
+public class EntryCollectionBuilder<T> extends StringEntryReader<T> {
     /**
      * default entry builder config comment, same as {@link #buildConfigDescription} with empty string
      * can't use {@link #buildConfigDescription} to be usable in annotations
@@ -28,7 +30,7 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
     /**
      * @param registry registry entries the to be created collections contain
      */
-    private EntryCollectionBuilder(IForgeRegistry<T> registry) {
+    private EntryCollectionBuilder(Registry<T> registry) {
         super(registry);
     }
 
@@ -122,12 +124,12 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
     }
 
     /**
-     * @param registry registry for type
+     * @param registryKey registry for type
      * @param <T> registry type
      * @return builder backed by <code>registry</code>
      */
-    public static <T extends IForgeRegistryEntry<T>> EntryCollectionBuilder<T> of(IForgeRegistry<T> registry) {
-        return new EntryCollectionBuilder<>(registry);
+    public static <T> EntryCollectionBuilder<T> of(final ResourceKey<? extends Registry<T>> registryKey) {
+        return new EntryCollectionBuilder<T>(getRegistryFromKey(registryKey));
     }
 
     /**
@@ -140,17 +142,24 @@ public class EntryCollectionBuilder<T extends IForgeRegistryEntry<T>> extends St
     }
 
     /**
-     * @param registry registry to get entry keys from
+     * @param registryKey registry to get entry keys from
      * @param entries entries to convert to string
      * @param <T> registry element type
      * @return entries as string list
      */
     @SafeVarargs
-    public static <T extends IForgeRegistryEntry<T>> List<String> getKeyList(IForgeRegistry<T> registry, T... entries) {
+    public static <T> List<String> getKeyList(final ResourceKey<? extends Registry<T>> registryKey, T... entries) {
+        Registry<? super T> registry = getRegistryFromKey(registryKey);
         return Stream.of(entries)
-                .filter(registry::containsValue)
                 .map(registry::getKey)
+                .filter(Objects::nonNull)
                 .map(ResourceLocation::toString)
                 .collect(Collectors.toList());
+    }
+
+    private static <T> Registry<T> getRegistryFromKey(ResourceKey<? extends Registry<T>> registryKey) {
+        Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(registryKey.location());
+        Objects.requireNonNull(registry, String.format("Registry for key %s not found", registryKey));
+        return registry;
     }
 }

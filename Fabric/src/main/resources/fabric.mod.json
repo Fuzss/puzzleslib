@@ -11,7 +11,7 @@
   "contact": {
     "homepage": "${modPageUrl}",
     "issues": "${modIssueUrl}",
-    "sources": "${modSourceUrl}"
+    "sources": "${modPageUrl}"
   },
 
   "license": "Mozilla Public License 2.0",

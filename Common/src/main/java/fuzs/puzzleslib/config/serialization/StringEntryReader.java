@@ -1,10 +1,9 @@
 package fuzs.puzzleslib.config.serialization;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.PuzzlesLibBase;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,16 +15,16 @@ import java.util.stream.Collectors;
  * parser logic for collection builder
  * @param <T> content type of collection to build
  */
-public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
+public class StringEntryReader<T> {
     /**
      * registry to work with
      */
-    private final IForgeRegistry<T> activeRegistry;
+    private final Registry<T> activeRegistry;
 
     /**
      * @param registry registry entries the to be created collections contain
      */
-    protected StringEntryReader(IForgeRegistry<T> registry) {
+    protected StringEntryReader(Registry<T> registry) {
         this.activeRegistry = registry;
     }
 
@@ -45,7 +44,7 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @return list of matches
      * @param <R> content type of registry
      */
-    public static <R extends IForgeRegistryEntry<R>> List<R> getEntriesFromRegistry(String source, IForgeRegistry<R> activeRegistry) {
+    public static <R> List<R> getEntriesFromRegistry(String source, Registry<R> activeRegistry) {
         List<R> foundEntries = Lists.newArrayList();
         if (source.contains("*")) {
             // an asterisk is present, so attempt to find entries including a wildcard
@@ -70,9 +69,9 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @return optional entry if found
      * @param <R> content type of registry
      */
-    private static <R extends IForgeRegistryEntry<R>> Optional<R> getEntryFromRegistry(ResourceLocation location, IForgeRegistry<R> activeRegistry) {
+    private static <R> Optional<R> getEntryFromRegistry(ResourceLocation location, Registry<R> activeRegistry) {
         if (activeRegistry.containsKey(location)) {
-            return Optional.ofNullable(activeRegistry.getValue(location));
+            return Optional.ofNullable(activeRegistry.get(location));
         } else {
             log(location.toString(), "Entry not found");
         }
@@ -86,7 +85,7 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @return all the entries found
      * @param <R> content type of registry
      */
-    private static <R extends IForgeRegistryEntry<R>> List<R> getWildcardEntries(String source, IForgeRegistry<R> activeRegistry) {
+    private static <R> List<R> getWildcardEntries(String source, Registry<R> activeRegistry) {
         String[] splitSource = source.split(":");
         switch (splitSource.length) {
             case 1:
@@ -108,11 +107,11 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @return all entries found
      * @param <R> content type of registry
      */
-    private static <R extends IForgeRegistryEntry<R>> List<R> getListFromRegistry(String namespace, String path, IForgeRegistry<R> activeRegistry) {
+    private static <R> List<R> getListFromRegistry(String namespace, String path, Registry<R> activeRegistry) {
         String regexPath = path.replace("*", "[a-z0-9/._-]*");
-        List<R> entries = activeRegistry.getEntries().stream()
-                .filter(entry -> entry.getKey().getRegistryName().getNamespace().equals(namespace))
-                .filter(entry -> entry.getKey().getRegistryName().getPath().matches(regexPath))
+        List<R> entries = activeRegistry.entrySet().stream()
+                .filter(entry -> entry.getKey().location().getNamespace().equals(namespace))
+                .filter(entry -> entry.getKey().location().getPath().matches(regexPath))
                 .map(Map.Entry::getValue).collect(Collectors.toList());
         if (entries.isEmpty()) {
             log(new ResourceLocation(namespace, path).toString(), "Entry not found");
@@ -128,7 +127,7 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      */
     protected final boolean isNotPresent(Collection<T> collection, T entry) {
         if (collection.contains(entry)) {
-            log(entry.getRegistryName().toString(), "Already present");
+            log(entry.getClass().getSimpleName(), "Already present");
             return false;
         }
         return true;
@@ -140,6 +139,6 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @param message message to print
      */
     protected static void log(String entry, String message) {
-        PuzzlesLib.LOGGER.warn("Unable to parse entry {}: {}", entry, message);
+        PuzzlesLibBase.LOGGER.warn("Unable to parse entry {}: {}", entry, message);
     }
 }

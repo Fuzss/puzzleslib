@@ -13,6 +13,9 @@ import fuzs.puzzleslib.registry.RegistryManager;
 
 import java.util.function.Supplier;
 
+/**
+ * factories for various utilities on Fabric
+ */
 public class FabricFactories implements CommonFactories {
 
     @Override

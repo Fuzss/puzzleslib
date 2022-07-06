@@ -7,6 +7,9 @@ import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.nio.file.Path;
 
+/**
+ * implementation of {@link ModLoaderEnvironment} for Forge
+ */
 public class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override

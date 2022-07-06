@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
  * utility class for common helper methods
  * also main puzzles lib mod, only really need, so it shows in the mods list
  */
-public class PuzzlesLib {
+public class PuzzlesLibBase {
     /**
      * puzzles lib mod id
      */
