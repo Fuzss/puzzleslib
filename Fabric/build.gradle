@@ -27,10 +27,6 @@ repositories {
         name = "jamieswhiteshirt"
         url = "https://maven.jamieswhiteshirt.com/libs-release/"
     }
-    maven {
-        name = "Fuzs Mod Resources"
-        url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
-    }
 }
 
 dependencies {
@@ -57,7 +53,8 @@ dependencies {
     // Cardinal Components
     // only entity module is used, and we'll probably only ever need that single one
     // but just in case all the others can easily be enabled (the code for supporting them is also there)
-    // also since those are included better keep jar size small
+    // those libraries are not included in puzzles lib itself, any mod using them must include them as jar-in-jar,
+    // and must also make sure to specifically depend on them in fabric.mods.json to avoid a crash on start-up due to a wrong mod loading order
     modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.1")
 //	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.0.1")
     modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1")
@@ -67,7 +64,7 @@ dependencies {
 
     // Puzzles Lib
     // from local maven
-//    modImplementation "fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}"
+//    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
     // try use curse maven when local maven is not available
     // file id is end of url (7 digits usually) when on file details page on curse
 //    modImplementation "curse.maven:puzzleslib-<project-id>:<file-id>"
@@ -102,7 +99,7 @@ processResources {
     inputs.property "modVersion", 				"${modVersion}"
     inputs.property "modDescription", 			"${modDescription}"
     inputs.property "modGroup", 				project.group
-    inputs.property "modPageUrl", 				"${modPageUrl}"
+    inputs.property "modPageUrl", 				"${modSourceUrl}"
     inputs.property "modIssueUrl", 				"${modIssueUrl}"
     inputs.property "modAuthor", 				"${modAuthor}"
     inputs.property "minFabricVersion", 		"${minFabricVersion}"
@@ -113,6 +110,7 @@ processResources {
     inputs.property "packFormat", 				"${packFormat}"
 	inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}"
 	inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}Client"
+    inputs.property "modFabricEnvironment", 	"${modFabricEnvironment}"
 
     // replace stuff in fabric.mod.json and pack.mcmeta
     filesMatching ('fabric.mod.json') {
@@ -122,7 +120,7 @@ processResources {
                 'modVersion':           	"${modVersion}",
                 'modDescription':       	"${modDescription}",
                 'modGroup':             	project.group,
-                'modPageUrl':           	"${modPageUrl}",
+                'modPageUrl':           	"${modSourceUrl}",
                 'modIssueUrl':          	"${modIssueUrl}",
                 'modAuthor':            	"${modAuthor}",
                 'minFabricVersion':     	"${minFabricVersion}",
@@ -131,7 +129,8 @@ processResources {
                 "nextMinecraftVersion": 	rootProject.getNextVersion("${minMinecraftVersion}"),
 //				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
 				"mainEntryPoint": 			"${project.group}.${rootProject.name}",
-				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}Client"
+				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}Client",
+                "modFabricEnvironment":		"${modFabricEnvironment}"
         )
     }
 
@@ -157,23 +156,106 @@ javadoc {
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
+        mavenJava (MavenPublication) {
+            artifactId = "${modId}-fabric"
+            version = modVersion
             from components.java
+            // exclude certain dependencies when publishing to maven
+            // from https://stackoverflow.com/a/50121790
+            pom.withXml {
+                asNode().dependencies.dependency.each { dep ->
+                    if (["modmenu"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
+                        assert dep.parent().remove(dep)
+                    }
+                }
+            }
+            pom {
+                name = "${modName} [Fabric]"
+                description = "${modDescription}"
+                url = "${modSourceUrl}"
+                scm {
+                    url = "${modSourceUrl}"
+                    connection = "${modSourceUrl}".replace("https", "scm:git:git").concat(".git")
+                    developerConnection = "${modSourceUrl}".replace("https://github.com/", "scm:git:git@github.com:").concat(".git")
+                }
+                issueManagement {
+                    system = 'github'
+                    url = "${modIssueUrl}"
+                }
+                licenses {
+                    license {
+                        name = 'MPL-2'
+                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = "${modAuthor}".toLowerCase()
+                        name = "${modAuthor}"
+                    }
+                }
+            }
         }
     }
-
     repositories {
         maven {
-            url "file://" + System.getenv("local_maven")
+            name = 'FuzsModResources'
+            url "file://${project.modResources}/maven"
         }
     }
 }
 
 signing {
     sign publishing.publications.mavenJava
+}
+
+curseforge {
+    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    apiKey = project.findProperty('curseApiToken')
+    project {
+        id = projectCurseId
+        changelogType = 'markdown'
+        changelog = file('../CHANGELOG.md')
+        releaseType = projectReleaseType
+        addGameVersion 'Fabric'
+        projectGameVersions.split(",").each {
+            addGameVersion it.trim()
+        }
+        mainArtifact(remapJar) {
+            displayName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+            relations {
+                requiredDependency 'fabric-api'
+                optionalDependency 'modmenu'
+            }
+        }
+        addArtifact sourcesJar
+    }
+    options {
+//        debug = true
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
+    }
+}
+
+modrinth {
+    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    token = project.findProperty('modrinthApiToken')
+    projectId = projectModrinthId
+    versionNumber = modVersion
+    versionName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+    changelog = file('../CHANGELOG.md').text
+    versionType = projectReleaseType
+    uploadFile = remapJar // This is the java jar task
+    projectGameVersions.split(",").each {
+        gameVersions.add it.trim()
+    }
+    loaders.add 'fabric'
+    additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
+    dependencies {
+        required.project "fabric-api"
+        optional.project "modmenu"
+    }
+//	debugMode = true
 }
 
 import groovy.json.*

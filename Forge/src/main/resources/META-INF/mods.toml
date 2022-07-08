@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="[${minForgeVersion},)"
-license="Mozilla Public License 2.0"
+license="MPL-2"
 issueTrackerURL="${modIssueUrl}"
 
 [[mods]]
@@ -13,6 +13,7 @@ issueTrackerURL="${modIssueUrl}"
     logoBlur=false
     displayURL="${modPageUrl}"
     updateJSONURL="${modUpdateUrl}"
+    displayTest="${modForgeDisplayTest}"
 
 [[dependencies.${modId}]]
     modId="forge"

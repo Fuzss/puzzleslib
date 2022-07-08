@@ -7,7 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * Represents a lazy wrapper for registry object.
- * Copied and adapted from https://github.com/jaredlll08/MultiLoader-Template/blob/1.18.2/examples/MultiLoader-Template-with-registration/Fabric/src/main/java/com/example/examplemod/FabricRegistrationFactory.java
+ * Copied and adapted from <a href="https://github.com/jaredlll08/MultiLoader-Template/blob/1.18.2/examples/MultiLoader-Template-with-registration/Fabric/src/main/java/com/example/examplemod/FabricRegistrationFactory.java">...</a>
  *
  * @param <T> the type of the object
  */

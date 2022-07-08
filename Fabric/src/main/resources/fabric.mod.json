@@ -14,10 +14,10 @@
     "sources": "${modPageUrl}"
   },
 
-  "license": "Mozilla Public License 2.0",
+  "license": "MPL-2",
   "icon": "mod_logo.png",
 
-  "environment": "*",
+  "environment": "${modFabricEnvironment}",
   "entrypoints": {
     "main": [
       "${mainEntryPoint}"
@@ -39,9 +39,7 @@
     "fabric": ">=${minFabricApiVersion}",
     "forgeconfigapiport": ">=4.0.0",
     "minecraft": ">=${minMinecraftVersion} <${nextMinecraftVersion}",
-    "java": ">=17",
-    "cardinal-components-base": "*",
-    "cardinal-components-entity": "*"
+    "java": ">=17"
   },
 
   "custom": {

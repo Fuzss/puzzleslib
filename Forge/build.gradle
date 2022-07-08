@@ -33,8 +33,9 @@ minecraft {
             workingDirectory project.file('run')
             jvmArgs '-Xms1G', '-Xmx4G'
             property 'fml.earlyprogresswindow', 'false'
-            args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
+            args "-mixin.config=${modId}.common.mixins.json", "-mixin.config=${modId}.forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Client'
             property 'terminal.ansi', 'true'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -50,8 +51,9 @@ minecraft {
             workingDirectory project.file('run')
             jvmArgs '-Xms1G', '-Xmx4G'
             arg 'nogui'
-            args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
+            args "-mixin.config=${modId}.common.mixins.json", "-mixin.config=${modId}.forge.mixins.json"
             ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Server'
             property 'terminal.ansi', 'true'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -66,9 +68,10 @@ minecraft {
         data {
             workingDirectory project.file('run')
             jvmArgs '-Xms1G', '-Xmx4G'
-            args "-mixin.config=${modId}_common.mixins.json", "-mixin.config=${modId}_forge.mixins.json"
+            args "-mixin.config=${modId}.common.mixins.json", "-mixin.config=${modId}.forge.mixins.json"
             args '--mod', modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Data'
             property 'terminal.ansi', 'true'
             property 'mixin.env.remapRefMap', 'true'
             property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
@@ -93,11 +96,12 @@ dependencies {
     // Quality of Life Mods
     runtimeOnly fg.deobf("curse.maven:catalogue-459701:3822882")
 //    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
-    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
+//    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
+    runtimeOnly fg.deobf("curse.maven:configured-457570:3822820")
 
     // Puzzles Lib
     // from local maven
-//    implementation fg.deobf("fuzs.puzzleslib:PuzzlesLib:${puzzlesVersion}")
+//    implementation fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
     // try use curse maven when local maven is not available
     // file id is end of url (7 digits usually) when on file details page on curse
 //    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
@@ -121,7 +125,7 @@ processResources {
     inputs.property "modVersion", "${modVersion}"
     inputs.property "modDescription", "${modDescription}"
     inputs.property "modGroup", project.group
-    inputs.property "modPageUrl", "${modPageUrl}"
+    inputs.property "modPageUrl", "${modSourceUrl}"
     inputs.property "modUpdateUrl", "${modUpdateUrl}"
     inputs.property "modIssueUrl", "${modIssueUrl}"
     inputs.property "modAuthor", "${modAuthor}"
@@ -130,6 +134,7 @@ processResources {
     inputs.property "nextMinecraftVersion", rootProject.getNextVersion("${minMinecraftVersion}")
 //    inputs.property "minPuzzlesVersion", "${minPuzzlesVersion}"
     inputs.property "packFormat", "${packFormat}"
+    inputs.property "modForgeDisplayTest", "${modForgeDisplayTest}"
 
     // replace stuff in mods.toml and pack.mcmeta
     filesMatching ('META-INF/mods.toml') {
@@ -139,14 +144,15 @@ processResources {
                 'modVersion':           "${modVersion}",
                 'modDescription':       "${modDescription}",
                 'modGroup':             project.group,
-                'modPageUrl':           "${modPageUrl}",
+                'modPageUrl':           "${modSourceUrl}",
                 'modUpdateUrl':         "${modUpdateUrl}",
                 'modIssueUrl':          "${modIssueUrl}",
                 'modAuthor':            "${modAuthor}",
                 'minForgeVersion':      "${minForgeVersion}",
                 'minMinecraftVersion':  "${minMinecraftVersion}",
-                "nextMinecraftVersion": rootProject.getNextVersion("${minMinecraftVersion}"),
-//                "minPuzzlesVersion":    "${minPuzzlesVersion}"
+                'nextMinecraftVersion': rootProject.getNextVersion("${minMinecraftVersion}"),
+//                'minPuzzlesVersion':    "${minPuzzlesVersion}",
+                'modForgeDisplayTest':  "${modForgeDisplayTest}"
         )
     }
 
@@ -189,29 +195,118 @@ jar.finalizedBy('reobfJar')
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            groupId project.group
-            artifactId project.archivesBaseName
-            version project.version
-            artifact jar
-            artifact sourcesJar
-            artifact apiJar
+        mavenJava (MavenPublication) {
+            artifactId = "${modId}-forge"
+            version = modVersion
+            from components.java
+            // exclude certain dependencies when publishing to maven
+            // from https://stackoverflow.com/a/50121790
             pom.withXml {
-                def node = asNode()
-                if(node.dependencies.size() > 0)
-                    node.remove(node.dependencies) // Remove deps, as they are all mappings-dependent and/or forge
+                asNode().dependencies.dependency.each { dep ->
+                    if (["catalogue", "bettermodsbutton", "configmenusforge", "configured"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
+                        assert dep.parent().remove(dep)
+                    }
+                }
+            }
+            pom {
+                name = "${modName} [Forge]"
+                description = "${modDescription}"
+                url = "${modSourceUrl}"
+                scm {
+                    url = "${modSourceUrl}"
+                    connection = "${modSourceUrl}".replace("https", "scm:git:git").concat(".git")
+                    developerConnection = "${modSourceUrl}".replace("https://github.com/", "scm:git:git@github.com:").concat(".git")
+                }
+                issueManagement {
+                    system = 'github'
+                    url = "${modIssueUrl}"
+                }
+                licenses {
+                    license {
+                        name = 'MPL-2'
+                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                    }
+                }
+                developers {
+                    developer {
+                        id = "${modAuthor}".toLowerCase()
+                        name = "${modAuthor}"
+                    }
+                }
             }
         }
     }
     repositories {
         maven {
-            url "file://" + System.getenv("local_maven")
+            name = 'FuzsModResources'
+            url "file://${project.modResources}/maven"
         }
     }
 }
 
 signing {
     sign publishing.publications.mavenJava
+}
+
+task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar, dependsOn: jar) {
+    onlyIf { project.hasProperty('keyStore') }
+    keyStore = project.findProperty('keyStore')
+    alias = project.findProperty('keyStoreAlias')
+    storePass = project.findProperty('keyStorePass')
+    keyPass = project.findProperty('keyStoreKeyPass')
+    inputFile = outputFile = jar.archivePath
+}
+
+jar.finalizedBy 'signJar'
+signJar.mustRunAfter 'reobfJar'
+
+curseforge {
+    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    apiKey = project.findProperty('curseApiToken')
+    project {
+        id = projectCurseId
+        changelogType = 'markdown'
+        changelog = file('../CHANGELOG.md')
+        releaseType = projectReleaseType
+        addGameVersion 'Forge'
+        projectGameVersions.split(",").each {
+            addGameVersion it.trim()
+        }
+        mainArtifact(jar) {
+            displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+            relations {
+                requiredDependency 'fabric-api'
+                optionalDependency 'modmenu'
+            }
+        }
+        addArtifact sourcesJar
+    }
+    options {
+//        debug = true
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
+    }
+}
+
+modrinth {
+    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    token = project.findProperty('modrinthApiToken')
+    projectId = projectModrinthId
+    versionNumber = modVersion
+    versionName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+    changelog = file('../CHANGELOG.md').text
+    versionType = projectReleaseType
+    uploadFile = jar // This is the java jar task
+    projectGameVersions.split(",").each {
+        gameVersions.add it.trim()
+    }
+    loaders.add 'forge'
+    additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
+    dependencies {
+        required.project "fabric-api"
+        optional.project "modmenu"
+    }
+//	debugMode = true
 }
 
 import groovy.json.*
@@ -245,7 +340,7 @@ task refreshUpdateJson {
         } else {
             def builder = new JsonBuilder()
             updateJson = builder {
-                homepage "${modPageUrl}"
+                homepage "${modSourceUrl}"
                 promos { project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
                     "${version}-latest" project.modversion
                     // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
@@ -261,4 +356,4 @@ task refreshUpdateJson {
 }
 
 build.finalizedBy project.tasks.copyJarToDir, rootProject.tasks.incrementBuildNumber
-//tasks.getByPath('curseforge').finalizedBy project.refreshUpdateJson
+[tasks.modrinth, tasks.curseforge].each {it.finalizedBy project.tasks.refreshUpdateJson}
