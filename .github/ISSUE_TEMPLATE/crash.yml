@@ -39,12 +39,12 @@ body:
     validations:
       required: true
   - type: textarea
-    id: reproduce
+    id: notes
     attributes:
-      label: Steps to Reproduce the Crash (Required)
-      description: Please explain what we need to do to cause the crash.
+      label: Notes (Required)
+      description: Please explain which steps we need to do to reproduce the crash. Please include anything else you'd like to say about the crash.
       placeholder: >-
-        Example:  
+        ex.  
         
         1. Open the furnace screen.
 
@@ -53,75 +53,18 @@ body:
         3. The game crashes.
     validations:
       required: true
-  - type: textarea
-    id: notes
-    attributes:
-      label: Additional Notes (Optional)
-      description: >-
-        Optionally, please include anything else you'd like to say about the crash.
-      placeholder: >-
-        Example:
-
-        I warned everyone on my server not to do this, so nobody is crashing any more. 
-        I just thought I should let you know so you can fix it, thanks!
-    validations:
-      required: false
-  - type: markdown
-    attributes:
-      value: >-
-        ## Sharing your Crash Report
-        
-        In order to diagnose a crash, we will need to see your crash report.
-
-        To share your crash report here, please follow these steps:
-
-
-        1. If you don't have it already, find your crash report file.
-
-        a. [Find your minecraft
-        folder](https://minecraft.fandom.com/wiki/.minecraft)
-
-        b. In the minecraft folder, go into the `crash-reports` folder and find
-        the most recent crash report file.
-
-        1. Create a Gist from the crash report file and copy the url.
-
-        [Click here for instructions on creating a
-        Gist](https://gist.github.com/Fuzss/bb307f86159b0011fcc2e10364a1b0a7)
   - type: input
-    id: crashlog
+    id: crash-report
     attributes:
       label: Crash Report (Required)
       description: >-
-        Please paste the url to the gist containing your crash report.
-      placeholder: https://gist.github.com/<your_user_name>/<gist_id>
+        Please paste the url to your shared crash report. [To share your crash report here, please follow these steps.](https://gist.github.com/Fuzss/9692f6ed5e8cca485a58004c28c9045b)
+      placeholder: ex. https://gist.github.com/<your_user_name>/<gist_id>
     validations:
       required: true
-  - type: markdown
-    attributes:
-      value: >-
-        ## Sharing your `latest.log`
-
-        In order to diagnose a bug, we will need to see your `latest.log`.
-
-        To share your `latest.log` here, please follow these steps:
-
-
-        1. If you don't have it already, find your `latest.log` file.
-
-        a. [Find your minecraft
-        folder](https://minecraft.fandom.com/wiki/.minecraft)
-
-        b. In the minecraft folder, go into the `logs` folder and find the
-        `latest.log` file.
-
-        1. Create a Gist from the `latest.log` and copy the url.
-
-        [Click here for instructions on creating a
-        Gist](https://gist.github.com/Fuzss/bb307f86159b0011fcc2e10364a1b0a7)
   - type: input
     id: latest-log
     attributes:
       label: latest.log (Optional)
-      description: Please paste the url to the gist containing your `latest.log` file.
-      placeholder: https://gist.github.com/<your_user_name>/<gist_id>
+      description: Please paste the url to your shared `latest.log` file. [To share your `latest.log` here, please follow these steps.](https://gist.github.com/Fuzss/866b384d353912986e37b17eeef7a285)
+      placeholder: ex. https://gist.github.com/<your_user_name>/<gist_id>

@@ -33,7 +33,12 @@ minecraft {
             workingDirectory project.file('run')
             jvmArgs '-Xms1G', '-Xmx4G'
             property 'fml.earlyprogresswindow', 'false'
-            args "-mixin.config=${modId}.common.mixins.json", "-mixin.config=${modId}.forge.mixins.json"
+            if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
+                arg "-mixin.config=${modId}.common.mixins.json"
+            }
+            if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
+                arg "-mixin.config=${modId}.forge.mixins.json"
+            }
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Client'
             property 'terminal.ansi', 'true'
@@ -51,7 +56,12 @@ minecraft {
             workingDirectory project.file('run')
             jvmArgs '-Xms1G', '-Xmx4G'
             arg 'nogui'
-            args "-mixin.config=${modId}.common.mixins.json", "-mixin.config=${modId}.forge.mixins.json"
+            if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
+                arg "-mixin.config=${modId}.common.mixins.json"
+            }
+            if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
+                arg "-mixin.config=${modId}.forge.mixins.json"
+            }
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Server'
             property 'terminal.ansi', 'true'
@@ -68,7 +78,12 @@ minecraft {
         data {
             workingDirectory project.file('run')
             jvmArgs '-Xms1G', '-Xmx4G'
-            args "-mixin.config=${modId}.common.mixins.json", "-mixin.config=${modId}.forge.mixins.json"
+            if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
+                arg "-mixin.config=${modId}.common.mixins.json"
+            }
+            if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
+                arg "-mixin.config=${modId}.forge.mixins.json"
+            }
             args '--mod', modId, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
             ideaModule "${rootProject.name}.${project.name}.main"
             taskName 'Data'
@@ -94,10 +109,10 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3822882")
+//    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3822882")
 //    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
 //    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
-    runtimeOnly fg.deobf("curse.maven:configured-457570:3822820")
+//    runtimeOnly fg.deobf("curse.maven:configured-457570:3822820")
 
     // Puzzles Lib
     // from local maven
@@ -110,8 +125,12 @@ dependencies {
 if (project.file("src/main/resources/${modId}.forge.mixins.json").exists() || project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
     mixin {
         add project(":Common").sourceSets.main, "${modId}.refmap.json"
-        config "${modId}.common.mixins.json"
-        config "${modId}.forge.mixins.json"
+        if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
+            config "${modId}.common.mixins.json"
+        }
+        if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
+            config "${modId}.forge.mixins.json"
+        }
     }
 }
 
@@ -129,6 +148,7 @@ processResources {
     inputs.property "modUpdateUrl", "${modUpdateUrl}"
     inputs.property "modIssueUrl", "${modIssueUrl}"
     inputs.property "modAuthor", "${modAuthor}"
+    inputs.property "minFMLVersion", "${minForgeVersion}".replaceAll("\\..*", "")
     inputs.property "minForgeVersion", "${minForgeVersion}"
     inputs.property "minMinecraftVersion", "${minMinecraftVersion}"
     inputs.property "nextMinecraftVersion", rootProject.getNextVersion("${minMinecraftVersion}")
@@ -148,6 +168,7 @@ processResources {
                 'modUpdateUrl':         "${modUpdateUrl}",
                 'modIssueUrl':          "${modIssueUrl}",
                 'modAuthor':            "${modAuthor}",
+                'minFMLVersion':        "${minForgeVersion}".replaceAll("\\..*", ""),
                 'minForgeVersion':      "${minForgeVersion}",
                 'minMinecraftVersion':  "${minMinecraftVersion}",
                 'nextMinecraftVersion': rootProject.getNextVersion("${minMinecraftVersion}"),
