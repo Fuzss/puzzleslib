@@ -59,6 +59,6 @@ body:
   - type: input
     id: latest-log
     attributes:
-      label: `latest.log` (Optional)
+      label: latest.log (Optional)
       description: Please paste the url to your shared `latest.log` file. [To share your `latest.log` here, please follow these steps.](https://gist.github.com/Fuzss/866b384d353912986e37b17eeef7a285)
       placeholder: ex. https://gist.github.com/<your_user_name>/<gist_id>
