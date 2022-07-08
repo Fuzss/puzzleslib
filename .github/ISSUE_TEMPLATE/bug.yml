@@ -49,6 +49,7 @@ body:
         Current behavior: Shift-clicking a fuel item in the furnace fuel slots does not work.
 
         Steps to reproduce: 
+        
         1. Open the furnace screen.
 
         2. Attempt to shift-click a fuel item into the fuel slot.

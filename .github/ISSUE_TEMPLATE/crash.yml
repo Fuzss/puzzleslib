@@ -62,28 +62,6 @@ body:
       placeholder: ex. https://gist.github.com/<your_user_name>/<gist_id>
     validations:
       required: true
-  - type: markdown
-    attributes:
-      value: >-
-        ## Sharing your `latest.log`
-
-        In order to diagnose a bug, we will need to see your `latest.log`.
-
-        To share your `latest.log` here, please follow these steps:
-
-
-        1. If you don't have it already, find your `latest.log` file.
-
-        a. [Find your minecraft
-        folder](https://minecraft.fandom.com/wiki/.minecraft)
-
-        b. In the minecraft folder, go into the `logs` folder and find the
-        `latest.log` file.
-
-        1. Create a Gist from the `latest.log` and copy the url.
-
-        [Click here for instructions on creating a
-        Gist](https://gist.github.com/Fuzss/bb307f86159b0011fcc2e10364a1b0a7)
   - type: input
     id: latest-log
     attributes:
