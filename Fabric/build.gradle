@@ -77,13 +77,13 @@ loom {
             client()
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("../run")
         }
         server {
             server()
             setConfigName("Fabric Server")
             ideConfigGenerated(true)
-            runDir("run")
+            runDir("../run")
         }
     }
 }
@@ -127,8 +127,8 @@ processResources {
                 'minMinecraftVersion':  	"${minMinecraftVersion}",
                 "nextMinecraftVersion": 	rootProject.getNextVersion("${minMinecraftVersion}"),
 //				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
-				"mainEntryPoint": 			"${project.group}.${rootProject.name}",
-				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}Client",
+				"mainEntryPoint": 			"${project.group}.${rootProject.name}Fabric",
+				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}FabricClient",
                 "modFabricEnvironment":		"${modFabricEnvironment}"
         )
     }

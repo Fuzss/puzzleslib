@@ -5,7 +5,7 @@ import net.fabricmc.api.ClientModInitializer;
 /**
  * main client class on Fabric, currently unused
  */
-public class PuzzlesLibClient implements ClientModInitializer {
+public class PuzzlesLibFabricClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {

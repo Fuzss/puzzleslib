@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
-import fuzs.puzzleslib.PuzzlesLibBase;
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.core.Services;
 import org.jetbrains.annotations.Nullable;
 
@@ -145,7 +145,7 @@ public class JsonConfigFileUtil {
                 return true;
             }
         } catch (Exception e) {
-            PuzzlesLibBase.LOGGER.error("Failed to copy {} in config directory: {}", jsonFile.getName(), e);
+            PuzzlesLib.LOGGER.error("Failed to copy {} in config directory: {}", jsonFile.getName(), e);
         }
         return false;
     }
@@ -162,7 +162,7 @@ public class JsonConfigFileUtil {
             GSON.toJson(jsonElement, writer);
             return true;
         } catch (Exception e) {
-            PuzzlesLibBase.LOGGER.error("Failed to create {} in config directory: {}", jsonFile.getName(), e);
+            PuzzlesLib.LOGGER.error("Failed to create {} in config directory: {}", jsonFile.getName(), e);
         }
         return false;
     }
@@ -176,7 +176,7 @@ public class JsonConfigFileUtil {
         try (FileReader reader = new FileReader(file)) {
             deserializer.accept(reader);
         } catch (Exception e) {
-            PuzzlesLibBase.LOGGER.error("Failed to read {} in config directory: {}", file.getName(), e);
+            PuzzlesLib.LOGGER.error("Failed to read {} in config directory: {}", file.getName(), e);
         }
     }
 
@@ -199,7 +199,7 @@ public class JsonConfigFileUtil {
                     try {
                         fileList.add(file);
                     } catch (Exception e) {
-                        PuzzlesLibBase.LOGGER.error("Failed to locate files in {} directory: {}", directory.getName(), e);
+                        PuzzlesLib.LOGGER.error("Failed to locate files in {} directory: {}", directory.getName(), e);
                     }
                 }
             }

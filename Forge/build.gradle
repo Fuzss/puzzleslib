@@ -30,7 +30,7 @@ minecraft {
 
     runs {
         client {
-            workingDirectory project.file('run')
+            workingDirectory project.file('../run')
             jvmArgs '-Xms1G', '-Xmx4G'
             property 'fml.earlyprogresswindow', 'false'
             if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
@@ -53,7 +53,7 @@ minecraft {
         }
 
         server {
-            workingDirectory project.file('run')
+            workingDirectory project.file('../run')
             jvmArgs '-Xms1G', '-Xmx4G'
             arg 'nogui'
             if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
@@ -76,7 +76,7 @@ minecraft {
         }
 
         data {
-            workingDirectory project.file('run')
+            workingDirectory project.file('../run')
             jvmArgs '-Xms1G', '-Xmx4G'
             if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
                 arg "-mixin.config=${modId}.common.mixins.json"
@@ -223,7 +223,8 @@ publishing {
             // from https://stackoverflow.com/a/50121790
             pom.withXml {
                 asNode().dependencies.dependency.each { dep ->
-                    if (["catalogue", "bettermodsbutton", "configmenusforge", "configured"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
+                    // we need to exclude Forge itself, which could be problematic for any mod containing 'forge' in its name, but shouldn't really affect many though
+                    if (["catalogue", "bettermodsbutton", "configmenusforge", "configured", "forge"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
                         assert dep.parent().remove(dep)
                     }
                 }

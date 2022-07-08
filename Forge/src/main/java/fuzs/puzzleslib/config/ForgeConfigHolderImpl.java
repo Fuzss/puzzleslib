@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.PuzzlesLibBase;
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.config.core.ForgeConfigBuilderWrapper;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
@@ -116,7 +116,7 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
                     }
                 }
             }
-            PuzzlesLibBase.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", config.getType().extension(), modId);
+            PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", config.getType().extension(), modId);
         }
     }
 
@@ -260,7 +260,7 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
     @Override
     public C client() {
         if (!this.isClientAvailable()) {
-            PuzzlesLibBase.LOGGER.error("Calling client config when it is not yet available! This is a bug! Current loading stage: {}", this.clientLoadingStage, new Exception("Client config not yet available"));
+            PuzzlesLib.LOGGER.error("Calling client config when it is not yet available! This is a bug! Current loading stage: {}", this.clientLoadingStage, new Exception("Client config not yet available"));
         }
         return this.client;
     }
@@ -268,7 +268,7 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
     @Override
     public S server() {
         if (!this.isServerAvailable()) {
-            PuzzlesLibBase.LOGGER.error("Calling server config when it is not yet available! This is a bug! Current loading stage: {}", this.serverLoadingStage, new Exception("Server config not yet available"));
+            PuzzlesLib.LOGGER.error("Calling server config when it is not yet available! This is a bug! Current loading stage: {}", this.serverLoadingStage, new Exception("Server config not yet available"));
         }
         return this.server;
     }

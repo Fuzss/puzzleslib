@@ -10,7 +10,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
-import fuzs.puzzleslib.PuzzlesLibBase;
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.capability.data.*;
 import fuzs.puzzleslib.registry.FabricRegistryManager;
 import net.minecraft.resources.ResourceLocation;
@@ -246,7 +246,7 @@ public class FabricCapabilityController implements EntityComponentInitializer {
     public static synchronized FabricCapabilityController of(String namespace) {
         return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
             final FabricCapabilityController manager = new FabricCapabilityController(namespace);
-            PuzzlesLibBase.LOGGER.info("Creating capability controller for mod id {}", namespace);
+            PuzzlesLib.LOGGER.info("Creating capability controller for mod id {}", namespace);
             return manager;
         });
     }
