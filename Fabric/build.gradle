@@ -63,9 +63,8 @@ dependencies {
 //	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1")
 
     // Puzzles Lib
-    // from local maven
 //    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
-    // try use curse maven when local maven is not available
+    // try use curse maven when no other option is available
     // file id is end of url (7 digits usually) when on file details page on curse
 //    modImplementation "curse.maven:puzzleslib-<project-id>:<file-id>"
 }

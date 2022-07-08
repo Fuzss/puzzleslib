@@ -162,7 +162,9 @@ task fabricBuild(type: GradleBuild) {
 task allBuild(type: GradleBuild) {
     group = '_main'
     tasks = [
-            'allClean',
+            ':Common:clean',
+            ':Forge:clean',
+            ':Fabric:clean',
             ':Common:build',
             ':Forge:build',
             ':Fabric:build'
@@ -198,7 +200,9 @@ task fabricPublish(type: GradleBuild) {
 task allPublish(type: GradleBuild) {
     group = '_main'
     tasks = [
-            'allClean',
+            ':Common:clean',
+            ':Forge:clean',
+            ':Fabric:clean',
             ':Common:publishMavenJavaPublicationToFuzsModResourcesRepository',
             ':Forge:publishMavenJavaPublicationToFuzsModResourcesRepository',
             ':Fabric:publishMavenJavaPublicationToFuzsModResourcesRepository'
@@ -208,7 +212,9 @@ task allPublish(type: GradleBuild) {
 task allUpload(type: GradleBuild) {
     group = '_main'
     tasks = [
-            'allClean',
+            ':Common:clean',
+            ':Forge:clean',
+            ':Fabric:clean',
             ':Forge:curseforge',
             ':Forge:modrinth',
             ':Fabric:curseforge',

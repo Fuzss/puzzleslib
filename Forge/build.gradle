@@ -115,9 +115,8 @@ dependencies {
 //    runtimeOnly fg.deobf("curse.maven:configured-457570:3822820")
 
     // Puzzles Lib
-    // from local maven
 //    implementation fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
-    // try use curse maven when local maven is not available
+    // try use curse maven when no other option is available
     // file id is end of url (7 digits usually) when on file details page on curse
 //    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
 }
@@ -347,26 +346,26 @@ task copyJarToDir(type: Copy) {
 task refreshUpdateJson {
     onlyIf { project.hasProperty('modResources') }
     doLast {
-        def updateFile = file(project.findProperty('modResources').concat(File.separator).concat('update').concat(File.separator).concat(project.modid).concat('.json'))
+        def updateFile = file(project.findProperty('modResources').concat(File.separator).concat('update').concat(File.separator).concat("${modId}").concat('.json'))
         def updateJson
         if (updateFile.exists() && updateFile.canRead()) {
             updateJson = new JsonSlurper().parseText(updateFile.text)
-            project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
-                updateJson['promos']["${version}-latest"] = project.modversion
+            "${projectGameVersions}".replaceAll(" ", "").split(",").each { version ->
+                updateJson['promos']["${version}-latest"] = "${modVersion}"
                 // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
-                if (project.modversion.matches("[^a-zA-Z]+")) {
-                    updateJson['promos']["${version}-recommended"] = project.modversion
+                if ("${modVersion}".matches("[^a-zA-Z]+")) {
+                    updateJson['promos']["${version}-recommended"] = "${modVersion}"
                 }
             }
         } else {
             def builder = new JsonBuilder()
             updateJson = builder {
                 homepage "${modSourceUrl}"
-                promos { project.findProperty('curseProjectVersion').replaceAll(" ", "").split(",").each { version ->
-                    "${version}-latest" project.modversion
+                promos { "${projectGameVersions}".replaceAll(" ", "").split(",").each { version ->
+                    "${version}-latest" "${modVersion}"
                     // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
-                    if (project.modversion.matches("[^a-zA-Z]+")) {
-                        "${version}-recommended" project.modversion
+                    if ("${modVersion}".matches("[^a-zA-Z]+")) {
+                        "${version}-recommended" "${modVersion}"
                     }
                 } }
             }
