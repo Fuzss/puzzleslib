@@ -295,10 +295,6 @@ curseforge {
         }
         mainArtifact(jar) {
             displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
-            relations {
-                requiredDependency 'fabric-api'
-                optionalDependency 'modmenu'
-            }
         }
         addArtifact sourcesJar
     }
@@ -323,10 +319,6 @@ modrinth {
     }
     loaders.add 'forge'
     additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
-    dependencies {
-        required.project "fabric-api"
-        optional.project "modmenu"
-    }
 //	debugMode = true
 }
 
