@@ -3,6 +3,20 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.5-1.19] - 2022-07-09
+### Fixed
+- Attempt to fix common jar not being deobfuscated when applying from Maven in dependant projects
+
+## [v4.0.4-1.19] - 2022-07-09
+### Fixed
+- Fixed common project depending on Quilt
+
+## [v4.0.3-1.19] - 2022-07-09
+### Added
+- Added a utility class for registering client side content
+### Fixed
+- Fixed Modrinth upload tasks
+
 ## [v4.0.2-1.19] - 2022-07-07
 ### Changed
 - Renamed internal base classes to follow mod loader specific names

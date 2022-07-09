@@ -4,6 +4,8 @@ plugins {
     // this depends on an older version of guava, which loom is incompatible with, so make sure to apply this plugin after loom
     // haven't found a proper way to manage plugin dependencies otherwise
     id 'me.hypherionmc.cursegradle' version '2.+'
+    // cannot apply this in the base build.gradle as it'll be the same for all subprojects, only one configuration will work
+    id 'com.modrinth.minotaur' version '2.+'
 }
 
 archivesBaseName = rootProject.name
@@ -90,6 +92,9 @@ loom {
 
 processResources {
     from project(":Common").sourceSets.main.resources
+    // we need to have this in common so that in a non-production environment the common jar is correctly deobfuscated
+    exclude("**/quilt.mod.json")
+
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
@@ -224,7 +229,7 @@ curseforge {
             displayName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
             relations {
                 requiredDependency 'fabric-api'
-                requiredDependency 'forge-config-api-port'
+                requiredDependency 'forge-config-api-port-fabric'
             }
         }
         addArtifact sourcesJar
@@ -240,8 +245,8 @@ modrinth {
     if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
     token = project.findProperty('modrinthApiToken')
     projectId = projectModrinthId
-    versionNumber = modVersion
-    versionName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+    versionNumber = project.version
+    versionName = "${rootProject.name}-v${modVersion}"
     changelog = file('../CHANGELOG.md').text
     versionType = projectReleaseType
     uploadFile = remapJar // This is the java jar task

@@ -13,6 +13,8 @@ buildscript {
 
 plugins {
     id 'me.hypherionmc.cursegradle' version '2.+'
+    // cannot apply this in the base build.gradle as it'll be the same for all subprojects, only one configuration will work
+    id 'com.modrinth.minotaur' version '2.+'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
@@ -135,6 +137,9 @@ if (project.file("src/main/resources/${modId}.forge.mixins.json").exists() || pr
 
 processResources {
     from project(":Common").sourceSets.main.resources
+    // we need to have this in common so that in a non-production environment the common jar is correctly deobfuscated
+    exclude("**/quilt.mod.json")
+
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
@@ -194,21 +199,6 @@ sourcesJar {
 
 javadoc {
     source project(":Common").sourceSets.main.allJava
-}
-
-sourceSets.main.resources {
-    srcDir 'src/generated/resources'
-}
-
-task apiJar(type: Jar, dependsOn: classes) {
-    // Sources included because of MinecraftForge/ForgeGradle#369
-    from project(":Common").sourceSets.main.allJava
-    from(sourceSets.main.allJava)
-    from(sourceSets.main.output)
-
-    include "${project.group}/api".replace('.', '/')
-
-    archiveClassifier = 'api'
 }
 
 jar.finalizedBy('reobfJar')
@@ -309,8 +299,8 @@ modrinth {
     if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
     token = project.findProperty('modrinthApiToken')
     projectId = projectModrinthId
-    versionNumber = modVersion
-    versionName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+    versionNumber = project.version
+    versionName = "${rootProject.name}-v${modVersion}"
     changelog = file('../CHANGELOG.md').text
     versionType = projectReleaseType
     uploadFile = jar // This is the java jar task

@@ -30,10 +30,21 @@ processResources {
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
+    inputs.property "modId", 					"${modId}"
+    inputs.property "modVersion", 				"${modVersion}"
+    inputs.property "modGroup", 				project.group
     inputs.property "modDescription", 			"${modDescription}"
     inputs.property "packFormat", 				"${packFormat}"
 
-    // replace stuff in pack.mcmeta
+    // replace stuff in fabric.mod.json and pack.mcmeta
+    filesMatching ('quilt.mod.json') {
+        expand (
+                'modId':                	"${modId}",
+                'modVersion':           	"${modVersion}",
+                'modGroup':             	project.group
+        )
+    }
+
     filesMatching ('pack.mcmeta') {
         expand (
                 'modDescription':       "${modDescription}",
@@ -52,7 +63,7 @@ publishing {
             // from https://stackoverflow.com/a/50121790
             pom.withXml {
                 asNode().dependencies.dependency.each { dep ->
-                    if ([].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
+                    if (["quilt-loader", "fabric-loader"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
                         assert dep.parent().remove(dep)
                     }
                 }
