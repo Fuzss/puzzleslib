@@ -70,10 +70,11 @@ public interface RegistryReference<T> {
      * @param <T>               specific object type, is inferred from variable this is stored as
      * @return                  a placeholder reference implementation
      */
+    @SuppressWarnings("unchecked")
     static <T> RegistryReference<T> placeholder(ResourceKey<? extends Registry<? super T>> registryKey, ResourceLocation resourceLocation) {
         Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(registryKey.location());
-        if (registry == null || !registry.containsKey(resourceLocation)) {
-            throw new IllegalStateException(String.format("Unable to retrieve placeholder %s from registry %s", resourceLocation, registryKey));
+        if (registry == null) {
+            throw new IllegalStateException(String.format("Unable to retrieve registry from key %s", registryKey));
         }
         ResourceKey<T> resourceKey = ResourceKey.create((ResourceKey<? extends Registry<T>>) registryKey, resourceLocation);
         return new RegistryReference<>() {
@@ -100,6 +101,9 @@ public interface RegistryReference<T> {
             @Override
             public T get() {
                 if (this.value == null) {
+                    if (!registry.containsKey(resourceLocation)) {
+                        throw new IllegalStateException(String.format("Unable to retrieve placeholder %s from registry %s", resourceLocation, registryKey));
+                    }
                     this.value = registry.get(resourceLocation);
                 }
                 return this.value;
@@ -107,7 +111,7 @@ public interface RegistryReference<T> {
 
             @Override
             public Holder<T> holder() {
-                return registry.getOrCreateHolderOrThrow(resourceKey);
+                return registry.getOrCreateHolderOrThrow(this.getResourceKey());
             }
         };
     }

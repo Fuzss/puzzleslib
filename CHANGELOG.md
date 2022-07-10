@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.6-1.19] - 2022-07-11
+### Added
+- Added a few more utility methods for registering game content
+### Fixed
+- Fixed RegistryReference::placeholder always throwing an exception when used
+
 ## [v4.0.5-1.19] - 2022-07-09
 ### Fixed
 - Attempt to fix common jar not being deobfuscated when applying from Maven in dependant projects

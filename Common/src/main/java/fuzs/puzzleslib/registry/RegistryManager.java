@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.registry;
 
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.registry.builder.ModBlockEntityTypeBuilder;
+import fuzs.puzzleslib.registry.builder.ModMenuSupplier;
+import fuzs.puzzleslib.registry.builder.ModPoiTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -8,6 +11,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -42,6 +46,17 @@ public interface RegistryManager {
      * @return namespace for this instance
      */
     String namespace();
+
+    /**
+     * creates a placeholder registry reference for this {@link #namespace()}
+     * @param registryKey key for registry to register to
+     * @param path path for new entry
+     * @param <T> registry type
+     * @return placeholder registry object for <code>entry</code>
+     */
+    default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return RegistryReference.placeholder(registryKey, this.locate(path));
+    }
 
     /**
      * register any type of registry entry with a path
@@ -199,8 +214,8 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
-    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityTypeBuilder(String path, Supplier<EntityType.Builder<T>> entry) {
-        return this.registerEntityType(path, () -> entry.get().build(path));
+    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityType(String path, Supplier<EntityType<T>> entry) {
+        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registry.ENTITY_TYPE_REGISTRY, path, entry);
     }
 
     /**
@@ -210,8 +225,8 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
-    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityType(String path, Supplier<EntityType<T>> entry) {
-        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registry.ENTITY_TYPE_REGISTRY, path, entry);
+    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityTypeBuilder(String path, Supplier<EntityType.Builder<T>> entry) {
+        return this.registerEntityType(path, () -> entry.get().build(path));
     }
 
     /**
@@ -226,6 +241,15 @@ public interface RegistryManager {
     }
 
     /**
+     * register tile entity type entry with a path
+     * @param path path for new entry
+     * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
+     * @param <T> block entity type
+     */
+    <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry);
+
+    /**
      * register container type entry with a path
      * @param path path for new entry
      * @param entry supplier for entry to register
@@ -235,6 +259,23 @@ public interface RegistryManager {
     default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registry.MENU_REGISTRY, path, entry);
     }
+
+    /**
+     * register container type entry with a path
+     * @param path path for new entry
+     * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
+     * @param <T> container menu type
+     */
+    <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<ModMenuSupplier<T>> entry);
+
+    /**
+     * register poi type from custom builder
+     * @param path path for new entry
+     * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
+     */
+    RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry);
 
     /**
      * @param path path for location

@@ -182,9 +182,32 @@ task allUploadEverywhere(type: GradleBuild) {
     ]
 }
 
+task commonGenSources(type: GradleBuild) {
+    group = '_main'
+    tasks = [
+            ':Common:genSourcesWithQuiltflower'
+    ]
+}
+
 task forgeGenRuns(type: GradleBuild) {
     group = '_main'
     tasks = [
+            ':Forge:genIntellijRuns'
+    ]
+}
+
+task fabricGenSources(type: GradleBuild) {
+    group = '_main'
+    tasks = [
+            ':Fabric:genSourcesWithQuiltflower'
+    ]
+}
+
+task allSetupWorkspace(type: GradleBuild) {
+    group = '_main'
+    tasks = [
+            ':Common:genSourcesWithQuiltflower',
+            ':Fabric:genSourcesWithQuiltflower',
             ':Forge:genIntellijRuns'
     ]
 }

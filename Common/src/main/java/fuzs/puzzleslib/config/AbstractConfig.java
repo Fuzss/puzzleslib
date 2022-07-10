@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * abstract config template
+ * abstract config template for each config category, can be nested (fields in a subclass can be once again of type {@link AbstractConfig})
  */
 public abstract class AbstractConfig {
     /**
@@ -24,7 +24,14 @@ public abstract class AbstractConfig {
     private final Map<List<String>, String[]> categoryComments = Maps.newHashMap();
 
     /**
-     * @param name category name
+     * base category, which does not have a name
+     */
+    public AbstractConfig() {
+        this("");
+    }
+
+    /**
+     * @param name category name, the base category has no name
      */
     public AbstractConfig(String name) {
         this.name = name;

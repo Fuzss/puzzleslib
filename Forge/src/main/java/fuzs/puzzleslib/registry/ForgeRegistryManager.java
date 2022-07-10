@@ -1,8 +1,13 @@
 package fuzs.puzzleslib.registry;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.registry.builder.ModBlockEntityTypeBuilder;
+import fuzs.puzzleslib.registry.builder.ModMenuSupplier;
+import fuzs.puzzleslib.registry.builder.ModPoiTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -66,27 +71,24 @@ public class ForgeRegistryManager implements RegistryManager {
         return new ForgeRegistryReference<>(registryObject, registryKey);
     }
 
-    /**
-     * register tile entity type entry with a path
-     * @param path path for new entry
-     * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
-     * @param <T> block entity type
-     */
     @SuppressWarnings("ConstantConditions")
-    public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<BlockEntityType.Builder<T>> entry) {
-        return this.registerBlockEntityType(path, () -> entry.get().build(null));
+    @Override
+    public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
+        ModBlockEntityTypeBuilder<T> builder = entry.get();
+        return this.registerBlockEntityType(path, () -> BlockEntityType.Builder.of(builder.factory()::create, builder.blocks()).build(null));
     }
 
-    /**
-     * register container type entry with a path
-     * @param path path for new entry
-     * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
-     * @param <T> container menu type
-     */
-    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
-        return this.registerMenuType(path, () -> new MenuType<>(entry.get()));
+    @Override
+    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<ModMenuSupplier<T>> entry) {
+        return this.registerMenuType(path, () -> new MenuType<>(entry.get()::create));
+    }
+
+    @Override
+    public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
+        return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, () -> {
+            ModPoiTypeBuilder builder = entry.get();
+            return new PoiType(ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
+        });
     }
 
     /**

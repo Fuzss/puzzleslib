@@ -1,9 +1,14 @@
 package fuzs.puzzleslib.registry;
 
+import fuzs.puzzleslib.registry.builder.ModBlockEntityTypeBuilder;
+import fuzs.puzzleslib.registry.builder.ModMenuSupplier;
+import fuzs.puzzleslib.registry.builder.ModPoiTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -47,26 +52,23 @@ public class FabricRegistryManager implements RegistryManager {
         return new FabricRegistryReference<>(value, resourceLocation, registry);
     }
 
-    /**
-     * register tile entity type entry with a path
-     * @param path path for new entry
-     * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
-     * @param <T> block entity type
-     */
-    public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<FabricBlockEntityTypeBuilder<T>> entry) {
-        return this.registerBlockEntityType(path, () -> entry.get().build());
+    @Override
+    public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
+        ModBlockEntityTypeBuilder<T> builder = entry.get();
+        return this.registerBlockEntityType(path, () -> FabricBlockEntityTypeBuilder.create(builder.factory()::create, builder.blocks()).build());
     }
 
-    /**
-     * register container type entry with a path
-     * @param path path for new entry
-     * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
-     * @param <T> container menu type
-     */
-    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
-        return this.registerMenuType(path, () -> new MenuType<>(entry.get()));
+    @Override
+    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<ModMenuSupplier<T>> entry) {
+        return this.registerMenuType(path, () -> new MenuType<>(entry.get()::create));
+    }
+
+    @Override
+    public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
+        ModPoiTypeBuilder builder = entry.get();
+        ResourceLocation resourceLocation = this.locate(path);
+        PoiType value = PointOfInterestHelper.register(resourceLocation, builder.ticketCount(), builder.searchDistance(), builder.blocks());
+        return new FabricRegistryReference<>(value, resourceLocation, Registry.POINT_OF_INTEREST_TYPE);
     }
 
     /**
