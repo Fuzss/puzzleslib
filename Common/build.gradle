@@ -14,9 +14,6 @@ dependencies {
 //        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
-    // ASM dependencies do not seem to be applying correctly without this for Mixins (manually adding those didn't help). Do not use anything from this!
-    modImplementation "org.quiltmc:quilt-loader:${quiltVersion}"
-
     // Common Dependencies
     compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
     compileOnly 'com.electronwill.night-config:core:3.6.5'
@@ -24,6 +21,13 @@ dependencies {
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}-Common"
+}
+
+loom {
+    mixin {
+        // fix for java.lang.NoClassDefFoundError: org/objectweb/asm/tree/MethodNode
+        useLegacyMixinAp = false
+    }
 }
 
 processResources {
@@ -63,7 +67,7 @@ publishing {
             // from https://stackoverflow.com/a/50121790
             pom.withXml {
                 asNode().dependencies.dependency.each { dep ->
-                    if (["quilt-loader", "fabric-loader"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
+                    if ([].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
                         assert dep.parent().remove(dep)
                     }
                 }
