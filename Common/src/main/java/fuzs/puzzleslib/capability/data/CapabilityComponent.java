@@ -3,7 +3,7 @@ package fuzs.puzzleslib.capability.data;
 import net.minecraft.nbt.CompoundTag;
 
 /**
- * an base to INBTSerializable (Forge) or ComponentV3 (Fabric) for providing common read and write methods
+ * same functionality as INBTSerializable (Forge) or ComponentV3 (Fabric) for providing common read and write methods
  */
 public interface CapabilityComponent {
 

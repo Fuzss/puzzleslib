@@ -236,24 +236,6 @@ public class FabricConfigHolderImpl<C extends AbstractConfig, S extends Abstract
         return ConfigLoadingStage.LOADED;
     }
 
-    /**
-     * @param fileName file name for client
-     * @return this
-     */
-    public FabricConfigHolderImpl<C, S> setClientFileName(String fileName) {
-        this.clientFileName = fileName;
-        return this;
-    }
-
-    /**
-     * @param fileName file name for server
-     * @return this
-     */
-    public FabricConfigHolderImpl<C, S> setServerFileName(String fileName) {
-        this.serverFileName = fileName;
-        return this;
-    }
-
     @Override
     public C client() {
         if (!this.isClientAvailable()) {
@@ -288,6 +270,18 @@ public class FabricConfigHolderImpl<C extends AbstractConfig, S extends Abstract
             return false;
         }
         return true;
+    }
+
+    @Override
+    public ConfigHolder<C, S> setClientFileName(String fileName) {
+        this.clientFileName = fileName;
+        return this;
+    }
+
+    @Override
+    public ConfigHolder<C, S> setServerFileName(String fileName) {
+        this.serverFileName = fileName;
+        return this;
     }
 
     @Override

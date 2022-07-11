@@ -239,24 +239,6 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
         return ConfigLoadingStage.LOADED;
     }
 
-    /**
-     * @param fileName file name for client
-     * @return this
-     */
-    public ForgeConfigHolderImpl<C, S> setClientFileName(String fileName) {
-        this.clientFileName = fileName;
-        return this;
-    }
-
-    /**
-     * @param fileName file name for server
-     * @return this
-     */
-    public ForgeConfigHolderImpl<C, S> setServerFileName(String fileName) {
-        this.serverFileName = fileName;
-        return this;
-    }
-
     @Override
     public C client() {
         if (!this.isClientAvailable()) {
@@ -291,6 +273,18 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
             return false;
         }
         return true;
+    }
+
+    @Override
+    public ConfigHolder<C, S> setClientFileName(String fileName) {
+        this.clientFileName = fileName;
+        return this;
+    }
+
+    @Override
+    public ConfigHolder<C, S> setServerFileName(String fileName) {
+        this.serverFileName = fileName;
+        return this;
     }
 
     @Override

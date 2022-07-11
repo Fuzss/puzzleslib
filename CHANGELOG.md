@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.7-1.19] - 2022-07-11
+### Changed
+- Small code clean-ups
+
 ## [v4.0.6-1.19] - 2022-07-11
 ### Added
 - Added a few more utility methods for registering game content

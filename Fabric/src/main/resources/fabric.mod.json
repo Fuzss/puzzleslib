@@ -20,10 +20,8 @@
   "environment": "${modFabricEnvironment}",
   "entrypoints": {
     "main": [
-      "${mainEntryPoint}"
     ],
     "client": [
-      "${clientEntryPoint}"
     ],
     "cardinal-components": [
       "fuzs.puzzleslib.capability.FabricCapabilityController"

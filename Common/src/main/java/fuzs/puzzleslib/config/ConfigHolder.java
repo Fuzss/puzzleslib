@@ -33,6 +33,18 @@ public interface ConfigHolder<C extends AbstractConfig, S extends AbstractConfig
     boolean isServerAvailable();
 
     /**
+     * @param fileName file name for client
+     * @return this
+     */
+    ConfigHolder<C, S> setClientFileName(String fileName);
+
+    /**
+     * @param fileName file name for server
+     * @return this
+     */
+    ConfigHolder<C, S> setServerFileName(String fileName);
+
+    /**
      * @param callback callback for this client config
      */
     void addClientCallback(Runnable callback);

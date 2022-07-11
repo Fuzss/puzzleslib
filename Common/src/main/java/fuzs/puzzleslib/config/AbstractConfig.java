@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.config.annotation.AnnotatedConfigBuilder;
 import fuzs.puzzleslib.config.core.AbstractConfigBuilder;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ public abstract class AbstractConfig {
     /**
      * category name, if no category leave empty
      */
+    @Nullable
     private final String name;
     /**
      * category comment, only added when this is a category ({@link #name} is present)
@@ -33,7 +35,7 @@ public abstract class AbstractConfig {
     /**
      * @param name category name, the base category has no name
      */
-    public AbstractConfig(String name) {
+    public AbstractConfig(@Nullable String name) {
         this.name = name;
     }
 
@@ -84,8 +86,7 @@ public abstract class AbstractConfig {
      */
     public static void setupConfig(AbstractConfig config, AbstractConfigBuilder builder, ConfigHolder.ConfigCallback saveCallback) {
         final HashMap<List<String>, String[]> categoryComments = Maps.newHashMap(config.categoryComments);
-        final boolean withCategory = !StringUtils.isEmpty(config.name);
-        if (withCategory) {
+        if (!StringUtils.isEmpty(config.name)) {
             final String[] comment = categoryComments.remove(Lists.<String>newArrayList());
             if (comment != null && comment.length != 0) builder.comment(comment);
             builder.push(config.name);
@@ -94,7 +95,7 @@ public abstract class AbstractConfig {
         AnnotatedConfigBuilder.serialize(builder, saveCallback, categoryComments, config);
         // legacy method, kept for now for types unsupported by annotation system
         config.addToBuilder(builder, saveCallback);
-        if (withCategory) {
+        if (!StringUtils.isEmpty(config.name)) {
             builder.pop();
         }
     }
