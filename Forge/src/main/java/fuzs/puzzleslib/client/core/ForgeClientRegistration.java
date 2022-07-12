@@ -1,16 +1,25 @@
 package fuzs.puzzleslib.client.core;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,11 +39,44 @@ public class ForgeClientRegistration implements ClientRegistration {
      * collected factories for building {@link ClientTooltipComponent} from {@link TooltipComponent}
      */
     private final Map<Class<? extends TooltipComponent>, Function<TooltipComponent, ClientTooltipComponent>> clientTooltipComponents = Maps.newHashMap();
+    /**
+     * particle types registered via particle providers
+     */
+    private final List<Pair<ParticleType<?>, ParticleProvider<?>>> particleProviders = Lists.newArrayList();
+    /**
+     * particle types registered via sprite factories
+     */
+    private final List<Pair<ParticleType<?>, ModSpriteParticleRegistration<?>>> spriteParticleFactories = Lists.newArrayList();
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
         this.registerModEventBus();
         this.clientTooltipComponents.put(type, (Function<TooltipComponent, ClientTooltipComponent>) factory);
+    }
+
+    @Override
+    public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
+        this.registerModEventBus();
+        this.particleProviders.add(Pair.of(type, provider));
+    }
+
+    @Override
+    public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
+        this.registerModEventBus();
+        this.spriteParticleFactories.add(Pair.of(type, factory));
+    }
+
+    @SubscribeEvent
+    public void onRegisterClientTooltipComponentFactories(final RegisterClientTooltipComponentFactoriesEvent evt) {
+        this.clientTooltipComponents.forEach(evt::register);
+    }
+
+    @SuppressWarnings("unchecked")
+    @SubscribeEvent
+    public <T extends ParticleOptions> void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
+        this.particleProviders.forEach(pair -> evt.register((ParticleType<T>) pair.left(), (ParticleProvider<T>) pair.right()));
+        this.spriteParticleFactories.forEach(pair -> evt.register((ParticleType<T>) pair.left(), spriteSet -> (ParticleProvider<T>) pair.right().create(spriteSet)));
     }
 
     /**
@@ -46,10 +88,5 @@ public class ForgeClientRegistration implements ClientRegistration {
             FMLJavaModLoadingContext.get().getModEventBus().register(this);
             PuzzlesLib.LOGGER.info("Added listener to client registration of mod {}", ModLoadingContext.get().getActiveNamespace());
         }
-    }
-
-    @SubscribeEvent
-    public void onRegisterClientTooltipComponentFactories(final RegisterClientTooltipComponentFactoriesEvent evt) {
-        this.clientTooltipComponents.forEach(evt::register);
     }
 }

@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.8-1.19] - 2022-07-12
+### Added
+- Added a way for registering particle types
+### Changed
+- Renamed `Services` to `CoreServices`, old classes remain as overloads for now
+### Fixed
+- Fixed `RegistryManager` not returning the exact type it was provided
+
 ## [v4.0.7-1.19] - 2022-07-11
 ### Changed
 - Small code clean-ups

@@ -59,16 +59,17 @@ public class ForgeRegistryManager implements RegistryManager {
         return this.namespace;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> RegistryReference<T> register(ResourceKey<? extends Registry<T>> registryKey, String path, Supplier<T> supplier) {
+    public <T> RegistryReference<T> register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         DeferredRegister<?> register = DEFERRED_REGISTERS.computeIfAbsent(registryKey, key -> {
-            DeferredRegister<T> deferredRegister = DeferredRegister.create(registryKey, this.namespace);
+            DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.namespace);
             deferredRegister.register(this.modEventBus);
             return deferredRegister;
         });
         if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("Can't register object without name");
         RegistryObject<T> registryObject = ((DeferredRegister<T>) register).register(path, supplier);
-        return new ForgeRegistryReference<>(registryObject, registryKey);
+        return new ForgeRegistryReference<>(registryObject, (ResourceKey<? extends Registry<T>>) registryKey);
     }
 
     @SuppressWarnings("ConstantConditions")

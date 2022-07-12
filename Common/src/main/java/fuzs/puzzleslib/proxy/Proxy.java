@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.proxy;
 
+import fuzs.puzzleslib.core.CoreServices;
 import fuzs.puzzleslib.core.DistTypeExecutor;
-import fuzs.puzzleslib.core.Services;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.network.message.Message;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,7 +20,7 @@ public interface Proxy {
      * sided proxy depending on physical side
      */
     @SuppressWarnings("Convert2MethodRef")
-    Proxy INSTANCE = DistTypeExecutor.getForDistType(() -> Services.FACTORIES.clientProxy(), () -> Services.FACTORIES.serverProxy());
+    Proxy INSTANCE = DistTypeExecutor.getForDistType(() -> CoreServices.FACTORIES.clientProxy(), () -> CoreServices.FACTORIES.serverProxy());
 
     /**
      * @return client player from Minecraft singleton when on physical client, otherwise null

@@ -42,7 +42,7 @@ public class FabricRegistryManager implements RegistryManager {
     }
 
     @Override
-    public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<T>> registryKey, String path, Supplier<T> supplier) {
+    public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         T value = supplier.get();
         Registry<? super T> registry = (Registry<? super T>) Registry.REGISTRY.get(registryKey.location());
         Objects.requireNonNull(value, "Can't register null value");

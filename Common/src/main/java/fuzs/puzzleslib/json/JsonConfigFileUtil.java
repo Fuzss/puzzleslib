@@ -5,7 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import fuzs.puzzleslib.PuzzlesLib;
-import fuzs.puzzleslib.core.Services;
+import fuzs.puzzleslib.core.CoreServices;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
@@ -212,7 +212,7 @@ public class JsonConfigFileUtil {
      * @return file
      */
     public static File getConfigPath(String jsonName) {
-        return Services.ENVIRONMENT.getConfigDir().resolve(jsonName).toFile();
+        return CoreServices.ENVIRONMENT.getConfigDir().resolve(jsonName).toFile();
     }
 
     /**
@@ -222,6 +222,6 @@ public class JsonConfigFileUtil {
      * @return file
      */
     public static File getSpecialConfigPath(String jsonName, String modId) {
-        return Services.ENVIRONMENT.getConfigDir().resolve(modId).resolve(jsonName).toFile();
+        return CoreServices.ENVIRONMENT.getConfigDir().resolve(modId).resolve(jsonName).toFile();
     }
 }

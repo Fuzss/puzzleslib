@@ -31,9 +31,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * handles registering to forge registries
+ * handles registering to game registries
  * this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
- * originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
+ * originally based on RegistryHelper found in Vazkii's AutoRegLib mod
  */
 public interface RegistryManager {
     /**
@@ -66,7 +66,7 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> registry type
      */
-    <T> RegistryReference<T> register(final ResourceKey<? extends Registry<T>> registryKey, String path, Supplier<T> supplier);
+    <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 
     /**
      * register block entry with a path
