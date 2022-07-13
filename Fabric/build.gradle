@@ -237,7 +237,7 @@ curseforge {
         addArtifact sourcesJar
     }
     options {
-        debug = true
+//        debug = true
         javaVersionAutoDetect = false
         forgeGradleIntegration = false
     }
@@ -250,7 +250,7 @@ modrinth {
     token = project.hasProperty('modrinthApiToken') ? project.findProperty('modrinthApiToken') : ''
     projectId = projectModrinthId
     versionNumber = project.version
-    versionName = "${rootProject.name}-v${modVersion}"
+    versionName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
     changelog = file('../CHANGELOG.md').text
     versionType = projectReleaseType
     uploadFile = remapJar // This is the java jar task
@@ -263,7 +263,7 @@ modrinth {
         required.project 'fabric-api'
         required.project 'forge-config-api-port'
     }
-    debugMode = true
+//    debugMode = true
 }
 
 import groovy.json.*
