@@ -5,9 +5,9 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import fuzs.puzzleslib.registry.RegistryReference;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -42,11 +42,11 @@ public class ForgeClientRegistration implements ClientRegistration {
     /**
      * particle types registered via particle providers
      */
-    private final List<Pair<ParticleType<?>, ParticleProvider<?>>> particleProviders = Lists.newArrayList();
+    private final List<Pair<RegistryReference<? extends ParticleType<? extends ParticleOptions>>, ParticleProvider<?>>> particleProviders = Lists.newArrayList();
     /**
      * particle types registered via sprite factories
      */
-    private final List<Pair<ParticleType<?>, ModSpriteParticleRegistration<?>>> spriteParticleFactories = Lists.newArrayList();
+    private final List<Pair<RegistryReference<? extends ParticleType<? extends ParticleOptions>>, ModSpriteParticleRegistration<?>>> spriteParticleFactories = Lists.newArrayList();
 
     @SuppressWarnings("unchecked")
     @Override
@@ -56,13 +56,13 @@ public class ForgeClientRegistration implements ClientRegistration {
     }
 
     @Override
-    public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
+    public <T extends ParticleOptions> void registerParticleProvider(RegistryReference<? extends ParticleType<T>> type, ParticleProvider<T> provider) {
         this.registerModEventBus();
         this.particleProviders.add(Pair.of(type, provider));
     }
 
     @Override
-    public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
+    public <T extends ParticleOptions> void registerParticleProvider(RegistryReference<? extends ParticleType<T>> type, ModSpriteParticleRegistration<T> factory) {
         this.registerModEventBus();
         this.spriteParticleFactories.add(Pair.of(type, factory));
     }
@@ -74,9 +74,9 @@ public class ForgeClientRegistration implements ClientRegistration {
 
     @SuppressWarnings("unchecked")
     @SubscribeEvent
-    public <T extends ParticleOptions> void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
-        this.particleProviders.forEach(pair -> evt.register((ParticleType<T>) pair.left(), (ParticleProvider<T>) pair.right()));
-        this.spriteParticleFactories.forEach(pair -> evt.register((ParticleType<T>) pair.left(), spriteSet -> (ParticleProvider<T>) pair.right().create(spriteSet)));
+    public void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
+        this.particleProviders.forEach(pair -> evt.register((ParticleType<ParticleOptions>) pair.left().get(), (ParticleProvider<ParticleOptions>) pair.right()));
+        this.spriteParticleFactories.forEach(pair -> evt.register((ParticleType<ParticleOptions>) pair.left().get(), spriteSet -> (ParticleProvider<ParticleOptions>) pair.right().create(spriteSet)));
     }
 
     /**

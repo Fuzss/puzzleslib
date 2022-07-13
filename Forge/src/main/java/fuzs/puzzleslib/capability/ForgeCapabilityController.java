@@ -92,8 +92,8 @@ public class ForgeCapabilityController {
         evt.getOriginal().reviveCaps();
         for (CapabilityData<?> data : this.typeToData.get(Entity.class)) {
             evt.getOriginal().getCapability(data.capability()).ifPresent(oldCapability -> {
-                evt.getPlayer().getCapability(data.capability()).ifPresent(newCapability -> {
-                    ((PlayerCapabilityData<?>) data).respawnStrategy().copy(oldCapability, newCapability, !evt.isWasDeath(), evt.getPlayer().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY));
+                evt.getEntity().getCapability(data.capability()).ifPresent(newCapability -> {
+                    ((PlayerCapabilityData<?>) data).respawnStrategy().copy(oldCapability, newCapability, !evt.isWasDeath(), evt.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY));
                 });
             });
         }

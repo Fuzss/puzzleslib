@@ -214,6 +214,7 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> entity type type
      */
+    @SuppressWarnings("unchecked")
     default <T extends Entity> RegistryReference<EntityType<T>> registerEntityType(String path, Supplier<EntityType<T>> entry) {
         return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registry.ENTITY_TYPE_REGISTRY, path, entry);
     }
@@ -236,6 +237,7 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> block entity type
      */
+    @SuppressWarnings("unchecked")
     default <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType<T>> entry) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registry.BLOCK_ENTITY_TYPE_REGISTRY, path, entry);
     }
@@ -256,6 +258,7 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      * @param <T> container menu type
      */
+    @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registry.MENU_REGISTRY, path, entry);
     }

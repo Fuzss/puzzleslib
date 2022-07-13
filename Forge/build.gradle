@@ -111,10 +111,10 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-//    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3822882")
-//    runtimeOnly fg.deobf("curse.maven:bettermodsbutton-541584:3516115")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3873264")
+    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:4.0.1")
 //    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
-//    runtimeOnly fg.deobf("curse.maven:configured-457570:3822820")
+    runtimeOnly fg.deobf("curse.maven:configured-457570:3872190")
 
     // Puzzles Lib
 //    implementation fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
@@ -250,7 +250,7 @@ publishing {
     repositories {
         maven {
             name = 'FuzsModResources'
-            url "file://${project.modResources}/maven"
+            url "file://" + project.hasProperty('modResources') ? "${project.findProperty('modResources')}/maven" : System.getenv('local_maven')
         }
     }
 }
@@ -271,45 +271,55 @@ task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar, dependsOn: ja
 jar.finalizedBy 'signJar'
 signJar.mustRunAfter 'reobfJar'
 
-curseforge {
-    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
-    apiKey = project.findProperty('curseApiToken')
-    project {
-        id = projectCurseId
-        changelogType = 'markdown'
-        changelog = file('../CHANGELOG.md')
-        releaseType = projectReleaseType
-        addGameVersion 'Forge'
-        projectGameVersions.split(",").each {
-            addGameVersion it.trim()
+tasks.curseforge {
+    onlyIf { project.hasProperty('curseApiToken') }
+    doLast {
+        if (!file('../CHANGELOG.md').canRead()) {
+            throw new FileNotFoundException("Could not read changelog file")
         }
-        mainArtifact(jar) {
-            displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+        apiKey = project.findProperty('curseApiToken')
+        project {
+            id = projectCurseId
+            changelogType = 'markdown'
+            changelog = file('../CHANGELOG.md')
+            releaseType = projectReleaseType
+            addGameVersion 'Forge'
+            projectGameVersions.split(",").each {
+                addGameVersion it.trim()
+            }
+            mainArtifact(jar) {
+                displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+            }
+            addArtifact sourcesJar
         }
-        addArtifact sourcesJar
-    }
-    options {
-//        debug = true
-        javaVersionAutoDetect = false
-        forgeGradleIntegration = false
+        options {
+//            debug = true
+            javaVersionAutoDetect = false
+            forgeGradleIntegration = false
+        }
     }
 }
 
-modrinth {
-    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
-    token = project.findProperty('modrinthApiToken')
-    projectId = projectModrinthId
-    versionNumber = project.version
-    versionName = "${rootProject.name}-v${modVersion}"
-    changelog = file('../CHANGELOG.md').text
-    versionType = projectReleaseType
-    uploadFile = jar // This is the java jar task
-    projectGameVersions.split(",").each {
-        gameVersions.add it.trim()
+tasks.modrinth {
+    onlyIf { project.hasProperty('modrinthApiToken') }
+    doLast {
+        if (!file('../CHANGELOG.md').canRead()) {
+            throw new FileNotFoundException("Could not read changelog file")
+        }
+        token = project.findProperty('modrinthApiToken')
+        projectId = projectModrinthId
+        versionNumber = project.version
+        versionName = "${rootProject.name}-v${modVersion}"
+        changelog = file('../CHANGELOG.md').text
+        versionType = projectReleaseType
+        uploadFile = jar // This is the java jar task
+        projectGameVersions.split(",").each {
+            gameVersions.add it.trim()
+        }
+        loaders.add 'forge'
+        additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
+//        debugMode = true
     }
-    loaders.add 'forge'
-    additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
-//	debugMode = true
 }
 
 import groovy.json.*

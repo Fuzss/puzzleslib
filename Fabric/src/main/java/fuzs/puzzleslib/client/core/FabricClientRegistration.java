@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import fuzs.puzzleslib.registry.RegistryReference;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -26,12 +27,12 @@ public class FabricClientRegistration implements ClientRegistration {
     }
 
     @Override
-    public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
-        ParticleFactoryRegistry.getInstance().register(type, provider);
+    public <T extends ParticleOptions> void registerParticleProvider(RegistryReference<? extends ParticleType<T>> type, ParticleProvider<T> provider) {
+        ParticleFactoryRegistry.getInstance().register(type.get(), provider);
     }
 
     @Override
-    public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
-        ParticleFactoryRegistry.getInstance().register(type, factory::create);
+    public <T extends ParticleOptions> void registerParticleProvider(RegistryReference<? extends ParticleType<T>> type, ModSpriteParticleRegistration<T> factory) {
+        ParticleFactoryRegistry.getInstance().register(type.get(), factory::create);
     }
 }

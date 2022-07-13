@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import fuzs.puzzleslib.registry.RegistryReference;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.ParticleOptions;
@@ -28,7 +29,7 @@ public interface ClientRegistration {
      * @param provider particle factory
      * @param <T>      type of particle
      */
-    <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider);
+    <T extends ParticleOptions> void registerParticleProvider(RegistryReference<? extends ParticleType<T>> type, ParticleProvider<T> provider);
 
     /**
      * registers a factory for a particle type client side
@@ -36,5 +37,5 @@ public interface ClientRegistration {
      * @param factory particle factory
      * @param <T>      type of particle
      */
-    <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ModSpriteParticleRegistration<T> factory);
+    <T extends ParticleOptions> void registerParticleProvider(RegistryReference<? extends ParticleType<T>> type, ModSpriteParticleRegistration<T> factory);
 }
