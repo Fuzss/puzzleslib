@@ -213,63 +213,57 @@ signing {
     sign publishing.publications.mavenJava
 }
 
-tasks.curseforge {
-    onlyIf { project.hasProperty('curseApiToken') }
-    doLast {
-        if (!file('../CHANGELOG.md').canRead()) {
-            throw new FileNotFoundException("Could not read changelog file")
+curseforge {
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
+    }
+    apiKey = project.hasProperty('curseApiToken') ? project.findProperty('curseApiToken') : ''
+    project {
+        id = projectCurseId
+        changelogType = 'markdown'
+        changelog = file('../CHANGELOG.md')
+        releaseType = projectReleaseType
+        addGameVersion 'Fabric'
+        projectGameVersions.split(",").each {
+            addGameVersion it.trim()
         }
-        apiKey = project.findProperty('curseApiToken')
-        project {
-            id = projectCurseId
-            changelogType = 'markdown'
-            changelog = file('../CHANGELOG.md')
-            releaseType = projectReleaseType
-            addGameVersion 'Fabric'
-            projectGameVersions.split(",").each {
-                addGameVersion it.trim()
+        mainArtifact(remapJar) {
+            displayName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+            relations {
+                requiredDependency 'fabric-api'
+                requiredDependency 'forge-config-api-port-fabric'
             }
-            mainArtifact(remapJar) {
-                displayName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
-                relations {
-                    requiredDependency 'fabric-api'
-                    requiredDependency 'forge-config-api-port-fabric'
-                }
-            }
-            addArtifact sourcesJar
         }
-        options {
-//            debug = true
-            javaVersionAutoDetect = false
-            forgeGradleIntegration = false
-        }
+        addArtifact sourcesJar
+    }
+    options {
+        debug = true
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
     }
 }
 
-tasks.modrinth {
-    onlyIf { project.hasProperty('modrinthApiToken') }
-    doLast {
-        if (!file('../CHANGELOG.md').canRead()) {
-            throw new FileNotFoundException("Could not read changelog file")
-        }
-        token = project.findProperty('modrinthApiToken')
-        projectId = projectModrinthId
-        versionNumber = project.version
-        versionName = "${rootProject.name}-v${modVersion}"
-        changelog = file('../CHANGELOG.md').text
-        versionType = projectReleaseType
-        uploadFile = remapJar // This is the java jar task
-        projectGameVersions.split(",").each {
-            gameVersions.add it.trim()
-        }
-        loaders.add 'fabric'
-        additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
-        dependencies {
-            required.project 'fabric-api'
-            required.project 'forge-config-api-port'
-        }
-//        debugMode = true
+modrinth {
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
     }
+    token = project.hasProperty('modrinthApiToken') ? project.findProperty('modrinthApiToken') : ''
+    projectId = projectModrinthId
+    versionNumber = project.version
+    versionName = "${rootProject.name}-v${modVersion}"
+    changelog = file('../CHANGELOG.md').text
+    versionType = projectReleaseType
+    uploadFile = remapJar // This is the java jar task
+    projectGameVersions.split(",").each {
+        gameVersions.add it.trim()
+    }
+    loaders.add 'fabric'
+    additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
+    dependencies {
+        required.project 'fabric-api'
+        required.project 'forge-config-api-port'
+    }
+    debugMode = true
 }
 
 import groovy.json.*

@@ -271,55 +271,49 @@ task signJar(type: net.minecraftforge.gradle.common.tasks.SignJar, dependsOn: ja
 jar.finalizedBy 'signJar'
 signJar.mustRunAfter 'reobfJar'
 
-tasks.curseforge {
-    onlyIf { project.hasProperty('curseApiToken') }
-    doLast {
-        if (!file('../CHANGELOG.md').canRead()) {
-            throw new FileNotFoundException("Could not read changelog file")
+curseforge {
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
+    }
+    apiKey = project.hasProperty('curseApiToken') ? project.findProperty('curseApiToken') : ''
+    project {
+        id = projectCurseId
+        changelogType = 'markdown'
+        changelog = file('../CHANGELOG.md')
+        releaseType = projectReleaseType
+        addGameVersion 'Forge'
+        projectGameVersions.split(",").each {
+            addGameVersion it.trim()
         }
-        apiKey = project.findProperty('curseApiToken')
-        project {
-            id = projectCurseId
-            changelogType = 'markdown'
-            changelog = file('../CHANGELOG.md')
-            releaseType = projectReleaseType
-            addGameVersion 'Forge'
-            projectGameVersions.split(",").each {
-                addGameVersion it.trim()
-            }
-            mainArtifact(jar) {
-                displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
-            }
-            addArtifact sourcesJar
+        mainArtifact(jar) {
+            displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
         }
-        options {
-//            debug = true
-            javaVersionAutoDetect = false
-            forgeGradleIntegration = false
-        }
+        addArtifact sourcesJar
+    }
+    options {
+        debug = true
+        javaVersionAutoDetect = false
+        forgeGradleIntegration = false
     }
 }
 
-tasks.modrinth {
-    onlyIf { project.hasProperty('modrinthApiToken') }
-    doLast {
-        if (!file('../CHANGELOG.md').canRead()) {
-            throw new FileNotFoundException("Could not read changelog file")
-        }
-        token = project.findProperty('modrinthApiToken')
-        projectId = projectModrinthId
-        versionNumber = project.version
-        versionName = "${rootProject.name}-v${modVersion}"
-        changelog = file('../CHANGELOG.md').text
-        versionType = projectReleaseType
-        uploadFile = jar // This is the java jar task
-        projectGameVersions.split(",").each {
-            gameVersions.add it.trim()
-        }
-        loaders.add 'forge'
-        additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
-//        debugMode = true
+modrinth {
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
     }
+    token = project.hasProperty('modrinthApiToken') ? project.findProperty('modrinthApiToken') : ''
+    projectId = projectModrinthId
+    versionNumber = project.version
+    versionName = "${rootProject.name}-v${modVersion}"
+    changelog = file('../CHANGELOG.md').text
+    versionType = projectReleaseType
+    uploadFile = jar // This is the java jar task
+    projectGameVersions.split(",").each {
+        gameVersions.add it.trim()
+    }
+    loaders.add 'forge'
+    additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
+    debugMode = true
 }
 
 import groovy.json.*
