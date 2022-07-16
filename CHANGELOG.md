@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.9-1.19] - 2022-07-14
+### Added
+- Added many new helper methods for registering content, mostly client side
+### Changed
+- Converted `FuelManager` to no longer use a Service Provider Interface
+### Fixed
+- Fixed possible start-up crash on Forge due to methods in mixin classes not being properly obfuscated
+
 ## [v4.0.8-1.19] - 2022-07-13
 - Fully compatible with Forge 41.0.98+ which is also now required
 ### Added

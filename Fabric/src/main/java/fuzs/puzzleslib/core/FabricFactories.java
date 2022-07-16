@@ -19,6 +19,11 @@ import java.util.function.Supplier;
 public class FabricFactories implements CommonFactories {
 
     @Override
+    public void construct(Supplier<ModConstructor> constructor) {
+        FabricRegistrationV2.construct(constructor.get());
+    }
+
+    @Override
     public NetworkHandler network(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         return FabricNetworkHandler.of(modId);
     }

@@ -19,6 +19,11 @@ import java.util.function.Supplier;
 public class ForgeFactories implements CommonFactories {
 
     @Override
+    public void construct(Supplier<ModConstructor> constructor) {
+        ForgeRegistrationV2.construct(constructor.get());
+    }
+
+    @Override
     public NetworkHandler network(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         return ForgeNetworkHandler.of(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }

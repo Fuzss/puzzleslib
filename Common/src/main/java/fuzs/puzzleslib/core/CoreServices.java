@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.registry.FuelManager;
-
 import java.util.ServiceLoader;
 
 /**
@@ -17,9 +15,10 @@ public class CoreServices {
      */
     public static final CommonFactories FACTORIES = load(CommonFactories.class);
     /**
-     * register for furnace fuel items, might be included in another service in the future
+     * for registering common content that doesn't use a {@link net.minecraft.core.Registry}
      */
-    public static final FuelManager FUEL_MANAGER = load(FuelManager.class);
+    @Deprecated(forRemoval = true)
+    public static final CommonRegistration REGISTRATION = load(CommonRegistration.class);
 
     /**
      * loads a service yay

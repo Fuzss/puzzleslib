@@ -123,15 +123,15 @@ dependencies {
 //    implementation fg.deobf("curse.maven:puzzles-lib:<file-id>")
 }
 
-if (project.file("src/main/resources/${modId}.forge.mixins.json").exists() || project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
-    mixin {
+mixin {
+    if (project.file("src/main/resources/${modId}.forge.mixins.json").exists() || project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
         add project(":Common").sourceSets.main, "${modId}.refmap.json"
-        if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
-            config "${modId}.common.mixins.json"
-        }
-        if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
-            config "${modId}.forge.mixins.json"
-        }
+    }
+    if (project(":Common").file("src/main/resources/${modId}.common.mixins.json").exists()) {
+        config "${modId}.common.mixins.json"
+    }
+    if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
+        config "${modId}.forge.mixins.json"
     }
 }
 

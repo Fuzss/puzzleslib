@@ -37,6 +37,18 @@ public class CapabilityController {
 
     /**
      * creates a placeholder key which will update itself when used for the first time
+     * @param modId          mod namespace
+     * @param keyId          capability key id
+     * @param componentClass capability type
+     * @param <T> capability type
+     * @return the placeholder key
+     */
+    public static <T> CapabilityKey<T> makeCapabilityKey(String modId, String keyId, Class<T> componentClass) {
+        return makeCapabilityKey(new ResourceLocation(modId, keyId), componentClass);
+    }
+
+    /**
+     * creates a placeholder key which will update itself when used for the first time
      * @param id capability id
      * @param componentClass capability type
      * @param <T> capability type
@@ -68,6 +80,7 @@ public class CapabilityController {
                 return this.holder.maybeGet(provider);
             }
 
+            @SuppressWarnings("unchecked")
             private void validateHolder() {
                 if (this.holder == null) {
                     if (CAPABILITY_KEY_REGISTRY.containsKey(id)) {

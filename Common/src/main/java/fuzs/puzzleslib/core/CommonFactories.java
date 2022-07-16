@@ -13,6 +13,8 @@ import java.util.function.Supplier;
  */
 public interface CommonFactories {
 
+    void construct(Supplier<ModConstructor> constructor);
+
     /**
      * creates a new network handler
      * @param modId id for channel name
