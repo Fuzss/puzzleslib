@@ -14,11 +14,6 @@ public class CoreServices {
      * important factories, mainly for networking, registering content and configs
      */
     public static final CommonFactories FACTORIES = load(CommonFactories.class);
-    /**
-     * for registering common content that doesn't use a {@link net.minecraft.core.Registry}
-     */
-    @Deprecated(forRemoval = true)
-    public static final CommonRegistration REGISTRATION = load(CommonRegistration.class);
 
     /**
      * loads a service yay

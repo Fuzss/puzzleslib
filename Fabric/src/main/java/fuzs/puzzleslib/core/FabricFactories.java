@@ -20,7 +20,7 @@ public class FabricFactories implements CommonFactories {
 
     @Override
     public void construct(Supplier<ModConstructor> constructor) {
-        FabricRegistrationV2.construct(constructor.get());
+        FabricRegistration.construct(constructor.get());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public RegistryManager registry(String namespace) {
+    public RegistryManager registration(String namespace) {
         return FabricRegistryManager.of(namespace);
     }
 }

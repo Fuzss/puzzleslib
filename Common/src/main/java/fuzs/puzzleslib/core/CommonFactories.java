@@ -13,6 +13,10 @@ import java.util.function.Supplier;
  */
 public interface CommonFactories {
 
+    /**
+     * loads a mod, being provided its base class
+     * @param constructor base class for constructing this mod
+     */
     void construct(Supplier<ModConstructor> constructor);
 
     /**
@@ -71,5 +75,15 @@ public interface CommonFactories {
      * @param namespace namespace used for registration
      * @return new mod specific registry manager
      */
-    RegistryManager registry(String namespace);
+    RegistryManager registration(String namespace);
+
+    /**
+     * @param namespace namespace used for registration
+     * @return new mod specific registry manager
+     * @deprecated use {@link #registration} instead
+     */
+    @Deprecated(forRemoval = true)
+    default RegistryManager registry(String namespace) {
+        return this.registration(namespace);
+    }
 }

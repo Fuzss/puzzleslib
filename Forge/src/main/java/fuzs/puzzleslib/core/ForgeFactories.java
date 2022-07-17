@@ -20,7 +20,7 @@ public class ForgeFactories implements CommonFactories {
 
     @Override
     public void construct(Supplier<ModConstructor> constructor) {
-        ForgeRegistrationV2.construct(constructor.get());
+        ForgeRegistration.construct(constructor.get());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public RegistryManager registry(String namespace) {
+    public RegistryManager registration(String namespace) {
         return ForgeRegistryManager.of(namespace);
     }
 }
