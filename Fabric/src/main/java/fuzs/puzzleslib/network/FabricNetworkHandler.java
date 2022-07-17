@@ -8,6 +8,7 @@ import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -62,7 +63,7 @@ public class FabricNetworkHandler implements NetworkHandler {
     public <T extends Message> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction) {
         ResourceLocation channelName = this.nextIdentifier();
         this.messageRegistry.put(clazz, channelName);
-        final Function<FriendlyByteBuf, Message> decode = buf -> PuzzlesUtil.make(supplier.get(), message -> message.read(buf));
+        final Function<FriendlyByteBuf, Message> decode = buf -> Util.make(supplier.get(), message -> message.read(buf));
         switch (direction) {
             case TO_CLIENT -> Proxy.INSTANCE.registerClientReceiver(channelName, decode);
             case TO_SERVER -> Proxy.INSTANCE.registerServerReceiver(channelName, decode);

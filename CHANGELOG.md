@@ -3,11 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.0.9-1.19] - 2022-07-14
+## [v4.0.9-1.19] - 2022-07-17
 ### Added
-- Added many new helper methods for registering content, mostly client side
+- Added mod base interfaces for common and client with many new helper methods for registering content
+- Added helper class for client factory methods
 ### Changed
-- Converted `FuelManager` to no longer use a Service Provider Interface
+- Converted `FuelManager` and `Screens` to no longer use a Service Provider Interface
 ### Fixed
 - Fixed possible start-up crash on Forge due to methods in mixin classes not being properly obfuscated
 

@@ -17,6 +17,17 @@ import java.util.Objects;
  * on Fabric adding is done via custom ButtonList
  */
 public class ForgeScreens implements Screens {
+    /**
+     * singleton instance
+     */
+    public static final Screens INSTANCE = new ForgeScreens();
+
+    /**
+     * singleton class
+     */
+    private ForgeScreens() {
+
+    }
     
     /**
      * @param screen screen instance

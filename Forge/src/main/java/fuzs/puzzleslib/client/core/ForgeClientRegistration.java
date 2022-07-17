@@ -2,9 +2,9 @@ package fuzs.puzzleslib.client.core;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
-import fuzs.puzzleslib.core.ContainsModEvents;
 import fuzs.puzzleslib.registry.RegistryReference;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
@@ -31,6 +31,8 @@ import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Collections;
 import java.util.Map;
@@ -45,8 +47,11 @@ import java.util.function.Supplier;
  *
  * this could probably also be done the other way around by implementing registry methods every time they are to be used and having consumers in those for registering content
  * it would circumvent having to store everything in some collection as is done here, but I had trouble with generics once again, so I skipped that idea haha
+ *
+ * @deprecated use {@link ClientModConstructor} instead for implementing everything directly on the main mod client class
  */
-public class ForgeClientRegistration implements ClientRegistration, ContainsModEvents {
+@Deprecated
+public class ForgeClientRegistration implements ClientRegistration {
     /**
      * all the mod event buses this instance has been registered to,
      * it is important to not register more than once as the events will also run every time, resulting in duplicate content
@@ -162,8 +167,14 @@ public class ForgeClientRegistration implements ClientRegistration, ContainsModE
         this.layerDefinitions.forEach(evt::registerLayerDefinition);
     }
 
-    @Override
-    public Set<IEventBus> getModEventBuses() {
-        return this.modEventBuses;
+    /**
+     * register this singleton instance to the provided mod event bus in case we haven't done so yet
+     * call this in every base method inherited from {@link ClientRegistration}
+     */
+    private void registerModEventBus() {
+        if (this.modEventBuses.add(FMLJavaModLoadingContext.get().getModEventBus())) {
+            FMLJavaModLoadingContext.get().getModEventBus().register(this);
+            PuzzlesLib.LOGGER.info("Added listener to client registration of mod {}", ModLoadingContext.get().getActiveNamespace());
+        }
     }
 }

@@ -27,7 +27,10 @@ import java.util.function.Supplier;
 
 /**
  * a collection of utility methods for registering client side content
+ *
+ * @deprecated use {@link ClientModConstructor} instead for implementing everything directly on the main mod client class
  */
+@Deprecated
 public interface ClientRegistration {
 
     /**

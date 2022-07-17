@@ -37,7 +37,10 @@ import java.util.function.Supplier;
 /**
  * Fabric implementation of {@link ClientRegistration}
  * everything is handled directly, as Fabric has no loading stages
+ *
+ * @deprecated use {@link ClientModConstructor} instead for implementing everything directly on the main mod client class
  */
+@Deprecated
 public class FabricClientRegistration implements ClientRegistration {
 
     @Override

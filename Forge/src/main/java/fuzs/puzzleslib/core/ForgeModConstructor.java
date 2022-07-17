@@ -6,6 +6,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
@@ -16,8 +18,11 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
  * wrapper class for {@link ModConstructor} for calling all required registration methods at the correct time
+ * most things need events for registering
+ *
+ * we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  */
-public class ForgeRegistration {
+public class ForgeModConstructor {
     /**
      * mod base class
      */
@@ -32,7 +37,7 @@ public class ForgeRegistration {
      *
      * @param constructor mod base class
      */
-    private ForgeRegistration(ModConstructor constructor) {
+    private ForgeModConstructor(ModConstructor constructor) {
         this.constructor = constructor;
         constructor.onConstructMod();
     }
@@ -54,10 +59,22 @@ public class ForgeRegistration {
         this.constructor.onEntityAttributeModification(evt::add);
     }
 
+    /**
+     * helper method for registering fuel item burn time
+     *
+     * @param item     the item
+     * @param burnTime burn time in ticks
+     */
     private void registerFuelItem(Item item, int burnTime) {
         if (burnTime > 0 && item != null) this.fuelBurnTimes.put(item, burnTime);
     }
 
+    /**
+     * event for setting burn time, Forge wants this to be implemented on the item using {@link net.minecraftforge.common.extensions.IForgeItem#getBurnTime},
+     * but this isn't very nice for instances of {@link net.minecraft.world.item.BlockItem}, so we do this installed
+     *
+     * @param evt the Forge event
+     */
     private void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
         Item item = evt.getItemStack().getItem();
         if (this.fuelBurnTimes.containsKey(item)) {
@@ -72,10 +89,10 @@ public class ForgeRegistration {
      * @param constructor mod base class
      */
     public static void construct(ModConstructor constructor) {
-        ForgeRegistration registrar = new ForgeRegistration(constructor);
-        FMLJavaModLoadingContext.get().getModEventBus().register(registrar);
+        ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
+        FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
-        MinecraftForge.EVENT_BUS.addListener(registrar::onFurnaceFuelBurnTime);
+        MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
     }
 }

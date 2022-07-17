@@ -18,6 +18,17 @@ import java.util.Objects;
  * on Fabric adding is done via custom ButtonList
  */
 public class FabricScreens implements Screens {
+    /**
+     * singleton instance
+     */
+    public static final Screens INSTANCE = new FabricScreens();
+
+    /**
+     * singleton class
+     */
+    private FabricScreens() {
+
+    }
 
     /**
      * @param screen screen instance

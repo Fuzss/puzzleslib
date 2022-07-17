@@ -6,12 +6,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ambient.Bat;
-import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -21,7 +17,7 @@ import net.minecraft.world.level.levelgen.Heightmap;
 public interface ModConstructor {
 
     /**
-     * runs when the mod is first constructed, mainly used for registering game content and configs
+     * runs when the mod is first constructed, mainly used for registering game content, configs, network packages, and event callbacks
      */
     default void onConstructMod() {
 
@@ -41,7 +37,7 @@ public interface ModConstructor {
      * @param consumer add to spawn placement register
      */
     default void onRegisterSpawnPlacements(SpawnPlacementConsumer consumer) {
-        consumer.register(EntityType.SKELETON, SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules);
+
     }
 
     /**
@@ -51,7 +47,7 @@ public interface ModConstructor {
      * @param consumer add to entity attribute map
      */
     default void onEntityAttributeCreation(EntityAttributeCreationConsumer consumer) {
-        consumer.register(EntityType.BAT, Bat.createMobAttributes());
+
     }
 
     /**
@@ -60,7 +56,7 @@ public interface ModConstructor {
      * @param consumer replace/add attribute to entity attribute map
      */
     default void onEntityAttributeModification(EntityAttributeModificationConsumer consumer) {
-        consumer.register(EntityType.ALLAY, Attributes.ATTACK_DAMAGE, 10.0);
+
     }
 
     /**
@@ -69,7 +65,7 @@ public interface ModConstructor {
      * @param consumer add fuel burn time for items/blocks
      */
     default void onRegisterFuelBurnTimes(FuelBurnTimeConsumer consumer) {
-        consumer.registerBlock(Blocks.BONE_BLOCK, 300);
+
     }
 
     /**
@@ -106,7 +102,7 @@ public interface ModConstructor {
     }
 
     /**
-     * registers modifications to attributes of already existing attributes
+     * registers modifications to attributes of already existing entities (not from our mod)
      */
     @FunctionalInterface
     interface EntityAttributeModificationConsumer {
@@ -141,14 +137,18 @@ public interface ModConstructor {
     interface FuelBurnTimeConsumer {
 
         /**
+         * base method, registers a fuel item
+         *
          * @param item item to add
-         * @param burnTime burn time
+         * @param burnTime burn time in ticks
          */
         void registerItem(Item item, int burnTime);
 
         /**
+         * overload method for blocks
+         *
          * @param block block to add
-         * @param burnTime burn time
+         * @param burnTime burn time in ticks
          */
         default void registerBlock(Block block, int burnTime) {
             this.registerItem(block.asItem(), burnTime);
@@ -156,7 +156,8 @@ public interface ModConstructor {
 
         /**
          * add wooden block with default vanilla times
-         * @param block block to add
+         *
+         * @param block block to add with burn time of 300 ticks
          */
         default void registerWoodenBlock(Block block) {
             this.registerBlock(block, block instanceof SlabBlock ? 150 : 300);

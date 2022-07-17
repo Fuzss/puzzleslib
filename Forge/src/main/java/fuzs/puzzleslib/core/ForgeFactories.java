@@ -11,6 +11,7 @@ import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.registry.ForgeRegistryManager;
 import fuzs.puzzleslib.registry.RegistryManager;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -19,8 +20,8 @@ import java.util.function.Supplier;
 public class ForgeFactories implements CommonFactories {
 
     @Override
-    public void construct(Supplier<ModConstructor> constructor) {
-        ForgeRegistration.construct(constructor.get());
+    public Consumer<ModConstructor> modConstructor() {
+        return ForgeModConstructor::construct;
     }
 
     @Override
@@ -28,11 +29,13 @@ public class ForgeFactories implements CommonFactories {
         return ForgeNetworkHandler.of(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
+    @SuppressWarnings("Convert2MethodRef")
     @Override
     public Supplier<Proxy> clientProxy() {
         return () -> new ForgeClientProxy();
     }
 
+    @SuppressWarnings("Convert2MethodRef")
     @Override
     public Supplier<Proxy> serverProxy() {
         return () -> new ForgeServerProxy();
@@ -54,7 +57,7 @@ public class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public RegistryManager registration(String namespace) {
-        return ForgeRegistryManager.of(namespace);
+    public RegistryManager registration(String modId) {
+        return ForgeRegistryManager.of(modId);
     }
 }

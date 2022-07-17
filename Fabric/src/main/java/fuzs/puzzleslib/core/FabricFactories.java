@@ -11,6 +11,7 @@ import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.registry.FabricRegistryManager;
 import fuzs.puzzleslib.registry.RegistryManager;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -19,8 +20,8 @@ import java.util.function.Supplier;
 public class FabricFactories implements CommonFactories {
 
     @Override
-    public void construct(Supplier<ModConstructor> constructor) {
-        FabricRegistration.construct(constructor.get());
+    public Consumer<ModConstructor> modConstructor() {
+        return FabricModConstructor::construct;
     }
 
     @Override
@@ -28,11 +29,13 @@ public class FabricFactories implements CommonFactories {
         return FabricNetworkHandler.of(modId);
     }
 
+    @SuppressWarnings("Convert2MethodRef")
     @Override
     public Supplier<Proxy> clientProxy() {
         return () -> new FabricClientProxy();
     }
 
+    @SuppressWarnings("Convert2MethodRef")
     @Override
     public Supplier<Proxy> serverProxy() {
         return () -> new FabricServerProxy();
@@ -54,7 +57,7 @@ public class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public RegistryManager registration(String namespace) {
-        return FabricRegistryManager.of(namespace);
+    public RegistryManager registration(String modId) {
+        return FabricRegistryManager.of(modId);
     }
 }

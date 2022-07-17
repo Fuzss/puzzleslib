@@ -6,21 +6,25 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.registry.RegistryManager;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
- * all sorts of instance factories that need to be created on a per mod basis
+ * all sorts of instance factories that need to be created on a per-mod basis
  */
 public interface CommonFactories {
 
     /**
-     * loads a mod, being provided its base class
-     * @param constructor base class for constructing this mod
+     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
+     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     *
+     * @return  provides a consumer for loading a mod being provided the base class
      */
-    void construct(Supplier<ModConstructor> constructor);
+    Consumer<ModConstructor> modConstructor();
 
     /**
      * creates a new network handler
+     *
      * @param modId id for channel name
      * @return mod specific network handler with default channel
      */
@@ -30,6 +34,7 @@ public interface CommonFactories {
 
     /**
      * creates a new network handler
+     *
      * @param modId id for channel name
      * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
@@ -38,13 +43,21 @@ public interface CommonFactories {
     NetworkHandler network(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
 
     /**
+     * internal factory for client proxy, use {@link Proxy#INSTANCE}
+     *
      * @return provides the client proxy supplier
      */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
     Supplier<Proxy> clientProxy();
 
     /**
+     * internal factory for server proxy, use {@link Proxy#INSTANCE}
+     *
      * @return provides the server proxy supplier
      */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
     Supplier<Proxy> serverProxy();
 
     /**
@@ -72,18 +85,20 @@ public interface CommonFactories {
 
     /**
      * creates a new registry manager for <code>namespace</code> or returns an existing one
-     * @param namespace namespace used for registration
+     *
+     * @param modId namespace used for registration
      * @return new mod specific registry manager
      */
-    RegistryManager registration(String namespace);
+    RegistryManager registration(String modId);
 
     /**
-     * @param namespace namespace used for registration
+     * @param modId namespace used for registration
      * @return new mod specific registry manager
+     *
      * @deprecated use {@link #registration} instead
      */
     @Deprecated(forRemoval = true)
-    default RegistryManager registry(String namespace) {
-        return this.registration(namespace);
+    default RegistryManager registry(String modId) {
+        return this.registration(modId);
     }
 }
