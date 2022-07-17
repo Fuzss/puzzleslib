@@ -8,6 +8,11 @@ import java.nio.file.Path;
 public interface ModLoaderEnvironment {
 
     /**
+     * @return the type of mod loader we are loaded on
+     */
+    ModLoader getModLoader();
+
+    /**
      * @return current physical environment
      */
     DistType getEnvironmentType();

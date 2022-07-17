@@ -10,6 +10,11 @@ import java.nio.file.Path;
 public class FabricEnvironment implements ModLoaderEnvironment {
 
     @Override
+    public ModLoader getModLoader() {
+        return ModLoader.FABRIC;
+    }
+
+    @Override
     public DistType getEnvironmentType() {
         return DistTypeConverter.fromEnvType(FabricLoader.getInstance().getEnvironmentType());
     }

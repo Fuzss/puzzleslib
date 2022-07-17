@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.11-1.19] - 2022-07-17
+### Added
+- Added the mod loader type to the current mod loader environment context
+### Fixed
+- Fixed type arguments when registering placeholder registry references
+
 ## [v4.0.10-1.19] - 2022-07-17
 ### Changed
 - Adjusted a few internal names for registering game content

@@ -54,7 +54,7 @@ public interface RegistryManager {
      * @param <T> registry type
      * @return placeholder registry object for <code>entry</code>
      */
-    default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+    default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<? super T>> registryKey, String path) {
         return RegistryReference.placeholder(registryKey, this.locate(path));
     }
 

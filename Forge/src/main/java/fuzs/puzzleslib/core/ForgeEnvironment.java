@@ -13,6 +13,11 @@ import java.nio.file.Path;
 public class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
+    public ModLoader getModLoader() {
+        return ModLoader.FORGE;
+    }
+
+    @Override
     public DistType getEnvironmentType() {
         return DistTypeConverter.fromDist(FMLEnvironment.dist);
     }
