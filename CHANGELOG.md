@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.10-1.19] - 2022-07-17
+### Changed
+- Adjusted a few internal names for registering game content
+
 ## [v4.0.9-1.19] - 2022-07-17
 ### Added
 - Added mod base interfaces for common and client with many new helper methods for registering content

@@ -34,9 +34,9 @@ public interface ModConstructor {
     /**
      * provides a place for registering spawn placements for entities
      *
-     * @param consumer add to spawn placement register
+     * @param context add to spawn placement register
      */
-    default void onRegisterSpawnPlacements(SpawnPlacementConsumer consumer) {
+    default void onRegisterSpawnPlacements(SpawnPlacementsContext context) {
 
     }
 
@@ -44,27 +44,27 @@ public interface ModConstructor {
      * allows for registering default attributes for our own entities
      * anything related to already existing entities (vanilla and modded) needs to be done in {@link #onEntityAttributeModification}
      *
-     * @param consumer add to entity attribute map
+     * @param context add to entity attribute map
      */
-    default void onEntityAttributeCreation(EntityAttributeCreationConsumer consumer) {
+    default void onEntityAttributeCreation(EntityAttributesCreateContext context) {
 
     }
 
     /**
      * allows for modifying the attributes of an already existing entity, attributes are modified individually
      *
-     * @param consumer replace/add attribute to entity attribute map
+     * @param context replace/add attribute to entity attribute map
      */
-    default void onEntityAttributeModification(EntityAttributeModificationConsumer consumer) {
+    default void onEntityAttributeModification(EntityAttributesModifyContext context) {
 
     }
 
     /**
      * allows for setting burn times for fuel items, e.g. in a furnace
      *
-     * @param consumer add fuel burn time for items/blocks
+     * @param context add fuel burn time for items/blocks
      */
-    default void onRegisterFuelBurnTimes(FuelBurnTimeConsumer consumer) {
+    default void onRegisterFuelBurnTimes(FuelBurnTimesContext context) {
 
     }
 
@@ -72,7 +72,7 @@ public interface ModConstructor {
      * register a default spawn placement for entities
      */
     @FunctionalInterface
-    interface SpawnPlacementConsumer {
+    interface SpawnPlacementsContext {
 
         /**
          * registers a spawning behavior for an <code>entityType</code>
@@ -83,29 +83,29 @@ public interface ModConstructor {
          * @param spawnPredicate    custom spawn predicate for mob
          * @param <T>               type of entity
          */
-        <T extends Mob> void register(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
+        <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
     }
 
     /**
      * register default attributes for our own entities
      */
     @FunctionalInterface
-    interface EntityAttributeCreationConsumer {
+    interface EntityAttributesCreateContext {
 
         /**
-         * register attributes for our own entities, modifying attributes for any other entity (vanilla or modded) should be done using {@link EntityAttributeModificationConsumer}
+         * register attributes for our own entities, modifying attributes for any other entity (vanilla or modded) should be done using {@link EntityAttributesModifyContext}
          *
          * @param type type of entity
          * @param builder the attribute supplier builder
          */
-        void register(EntityType<? extends LivingEntity> type, AttributeSupplier.Builder builder);
+        void registerEntityAttributes(EntityType<? extends LivingEntity> type, AttributeSupplier.Builder builder);
     }
 
     /**
      * registers modifications to attributes of already existing entities (not from our mod)
      */
     @FunctionalInterface
-    interface EntityAttributeModificationConsumer {
+    interface EntityAttributesModifyContext {
 
         /**
          * use this method for modifying attributes of existing entity types
@@ -114,8 +114,8 @@ public interface ModConstructor {
          * @param type                  type of entity
          * @param attribute             attribute to override/add
          */
-        default void register(EntityType<? extends LivingEntity> type, Attribute attribute) {
-            this.register(type, attribute, attribute.getDefaultValue());
+        default void registerAttributeModification(EntityType<? extends LivingEntity> type, Attribute attribute) {
+            this.registerAttributeModification(type, attribute, attribute.getDefaultValue());
         }
 
         /**
@@ -126,7 +126,7 @@ public interface ModConstructor {
          * @param attribute             attribute to override/add
          * @param attributeValue        new value, possibly {@link Attribute#getDefaultValue()}
          */
-        void register(EntityType<? extends LivingEntity> type, Attribute attribute, double attributeValue);
+        void registerAttributeModification(EntityType<? extends LivingEntity> type, Attribute attribute, double attributeValue);
     }
 
     /**
@@ -134,7 +134,7 @@ public interface ModConstructor {
      * heavily inspired by FuelHandler found in Vazkii's Quark mod
      */
     @FunctionalInterface
-    interface FuelBurnTimeConsumer {
+    interface FuelBurnTimesContext {
 
         /**
          * base method, registers a fuel item
@@ -142,7 +142,7 @@ public interface ModConstructor {
          * @param item item to add
          * @param burnTime burn time in ticks
          */
-        void registerItem(Item item, int burnTime);
+        void registerFuelItem(Item item, int burnTime);
 
         /**
          * overload method for blocks
@@ -150,8 +150,8 @@ public interface ModConstructor {
          * @param block block to add
          * @param burnTime burn time in ticks
          */
-        default void registerBlock(Block block, int burnTime) {
-            this.registerItem(block.asItem(), burnTime);
+        default void registerFuelBlock(Block block, int burnTime) {
+            this.registerFuelItem(block.asItem(), burnTime);
         }
 
         /**
@@ -160,7 +160,7 @@ public interface ModConstructor {
          * @param block block to add with burn time of 300 ticks
          */
         default void registerWoodenBlock(Block block) {
-            this.registerBlock(block, block instanceof SlabBlock ? 150 : 300);
+            this.registerFuelBlock(block, block instanceof SlabBlock ? 150 : 300);
         }
     }
 }

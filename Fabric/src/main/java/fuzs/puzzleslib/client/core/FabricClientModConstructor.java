@@ -78,15 +78,15 @@ public class FabricClientModConstructor {
         constructor.onRegisterEntityRenderers(EntityRendererRegistry::register);
         constructor.onRegisterBlockEntityRenderers(BlockEntityRendererRegistry::register);
         constructor.onRegisterClientTooltipComponents(fabricClientModConstructor::registerClientTooltipComponent);
-        constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProviderConsumer() {
+        constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProvidersContext() {
 
             @Override
-            public <T extends ParticleOptions> void register(ParticleType<T> type, ParticleProvider<T> provider) {
+            public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
                 ParticleFactoryRegistry.getInstance().register(type, provider);
             }
 
             @Override
-            public <T extends ParticleOptions> void register(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
+            public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
                 ParticleFactoryRegistry.getInstance().register(type, factory::create);
             }
         });

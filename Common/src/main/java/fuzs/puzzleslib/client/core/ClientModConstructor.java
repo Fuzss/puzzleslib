@@ -45,51 +45,51 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param consumer add a renderer to an entity
+     * @param context add a renderer to an entity
      */
-    default void onRegisterEntityRenderers(EntityRendererConsumer consumer) {
+    default void onRegisterEntityRenderers(EntityRenderersContext context) {
 
     }
 
     /**
-     * @param consumer add a renderer to a block entity
+     * @param context add a renderer to a block entity
      */
-    default void onRegisterBlockEntityRenderers(BlockEntityRendererConsumer consumer) {
+    default void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {
 
     }
 
     /**
-     * @param consumer add a client tooltip component to a common tooltip component
+     * @param context add a client tooltip component to a common tooltip component
      */
-    default void onRegisterClientTooltipComponents(ClientTooltipComponentConsumer consumer) {
+    default void onRegisterClientTooltipComponents(ClientTooltipComponentsContext context) {
 
     }
 
     /**
-     * @param consumer add particle providers for a particle type
+     * @param context add particle providers for a particle type
      */
-    default void onRegisterParticleProviders(ParticleProviderConsumer consumer) {
+    default void onRegisterParticleProviders(ParticleProvidersContext context) {
 
     }
 
     /**
-     * @param consumer register a screen for a menu type
+     * @param context register a screen for a menu type
      */
-    default void onRegisterMenuScreens(MenuScreenConsumer consumer) {
+    default void onRegisterMenuScreens(MenuScreensContext context) {
 
     }
 
     /**
-     * @param consumer add a sprite to a texture atlas
+     * @param context add a sprite to a texture atlas
      */
-    default void onRegisterAtlasSprites(AtlasSpriteConsumer consumer) {
+    default void onRegisterAtlasSprites(AtlasSpritesContext context) {
 
     }
 
     /**
-     * @param consumer add a layer definition for a {@link ModelLayerLocation}
+     * @param context add a layer definition for a {@link ModelLayerLocation}
      */
-    default void onRegisterLayerDefinitions(LayerDefinitionConsumer consumer) {
+    default void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
 
     }
 
@@ -97,7 +97,7 @@ public interface ClientModConstructor {
      * register a renderer for an entity
      */
     @FunctionalInterface
-    interface EntityRendererConsumer {
+    interface EntityRenderersContext {
 
         /**
          * registers an {@link net.minecraft.client.renderer.entity.EntityRenderer} for a given entity
@@ -106,14 +106,14 @@ public interface ClientModConstructor {
          * @param entityRendererProvider entity renderer provider
          * @param <T> type of entity
          */
-        <T extends Entity> void register(EntityType<? extends T> entityType, EntityRendererProvider<T> entityRendererProvider);
+        <T extends Entity> void registerEntityRenderer(EntityType<? extends T> entityType, EntityRendererProvider<T> entityRendererProvider);
     }
 
     /**
      * register a renderer for a block entity
      */
     @FunctionalInterface
-    interface BlockEntityRendererConsumer {
+    interface BlockEntityRenderersContext {
 
         /**
          * registers an {@link net.minecraft.client.renderer.blockentity.BlockEntityRenderer} for a given block entity
@@ -122,14 +122,14 @@ public interface ClientModConstructor {
          * @param blockEntityRendererProvider   block entity renderer provider
          * @param <T> type of entity
          */
-        <T extends BlockEntity> void register(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider);
+        <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider);
     }
 
     /**
      * register a client-side tooltip component factory
      */
     @FunctionalInterface
-    interface ClientTooltipComponentConsumer {
+    interface ClientTooltipComponentsContext {
 
         /**
          * register custom tooltip components
@@ -138,13 +138,13 @@ public interface ClientModConstructor {
          * @param factory factory for creating {@link ClientTooltipComponent} from <code>type</code>
          * @param <T>     type of common component
          */
-        <T extends TooltipComponent> void register(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory);
+        <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory);
     }
 
     /**
      * register a particle provider for a particle type
      */
-    interface ParticleProviderConsumer {
+    interface ParticleProvidersContext {
 
         /**
          * registers a factory for a particle type client side
@@ -153,7 +153,7 @@ public interface ClientModConstructor {
          * @param provider particle factory
          * @param <T>      type of particle
          */
-        <T extends ParticleOptions> void register(ParticleType<T> type, ParticleProvider<T> provider);
+        <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider);
 
         /**
          * registers a factory for a particle type client side
@@ -162,14 +162,14 @@ public interface ClientModConstructor {
          * @param factory particle factory
          * @param <T>      type of particle
          */
-        <T extends ParticleOptions> void register(ParticleType<T> type, ModSpriteParticleRegistration<T> factory);
+        <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory);
     }
 
     /**
      * register a screen for a menu type
      */
     @FunctionalInterface
-    interface MenuScreenConsumer {
+    interface MenuScreensContext {
 
         /**
          * register a factory for a {@link MenuType}
@@ -187,7 +187,7 @@ public interface ClientModConstructor {
      * stitch a custom sprite onto an atlas
      */
     @FunctionalInterface
-    interface AtlasSpriteConsumer {
+    interface AtlasSpritesContext {
 
         /**
          * registers a sprite for being stitched onto an atlas
@@ -195,14 +195,14 @@ public interface ClientModConstructor {
          * @param atlasId the atlas to register to, since 1.14 there are multiples
          * @param spriteId the sprite to register
          */
-        void register(ResourceLocation atlasId, ResourceLocation spriteId);
+        void registerAtlasSprite(ResourceLocation atlasId, ResourceLocation spriteId);
     }
 
     /**
      * register layer definitions for entity models
      */
     @FunctionalInterface
-    interface LayerDefinitionConsumer {
+    interface LayerDefinitionsContext {
 
         /**
          * registers a new layer definition (used for entity model parts)
@@ -210,6 +210,6 @@ public interface ClientModConstructor {
          * @param layerLocation model location
          * @param supplier      layer definition supplier
          */
-        void register(ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier);
+        void registerLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier);
     }
 }

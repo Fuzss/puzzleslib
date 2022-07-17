@@ -45,7 +45,7 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onCommonSetup(final FMLCommonSetupEvent evt) {
         this.constructor.onClientSetup();
-        this.constructor.onRegisterMenuScreens(new ClientModConstructor.MenuScreenConsumer() {
+        this.constructor.onRegisterMenuScreens(new ClientModConstructor.MenuScreensContext() {
 
             @Override
             public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory) {
@@ -67,15 +67,15 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
-        this.constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProviderConsumer() {
+        this.constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProvidersContext() {
 
             @Override
-            public <T extends ParticleOptions> void register(ParticleType<T> type, ParticleProvider<T> provider) {
+            public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
                 evt.register(type, provider);
             }
 
             @Override
-            public <T extends ParticleOptions> void register(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
+            public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
                 evt.register(type, factory::create);
             }
         });
