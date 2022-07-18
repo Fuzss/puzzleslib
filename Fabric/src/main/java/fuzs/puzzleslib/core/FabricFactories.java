@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.config.AbstractConfig;
-import fuzs.puzzleslib.config.ConfigHolder;
-import fuzs.puzzleslib.config.FabricConfigHolderImpl;
+import fuzs.puzzleslib.config.*;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
@@ -54,6 +52,21 @@ public class FabricFactories implements CommonFactories {
     @Override
     public <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server) {
         return new FabricConfigHolderImpl<>(() -> null, server);
+    }
+
+    @Override
+    public <T extends AbstractConfig> ConfigHolderV2.Builder client(Class<T> clazz, Supplier<T> clientConfig) {
+        return new FabricConfigHolderImplV2().client(clazz, clientConfig);
+    }
+
+    @Override
+    public <T extends AbstractConfig> ConfigHolderV2.Builder common(Class<T> clazz, Supplier<T> commonConfig) {
+        return new FabricConfigHolderImplV2().common(clazz, commonConfig);
+    }
+
+    @Override
+    public <T extends AbstractConfig> ConfigHolderV2.Builder server(Class<T> clazz, Supplier<T> serverConfig) {
+        return new FabricConfigHolderImplV2().server(clazz, serverConfig);
     }
 
     @Override

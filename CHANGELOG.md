@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.12-1.19] - 2022-07-18
+### Added
+- Added overhauled config system to allow for as many configs as desired regardless of type
+
 ## [v4.0.11-1.19] - 2022-07-17
 ### Added
 - Added the mod loader type to the current mod loader environment context
