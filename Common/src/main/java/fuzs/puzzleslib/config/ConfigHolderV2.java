@@ -29,6 +29,13 @@ public interface ConfigHolderV2 {
     }
 
     /**
+     * register config event and configs themselves for <code>modId</code>
+     *
+     * @param modId modId to register for
+     */
+    void bakeConfigs(String modId);
+
+    /**
      * @param modId mod id this config belongs to
      * @return config name
      */
@@ -102,12 +109,5 @@ public interface ConfigHolderV2 {
          * @return          the builder we are working with
          */
         <T extends AbstractConfig> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName);
-
-        /**
-         * register config event and configs themselves for <code>modId</code>
-         *
-         * @param modId modId to register for
-         */
-        void bakeConfigs(String modId);
     }
 }

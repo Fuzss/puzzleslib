@@ -54,8 +54,10 @@ public class FabricRegistryManager implements RegistryManager {
 
     @Override
     public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
-        ModBlockEntityTypeBuilder<T> builder = entry.get();
-        return this.registerBlockEntityType(path, () -> FabricBlockEntityTypeBuilder.create(builder.factory()::create, builder.blocks()).build());
+        return this.registerBlockEntityType(path, () -> {
+            ModBlockEntityTypeBuilder<T> builder = entry.get();
+            return FabricBlockEntityTypeBuilder.create(builder.factory()::create, builder.blocks()).build();
+        });
     }
 
     @Override

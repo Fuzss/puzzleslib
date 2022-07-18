@@ -10,6 +10,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -188,6 +189,15 @@ public interface ClientModConstructor {
      */
     @FunctionalInterface
     interface AtlasSpritesContext {
+
+        /**
+         * convenient overload for directly registering a material
+         *
+         * @param material a texture material
+         */
+        default void registerMaterial(Material material) {
+            this.registerAtlasSprite(material.atlasLocation(), material.texture());
+        }
 
         /**
          * registers a sprite for being stitched onto an atlas

@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.13-1.19] - 2022-07-19
+### Added
+- Added a helper method for registering a material to the proper texture atlas
+### Changed
+- Moved method for baking configs into base interface
+### Fixed
+- Fixed a bug where `ConfigDataHolderV2` would always throw a `NullPointerException` during config load
+- Fixed `ModEntityTypeBuilder` being created from supplier too early on Forge
+
 ## [v4.0.12-1.19] - 2022-07-18
 ### Added
 - Added overhauled config system to allow for as many configs as desired regardless of type

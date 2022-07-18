@@ -83,28 +83,26 @@ class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHo
             // add config reload callback first to make sure it's called when initially loading configs
             // (since on some systems reload event doesn't trigger during startup, resulting in configs only being loaded here)
             this.addCallback(this.config::afterConfigReload);
-            ImmutableList.Builder<Runnable> builder = ImmutableList.builder();
-            ForgeConfigSpec spec = this.buildSpec(this.config, new ConfigHolder.ConfigCallback() {
-
-                @Override
-                public <V> void accept(Supplier<V> entry, Consumer<V> save) {
-                    builder.add(() -> save.accept(entry.get()));
-                }
-            });
-            this.modConfig = factory.createAndRegister(this.configType, spec, this.fileName);
-            this.configValueCallbacks = builder.build();
+            this.modConfig = factory.createAndRegister(this.configType, this.buildSpec(), this.fileName);
         }
     }
 
     /**
      * creates a builder and builds the config spec from it
      *
-     * @param config config to build
      * @return built spec
      */
-    private ForgeConfigSpec buildSpec(AbstractConfig config, ConfigHolder.ConfigCallback saveCallback) {
+    private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        config.setupConfig(new ForgeConfigBuilderWrapper(builder), saveCallback);
+        ImmutableList.Builder<Runnable> listBuilder = ImmutableList.builder();
+        this.config.setupConfig(new ForgeConfigBuilderWrapper(builder), new ConfigHolder.ConfigCallback() {
+
+            @Override
+            public <V> void accept(Supplier<V> entry, Consumer<V> save) {
+                listBuilder.add(() -> save.accept(entry.get()));
+            }
+        });
+        this.configValueCallbacks = listBuilder.build();
         return builder.build();
     }
 

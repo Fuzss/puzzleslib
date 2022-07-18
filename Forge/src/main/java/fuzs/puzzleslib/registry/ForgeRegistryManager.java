@@ -75,8 +75,10 @@ public class ForgeRegistryManager implements RegistryManager {
     @SuppressWarnings("ConstantConditions")
     @Override
     public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
-        ModBlockEntityTypeBuilder<T> builder = entry.get();
-        return this.registerBlockEntityType(path, () -> BlockEntityType.Builder.of(builder.factory()::create, builder.blocks()).build(null));
+        return this.registerBlockEntityType(path, () -> {
+            ModBlockEntityTypeBuilder<T> builder = entry.get();
+            return BlockEntityType.Builder.of(builder.factory()::create, builder.blocks()).build(null);
+        });
     }
 
     @Override
