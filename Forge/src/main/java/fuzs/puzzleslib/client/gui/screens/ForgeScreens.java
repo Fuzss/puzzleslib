@@ -2,10 +2,12 @@ package fuzs.puzzleslib.client.gui.screens;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -28,71 +30,48 @@ public class ForgeScreens implements Screens {
     private ForgeScreens() {
 
     }
-    
-    /**
-     * @param screen screen instance
-     * @return minecraft singleton
-     */
+
     @Override
     public Minecraft getMinecraft(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return screen.getMinecraft();
     }
 
-    /**
-     * @param screen screen instance
-     * @return font renderer
-     */
     @Override
     public Font getFont(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return this.getMinecraft(screen).font;
     }
 
-    /**
-     * @param screen screen instance
-     * @return item renderer
-     */
     @Override
     public ItemRenderer getItemRenderer(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return this.getMinecraft(screen).getItemRenderer();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return width of container interface
-     */
+    @Override
+    public List<Widget> getRenderableButtons(Screen screen) {
+        return screen.renderables;
+    }
+
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return screen.getXSize();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return height of container interface
-     */
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return screen.getYSize();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return left position of container interface
-     */
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return screen.getGuiLeft();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return top position of container interface
-     */
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");

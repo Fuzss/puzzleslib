@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.15-1.19] - 2022-07-19
+### Added
+- Added access for screen buttons to `Screens` utility class
+- Added a way for registering search trees
+
 ## [v4.0.14-1.19] - 2022-07-19
 ### Changed
 - Made sure mods always use the correct mod event bus when registering game content

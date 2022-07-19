@@ -3,12 +3,14 @@ package fuzs.puzzleslib.client.core;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
@@ -17,6 +19,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -67,6 +70,10 @@ public class FabricClientModConstructor {
         EntityModelLayerRegistry.registerModelLayer(layerLocation, supplier::get);
     }
 
+    private <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
+        ((MinecraftAccessor) Minecraft.getInstance()).getSearchRegistry().register(searchRegistryKey, treeBuilder);
+    }
+
     /**
      * construct the mod, calling all necessary registration methods (we don't need the object, it's only useful on Forge)
      *
@@ -96,6 +103,7 @@ public class FabricClientModConstructor {
         constructor.onRegisterMenuScreens(fabricClientModConstructor::registerMenuScreen);
         constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
+        constructor.onRegisterSearchTress(fabricClientModConstructor::registerSearchTree);
         // TODO remove check in the future, modId must always be provided
         if (!Strings.isBlank(modId)) {
             PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);

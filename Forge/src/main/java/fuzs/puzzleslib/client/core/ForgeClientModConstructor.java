@@ -5,10 +5,12 @@ import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.core.ModConstructor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +21,7 @@ import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEv
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.util.Strings;
 
@@ -46,13 +48,20 @@ public class ForgeClientModConstructor {
     }
 
     @SubscribeEvent
-    public void onCommonSetup(final FMLCommonSetupEvent evt) {
+    public void onClientSetup(final FMLClientSetupEvent evt) {
         this.constructor.onClientSetup();
         this.constructor.onRegisterMenuScreens(new ClientModConstructor.MenuScreensContext() {
 
             @Override
             public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory) {
                 MenuScreens.register(menuType, factory::create);
+            }
+        });
+        this.constructor.onRegisterSearchTress(new ClientModConstructor.SearchRegistryContext() {
+
+            @Override
+            public <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
+                Minecraft.getInstance().getSearchTreeManager().register(searchRegistryKey, treeBuilder);
             }
         });
     }

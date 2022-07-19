@@ -3,10 +3,12 @@ package fuzs.puzzleslib.client.gui.screens;
 import fuzs.puzzleslib.mixin.client.accessor.AbstractContainerScreenAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -30,70 +32,48 @@ public class FabricScreens implements Screens {
 
     }
 
-    /**
-     * @param screen screen instance
-     * @return minecraft singleton
-     */
     @Override
     public Minecraft getMinecraft(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return net.fabricmc.fabric.api.client.screen.v1.Screens.getClient(screen);
     }
 
-    /**
-     * @param screen screen instance
-     * @return font renderer
-     */
     @Override
     public Font getFont(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return net.fabricmc.fabric.api.client.screen.v1.Screens.getTextRenderer(screen);
     }
 
-    /**
-     * @param screen screen instance
-     * @return item renderer
-     */
     @Override
     public ItemRenderer getItemRenderer(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return net.fabricmc.fabric.api.client.screen.v1.Screens.getItemRenderer(screen);
     }
 
-    /**
-     * @param screen container screen instance
-     * @return width of container interface
-     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Widget> getRenderableButtons(Screen screen) {
+        return (List<Widget>) (List<?>) net.fabricmc.fabric.api.client.screen.v1.Screens.getButtons(screen);
+    }
+
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return ((AbstractContainerScreenAccessor) screen).getXSize();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return height of container interface
-     */
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return ((AbstractContainerScreenAccessor) screen).getYSize();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return left position of container interface
-     */
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return ((AbstractContainerScreenAccessor) screen).getGuiLeft();
     }
 
-    /**
-     * @param screen container screen instance
-     * @return top position of container interface
-     */
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");

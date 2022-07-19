@@ -11,6 +11,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
@@ -91,6 +92,13 @@ public interface ClientModConstructor {
      * @param context add a layer definition for a {@link ModelLayerLocation}
      */
     default void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
+
+    }
+
+    /**
+     * @param context add a search tree builder together with a token
+     */
+    default void onRegisterSearchTress(SearchRegistryContext context) {
 
     }
 
@@ -221,5 +229,21 @@ public interface ClientModConstructor {
          * @param supplier      layer definition supplier
          */
         void registerLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier);
+    }
+
+    /**
+     * register search tree to private registry in Minecraft singleton
+     */
+    @FunctionalInterface
+    interface SearchRegistryContext {
+
+        /**
+         * registers a search tree to {@link SearchRegistry} in {@link net.minecraft.world.entity.vehicle.Minecart}
+         *
+         * @param searchRegistryKey the search tree token
+         * @param treeBuilder       builder supplier for search tree
+         * @param <T>               type to be searched for
+         */
+        <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder);
     }
 }
