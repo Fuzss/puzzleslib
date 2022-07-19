@@ -2,6 +2,7 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.config.core.ForgeConfigBuilderWrapper;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
@@ -138,7 +139,7 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
     @Override
     public void loadConfigs(String modId) {
         // register events before registering configs
-        final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus modBus = PuzzlesLibForge.getModEventBus(modId);
         modBus.addListener((final ModConfigEvent evt) -> this.onModConfig(evt.getConfig(), modId, evt instanceof ModConfigEvent.Reloading));
         this.registerConfigs(ModLoadingContext.get());
     }

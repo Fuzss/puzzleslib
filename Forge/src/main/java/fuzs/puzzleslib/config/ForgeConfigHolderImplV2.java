@@ -2,6 +2,7 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -71,7 +72,7 @@ public class ForgeConfigHolderImplV2 implements ConfigHolderV2.Builder {
     public void bakeConfigs(String modId) {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
-        final IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus modBus = PuzzlesLibForge.getModEventBus(modId);
         for (ForgeConfigDataHolderImplV2<? extends AbstractConfig> holder : this.configsByClass.values()) {
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent

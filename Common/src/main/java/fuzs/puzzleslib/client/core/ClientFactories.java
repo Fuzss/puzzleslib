@@ -16,7 +16,19 @@ public interface ClientFactories {
      *
      * @return  provides a consumer for loading a mod being provided the base class
      */
-    Consumer<ClientModConstructor> clientModConstructor();
+    @Deprecated(forRemoval = true)
+    default Consumer<ClientModConstructor> clientModConstructor() {
+        return this.clientModConstructor("");
+    }
+
+    /**
+     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
+     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
+     * @return  provides a consumer for loading a mod being provided the base class
+     */
+    Consumer<ClientModConstructor> clientModConstructor(String modId);
 
     /**
      * helper for creating {@link ModelLayerRegistry} objects with a provided <code>modId</code>>

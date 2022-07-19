@@ -2,6 +2,7 @@ package fuzs.puzzleslib.registry;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.registry.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.registry.builder.ModMenuSupplier;
 import fuzs.puzzleslib.registry.builder.ModPoiTypeBuilder;
@@ -13,8 +14,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.StringUtils;
@@ -48,10 +47,7 @@ public class ForgeRegistryManager implements RegistryManager {
      */
     private ForgeRegistryManager(String namespace) {
         this.namespace = namespace;
-        this.modEventBus = ModList.get().getModContainerById(namespace)
-                .map(container -> (FMLModContainer) container)
-                .map(FMLModContainer::getEventBus)
-                .orElseThrow();
+        this.modEventBus = PuzzlesLibForge.getModEventBus(namespace);
     }
 
     @Override

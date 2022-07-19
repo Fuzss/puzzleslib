@@ -22,8 +22,8 @@ import java.util.function.Supplier;
 public class ForgeFactories implements CommonFactories {
 
     @Override
-    public Consumer<ModConstructor> modConstructor() {
-        return ForgeModConstructor::construct;
+    public Consumer<ModConstructor> modConstructor(String modId) {
+        return constructor -> ForgeModConstructor.construct(modId, constructor);
     }
 
     @Override

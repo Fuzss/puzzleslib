@@ -11,8 +11,8 @@ import java.util.function.Consumer;
 public class ForgeClientFactories implements ClientFactories {
 
     @Override
-    public Consumer<ClientModConstructor> clientModConstructor() {
-        return ForgeClientModConstructor::construct;
+    public Consumer<ClientModConstructor> clientModConstructor(String modId) {
+        return constructor -> ForgeClientModConstructor.construct(modId, constructor);
     }
 
     @Override

@@ -21,7 +21,19 @@ public interface CommonFactories {
      *
      * @return  provides a consumer for loading a mod being provided the base class
      */
-    Consumer<ModConstructor> modConstructor();
+    @Deprecated(forRemoval = true)
+    default Consumer<ModConstructor> modConstructor() {
+        return this.modConstructor("");
+    }
+
+    /**
+     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
+     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
+     * @return  provides a consumer for loading a mod being provided the base class
+     */
+    Consumer<ModConstructor> modConstructor(String modId);
 
     /**
      * creates a new network handler

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.14-1.19] - 2022-07-19
+### Changed
+- Made sure mods always use the correct mod event bus when registering game content
+
 ## [v4.0.13-1.19] - 2022-07-19
 ### Added
 - Added a helper method for registering a material to the proper texture atlas

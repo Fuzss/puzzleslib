@@ -3,6 +3,7 @@ package fuzs.puzzleslib.capability;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.capability.data.*;
 import fuzs.puzzleslib.registry.ForgeRegistryManager;
 import net.minecraft.resources.ResourceLocation;
@@ -226,7 +227,7 @@ public class ForgeCapabilityController {
         return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
             final ForgeCapabilityController manager = new ForgeCapabilityController(namespace);
             // for registering capabilities
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(manager::onRegisterCapabilities);
+            PuzzlesLibForge.getModEventBus(namespace).addListener(manager::onRegisterCapabilities);
             // for attaching capabilities
             MinecraftForge.EVENT_BUS.register(manager);
             return manager;

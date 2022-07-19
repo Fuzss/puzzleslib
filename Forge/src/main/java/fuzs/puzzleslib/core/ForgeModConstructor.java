@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.PuzzlesLibForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -15,6 +16,7 @@ import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * wrapper class for {@link ModConstructor} for calling all required registration methods at the correct time
@@ -86,11 +88,17 @@ public class ForgeModConstructor {
      * construct the mod, calling all necessary registration methods
      * we don't need the object, it's only important for being registered to the necessary events buses
      *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(ModConstructor constructor) {
+    public static void construct(String modId, ModConstructor constructor) {
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
-        FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
+        // TODO remove in the future, modId must always be provided
+        if (Strings.isBlank(modId)) {
+            FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
+        } else {
+            PuzzlesLibForge.getModEventBus(modId).register(forgeModConstructor);
+        }
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);

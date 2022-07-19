@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
+import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.core.ModConstructor;
@@ -19,6 +20,7 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.util.Strings;
 
 /**
  * wrapper class for {@link ClientModConstructor} for calling all required registration methods at the correct time
@@ -99,10 +101,16 @@ public class ForgeClientModConstructor {
      * construct the mod, calling all necessary registration methods
      * we don't need the object, it's only important for being registered to the necessary events buses
      *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(ClientModConstructor constructor) {
+    public static void construct(String modId, ClientModConstructor constructor) {
         ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
-        FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
+        // TODO remove in the future, modId must always be provided
+        if (Strings.isBlank(modId)) {
+            FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
+        } else {
+            PuzzlesLibForge.getModEventBus(modId).register(forgeModConstructor);
+        }
     }
 }

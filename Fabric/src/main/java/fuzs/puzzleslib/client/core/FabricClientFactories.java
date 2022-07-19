@@ -11,7 +11,7 @@ import java.util.function.Consumer;
 public class FabricClientFactories implements ClientFactories {
 
     @Override
-    public Consumer<ClientModConstructor> clientModConstructor() {
+    public Consumer<ClientModConstructor> clientModConstructor(String modId) {
         return FabricClientModConstructor::construct;
     }
 

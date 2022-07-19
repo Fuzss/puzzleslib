@@ -18,7 +18,7 @@ import java.util.function.Supplier;
 public class FabricFactories implements CommonFactories {
 
     @Override
-    public Consumer<ModConstructor> modConstructor() {
+    public Consumer<ModConstructor> modConstructor(String modId) {
         return FabricModConstructor::construct;
     }
 
