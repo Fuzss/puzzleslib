@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
@@ -106,11 +107,12 @@ public class ForgeClientModConstructor {
      */
     public static void construct(String modId, ClientModConstructor constructor) {
         ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
-        // TODO remove in the future, modId must always be provided
+        // TODO remove this branch in the future, modId must always be provided
         if (Strings.isBlank(modId)) {
             FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
         } else {
-            PuzzlesLibForge.getModEventBus(modId).register(forgeModConstructor);
+            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+            PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
         }
     }
 }

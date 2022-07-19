@@ -8,10 +8,10 @@ import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -139,35 +139,35 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
     @Override
     public void loadConfigs(String modId) {
         // register events before registering configs
-        final IEventBus modBus = PuzzlesLibForge.getModEventBus(modId);
+        final IEventBus modBus = PuzzlesLibForge.findModEventBus(modId);
         modBus.addListener((final ModConfigEvent evt) -> this.onModConfig(evt.getConfig(), modId, evt instanceof ModConfigEvent.Reloading));
-        this.registerConfigs(ModLoadingContext.get());
+        this.registerConfigs(PuzzlesLibForge.findModContainer(modId));
     }
 
     /**
      * register configs
-     * @param context mod context to register to
+     * @param modContainer mod context to register to
      */
-    private void registerConfigs(ModLoadingContext context) {
+    private void registerConfigs(ModContainer modContainer) {
         // add config reload callback first to make sure it's called when initially loading configs (since on some systems reload event doesn't trigger during startup, resulting in configs only being loaded here)
         if (this.client != null) {
             this.addClientCallback(this.client::afterConfigReload);
-            this.registerConfig(context, ModConfig.Type.CLIENT, this.client, this.clientFileName);
+            this.registerConfig(modContainer, ModConfig.Type.CLIENT, this.client, this.clientFileName);
         }
         if (this.server != null) {
             this.addServerCallback(this.server::afterConfigReload);
-            this.registerConfig(context, ModConfig.Type.SERVER, this.server, this.serverFileName);
+            this.registerConfig(modContainer, ModConfig.Type.SERVER, this.server, this.serverFileName);
         }
     }
 
     /**
      * register config and reloading callbacks
-     * @param context mod context to register to
+     * @param modContainer mod context to register to
      * @param type client or server config type
      * @param config the config object
      * @param fileName file name, might be empty, will use default name then
      */
-    private void registerConfig(ModLoadingContext context, ModConfig.Type type, AbstractConfig config, String fileName) {
+    private void registerConfig(ModContainer modContainer, ModConfig.Type type, AbstractConfig config, String fileName) {
         // can't use a lambda expression for a functional interface, if the method in the functional interface has type parameters
         final ConfigCallback saveCallback = new ConfigCallback() {
             @Override
@@ -177,11 +177,11 @@ public class ForgeConfigHolderImpl<C extends AbstractConfig, S extends AbstractC
         };
         ModConfig modConfig;
         if (StringUtils.isEmpty(fileName)) {
-            modConfig = new ModConfig(type, this.buildSpec(config, saveCallback), context.getActiveContainer());
+            modConfig = new ModConfig(type, this.buildSpec(config, saveCallback), modContainer);
         } else {
-            modConfig = new ModConfig(type, this.buildSpec(config, saveCallback), context.getActiveContainer(), fileName);
+            modConfig = new ModConfig(type, this.buildSpec(config, saveCallback), modContainer, fileName);
         }
-        context.getActiveContainer().addConfig(modConfig);
+        modContainer.addConfig(modConfig);
         switch (type) {
             case CLIENT -> this.clientModConfig = modConfig;
             case SERVER -> this.serverModConfig = modConfig;

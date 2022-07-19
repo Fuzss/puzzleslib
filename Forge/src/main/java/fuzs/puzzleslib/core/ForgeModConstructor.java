@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.PuzzlesLibForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.entity.EntityType;
@@ -7,8 +8,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
@@ -93,11 +92,12 @@ public class ForgeModConstructor {
      */
     public static void construct(String modId, ModConstructor constructor) {
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
-        // TODO remove in the future, modId must always be provided
+        // TODO remove this branch in the future, modId must always be provided
         if (Strings.isBlank(modId)) {
             FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
         } else {
-            PuzzlesLibForge.getModEventBus(modId).register(forgeModConstructor);
+            PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
+            PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
         }
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class

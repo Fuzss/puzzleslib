@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog].
 ## [v4.0.14-1.19] - 2022-07-19
 ### Changed
 - Made sure mods always use the correct mod event bus when registering game content
+### Fixed
+- Fixed bug in registry manager that would result in game content being registered for the wrong mod id
 
 ## [v4.0.13-1.19] - 2022-07-19
 ### Added

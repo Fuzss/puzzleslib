@@ -20,7 +20,6 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Map;
 import java.util.function.Predicate;
@@ -227,7 +226,7 @@ public class ForgeCapabilityController {
         return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
             final ForgeCapabilityController manager = new ForgeCapabilityController(namespace);
             // for registering capabilities
-            PuzzlesLibForge.getModEventBus(namespace).addListener(manager::onRegisterCapabilities);
+            PuzzlesLibForge.findModEventBus(namespace).addListener(manager::onRegisterCapabilities);
             // for attaching capabilities
             MinecraftForge.EVENT_BUS.register(manager);
             return manager;

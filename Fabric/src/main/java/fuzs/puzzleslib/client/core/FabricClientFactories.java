@@ -12,7 +12,7 @@ public class FabricClientFactories implements ClientFactories {
 
     @Override
     public Consumer<ClientModConstructor> clientModConstructor(String modId) {
-        return FabricClientModConstructor::construct;
+        return constructor -> FabricClientModConstructor.construct(modId, constructor);
     }
 
     @Override

@@ -7,10 +7,9 @@ import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 import java.util.Map;
 import java.util.Objects;
@@ -72,7 +71,7 @@ public class ForgeConfigHolderImplV2 implements ConfigHolderV2.Builder {
     public void bakeConfigs(String modId) {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
-        final IEventBus modBus = PuzzlesLibForge.getModEventBus(modId);
+        final IEventBus modBus = PuzzlesLibForge.findModEventBus(modId);
         for (ForgeConfigDataHolderImplV2<? extends AbstractConfig> holder : this.configsByClass.values()) {
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
@@ -87,9 +86,9 @@ public class ForgeConfigHolderImplV2 implements ConfigHolderV2.Builder {
                 }
             });
             holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-                ModLoadingContext context = ModLoadingContext.get();
-                ModConfig modConfig = new ModConfig(type, spec, context.getActiveContainer(), fileName.apply(modId));
-                context.getActiveContainer().addConfig(modConfig);
+                ModContainer modContainer = PuzzlesLibForge.findModContainer(modId);
+                ModConfig modConfig = new ModConfig(type, spec, modContainer, fileName.apply(modId));
+                modContainer.addConfig(modConfig);
                 return modConfig;
             });
         }

@@ -41,6 +41,7 @@ public class FabricRegistryManager implements RegistryManager {
         return this.namespace;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         T value = supplier.get();
@@ -78,7 +79,7 @@ public class FabricRegistryManager implements RegistryManager {
      * @param namespace namespace used for registration
      * @return new mod specific registry manager
      */
-    public static RegistryManager of(String namespace) {
+    public synchronized static RegistryManager of(String namespace) {
         return MOD_TO_REGISTRY.computeIfAbsent(namespace, FabricRegistryManager::new);
     }
 }

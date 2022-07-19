@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
+import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -22,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -68,9 +70,10 @@ public class FabricClientModConstructor {
     /**
      * construct the mod, calling all necessary registration methods (we don't need the object, it's only useful on Forge)
      *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(ClientModConstructor constructor) {
+    public static void construct(String modId, ClientModConstructor constructor) {
         FabricClientModConstructor fabricClientModConstructor = new FabricClientModConstructor(constructor);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
@@ -93,5 +96,9 @@ public class FabricClientModConstructor {
         constructor.onRegisterMenuScreens(fabricClientModConstructor::registerMenuScreen);
         constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
+        // TODO remove check in the future, modId must always be provided
+        if (!Strings.isBlank(modId)) {
+            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+        }
     }
 }

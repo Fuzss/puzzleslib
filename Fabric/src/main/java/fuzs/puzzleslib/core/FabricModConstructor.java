@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.PuzzlesLib;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.levelgen.Heightmap;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Map;
 import java.util.Objects;
@@ -101,9 +103,10 @@ public class FabricModConstructor {
     /**
      * construct the mod, calling all necessary registration methods (we don't need the object, it's only useful on Forge)
      *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(ModConstructor constructor) {
+    public static void construct(String modId, ModConstructor constructor) {
         FabricModConstructor fabricModConstructor = new FabricModConstructor(constructor);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
@@ -112,5 +115,9 @@ public class FabricModConstructor {
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
         constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);
+        // TODO remove check in the future, modId must always be provided
+        if (!Strings.isBlank(modId)) {
+            PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
+        }
     }
 }

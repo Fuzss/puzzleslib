@@ -19,7 +19,7 @@ public class FabricFactories implements CommonFactories {
 
     @Override
     public Consumer<ModConstructor> modConstructor(String modId) {
-        return FabricModConstructor::construct;
+        return constructor -> FabricModConstructor.construct(modId, constructor);
     }
 
     @Override

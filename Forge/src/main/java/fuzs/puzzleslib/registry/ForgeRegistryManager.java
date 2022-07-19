@@ -28,11 +28,6 @@ import java.util.function.Supplier;
  */
 public class ForgeRegistryManager implements RegistryManager {
     /**
-     * storage for {@link DeferredRegister} required for registering data on Forge
-     */
-    private static final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> DEFERRED_REGISTERS = Maps.newConcurrentMap();
-
-    /**
      * namespace for this instance
      */
     private final String namespace;
@@ -40,6 +35,10 @@ public class ForgeRegistryManager implements RegistryManager {
      * the mod event bus required for registering {@link DeferredRegister}
      */
     private final IEventBus modEventBus;
+    /**
+     * storage for {@link DeferredRegister} required for registering data on Forge
+     */
+    private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> deferredRegisters = Maps.newIdentityHashMap();
 
     /**
      * private constructor
@@ -47,7 +46,7 @@ public class ForgeRegistryManager implements RegistryManager {
      */
     private ForgeRegistryManager(String namespace) {
         this.namespace = namespace;
-        this.modEventBus = PuzzlesLibForge.getModEventBus(namespace);
+        this.modEventBus = PuzzlesLibForge.findModEventBus(namespace);
     }
 
     @Override
@@ -58,7 +57,7 @@ public class ForgeRegistryManager implements RegistryManager {
     @SuppressWarnings("unchecked")
     @Override
     public <T> RegistryReference<T> register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
-        DeferredRegister<?> register = DEFERRED_REGISTERS.computeIfAbsent(registryKey, key -> {
+        DeferredRegister<?> register = this.deferredRegisters.computeIfAbsent(registryKey, key -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.namespace);
             deferredRegister.register(this.modEventBus);
             return deferredRegister;
@@ -95,7 +94,7 @@ public class ForgeRegistryManager implements RegistryManager {
      * @param namespace namespace used for registration
      * @return new mod specific registry manager
      */
-    public static RegistryManager of(String namespace) {
+    public synchronized static RegistryManager of(String namespace) {
         return MOD_TO_REGISTRY.computeIfAbsent(namespace, ForgeRegistryManager::new);
     }
 }
