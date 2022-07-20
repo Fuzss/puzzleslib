@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.config;
 
-import org.apache.commons.compress.utils.Lists;
+import com.google.common.collect.Lists;
 
 import java.util.List;
 import java.util.function.Supplier;
