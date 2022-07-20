@@ -42,17 +42,28 @@ public class ForgeNetworkHandler implements NetworkHandler {
     /**
      * message index
      */
-    private final AtomicInteger discriminator = new AtomicInteger();
+    private final AtomicInteger discriminator;
 
     /**
      * @param channel mod network channel
      */
     private ForgeNetworkHandler(SimpleChannel channel) {
         this.channel = channel;
+        this.discriminator = new AtomicInteger();
     }
 
+    /**
+     * register a message for a side
+     * mostly from AutoRegLib, thanks Vazkii!
+     * @param clazz     message class type
+     * @param supplier supplier for message (called when receiving at executing end)
+     *                 we use this additional supplier to avoid having to invoke the class via reflection
+     *                 and so that a default constructor in every message cannot be forgotten
+     * @param direction side this message is to be executed at
+     * @param <T> message implementation
+     */
     @Override
-    public <T extends Message<T>> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction) {
+    public <T extends Message> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction) {
         BiConsumer<T, FriendlyByteBuf> encode = Message::write;
         Function<FriendlyByteBuf, T> decode = buf -> {
             T message = supplier.get();
@@ -77,24 +88,42 @@ public class ForgeNetworkHandler implements NetworkHandler {
         this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle);
     }
 
+    /**
+     * send message from client to server
+     * @param message message to send
+     */
     @Override
-    public void sendToServer(Message<?> message) {
+    public void sendToServer(Message message) {
         Objects.requireNonNull(Minecraft.getInstance().getConnection(), "Cannot send packets when not in game!");
         Minecraft.getInstance().getConnection().send(this.toServerboundPacket(message));
     }
 
+    /**
+     * send message from server to client
+     * @param message message to send
+     * @param player client player to send to
+     */
     @Override
-    public void sendTo(Message<?> message, ServerPlayer player) {
+    public void sendTo(Message message, ServerPlayer player) {
         player.connection.send(this.toClientboundPacket(message));
     }
 
+    /**
+     * send message from server to all clients
+     * @param message message to send
+     */
     @Override
-    public void sendToAll(Message<?> message) {
+    public void sendToAll(Message message) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
     }
 
+    /**
+     * send message from server to all clients except one
+     * @param message message to send
+     * @param exclude client to exclude
+     */
     @Override
-    public void sendToAllExcept(Message<?> message, ServerPlayer exclude) {
+    public void sendToAllExcept(Message message, ServerPlayer exclude) {
         final Packet<?> packet = this.toClientboundPacket(message);
         for (ServerPlayer player : Proxy.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
             if (player != exclude) {
@@ -103,45 +132,70 @@ public class ForgeNetworkHandler implements NetworkHandler {
         }
     }
 
+    /**
+     * send message from server to all clients near given position
+     * @param message message to send
+     * @param pos source position
+     * @param level dimension key provider level
+     */
     @Override
-    public void sendToAllNear(Message<?> message, BlockPos pos, Level level) {
+    public void sendToAllNear(Message message, BlockPos pos, Level level) {
         this.sendToAllNearExcept(message, null, pos.getX(), pos.getY(), pos.getZ(), 64.0, level);
     }
 
+    /**
+     * send message from server to all clients near given position
+     * @param message message to send
+     * @param exclude exclude player having caused this event
+     * @param posX     source position x
+     * @param posY     source position y
+     * @param posZ     source position z
+     * @param distance distance from source to receive message
+     * @param level dimension key provider level
+     */
     @Override
-    public void sendToAllNearExcept(Message<?> message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
+    public void sendToAllNearExcept(Message message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
+    /**
+     * send message from server to all clients in dimension
+     * @param message message to send
+     * @param level dimension key provider level
+     */
     @Override
-    public void sendToDimension(Message<?> message, Level level) {
+    public void sendToDimension(Message message, Level level) {
         this.sendToDimension(message, level.dimension());
     }
 
+    /**
+     * send message from server to all clients in dimension
+     * @param message message to send
+     * @param dimension dimension to send message in
+     */
     @Override
-    public void sendToDimension(Message<?> message, ResourceKey<Level> dimension) {
+    public void sendToDimension(Message message, ResourceKey<Level> dimension) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
     }
 
     /**
-     * @param message   message to create packet from
-     * @return          packet for message
+     * @param message message to create packet from
+     * @return      packet for message
      */
-    private Packet<?> toServerboundPacket(Message<?> message) {
+    private Packet<?> toServerboundPacket(Message message) {
         return this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER);
     }
 
     /**
-     * @param message   message to create packet from
-     * @return          packet for message
+     * @param message message to create packet from
+     * @return      packet for message
      */
-    private Packet<?> toClientboundPacket(Message<?> message) {
+    private Packet<?> toClientboundPacket(Message message) {
         return this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     /**
      * creates a new network handler
-     *
      * @param modId id for channel name
      * @return mod specific network handler with default channel
      */
@@ -151,7 +205,6 @@ public class ForgeNetworkHandler implements NetworkHandler {
 
     /**
      * creates a new network handler
-     *
      * @param modId id for channel name
      * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible

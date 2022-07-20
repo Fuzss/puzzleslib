@@ -28,9 +28,9 @@ public class FabricClientProxy extends FabricServerProxy {
     }
 
     @Override
-    public void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
+    public void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message> factory) {
         ClientPlayNetworking.registerGlobalReceiver(channelName, (Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) -> {
-            Message<?> message = factory.apply(buf);
+            Message message = factory.apply(buf);
             client.execute(() -> message.handle(client.player, client));
         });
     }

@@ -48,9 +48,9 @@ public class FabricServerProxy implements Proxy {
     }
 
     @Override
-    public void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
+    public void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message> factory) {
         ServerPlayNetworking.registerGlobalReceiver(channelName, (MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) -> {
-            Message<?> message = factory.apply(buf);
+            Message message = factory.apply(buf);
             server.execute(() -> message.handle(player, server));
         });
     }

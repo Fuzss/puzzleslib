@@ -3,10 +3,6 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.0.16-1.19] - 2022-07-19
-### Changed
-- Cleaned up networking classes
-
 ## [v4.0.15-1.19] - 2022-07-19
 ### Added
 - Added access for screen buttons to `Screens` utility class
