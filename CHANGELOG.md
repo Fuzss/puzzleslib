@@ -3,9 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.0.16-1.19] - 2022-07-19
+## [v4.0.16-1.19] - 2022-07-20
 ### Changed
 - Cleaned up networking classes
+- Allow final category fields in config
 
 ## [v4.0.15-1.19] - 2022-07-19
 ### Added

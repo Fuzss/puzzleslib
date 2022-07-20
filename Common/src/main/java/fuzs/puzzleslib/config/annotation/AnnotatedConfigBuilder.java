@@ -86,7 +86,6 @@ public class AnnotatedConfigBuilder {
                 field.setAccessible(true);
                 final boolean isStatic = Modifier.isStatic(field.getModifiers());
                 if (!isStatic) Objects.requireNonNull(instance, "Null instance for non-static field");
-                if (Modifier.isFinal(field.getModifiers())) throw new RuntimeException("Field may not be final");
                 buildConfig(builder, saveCallback, isStatic ? null : instance, field, field.getDeclaredAnnotation(Config.class));
             }
             builder.pop(path.size());
@@ -120,8 +119,6 @@ public class AnnotatedConfigBuilder {
     private static void buildConfig(final AbstractConfigBuilder builder, final ConfigHolder.ConfigCallback saveCallback, @Nullable Object instance, Field field, Config annotation) {
         String name = annotation.name();
         if (name.isEmpty()) {
-            // transform lower camel case to normal words from https://stackoverflow.com/a/46945726
-//            name = StringUtils.capitalize(StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(field.getName()), " "));
             name = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, field.getName());
         }
         Class<?> type = field.getType();
@@ -145,6 +142,9 @@ public class AnnotatedConfigBuilder {
             return;
         }
 
+        // final fields are permitted until here, since values must be able to change
+        // previously only new config categories are handled, those instances never change
+        if (Modifier.isFinal(field.getModifiers())) throw new RuntimeException("Field may not be final");
         if (description.length != 0) builder.comment(description);
         if (annotation.worldRestart()) builder.worldRestart();
         if (type == boolean.class) {
