@@ -75,7 +75,10 @@ public interface ConfigHolderV2 {
          * @param <T>           client config type
          * @return              the builder we are working with
          */
-        <T extends AbstractConfig> Builder client(Class<T> clazz, Supplier<T> clientConfig);
+        @Deprecated(forRemoval = true)
+        default <T extends AbstractConfig> Builder client(Class<T> clazz, Supplier<T> clientConfig) {
+            return this.clientConfig(clazz, clientConfig);
+        }
 
         /**
          * register a new client config to the holder/builder
@@ -85,7 +88,10 @@ public interface ConfigHolderV2 {
          * @param <T>           common config type
          * @return              the builder we are working with
          */
-        <T extends AbstractConfig> Builder common(Class<T> clazz, Supplier<T> commonConfig);
+        @Deprecated(forRemoval = true)
+        default <T extends AbstractConfig> Builder common(Class<T> clazz, Supplier<T> commonConfig) {
+            return this.commonConfig(clazz, commonConfig);
+        }
 
         /**
          * register a new client config to the holder/builder
@@ -95,7 +101,40 @@ public interface ConfigHolderV2 {
          * @param <T>           server config type
          * @return              the builder we are working with
          */
-        <T extends AbstractConfig> Builder server(Class<T> clazz, Supplier<T> serverConfig);
+        @Deprecated(forRemoval = true)
+        default <T extends AbstractConfig> Builder server(Class<T> clazz, Supplier<T> serverConfig) {
+            return this.serverConfig(clazz, serverConfig);
+        }
+
+        /**
+         * register a new client config to the holder/builder
+         *
+         * @param clazz         client config main class
+         * @param clientConfig  client config factory
+         * @param <T>           client config type
+         * @return              the builder we are working with
+         */
+        <T extends AbstractConfig> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
+
+        /**
+         * register a new client config to the holder/builder
+         *
+         * @param clazz         common config main class
+         * @param commonConfig  common config factory
+         * @param <T>           common config type
+         * @return              the builder we are working with
+         */
+        <T extends AbstractConfig> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
+
+        /**
+         * register a new client config to the holder/builder
+         *
+         * @param clazz         server config main class
+         * @param serverConfig  server config factory
+         * @param <T>           server config type
+         * @return              the builder we are working with
+         */
+        <T extends AbstractConfig> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
 
         /**
          * this sets the file name on {@link ConfigDataHolderV2}, it's only used for storing,

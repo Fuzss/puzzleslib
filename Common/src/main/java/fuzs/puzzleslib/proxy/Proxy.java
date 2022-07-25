@@ -19,7 +19,7 @@ public interface Proxy {
     /**
      * sided proxy depending on physical side
      */
-    @SuppressWarnings({"Convert2MethodRef", "deprecation"})
+    @SuppressWarnings("Convert2MethodRef")
     Proxy INSTANCE = DistTypeExecutor.getForDistType(() -> CoreServices.FACTORIES.clientProxy(), () -> CoreServices.FACTORIES.serverProxy());
 
     /**

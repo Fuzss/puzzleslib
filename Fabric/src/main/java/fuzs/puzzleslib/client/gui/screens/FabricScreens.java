@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.client.gui.screens;
 
 import fuzs.puzzleslib.mixin.client.accessor.AbstractContainerScreenAccessor;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Widget;
@@ -19,41 +20,30 @@ import java.util.Objects;
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */
-public class FabricScreens implements Screens {
-    /**
-     * singleton instance
-     */
-    public static final Screens INSTANCE = new FabricScreens();
-
-    /**
-     * singleton class
-     */
-    private FabricScreens() {
-
-    }
+public class FabricScreens implements CommonScreens {
 
     @Override
     public Minecraft getMinecraft(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return net.fabricmc.fabric.api.client.screen.v1.Screens.getClient(screen);
+        return Screens.getClient(screen);
     }
 
     @Override
     public Font getFont(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return net.fabricmc.fabric.api.client.screen.v1.Screens.getTextRenderer(screen);
+        return Screens.getTextRenderer(screen);
     }
 
     @Override
     public ItemRenderer getItemRenderer(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return net.fabricmc.fabric.api.client.screen.v1.Screens.getItemRenderer(screen);
+        return Screens.getItemRenderer(screen);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Widget> getRenderableButtons(Screen screen) {
-        return (List<Widget>) (List<?>) net.fabricmc.fabric.api.client.screen.v1.Screens.getButtons(screen);
+        return (List<Widget>) (List<?>) Screens.getButtons(screen);
     }
 
     @Override

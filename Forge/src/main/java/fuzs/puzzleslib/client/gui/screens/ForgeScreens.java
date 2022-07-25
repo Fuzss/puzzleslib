@@ -18,18 +18,7 @@ import java.util.Objects;
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */
-public class ForgeScreens implements Screens {
-    /**
-     * singleton instance
-     */
-    public static final Screens INSTANCE = new ForgeScreens();
-
-    /**
-     * singleton class
-     */
-    private ForgeScreens() {
-
-    }
+public class ForgeScreens implements CommonScreens {
 
     @Override
     public Minecraft getMinecraft(Screen screen) {

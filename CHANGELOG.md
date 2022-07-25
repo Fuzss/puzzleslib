@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.0.18-1.19] - 2022-07-26
+### Added
+- Added a utility class for creating and registering new game rules
+### Changed
+- Switched `CommonScreens` class back to using an SPI
+- Renamed config related helper methods 
+
 ## [v4.0.17-1.19] - 2022-07-20
 ### Changed
 - Allow final category fields in annotated configs

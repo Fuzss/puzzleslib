@@ -59,18 +59,18 @@ public class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder client(Class<T> clazz, Supplier<T> clientConfig) {
-        return new ForgeConfigHolderImplV2().client(clazz, clientConfig);
+    public <T extends AbstractConfig> ConfigHolderV2.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
+        return new ForgeConfigHolderImplV2().clientConfig(clazz, clientConfig);
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder common(Class<T> clazz, Supplier<T> commonConfig) {
-        return new ForgeConfigHolderImplV2().common(clazz, commonConfig);
+    public <T extends AbstractConfig> ConfigHolderV2.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
+        return new ForgeConfigHolderImplV2().commonConfig(clazz, commonConfig);
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder server(Class<T> clazz, Supplier<T> serverConfig) {
-        return new ForgeConfigHolderImplV2().server(clazz, serverConfig);
+    public <T extends AbstractConfig> ConfigHolderV2.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
+        return new ForgeConfigHolderImplV2().serverConfig(clazz, serverConfig);
     }
 
     @Override

@@ -6,6 +6,7 @@ import fuzs.puzzleslib.config.ConfigHolderV2;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.registry.RegistryManager;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -60,8 +61,7 @@ public interface CommonFactories {
      *
      * @return provides the client proxy supplier
      */
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
+    @ApiStatus.Internal
     Supplier<Proxy> clientProxy();
 
     /**
@@ -69,8 +69,7 @@ public interface CommonFactories {
      *
      * @return provides the server proxy supplier
      */
-    @SuppressWarnings("DeprecatedIsStillUsed")
-    @Deprecated
+    @ApiStatus.Internal
     Supplier<Proxy> serverProxy();
 
     /**
@@ -80,7 +79,7 @@ public interface CommonFactories {
      * @param <S> server config type
      * @return a config holder which only holds both a client config and a server config
      *
-     * @deprecated use the new config implementation, see {@link #client}, {@link #common} and {@link #server}
+     * @deprecated use the new config implementation, see {@link #clientConfig}, {@link #commonConfig} and {@link #serverConfig}
      */
     @Deprecated(forRemoval = true)
     <C extends AbstractConfig, S extends AbstractConfig> ConfigHolder<C, S> config(Supplier<C> client, Supplier<S> server);
@@ -90,7 +89,7 @@ public interface CommonFactories {
      * @param <C> client config type
      * @return a config holder which only holds a client config
      *
-     * @deprecated use the new config implementation, see {@link #client}, {@link #common} and {@link #server}
+     * @deprecated use the new config implementation, see {@link #clientConfig}, {@link #commonConfig} and {@link #serverConfig}
      */
     @Deprecated(forRemoval = true)
     <C extends AbstractConfig> ConfigHolder<C, AbstractConfig> clientConfig(Supplier<C> client);
@@ -100,43 +99,85 @@ public interface CommonFactories {
      * @param <S> server config type
      * @return a config holder which only holds a server config
      *
-     * @deprecated use the new config implementation, see {@link #client}, {@link #common} and {@link #server}
+     * @deprecated use the new config implementation, see {@link #clientConfig}, {@link #commonConfig} and {@link #serverConfig}
      */
     @Deprecated(forRemoval = true)
     <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server);
 
     /**
      * register a new client config to the holder/builder
-     * just an overload for {@link ConfigHolderV2.Builder#client} that also creates a new builder instance
+     * just an overload for {@link ConfigHolderV2.Builder#clientConfig} that also creates a new builder instance
      *
      * @param clazz         client config main class
      * @param clientConfig  client config factory
      * @param <T>           client config type
      * @return              the builder we are working with
      */
-    <T extends AbstractConfig> ConfigHolderV2.Builder client(Class<T> clazz, Supplier<T> clientConfig);
+    @Deprecated(forRemoval = true)
+    default <T extends AbstractConfig> ConfigHolderV2.Builder client(Class<T> clazz, Supplier<T> clientConfig) {
+        return this.clientConfig(clazz, clientConfig);
+    }
 
     /**
      * register a new client config to the holder/builder
-     * just an overload for {@link ConfigHolderV2.Builder#common} that also creates a new builder instance
+     * just an overload for {@link ConfigHolderV2.Builder#commonConfig} that also creates a new builder instance
      *
      * @param clazz         common config main class
      * @param commonConfig  common config factory
      * @param <T>           common config type
      * @return              the builder we are working with
      */
-    <T extends AbstractConfig> ConfigHolderV2.Builder common(Class<T> clazz, Supplier<T> commonConfig);
+    @Deprecated(forRemoval = true)
+    default <T extends AbstractConfig> ConfigHolderV2.Builder common(Class<T> clazz, Supplier<T> commonConfig) {
+        return this.commonConfig(clazz, commonConfig);
+    }
 
     /**
      * register a new client config to the holder/builder
-     * just an overload for {@link ConfigHolderV2.Builder#server} that also creates a new builder instance
+     * just an overload for {@link ConfigHolderV2.Builder#serverConfig} that also creates a new builder instance
      *
      * @param clazz         server config main class
      * @param serverConfig  server config factory
      * @param <T>           server config type
      * @return              the builder we are working with
      */
-    <T extends AbstractConfig> ConfigHolderV2.Builder server(Class<T> clazz, Supplier<T> serverConfig);
+    @Deprecated(forRemoval = true)
+    default <T extends AbstractConfig> ConfigHolderV2.Builder server(Class<T> clazz, Supplier<T> serverConfig) {
+        return this.serverConfig(clazz, serverConfig);
+    }
+
+    /**
+     * register a new client config to the holder/builder
+     * just an overload for {@link ConfigHolderV2.Builder#clientConfig} that also creates a new builder instance
+     *
+     * @param clazz         client config main class
+     * @param clientConfig  client config factory
+     * @param <T>           client config type
+     * @return              the builder we are working with
+     */
+    <T extends AbstractConfig> ConfigHolderV2.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
+
+    /**
+     * register a new client config to the holder/builder
+     * just an overload for {@link ConfigHolderV2.Builder#commonConfig} that also creates a new builder instance
+     *
+     * @param clazz         common config main class
+     * @param commonConfig  common config factory
+     * @param <T>           common config type
+     * @return              the builder we are working with
+     */
+    <T extends AbstractConfig> ConfigHolderV2.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
+
+    /**
+     * register a new client config to the holder/builder
+     * just an overload for {@link ConfigHolderV2.Builder#serverConfig} that also creates a new builder instance
+     *
+     * @param clazz         server config main class
+     * @param serverConfig  server config factory
+     * @param <T>           server config type
+     * @return              the builder we are working with
+     */
+    <T extends AbstractConfig> ConfigHolderV2.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
 
     /**
      * creates a new registry manager for <code>namespace</code> or returns an existing one

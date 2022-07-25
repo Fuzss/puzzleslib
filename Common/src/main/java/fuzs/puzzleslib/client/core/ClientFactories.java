@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
-import fuzs.puzzleslib.client.gui.screens.Screens;
+import fuzs.puzzleslib.client.gui.screens.CommonScreens;
 import fuzs.puzzleslib.client.model.geom.ModelLayerRegistry;
 
 import java.util.function.Consumer;
@@ -45,5 +45,8 @@ public interface ClientFactories {
      *
      * @return utility class for working with screens, a singleton instance is passed whenever this is called
      */
-    Screens screens();
+    @Deprecated(forRemoval = true)
+    default CommonScreens screens() {
+        return ClientCoreServices.SCREENS;
+    }
 }

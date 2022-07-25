@@ -2,7 +2,6 @@ package fuzs.puzzleslib.client.gui.screens;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -18,7 +17,7 @@ import java.util.List;
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */
-public interface Screens {
+public interface CommonScreens {
 
     /**
      * @param screen screen instance

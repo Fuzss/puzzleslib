@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "fuzs.puzzleslib.mixin",
+  "refmap": "puzzleslib.refmap.json",
+  "mixins": [
+    "accessor.BooleanValueAccessor",
+    "accessor.IntegerValueAccessor"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

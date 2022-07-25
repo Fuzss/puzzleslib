@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.registry.CommonGameRuleFactory;
+
 import java.util.ServiceLoader;
 
 /**
@@ -14,6 +16,10 @@ public class CoreServices {
      * important factories, mainly for networking, registering content and configs
      */
     public static final CommonFactories FACTORIES = load(CommonFactories.class);
+    /**
+     * helper class for creating and registering new game rules
+     */
+    public static final CommonGameRuleFactory GAME_RULES = load(CommonGameRuleFactory.class);
 
     /**
      * loads a service yay

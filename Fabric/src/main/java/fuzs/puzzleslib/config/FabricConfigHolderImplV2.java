@@ -33,7 +33,7 @@ public class FabricConfigHolderImplV2 implements ConfigHolderV2.Builder {
     }
 
     @Override
-    public <T extends AbstractConfig> Builder client(Class<T> clazz, Supplier<T> clientConfig) {
+    public <T extends AbstractConfig> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
         Supplier<T> config = () -> DistTypeExecutor.getWhenOn(DistType.CLIENT, () -> clientConfig);
         if (this.configsByClass.put(clazz, new FabricConfigDataHolderImplV2<T>(ModConfig.Type.CLIENT, config)) != null) {
@@ -43,7 +43,7 @@ public class FabricConfigHolderImplV2 implements ConfigHolderV2.Builder {
     }
 
     @Override
-    public <T extends AbstractConfig> Builder common(Class<T> clazz, Supplier<T> commonConfig) {
+    public <T extends AbstractConfig> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
         if (this.configsByClass.put(clazz, new FabricConfigDataHolderImplV2<T>(ModConfig.Type.COMMON, commonConfig)) != null) {
             throw new IllegalStateException(String.format("Duplicate registration for common config of type %s", clazz));
         }
@@ -51,7 +51,7 @@ public class FabricConfigHolderImplV2 implements ConfigHolderV2.Builder {
     }
 
     @Override
-    public <T extends AbstractConfig> Builder server(Class<T> clazz, Supplier<T> serverConfig) {
+    public <T extends AbstractConfig> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
         if (this.configsByClass.put(clazz, new FabricConfigDataHolderImplV2<>(ModConfig.Type.SERVER, serverConfig)) != null) {
             throw new IllegalStateException(String.format("Duplicate registration for server config of type %s", clazz));
         }
