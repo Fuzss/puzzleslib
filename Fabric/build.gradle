@@ -47,10 +47,10 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 
     // Forge Configs
-    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.0.0"
+    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.1.2"
 
     // Mod Menu
-    modImplementation "com.terraformersmc:modmenu:4.0.0"
+    modImplementation "com.terraformersmc:modmenu:4.0.5"
 
     // Cardinal Components
     // only entity module is used, and we'll probably only ever need that single one
@@ -164,15 +164,6 @@ publishing {
             artifactId = "${modId}-fabric"
             version = modVersion
             from components.java
-            // exclude certain dependencies when publishing to maven
-            // from https://stackoverflow.com/a/50121790
-            pom.withXml {
-                asNode().dependencies.dependency.each { dep ->
-                    if (["modmenu"].stream().anyMatch(mod -> dep.artifactId.last().value().last().contains(mod))) {
-                        assert dep.parent().remove(dep)
-                    }
-                }
-            }
             pom {
                 name = "${modName} [Fabric]"
                 description = "${modDescription}"
@@ -196,6 +187,18 @@ publishing {
                     developer {
                         id = "${modAuthor}".toLowerCase()
                         name = "${modAuthor}"
+                    }
+                }
+            }
+            afterEvaluate {
+                // exclude certain dependencies when publishing to maven
+                // from https://stackoverflow.com/a/50121790
+                pom.withXml {
+                    asNode().dependencies.dependency.each { dep ->
+                        // use this approach to make excluding dependencies from Curse Maven more convenient
+                        if (["com.terraformersmc:modmenu", "dev.onyxstudios.cardinal-components-api:cardinal-components"].stream().anyMatch(mod -> "${dep.groupId.last().value()}:${dep.artifactId.last().value()}".startsWith(mod))) {
+                            assert dep.parent().remove(dep)
+                        }
                     }
                 }
             }
