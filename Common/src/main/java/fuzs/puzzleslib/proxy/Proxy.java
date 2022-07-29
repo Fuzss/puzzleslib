@@ -42,7 +42,7 @@ public interface Proxy {
      * @param channelName channel name
      * @param factory message factory when received
      */
-    default void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message> factory) {
+    default void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
 
     }
 
@@ -51,7 +51,7 @@ public interface Proxy {
      * @param channelName channel name
      * @param factory message factory when received
      */
-    default void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message> factory) {
+    default void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
 
     }
 

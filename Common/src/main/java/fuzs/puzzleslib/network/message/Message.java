@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 /**
  * network message template
  */
-public interface Message {
+public interface Message<T extends Message<T>> {
 
     /**
      * writes message data to buffer
@@ -25,21 +25,21 @@ public interface Message {
      * @param player       server or client player
      * @param gameInstance  server or client instance
      */
+    @SuppressWarnings("unchecked")
     default void handle(Player player, Object gameInstance) {
-        this.makeHandler().handle(this, player, gameInstance);
+        this.makeHandler().handle((T) this, player, gameInstance);
     }
 
     /**
-     * @param <T> this message
      * @return packet handler for message
      */
-    <T extends Message> PacketHandler<T> makeHandler();
+    PacketHandler<T> makeHandler();
 
     /**
      * this is a class, so it cannot be implemented as a functional interface to avoid client only calls somehow running into problems on a dedicated server
      * @param <T> this message
      */
-    abstract class PacketHandler<T extends Message> {
+    abstract class PacketHandler<T extends Message<T>> {
 
         /**
          * handle given packet
