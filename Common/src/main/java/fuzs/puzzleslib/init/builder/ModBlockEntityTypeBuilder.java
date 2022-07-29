@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry.builder;
+package fuzs.puzzleslib.init.builder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;

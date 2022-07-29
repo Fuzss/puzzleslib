@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry;
+package fuzs.puzzleslib.init;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;

@@ -3,62 +3,38 @@ package fuzs.puzzleslib.config;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
- * a config holder holds two separate configs for both logical server and logical client
- * one or both types may not be present, depending on mod requirements and physical side
- * @param <C> client config type
- * @param <S> server config type
+ * a config holder for holding mod configs
+ * there are three different kinds depending on where the data shall be used: CLIENT, COMMON, SERVER
+ * this implementation is not limited to three held configs though, as many configs as desired may be added (file names must be different!)
+ * instead of retrieving configs via mod config type they are stored by class type
  */
-public interface ConfigHolder<C extends AbstractConfig, S extends AbstractConfig> {
+public interface ConfigHolder {
 
     /**
-     * @return client config from this holder, possibly null
+     * @param clazz config clazz type
+     * @param <T>   config type
+     * @return      the config holder
      */
-    C client();
+    <T extends AbstractConfig> ConfigDataHolder<T> getHolder(Class<T> clazz);
 
     /**
-     * @return server config from this holder, possibly null
+     * @param clazz config clazz type
+     * @param <T>   config type
+     * @return      the actual config
      */
-    S server();
-
-    /**
-     * @return is the client config full loaded and ready to be used
-     */
-    boolean isClientAvailable();
-
-    /**
-     * @return is the server config full loaded and ready to be used
-     */
-    boolean isServerAvailable();
-
-    /**
-     * @param fileName file name for client
-     * @return this
-     */
-    ConfigHolder<C, S> setClientFileName(String fileName);
-
-    /**
-     * @param fileName file name for server
-     * @return this
-     */
-    ConfigHolder<C, S> setServerFileName(String fileName);
-
-    /**
-     * @param callback callback for this client config
-     */
-    void addClientCallback(Runnable callback);
-
-    /**
-     * @param callback callback for this server config
-     */
-    void addServerCallback(Runnable callback);
+    default <T extends AbstractConfig> T get(Class<T> clazz) {
+        return this.getHolder(clazz).config();
+    }
 
     /**
      * register config event and configs themselves for <code>modId</code>
+     *
      * @param modId modId to register for
      */
-    void loadConfigs(String modId);
+    void bakeConfigs(String modId);
 
     /**
      * @param modId mod id this config belongs to
@@ -84,6 +60,56 @@ public interface ConfigHolder<C extends AbstractConfig, S extends AbstractConfig
      */
     static String moveToDir(String configDir, String fileName) {
         return Paths.get(configDir, fileName).toString();
+    }
+
+    /**
+     * builder interface for registering configs, not needed anymore after initial registration is complete,
+     * but no new instance is created, so we only store the super type {@link ConfigHolder}
+     */
+    interface Builder extends ConfigHolder {
+
+        /**
+         * register a new client config to the holder/builder
+         *
+         * @param clazz         client config main class
+         * @param clientConfig  client config factory
+         * @param <T>           client config type
+         * @return              the builder we are working with
+         */
+        <T extends AbstractConfig> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
+
+        /**
+         * register a new client config to the holder/builder
+         *
+         * @param clazz         common config main class
+         * @param commonConfig  common config factory
+         * @param <T>           common config type
+         * @return              the builder we are working with
+         */
+        <T extends AbstractConfig> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
+
+        /**
+         * register a new client config to the holder/builder
+         *
+         * @param clazz         server config main class
+         * @param serverConfig  server config factory
+         * @param <T>           server config type
+         * @return              the builder we are working with
+         */
+        <T extends AbstractConfig> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
+
+        /**
+         * this sets the file name on {@link ConfigDataHolder}, it's only used for storing,
+         * since actually it's only ever need in this class when calling {@link #bakeConfigs}
+         *
+         * by default this is set to {@link #defaultName}, otherwise {@link #simpleName} and {@link #moveToDir} exist for convenience
+         *
+         * @param clazz     config main class
+         * @param fileName  file name operator, passed in is the modId
+         * @param <T>       config type
+         * @return          the builder we are working with
+         */
+        <T extends AbstractConfig> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName);
     }
 
     /**

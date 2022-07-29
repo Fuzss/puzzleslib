@@ -3,15 +3,13 @@ package fuzs.puzzleslib.core;
 import fuzs.puzzleslib.config.AbstractConfig;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.config.ForgeConfigHolderImpl;
-import fuzs.puzzleslib.config.ConfigHolderV2;
-import fuzs.puzzleslib.config.ForgeConfigHolderImplV2;
+import fuzs.puzzleslib.init.ForgeRegistryManager;
+import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.ForgeNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.ForgeClientProxy;
 import fuzs.puzzleslib.proxy.ForgeServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
-import fuzs.puzzleslib.registry.ForgeRegistryManager;
-import fuzs.puzzleslib.registry.RegistryManager;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -44,33 +42,18 @@ public class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public <C extends AbstractConfig, S extends AbstractConfig> ConfigHolder<C, S> config(Supplier<C> client, Supplier<S> server) {
-        return new ForgeConfigHolderImpl<>(client, server);
+    public <T extends AbstractConfig> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
+        return new ForgeConfigHolderImpl().clientConfig(clazz, clientConfig);
     }
 
     @Override
-    public <C extends AbstractConfig> ConfigHolder<C, AbstractConfig> clientConfig(Supplier<C> client) {
-        return new ForgeConfigHolderImpl<>(client, () -> null);
+    public <T extends AbstractConfig> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
+        return new ForgeConfigHolderImpl().commonConfig(clazz, commonConfig);
     }
 
     @Override
-    public <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server) {
-        return new ForgeConfigHolderImpl<>(() -> null, server);
-    }
-
-    @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
-        return new ForgeConfigHolderImplV2().clientConfig(clazz, clientConfig);
-    }
-
-    @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
-        return new ForgeConfigHolderImplV2().commonConfig(clazz, commonConfig);
-    }
-
-    @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
-        return new ForgeConfigHolderImplV2().serverConfig(clazz, serverConfig);
+    public <T extends AbstractConfig> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
+        return new ForgeConfigHolderImpl().serverConfig(clazz, serverConfig);
     }
 
     @Override

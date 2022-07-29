@@ -1,9 +1,9 @@
-package fuzs.puzzleslib.registry;
+package fuzs.puzzleslib.init;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.registry.builder.ModBlockEntityTypeBuilder;
-import fuzs.puzzleslib.registry.builder.ModMenuSupplier;
-import fuzs.puzzleslib.registry.builder.ModPoiTypeBuilder;
+import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
+import fuzs.puzzleslib.init.builder.ModMenuSupplier;
+import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;

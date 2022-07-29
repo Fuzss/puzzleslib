@@ -115,9 +115,7 @@ public class FabricModConstructor {
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
         constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);
-        // TODO remove check in the future, modId must always be provided
-        if (!Strings.isBlank(modId)) {
-            PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
-        }
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
     }
 }

@@ -50,7 +50,7 @@ dependencies {
     modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.1.2"
 
     // Mod Menu
-    modImplementation "com.terraformersmc:modmenu:4.0.5"
+    modRuntimeOnly "com.terraformersmc:modmenu:4.0.5"
 
     // Cardinal Components
     // only entity module is used, and we'll probably only ever need that single one
@@ -66,9 +66,6 @@ dependencies {
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
-    // try use curse maven when no other option is available
-    // file id is end of url (7 digits usually) when on file details page on curse
-//    modImplementation "curse.maven:puzzleslib-<project-id>:<file-id>"
 }
 
 loom {
@@ -80,12 +77,14 @@ loom {
             setConfigName("Fabric Client")
             ideConfigGenerated(true)
             runDir("../run")
+            vmArg '-Dmixin.debug.export=true'
         }
         server {
             server()
             setConfigName("Fabric Server")
             ideConfigGenerated(true)
             runDir("../run")
+            vmArg '-Dmixin.debug.export=true'
         }
     }
 }
@@ -110,10 +109,10 @@ processResources {
     inputs.property "minFabricApiVersion", 		"${minFabricApiVersion}"
     inputs.property "minMinecraftVersion", 		"${minMinecraftVersion}"
     inputs.property "nextMinecraftVersion", 	rootProject.getNextVersion("${minMinecraftVersion}")
-//	inputs.property "minPuzzlesVersion", 		"${minPuzzlesVersion}"
+	inputs.property "minPuzzlesVersion", 		"${minPuzzlesVersion}"
     inputs.property "packFormat", 				"${packFormat}"
-	inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}"
-	inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}Client"
+	inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}Fabric"
+	inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}FabricClient"
     inputs.property "modFabricEnvironment", 	"${modFabricEnvironment}"
 
     // replace stuff in fabric.mod.json and pack.mcmeta
@@ -131,7 +130,7 @@ processResources {
                 'minFabricApiVersion':  	"${minFabricApiVersion}",
                 'minMinecraftVersion':  	"${minMinecraftVersion}",
                 "nextMinecraftVersion": 	rootProject.getNextVersion("${minMinecraftVersion}"),
-//				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
+				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
 				"mainEntryPoint": 			"${project.group}.${rootProject.name}Fabric",
 				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}FabricClient",
                 "modFabricEnvironment":		"${modFabricEnvironment}"
@@ -196,7 +195,7 @@ publishing {
                 pom.withXml {
                     asNode().dependencies.dependency.each { dep ->
                         // use this approach to make excluding dependencies from Curse Maven more convenient
-                        if (["com.terraformersmc:modmenu", "dev.onyxstudios.cardinal-components-api:cardinal-components"].stream().anyMatch(mod -> "${dep.groupId.last().value()}:${dep.artifactId.last().value()}".startsWith(mod))) {
+                        if (["com.terraformersmc:modmenu"].stream().anyMatch(mod -> "${dep.groupId.last().value().last()}:${dep.artifactId.last().value().last()}".startsWith(mod))) {
                             assert dep.parent().remove(dep)
                         }
                     }
@@ -217,9 +216,7 @@ signing {
 }
 
 curseforge {
-    if (!file('../CHANGELOG.md').canRead()) {
-        throw new FileNotFoundException("Could not read changelog file")
-    }
+    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
     apiKey = project.hasProperty('curseApiToken') ? project.findProperty('curseApiToken') : ''
     project {
         id = projectCurseId
@@ -235,6 +232,7 @@ curseforge {
             relations {
                 requiredDependency 'fabric-api'
                 requiredDependency 'forge-config-api-port-fabric'
+                requiredDependency 'puzzles-lib'
             }
         }
         addArtifact sourcesJar
@@ -247,9 +245,7 @@ curseforge {
 }
 
 modrinth {
-    if (!file('../CHANGELOG.md').canRead()) {
-        throw new FileNotFoundException("Could not read changelog file")
-    }
+    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
     token = project.hasProperty('modrinthApiToken') ? project.findProperty('modrinthApiToken') : ''
     projectId = projectModrinthId
     versionNumber = project.version
@@ -265,8 +261,9 @@ modrinth {
     dependencies {
         required.project 'fabric-api'
         required.project 'forge-config-api-port'
+        required.project 'puzzles-lib'
     }
-//    debugMode = true
+//	debugMode = true
 }
 
 import groovy.json.*

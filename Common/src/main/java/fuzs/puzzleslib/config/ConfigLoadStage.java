@@ -3,7 +3,7 @@ package fuzs.puzzleslib.config;
 /**
  * used for tracking config load process, only state we really care about is {@link #AVAILABLE}
  */
-enum ConfigLoadStageV2 {
+enum ConfigLoadStage {
     /**
      * config does not exist within this mod context, meaning the {@link AbstractConfig} object is null
      */

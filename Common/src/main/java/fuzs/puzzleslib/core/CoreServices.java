@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.registry.CommonGameRuleFactory;
+import fuzs.puzzleslib.init.CommonGameRuleFactory;
 
 import java.util.ServiceLoader;
 

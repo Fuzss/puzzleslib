@@ -116,12 +116,8 @@ public class ForgeClientModConstructor {
      */
     public static void construct(String modId, ClientModConstructor constructor) {
         ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
-        // TODO remove this branch in the future, modId must always be provided
-        if (Strings.isBlank(modId)) {
-            FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
-        } else {
-            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-            PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
-        }
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+        PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
     }
 }

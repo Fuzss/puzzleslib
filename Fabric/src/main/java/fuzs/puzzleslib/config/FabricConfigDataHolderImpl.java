@@ -2,7 +2,7 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.PuzzlesLib;
-import fuzs.puzzleslib.config.core.ForgeConfigBuilderWrapper;
+import fuzs.puzzleslib.config.core.FabricConfigBuilderWrapper;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import org.jetbrains.annotations.Nullable;
@@ -13,10 +13,10 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 /**
- * implementation on Forge, identical to Fabric class (needs to exist twice as it cannot exist in the common sub project)
+ * implementation on Fabric, identical to Forge class (needs to exist twice as it cannot exist in the common sub project)
  * @param <T> config type
  */
-class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHolderImplV2<T> {
+class FabricConfigDataHolderImpl<T extends AbstractConfig> extends ConfigDataHolderImpl<T> {
     /**
      * the type of config, need when registering and for the file name
      */
@@ -35,10 +35,10 @@ class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHo
      * @param configType    type of config
      * @param config        config factory
      */
-    public ForgeConfigDataHolderImplV2(ModConfig.Type configType, Supplier<T> config) {
+    public FabricConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> config) {
         super(config);
         this.configType = configType;
-        this.fileName = modId -> ConfigHolderV2.defaultName(modId, configType.extension());
+        this.fileName = modId -> ConfigHolder.defaultName(modId, configType.extension());
     }
 
     @Override
@@ -49,7 +49,7 @@ class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHo
     }
 
     @Override
-    protected ConfigLoadStageV2 findLoadStage() {
+    protected ConfigLoadStage findLoadStage() {
         return this.findLoadStage(this.config, this.modConfig);
     }
 
@@ -95,7 +95,7 @@ class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHo
     private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         ImmutableList.Builder<Runnable> listBuilder = ImmutableList.builder();
-        this.config.setupConfig(new ForgeConfigBuilderWrapper(builder), new ConfigHolder.ConfigCallback() {
+        this.config.setupConfig(new FabricConfigBuilderWrapper(builder), new ConfigHolder.ConfigCallback() {
 
             @Override
             public <V> void accept(Supplier<V> entry, Consumer<V> save) {
@@ -107,14 +107,14 @@ class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHo
     }
 
     /**
-     * tries to set client loading stage to {@link ConfigLoadStageV2#AVAILABLE}
+     * tries to set client loading stage to {@link ConfigLoadStage#AVAILABLE}
      *
      * @param modConfig the mod config object to check, do not use global field as it might not have been set yet since the loading event is called inside the ModConfig constructor on Fabric
      */
     private void makeConfigAvailable(@Nullable ModConfig modConfig) {
-        ConfigLoadStageV2 currentLoadingStage = this.findLoadStage(this.config, modConfig);
-        if (currentLoadingStage == ConfigLoadStageV2.LOADED) {
-            currentLoadingStage = ConfigLoadStageV2.AVAILABLE;
+        ConfigLoadStage currentLoadingStage = this.findLoadStage(this.config, modConfig);
+        if (currentLoadingStage == ConfigLoadStage.LOADED) {
+            currentLoadingStage = ConfigLoadStage.AVAILABLE;
         }
         this.loadStage = currentLoadingStage;
     }
@@ -124,15 +124,15 @@ class ForgeConfigDataHolderImplV2<T extends AbstractConfig> extends ConfigDataHo
      * @param modConfig mod config object for this config type
      * @return loading stage corresponding to state of <code>config</code> and <code>modConfig</code>
      */
-    private ConfigLoadStageV2 findLoadStage(@Nullable AbstractConfig config, @Nullable ModConfig modConfig) {
+    private ConfigLoadStage findLoadStage(@Nullable AbstractConfig config, @Nullable ModConfig modConfig) {
         if (config == null) {
-            return ConfigLoadStageV2.NOT_PRESENT;
+            return ConfigLoadStage.NOT_PRESENT;
         } else if (modConfig == null) {
-            return ConfigLoadStageV2.INITIALIZED;
+            return ConfigLoadStage.INITIALIZED;
         } else if (modConfig.getConfigData() == null) {
-            return ConfigLoadStageV2.MISSING_DATA;
+            return ConfigLoadStage.MISSING_DATA;
         }
-        return ConfigLoadStageV2.LOADED;
+        return ConfigLoadStage.LOADED;
     }
 
     /**

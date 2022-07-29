@@ -92,13 +92,9 @@ public class ForgeModConstructor {
      */
     public static void construct(String modId, ModConstructor constructor) {
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
-        // TODO remove this branch in the future, modId must always be provided
-        if (Strings.isBlank(modId)) {
-            FMLJavaModLoadingContext.get().getModEventBus().register(forgeModConstructor);
-        } else {
-            PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
-            PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
-        }
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
+        PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);

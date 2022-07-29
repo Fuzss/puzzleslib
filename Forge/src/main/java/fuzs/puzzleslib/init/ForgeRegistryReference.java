@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry;
+package fuzs.puzzleslib.init;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;

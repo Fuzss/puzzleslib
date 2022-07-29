@@ -4,7 +4,7 @@ package fuzs.puzzleslib.config;
  * a pretty basic holder for a config, {@link #config()} is all we want most of the time
  * @param <T> config type
  */
-public interface ConfigDataHolderV2<T extends AbstractConfig> {
+public interface ConfigDataHolder<T extends AbstractConfig> {
 
     /**
      * @return config from this holder, possibly null

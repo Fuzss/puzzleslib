@@ -12,7 +12,7 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.capability.data.*;
-import fuzs.puzzleslib.registry.FabricRegistryManager;
+import fuzs.puzzleslib.init.FabricRegistryManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 

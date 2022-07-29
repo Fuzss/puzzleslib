@@ -203,15 +203,6 @@ task fabricGenSources(type: GradleBuild) {
     ]
 }
 
-task allSetupWorkspace(type: GradleBuild) {
-    group = '_main'
-    tasks = [
-            ':Common:genSourcesWithQuiltflower',
-            ':Fabric:genSourcesWithQuiltflower',
-            ':Forge:genIntellijRuns'
-    ]
-}
-
 task forgeClient(type: GradleBuild) {
     group = '_main'
     tasks = [

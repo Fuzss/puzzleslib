@@ -1,8 +1,8 @@
-package fuzs.puzzleslib.registry;
+package fuzs.puzzleslib.init;
 
-import fuzs.puzzleslib.registry.builder.ModBlockEntityTypeBuilder;
-import fuzs.puzzleslib.registry.builder.ModMenuSupplier;
-import fuzs.puzzleslib.registry.builder.ModPoiTypeBuilder;
+import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
+import fuzs.puzzleslib.init.builder.ModMenuSupplier;
+import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.minecraft.core.Registry;

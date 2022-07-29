@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry.builder;
+package fuzs.puzzleslib.init.builder;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.world.level.block.Block;

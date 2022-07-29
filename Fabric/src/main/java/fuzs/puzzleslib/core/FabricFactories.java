@@ -6,8 +6,8 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
-import fuzs.puzzleslib.registry.FabricRegistryManager;
-import fuzs.puzzleslib.registry.RegistryManager;
+import fuzs.puzzleslib.init.FabricRegistryManager;
+import fuzs.puzzleslib.init.RegistryManager;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -40,33 +40,18 @@ public class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public <C extends AbstractConfig, S extends AbstractConfig> ConfigHolder<C, S> config(Supplier<C> client, Supplier<S> server) {
-        return new FabricConfigHolderImpl<>(client, server);
+    public <T extends AbstractConfig> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
+        return new FabricConfigHolderImpl().clientConfig(clazz, clientConfig);
     }
 
     @Override
-    public <C extends AbstractConfig> ConfigHolder<C, AbstractConfig> clientConfig(Supplier<C> client) {
-        return new FabricConfigHolderImpl<>(client, () -> null);
+    public <T extends AbstractConfig> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
+        return new FabricConfigHolderImpl().commonConfig(clazz, commonConfig);
     }
 
     @Override
-    public <S extends AbstractConfig> ConfigHolder<AbstractConfig, S> serverConfig(Supplier<S> server) {
-        return new FabricConfigHolderImpl<>(() -> null, server);
-    }
-
-    @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
-        return new FabricConfigHolderImplV2().clientConfig(clazz, clientConfig);
-    }
-
-    @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
-        return new FabricConfigHolderImplV2().commonConfig(clazz, commonConfig);
-    }
-
-    @Override
-    public <T extends AbstractConfig> ConfigHolderV2.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
-        return new FabricConfigHolderImplV2().serverConfig(clazz, serverConfig);
+    public <T extends AbstractConfig> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
+        return new FabricConfigHolderImpl().serverConfig(clazz, serverConfig);
     }
 
     @Override

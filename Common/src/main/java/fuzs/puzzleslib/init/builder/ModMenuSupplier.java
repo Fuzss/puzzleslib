@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry.builder;
+package fuzs.puzzleslib.init.builder;
 
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;

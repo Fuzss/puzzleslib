@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.1.0-1.19.1] - 2022-07-29
+- Compiled for Minecraft 1.19.1
+## Changed
+- Cleaned up networking classes 
+## Removed
+- Remove deprecated methods and classes
+
 ## [v4.0.18-1.19] - 2022-07-26
 ### Added
 - Added a utility class for creating and registering new game rules

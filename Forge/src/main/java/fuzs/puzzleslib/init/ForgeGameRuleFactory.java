@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.registry;
+package fuzs.puzzleslib.init;
 
 import fuzs.puzzleslib.mixin.accessor.BooleanValueAccessor;
 import fuzs.puzzleslib.mixin.accessor.IntegerValueAccessor;

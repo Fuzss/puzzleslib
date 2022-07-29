@@ -5,7 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.capability.data.*;
-import fuzs.puzzleslib.registry.ForgeRegistryManager;
+import fuzs.puzzleslib.init.ForgeRegistryManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

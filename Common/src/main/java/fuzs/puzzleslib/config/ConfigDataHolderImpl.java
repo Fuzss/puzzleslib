@@ -7,16 +7,16 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 /**
- * just a very basic template for implementing {@link ConfigDataHolderV2} in the common project
+ * just a very basic template for implementing {@link ConfigDataHolder} in the common project
  * @param <T> config type
  */
-abstract class ConfigDataHolderImplV2<T extends AbstractConfig> implements ConfigDataHolderV2<T> {
+abstract class ConfigDataHolderImpl<T extends AbstractConfig> implements ConfigDataHolder<T> {
     /**
      * the stored config
      */
     protected final T config;
     /**
-     * file name, should be set to {@link ConfigHolderV2#defaultName} in mod loader specific implementation
+     * file name, should be set to {@link ConfigHolder#defaultName} in mod loader specific implementation
      */
     protected UnaryOperator<String> fileName;
     /**
@@ -26,12 +26,12 @@ abstract class ConfigDataHolderImplV2<T extends AbstractConfig> implements Confi
     /**
      * loading stage for config, useful to determine if it has properly been loaded when used (for finding bugs of early access)
      */
-    protected ConfigLoadStageV2 loadStage = ConfigLoadStageV2.NOT_PRESENT;
+    protected ConfigLoadStage loadStage = ConfigLoadStage.NOT_PRESENT;
 
     /**
      * @param config config factory
      */
-    protected ConfigDataHolderImplV2(Supplier<T> config) {
+    protected ConfigDataHolderImpl(Supplier<T> config) {
         this.config = config.get();
     }
 
@@ -43,8 +43,8 @@ abstract class ConfigDataHolderImplV2<T extends AbstractConfig> implements Confi
 
     @Override
     public boolean isAvailable() {
-        ConfigLoadStageV2 currentLoadingStage = this.findLoadStage();
-        if (currentLoadingStage != ConfigLoadStageV2.LOADED || this.loadStage != ConfigLoadStageV2.AVAILABLE) {
+        ConfigLoadStage currentLoadingStage = this.findLoadStage();
+        if (currentLoadingStage != ConfigLoadStage.LOADED || this.loadStage != ConfigLoadStage.AVAILABLE) {
             this.loadStage = currentLoadingStage;
             return false;
         }
@@ -57,7 +57,7 @@ abstract class ConfigDataHolderImplV2<T extends AbstractConfig> implements Confi
     }
 
     /**
-     * by default this is set to {@link ConfigHolderV2#defaultName}, otherwise {@link ConfigHolderV2#simpleName} and {@link ConfigHolderV2#moveToDir} exist for convenience
+     * by default this is set to {@link ConfigHolder#defaultName}, otherwise {@link ConfigHolder#simpleName} and {@link ConfigHolder#moveToDir} exist for convenience
      *
      * @param fileName file name for this config
      */
@@ -75,5 +75,5 @@ abstract class ConfigDataHolderImplV2<T extends AbstractConfig> implements Confi
      *
      * @return the current loading stage
      */
-    protected abstract ConfigLoadStageV2 findLoadStage();
+    protected abstract ConfigLoadStage findLoadStage();
 }

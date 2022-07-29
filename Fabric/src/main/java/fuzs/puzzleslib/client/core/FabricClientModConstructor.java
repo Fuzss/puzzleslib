@@ -104,9 +104,7 @@ public class FabricClientModConstructor {
         constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
         constructor.onRegisterSearchTress(fabricClientModConstructor::registerSearchTree);
-        // TODO remove check in the future, modId must always be provided
-        if (!Strings.isBlank(modId)) {
-            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-        }
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
     }
 }
