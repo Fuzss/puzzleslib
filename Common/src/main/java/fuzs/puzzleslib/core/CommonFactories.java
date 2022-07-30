@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.config.AbstractConfig;
+import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.NetworkHandler;
@@ -69,7 +69,7 @@ public interface CommonFactories {
      * @param <T>           client config type
      * @return              the builder we are working with
      */
-    <T extends AbstractConfig> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
+    <T extends ConfigCore> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
 
     /**
      * register a new client config to the holder/builder
@@ -80,7 +80,7 @@ public interface CommonFactories {
      * @param <T>           common config type
      * @return              the builder we are working with
      */
-    <T extends AbstractConfig> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
+    <T extends ConfigCore> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
 
     /**
      * register a new client config to the holder/builder
@@ -91,7 +91,7 @@ public interface CommonFactories {
      * @param <T>           server config type
      * @return              the builder we are working with
      */
-    <T extends AbstractConfig> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
+    <T extends ConfigCore> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
 
     /**
      * creates a new registry manager for <code>namespace</code> or returns an existing one

@@ -13,7 +13,7 @@ import net.minecraftforge.fml.javafmlmod.FMLModContainer;
  */
 @Mod(PuzzlesLib.MOD_ID)
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
-public class PuzzlesLibForge extends PuzzlesLib {
+public class PuzzlesLibForge {
 
     /**
      * find the {@link ModContainer} for a specific <code>modId</code> so we do not have to rely on {@link ModLoadingContext#get()}
@@ -27,7 +27,7 @@ public class PuzzlesLibForge extends PuzzlesLib {
     }
 
     /**
-     * find the {@link IEventBus} for a specific <code>modId</code> so we do not have to rely on {@link FMLJavaModLoadingContext#get()#getModEventBus()}
+     * find the {@link IEventBus} for a specific <code>modId</code> so we do not have to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}
      *
      * @param modId id for mod container
      * @return      the mod event bus

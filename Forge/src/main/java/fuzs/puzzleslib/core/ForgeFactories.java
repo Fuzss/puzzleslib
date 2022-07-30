@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.config.AbstractConfig;
+import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.config.ForgeConfigHolderImpl;
 import fuzs.puzzleslib.init.ForgeRegistryManager;
@@ -42,17 +42,17 @@ public class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
+    public <T extends ConfigCore> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
         return new ForgeConfigHolderImpl().clientConfig(clazz, clientConfig);
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
+    public <T extends ConfigCore> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
         return new ForgeConfigHolderImpl().commonConfig(clazz, commonConfig);
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
+    public <T extends ConfigCore> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
         return new ForgeConfigHolderImpl().serverConfig(clazz, serverConfig);
     }
 

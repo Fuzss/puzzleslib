@@ -40,17 +40,17 @@ public class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
+    public <T extends ConfigCore> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
         return new FabricConfigHolderImpl().clientConfig(clazz, clientConfig);
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
+    public <T extends ConfigCore> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
         return new FabricConfigHolderImpl().commonConfig(clazz, commonConfig);
     }
 
     @Override
-    public <T extends AbstractConfig> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
+    public <T extends ConfigCore> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
         return new FabricConfigHolderImpl().serverConfig(clazz, serverConfig);
     }
 

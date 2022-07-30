@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.client.core;
 
-import fuzs.puzzleslib.client.gui.screens.CommonScreens;
 import fuzs.puzzleslib.client.model.geom.ModelLayerRegistry;
 
 import java.util.function.Consumer;

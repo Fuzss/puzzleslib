@@ -3,10 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.1.0-1.19.1] - 2022-07-29
+## [v4.1.0-1.19.1] - 2022-07-30
 - Compiled for Minecraft 1.19.1
 ## Changed
-- Cleaned up networking classes 
+- Cleaned up networking classes
+- Made config annotations more powerful, removing the need to set category names and comments on config objects
 ## Removed
 - Remove deprecated methods and classes
 

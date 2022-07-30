@@ -2,13 +2,12 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.config.annotation.AnnotatedConfigBuilder;
 import fuzs.puzzleslib.config.core.FabricConfigBuilderWrapper;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -16,7 +15,7 @@ import java.util.function.UnaryOperator;
  * implementation on Fabric, identical to Forge class (needs to exist twice as it cannot exist in the common sub project)
  * @param <T> config type
  */
-class FabricConfigDataHolderImpl<T extends AbstractConfig> extends ConfigDataHolderImpl<T> {
+class FabricConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
     /**
      * the type of config, need when registering and for the file name
      */
@@ -26,10 +25,6 @@ class FabricConfigDataHolderImpl<T extends AbstractConfig> extends ConfigDataHol
      */
     @Nullable
     private ModConfig modConfig;
-    /**
-     * immutable list of config value callbacks created from annotated configs for syncing changes
-     */
-    private List<Runnable> configValueCallbacks;
 
     /**
      * @param configType    type of config
@@ -80,9 +75,6 @@ class FabricConfigDataHolderImpl<T extends AbstractConfig> extends ConfigDataHol
     public void register(ModConfigFactory factory) {
         if (this.modConfig != null) throw new IllegalStateException(String.format("Config for type %s has already been registered!", this.configType));
         if (this.config != null) {
-            // add config reload callback first to make sure it's called when initially loading configs
-            // (since on some systems reload event doesn't trigger during startup, resulting in configs only being loaded here)
-            this.addCallback(this.config::afterConfigReload);
             this.modConfig = factory.createAndRegister(this.configType, this.buildSpec(), this.fileName);
         }
     }
@@ -94,15 +86,8 @@ class FabricConfigDataHolderImpl<T extends AbstractConfig> extends ConfigDataHol
      */
     private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        ImmutableList.Builder<Runnable> listBuilder = ImmutableList.builder();
-        this.config.setupConfig(new FabricConfigBuilderWrapper(builder), new ConfigHolder.ConfigCallback() {
-
-            @Override
-            public <V> void accept(Supplier<V> entry, Consumer<V> save) {
-                listBuilder.add(() -> save.accept(entry.get()));
-            }
-        });
-        this.configValueCallbacks = listBuilder.build();
+        AnnotatedConfigBuilder.serialize(new FabricConfigBuilderWrapper(builder),this, this.config);
+        this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }
 
@@ -124,7 +109,7 @@ class FabricConfigDataHolderImpl<T extends AbstractConfig> extends ConfigDataHol
      * @param modConfig mod config object for this config type
      * @return loading stage corresponding to state of <code>config</code> and <code>modConfig</code>
      */
-    private ConfigLoadStage findLoadStage(@Nullable AbstractConfig config, @Nullable ModConfig modConfig) {
+    private ConfigLoadStage findLoadStage(@Nullable ConfigCore config, @Nullable ModConfig modConfig) {
         if (config == null) {
             return ConfigLoadStage.NOT_PRESENT;
         } else if (modConfig == null) {

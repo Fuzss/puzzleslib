@@ -5,7 +5,7 @@ package fuzs.puzzleslib.config;
  */
 enum ConfigLoadStage {
     /**
-     * config does not exist within this mod context, meaning the {@link AbstractConfig} object is null
+     * config does not exist within this mod context, meaning the {@link ConfigCore} object is null
      */
     NOT_PRESENT,
     /**

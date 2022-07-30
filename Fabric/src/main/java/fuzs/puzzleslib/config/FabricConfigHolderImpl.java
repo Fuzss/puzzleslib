@@ -22,18 +22,18 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
     /**
      * all configs in this holder, made immutable on baking
      */
-    private Map<Class<? extends AbstractConfig>, FabricConfigDataHolderImpl<? extends AbstractConfig>> configsByClass = Maps.newIdentityHashMap();
+    private Map<Class<? extends ConfigCore>, FabricConfigDataHolderImpl<? extends ConfigCore>> configsByClass = Maps.newIdentityHashMap();
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends AbstractConfig> ConfigDataHolder<T> getHolder(Class<T> clazz) {
-        FabricConfigDataHolderImpl<? extends AbstractConfig> holder = this.configsByClass.get(clazz);
+    public <T extends ConfigCore> ConfigDataHolder<T> getHolder(Class<T> clazz) {
+        FabricConfigDataHolderImpl<? extends ConfigCore> holder = this.configsByClass.get(clazz);
         Objects.requireNonNull(holder, String.format("No config holder available for type %s", clazz));
         return (ConfigDataHolder<T>) holder;
     }
 
     @Override
-    public <T extends AbstractConfig> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
+    public <T extends ConfigCore> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
         Supplier<T> config = () -> DistTypeExecutor.getWhenOn(DistType.CLIENT, () -> clientConfig);
         if (this.configsByClass.put(clazz, new FabricConfigDataHolderImpl<T>(ModConfig.Type.CLIENT, config)) != null) {
@@ -43,7 +43,7 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
     }
 
     @Override
-    public <T extends AbstractConfig> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
+    public <T extends ConfigCore> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
         if (this.configsByClass.put(clazz, new FabricConfigDataHolderImpl<T>(ModConfig.Type.COMMON, commonConfig)) != null) {
             throw new IllegalStateException(String.format("Duplicate registration for common config of type %s", clazz));
         }
@@ -51,7 +51,7 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
     }
 
     @Override
-    public <T extends AbstractConfig> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
+    public <T extends ConfigCore> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
         if (this.configsByClass.put(clazz, new FabricConfigDataHolderImpl<>(ModConfig.Type.SERVER, serverConfig)) != null) {
             throw new IllegalStateException(String.format("Duplicate registration for server config of type %s", clazz));
         }
@@ -59,7 +59,7 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
     }
 
     @Override
-    public <T extends AbstractConfig> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName) {
+    public <T extends ConfigCore> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName) {
         FabricConfigDataHolderImpl<T> holder = (FabricConfigDataHolderImpl<T>) this.getHolder(clazz);
         holder.setFileName(fileName);
         return this;
@@ -69,7 +69,7 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
     public void bakeConfigs(String modId) {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
-        for (FabricConfigDataHolderImpl<? extends AbstractConfig> holder : this.configsByClass.values()) {
+        for (FabricConfigDataHolderImpl<? extends ConfigCore> holder : this.configsByClass.values()) {
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
             ModConfigEvent.LOADING.register((ModConfig config) -> {

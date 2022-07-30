@@ -7,11 +7,12 @@ import java.lang.annotation.Target;
 
 /**
  * config annotation for individual config fields
- * a file containing these annotations needs to be registered via a {@link ConfigHolder}
+ * a file containing these annotations needs to be registered via a {@link fuzs.puzzleslib.config.ConfigHolder}
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
 public @interface Config {
+
     /**
      * @return name of this config option, will use field as name when empty
      */
@@ -38,10 +39,12 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface IntRange {
+
         /**
          * @return min value
          */
         int min() default Integer.MIN_VALUE;
+
         /**
          * @return max value
          */
@@ -54,30 +57,16 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface LongRange {
+
         /**
          * @return min value
          */
         long min() default Long.MIN_VALUE;
+
         /**
          * @return max value
          */
         long max() default Long.MAX_VALUE;
-    }
-
-    /**
-     * range for float values
-     */
-    @Retention(RetentionPolicy.RUNTIME)
-    @Target(ElementType.FIELD)
-    @interface FloatRange {
-        /**
-         * @return min value
-         */
-        float min() default Float.MIN_VALUE;
-        /**
-         * @return max value
-         */
-        float max() default Float.MAX_VALUE;
     }
 
     /**
@@ -86,10 +75,12 @@ public @interface Config {
     @Retention(RetentionPolicy.RUNTIME)
     @Target(ElementType.FIELD)
     @interface DoubleRange {
+
         /**
          * @return min value
          */
         double min() default Double.MIN_VALUE;
+
         /**
          * @return max value
          */
@@ -102,6 +93,7 @@ public @interface Config {
     @Target(ElementType.FIELD)
     @Retention(RetentionPolicy.RUNTIME)
     @interface AllowedValues {
+
         /**
          * @return allowed values
          */

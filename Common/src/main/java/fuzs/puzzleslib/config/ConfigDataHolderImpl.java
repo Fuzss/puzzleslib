@@ -3,6 +3,7 @@ package fuzs.puzzleslib.config;
 import com.google.common.collect.Lists;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -10,7 +11,7 @@ import java.util.function.UnaryOperator;
  * just a very basic template for implementing {@link ConfigDataHolder} in the common project
  * @param <T> config type
  */
-abstract class ConfigDataHolderImpl<T extends AbstractConfig> implements ConfigDataHolder<T> {
+public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>, ValueCallback {
     /**
      * the stored config
      */
@@ -23,6 +24,11 @@ abstract class ConfigDataHolderImpl<T extends AbstractConfig> implements ConfigD
      * custom syncs to perform when config reloads
      */
     protected final List<Runnable> additionalCallbacks = Lists.newArrayList();
+    /**
+     * list of config value callbacks created from annotated configs for syncing changes
+     * this is replaced with an immutable list after config setup is done
+     */
+    protected List<Runnable> configValueCallbacks = Lists.newArrayList();
     /**
      * loading stage for config, useful to determine if it has properly been loaded when used (for finding bugs of early access)
      */
@@ -52,8 +58,13 @@ abstract class ConfigDataHolderImpl<T extends AbstractConfig> implements ConfigD
     }
 
     @Override
-    public void addCallback(Runnable callback) {
+    public void accept(Runnable callback) {
         this.additionalCallbacks.add(callback);
+    }
+
+    @Override
+    public <V> void accept(Supplier<V> entry, Consumer<V> save) {
+        this.configValueCallbacks.add(() -> save.accept(entry.get()));
     }
 
     /**

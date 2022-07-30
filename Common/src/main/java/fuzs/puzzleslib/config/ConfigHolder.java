@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.config;
 
 import java.nio.file.Paths;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -18,14 +17,14 @@ public interface ConfigHolder {
      * @param <T>   config type
      * @return      the config holder
      */
-    <T extends AbstractConfig> ConfigDataHolder<T> getHolder(Class<T> clazz);
+    <T extends ConfigCore> ConfigDataHolder<T> getHolder(Class<T> clazz);
 
     /**
      * @param clazz config clazz type
      * @param <T>   config type
      * @return      the actual config
      */
-    default <T extends AbstractConfig> T get(Class<T> clazz) {
+    default <T extends ConfigCore> T get(Class<T> clazz) {
         return this.getHolder(clazz).config();
     }
 
@@ -76,7 +75,7 @@ public interface ConfigHolder {
          * @param <T>           client config type
          * @return              the builder we are working with
          */
-        <T extends AbstractConfig> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
+        <T extends ConfigCore> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
 
         /**
          * register a new client config to the holder/builder
@@ -86,7 +85,7 @@ public interface ConfigHolder {
          * @param <T>           common config type
          * @return              the builder we are working with
          */
-        <T extends AbstractConfig> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
+        <T extends ConfigCore> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
 
         /**
          * register a new client config to the holder/builder
@@ -96,7 +95,7 @@ public interface ConfigHolder {
          * @param <T>           server config type
          * @return              the builder we are working with
          */
-        <T extends AbstractConfig> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
+        <T extends ConfigCore> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
 
         /**
          * this sets the file name on {@link ConfigDataHolder}, it's only used for storing,
@@ -109,20 +108,6 @@ public interface ConfigHolder {
          * @param <T>       config type
          * @return          the builder we are working with
          */
-        <T extends AbstractConfig> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName);
-    }
-
-    /**
-     * callback interface for saving config values upon config reload
-     */
-    @FunctionalInterface
-    interface ConfigCallback {
-
-        /**
-         * @param entry source config value object
-         * @param save action to perform when value changes (is reloaded)
-         * @param <T> type for value
-         */
-        <T> void accept(Supplier<T> entry, Consumer<T> save);
+        <T extends ConfigCore> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName);
     }
 }
