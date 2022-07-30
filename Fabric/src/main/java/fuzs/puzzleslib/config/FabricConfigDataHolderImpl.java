@@ -55,15 +55,19 @@ class FabricConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderI
      * @param reloading is the config being reloaded (only for log message)
      */
     public void onModConfig(ModConfig config, boolean reloading) {
-        if (config.getType() == this.configType) {
-            // not sure why null is permitted, but there probably is a reason...
-            if (this.modConfig == null || config == this.modConfig) {
+        // null must be permitted for config loading as the event is triggered during construction of ModConfig (before the field can even be set)
+        if (config.getType() == this.configType && (this.modConfig == null || config == this.modConfig)) {
+            // call this before running callbacks, so they may use the config already
+            this.makeConfigAvailable(config);
+            String loading;
+            if (this.isAvailable()) {
+                loading = reloading ? "Reloading" : "Loading";
                 this.configValueCallbacks.forEach(Runnable::run);
-                // call this before running callbacks, so they may use the config already
-                this.makeConfigAvailable(config);
                 this.additionalCallbacks.forEach(Runnable::run);
-                PuzzlesLib.LOGGER.info("{} {} config for {}", reloading ? "Reloading" : "Loading", config.getType().extension(), config.getModId());
+            } else {
+                loading = "Unloading";
             }
+            PuzzlesLib.LOGGER.info("{} {} config for {}", loading, config.getType().extension(), config.getModId());
         }
     }
 
