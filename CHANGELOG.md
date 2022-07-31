@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.1.2-1.19.1] - 2022-07-31
+### Fixed
+- Fixed log spam when loading configs
+
 ## [v4.1.1-1.19.1] - 2022-07-30
 ### Fixed
 - Correctly handle config unloading

@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.config;
 
 import com.google.common.collect.Lists;
+import com.mojang.datafixers.util.Either;
+import com.mojang.datafixers.util.Unit;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,7 +34,7 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
     /**
      * loading stage for config, useful to determine if it has properly been loaded when used (for finding bugs of early access)
      */
-    protected ConfigLoadStage loadStage = ConfigLoadStage.NOT_PRESENT;
+    protected boolean available;
 
     /**
      * @param config config factory
@@ -49,12 +51,7 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
 
     @Override
     public boolean isAvailable() {
-        ConfigLoadStage currentLoadingStage = this.findLoadStage();
-        if (currentLoadingStage != ConfigLoadStage.LOADED || this.loadStage != ConfigLoadStage.AVAILABLE) {
-            this.loadStage = currentLoadingStage;
-            return false;
-        }
-        return true;
+        return this.findErrorMessage().left().isPresent();
     }
 
     @Override
@@ -82,9 +79,9 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
     protected abstract void testAvailable();
 
     /**
-     * abstraction for determining the current loading stage so it may be used in here already
+     * abstraction for determining a possible error due to missing data when accessing configs externally
      *
-     * @return the current loading stage
+     * @return the error message if present
      */
-    protected abstract ConfigLoadStage findLoadStage();
+    protected abstract Either<Unit, String> findErrorMessage();
 }
