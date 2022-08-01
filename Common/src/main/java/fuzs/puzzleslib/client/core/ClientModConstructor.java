@@ -10,7 +10,10 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -23,6 +26,7 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -98,7 +102,31 @@ public interface ClientModConstructor {
     /**
      * @param context add a search tree builder together with a token
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterSearchTress(SearchRegistryContext context) {
+
+    }
+
+    /**
+     * @param context add a search tree builder together with a token
+     */
+    default void onRegisterSearchTrees(SearchRegistryContext context) {
+        this.onRegisterSearchTress(context);
+    }
+
+    /**
+     * @param modelManager      the model manager
+     * @param models            map of all baked models, useful to add or replace models
+     * @param modelBakery       the bakery
+     */
+    default void onLoadModels(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+
+    }
+
+    /**
+     * @param context add external models to be loaded
+     */
+    default void onRegisterAdditionalModels(AdditionalModelsContext context) {
 
     }
 
@@ -245,5 +273,19 @@ public interface ClientModConstructor {
          * @param <T>               type to be searched for
          */
         <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder);
+    }
+
+    /**
+     * get access to registering additional models
+     */
+    @FunctionalInterface
+    interface AdditionalModelsContext {
+
+        /**
+         * register a model that is referenced nowhere and would normally not be loaded
+         *
+         * @param location the models location
+         */
+        void registerAdditionalModel(ResourceLocation location);
     }
 }

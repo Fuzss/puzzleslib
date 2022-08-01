@@ -16,13 +16,9 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
-import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.util.Strings;
 
 /**
@@ -57,7 +53,7 @@ public class ForgeClientModConstructor {
                 MenuScreens.register(menuType, factory::create);
             }
         });
-        this.constructor.onRegisterSearchTress(new ClientModConstructor.SearchRegistryContext() {
+        this.constructor.onRegisterSearchTrees(new ClientModConstructor.SearchRegistryContext() {
 
             @Override
             public <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
@@ -105,6 +101,16 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onRegisterLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions evt) {
         this.constructor.onRegisterLayerDefinitions(evt::registerLayerDefinition);
+    }
+
+    @SubscribeEvent
+    public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
+        this.constructor.onLoadModels(evt.getModelManager(), evt.getModels(), evt.getModelBakery());
+    }
+
+    @SubscribeEvent
+    public void onRegisterAdditional(final ModelEvent.RegisterAdditional evt) {
+        this.constructor.onRegisterAdditionalModels(evt::register);
     }
 
     /**

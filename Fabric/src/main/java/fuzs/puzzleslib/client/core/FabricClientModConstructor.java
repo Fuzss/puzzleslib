@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.api.client.event.ModelEvents;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
+import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
@@ -23,18 +25,19 @@ import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * wrapper class for {@link ClientModConstructor} for calling all required registration methods at the correct time,
  * which means everything is called immediately on Fabric (but in the correct order)
- *
  * we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  * (this doesn't really matter on Fabric)
  */
@@ -103,7 +106,11 @@ public class FabricClientModConstructor {
         constructor.onRegisterMenuScreens(fabricClientModConstructor::registerMenuScreen);
         constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
-        constructor.onRegisterSearchTress(fabricClientModConstructor::registerSearchTree);
+        constructor.onRegisterSearchTrees(fabricClientModConstructor::registerSearchTree);
+        ModelEvents.BAKING_COMPLETED.register(constructor::onLoadModels);
+        ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
+            constructor.onRegisterAdditionalModels(out::accept);
+        });
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
     }
