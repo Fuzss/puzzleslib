@@ -73,6 +73,8 @@ public class ForgeConfigHolderImpl implements ConfigHolder.Builder {
         // register events before registering configs
         final IEventBus modBus = PuzzlesLibForge.findModEventBus(modId);
         for (ForgeConfigDataHolderImpl<? extends ConfigCore> holder : this.configsByClass.values()) {
+            // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
+            if (holder.config == null) continue;
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
             modBus.addListener((final ModConfigEvent.Loading evt) -> {

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.1.4-1.19.1] - 2022-08-01
+### Fixed
+- Fixed client configs causing dedicated servers to fail on start-up
+
 ## [v4.1.3-1.19.1] - 2022-08-01
 ### Added
 - Added a few utility methods for handling block models

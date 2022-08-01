@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 /**
- * implementation on Forge, identical to Fabric class (needs to exist twice as it cannot exist in the common sub project)
+ * implementation on Forge, identical to Fabric class (needs to exist twice as it cannot exist in the common subproject)
  * @param <T> config type
  */
 class ForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
@@ -65,7 +65,7 @@ class ForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderIm
      * @param reloading is the config being reloaded (only for log message)
      */
     public void onModConfig(ModConfig config, boolean reloading) {
-        Objects.requireNonNull(this.config, "Config is null on loading");
+        Objects.requireNonNull(this.config, "Attempting to register invalid config of type %s for mod id %s".formatted(this.configType.extension(), config.getModId()));
         // null must be permitted for config loading as the event is triggered during construction of ModConfig (before the field can even be set)
         if (config.getType() == this.configType && (this.modConfig == null || config == this.modConfig)) {
             String loading;
@@ -88,10 +88,9 @@ class ForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderIm
      * @param factory factory for actual ModConfig
      */
     public void register(ModConfigFactory factory) {
+        Objects.requireNonNull(this.config, "Attempting to register invalid config of type %s".formatted(this.configType.extension()));
         if (this.modConfig != null) throw new IllegalStateException(String.format("Config for type %s has already been registered!", this.configType));
-        if (this.config != null) {
-            this.modConfig = factory.createAndRegister(this.configType, this.buildSpec(), this.fileName);
-        }
+        this.modConfig = factory.createAndRegister(this.configType, this.buildSpec(), this.fileName);
     }
 
     /**

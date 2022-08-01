@@ -70,6 +70,8 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
         for (FabricConfigDataHolderImpl<? extends ConfigCore> holder : this.configsByClass.values()) {
+            // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
+            if (holder.config == null) continue;
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
             ModConfigEvent.LOADING.register((ModConfig config) -> {
