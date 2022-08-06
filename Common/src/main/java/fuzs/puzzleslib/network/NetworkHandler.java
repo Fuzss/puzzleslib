@@ -25,7 +25,7 @@ public interface NetworkHandler {
      * @param direction side this message is to be executed at
      * @param <T> message implementation
      */
-    <T extends Message<T>> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction);
+    <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction);
 
     /**
      * send message from client to server

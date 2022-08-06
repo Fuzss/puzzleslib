@@ -51,8 +51,9 @@ public class ForgeNetworkHandler implements NetworkHandler {
         this.channel = channel;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Message<T>> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction) {
+    public <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction) {
         BiConsumer<T, FriendlyByteBuf> encode = Message::write;
         Function<FriendlyByteBuf, T> decode = buf -> {
             T message = supplier.get();
@@ -62,8 +63,9 @@ public class ForgeNetworkHandler implements NetworkHandler {
         BiConsumer<T, Supplier<NetworkEvent.Context>> handle = (msg, ctxSup) -> {
             NetworkEvent.Context ctx = ctxSup.get();
             final LogicalSide receptionSide = DistTypeConverter.toLogicalSide(direction.getReceptionSide());
-            if (ctx.getDirection().getReceptionSide() != receptionSide) {
-                throw new IllegalStateException(String.format("Received message on wrong side, expected %s, was %s", receptionSide, ctx.getDirection().getReceptionSide()));
+            LogicalSide expectedReceptionSide = ctx.getDirection().getReceptionSide();
+            if (expectedReceptionSide != receptionSide) {
+                throw new IllegalStateException(String.format("Received message on wrong side, expected %s, was %s", receptionSide, expectedReceptionSide));
             }
             Player player;
             if (receptionSide.isClient()) {
@@ -74,7 +76,7 @@ public class ForgeNetworkHandler implements NetworkHandler {
             ctx.enqueueWork(() -> msg.handle(player, LogicalSidedProvider.WORKQUEUE.get(receptionSide)));
             ctx.setPacketHandled(true);
         };
-        this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle);
+        this.channel.registerMessage(this.discriminator.getAndIncrement(), (Class<T>) clazz, encode, decode, handle);
     }
 
     @Override

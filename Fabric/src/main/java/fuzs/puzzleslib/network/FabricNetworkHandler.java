@@ -31,7 +31,7 @@ public class FabricNetworkHandler implements NetworkHandler {
     /**
      * registry for class to identifier relation
      */
-    private final Map<Class<? extends Message<?>>, ResourceLocation> messageRegistry = Maps.newIdentityHashMap();
+    private final Map<Class<? extends Message<?>>, MessageData> messages = Maps.newIdentityHashMap();
     /**
      * mod id for channel identifier
      */
@@ -49,9 +49,9 @@ public class FabricNetworkHandler implements NetworkHandler {
     }
 
     @Override
-    public <T extends Message<T>> void register(Class<T> clazz, Supplier<T> supplier, MessageDirection direction) {
+    public <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction) {
         ResourceLocation channelName = this.nextIdentifier();
-        this.messageRegistry.put(clazz, channelName);
+        this.messages.put(clazz, new MessageData(clazz, channelName, direction));
         final Function<FriendlyByteBuf, Message<?>> decode = buf -> Util.make(supplier.get(), message -> message.read(buf));
         switch (direction) {
             case TO_CLIENT -> Proxy.INSTANCE.registerClientReceiver(channelName, decode);
@@ -117,6 +117,7 @@ public class FabricNetworkHandler implements NetworkHandler {
      * @return          packet for message
      */
     private Packet<?> toServerboundPacket(Message<?> message) {
+        if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_SERVER) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_SERVER, MessageDirection.TO_CLIENT));
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
@@ -125,6 +126,7 @@ public class FabricNetworkHandler implements NetworkHandler {
      * @return          packet for message
      */
     private Packet<?> toClientboundPacket(Message<?> message) {
+        if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_CLIENT) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_CLIENT, MessageDirection.TO_SERVER));
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
@@ -134,7 +136,7 @@ public class FabricNetworkHandler implements NetworkHandler {
      * @return                  packet for message
      */
     private Packet<?> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<?>> packetFactory, Message<?> message) {
-        ResourceLocation identifier = this.messageRegistry.get(message.getClass());
+        ResourceLocation identifier = this.messages.get(message.getClass()).identifier();
         FriendlyByteBuf byteBuf = PacketByteBufs.create();
         message.write(byteBuf);
         return packetFactory.apply(identifier, byteBuf);
@@ -148,5 +150,16 @@ public class FabricNetworkHandler implements NetworkHandler {
      */
     public static FabricNetworkHandler of(String modId) {
         return new FabricNetworkHandler(modId);
+    }
+
+    /**
+     * basic data class for data from registering messages
+     *
+     * @param clazz         message base class
+     * @param identifier    registered identifier
+     * @param direction     direction message is sent
+     */
+    private record MessageData(Class<? extends Message<?>> clazz, ResourceLocation identifier, MessageDirection direction) {
+
     }
 }

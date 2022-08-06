@@ -34,4 +34,11 @@ public enum MessageDirection {
     public DistType getReceptionSide() {
         return this.receptionSide;
     }
+
+    /**
+     * @return the other side duh
+     */
+    public MessageDirection other() {
+        return this == TO_CLIENT ? TO_SERVER : TO_CLIENT;
+    }
 }
