@@ -32,6 +32,14 @@ public interface ModConstructor {
     }
 
     /**
+     * fired when all of mod loading has completed
+     * on Fabric this only guarantees this mod to have been fully loaded
+     */
+    default void onLoadComplete() {
+
+    }
+
+    /**
      * provides a place for registering spawn placements for entities
      *
      * @param context add to spawn placement register

@@ -107,6 +107,8 @@ public class FabricModConstructor {
      * @param constructor mod base class
      */
     public static void construct(String modId, ModConstructor constructor) {
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         FabricModConstructor fabricModConstructor = new FabricModConstructor(constructor);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
@@ -115,7 +117,6 @@ public class FabricModConstructor {
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
         constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
-        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
+        constructor.onLoadComplete();
     }
 }

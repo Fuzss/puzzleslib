@@ -84,6 +84,8 @@ public class FabricClientModConstructor {
      * @param constructor mod base class
      */
     public static void construct(String modId, ClientModConstructor constructor) {
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
         FabricClientModConstructor fabricClientModConstructor = new FabricClientModConstructor(constructor);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
@@ -111,7 +113,6 @@ public class FabricClientModConstructor {
         ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
             constructor.onRegisterAdditionalModels(out::accept);
         });
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
-        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+        constructor.onLoadComplete();
     }
 }

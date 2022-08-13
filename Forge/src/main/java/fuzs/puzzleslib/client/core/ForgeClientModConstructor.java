@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import org.apache.logging.log4j.util.Strings;
 
 /**
@@ -60,6 +61,11 @@ public class ForgeClientModConstructor {
                 Minecraft.getInstance().getSearchTreeManager().register(searchRegistryKey, treeBuilder);
             }
         });
+    }
+
+    @SubscribeEvent
+    public void onLoadComplete(final FMLLoadCompleteEvent evt) {
+        this.constructor.onLoadComplete();
     }
 
     @SubscribeEvent
@@ -121,9 +127,9 @@ public class ForgeClientModConstructor {
      * @param constructor mod base class
      */
     public static void construct(String modId, ClientModConstructor constructor) {
-        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
         PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
     }
 }

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.1.7-1.19.1] - 2022-08-13
+### Added
+- Added an event to signify mod construction has completed
+
 ## [v4.1.6-1.19.1] - 2022-08-06
 ### Changed
 - Made network manager check messages are being sent to the correct side on Fabric

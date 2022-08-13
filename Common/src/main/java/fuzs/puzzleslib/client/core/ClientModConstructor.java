@@ -51,6 +51,14 @@ public interface ClientModConstructor {
     }
 
     /**
+     * fired when all of mod loading has completed
+     * on Fabric this only guarantees this mod to have been fully loaded
+     */
+    default void onLoadComplete() {
+
+    }
+
+    /**
      * @param context add a renderer to an entity
      */
     default void onRegisterEntityRenderers(EntityRenderersContext context) {
