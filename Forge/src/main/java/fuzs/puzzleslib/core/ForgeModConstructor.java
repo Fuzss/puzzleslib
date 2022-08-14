@@ -14,7 +14,7 @@ import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.util.Strings;
 
 /**
@@ -48,11 +48,6 @@ public class ForgeModConstructor {
         this.constructor.onCommonSetup();
         this.constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
         this.constructor.onRegisterFuelBurnTimes(this::registerFuelItem);
-    }
-
-    @SubscribeEvent
-    public void onLoadComplete(final FMLLoadCompleteEvent evt) {
-        this.constructor.onLoadComplete();
     }
 
     @SubscribeEvent
@@ -96,9 +91,9 @@ public class ForgeModConstructor {
      * @param constructor mod base class
      */
     public static void construct(String modId, ModConstructor constructor) {
+        ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
-        ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
         PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
