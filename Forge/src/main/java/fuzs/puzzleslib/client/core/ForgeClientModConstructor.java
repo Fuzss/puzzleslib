@@ -121,9 +121,9 @@ public class ForgeClientModConstructor {
      * @param constructor mod base class
      */
     public static void construct(String modId, ClientModConstructor constructor) {
-        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
         PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
     }
 }

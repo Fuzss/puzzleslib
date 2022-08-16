@@ -1,5 +1,9 @@
 package fuzs.puzzleslib.core;
 
+import com.mojang.brigadier.CommandDispatcher;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -65,6 +69,17 @@ public interface ModConstructor {
      * @param context add fuel burn time for items/blocks
      */
     default void onRegisterFuelBurnTimes(FuelBurnTimesContext context) {
+
+    }
+
+    /**
+     * register a new command, also supports replacing existing commands by default
+     *
+     * @param dispatcher    the dispatcher used for registering commands
+     * @param environment   command selection environment
+     * @param context       registry access context
+     */
+    default void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
 
     }
 

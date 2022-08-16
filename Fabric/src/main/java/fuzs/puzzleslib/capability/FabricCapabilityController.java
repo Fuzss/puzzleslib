@@ -59,7 +59,7 @@ public class FabricCapabilityController implements EntityComponentInitializer {
 
     /**
      * invoked by cardinal components entry point via reflection
-     * this should better be a separate class, but kept in here to remain consistent with Forge and doesn't matter anyways
+     * this should better be a separate class, but kept in here to remain consistent with Forge and doesn't matter anyway
      */
     @Deprecated
     public FabricCapabilityController() {

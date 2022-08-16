@@ -9,19 +9,18 @@ import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.util.Strings;
 
 /**
  * wrapper class for {@link ModConstructor} for calling all required registration methods at the correct time
- * most things need events for registering
- *
- * we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
+ * most things need events for registering.
+ * We use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  */
 public class ForgeModConstructor {
     /**
@@ -91,12 +90,15 @@ public class ForgeModConstructor {
      * @param constructor mod base class
      */
     public static void construct(String modId, ModConstructor constructor) {
-        ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
+        ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
         PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
+        MinecraftForge.EVENT_BUS.addListener((final RegisterCommandsEvent evt) -> {
+           constructor.onRegisterCommands(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection());
+        });
     }
 }
