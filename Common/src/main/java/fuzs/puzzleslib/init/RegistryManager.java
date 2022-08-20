@@ -55,7 +55,7 @@ public interface RegistryManager {
      * @return placeholder registry object for <code>entry</code>
      */
     default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        return RegistryReference.placeholder(registryKey, this.locate(path));
+        return RegistryReference.placeholder(registryKey, this.makeKey(path));
     }
 
     /**
@@ -152,7 +152,7 @@ public interface RegistryManager {
      */
     default RegistryReference<Item> registerBlockItem(String path, Item.Properties properties) {
         return this.registerItem(path, () -> {
-            Block block = Registry.BLOCK.get(this.locate(path));
+            Block block = Registry.BLOCK.get(this.makeKey(path));
             Objects.requireNonNull(block, "Can't register item for null block");
             return new BlockItem(block, properties);
         });
@@ -174,7 +174,7 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      */
     default RegistryReference<SoundEvent> registerRawSoundEvent(String path) {
-        return this.registerSoundEvent(path, () -> new SoundEvent(this.locate(path)));
+        return this.registerSoundEvent(path, () -> new SoundEvent(this.makeKey(path)));
     }
 
     /**
@@ -284,7 +284,7 @@ public interface RegistryManager {
      * @param path path for location
      * @return resource location for {@link #namespace}
      */
-    default ResourceLocation locate(String path) {
+    default ResourceLocation makeKey(String path) {
         if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("Can't register object without name");
         return new ResourceLocation(this.namespace(), path);
     }

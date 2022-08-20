@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.capability.CapabilityController;
+import fuzs.puzzleslib.capability.FabricCapabilityController;
 import fuzs.puzzleslib.config.*;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
@@ -57,5 +59,10 @@ public class FabricFactories implements CommonFactories {
     @Override
     public RegistryManager registration(String modId) {
         return FabricRegistryManager.of(modId);
+    }
+
+    @Override
+    public CapabilityController capabilities(String modId) {
+        return FabricCapabilityController.of(modId);
     }
 }

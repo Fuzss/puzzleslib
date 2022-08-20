@@ -1,10 +1,6 @@
 package fuzs.puzzleslib.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.capability.CapabilityController;
-import fuzs.puzzleslib.capability.data.CapabilityComponent;
-import fuzs.puzzleslib.capability.data.CapabilityKey;
-import fuzs.puzzleslib.capability.data.ComponentHolder;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,9 +10,10 @@ import java.util.Optional;
  * due to how a {@link ComponentKey} is forced to have the same type parameters as the component instance provided by the corresponding factory,
  * this has to work with our {@link ComponentHolder} wrapper instead of the component directly
  * therefore this class also includes a (safe) unchecked cast when retrieving the component
- * @param <T> capability type
+ *
+ * @param <C> capability type
  */
-public class FabricCapabilityKey<T extends CapabilityComponent> implements CapabilityKey<T> {
+public class FabricCapabilityKey<C extends CapabilityComponent> implements CapabilityKey<C> {
     /**
      * the wrapped {@link ComponentKey}, which is always for a {@link ComponentHolder}
      */
@@ -25,16 +22,15 @@ public class FabricCapabilityKey<T extends CapabilityComponent> implements Capab
      * the component class, so we can get the actual class from {@link #getComponentClass()}
      * also used to set type parameter to enable casting in getters
      */
-    private final Class<T> componentClass;
+    private final Class<C> componentClass;
 
     /**
      * @param capability the wrapped {@link ComponentKey}
      * @param componentClass capability type class for setting type parameter
      */
-    public FabricCapabilityKey(ComponentKey<ComponentHolder> capability, Class<T> componentClass) {
+    public FabricCapabilityKey(ComponentKey<ComponentHolder> capability, Class<C> componentClass) {
         this.capability = capability;
         this.componentClass = componentClass;
-        CapabilityController.submit(this);
     }
 
     @Override
@@ -43,21 +39,23 @@ public class FabricCapabilityKey<T extends CapabilityComponent> implements Capab
     }
 
     @Override
-    public Class<T> getComponentClass() {
+    public Class<C> getComponentClass() {
         return this.componentClass;
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
-    public <V> T get(@Nullable V provider) {
+    public <V> C get(@Nullable V provider) {
         if (provider == null) return null;
         ComponentHolder holder = this.capability.getNullable(provider);
         if (holder == null) return null;
-        return (T) holder.component();
+        return (C) holder.component();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <V> Optional<T> maybeGet(@Nullable V provider) {
-        return this.capability.maybeGet(provider).map(holder -> (T) holder.component());
+    public <V> Optional<C> maybeGet(@Nullable V provider) {
+        return this.capability.maybeGet(provider).map(holder -> (C) holder.component());
     }
 }

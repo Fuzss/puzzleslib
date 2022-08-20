@@ -16,7 +16,6 @@ public interface NetworkHandler {
 
     /**
      * register a message for a side
-     * mostly from AutoRegLib, thanks Vazkii!
      *
      * @param clazz     message class type
      * @param supplier supplier for message (called when receiving at executing end)

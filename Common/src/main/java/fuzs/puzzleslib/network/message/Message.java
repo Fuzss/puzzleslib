@@ -33,13 +33,13 @@ public interface Message<T extends Message<T>> {
     /**
      * @return packet handler for message
      */
-    PacketHandler<T> makeHandler();
+    MessageHandler<T> makeHandler();
 
     /**
      * this is a class, so it cannot be implemented as a functional interface to avoid client only calls somehow running into problems on a dedicated server
      * @param <T> this message
      */
-    abstract class PacketHandler<T extends Message<T>> {
+    abstract class MessageHandler<T extends Message<T>> {
 
         /**
          * handle given packet

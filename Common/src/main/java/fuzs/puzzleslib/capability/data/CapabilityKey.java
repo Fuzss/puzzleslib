@@ -7,9 +7,10 @@ import java.util.Optional;
 
 /**
  * common wrapper for Capability (Forge) and Component (Fabric)
+ *
  * @param <T> capability type
  */
-public interface CapabilityKey<T> {
+public interface CapabilityKey<T extends CapabilityComponent> {
 
     /**
      * @return capability id

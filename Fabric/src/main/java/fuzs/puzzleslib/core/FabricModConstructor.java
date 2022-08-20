@@ -4,18 +4,15 @@ import fuzs.puzzleslib.PuzzlesLib;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
-import net.fabricmc.fabric.mixin.object.builder.SpawnRestrictionAccessor;
 import net.minecraft.core.Registry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.levelgen.Heightmap;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Map;
@@ -37,22 +34,6 @@ public class FabricModConstructor {
     private FabricModConstructor(ModConstructor constructor) {
         // only call ModConstructor::onConstructMod during object construction to be similar to Forge
         constructor.onConstructMod();
-    }
-
-    /**
-     * utility method for registering a spawning behavior for an <code>entityType</code>
-     *
-     * @param entityType        the entity type
-     * @param location          type of spawn placement, probably {@link SpawnPlacements.Type#ON_GROUND}
-     * @param heightmap         heightmap type, probably {@link Heightmap.Types#MOTION_BLOCKING_NO_LEAVES}
-     * @param spawnPredicate    custom spawn predicate for mob
-     * @param <T>               type of entity
-     */
-    private <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
-        // this accessor is not within an api package, so using it is not a good idea (if it is removed just add the accessor ourselves)
-        // unfortunately there is no other access to this within the api, as it's only used as part of net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder
-        // which we cannot use without introducing yet another wrapper as it's a Fabric exclusive class
-        SpawnRestrictionAccessor.callRegister(entityType, location, heightmap, spawnPredicate);
     }
 
     /**
@@ -114,7 +95,7 @@ public class FabricModConstructor {
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
         constructor.onCommonSetup();
-        constructor.onRegisterSpawnPlacements(fabricModConstructor::registerSpawnPlacement);
+        constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
         constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);

@@ -3,7 +3,6 @@ package fuzs.puzzleslib.init;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
-import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -48,16 +47,17 @@ public class FabricRegistryManager implements RegistryManager {
         Registry<? super T> registry = (Registry<? super T>) Registry.REGISTRY.get(registryKey.location());
         Objects.requireNonNull(value, "Can't register null value");
         Objects.requireNonNull(registry, String.format("Registry %s not found", registryKey));
-        ResourceLocation resourceLocation = this.locate(path);
-        Registry.register(registry, resourceLocation, value);
-        return new FabricRegistryReference<>(value, resourceLocation, registry);
+        ResourceLocation key = this.makeKey(path);
+        Registry.register(registry, key, value);
+        return new FabricRegistryReference<>(value, key, registry);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
         return this.registerBlockEntityType(path, () -> {
             ModBlockEntityTypeBuilder<T> builder = entry.get();
-            return FabricBlockEntityTypeBuilder.create(builder.factory()::create, builder.blocks()).build();
+            return BlockEntityType.Builder.of(builder.factory()::create, builder.blocks()).build(null);
         });
     }
 
@@ -69,9 +69,9 @@ public class FabricRegistryManager implements RegistryManager {
     @Override
     public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
         ModPoiTypeBuilder builder = entry.get();
-        ResourceLocation resourceLocation = this.locate(path);
-        PoiType value = PointOfInterestHelper.register(resourceLocation, builder.ticketCount(), builder.searchDistance(), builder.blocks());
-        return new FabricRegistryReference<>(value, resourceLocation, Registry.POINT_OF_INTEREST_TYPE);
+        ResourceLocation key = this.makeKey(path);
+        PoiType value = PointOfInterestHelper.register(key, builder.ticketCount(), builder.searchDistance(), builder.blocks());
+        return new FabricRegistryReference<>(value, key, Registry.POINT_OF_INTEREST_TYPE);
     }
 
     /**

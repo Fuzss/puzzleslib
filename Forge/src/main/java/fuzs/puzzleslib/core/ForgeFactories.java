@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.capability.CapabilityController;
+import fuzs.puzzleslib.capability.ForgeCapabilityController;
 import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.config.ForgeConfigHolderImpl;
@@ -59,5 +61,10 @@ public class ForgeFactories implements CommonFactories {
     @Override
     public RegistryManager registration(String modId) {
         return ForgeRegistryManager.of(modId);
+    }
+
+    @Override
+    public CapabilityController capabilities(String modId) {
+        return ForgeCapabilityController.of(modId);
     }
 }

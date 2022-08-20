@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.capability.CapabilityController;
 import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.init.RegistryManager;
@@ -100,4 +101,12 @@ public interface CommonFactories {
      * @return new mod specific registry manager
      */
     RegistryManager registration(String modId);
+
+    /**
+     * creates a new capability controller for <code>namespace</code> or returns an existing one
+     *
+     * @param modId     namespace used for registration
+     * @return          the mod specific capability controller
+     */
+    CapabilityController capabilities(String modId);
 }

@@ -102,16 +102,8 @@ public interface ClientModConstructor {
     /**
      * @param context add a search tree builder together with a token
      */
-    @Deprecated(forRemoval = true)
-    default void onRegisterSearchTress(SearchRegistryContext context) {
-
-    }
-
-    /**
-     * @param context add a search tree builder together with a token
-     */
     default void onRegisterSearchTrees(SearchRegistryContext context) {
-        this.onRegisterSearchTress(context);
+
     }
 
     /**

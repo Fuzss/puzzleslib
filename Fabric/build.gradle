@@ -39,7 +39,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
     // Fabric
@@ -47,22 +47,18 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 
     // Forge Configs
-    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.1.2"
+    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.2.0"
 
     // Mod Menu
-    modRuntimeOnly "com.terraformersmc:modmenu:4.0.5"
+    modRuntimeOnly "com.terraformersmc:modmenu:4.0.6"
 
     // Cardinal Components
-    // only entity module is used, and we'll probably only ever need that single one
-    // but just in case all the others can easily be enabled (the code for supporting them is also there)
-    // those libraries are not included in puzzles lib itself, any mod using them must include them as jar-in-jar,
-    // and must also make sure to specifically depend on them in fabric.mods.json to avoid a crash on start-up due to a wrong mod loading order
+    // those libraries are not set as a dependency for puzzles lib itself, any mod using them must do that separately in fabric.mods.json to avoid a crash on start-up due to a wrong mod loading order
     modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.1")
-//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-item:5.0.1")
     modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1")
-//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.1")
-//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.1")
-//	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1")
+	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.1")
+	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.1")
+	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1")
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
@@ -265,8 +261,6 @@ modrinth {
     }
 //	debugMode = true
 }
-
-import groovy.json.*
 
 task copyJarToDir(type: Copy) {
     onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
