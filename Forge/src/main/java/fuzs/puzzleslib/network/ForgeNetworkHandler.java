@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.network;
 
 import fuzs.puzzleslib.core.DistTypeConverter;
-import fuzs.puzzleslib.network.message.Message;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;

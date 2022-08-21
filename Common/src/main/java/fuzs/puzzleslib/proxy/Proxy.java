@@ -3,7 +3,7 @@ package fuzs.puzzleslib.proxy;
 import fuzs.puzzleslib.core.CoreServices;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import fuzs.puzzleslib.network.NetworkHandler;
-import fuzs.puzzleslib.network.message.Message;
+import fuzs.puzzleslib.network.Message;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;

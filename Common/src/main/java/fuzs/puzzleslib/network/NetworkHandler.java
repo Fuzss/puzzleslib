@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.network;
 
-import fuzs.puzzleslib.network.message.Message;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
