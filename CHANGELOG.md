@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.2-1.19.2] - 2022-08-22
+### Fixed
+- Temporarily fixed crash with other mods including only a few modules of Cardinal Components
+
 ## [v4.2.1-1.19.2] - 2022-08-21
 ### Changed
 - Minor networking `Message` cleanup
