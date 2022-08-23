@@ -4,6 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -14,6 +15,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
 
 /**
  * a base class for a mods main common class, contains a bunch of methods for registering various things
@@ -78,8 +82,38 @@ public interface ModConstructor {
      * @param dispatcher    the dispatcher used for registering commands
      * @param environment   command selection environment
      * @param context       registry access context
+     *
+     * @deprecated          use {@link #onRegisterCommands(RegisterCommandsContext)} instead
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
+
+    }
+
+    /**
+     * register a new command, also natively supports replacing existing commands
+     *
+     * @param context context with helper objects for registering commands
+     */
+    default void onRegisterCommands(RegisterCommandsContext context) {
+        this.onRegisterCommands(context.dispatcher(), context.context(), context.environment());
+    }
+
+    /**
+     * allows for replacing built-in {@link LootTable}s on loading
+     *
+     * @param context replace a whole {@link LootTable}
+     */
+    default void onLootTableReplacement(LootTablesReplaceContext context) {
+
+    }
+
+    /**
+     * allows changing of {@link LootPool}s in a {@link LootTable}
+     *
+     * @param context add or remove a {@link LootPool}
+     */
+    default void onLootTableModification(LootTablesModifyContext context) {
 
     }
 
@@ -177,5 +211,110 @@ public interface ModConstructor {
         default void registerWoodenBlock(Block block) {
             this.registerFuelBlock(block, block instanceof SlabBlock ? 150 : 300);
         }
+    }
+
+    /**
+     * register a new command, also supports replacing existing commands by default
+     *
+     * @param dispatcher    the dispatcher used for registering commands
+     * @param environment   command selection environment
+     * @param context       registry access context
+     */
+    record RegisterCommandsContext(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
+
+    }
+
+    /**
+     * basic context for loot tables
+     */
+    abstract class LootTablesContext {
+        /**
+         * access to all loot tables
+         */
+        private final LootTables lootManager;
+        /**
+         * the loot table id
+         */
+        private final ResourceLocation id;
+
+        /**
+         * @param lootManager   access to all loot tables
+         * @param id            the loot table id
+         */
+        protected LootTablesContext(LootTables lootManager, ResourceLocation id) {
+            this.lootManager = lootManager;
+            this.id = id;
+        }
+
+        /**
+         * @return  access to all loot tables
+         */
+        public final LootTables getLootManager() {
+            return this.lootManager;
+        }
+
+        /**
+         * @return  the loot table id
+         */
+        public final ResourceLocation getId() {
+            return this.id;
+        }
+    }
+
+    /**
+     * allows for replacing built-in {@link LootTable}s on loading
+     */
+    abstract class LootTablesReplaceContext extends LootTablesContext {
+        /**
+         * the original loot table that will be replaced
+         */
+        private final LootTable original;
+
+        /**
+         * @param lootManager   access to all loot tables
+         * @param id            the loot table id
+         * @param original      the original loot table that will be replaced
+         */
+        public LootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable original) {
+            super(lootManager, id);
+            this.original = original;
+        }
+
+        /**
+         * @return the original loot table that will be replaced
+         */
+        public LootTable getLootTable() {
+            return this.original;
+        }
+
+        /**
+         * @param table     replacement for <code>original</code>
+         */
+        public abstract void setLootTable(LootTable table);
+    }
+
+    /**
+     * allows changing of {@link LootPool}s in a {@link LootTable}
+     */
+    abstract class LootTablesModifyContext extends LootTablesContext {
+
+        /**
+         * @param lootManager   access to all loot tables
+         * @param id            the loot table id
+         */
+        public LootTablesModifyContext(LootTables lootManager, ResourceLocation id) {
+            super(lootManager, id);
+        }
+
+        /**
+         * @param pool  add a {@link LootPool}
+         */
+        public abstract void addLootPool(LootPool pool);
+
+        /**
+         * @param index     pool to remove at index, pools are indexed starting from 0
+         * @return          was removing the pool successful (has a pool at <code>index</code> been found)
+         */
+        public abstract boolean removeLootPool(int index);
     }
 }

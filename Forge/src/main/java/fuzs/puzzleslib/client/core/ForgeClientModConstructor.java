@@ -25,7 +25,7 @@ import org.apache.logging.log4j.util.Strings;
  * wrapper class for {@link ClientModConstructor} for calling all required registration methods at the correct time
  * most things need events for registering
  *
- * we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
+ * <p>we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  */
 public class ForgeClientModConstructor {
     /**
@@ -105,7 +105,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
-        this.constructor.onLoadModels(evt.getModelManager(), evt.getModels(), evt.getModelBakery());
+        this.constructor.onLoadModels(new ClientModConstructor.LoadModelsContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()));
     }
 
     @SubscribeEvent

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.3-1.19.2] - 2022-08-23
+### Added
+- Added a few utility methods for modifying/replacing loot tables
+
 ## [v4.2.2-1.19.2] - 2022-08-22
 ### Fixed
 - Temporarily fixed crash with other mods including only a few modules of Cardinal Components

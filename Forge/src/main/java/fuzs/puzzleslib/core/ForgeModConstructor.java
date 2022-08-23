@@ -3,12 +3,17 @@ package fuzs.puzzleslib.core;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.PuzzlesLibForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
@@ -17,10 +22,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.function.Consumer;
+
 /**
- * wrapper class for {@link ModConstructor} for calling all required registration methods at the correct time
- * most things need events for registering.
- * We use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
+ * wrapper class for {@link ModConstructor} for calling all required registration methods at the correct time most things need events for registering
+ * <p>we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  */
 public class ForgeModConstructor {
     /**
@@ -71,7 +77,7 @@ public class ForgeModConstructor {
 
     /**
      * event for setting burn time, Forge wants this to be implemented on the item using {@link net.minecraftforge.common.extensions.IForgeItem#getBurnTime},
-     * but this isn't very nice for instances of {@link net.minecraft.world.item.BlockItem}, so we do this installed
+     * but this isn't very nice for instances of {@link net.minecraft.world.item.BlockItem}, so we do this instead
      *
      * @param evt the Forge event
      */
@@ -80,6 +86,35 @@ public class ForgeModConstructor {
         if (this.fuelBurnTimes.containsKey(item)) {
             evt.setBurnTime(this.fuelBurnTimes.getInt(item));
         }
+    }
+
+    private ModConstructor.LootTablesReplaceContext getLootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable lootTable, Consumer<LootTable> lootTableSetter) {
+        return new ModConstructor.LootTablesReplaceContext(lootManager, id, lootTable) {
+
+            @Override
+            public void setLootTable(LootTable table) {
+                lootTableSetter.accept(table);
+            }
+        };
+    }
+
+    private ModConstructor.LootTablesModifyContext getLootTablesModifyContext(LootTables lootManager, ResourceLocation id, LootTable lootTable) {
+        return new ModConstructor.LootTablesModifyContext(lootManager, id) {
+
+            @Override
+            public void addLootPool(LootPool pool) {
+                lootTable.addPool(pool);
+            }
+
+            @SuppressWarnings("ConstantConditions")
+            @Override
+            public boolean removeLootPool(int index) {
+                if (index == 0 && lootTable.removePool("main") != null) {
+                    return true;
+                }
+                return lootTable.removePool("pool" + index) != null;
+            }
+        };
     }
 
     /**
@@ -98,7 +133,11 @@ public class ForgeModConstructor {
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
         MinecraftForge.EVENT_BUS.addListener((final RegisterCommandsEvent evt) -> {
-           constructor.onRegisterCommands(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection());
+           constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection()));
+        });
+        MinecraftForge.EVENT_BUS.addListener((final LootTableLoadEvent evt) -> {
+            constructor.onLootTableReplacement(forgeModConstructor.getLootTablesReplaceContext(evt.getLootTableManager(), evt.getName(), evt.getTable(), evt::setTable));
+            constructor.onLootTableModification(forgeModConstructor.getLootTablesModifyContext(evt.getLootTableManager(), evt.getName(), evt.getTable()));
         });
     }
 }

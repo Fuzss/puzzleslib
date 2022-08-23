@@ -107,12 +107,24 @@ public interface ClientModConstructor {
     }
 
     /**
+     * context for modifying baked models right after they've been loaded
+     *
      * @param modelManager      the model manager
      * @param models            map of all baked models, useful to add or replace models
      * @param modelBakery       the bakery
+     *
+     * @deprecated              use {@link #onLoadModels(LoadModelsContext)}
      */
+    @Deprecated(forRemoval = true)
     default void onLoadModels(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
 
+    }
+
+    /**
+     * @param context context for modifying baked models right after they've been loaded
+     */
+    default void onLoadModels(LoadModelsContext context) {
+        this.onLoadModels(context.modelManager(), context.models(), context.modelBakery());
     }
 
     /**
@@ -265,6 +277,17 @@ public interface ClientModConstructor {
          * @param <T>               type to be searched for
          */
         <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder);
+    }
+
+    /**
+     * context for modifying baked models right after they've been loaded
+     *
+     * @param modelManager      the model manager
+     * @param models            map of all baked models, useful to add or replace models
+     * @param modelBakery       the bakery
+     */
+    record LoadModelsContext(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+
     }
 
     /**

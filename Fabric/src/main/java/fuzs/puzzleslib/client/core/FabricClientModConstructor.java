@@ -21,6 +21,9 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -31,6 +34,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -59,6 +63,21 @@ public class FabricClientModConstructor {
         });
     }
 
+    private ClientModConstructor.ParticleProvidersContext getParticleProvidersContext() {
+        return new ClientModConstructor.ParticleProvidersContext() {
+
+            @Override
+            public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
+                ParticleFactoryRegistry.getInstance().register(type, provider);
+            }
+
+            @Override
+            public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
+                ParticleFactoryRegistry.getInstance().register(type, factory::create);
+            }
+        };
+    }
+
     private <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory) {
         MenuScreens.register(menuType, factory::create);
     }
@@ -80,8 +99,8 @@ public class FabricClientModConstructor {
     /**
      * construct the mod, calling all necessary registration methods (we don't need the object, it's only useful on Forge)
      *
-     * @param modId the mod id for registering events on Forge to the correct mod event bus
-     * @param constructor mod base class
+     * @param modId         the mod id for registering events on Forge to the correct mod event bus
+     * @param constructor   mod base class
      */
     public static void construct(String modId, ClientModConstructor constructor) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
@@ -93,23 +112,12 @@ public class FabricClientModConstructor {
         constructor.onRegisterEntityRenderers(EntityRendererRegistry::register);
         constructor.onRegisterBlockEntityRenderers(BlockEntityRendererRegistry::register);
         constructor.onRegisterClientTooltipComponents(fabricClientModConstructor::registerClientTooltipComponent);
-        constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProvidersContext() {
-
-            @Override
-            public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
-                ParticleFactoryRegistry.getInstance().register(type, provider);
-            }
-
-            @Override
-            public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
-                ParticleFactoryRegistry.getInstance().register(type, factory::create);
-            }
-        });
+        constructor.onRegisterParticleProviders(fabricClientModConstructor.getParticleProvidersContext());
         constructor.onRegisterMenuScreens(fabricClientModConstructor::registerMenuScreen);
         constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
         constructor.onRegisterSearchTrees(fabricClientModConstructor::registerSearchTree);
-        ModelEvents.BAKING_COMPLETED.register(constructor::onLoadModels);
+        ModelEvents.BAKING_COMPLETED.register((ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> constructor.onLoadModels(new ClientModConstructor.LoadModelsContext(modelManager, models, modelBakery)));
         ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
             constructor.onRegisterAdditionalModels(out::accept);
         });
