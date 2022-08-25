@@ -4,18 +4,26 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
+import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
+import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
 import fuzs.puzzleslib.PuzzlesLib;
 import fuzs.puzzleslib.capability.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.util.Map;
 import java.util.function.Consumer;
@@ -30,8 +38,7 @@ import java.util.function.Predicate;
  * so we once again only use the entity module, since this has been working fine in the past as it's the module most mods use
  * needs a new approach in the future though...
  */
-//public class FabricCapabilityController implements CapabilityController, EntityComponentInitializer, BlockComponentInitializer, ChunkComponentInitializer, WorldComponentInitializer {
-public class FabricCapabilityController implements CapabilityController, EntityComponentInitializer {
+public class FabricCapabilityController implements CapabilityController, EntityComponentInitializer, BlockComponentInitializer, ChunkComponentInitializer, WorldComponentInitializer {
     /**
      * capability controllers are stored for each mod separately to avoid concurrency issues, might not be need though
      */
@@ -94,26 +101,23 @@ public class FabricCapabilityController implements CapabilityController, EntityC
 
     @Override
     public <T extends BlockEntity, C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<T> blockEntityType) {
-        throw new RuntimeException("Registering block entity capabilities is currently not supported on Fabric, wait for an update to enable support");
-//        return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, componentKey -> o -> {
-//            if (o instanceof BlockComponentFactoryRegistry registry) registry.registerFor(blockEntityType, componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
-//        });
+        return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, componentKey -> o -> {
+            if (o instanceof BlockComponentFactoryRegistry registry) registry.registerFor(blockEntityType, componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+        });
     }
 
     @Override
     public <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory) {
-        throw new RuntimeException("Registering chunk capabilities is currently not supported on Fabric, wait for an update to enable support");
-//        return this.registerCapability(LevelChunk.class, capabilityKey, capabilityType, componentKey -> o -> {
-//            if (o instanceof ChunkComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
-//        });
+        return this.registerCapability(LevelChunk.class, capabilityKey, capabilityType, componentKey -> o -> {
+            if (o instanceof ChunkComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+        });
     }
 
     @Override
     public <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory) {
-        throw new RuntimeException("Registering level capabilities is currently not supported on Fabric, wait for an update to enable support");
-//        return this.registerCapability(Level.class, capabilityKey, capabilityType, componentKey -> o -> {
-//            if (o instanceof WorldComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
-//        });
+        return this.registerCapability(Level.class, capabilityKey, capabilityType, componentKey -> o -> {
+            if (o instanceof WorldComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+        });
     }
 
     /**
@@ -137,20 +141,20 @@ public class FabricCapabilityController implements CapabilityController, EntityC
         registerComponentFactories(Entity.class, registry);
     }
 
-//    @Override
-//    public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
-//        registerComponentFactories(BlockEntity.class, registry);
-//    }
-//
-//    @Override
-//    public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
-//        registerComponentFactories(LevelChunk.class, registry);
-//    }
-//
-//    @Override
-//    public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-//        registerComponentFactories(Level.class, registry);
-//    }
+    @Override
+    public void registerBlockComponentFactories(BlockComponentFactoryRegistry registry) {
+        registerComponentFactories(BlockEntity.class, registry);
+    }
+
+    @Override
+    public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
+        registerComponentFactories(LevelChunk.class, registry);
+    }
+
+    @Override
+    public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
+        registerComponentFactories(Level.class, registry);
+    }
 
     /**
      * register for all CapabilityController's, static to not confuse with actual instance as they're separate kinda

@@ -54,11 +54,11 @@ dependencies {
 
     // Cardinal Components
     // those libraries are not set as a dependency for puzzles lib itself, any mod using them must do that separately in fabric.mods.json to avoid a crash on start-up due to a wrong mod loading order
-    modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.1")
-    modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1")
-	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.1")
-	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.1")
-	modImplementation("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1")
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.1"))
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.1"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1"))
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
@@ -229,6 +229,7 @@ curseforge {
                 requiredDependency 'fabric-api'
                 requiredDependency 'forge-config-api-port-fabric'
                 requiredDependency 'puzzles-lib'
+                embeddedLibrary 'cardinal-components'
             }
         }
         addArtifact sourcesJar
@@ -258,6 +259,7 @@ modrinth {
         required.project 'fabric-api'
         required.project 'forge-config-api-port'
         required.project 'puzzles-lib'
+        embedded.project 'cardinal-components-api'
     }
 //	debugMode = true
 }

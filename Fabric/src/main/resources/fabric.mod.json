@@ -24,7 +24,7 @@
     "client": [
     ],
     "cardinal-components": [
-      "{$modGroup}.capability.FabricCapabilityController"
+      "${modGroup}.capability.FabricCapabilityController"
     ]
   },
   "mixins": [
@@ -36,7 +36,12 @@
     "fabric-api": ">=${minFabricApiVersion}",
     "forgeconfigapiport": ">=4.0.0",
     "minecraft": ">=${minMinecraftVersion} <${nextMinecraftVersion}",
-    "java": ">=17"
+    "java": ">=17",
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*",
+    "cardinal-components-block": "*",
+    "cardinal-components-chunk": "*",
+    "cardinal-components-world": "*"
   },
 
   "custom": {
