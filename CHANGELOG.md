@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.7-1.19.2] - 2022-08-26
+### Fixed
+- Fix capability data failing to save on Forge
+
 ## [v4.2.6-1.19.2] - 2022-08-26
 ### Added
 - Added utility method for registering item model predicates

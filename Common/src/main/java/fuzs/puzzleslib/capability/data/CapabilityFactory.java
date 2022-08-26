@@ -5,7 +5,7 @@ package fuzs.puzzleslib.capability.data;
  * @param <C> serializable capability type
  */
 @FunctionalInterface
-public interface CapabilityFactory<C extends CapabilityComponent> {
+public interface CapabilityFactory<C> {
 
     /**
      * @param t object to create capability from, mostly unused

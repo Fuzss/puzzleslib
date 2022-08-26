@@ -4,6 +4,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nonnull;
@@ -13,7 +14,7 @@ import javax.annotation.Nullable;
  * dispatcher for this serializable capability
  * @param <T> capability class
  */
-public class CapabilityHolder<T extends CapabilityComponent> implements ICapabilityProvider, CapabilityComponent {
+public class CapabilityHolder<T extends CapabilityComponent> implements ICapabilityProvider, INBTSerializable<CompoundTag> {
     /**
      * capability wrapper for object
      */
@@ -39,12 +40,14 @@ public class CapabilityHolder<T extends CapabilityComponent> implements ICapabil
     }
 
     @Override
-    public void write(CompoundTag tag) {
+    public CompoundTag serializeNBT() {
+        CompoundTag tag = new CompoundTag();
         this.storage.write(tag);
+        return tag;
     }
 
     @Override
-    public void read(CompoundTag tag) {
-        this.storage.read(tag);
+    public void deserializeNBT(CompoundTag nbt) {
+        this.storage.read(nbt);
     }
 }
