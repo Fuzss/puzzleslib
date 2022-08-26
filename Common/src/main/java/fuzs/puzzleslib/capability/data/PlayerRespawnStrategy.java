@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.capability.data;
 
-import net.minecraft.nbt.CompoundTag;
-
 /**
  * modes determining how capability data should be handled when the player entity is recreated, which will usually happen when returning from the end dimension and when respawning
  * this is basically the same class as in {@see <a href="https://github.com/OnyxStudios/Cardinal-Components-API">https://github.com/OnyxStudios/Cardinal-Components-API</a>} for the Fabric mod loader
@@ -55,9 +53,7 @@ public abstract class PlayerRespawnStrategy {
      * @param newCapability target capability component
      */
     protected void actuallyCopy(CapabilityComponent oldCapability, CapabilityComponent newCapability) {
-        CompoundTag tag = new CompoundTag();
-        oldCapability.write(tag);
-        newCapability.read(tag);
+        newCapability.read(oldCapability.toCompoundTag());
     }
 
     /**

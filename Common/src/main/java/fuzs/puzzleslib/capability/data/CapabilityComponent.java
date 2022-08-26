@@ -16,4 +16,13 @@ public interface CapabilityComponent {
      * @param tag tag to read from
      */
     void read(CompoundTag tag);
+
+    /**
+     * @return this capability serialized to {@link CompoundTag}
+     */
+    default CompoundTag toCompoundTag() {
+        CompoundTag tag = new CompoundTag();
+        this.write(tag);
+        return tag;
+    }
 }

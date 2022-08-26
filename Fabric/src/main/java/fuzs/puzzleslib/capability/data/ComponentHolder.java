@@ -14,11 +14,11 @@ public record ComponentHolder(CapabilityComponent component) implements Componen
 
     @Override
     public void readFromNbt(CompoundTag tag) {
-        this.component().read(tag);
+        this.component.read(tag);
     }
 
     @Override
     public void writeToNbt(CompoundTag tag) {
-        this.component().write(tag);
+        this.component.write(tag);
     }
 }

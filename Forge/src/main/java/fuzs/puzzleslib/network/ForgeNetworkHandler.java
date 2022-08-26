@@ -45,28 +45,31 @@ public class ForgeNetworkHandler implements NetworkHandler {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction) {
+    public <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> factory, MessageDirection direction) {
         BiConsumer<T, FriendlyByteBuf> encode = Message::write;
         Function<FriendlyByteBuf, T> decode = buf -> {
-            T message = supplier.get();
+            T message = factory.get();
             message.read(buf);
             return message;
         };
-        BiConsumer<T, Supplier<NetworkEvent.Context>> handle = (msg, ctxSup) -> {
-            NetworkEvent.Context ctx = ctxSup.get();
+        BiConsumer<T, Supplier<NetworkEvent.Context>> handle = (message, supplier) -> {
+            NetworkEvent.Context context = supplier.get();
             final LogicalSide receptionSide = DistTypeConverter.toLogicalSide(direction.getReceptionSide());
-            LogicalSide expectedReceptionSide = ctx.getDirection().getReceptionSide();
+            LogicalSide expectedReceptionSide = context.getDirection().getReceptionSide();
             if (expectedReceptionSide != receptionSide) {
                 throw new IllegalStateException(String.format("Received message on wrong side, expected %s, was %s", receptionSide, expectedReceptionSide));
             }
-            Player player;
-            if (receptionSide.isClient()) {
-                player = Proxy.INSTANCE.getClientPlayer();
-            } else {
-                player = ctx.getSender();
-            }
-            ctx.enqueueWork(() -> msg.handle(player, LogicalSidedProvider.WORKQUEUE.get(receptionSide)));
-            ctx.setPacketHandled(true);
+            context.enqueueWork(() -> {
+                // this needs to happen in here, otherwise Minecraft#player might still be null for events fired on login/entity creation
+                Player player;
+                if (receptionSide.isClient()) {
+                    player = Proxy.INSTANCE.getClientPlayer();
+                } else {
+                    player = context.getSender();
+                }
+                message.handle(player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
+            });
+            context.setPacketHandled(true);
         };
         this.channel.registerMessage(this.discriminator.getAndIncrement(), (Class<T>) clazz, encode, decode, handle);
     }

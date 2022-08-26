@@ -41,9 +41,7 @@ public class CapabilityHolder<T extends CapabilityComponent> implements ICapabil
 
     @Override
     public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
-        this.storage.write(tag);
-        return tag;
+        return this.storage.toCompoundTag();
     }
 
     @Override

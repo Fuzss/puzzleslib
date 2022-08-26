@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.8-1.19.2] - 2022-08-26
+### Changed
+- Minor additions to capability handling
+### Fixed
+- Fixed client player instance sometimes being `null` for received network messages on Forge
+
 ## [v4.2.7-1.19.2] - 2022-08-26
 ### Fixed
 - Fix capability data failing to save on Forge
