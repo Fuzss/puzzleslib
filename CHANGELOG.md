@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.6-1.19.2] - 2022-08-26
+### Added
+- Added utility method for registering item model predicates
+- Added support for sending messages to players tracking an entity in `NetworkHandler`
+### Changed
+- Moved a bunch of duplicate code in `NetworkHandler` to common project
+
 ## [v4.2.5-1.19.2] - 2022-08-26
 ### Added
 - Added utility method for creating creative mode tabs

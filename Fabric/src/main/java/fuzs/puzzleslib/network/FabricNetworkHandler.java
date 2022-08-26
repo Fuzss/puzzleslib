@@ -6,18 +6,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -58,50 +51,6 @@ public class FabricNetworkHandler implements NetworkHandler {
         }
     }
 
-    @Override
-    public void sendToServer(Message<?> message) {
-        Objects.requireNonNull(Minecraft.getInstance().getConnection(), "Cannot send packets when not in game!");
-        Minecraft.getInstance().getConnection().send(this.toServerboundPacket(message));
-    }
-
-    @Override
-    public void sendTo(Message<?> message, ServerPlayer player) {
-        player.connection.send(this.toClientboundPacket(message));
-    }
-
-    @Override
-    public void sendToAll(Message<?> message) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
-    }
-
-    @Override
-    public void sendToAllExcept(Message<?> message, ServerPlayer exclude) {
-        final Packet<?> packet = this.toClientboundPacket(message);
-        for (ServerPlayer player : Proxy.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
-            if (player != exclude) player.connection.send(packet);
-        }
-    }
-
-    @Override
-    public void sendToAllNear(Message<?> message, BlockPos pos, Level level) {
-        this.sendToAllNearExcept(message, null, pos.getX(), pos.getY(), pos.getZ(), 64.0, level);
-    }
-
-    @Override
-    public void sendToAllNearExcept(Message<?> message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
-    }
-
-    @Override
-    public void sendToDimension(Message<?> message, Level level) {
-        this.sendToDimension(message, level.dimension());
-    }
-
-    @Override
-    public void sendToDimension(Message<?> message, ResourceKey<Level> dimension) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
-    }
-
     /**
      * use discriminator to generate identifier for package
      *
@@ -111,20 +60,14 @@ public class FabricNetworkHandler implements NetworkHandler {
         return new ResourceLocation(this.modId, "play/" + this.discriminator.getAndIncrement());
     }
 
-    /**
-     * @param message   message to create packet from
-     * @return          packet for message
-     */
-    private Packet<?> toServerboundPacket(Message<?> message) {
+    @Override
+    public Packet<?> toServerboundPacket(Message<?> message) {
         if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_SERVER) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_SERVER, MessageDirection.TO_CLIENT));
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
-    /**
-     * @param message   message to create packet from
-     * @return          packet for message
-     */
-    private Packet<?> toClientboundPacket(Message<?> message) {
+    @Override
+    public Packet<?> toClientboundPacket(Message<?> message) {
         if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_CLIENT) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_CLIENT, MessageDirection.TO_SERVER));
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }

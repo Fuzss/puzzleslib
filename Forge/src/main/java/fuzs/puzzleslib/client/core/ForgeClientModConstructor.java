@@ -10,12 +10,15 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -60,6 +63,22 @@ public class ForgeClientModConstructor {
                 Minecraft.getInstance().getSearchTreeManager().register(searchRegistryKey, treeBuilder);
             }
         });
+        this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
+    }
+
+    private ClientModConstructor.ItemModelPropertiesContext getItemPropertiesContext() {
+        return new ClientModConstructor.ItemModelPropertiesContext() {
+
+            @Override
+            public void register(ResourceLocation name, ClampedItemPropertyFunction property) {
+                ItemProperties.registerGeneric(name, property);
+            }
+
+            @Override
+            public void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction property) {
+                ItemProperties.register(item, name, property);
+            }
+        };
     }
 
     @SubscribeEvent

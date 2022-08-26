@@ -20,6 +20,8 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -32,6 +34,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Map;
@@ -96,6 +99,21 @@ public class FabricClientModConstructor {
         ((MinecraftAccessor) Minecraft.getInstance()).getSearchRegistry().register(searchRegistryKey, treeBuilder);
     }
 
+    private ClientModConstructor.ItemModelPropertiesContext getItemPropertiesContext() {
+        return new ClientModConstructor.ItemModelPropertiesContext() {
+
+            @Override
+            public void register(ResourceLocation name, ClampedItemPropertyFunction property) {
+                ItemProperties.registerGeneric(name, property);
+            }
+
+            @Override
+            public void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction property) {
+                ItemProperties.register(item, name, property);
+            }
+        };
+    }
+
     /**
      * construct the mod, calling all necessary registration methods (we don't need the object, it's only useful on Forge)
      *
@@ -121,5 +139,6 @@ public class FabricClientModConstructor {
         ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
             constructor.onRegisterAdditionalModels(out::accept);
         });
+        constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
     }
 }

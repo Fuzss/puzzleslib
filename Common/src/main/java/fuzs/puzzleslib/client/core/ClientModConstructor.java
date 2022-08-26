@@ -10,6 +10,7 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -131,6 +133,13 @@ public interface ClientModConstructor {
      * @param context add external models to be loaded
      */
     default void onRegisterAdditionalModels(AdditionalModelsContext context) {
+
+    }
+
+    /**
+     * @param context register model predicates for custom item models
+     */
+    default void onRegisterItemModelProperties(ItemModelPropertiesContext context) {
 
     }
 
@@ -302,5 +311,28 @@ public interface ClientModConstructor {
          * @param location the models location
          */
         void registerAdditionalModel(ResourceLocation location);
+    }
+
+    /**
+     * register model predicates for custom item models
+     */
+    interface ItemModelPropertiesContext {
+
+        /**
+         * register a predicate for all items
+         *
+         * @param name      predicate name
+         * @param property  handler for this predicate
+         */
+        void register(ResourceLocation name, ClampedItemPropertyFunction property);
+
+        /**
+         * register a predicate for an <code>item</code>
+         *
+         * @param item      the item
+         * @param name      predicate name
+         * @param property  handler for this predicate
+         */
+        void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction property);
     }
 }
