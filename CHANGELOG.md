@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.5-1.19.2] - 2022-08-26
+### Added
+- Added utility method for creating creative mode tabs
+
 ## [v4.2.4-1.19.2] - 2022-08-26
 ### Changed
 - Cardinal Components is once again included in the mod jar, this is done to be able to have a single component initializer for all my mods, while also being safe from not all required modules of Cardinal Components being present at runtime
