@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
+import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModContainer;
@@ -71,7 +72,7 @@ public class ForgeConfigHolderImpl implements ConfigHolder.Builder {
     public void bakeConfigs(String modId) {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
-        final IEventBus modBus = PuzzlesLibForge.findModEventBus(modId);
+        final IEventBus modBus = PuzzlesUtilForge.findModEventBus(modId);
         for (ForgeConfigDataHolderImpl<? extends ConfigCore> holder : this.configsByClass.values()) {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
             if (holder.config == null) continue;
@@ -88,7 +89,7 @@ public class ForgeConfigHolderImpl implements ConfigHolder.Builder {
                 }
             });
             holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-                ModContainer modContainer = PuzzlesLibForge.findModContainer(modId);
+                ModContainer modContainer = PuzzlesUtilForge.findModContainer(modId);
                 ModConfig modConfig = new ModConfig(type, spec, modContainer, fileName.apply(modId));
                 modContainer.addConfig(modConfig);
                 return modConfig;

@@ -9,6 +9,7 @@
     "accessor.IntegerValueAccessor"
   ],
   "client": [
+    "client.accessor.ItemAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

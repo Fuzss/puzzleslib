@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
+import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.api.client.event.ModelEvents;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
@@ -7,10 +8,7 @@ import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -35,6 +33,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Map;
@@ -140,5 +139,8 @@ public class FabricClientModConstructor {
             constructor.onRegisterAdditionalModels(out::accept);
         });
         constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
+        constructor.onRegisterBuiltinModelItemRenderer((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
+            BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::render);
+        });
     }
 }

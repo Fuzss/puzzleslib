@@ -1,27 +1,39 @@
 package fuzs.puzzleslib.client.core;
 
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.PuzzlesLibForge;
+import com.mojang.blaze3d.vertex.PoseStack;
+import fuzs.puzzleslib.client.extension.WrappedClientItemExtension;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.core.ModConstructor;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.mixin.client.accessor.ItemAccessor;
+import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.util.Strings;
 
 /**
@@ -64,6 +76,39 @@ public class ForgeClientModConstructor {
             }
         });
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
+        this.constructor.onRegisterBuiltinModelItemRenderer((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
+            // copied from Forge, supposed to break data gen otherwise
+            if (FMLLoader.getLaunchHandler().isData()) return;
+            // this solution is very dangerous as it relies on internal stuff in Forge
+            // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
+            final IClientItemExtensions clientItemExtension = new IClientItemExtensions() {
+
+                @Override
+                public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                    Minecraft minecraft = Minecraft.getInstance();
+                    return new BlockEntityWithoutLevelRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels()) {
+
+                        @Override
+                        public void renderByItem(ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+                            renderer.render(stack, mode, matrices, vertexConsumers, light, overlay);
+                        }
+
+                        @Override
+                        public void onResourceManagerReload(ResourceManager p_172555_) {
+
+                        }
+                    };
+                }
+            };
+            Object currentClientItemExtension = ((ItemAccessor) item.asItem()).getRenderProperties();
+            ((ItemAccessor) item.asItem()).setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IClientItemExtensions) currentClientItemExtension) {
+
+                @Override
+                public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                    return clientItemExtension.getCustomRenderer();
+                }
+            } : clientItemExtension);
+        });
     }
 
     private ClientModConstructor.ItemModelPropertiesContext getItemPropertiesContext() {
@@ -143,6 +188,6 @@ public class ForgeClientModConstructor {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
         ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor);
-        PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
+        PuzzlesUtilForge.findModEventBus(modId).register(forgeModConstructor);
     }
 }

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.core;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.PuzzlesLibForge;
+import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -128,7 +128,7 @@ public class ForgeModConstructor {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
-        PuzzlesLibForge.findModEventBus(modId).register(forgeModConstructor);
+        PuzzlesUtilForge.findModEventBus(modId).register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);

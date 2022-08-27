@@ -2,10 +2,10 @@ package fuzs.puzzleslib.init;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
+import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -46,7 +46,7 @@ public class ForgeRegistryManager implements RegistryManager {
      */
     private ForgeRegistryManager(String namespace) {
         this.namespace = namespace;
-        this.modEventBus = PuzzlesLibForge.findModEventBus(namespace);
+        this.modEventBus = PuzzlesUtilForge.findModEventBus(namespace);
     }
 
     @Override

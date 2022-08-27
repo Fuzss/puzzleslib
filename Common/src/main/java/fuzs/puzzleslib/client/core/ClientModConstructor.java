@@ -2,6 +2,7 @@ package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
+import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -25,6 +26,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -140,6 +142,13 @@ public interface ClientModConstructor {
      * @param context register model predicates for custom item models
      */
     default void onRegisterItemModelProperties(ItemModelPropertiesContext context) {
+
+    }
+
+    /**
+     * @param context register a custom inventory renderer for an item belonging to a block entity
+     */
+    default void onRegisterBuiltinModelItemRenderer(BuiltinModelItemRendererContext context) {
 
     }
 
@@ -334,5 +343,20 @@ public interface ClientModConstructor {
          * @param property  handler for this predicate
          */
         void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction property);
+    }
+
+    /**
+     * register a custom inventory renderer for an item belonging to a block entity
+     */
+    @FunctionalInterface
+    interface BuiltinModelItemRendererContext {
+
+        /**
+         * register a <code>renderer</code> for an <code>item</code>
+         *
+         * @param item      the item to register for
+         * @param renderer  dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
+         */
+        void register(ItemLike item, DynamicBuiltinModelItemRenderer renderer);
     }
 }
