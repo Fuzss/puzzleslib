@@ -2,7 +2,7 @@ package fuzs.puzzleslib.init;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.PuzzlesLibForge;
+import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;

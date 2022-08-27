@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.core;
 
 import com.mojang.brigadier.CommandDispatcher;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
  * wrapper class for {@link ModConstructor} for calling all required registration methods at the correct time,
  * which means everything is called immediately on Fabric (but in the correct order)
  *
- * we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
+ * <p>we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  * (this doesn't really matter on Fabric)
  */
 public class FabricModConstructor {

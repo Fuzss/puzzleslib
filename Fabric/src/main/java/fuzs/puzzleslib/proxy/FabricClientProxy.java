@@ -6,10 +6,13 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -20,6 +23,17 @@ public class FabricClientProxy extends FabricServerProxy {
     @Override
     public Player getClientPlayer() {
         return Minecraft.getInstance().player;
+    }
+
+    @Override
+    public Level getClientLevel() {
+        return Minecraft.getInstance().level;
+    }
+
+    @Override
+    public Connection getClientConnection() {
+        Objects.requireNonNull(Minecraft.getInstance().getConnection(), "Cannot send packets when not in game!");
+        return Minecraft.getInstance().getConnection().getConnection();
     }
 
     @Override

@@ -20,6 +20,7 @@
   "environment": "${modFabricEnvironment}",
   "entrypoints": {
     "main": [
+      "${modGroup}.impl.PuzzlesLibFabric"
     ],
     "client": [
     ],

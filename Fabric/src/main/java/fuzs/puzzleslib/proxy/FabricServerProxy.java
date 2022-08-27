@@ -5,12 +5,14 @@ import fuzs.puzzleslib.network.Message;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 import java.util.function.Function;
 
@@ -38,7 +40,17 @@ public class FabricServerProxy implements Proxy {
     }
 
     @Override
+    public Level getClientLevel() {
+        return null;
+    }
+
+    @Override
     public Object getClientInstance() {
+        return null;
+    }
+
+    @Override
+    public Connection getClientConnection() {
         return null;
     }
 

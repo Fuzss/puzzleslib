@@ -3,7 +3,7 @@ package fuzs.puzzleslib.config;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.config.annotation.AnnotatedConfigBuilder;
 import fuzs.puzzleslib.config.core.ForgeConfigBuilderWrapper;
 import net.minecraftforge.common.ForgeConfigSpec;

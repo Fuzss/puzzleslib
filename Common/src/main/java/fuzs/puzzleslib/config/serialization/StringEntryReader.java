@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.config.serialization;
 
 import com.google.common.collect.Lists;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 

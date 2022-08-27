@@ -16,7 +16,7 @@ import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.capability.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -93,10 +93,15 @@ public class FabricCapabilityController implements CapabilityController, EntityC
     }
 
     @Override
-    public <C extends CapabilityComponent> CapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy) {
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, componentKey -> o -> {
             if (o instanceof EntityComponentFactoryRegistry registry) registry.registerForPlayers(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)), STRATEGY_CONVERTER_MAP.get(respawnStrategy));
-        });
+        }, FabricPlayerCapabilityKey<C>::new);
+    }
+
+    @Override
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, SyncStrategy syncStrategy) {
+        return ((FabricPlayerCapabilityKey<C>) this.registerPlayerCapability(capabilityKey, capabilityType, capabilityFactory, respawnStrategy)).setSyncStrategy(syncStrategy);
     }
 
     @Override
@@ -131,9 +136,24 @@ public class FabricCapabilityController implements CapabilityController, EntityC
      * @return                      capability instance from capability manager
      */
     private <C extends CapabilityComponent> CapabilityKey<C> registerCapability(Class<?> objectType, String capabilityKey, Class<C> capabilityType, Function<ComponentKey<ComponentHolder>, Consumer<Object>> factoryRegistration) {
+        return this.registerCapability(objectType, capabilityKey, capabilityType, factoryRegistration, FabricCapabilityKey<C>::new);
+    }
+
+    /**
+     * register capabilities for a given object type
+     *
+     * @param objectType            type of object to attach to, only works for generic supertypes
+     * @param capabilityKey         path for internal name of this capability, will be used for serialization
+     * @param capabilityType        interface for this capability
+     * @param factoryRegistration   capability factory
+     * @param capabilityKeyFactory  factory for the capability key implementation, required by players
+     * @param <C>                   capability type
+     * @return                      capability instance from capability manager
+     */
+    private <C extends CapabilityComponent, T extends CapabilityKey<C>> T registerCapability(Class<?> objectType, String capabilityKey, Class<C> capabilityType, Function<ComponentKey<ComponentHolder>, Consumer<Object>> factoryRegistration, FabricCapabilityKey.FabricCapabilityKeyFactory<C, T> capabilityKeyFactory) {
         final ComponentKey<ComponentHolder> componentKey = ComponentRegistryV3.INSTANCE.getOrCreate(new ResourceLocation(this.namespace, capabilityKey), ComponentHolder.class);
         this.providerClazzToRegistration.put(objectType, factoryRegistration.apply(componentKey));
-        return new FabricCapabilityKey<>(componentKey, capabilityType);
+        return capabilityKeyFactory.apply(componentKey, capabilityType);
     }
 
     @Override

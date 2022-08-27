@@ -3,9 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.2.8-1.19.2] - 2022-08-26
+## [v4.2.8-1.19.2] - 2022-08-27
+### Added
+- Added support for automatically syncing player capabilities
 ### Changed
-- Minor additions to capability handling
+- Capability player respawn strategies are now handled by the capability key
 ### Fixed
 - Fixed client player instance sometimes being `null` for received network messages on Forge
 

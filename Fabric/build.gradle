@@ -228,7 +228,7 @@ curseforge {
             relations {
                 requiredDependency 'fabric-api'
                 requiredDependency 'forge-config-api-port-fabric'
-                requiredDependency 'puzzles-lib'
+//                requiredDependency 'puzzles-lib'
                 embeddedLibrary 'cardinal-components'
             }
         }
@@ -258,7 +258,7 @@ modrinth {
     dependencies {
         required.project 'fabric-api'
         required.project 'forge-config-api-port'
-        required.project 'puzzles-lib'
+//        required.project 'puzzles-lib'
         embedded.project 'cardinal-components-api'
     }
 //	debugMode = true

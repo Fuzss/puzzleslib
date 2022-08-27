@@ -3,23 +3,20 @@ package fuzs.puzzleslib.capability;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import fuzs.puzzleslib.PuzzlesLibForge;
 import fuzs.puzzleslib.capability.data.*;
+import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -70,8 +67,13 @@ public class ForgeCapabilityController implements CapabilityController {
     }
 
     @Override
-    public <C extends CapabilityComponent> CapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy) {
-        return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, Player.class::isInstance, respawnStrategy);
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy) {
+        return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, Player.class::isInstance, ForgePlayerCapabilityKey<C>::new).setRespawnStrategy(respawnStrategy);
+    }
+
+    @Override
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, SyncStrategy syncStrategy) {
+        return ((ForgePlayerCapabilityKey<C>) this.registerPlayerCapability(capabilityKey, capabilityType, capabilityFactory, respawnStrategy)).setSyncStrategy(syncStrategy);
     }
 
     @Override
@@ -101,7 +103,7 @@ public class ForgeCapabilityController implements CapabilityController {
      * @return                      capability instance from capability manager
      */
     private <C extends CapabilityComponent> CapabilityKey<C> registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Object> filter) {
-        return this.registerCapability(providerType, capabilityKey, capabilityType, capabilityFactory, filter, null);
+        return this.registerCapability(providerType, capabilityKey, capabilityType, capabilityFactory, filter, ForgeCapabilityKey<C>::new);
     }
 
     /**
@@ -112,16 +114,17 @@ public class ForgeCapabilityController implements CapabilityController {
      * @param capabilityType        interface for this capability
      * @param capabilityFactory     capability factory called when attaching to an object
      * @param filter                filter for <code>providerType</code>
-     * @param respawnStrategy       respawn strategy for players for copying capability data
+     * @param capabilityKeyFactory  factory for the capability key implementation, required by players
      * @param <C>                   capability type
+     * @param <T>                   special capability type for performing additional setup actions on the key
      * @return                      capability instance from capability manager
      */
-    private <C extends CapabilityComponent> CapabilityKey<C> registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Object> filter, @Nullable PlayerRespawnStrategy respawnStrategy) {
+    private <C extends CapabilityComponent, T extends CapabilityKey<C>> T registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<C, T> capabilityKeyFactory) {
         ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
         this.providerClazzToIds.put(providerType, key);
-        return new ForgeCapabilityKey<>(key, capabilityType, token -> {
+        return capabilityKeyFactory.apply(key, capabilityType, token -> {
             final Capability<C> capability = CapabilityManager.get(token);
-            this.idToCapabilityData.put(key, new CapabilityData<>(key, capability, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), filter, respawnStrategy));
+            this.idToCapabilityData.put(key, new CapabilityData<>(key, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), filter));
             return capability;
         });
     }
@@ -139,21 +142,6 @@ public class ForgeCapabilityController implements CapabilityController {
                 evt.addCapability(data.capabilityKey(), data.capabilityFactory().createComponent(evt.getObject()));
             }
         }
-    }
-
-    @SubscribeEvent
-    public void onPlayerClone(final PlayerEvent.Clone evt) {
-        if (this.providerClazzToIds.get(Entity.class).isEmpty()) return;
-        // we have to revive caps and then invalidate them again since 1.17+
-        evt.getOriginal().reviveCaps();
-        for (CapabilityData<?> data : this.toCapabilityData(Entity.class)) {
-            evt.getOriginal().getCapability(data.capability()).ifPresent(oldCapability -> {
-                evt.getEntity().getCapability(data.capability()).ifPresent(newCapability -> {
-                    data.respawnStrategy().copy(oldCapability, newCapability, !evt.isWasDeath(), evt.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY));
-                });
-            });
-        }
-        evt.getOriginal().invalidateCaps();
     }
 
     /**
@@ -214,14 +202,12 @@ public class ForgeCapabilityController implements CapabilityController {
      * just a data class for all the things we need when registering capabilities...
      *
      * @param capabilityKey         path for internal name of this capability, will be used for serialization
-     * @param capability            capability instance
      * @param capabilityType        interface for this capability
      * @param capabilityFactory     capability factory called when attaching to an object
      * @param filter                filter for provider type
-     * @param respawnStrategy       respawn strategy for players for copying capability data
      * @param <C>                   capability type
      */
-    private record CapabilityData<C extends CapabilityComponent>(ResourceLocation capabilityKey, Capability<C> capability, Class<C> capabilityType, CapabilityFactory<CapabilityHolder<C>> capabilityFactory, Predicate<Object> filter, PlayerRespawnStrategy respawnStrategy) {
+    private record CapabilityData<C extends CapabilityComponent>(ResourceLocation capabilityKey, Class<C> capabilityType, CapabilityFactory<CapabilityHolder<C>> capabilityFactory, Predicate<Object> filter) {
 
     }
 }

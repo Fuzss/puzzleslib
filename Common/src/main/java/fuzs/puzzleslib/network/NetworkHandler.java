@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.network;
 
 import fuzs.puzzleslib.proxy.Proxy;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceKey;
@@ -11,7 +10,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -53,8 +51,7 @@ public interface NetworkHandler {
      * @param message       message to send
      */
     default void sendToServer(Message<?> message) {
-        Objects.requireNonNull(Minecraft.getInstance().getConnection(), "Cannot send packets when not in game!");
-        Minecraft.getInstance().getConnection().send(this.toServerboundPacket(message));
+        Proxy.INSTANCE.getClientConnection().send(this.toServerboundPacket(message));
     }
 
     /**

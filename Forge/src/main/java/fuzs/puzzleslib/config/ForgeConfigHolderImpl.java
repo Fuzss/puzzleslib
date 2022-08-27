@@ -2,7 +2,7 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.PuzzlesLibForge;
+import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import net.minecraftforge.common.ForgeConfigSpec;

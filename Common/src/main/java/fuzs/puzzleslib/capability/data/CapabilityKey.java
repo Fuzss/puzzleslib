@@ -8,9 +8,9 @@ import java.util.Optional;
 /**
  * common wrapper for Capability (Forge) and Component (Fabric)
  *
- * @param <T> capability type
+ * @param <C> capability type
  */
-public interface CapabilityKey<T extends CapabilityComponent> {
+public interface CapabilityKey<C extends CapabilityComponent> {
 
     /**
      * @return capability id
@@ -20,7 +20,7 @@ public interface CapabilityKey<T extends CapabilityComponent> {
     /**
      * @return capability type
      */
-    Class<T> getComponentClass();
+    Class<C> getComponentClass();
 
     /**
      * get capability implementation from <code>provider</code> directly
@@ -30,7 +30,7 @@ public interface CapabilityKey<T extends CapabilityComponent> {
      * @return              capability implementation for this <code>provider</code>
      */
     @Nullable
-    <V> T get(@Nullable V provider);
+    <V> C get(@Nullable V provider);
 
     /**
      * get capability implementation from <code>provider</code> as optional
@@ -39,7 +39,19 @@ public interface CapabilityKey<T extends CapabilityComponent> {
      * @param <V>           provider type
      * @return              capability implementation for this <code>provider</code> as optional
      */
-    <V> Optional<T> maybeGet(@Nullable V provider);
+    <V> Optional<C> maybeGet(@Nullable V provider);
+
+    /**
+     * get capability implementation from <code>provider</code> directly
+     * alternative to {@link #get}, will throw an exception if not present
+     *
+     * @param provider      provider to get capability from
+     * @param <V>           provider type
+     * @return              capability implementation for this <code>provider</code>
+     */
+    default <V> C orThrow(@Nullable V provider) {
+        return this.maybeGet(provider).orElseThrow(IllegalStateException::new);
+    }
 
     /**
      * checks if a capability is present on the given <code>provider</code>
@@ -48,7 +60,7 @@ public interface CapabilityKey<T extends CapabilityComponent> {
      * @param <V>           provider type
      * @return              is this capability present on the given <code>provider</code>
      */
-    default <V> boolean isProvidedBy(V provider) {
+    default <V> boolean isProvidedBy(@Nullable V provider) {
         return this.get(provider) != null;
     }
 }

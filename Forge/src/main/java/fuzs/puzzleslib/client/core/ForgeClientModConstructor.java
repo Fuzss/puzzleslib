@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.client.core;
 
-import fuzs.puzzleslib.PuzzlesLib;
-import fuzs.puzzleslib.PuzzlesLibForge;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.core.ModConstructor;

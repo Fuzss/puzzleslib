@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.capability.data;
 
+import fuzs.puzzleslib.capability.CapabilityController;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -36,11 +37,13 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
     /**
      * @param id                capability id
      * @param componentClass    capability type class
+     * @param factory           factory for creating the actual capability, needs to wait until we have the {@link CapabilityToken}
      */
     public ForgeCapabilityKey(ResourceLocation id, Class<C> componentClass, CapabilityTokenFactory<C> factory) {
         this.id = id;
         this.componentClass = componentClass;
         this.factory = factory;
+        CapabilityController.submit(this);
     }
 
     /**
@@ -89,7 +92,7 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
     /**
      * check if a token has been supplied and the capability has been created
      */
-    private void validateCapability() {
+    void validateCapability() {
         Objects.requireNonNull(this.capability, "No valid capability implementation registered for %s".formatted(this.id));
     }
 
@@ -107,5 +110,24 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
          * @return          capability for token
          */
         Capability<C> apply(CapabilityToken<C> token);
+    }
+
+    /**
+     * a factory for capability keys on Forge, required to support unique implementation for players
+     *
+     * @param <C> capability type
+     * @param <T> capability key type
+     */
+    public interface ForgeCapabilityKeyFactory<C extends CapabilityComponent, T extends CapabilityKey<C>> {
+
+        /**
+         * factory method
+         *
+         * @param id                capability id
+         * @param componentClass    capability type class
+         * @param factory           factory for creating the actual capability, needs to wait until we have the {@link CapabilityToken}
+         * @return                  the constructed capability key
+         */
+        T apply(ResourceLocation id, Class<C> componentClass, CapabilityTokenFactory<C> factory);
     }
 }

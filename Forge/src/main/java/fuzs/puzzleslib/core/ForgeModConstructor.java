@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.PuzzlesLib;
-import fuzs.puzzleslib.PuzzlesLibForge;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;

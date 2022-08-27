@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.util;
 
-import fuzs.puzzleslib.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

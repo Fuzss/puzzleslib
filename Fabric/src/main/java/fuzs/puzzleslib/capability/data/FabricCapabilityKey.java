@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import fuzs.puzzleslib.capability.CapabilityController;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,6 +32,7 @@ public class FabricCapabilityKey<C extends CapabilityComponent> implements Capab
     public FabricCapabilityKey(ComponentKey<ComponentHolder> capability, Class<C> componentClass) {
         this.capability = capability;
         this.componentClass = componentClass;
+        CapabilityController.submit(this);
     }
 
     @Override
@@ -57,5 +59,23 @@ public class FabricCapabilityKey<C extends CapabilityComponent> implements Capab
     @Override
     public <V> Optional<C> maybeGet(@Nullable V provider) {
         return this.capability.maybeGet(provider).map(holder -> (C) holder.component());
+    }
+
+    /**
+     * a factory for capability keys on Fabric, required to support unique implementation for players
+     *
+     * @param <C> capability type
+     * @param <T> capability key type
+     */
+    public interface FabricCapabilityKeyFactory<C extends CapabilityComponent, T extends CapabilityKey<C>> {
+
+        /**
+         * factory method
+         *
+         * @param capability the wrapped {@link ComponentKey}
+         * @param componentClass capability type class for setting type parameter
+         * @return                  the constructed capability key
+         */
+        T apply(ComponentKey<ComponentHolder> capability, Class<C> componentClass);
     }
 }
