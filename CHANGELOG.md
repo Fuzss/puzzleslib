@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.10-1.19.2] - 2022-08-27
+### Fixed
+- Fixed setting a player sync strategy for a capability not being accessible from the common project
+
+## [v4.2.9-1.19.2] - 2022-08-27
+### Fixed
+- Fixed retrieving capability id falsely requiring the capability to be present on Forge
+
 ## [v4.2.8-1.19.2] - 2022-08-27
 ### Added
 - Added support for automatically syncing player capabilities

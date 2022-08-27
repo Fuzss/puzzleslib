@@ -57,13 +57,11 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
 
     @Override
     public ResourceLocation getId() {
-        this.validateCapability();
         return this.id;
     }
 
     @Override
     public Class<C> getComponentClass() {
-        this.validateCapability();
         return this.componentClass;
     }
 
