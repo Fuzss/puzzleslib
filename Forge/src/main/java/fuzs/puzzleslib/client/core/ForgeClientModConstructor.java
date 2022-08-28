@@ -76,7 +76,7 @@ public class ForgeClientModConstructor {
             }
         });
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
-        this.constructor.onRegisterBuiltinModelItemRenderer((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
+        this.constructor.onRegisterBuiltinModelItemRenderers((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
             // copied from Forge, supposed to break data gen otherwise
             if (FMLLoader.getLaunchHandler().isData()) return;
             // this solution is very dangerous as it relies on internal stuff in Forge
@@ -175,6 +175,11 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onRegisterAdditional(final ModelEvent.RegisterAdditional evt) {
         this.constructor.onRegisterAdditionalModels(evt::register);
+    }
+
+    @SubscribeEvent
+    public void onRegisterItemDecorations(final RegisterItemDecorationsEvent evt) {
+        this.constructor.onRegisterItemDecorations((itemLike, decorator) -> evt.register(itemLike, decorator::render));
     }
 
     /**

@@ -3,6 +3,7 @@ package fuzs.puzzleslib.client.core;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
+import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -146,9 +147,26 @@ public interface ClientModConstructor {
     }
 
     /**
+     * @param context   register a custom inventory renderer for an item belonging to a block entity
+     *
+     * @deprecated      use {@link #onRegisterBuiltinModelItemRenderers}
+     */
+    @Deprecated(forRemoval = true)
+    default void onRegisterBuiltinModelItemRenderer(BuiltinModelItemRendererContext context) {
+
+    }
+
+    /**
      * @param context register a custom inventory renderer for an item belonging to a block entity
      */
-    default void onRegisterBuiltinModelItemRenderer(BuiltinModelItemRendererContext context) {
+    default void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
+        this.onRegisterBuiltinModelItemRenderer(context);
+    }
+
+    /**
+     * @param context register additional renders to run after stack count and durability have been drawn for an item stack
+     */
+    default void onRegisterItemDecorations(ItemDecorationContext context) {
 
     }
 
@@ -358,5 +376,20 @@ public interface ClientModConstructor {
          * @param renderer  dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
          */
         void register(ItemLike item, DynamicBuiltinModelItemRenderer renderer);
+    }
+
+    /**
+     * register additional renders to run after stack count and durability have been drawn for an item stack
+     */
+    @FunctionalInterface
+    interface ItemDecorationContext {
+
+        /**
+         * register a {@link DynamicItemDecorator} for an <code>item</code>
+         *
+         * @param item              the item to draw for
+         * @param itemDecorator     renderer implementation
+         */
+        void register(ItemLike item, DynamicItemDecorator itemDecorator);
     }
 }

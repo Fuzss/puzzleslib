@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * a wrapper for {@link IClientItemExtensions}
  *
- * <p>we need this for {@link fuzs.puzzleslib.client.core.ClientModConstructor#onRegisterBuiltinModelItemRenderer}
+ * <p>we need this for {@link fuzs.puzzleslib.client.core.ClientModConstructor#onRegisterBuiltinModelItemRenderers}
  * in case an {@link IClientItemExtensions} is already present on the item
  */
 public class WrappedClientItemExtension implements IClientItemExtensions {

@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
+import fuzs.puzzleslib.api.client.renderer.ItemDecoratorRegistry;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.api.client.event.ModelEvents;
@@ -44,7 +45,8 @@ import java.util.function.Supplier;
 /**
  * wrapper class for {@link ClientModConstructor} for calling all required registration methods at the correct time,
  * which means everything is called immediately on Fabric (but in the correct order)
- * we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
+ *
+ * <p>we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  * (this doesn't really matter on Fabric)
  */
 public class FabricClientModConstructor {
@@ -139,8 +141,9 @@ public class FabricClientModConstructor {
             constructor.onRegisterAdditionalModels(out::accept);
         });
         constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
-        constructor.onRegisterBuiltinModelItemRenderer((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
+        constructor.onRegisterBuiltinModelItemRenderers((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
             BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::render);
         });
+        constructor.onRegisterItemDecorations(ItemDecoratorRegistry.INSTANCE::register);
     }
 }

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.12-1.19.2] - 2022-08-28
+### Added
+- Allow for registering item decorators (like stack count) in common project, includes api implementation on Fabric
+
 ## [v4.2.11-1.19.2] - 2022-08-27
 ### Added
 - Allow for registering custom `BlockEntityWithoutLevelRenderer`'s in the common project
