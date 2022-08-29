@@ -21,5 +21,5 @@ public interface DynamicItemDecorator {
      * @param blitOffset    current blit offset (z-level)
      * @return              return true if any render state has been altered (rendering text using <code>font</code> does that too), so that we can reset that afterwards
      */
-    boolean render(Font font, ItemStack stack, int itemPosX, int itemPosY, float blitOffset);
+    boolean renderItemDecorations(Font font, ItemStack stack, int itemPosX, int itemPosY, float blitOffset);
 }

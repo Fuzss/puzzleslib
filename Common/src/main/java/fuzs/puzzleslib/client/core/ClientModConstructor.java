@@ -4,6 +4,7 @@ import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
+import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -126,10 +128,20 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context context for modifying baked models right after they've been loaded
+     * @param context           context for modifying baked models right after they've been loaded
+     *
+     * @deprecated              use {@link #onRegisterModelBakingCompletedListeners}
      */
+    @Deprecated(forRemoval = true)
     default void onLoadModels(LoadModelsContext context) {
         this.onLoadModels(context.modelManager(), context.models(), context.modelBakery());
+    }
+
+    /**
+     * @param context context for registering a listener that runs right after baked models have been reloaded
+     */
+    default void onRegisterModelBakingCompletedListeners(ModelBakingCompletedListenersContext context) {
+        context.registerReloadListener(c -> this.onLoadModels(new LoadModelsContext(c.modelManager, c.models, c.modelBakery)));
     }
 
     /**
@@ -338,6 +350,20 @@ public interface ClientModConstructor {
          * @param location the models location
          */
         void registerAdditionalModel(ResourceLocation location);
+    }
+
+    /**
+     * context for registering a listener that runs right after baked models have been reloaded
+     */
+    @FunctionalInterface
+    interface ModelBakingCompletedListenersContext {
+
+        /**
+         * register a reload listener
+         *
+         * @param action    action that runs everytime baked models are reloaded
+         */
+        void registerReloadListener(Consumer<DynamicModelBakingContext> action);
     }
 
     /**

@@ -26,7 +26,7 @@ public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
     public static void render(Font font, ItemStack stack, int itemPosX, int itemPosY, float blitOffset) {
         resetRenderState();
         for (DynamicItemDecorator itemDecorator : DECORATORS.get(stack.getItem())) {
-            if (itemDecorator.render(font, stack, itemPosX, itemPosY, blitOffset)) {
+            if (itemDecorator.renderItemDecorations(font, stack, itemPosX, itemPosY, blitOffset)) {
                 resetRenderState();
             }
         }
