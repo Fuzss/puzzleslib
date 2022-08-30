@@ -6,6 +6,7 @@ import fuzs.puzzleslib.client.extension.WrappedClientItemExtension;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
+import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -15,26 +16,42 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.searchtree.SearchRegistry;
+import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -43,7 +60,10 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * wrapper class for {@link ClientModConstructor} for calling all required registration methods at the correct time
@@ -92,6 +112,8 @@ public class ForgeClientModConstructor {
 
             @Override
             public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory) {
+                Objects.requireNonNull(menuType, "menu type is null");
+                Objects.requireNonNull(factory, "screen constructor is null");
                 MenuScreens.register(menuType, factory::create);
             }
         };
@@ -102,7 +124,11 @@ public class ForgeClientModConstructor {
 
             @Override
             public <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
-                Minecraft.getInstance().getSearchTreeManager().register(searchRegistryKey, treeBuilder);
+                Objects.requireNonNull(searchRegistryKey, "search registry key is null");
+                Objects.requireNonNull(treeBuilder, "search registry tree builder is null");
+                SearchRegistry searchTreeManager = Minecraft.getInstance().getSearchTreeManager();
+                Objects.requireNonNull(searchTreeManager, "search tree manager is null");
+                searchTreeManager.register(searchRegistryKey, treeBuilder);
             }
         };
     }
@@ -111,19 +137,26 @@ public class ForgeClientModConstructor {
         return new ClientModConstructor.ItemModelPropertiesContext() {
 
             @Override
-            public void register(ResourceLocation name, ClampedItemPropertyFunction property) {
-                ItemProperties.registerGeneric(name, property);
+            public void register(ResourceLocation name, ClampedItemPropertyFunction function) {
+                Objects.requireNonNull(name, "property name is null");
+                Objects.requireNonNull(function, "property function is null");
+                ItemProperties.registerGeneric(name, function);
             }
 
             @Override
-            public void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction property) {
-                ItemProperties.register(item, name, property);
+            public void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function) {
+                Objects.requireNonNull(item, "item is null");
+                Objects.requireNonNull(name, "property name is null");
+                Objects.requireNonNull(function, "property function is null");
+                ItemProperties.register(item, name, function);
             }
         };
     }
 
     private ClientModConstructor.BuiltinModelItemRendererContext getBuiltinModelItemRendererContext() {
         return (ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
+            Objects.requireNonNull(item, "item is null");
+            Objects.requireNonNull(renderer, "renderer is null");
             // copied from Forge, supposed to break data gen otherwise
             if (FMLLoader.getLaunchHandler().isData()) return;
             // this solution is very dangerous as it relies on internal stuff in Forge
@@ -160,13 +193,37 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterRenderers(final EntityRenderersEvent.RegisterRenderers evt) {
-        this.constructor.onRegisterEntityRenderers(evt::registerEntityRenderer);
-        this.constructor.onRegisterBlockEntityRenderers(evt::registerBlockEntityRenderer);
+        this.constructor.onRegisterEntityRenderers(new ClientModConstructor.EntityRenderersContext() {
+
+            @Override
+            public <T extends Entity> void registerEntityRenderer(EntityType<? extends T> entityType, EntityRendererProvider<T> entityRendererProvider) {
+                Objects.requireNonNull(entityType, "entity type is null");
+                Objects.requireNonNull(entityRendererProvider, "entity renderer provider is null");
+                evt.registerEntityRenderer(entityType, entityRendererProvider);
+            }
+        });
+        this.constructor.onRegisterBlockEntityRenderers(new ClientModConstructor.BlockEntityRenderersContext() {
+
+            @Override
+            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider) {
+                Objects.requireNonNull(blockEntityType, "block entity type is null");
+                Objects.requireNonNull(blockEntityRendererProvider, "block entity renderer provider is null");
+                evt.registerBlockEntityRenderer(blockEntityType, blockEntityRendererProvider);
+            }
+        });
     }
 
     @SubscribeEvent
     public void onRegisterClientTooltipComponentFactories(final RegisterClientTooltipComponentFactoriesEvent evt) {
-        this.constructor.onRegisterClientTooltipComponents(evt::register);
+        this.constructor.onRegisterClientTooltipComponents(new ClientModConstructor.ClientTooltipComponentsContext() {
+
+            @Override
+            public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
+                Objects.requireNonNull(type, "tooltip component type is null");
+                Objects.requireNonNull(factory, "tooltip component factory is null");
+                evt.register(type, factory);
+            }
+        });
     }
 
     @SubscribeEvent
@@ -175,11 +232,15 @@ public class ForgeClientModConstructor {
 
             @Override
             public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
+                Objects.requireNonNull(type, "particle type is null");
+                Objects.requireNonNull(provider, "particle provider is null");
                 evt.register(type, provider);
             }
 
             @Override
             public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
+                Objects.requireNonNull(type, "particle type is null");
+                Objects.requireNonNull(factory, "particle provider factory is null");
                 evt.register(type, factory::create);
             }
         });
@@ -188,6 +249,8 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onTextureStitch(final TextureStitchEvent.Pre evt) {
         this.constructor.onRegisterAtlasSprites((ResourceLocation atlasId, ResourceLocation spriteId) -> {
+            Objects.requireNonNull(atlasId, "atlas id is null");
+            Objects.requireNonNull(spriteId, "sprite id is null");
             if (evt.getAtlas().location().equals(atlasId)) {
                 evt.addSprite(spriteId);
             }
@@ -196,7 +259,11 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions evt) {
-        this.constructor.onRegisterLayerDefinitions(evt::registerLayerDefinition);
+        this.constructor.onRegisterLayerDefinitions((ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier) -> {
+            Objects.requireNonNull(layerLocation, "layer location is null");
+            Objects.requireNonNull(supplier, "layer supplier is null");
+            evt.registerLayerDefinition(layerLocation, supplier);
+        });
     }
 
     @SubscribeEvent
@@ -204,9 +271,11 @@ public class ForgeClientModConstructor {
         final DynamicModelBakingContext context = new DynamicModelBakingContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()) {
 
             @Override
-            public BakedModel bakeModel(ResourceLocation modelLocation) {
-                UnbakedModel unbakedModel = this.modelBakery.getModel(modelLocation);
-                return unbakedModel.bake(this.modelBakery, this.modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, modelLocation);
+            public BakedModel bakeModel(ResourceLocation model) {
+                Objects.requireNonNull(model, "model location is null");
+                // this will never be null, if not present returns missing model
+                UnbakedModel unbakedModel = this.modelBakery.getModel(model);
+                return unbakedModel.bake(this.modelBakery, this.modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, model);
             }
         };
         for (Consumer<DynamicModelBakingContext> listener : this.modelBakingConsumers) {
@@ -220,17 +289,54 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterAdditional(final ModelEvent.RegisterAdditional evt) {
-        this.constructor.onRegisterAdditionalModels(evt::register);
+        this.constructor.onRegisterAdditionalModels((ResourceLocation model) -> {
+            Objects.requireNonNull(model, "additional model is null");
+            evt.register(model);
+        });
     }
 
     @SubscribeEvent
     public void onRegisterItemDecorations(final RegisterItemDecorationsEvent evt) {
-        this.constructor.onRegisterItemDecorations((itemLike, decorator) -> evt.register(itemLike, decorator::renderItemDecorations));
+        this.constructor.onRegisterItemDecorations((ItemLike item, DynamicItemDecorator decorator) -> {
+            Objects.requireNonNull(item, "item is null");
+            Objects.requireNonNull(decorator, "item decorator is null");
+            evt.register(item, decorator::renderItemDecorations);
+        });
     }
 
     @SubscribeEvent
     public void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent evt) {
-        this.constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> evt.registerReloadListener(reloadListener));
+        this.constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> {
+            Objects.requireNonNull(id, "reload listener id is null");
+            Objects.requireNonNull(reloadListener, "reload listener is null");
+            evt.registerReloadListener(reloadListener);
+        });
+    }
+
+    @SubscribeEvent
+    public void onAddLayers(final EntityRenderersEvent.AddLayers evt) {
+        this.constructor.onRegisterLivingEntityRenderLayers(new ClientModConstructor.LivingEntityRenderLayersContext() {
+
+            @SuppressWarnings({"unchecked", "deprecation"})
+            @Override
+            public <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, Function<EntityModelSet, RenderLayer<T, ? extends EntityModel<T>>> factory) {
+                Objects.requireNonNull(entityType, "entity type is null");
+                Objects.requireNonNull(factory, "render layer factory is null");
+                if (entityType == EntityType.PLAYER) {
+                    evt.getSkins().stream()
+                            .map(evt::getSkin)
+                            .filter(Objects::nonNull)
+                            .map(livingRenderer -> ((LivingEntityRenderer<T, EntityModel<T>>) livingRenderer))
+                            .forEach(livingRenderer -> {
+                                livingRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(evt.getEntityModels()));
+                            });
+                } else {
+                    LivingEntityRenderer<T, EntityModel<T>> entityRenderer = evt.getRenderer(entityType);
+                    Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(Registry.ENTITY_TYPE.getKey(entityType).toString()));
+                    entityRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(evt.getEntityModels()));
+                }
+            }
+        });
     }
 
     /**

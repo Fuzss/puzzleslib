@@ -41,8 +41,8 @@ public abstract class DynamicModelBakingContext {
      *
      * <p>implementation on Fabric does not need to create the unbaked model, it's done automatically when registering an additional model location
      *
-     * @param modelLocation     location to get {@link net.minecraft.client.resources.model.UnbakedModel} from
-     * @return                  the baked model, possible from {@link ModelBakery#MISSING_MODEL_LOCATION}
+     * @param model         location to get {@link net.minecraft.client.resources.model.UnbakedModel} from
+     * @return              the baked model, possible from {@link ModelBakery#MISSING_MODEL_LOCATION}
      */
-    public abstract BakedModel bakeModel(ResourceLocation modelLocation);
+    public abstract BakedModel bakeModel(ResourceLocation model);
 }

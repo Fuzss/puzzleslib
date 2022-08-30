@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.15-1.19.2] - 2022-08-30
+### Added
+- Allow for registering living entity layers in common
+### Changed
+- Added a bunch of null safety checks for methods involved with mod construction
+
 ## [v4.2.14-1.19.2] - 2022-08-30
 ### Added
 - Allow for registering custom client resource managers in common

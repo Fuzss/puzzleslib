@@ -8,11 +8,14 @@ import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -25,6 +28,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -191,6 +195,13 @@ public interface ClientModConstructor {
     }
 
     /**
+     * @param context register additional {@link RenderLayer}s for a living entity
+     */
+    default void onRegisterLivingEntityRenderLayers(LivingEntityRenderLayersContext context) {
+
+    }
+
+    /**
      * register a renderer for an entity
      */
     @FunctionalInterface
@@ -328,9 +339,9 @@ public interface ClientModConstructor {
         /**
          * registers a search tree to {@link SearchRegistry} in {@link net.minecraft.world.entity.vehicle.Minecart}
          *
-         * @param searchRegistryKey the search tree token
-         * @param treeBuilder       builder supplier for search tree
-         * @param <T>               type to be searched for
+         * @param searchRegistryKey     the search tree token
+         * @param treeBuilder           builder supplier for search tree
+         * @param <T>                   type to be searched for
          */
         <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder);
     }
@@ -341,7 +352,10 @@ public interface ClientModConstructor {
      * @param modelManager      the model manager
      * @param models            map of all baked models, useful to add or replace models
      * @param modelBakery       the bakery
+     *
+     * @deprecated              replaced with {@link DynamicModelBakingContext} in {@link #onRegisterModelBakingCompletedListeners}
      */
+    @Deprecated(forRemoval = true)
     record LoadModelsContext(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
 
     }
@@ -355,9 +369,9 @@ public interface ClientModConstructor {
         /**
          * register a model that is referenced nowhere and would normally not be loaded
          *
-         * @param location the models location
+         * @param model     the models location
          */
-        void registerAdditionalModel(ResourceLocation location);
+        void registerAdditionalModel(ResourceLocation model);
     }
 
     /**
@@ -382,19 +396,19 @@ public interface ClientModConstructor {
         /**
          * register a predicate for all items
          *
-         * @param name      predicate name
-         * @param property  handler for this predicate
+         * @param name          predicate name
+         * @param function      handler for this predicate
          */
-        void register(ResourceLocation name, ClampedItemPropertyFunction property);
+        void register(ResourceLocation name, ClampedItemPropertyFunction function);
 
         /**
          * register a predicate for an <code>item</code>
          *
-         * @param item      the item
-         * @param name      predicate name
-         * @param property  handler for this predicate
+         * @param item          the item
+         * @param name          predicate name
+         * @param function      handler for this predicate
          */
-        void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction property);
+        void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function);
     }
 
     /**
@@ -422,9 +436,9 @@ public interface ClientModConstructor {
          * register a {@link DynamicItemDecorator} for an <code>item</code>
          *
          * @param item              the item to draw for
-         * @param itemDecorator     renderer implementation
+         * @param decorator         renderer implementation
          */
-        void register(ItemLike item, DynamicItemDecorator itemDecorator);
+        void register(ItemLike item, DynamicItemDecorator decorator);
     }
 
     /**
@@ -444,5 +458,21 @@ public interface ClientModConstructor {
          * @param reloadListener        the reload-listener to add
          */
         void registerReloadListener(String id, PreparableReloadListener reloadListener);
+    }
+
+    /**
+     * register additional {@link RenderLayer}s for a living entity, supports players like any other entity
+     */
+    @FunctionalInterface
+    interface LivingEntityRenderLayersContext {
+
+        /**
+         * register the additional layer
+         *
+         * @param entityType        entity type to register for
+         * @param factory           the new layer factory
+         * @param <T>               entity type
+         */
+        <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, Function<EntityModelSet, RenderLayer<T, ? extends EntityModel<T>>> factory);
     }
 }
