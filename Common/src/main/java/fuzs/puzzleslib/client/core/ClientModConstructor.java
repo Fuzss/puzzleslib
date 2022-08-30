@@ -22,6 +22,7 @@ import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -179,6 +180,13 @@ public interface ClientModConstructor {
      * @param context register additional renders to run after stack count and durability have been drawn for an item stack
      */
     default void onRegisterItemDecorations(ItemDecorationContext context) {
+
+    }
+
+    /**
+     * @param context adds a listener to the client resource manager to reload at the end of all resources
+     */
+    default void onRegisterClientReloadListeners(ClientReloadListenersContext context) {
 
     }
 
@@ -417,5 +425,24 @@ public interface ClientModConstructor {
          * @param itemDecorator     renderer implementation
          */
         void register(ItemLike item, DynamicItemDecorator itemDecorator);
+    }
+
+    /**
+     * adds a listener to the client resource manager to reload at the end of all resources
+     *
+     * <p>(the resource manager uses a list for keeping track, so it's pretty safe to assume it'll load after vanilla,
+     * Fabric has a very limited way of setting some sort of resource dependencies,
+     * but they don't work for most stuff and Forge doesn't have them anyway)
+     */
+    @FunctionalInterface
+    interface ClientReloadListenersContext {
+
+        /**
+         * register a {@link PreparableReloadListener}
+         *
+         * @param id                    id of this listener for identifying, only used on Fabric
+         * @param reloadListener        the reload-listener to add
+         */
+        void registerReloadListener(String id, PreparableReloadListener reloadListener);
     }
 }

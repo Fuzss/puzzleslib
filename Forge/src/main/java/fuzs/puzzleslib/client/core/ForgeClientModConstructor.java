@@ -23,12 +23,12 @@ import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -226,6 +226,11 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onRegisterItemDecorations(final RegisterItemDecorationsEvent evt) {
         this.constructor.onRegisterItemDecorations((itemLike, decorator) -> evt.register(itemLike, decorator::renderItemDecorations));
+    }
+
+    @SubscribeEvent
+    public void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent evt) {
+        this.constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> evt.registerReloadListener(reloadListener));
     }
 
     /**

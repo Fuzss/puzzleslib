@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.14-1.19.2] - 2022-08-30
+### Added
+- Allow for registering custom client resource managers in common
+
 ## [v4.2.13-1.19.2] - 2022-08-29
 ### Added
 - Allow for registering listeners that run after baked models have been reloaded
@@ -10,7 +14,7 @@ The format is based on [Keep a Changelog].
 ### Changed
 - Mod service classes should no longer extend `CoreServices`, method for loading a service is now accessible from outside
 ### Removed
-- Removed `ModelEvents` class on Fabric, the same can be achieved by registering a `ReloadListener`
+- Removed `ModelEvents` class on Fabric, the same can be achieved by registering a `ReloadListener` for baked models
 
 ## [v4.2.12-1.19.2] - 2022-08-28
 ### Added

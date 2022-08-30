@@ -36,6 +36,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
@@ -137,38 +138,45 @@ public class FabricClientModConstructor {
         };
     }
 
-    private IdentifiableResourceReloadListener getResourceReloadListener() {
+    private PreparableReloadListener getBakingCompletedListener() {
+        return (PreparableReloadListener.PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller profilerFiller, ProfilerFiller profilerFiller2, Executor executor, Executor executor2) -> {
+            return preparationBarrier.wait(Unit.INSTANCE).thenRunAsync(() -> {
+                ModelManager modelManager = Minecraft.getInstance().getModelManager();
+                final DynamicModelBakingContext context = new DynamicModelBakingContext(modelManager, ((ModelManagerExtension) modelManager).puzzleslib_getBakedRegistry(), ((ModelManagerExtension) modelManager).puzzleslib_getModelBakery()) {
+
+                    @Override
+                    public BakedModel bakeModel(ResourceLocation modelLocation) {
+                        return BakedModelManagerHelper.getModel(this.modelManager, modelLocation);
+                    }
+                };
+                for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
+                    try {
+                        listener.accept(context);
+                    } catch (Exception e) {
+                        PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
+                    }
+                }
+            }, executor2);
+        };
+    }
+
+    private IdentifiableResourceReloadListener getFabricResourceReloadListener(String id, PreparableReloadListener reloadListener, ResourceLocation... dependencies) {
+        final Collection<ResourceLocation> fabricDependencies = ImmutableList.copyOf(dependencies);
         return new IdentifiableResourceReloadListener() {
 
             @Override
             public ResourceLocation getFabricId() {
-                return new ResourceLocation(FabricClientModConstructor.this.modId, "model_baking_completed_listeners");
+                return new ResourceLocation(FabricClientModConstructor.this.modId, id);
             }
 
             @Override
             public Collection<ResourceLocation> getFabricDependencies() {
-                return ImmutableList.of(ResourceReloadListenerKeys.MODELS);
+                return fabricDependencies;
             }
 
             @Override
             public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller profilerFiller, ProfilerFiller profilerFiller2, Executor executor, Executor executor2) {
-                return preparationBarrier.wait(Unit.INSTANCE).thenRunAsync(() -> {
-                    ModelManager modelManager = Minecraft.getInstance().getModelManager();
-                    final DynamicModelBakingContext context = new DynamicModelBakingContext(modelManager, ((ModelManagerExtension) modelManager).puzzleslib_getBakedRegistry(), ((ModelManagerExtension) modelManager).puzzleslib_getModelBakery()) {
-
-                        @Override
-                        public BakedModel bakeModel(ResourceLocation modelLocation) {
-                            return BakedModelManagerHelper.getModel(this.modelManager, modelLocation);
-                        }
-                    };
-                    for (Consumer<DynamicModelBakingContext> listener : FabricClientModConstructor.this.modelBakingListeners) {
-                        try {
-                            listener.accept(context);
-                        } catch (Exception e) {
-                            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", FabricClientModConstructor.this.modId, e);
-                        }
-                    }
-                }, executor2);
+                return reloadListener.reload(preparationBarrier, resourceManager, profilerFiller, profilerFiller2, executor, executor2);
             }
         };
     }
@@ -196,7 +204,7 @@ public class FabricClientModConstructor {
         constructor.onRegisterSearchTrees(fabricClientModConstructor::registerSearchTree);
         constructor.onRegisterModelBakingCompletedListeners(fabricClientModConstructor.modelBakingListeners::add);
         if (!fabricClientModConstructor.modelBakingListeners.isEmpty()) {
-            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getResourceReloadListener());
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener("model_baking_completed_listeners", fabricClientModConstructor.getBakingCompletedListener(), ResourceReloadListenerKeys.MODELS));
         }
         ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
             constructor.onRegisterAdditionalModels(out::accept);
@@ -204,6 +212,9 @@ public class FabricClientModConstructor {
         constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
         constructor.onRegisterBuiltinModelItemRenderers((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
             BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
+        });
+        constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> {
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener(id, reloadListener));
         });
         constructor.onRegisterItemDecorations(ItemDecoratorRegistry.INSTANCE::register);
     }
