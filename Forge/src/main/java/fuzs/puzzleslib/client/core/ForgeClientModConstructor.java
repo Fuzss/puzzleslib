@@ -18,7 +18,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
@@ -28,6 +27,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -61,6 +61,7 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -319,22 +320,30 @@ public class ForgeClientModConstructor {
 
             @SuppressWarnings({"unchecked", "deprecation"})
             @Override
-            public <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, Function<EntityModelSet, RenderLayer<T, ? extends EntityModel<T>>> factory) {
+            public <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory) {
                 Objects.requireNonNull(entityType, "entity type is null");
                 Objects.requireNonNull(factory, "render layer factory is null");
                 if (entityType == EntityType.PLAYER) {
                     evt.getSkins().stream()
                             .map(evt::getSkin)
                             .filter(Objects::nonNull)
-                            .map(livingRenderer -> ((LivingEntityRenderer<T, EntityModel<T>>) livingRenderer))
-                            .forEach(livingRenderer -> {
-                                livingRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(evt.getEntityModels()));
+                            .map(entityRenderer -> ((LivingEntityRenderer<T, EntityModel<T>>) entityRenderer))
+                            .forEach(entityRenderer -> {
+                                this.actuallyRegisterRenderLayer(entityRenderer, factory);
                             });
                 } else {
                     LivingEntityRenderer<T, EntityModel<T>> entityRenderer = evt.getRenderer(entityType);
                     Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(Registry.ENTITY_TYPE.getKey(entityType).toString()));
-                    entityRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(evt.getEntityModels()));
+                    this.actuallyRegisterRenderLayer(entityRenderer, factory);
                 }
+            }
+
+            @SuppressWarnings("unchecked")
+            private <T extends LivingEntity> void actuallyRegisterRenderLayer(LivingEntityRenderer<T, EntityModel<T>> entityRenderer, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory) {
+                Minecraft minecraft = Minecraft.getInstance();
+                // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
+                EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, evt.getEntityModels(), minecraft.font);
+                entityRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(entityRenderer, context));
             }
         });
     }

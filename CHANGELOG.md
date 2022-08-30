@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.2.16-1.19.2] - 2022-08-30
+### Fixed
+- Fixed context for registering living entity layers not containing all required instances
+
 ## [v4.2.15-1.19.2] - 2022-08-30
 ### Added
 - Allow for registering living entity layers in common
