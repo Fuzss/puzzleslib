@@ -23,8 +23,8 @@ import java.util.function.Supplier;
 
 /**
  * handles registering to forge registries
- * this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
- * originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
+ * <p>this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
+ * <p>originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
  */
 public class ForgeRegistryManager implements RegistryManager {
     /**
@@ -42,11 +42,12 @@ public class ForgeRegistryManager implements RegistryManager {
 
     /**
      * private constructor
-     * @param namespace namespace for this instance
+     *
+     * @param modId     namespace for this instance
      */
-    private ForgeRegistryManager(String namespace) {
-        this.namespace = namespace;
-        this.modEventBus = PuzzlesUtilForge.findModEventBus(namespace);
+    private ForgeRegistryManager(String modId) {
+        this.namespace = modId;
+        this.modEventBus = PuzzlesUtilForge.findModEventBus(modId);
     }
 
     @Override
@@ -90,11 +91,13 @@ public class ForgeRegistryManager implements RegistryManager {
     }
 
     /**
-     * creates a new registry manager for <code>namespace</code> or returns an existing one
-     * @param namespace namespace used for registration
-     * @return new mod specific registry manager
+     * creates a new registry manager for <code>modId</code> or returns an existing one
+     *
+     * @param modId     namespace used for registration
+     *
+     * @return          new mod specific registry manager
      */
-    public synchronized static RegistryManager of(String namespace) {
-        return MOD_TO_REGISTRY.computeIfAbsent(namespace, ForgeRegistryManager::new);
+    public synchronized static RegistryManager of(String modId) {
+        return MOD_TO_REGISTRY.computeIfAbsent(modId, ForgeRegistryManager::new);
     }
 }

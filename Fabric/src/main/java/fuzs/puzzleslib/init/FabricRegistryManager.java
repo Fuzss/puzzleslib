@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.init;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
@@ -13,26 +15,39 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
  * handles registering to forge registries
- * this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
- * originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
+ * <p>this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
+ * <p>originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
  */
 public class FabricRegistryManager implements RegistryManager {
     /**
      * namespace for this instance
      */
     private final String namespace;
+    /**
+     * defer registration for this manager until {@link #applyRegistration()} is called
+     */
+    private final boolean deferred;
+    /**
+     * internal storage for collecting and registering registry entries
+     */
+    private final Multimap<ResourceKey<? extends Registry<?>>, Runnable> registryToFactory = ArrayListMultimap.create();
 
     /**
      * private constructor
-     * @param namespace namespace for this instance
+     *
+     * @param modId         namespace for this instance
+     * @param deferred      defer registration for this manager until {@link #applyRegistration()} is called
      */
-    private FabricRegistryManager(String namespace) {
-        this.namespace = namespace;
+    private FabricRegistryManager(String modId, boolean deferred) {
+        this.namespace = modId;
+        this.deferred = deferred;
     }
 
     @Override
@@ -40,9 +55,30 @@ public class FabricRegistryManager implements RegistryManager {
         return this.namespace;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public void applyRegistration() {
+        if (!this.deferred || this.registryToFactory.isEmpty()) throw new IllegalStateException("No registry entries available for deferred registration");
+        // follow the same order as Forge: blocks, items, everything else
+        // this will run into issues for spawn eggs, as the eggs will be registered before the entity type is created -> we'll deal with this when it's required by a mod
+        this.registryToFactory.get(Registry.BLOCK_REGISTRY).forEach(Runnable::run);
+        this.registryToFactory.get(Registry.ITEM_REGISTRY).forEach(Runnable::run);
+        for (Map.Entry<ResourceKey<? extends Registry<?>>, Collection<Runnable>> entry : this.registryToFactory.asMap().entrySet()) {
+            if (entry.getKey() != Registry.BLOCK_REGISTRY && entry.getKey() != Registry.ITEM_REGISTRY) entry.getValue().forEach(Runnable::run);
+        }
+    }
+
     @Override
     public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        if (!this.deferred) {
+            return this.actuallyRegister(registryKey, path, supplier);
+        } else {
+            this.registryToFactory.put(registryKey, () -> this.actuallyRegister(registryKey, path, supplier));
+            return this.placeholder(registryKey, path);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         T value = supplier.get();
         Registry<? super T> registry = (Registry<? super T>) Registry.REGISTRY.get(registryKey.location());
         Objects.requireNonNull(value, "Can't register null value");
@@ -75,11 +111,14 @@ public class FabricRegistryManager implements RegistryManager {
     }
 
     /**
-     * creates a new registry manager for <code>namespace</code> or returns an existing one
-     * @param namespace namespace used for registration
-     * @return new mod specific registry manager
+     * creates a new registry manager for <code>modId</code> or returns an existing one
+     *
+     * @param modId         namespace used for registration
+     * @param deferred      defer registration for this manager until {@link #applyRegistration()} is called
+     *
+     * @return              new mod specific registry manager
      */
-    public synchronized static RegistryManager of(String namespace) {
-        return MOD_TO_REGISTRY.computeIfAbsent(namespace, FabricRegistryManager::new);
+    public synchronized static RegistryManager of(String modId, boolean deferred) {
+        return MOD_TO_REGISTRY.computeIfAbsent(modId, modId1 -> new FabricRegistryManager(modId1, deferred));
     }
 }

@@ -88,16 +88,6 @@ public class ForgeNetworkHandler implements NetworkHandler {
      * creates a new network handler
      *
      * @param modId id for channel name
-     * @return mod specific network handler with default channel
-     */
-    public static ForgeNetworkHandler of(String modId) {
-        return of(modId, false, false);
-    }
-
-    /**
-     * creates a new network handler
-     *
-     * @param modId id for channel name
      * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
      * @return mod specific network handler with configured channel

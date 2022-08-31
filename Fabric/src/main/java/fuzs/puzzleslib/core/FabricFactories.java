@@ -57,8 +57,8 @@ public class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public RegistryManager registration(String modId) {
-        return FabricRegistryManager.of(modId);
+    public RegistryManager registration(String modId, boolean deferred) {
+        return FabricRegistryManager.of(modId, deferred);
     }
 
     @Override

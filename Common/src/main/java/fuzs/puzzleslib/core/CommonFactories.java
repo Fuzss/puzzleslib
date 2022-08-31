@@ -20,16 +20,18 @@ public interface CommonFactories {
      * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
      * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
      *
-     * @param modId the mod id for registering events on Forge to the correct mod event bus
-     * @return  provides a consumer for loading a mod being provided the base class
+     * @param modId             the mod id for registering events on Forge to the correct mod event bus
+     *
+     * @return                  provides a consumer for loading a mod being provided the base class
      */
     Consumer<ModConstructor> modConstructor(String modId);
 
     /**
      * creates a new network handler
      *
-     * @param modId id for channel name
-     * @return mod specific network handler with default channel
+     * @param modId             id for channel name
+     *
+     * @return                  mod specific network handler with default channel
      */
     default NetworkHandler network(String modId) {
         return this.network(modId, false, false);
@@ -38,17 +40,18 @@ public interface CommonFactories {
     /**
      * creates a new network handler
      *
-     * @param modId id for channel name
-     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
-     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
-     * @return mod specific network handler with configured channel
+     * @param modId                             id for channel name
+     * @param clientAcceptsVanillaOrMissing     are servers without this mod or vanilla compatible
+     * @param serverAcceptsVanillaOrMissing     are clients without this mod or vanilla compatible
+     *
+     * @return                                  mod specific network handler with configured channel
      */
     NetworkHandler network(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
 
     /**
      * internal factory for client proxy, use {@link Proxy#INSTANCE}
      *
-     * @return provides the client proxy supplier
+     * @return      provides the client proxy supplier
      */
     @ApiStatus.Internal
     Supplier<Proxy> clientProxy();
@@ -56,14 +59,14 @@ public interface CommonFactories {
     /**
      * internal factory for server proxy, use {@link Proxy#INSTANCE}
      *
-     * @return provides the server proxy supplier
+     * @return      provides the server proxy supplier
      */
     @ApiStatus.Internal
     Supplier<Proxy> serverProxy();
 
     /**
      * register a new client config to the holder/builder
-     * just an overload for {@link ConfigHolder.Builder#clientConfig} that also creates a new builder instance
+     * <p>just an overload for {@link ConfigHolder.Builder#clientConfig} that also creates a new builder instance
      *
      * @param clazz         client config main class
      * @param clientConfig  client config factory
@@ -74,7 +77,7 @@ public interface CommonFactories {
 
     /**
      * register a new client config to the holder/builder
-     * just an overload for {@link ConfigHolder.Builder#commonConfig} that also creates a new builder instance
+     * <p>just an overload for {@link ConfigHolder.Builder#commonConfig} that also creates a new builder instance
      *
      * @param clazz         common config main class
      * @param commonConfig  common config factory
@@ -85,7 +88,7 @@ public interface CommonFactories {
 
     /**
      * register a new client config to the holder/builder
-     * just an overload for {@link ConfigHolder.Builder#serverConfig} that also creates a new builder instance
+     * <p>just an overload for {@link ConfigHolder.Builder#serverConfig} that also creates a new builder instance
      *
      * @param clazz         server config main class
      * @param serverConfig  server config factory
@@ -97,10 +100,23 @@ public interface CommonFactories {
     /**
      * creates a new registry manager for <code>namespace</code> or returns an existing one
      *
-     * @param modId namespace used for registration
-     * @return new mod specific registry manager
+     * @param modId         namespace used for registration
+     *
+     * @return              new mod specific registry manager
      */
-    RegistryManager registration(String modId);
+    default RegistryManager registration(String modId) {
+        return this.registration(modId, false);
+    }
+
+    /**
+     * creates a new registry manager for <code>namespace</code> or returns an existing one
+     *
+     * @param modId         namespace used for registration
+     * @param deferred      defer registration for this manager until {@link RegistryManager#applyRegistration()} is called
+     *
+     * @return              new mod specific registry manager
+     */
+    RegistryManager registration(String modId, boolean deferred);
 
     /**
      * creates a new capability controller for <code>namespace</code> or returns an existing one

@@ -48,6 +48,14 @@ public interface RegistryManager {
     String namespace();
 
     /**
+     * allow for deferring registration on Fabric, required when e.g. registering blocks in Fabric project, but related block entity is registered in common
+     * <p>follows the same order as Forge: blocks, items, everything else
+     */
+    default void applyRegistration() {
+        // registration is always deferred on Forge, so make this have a default variant
+    }
+
+    /**
      * creates a placeholder registry reference for this {@link #namespace()}
      * @param registryKey key for registry to register to
      * @param path path for new entry

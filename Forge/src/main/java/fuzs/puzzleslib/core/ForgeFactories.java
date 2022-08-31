@@ -59,7 +59,7 @@ public class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public RegistryManager registration(String modId) {
+    public RegistryManager registration(String modId, boolean deferred) {
         return ForgeRegistryManager.of(modId);
     }
 
