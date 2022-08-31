@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.init;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
@@ -25,7 +24,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -36,11 +34,6 @@ import java.util.function.Supplier;
  * originally based on RegistryHelper found in Vazkii's AutoRegLib mod
  */
 public interface RegistryManager {
-    /**
-     * registry data is stored for each mod separately so when registry events are fired every mod is responsible for registering their own stuff
-     * this is important so that entries are registered for the proper namespace
-     */
-    Map<String, RegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
 
     /**
      * @return namespace for this instance

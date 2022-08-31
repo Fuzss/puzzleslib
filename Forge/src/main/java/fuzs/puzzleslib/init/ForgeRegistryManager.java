@@ -28,6 +28,12 @@ import java.util.function.Supplier;
  */
 public class ForgeRegistryManager implements RegistryManager {
     /**
+     * registry data is stored for each mod separately so when registry events are fired every mod is responsible for registering their own stuff
+     * this is important so that entries are registered for the proper namespace
+     */
+    private static final Map<String, ForgeRegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
+
+    /**
      * namespace for this instance
      */
     private final String namespace;

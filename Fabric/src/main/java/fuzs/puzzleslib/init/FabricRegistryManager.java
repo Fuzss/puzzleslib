@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.init;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
@@ -26,6 +27,12 @@ import java.util.function.Supplier;
  * <p>originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
  */
 public class FabricRegistryManager implements RegistryManager {
+    /**
+     * registry data is stored for each mod separately so when registry events are fired every mod is responsible for registering their own stuff
+     * this is important so that entries are registered for the proper namespace
+     */
+    private static final Map<String, FabricRegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
+
     /**
      * namespace for this instance
      */
@@ -119,6 +126,8 @@ public class FabricRegistryManager implements RegistryManager {
      * @return              new mod specific registry manager
      */
     public synchronized static RegistryManager of(String modId, boolean deferred) {
-        return MOD_TO_REGISTRY.computeIfAbsent(modId, modId1 -> new FabricRegistryManager(modId1, deferred));
+        FabricRegistryManager registryManager = MOD_TO_REGISTRY.computeIfAbsent(modId, modId1 -> new FabricRegistryManager(modId1, deferred));
+        if (deferred != registryManager.deferred) throw new IllegalArgumentException("deferred: %s does not match value set for existing RegistryManager".formatted(deferred));
+        return registryManager;
     }
 }
