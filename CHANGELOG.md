@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.1-1.19.2] - 2022-09-01
+### Fixed
+- Set dependency on Minecraft 1.19.2+ due to features introduced in Forge 1.19.2-43.1.0 being used
+
 ## [v4.3.0-1.19.2] - 2022-09-01
 - Public release for all additions and changes made since v4.2.4
 - This breaks a small number of mods, they'll quickly be updated
