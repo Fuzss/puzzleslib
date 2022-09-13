@@ -84,7 +84,7 @@ public class ForgeClientModConstructor {
     /**
      * actions to run each time after baked models have been reloaded
      */
-    private final List<Consumer<DynamicModelBakingContext>> modelBakingConsumers = Lists.newArrayList();
+    private final List<Consumer<DynamicModelBakingContext>> modelBakingListeners = Lists.newArrayList();
 
     /**
      * only calls {@link ModConstructor#onConstructMod()}, everything else is done via events later
@@ -103,7 +103,7 @@ public class ForgeClientModConstructor {
         this.constructor.onClientSetup();
         this.constructor.onRegisterMenuScreens(this.getMenuScreensContext());
         this.constructor.onRegisterSearchTrees(this.getSearchRegistryContext());
-        this.constructor.onRegisterModelBakingCompletedListeners(this.modelBakingConsumers::add);
+        this.constructor.onRegisterModelBakingCompletedListeners(this.modelBakingListeners::add);
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
         this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
     }
@@ -279,7 +279,7 @@ public class ForgeClientModConstructor {
                 return unbakedModel.bake(this.modelBakery, this.modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, model);
             }
         };
-        for (Consumer<DynamicModelBakingContext> listener : this.modelBakingConsumers) {
+        for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
             try {
                 listener.accept(context);
             } catch (Exception e) {

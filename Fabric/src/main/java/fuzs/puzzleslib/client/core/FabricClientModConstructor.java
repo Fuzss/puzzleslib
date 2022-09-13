@@ -2,6 +2,7 @@ package fuzs.puzzleslib.client.core;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import fuzs.puzzleslib.api.client.event.ModelEvents;
 import fuzs.puzzleslib.api.client.renderer.ItemDecoratorRegistry;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
@@ -9,7 +10,6 @@ import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.resources.model.ModelManagerExtension;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -18,14 +18,12 @@ import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
@@ -38,6 +36,7 @@ import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -46,7 +45,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.Unit;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -62,6 +60,7 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -198,27 +197,22 @@ public class FabricClientModConstructor {
         };
     }
 
-    private PreparableReloadListener getBakingCompletedListener() {
-        return (PreparableReloadListener.PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller profilerFiller, ProfilerFiller profilerFiller2, Executor executor, Executor executor2) -> {
-            return preparationBarrier.wait(Unit.INSTANCE).thenRunAsync(() -> {
-                ModelManager modelManager = Minecraft.getInstance().getModelManager();
-                final DynamicModelBakingContext context = new DynamicModelBakingContext(modelManager, ((ModelManagerExtension) modelManager).puzzleslib_getBakedRegistry(), ((ModelManagerExtension) modelManager).puzzleslib_getModelBakery()) {
+    private void onBakingCompleted(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+        final DynamicModelBakingContext context = new DynamicModelBakingContext(modelManager, models, modelBakery) {
 
-                    @Override
-                    public BakedModel bakeModel(ResourceLocation model) {
-                        Objects.requireNonNull(model, "model location is null");
-                        return BakedModelManagerHelper.getModel(this.modelManager, model);
-                    }
-                };
-                for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
-                    try {
-                        listener.accept(context);
-                    } catch (Exception e) {
-                        PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
-                    }
-                }
-            }, executor2);
+            @Override
+            public BakedModel bakeModel(ResourceLocation model) {
+                Objects.requireNonNull(model, "model location is null");
+                return BakedModelManagerHelper.getModel(this.modelManager, model);
+            }
         };
+        for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
+            try {
+                listener.accept(context);
+            } catch (Exception e) {
+                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
+            }
+        }
     }
 
     private IdentifiableResourceReloadListener getFabricResourceReloadListener(String id, PreparableReloadListener reloadListener, ResourceLocation... dependencies) {
@@ -280,7 +274,7 @@ public class FabricClientModConstructor {
         constructor.onRegisterSearchTrees(fabricClientModConstructor::registerSearchTree);
         constructor.onRegisterModelBakingCompletedListeners(fabricClientModConstructor.modelBakingListeners::add);
         if (!fabricClientModConstructor.modelBakingListeners.isEmpty()) {
-            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener("model_baking_completed_listeners", fabricClientModConstructor.getBakingCompletedListener(), ResourceReloadListenerKeys.MODELS));
+            ModelEvents.BAKING_COMPLETED.register(fabricClientModConstructor::onBakingCompleted);
         }
         constructor.onRegisterAdditionalModels((ResourceLocation model) -> {
             Objects.requireNonNull(model, "model location is null");
