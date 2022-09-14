@@ -17,11 +17,16 @@ import java.util.stream.Stream;
  *
  * @param <T> registry entry type for stored values
  */
-public sealed interface ConfigDataSet<T> permits ConfigDataSetImpl {
+public interface ConfigDataSet<T> {
     /**
      * default config option comment for options backed by {@link ConfigDataSet}
      */
-    String CONFIG_DESCRIPTION = "Format for every entry is \"<namespace>:<path>\". Path may use asterisk as wildcard parameter. Tags are supported, must be in the format of \"#<namespace>:<path>\".";
+    String CONFIG_DESCRIPTION = "Format for every entry is \"<namespace>:<path>\". Tags are supported, must be in the format of \"#<namespace>:<path>\". Namespace may be omitted to use \"minecraft\" by default. Path may use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*shulker_box\" to match all shulker boxes no matter of color.";
+
+    /**
+     * @return the dissolved entry map backing this config data set (values are mostly an empty array, so this is more like a set actually)
+     */
+    Map<T, Object[]> toMap();
 
     /**
      * tests if this set contains a value
@@ -29,7 +34,9 @@ public sealed interface ConfigDataSet<T> permits ConfigDataSetImpl {
      * @param entry entry to check
      * @return does this set contain <code>entry</code>
      */
-    boolean contains(T entry);
+    default boolean contains(T entry) {
+        return this.toMap().containsKey(entry);
+    }
 
     /**
      * queries data for a given value from this set
@@ -37,14 +44,26 @@ public sealed interface ConfigDataSet<T> permits ConfigDataSetImpl {
      * @param entry entry to query data for
      * @return data array
      *
-     * @throws NullPointerException if <code>entry</code> is invalid for this set
+     * @throws NullPointerException if <code>entry</code> is not present for this set
      */
-    Object[] getData(T entry);
+    default Object[] get(T entry) {
+        if (!this.contains(entry)) throw new NullPointerException("no data found for %s".formatted(entry));
+        return this.toMap().get(entry);
+    }
 
     /**
-     * @return the dissolved entry map backing this config data set
+     * @return is this set empty
      */
-    Map<T, Object[]> toMap();
+    default boolean isEmpty() {
+        return this.toMap().isEmpty();
+    }
+
+    /**
+     * @return size of this set
+     */
+    default int size() {
+        return this.toMap().size();
+    }
 
     /**
      * @param registryKey registry for type

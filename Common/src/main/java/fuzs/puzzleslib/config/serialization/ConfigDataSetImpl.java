@@ -31,7 +31,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      */
     private final Registry<T> activeRegistry;
     /**
-     * internal entry holder storage, will be dissolved when {@link #contains} or {@link #getData} is called for the first time
+     * internal entry holder storage, will be dissolved when {@link #toMap()} is called for the first time
      */
     private final List<EntryHolder<?, T>> values = Lists.newArrayList();
     /**
@@ -58,19 +58,6 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         for (String value : values) {
             this.deserialize(value, types).ifPresent(this.values::add);
         }
-    }
-
-    @Override
-    public boolean contains(T entry) {
-        this.dissolve();
-        return this.dissolved.containsKey(entry);
-    }
-
-    @Override
-    public Object[] getData(T entry) {
-        this.dissolve();
-        if (!this.dissolved.containsKey(entry)) throw new NullPointerException("no data found for %s".formatted(entry));
-        return this.dissolved.get(entry);
     }
 
     @Override
@@ -277,7 +264,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             }
             // test if this is a valid entry first
             if (this.activeRegistry != null && matches.isEmpty()) {
-                PuzzlesLib.LOGGER.warn("Unable to parse entry {}: {}", namespace + ":" + path, "Entry not found");
+                PuzzlesLib.LOGGER.warn("Unable to parse entry {}:{}: No matches found in registry {}", namespace, path, this.activeRegistry.key().location());
             }
             return matches;
         }

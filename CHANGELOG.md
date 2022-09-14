@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.4-1.19.2] - 2022-09-14
+### Changed
+- Added a few small utility methods to `ConfigDataSet`
+
 ## [v4.3.3-1.19.2] - 2022-09-14
 ### Changed
 - Overhauled internal handling of config options for game registry data (e.g. a list of items or blocks) to allow for tag support and greater flexibility when defining these options
