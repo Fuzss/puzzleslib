@@ -14,7 +14,8 @@ public class PuzzlesLib implements ModConstructor {
     public static final String MOD_NAME = "Puzzles Lib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
-    public static final NetworkHandler NETWORK = CoreServices.FACTORIES.network(MOD_ID);
+    // set this to allow client only mods using this library
+    public static final NetworkHandler NETWORK = CoreServices.FACTORIES.network(MOD_ID, true, true);
 
     @Override
     public void onConstructMod() {

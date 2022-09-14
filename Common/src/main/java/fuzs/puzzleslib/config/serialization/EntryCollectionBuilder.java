@@ -5,7 +5,6 @@ import com.google.common.collect.Sets;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,10 @@ import java.util.stream.Stream;
 /**
  * builds a collection for a given type of registry from a list of strings
  * @param <T> content type of collection to build
+ *
+ * @deprecated use {@link ConfigDataSetImpl} instead
  */
+@Deprecated(forRemoval = true)
 public class EntryCollectionBuilder<T> extends StringEntryReader<T> {
     /**
      * default entry builder config comment, same as {@link #buildConfigDescription} with empty string

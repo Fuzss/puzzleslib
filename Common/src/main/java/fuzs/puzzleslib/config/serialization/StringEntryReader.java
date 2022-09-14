@@ -14,7 +14,10 @@ import java.util.stream.Collectors;
 /**
  * parser logic for collection builder
  * @param <T> content type of collection to build
+ *
+ * @deprecated use {@link ConfigDataSetImpl} instead
  */
+@Deprecated(forRemoval = true)
 public class StringEntryReader<T> {
     /**
      * registry to work with
