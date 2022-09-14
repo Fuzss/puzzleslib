@@ -8,11 +8,11 @@ import java.util.function.BiConsumer;
 /**
  * helper class for registering custom game rules
  *
- * this is adapted from Fabric, since Forge unfortunately doesn't have anything for dealing with game rules
+ * <p>this is adapted from Fabric, since Forge unfortunately doesn't have anything for dealing with game rules
  * Fabric has many custom options for game rules (e.g. double and enum rules, also bounded int rules),
  * but since they don't exist in vanilla we don't use them to avoid having to implement on Forge ourselves
  *
- * name includes common as it would otherwise be the same as in Fabric Api
+ * <p>name includes common as it would otherwise be the same as in Fabric Api
  */
 public interface CommonGameRuleFactory {
 

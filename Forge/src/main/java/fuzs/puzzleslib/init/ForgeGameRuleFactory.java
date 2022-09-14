@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 /**
  * implementation on Forge, we need to use custom accessors as Forge has nothing to help us unfortunately
  */
-public class ForgeGameRuleFactory implements CommonGameRuleFactory {
+public final class ForgeGameRuleFactory implements CommonGameRuleFactory {
 
     @Override
     public <T extends GameRules.Value<T>> GameRules.Key<T> register(String name, GameRules.Category category, GameRules.Type<T> type) {

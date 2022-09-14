@@ -3,10 +3,12 @@ package fuzs.puzzleslib.init;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -110,6 +112,11 @@ public class FabricRegistryManager implements RegistryManager {
     }
 
     @Override
+    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuTypeSupplier(String path, Supplier<ExtendedModMenuSupplier<T>> entry) {
+        return this.registerMenuType(path, () -> new ExtendedScreenHandlerType<>(entry.get()::create));
+    }
+
+    @Override
     public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
         ModPoiTypeBuilder builder = entry.get();
         ResourceLocation key = this.makeKey(path);
@@ -122,7 +129,6 @@ public class FabricRegistryManager implements RegistryManager {
      *
      * @param modId         namespace used for registration
      * @param deferred      defer registration for this manager until {@link #applyRegistration()} is called
-     *
      * @return              new mod specific registry manager
      */
     public synchronized static RegistryManager of(String modId, boolean deferred) {

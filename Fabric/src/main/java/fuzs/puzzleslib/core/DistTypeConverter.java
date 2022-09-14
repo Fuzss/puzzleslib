@@ -3,7 +3,7 @@ package fuzs.puzzleslib.core;
 import net.fabricmc.api.EnvType;
 
 /**
- * converts our custom {@link DistType} from and to Fabric  equivalent(s)
+ * converts our custom {@link DistType} from and to Fabric equivalent(s)
  */
 public class DistTypeConverter {
 

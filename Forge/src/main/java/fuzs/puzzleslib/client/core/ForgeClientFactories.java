@@ -9,7 +9,7 @@ import java.util.function.Supplier;
 /**
  * Forge client factories
  */
-public class ForgeClientFactories implements ClientFactories {
+public final class ForgeClientFactories implements ClientFactories {
 
     @Override
     public Consumer<ClientModConstructor> clientModConstructor(String modId) {

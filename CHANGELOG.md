@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.5-1.19.2] - 2022-09-14
+### Added
+- Added a way for opening menus with additional data
+
 ## [v4.3.4-1.19.2] - 2022-09-14
 ### Changed
 - Added a few small utility methods to `ConfigDataSet`

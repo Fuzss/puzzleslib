@@ -11,13 +11,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
  * @param <T> type of menu
  */
 @FunctionalInterface
-public interface ModMenuSupplier<T extends AbstractContainerMenu> {
+public interface ExtendedModMenuSupplier<T extends AbstractContainerMenu> {
 
     /**
      * container menu factory method
      * @param containerId menu id
      * @param inventory player inventory
+     * @param data additional data to be sent to client
      * @return the container menu
      */
-    T create(int containerId, Inventory inventory);
+    T create(int containerId, Inventory inventory, FriendlyByteBuf data);
 }

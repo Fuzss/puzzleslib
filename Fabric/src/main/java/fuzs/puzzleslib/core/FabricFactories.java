@@ -17,7 +17,7 @@ import java.util.function.Supplier;
 /**
  * factories for various utilities on Fabric
  */
-public class FabricFactories implements CommonFactories {
+public final class FabricFactories implements CommonFactories {
 
     @Override
     public Consumer<ModConstructor> modConstructor(String modId) {

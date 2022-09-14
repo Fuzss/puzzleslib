@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.init;
 
+import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
@@ -272,6 +273,15 @@ public interface RegistryManager {
      * @param <T> container menu type
      */
     <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<ModMenuSupplier<T>> entry);
+
+    /**
+     * register container type entry with a path
+     * @param path path for new entry
+     * @param entry supplier for entry to register
+     * @return registry object for <code>entry</code>
+     * @param <T> container menu type
+     */
+    <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuTypeSupplier(String path, Supplier<ExtendedModMenuSupplier<T>> entry);
 
     /**
      * register poi type from custom builder

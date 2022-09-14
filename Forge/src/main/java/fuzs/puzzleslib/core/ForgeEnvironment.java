@@ -10,7 +10,7 @@ import java.nio.file.Path;
 /**
  * implementation of {@link ModLoaderEnvironment} for Forge
  */
-public class ForgeEnvironment implements ModLoaderEnvironment {
+public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public ModLoader getModLoader() {

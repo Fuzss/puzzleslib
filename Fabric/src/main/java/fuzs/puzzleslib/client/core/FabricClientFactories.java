@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 /**
  * Fabric client factories
  */
-public class FabricClientFactories implements ClientFactories {
+public final class FabricClientFactories implements ClientFactories {
 
     @Override
     public Consumer<ClientModConstructor> clientModConstructor(String modId) {

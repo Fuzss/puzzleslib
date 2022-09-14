@@ -7,7 +7,7 @@ import java.nio.file.Path;
 /**
  * implementation of {@link ModLoaderEnvironment} for Fabric
  */
-public class FabricEnvironment implements ModLoaderEnvironment {
+public final class FabricEnvironment implements ModLoaderEnvironment {
 
     @Override
     public ModLoader getModLoader() {

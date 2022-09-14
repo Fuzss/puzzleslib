@@ -4,7 +4,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.LogicalSide;
 
 /**
- * converts our custom {@link DistType} from and to Fabric  equivalent(s)
+ * converts our custom {@link DistType} from and to Forge equivalent(s)
  */
 public class DistTypeConverter {
 

@@ -20,6 +20,10 @@ public class CoreServices {
      */
     public static final CommonFactories FACTORIES = loadServiceProvider(CommonFactories.class);
     /**
+     * useful methods for gameplay related things that require mod loader specific abstractions
+     */
+    public static final CommonAbstractions ABSTRACTIONS = loadServiceProvider(CommonAbstractions.class);
+    /**
      * helper class for creating and registering new game rules
      */
     public static final CommonGameRuleFactory GAME_RULES = loadServiceProvider(CommonGameRuleFactory.class);

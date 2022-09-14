@@ -10,7 +10,7 @@ import java.util.function.BiConsumer;
 /**
  * implementation on Fabric using methods conveniently provided by Fabric Api
  */
-public class FabricGameRuleFactory implements CommonGameRuleFactory {
+public final class FabricGameRuleFactory implements CommonGameRuleFactory {
 
     @Override
     public <T extends GameRules.Value<T>> GameRules.Key<T> register(String name, GameRules.Category category, GameRules.Type<T> type) {

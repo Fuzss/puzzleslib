@@ -19,7 +19,7 @@ import java.util.function.Supplier;
 /**
  * factories for various utilities on Forge
  */
-public class ForgeFactories implements CommonFactories {
+public final class ForgeFactories implements CommonFactories {
 
     @Override
     public Consumer<ModConstructor> modConstructor(String modId) {

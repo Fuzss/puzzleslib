@@ -2,6 +2,7 @@ package fuzs.puzzleslib.init;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
@@ -14,6 +15,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.StringUtils;
@@ -89,6 +91,11 @@ public class ForgeRegistryManager implements RegistryManager {
     }
 
     @Override
+    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuTypeSupplier(String path, Supplier<ExtendedModMenuSupplier<T>> entry) {
+        return this.registerMenuType(path, () -> new MenuType<>((IContainerFactory<T>) (containerId, inventory, data) -> entry.get().create(containerId, inventory, data)));
+    }
+
+    @Override
     public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
         return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, () -> {
             ModPoiTypeBuilder builder = entry.get();
@@ -100,7 +107,6 @@ public class ForgeRegistryManager implements RegistryManager {
      * creates a new registry manager for <code>modId</code> or returns an existing one
      *
      * @param modId     namespace used for registration
-     *
      * @return          new mod specific registry manager
      */
     public synchronized static RegistryManager of(String modId) {
