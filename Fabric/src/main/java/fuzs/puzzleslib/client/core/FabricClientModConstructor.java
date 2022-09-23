@@ -11,6 +11,7 @@ import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
@@ -18,6 +19,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
@@ -298,6 +300,10 @@ public class FabricClientModConstructor {
             Objects.requireNonNull(item, "item is null");
             Objects.requireNonNull(decorator, "item decorator is null");
             ItemDecoratorRegistry.INSTANCE.register(item, decorator);
+        });
+        constructor.onRegisterKeyMappings((KeyMapping keyBinding) -> {
+            Objects.requireNonNull(keyBinding, "key mapping is null");
+            KeyBindingHelper.registerKeyBinding(keyBinding);
         });
     }
 }

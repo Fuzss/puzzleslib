@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.6-1.19.2] - 2022-09-23
+### Added
+- Added an event for registering key binds
+
 ## [v4.3.5-1.19.2] - 2022-09-14
 ### Added
 - Added a way for opening menus with additional data

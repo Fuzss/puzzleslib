@@ -12,6 +12,7 @@ import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.ItemAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
@@ -345,6 +346,14 @@ public class ForgeClientModConstructor {
                 EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, evt.getEntityModels(), minecraft.font);
                 entityRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(entityRenderer, context));
             }
+        });
+    }
+
+    @SubscribeEvent
+    public void onRegisterKeyMappings(final RegisterKeyMappingsEvent evt) {
+        this.constructor.onRegisterKeyMappings((KeyMapping key) -> {
+            Objects.requireNonNull(key, "key mapping is null");
+            evt.register(key);
         });
     }
 

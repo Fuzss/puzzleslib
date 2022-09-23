@@ -5,6 +5,7 @@ import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -200,6 +201,13 @@ public interface ClientModConstructor {
      * @param context register additional {@link RenderLayer}s for a living entity
      */
     default void onRegisterLivingEntityRenderLayers(LivingEntityRenderLayersContext context) {
+
+    }
+
+    /**
+     * @param context register a {@link KeyMapping} so it can be saved to and loaded from game options
+     */
+    default void onRegisterKeyMappings(KeyMappingsContext context) {
 
     }
 
@@ -476,5 +484,19 @@ public interface ClientModConstructor {
          * @param <T>               entity type
          */
         <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory);
+    }
+
+    /**
+     * register a {@link KeyMapping} so it can be saved to and loaded from game options
+     */
+    @FunctionalInterface
+    interface KeyMappingsContext {
+
+        /**
+         * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
+         *
+         * @param key the key mapping to register
+         */
+        void registerKeyMappings(KeyMapping key);
     }
 }
