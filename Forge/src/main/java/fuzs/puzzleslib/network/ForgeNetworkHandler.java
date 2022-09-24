@@ -27,7 +27,7 @@ public class ForgeNetworkHandler implements NetworkHandler {
     /**
      * store network handlers created for a mod to avoid duplicate channels
      */
-    private static final Map<String, NetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
+    private static final Map<String, ForgeNetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
     /**
      * protocol version for testing client-server compatibility of this mod
      */
@@ -38,6 +38,16 @@ public class ForgeNetworkHandler implements NetworkHandler {
      */
     private final SimpleChannel channel;
     /**
+     * are servers without this mod or vanilla compatible
+     * <p>only stored to ensure other handlers for this mod are created validly
+     */
+    private final boolean clientAcceptsVanillaOrMissing;
+    /**
+     * are clients without this mod or vanilla compatible
+     * <p>only stored to ensure other handlers for this mod are created validly
+     */
+    private final boolean serverAcceptsVanillaOrMissing;
+    /**
      * message index
      */
     private final AtomicInteger discriminator = new AtomicInteger();
@@ -45,8 +55,10 @@ public class ForgeNetworkHandler implements NetworkHandler {
     /**
      * @param channel mod network channel
      */
-    private ForgeNetworkHandler(SimpleChannel channel) {
+    private ForgeNetworkHandler(SimpleChannel channel, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         this.channel = channel;
+        this.clientAcceptsVanillaOrMissing = clientAcceptsVanillaOrMissing;
+        this.serverAcceptsVanillaOrMissing = serverAcceptsVanillaOrMissing;
     }
 
     @SuppressWarnings("unchecked")
@@ -99,9 +111,12 @@ public class ForgeNetworkHandler implements NetworkHandler {
      * @return mod specific network handler with configured channel
      */
     public synchronized static NetworkHandler of(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return MOD_TO_NETWORK.computeIfAbsent(modId, modId1 -> {
-            return new ForgeNetworkHandler(buildSimpleChannel(modId1, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing));
+        ForgeNetworkHandler handler = MOD_TO_NETWORK.computeIfAbsent(modId, modId1 -> {
+            return new ForgeNetworkHandler(buildSimpleChannel(modId1, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
         });
+        if (handler.clientAcceptsVanillaOrMissing != clientAcceptsVanillaOrMissing) throw new IllegalArgumentException("client channel settings mismatch, expected %s, but was %s".formatted(handler.clientAcceptsVanillaOrMissing, clientAcceptsVanillaOrMissing));
+        if (handler.serverAcceptsVanillaOrMissing != serverAcceptsVanillaOrMissing) throw new IllegalArgumentException("server channel settings mismatch, expected %s, but was %s".formatted(handler.serverAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing));
+        return handler;
     }
 
     /**

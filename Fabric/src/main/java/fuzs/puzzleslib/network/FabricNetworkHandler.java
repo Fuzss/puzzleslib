@@ -23,7 +23,7 @@ public class FabricNetworkHandler implements NetworkHandler {
     /**
      * store network handlers created for a mod to avoid duplicate channels
      */
-    private static final Map<String, NetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
+    private static final Map<String, FabricNetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
 
     /**
      * registry for class to identifier relation
