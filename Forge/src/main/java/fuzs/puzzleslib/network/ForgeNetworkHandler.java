@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.network;
 
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.core.DistTypeConverter;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.network.FriendlyByteBuf;
@@ -13,6 +14,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -22,6 +24,10 @@ import java.util.function.Supplier;
  * handler for network communications of all puzzles lib mods
  */
 public class ForgeNetworkHandler implements NetworkHandler {
+    /**
+     * store network handlers created for a mod to avoid duplicate channels
+     */
+    private static final Map<String, NetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
     /**
      * protocol version for testing client-server compatibility of this mod
      */
@@ -85,20 +91,33 @@ public class ForgeNetworkHandler implements NetworkHandler {
     }
 
     /**
-     * creates a new network handler
+     * creates a new network handler for <code>modId</code> or returns an existing one
      *
      * @param modId id for channel name
      * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
-    public static ForgeNetworkHandler of(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        final SimpleChannel channel = NetworkRegistry.ChannelBuilder
+    public synchronized static NetworkHandler of(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return MOD_TO_NETWORK.computeIfAbsent(modId, modId1 -> {
+            return new ForgeNetworkHandler(buildSimpleChannel(modId1, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing));
+        });
+    }
+
+    /**
+     * creates a configured channel
+     *
+     * @param modId id for channel name
+     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
+     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
+     * @return configured channel
+     */
+    private static SimpleChannel buildSimpleChannel(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return NetworkRegistry.ChannelBuilder
                 .named(new ResourceLocation(modId, "play"))
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
                 .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
                 .simpleChannel();
-        return new ForgeNetworkHandler(channel);
     }
 }

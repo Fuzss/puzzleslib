@@ -21,6 +21,11 @@ import java.util.function.Supplier;
  */
 public class FabricNetworkHandler implements NetworkHandler {
     /**
+     * store network handlers created for a mod to avoid duplicate channels
+     */
+    private static final Map<String, NetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
+
+    /**
      * registry for class to identifier relation
      */
     private final Map<Class<? extends Message<?>>, MessageData> messages = Maps.newIdentityHashMap();
@@ -85,13 +90,13 @@ public class FabricNetworkHandler implements NetworkHandler {
     }
 
     /**
-     * creates a new network handler
+     * creates a new network handler for <code>modId</code> or returns an existing one
      *
      * @param modId id for channel name
      * @return mod specific network handler with default channel
      */
-    public static FabricNetworkHandler of(String modId) {
-        return new FabricNetworkHandler(modId);
+    public synchronized static NetworkHandler of(String modId) {
+        return MOD_TO_NETWORK.computeIfAbsent(modId, FabricNetworkHandler::new);
     }
 
     /**
