@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.init;
 
+import fuzs.puzzleslib.core.ModLoader;
 import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
@@ -23,11 +24,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * handles registering to game registries
@@ -40,6 +43,27 @@ public interface RegistryManager {
      * @return namespace for this instance
      */
     String namespace();
+
+    /**
+     * allows for registering content in the common project for only a few mod loaders
+     *
+     * @param allowedModLoaders the mod loaders to register on, every mod loader not registered to should handle this in the loader specific subproject
+     * @return this manager as a builder
+     */
+    RegistryManager whenOn(ModLoader... allowedModLoaders);
+
+    /**
+     * allows for registering content in the common project for only a few mod loaders
+     *
+     * @param forbiddenModLoaders the mod loaders to not register on
+     * @return this manager as a builder
+     */
+    default RegistryManager whenNotOn(ModLoader... forbiddenModLoaders) {
+        ModLoader[] allowedModLoaders = Stream.of(ModLoader.values())
+                .filter(modLoader -> !ArrayUtils.contains(forbiddenModLoaders, modLoader))
+                .toArray(ModLoader[]::new);
+        return this.whenOn(allowedModLoaders);
+    }
 
     /**
      * allow for deferring registration on Fabric, required when e.g. registering blocks in Fabric project, but related block entity is registered in common

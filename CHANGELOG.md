@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.8-1.19.2] - 2022-09-26
+### Changed
+- Improve handling of registry manager placeholder entries
+
 ## [v4.3.7-1.19.2] - 2022-09-24
 ### Fixed
 - Fixed existing `NetworkHandler`'s being recreated 

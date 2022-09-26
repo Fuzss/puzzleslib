@@ -1,8 +1,10 @@
 package fuzs.puzzleslib.init;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.core.ModLoader;
 import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
@@ -17,10 +19,12 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -47,6 +51,11 @@ public class FabricRegistryManager implements RegistryManager {
      * internal storage for collecting and registering registry entries
      */
     private final Multimap<ResourceKey<? extends Registry<?>>, Runnable> registryToFactory = ArrayListMultimap.create();
+    /**
+     * mod loader sto register the next entry to, null by default for registering to any
+     */
+    @Nullable
+    private Set<ModLoader> allowedModLoaders;
 
     /**
      * private constructor
@@ -65,6 +74,13 @@ public class FabricRegistryManager implements RegistryManager {
     }
 
     @Override
+    public RegistryManager whenOn(ModLoader... allowedModLoaders) {
+        if (allowedModLoaders.length == 0) throw new IllegalArgumentException("Must provide at least one mod loader to register on");
+        this.allowedModLoaders = ImmutableSet.copyOf(allowedModLoaders);
+        return this;
+    }
+
+    @Override
     public void applyRegistration() {
         if (!this.deferred || this.registryToFactory.isEmpty()) throw new IllegalStateException("No registry entries available for deferred registration");
         // follow the same order as Forge: blocks, items, everything else
@@ -78,20 +94,25 @@ public class FabricRegistryManager implements RegistryManager {
 
     @Override
     public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        Set<ModLoader> modLoaders = this.allowedModLoaders;
+        this.allowedModLoaders = null;
         if (!this.deferred) {
-            return this.actuallyRegister(registryKey, path, supplier);
+            return this.actuallyRegister(registryKey, path, supplier, modLoaders);
         } else {
-            this.registryToFactory.put(registryKey, () -> this.actuallyRegister(registryKey, path, supplier));
+            this.registryToFactory.put(registryKey, () -> this.actuallyRegister(registryKey, path, supplier, modLoaders));
             return this.placeholder(registryKey, path);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+    private <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, @Nullable Set<ModLoader> modLoaders) {
+        if (modLoaders != null && !modLoaders.contains(ModLoader.FABRIC)) {
+            return this.placeholder(registryKey, path);
+        }
         T value = supplier.get();
         Registry<? super T> registry = (Registry<? super T>) Registry.REGISTRY.get(registryKey.location());
         Objects.requireNonNull(value, "Can't register null value");
-        Objects.requireNonNull(registry, String.format("Registry %s not found", registryKey));
+        Objects.requireNonNull(registry, "Registry %s not found".formatted(registryKey));
         ResourceLocation key = this.makeKey(path);
         Registry.register(registry, key, value);
         return new FabricRegistryReference<>(value, key, registry);

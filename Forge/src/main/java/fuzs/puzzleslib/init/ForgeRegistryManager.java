@@ -2,6 +2,7 @@ package fuzs.puzzleslib.init;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.core.ModLoader;
 import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
@@ -19,8 +20,10 @@ import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -47,6 +50,11 @@ public class ForgeRegistryManager implements RegistryManager {
      * storage for {@link DeferredRegister} required for registering data on Forge
      */
     private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> deferredRegisters = Maps.newIdentityHashMap();
+    /**
+     * mod loader sto register the next entry to, null by default for registering to any
+     */
+    @Nullable
+    private Set<ModLoader> allowedModLoaders;
 
     /**
      * private constructor
@@ -63,9 +71,21 @@ public class ForgeRegistryManager implements RegistryManager {
         return this.namespace;
     }
 
+    @Override
+    public RegistryManager whenOn(ModLoader... allowedModLoaders) {
+        if (allowedModLoaders.length == 0) throw new IllegalArgumentException("Must provide at least one mod loader to register on");
+        this.allowedModLoaders = ImmutableSet.copyOf(allowedModLoaders);
+        return this;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <T> RegistryReference<T> register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        Set<ModLoader> modLoaders = this.allowedModLoaders;
+        this.allowedModLoaders = null;
+        if (modLoaders != null && !modLoaders.contains(ModLoader.FORGE)) {
+            return this.placeholder(registryKey, path);
+        }
         DeferredRegister<?> register = this.deferredRegisters.computeIfAbsent(registryKey, key -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.namespace);
             deferredRegister.register(this.modEventBus);
