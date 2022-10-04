@@ -3,6 +3,7 @@ package fuzs.puzzleslib.config;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -18,6 +19,15 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
      * the stored config
      */
     protected final T config;
+    /**
+     * supplier for default config if needed at some point
+     */
+    private final Supplier<T> defaultConfigSupplier;
+    /**
+     * stored default config, null be default, only created when needed
+     */
+    @Nullable
+    private T defaultConfig;
     /**
      * file name, should be set to {@link ConfigHolder#defaultName} in mod loader specific implementation
      */
@@ -41,12 +51,26 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
      */
     protected ConfigDataHolderImpl(Supplier<T> config) {
         this.config = config.get();
+        this.defaultConfigSupplier = config;
     }
 
     @Override
     public T config() {
-        this.testAvailable();
-        return this.config;
+        return this.isAvailable() ? this.config : this.getOrCreateDefaultConfig();
+    }
+
+    /**
+     * gets the default config, creates it first and calls {@link #testAvailable()} when not present yet
+     * <p>set up this way to ensure only one error message is printed to the log to avoid spam
+     *
+     * @return the config with default values
+     */
+    private T getOrCreateDefaultConfig() {
+        if (this.defaultConfig == null) {
+            this.testAvailable();
+            this.defaultConfig = this.defaultConfigSupplier.get();
+        }
+        return this.defaultConfig;
     }
 
     @Override
