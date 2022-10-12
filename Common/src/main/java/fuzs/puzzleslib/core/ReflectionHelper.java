@@ -10,7 +10,10 @@ import java.util.Optional;
 
 /**
  * helper class for reflection operations, similar to the Forge thing, but we want to use this on Fabric as well
+ *
+ * @deprecated use {@link ReflectionHelperV2} instead
  */
+@Deprecated(forRemoval = true)
 @SuppressWarnings("unchecked")
 public class ReflectionHelper {
     /**

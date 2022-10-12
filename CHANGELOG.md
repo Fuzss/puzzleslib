@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.10-1.19.2] - 2022-10-12
+### Added
+- Added new `ReflectionHelperV2` class, the old one is now deprecated
+
 ## [v4.3.9-1.19.2] - 2022-10-04
 ### Changed
 - Limited error messages from config values being used when a config is not yet available to showing up just once to avoid log spam 
