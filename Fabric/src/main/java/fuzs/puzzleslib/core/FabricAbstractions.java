@@ -16,23 +16,29 @@ public final class FabricAbstractions implements CommonAbstractions {
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {
-        player.openMenu(new ExtendedScreenHandlerFactory() {
+        new Runnable() {
 
             @Override
-            public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf) {
-                screenOpeningDataWriter.accept(player, buf);
-            }
+            public void run() {
+                player.openMenu(new ExtendedScreenHandlerFactory() {
 
-            @Override
-            public Component getDisplayName() {
-                return menuProvider.getDisplayName();
-            }
+                    @Override
+                    public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf) {
+                        screenOpeningDataWriter.accept(player, buf);
+                    }
 
-            @Nullable
-            @Override
-            public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-                return menuProvider.createMenu(i, inventory, player);
+                    @Override
+                    public Component getDisplayName() {
+                        return menuProvider.getDisplayName();
+                    }
+
+                    @Nullable
+                    @Override
+                    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
+                        return menuProvider.createMenu(i, inventory, player);
+                    }
+                });
             }
-        });
+        }.run();
     }
 }
