@@ -16,6 +16,8 @@ public final class FabricAbstractions implements CommonAbstractions {
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {
+        // this is done to fix an early class loading issue on Quilt due to net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
+        // in future versions (1.20+) this should be handled by creating SPI's only on demand in fuzs.puzzleslib.core.CoreServices (supplier memoization)
         new Runnable() {
 
             @Override

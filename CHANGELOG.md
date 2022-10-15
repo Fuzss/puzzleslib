@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.11-1.19.2] - 2022-10-15
+### Fixed
+- Temporary fix for start-up crash due to a class being loaded before all mixins could apply when Stylish Effects is installed on Quilt
+
 ## [v4.3.10-1.19.2] - 2022-10-12
 ### Added
 - Added new `ReflectionHelperV2` class, the old one is now deprecated
@@ -170,10 +174,10 @@ The format is based on [Keep a Changelog].
 
 ## [v4.1.0-1.19.1] - 2022-07-30
 - Compiled for Minecraft 1.19.1
-## Changed
+### Changed
 - Cleaned up networking classes
 - Made config annotations more powerful, removing the need to set category names and comments on config objects
-## Removed
+### Removed
 - Remove deprecated methods and classes
 
 ## [v4.0.18-1.19] - 2022-07-26
