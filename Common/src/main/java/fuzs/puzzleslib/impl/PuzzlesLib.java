@@ -1,11 +1,10 @@
 package fuzs.puzzleslib.impl;
 
-import fuzs.puzzleslib.core.CoreServices;
+import fuzs.puzzleslib.core.CommonFactories;
 import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.impl.network.S2CSyncCapabilityMessage;
 import fuzs.puzzleslib.network.MessageDirection;
 import fuzs.puzzleslib.network.NetworkHandler;
-import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +14,7 @@ public class PuzzlesLib implements ModConstructor {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     // set this to allow client only mods using this library
-    public static final NetworkHandler NETWORK = CoreServices.FACTORIES.network(MOD_ID, true, true);
+    public static final NetworkHandler NETWORK = CommonFactories.INSTANCE.network(MOD_ID, true, true);
 
     @Override
     public void onConstructMod() {

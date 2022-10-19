@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.init;
 
+import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
@@ -15,6 +16,10 @@ import java.util.function.BiConsumer;
  * <p>name includes common as it would otherwise be the same as in Fabric Api
  */
 public interface CommonGameRuleFactory {
+    /**
+     * instance of the game rule factory SPI
+     */
+    CommonGameRuleFactory INSTANCE = PuzzlesUtil.loadServiceProvider(CommonGameRuleFactory.class);
 
     /**
      * register a new game rule

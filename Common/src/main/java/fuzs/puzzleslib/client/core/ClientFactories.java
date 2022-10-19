@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.client.model.geom.ModelLayerRegistry;
+import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -11,6 +12,10 @@ import java.util.function.Supplier;
  * all sorts of instance factories that need to be created on a per-mod basis
  */
 public interface ClientFactories {
+    /**
+     * instance of the client factories SPI
+     */
+    ClientFactories INSTANCE = PuzzlesUtil.loadServiceProvider(ClientFactories.class);
 
     /**
      * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have

@@ -17,7 +17,7 @@ public abstract class ItemRendererMixin {
     public float blitOffset;
 
     @Inject(method = "renderGuiItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("TAIL"))
-    public void renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text, CallbackInfo callback) {
+    public void puzzleslib$renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text, CallbackInfo callback) {
         if (!stack.isEmpty()) ItemDecoratorRegistryImpl.render(fr, stack, xPosition, yPosition, this.blitOffset);
     }
 }

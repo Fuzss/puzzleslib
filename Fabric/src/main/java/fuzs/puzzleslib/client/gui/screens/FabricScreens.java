@@ -8,6 +8,8 @@ import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.inventory.Slot;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -24,19 +26,16 @@ public final class FabricScreens implements CommonScreens {
 
     @Override
     public Minecraft getMinecraft(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
         return Screens.getClient(screen);
     }
 
     @Override
     public Font getFont(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
         return Screens.getTextRenderer(screen);
     }
 
     @Override
     public ItemRenderer getItemRenderer(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
         return Screens.getItemRenderer(screen);
     }
 
@@ -68,5 +67,11 @@ public final class FabricScreens implements CommonScreens {
     public int getTopPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return ((AbstractContainerScreenAccessor) screen).getGuiTop();
+    }
+
+    @Override
+    public @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
+        Objects.requireNonNull(screen, "Screen cannot be null");
+        return ((AbstractContainerScreenAccessor) screen).getSlotUnderMouse();
     }
 }

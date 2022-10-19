@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.12-1.19.2] - 2022-10-19
+### Added
+- Added access to the `hoveredSlot` in the `CommonScreens` helper class
+### Changed
+- Moved all Service Provider Interfaces to their decentralized classes to prevent issues with early class loading when all SPIs are loaded simultaneously (this is not effective yet as the main `CoreServices` and `ClientCoreServices` currently remain for backwards compatibility)
+
 ## [v4.3.11-1.19.2] - 2022-10-15
 ### Fixed
 - Temporary fix for start-up crash due to a class being loaded before all mixins could apply when Stylish Effects is installed on Quilt

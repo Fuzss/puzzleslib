@@ -6,6 +6,7 @@ import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
+import fuzs.puzzleslib.util.PuzzlesUtil;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
@@ -15,6 +16,10 @@ import java.util.function.Supplier;
  * all sorts of instance factories that need to be created on a per-mod basis
  */
 public interface CommonFactories {
+    /**
+     * instance of the common factories SPI
+     */
+    CommonFactories INSTANCE = PuzzlesUtil.loadServiceProvider(CommonFactories.class);
 
     /**
      * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have

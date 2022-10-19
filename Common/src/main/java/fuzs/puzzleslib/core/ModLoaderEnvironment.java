@@ -1,11 +1,17 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.util.PuzzlesUtil;
+
 import java.nio.file.Path;
 
 /**
  * easy access to various mod loader methods and fields for forge
  */
 public interface ModLoaderEnvironment {
+    /**
+     * instance of the mod loader environment SPI
+     */
+    ModLoaderEnvironment INSTANCE = PuzzlesUtil.loadServiceProvider(ModLoaderEnvironment.class);
 
     /**
      * @return the type of mod loader we are loaded on

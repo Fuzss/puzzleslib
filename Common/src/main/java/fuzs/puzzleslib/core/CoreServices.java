@@ -8,25 +8,26 @@ import static fuzs.puzzleslib.util.PuzzlesUtil.loadServiceProvider;
 /**
  * common core services
  *
- * <p>TODO make final
+ * @deprecated remove in favor of decentralized access to prevent loading all SPIs at the same time
  */
+@Deprecated(forRemoval = true)
 public class CoreServices {
     /**
      * helper class for mod loader environment
      */
-    public static final ModLoaderEnvironment ENVIRONMENT = loadServiceProvider(ModLoaderEnvironment.class);
+    public static final ModLoaderEnvironment ENVIRONMENT = ModLoaderEnvironment.INSTANCE;
     /**
      * important factories, mainly for networking, registering content and configs
      */
-    public static final CommonFactories FACTORIES = loadServiceProvider(CommonFactories.class);
+    public static final CommonFactories FACTORIES = CommonFactories.INSTANCE;
     /**
      * useful methods for gameplay related things that require mod loader specific abstractions
      */
-    public static final CommonAbstractions ABSTRACTIONS = loadServiceProvider(CommonAbstractions.class);
+    public static final CommonAbstractions ABSTRACTIONS = CommonAbstractions.INSTANCE;
     /**
      * helper class for creating and registering new game rules
      */
-    public static final CommonGameRuleFactory GAME_RULES = loadServiceProvider(CommonGameRuleFactory.class);
+    public static final CommonGameRuleFactory GAME_RULES = CommonGameRuleFactory.INSTANCE;
 
     /**
      * loads a service provider interface yay

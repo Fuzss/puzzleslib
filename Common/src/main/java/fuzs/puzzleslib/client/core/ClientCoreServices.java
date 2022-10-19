@@ -8,15 +8,16 @@ import static fuzs.puzzleslib.util.PuzzlesUtil.loadServiceProvider;
 /**
  * services which may only be loaded on the client side
  *
- * <p>TODO don't extend CoreServices + make final
+ * @deprecated remove in favor of decentralized access to prevent loading all SPIs at the same time
  */
+@Deprecated(forRemoval = true)
 public class ClientCoreServices extends CoreServices {
     /**
      * important client exclusive factories
      */
-    public static final ClientFactories FACTORIES = loadServiceProvider(ClientFactories.class);
+    public static final ClientFactories FACTORIES = ClientFactories.INSTANCE;
     /**
      * a helper class for dealing with instances of {@link net.minecraft.client.gui.screens.Screen}
      */
-    public static final CommonScreens SCREENS = loadServiceProvider(CommonScreens.class);
+    public static final CommonScreens SCREENS = CommonScreens.INSTANCE;
 }

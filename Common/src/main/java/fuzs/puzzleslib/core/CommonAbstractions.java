@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -10,6 +11,10 @@ import java.util.function.BiConsumer;
  * useful methods for gameplay related things that require mod loader specific abstractions
  */
 public interface CommonAbstractions {
+    /**
+     * instance of the common abstractions SPI
+     */
+    CommonAbstractions INSTANCE = PuzzlesUtil.loadServiceProvider(CommonAbstractions.class);
 
     /**
      * opens a menu on both client and server

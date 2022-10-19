@@ -22,7 +22,7 @@ public abstract class ModelManagerMixin extends SimplePreparableReloadListener<M
     private Map<ResourceLocation, BakedModel> bakedRegistry;
 
     @Inject(method = "apply", at = @At(value = "FIELD", target = "Lnet/minecraft/client/resources/model/ModelManager;missingModel:Lnet/minecraft/client/resources/model/BakedModel;", shift = At.Shift.AFTER))
-    protected void apply$inject$field(ModelBakery modelBakery, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo callback) {
+    protected void puzzleslib$apply(ModelBakery modelBakery, ResourceManager resourceManager, ProfilerFiller profilerFiller, CallbackInfo callback) {
         ModelEvents.BAKING_COMPLETED.invoker().onBakingCompleted((ModelManager) (Object) this, this.bakedRegistry, modelBakery);
     }
 }

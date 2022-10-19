@@ -47,18 +47,18 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 
     // Forge Configs
-    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.2.0"
+    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.2.6"
 
     // Mod Menu
     modRuntimeOnly "com.terraformersmc:modmenu:4.0.6"
 
     // Cardinal Components
     // those libraries are not set as a dependency for puzzles lib itself, any mod using them must do that separately in fabric.mods.json to avoid a crash on start-up due to a wrong mod loading order
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.1"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.1"))
-	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.1"))
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.2"))
+    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.2"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.2"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.2"))
+	modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.2"))
 
     // Puzzles Lib
 //    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"

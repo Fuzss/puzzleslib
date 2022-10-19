@@ -18,7 +18,7 @@ public class DistTypeExecutor {
      */
     @Nullable
     public static <T> T callWhenOn(DistType envType, Supplier<Callable<T>> toRun) {
-        if (CoreServices.ENVIRONMENT.isEnvironmentType(envType)) {
+        if (ModLoaderEnvironment.INSTANCE.isEnvironmentType(envType)) {
             try {
                 return toRun.get().call();
             } catch (Exception e) {
@@ -33,7 +33,7 @@ public class DistTypeExecutor {
      * @param toRun to run
      */
     public static void runWhenOn(DistType envType, Supplier<Runnable> toRun) {
-        if (CoreServices.ENVIRONMENT.isEnvironmentType(envType)) {
+        if (ModLoaderEnvironment.INSTANCE.isEnvironmentType(envType)) {
             toRun.get().run();
         }
     }
@@ -46,7 +46,7 @@ public class DistTypeExecutor {
      */
     @Nullable
     public static <T> T getWhenOn(DistType envType, Supplier<Supplier<T>> toGet) {
-        if (CoreServices.ENVIRONMENT.isEnvironmentType(envType)) {
+        if (ModLoaderEnvironment.INSTANCE.isEnvironmentType(envType)) {
             return toGet.get().get();
         }
         return null;
@@ -59,7 +59,7 @@ public class DistTypeExecutor {
      * @return value
      */
     public static <T> T getForDistType(Supplier<Supplier<T>> clientTarget, Supplier<Supplier<T>> serverTarget) {
-        return switch (CoreServices.ENVIRONMENT.getEnvironmentType()) {
+        return switch (ModLoaderEnvironment.INSTANCE.getEnvironmentType()) {
             case CLIENT -> clientTarget.get().get();
             case SERVER -> serverTarget.get().get();
         };
