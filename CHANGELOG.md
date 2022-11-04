@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.13-1.19.2] - 2022-11-04
+### Added
+- Added interface with default implementation for containers
+### Fixed
+- Moved `CreativeModeTab` factory to common packages
+
 ## [v4.3.12-1.19.2] - 2022-10-19
 ### Added
 - Added access to the `hoveredSlot` in the `CommonScreens` helper class

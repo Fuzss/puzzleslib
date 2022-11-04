@@ -2,14 +2,20 @@ package fuzs.puzzleslib.core;
 
 import fuzs.puzzleslib.capability.CapabilityController;
 import fuzs.puzzleslib.capability.FabricCapabilityController;
-import fuzs.puzzleslib.config.*;
+import fuzs.puzzleslib.config.ConfigCore;
+import fuzs.puzzleslib.config.ConfigHolder;
+import fuzs.puzzleslib.config.FabricConfigHolderImpl;
+import fuzs.puzzleslib.init.FabricRegistryManager;
+import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
-import fuzs.puzzleslib.init.FabricRegistryManager;
-import fuzs.puzzleslib.init.RegistryManager;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -64,5 +70,10 @@ public final class FabricFactories implements CommonFactories {
     @Override
     public CapabilityController capabilities(String modId) {
         return FabricCapabilityController.of(modId);
+    }
+
+    @Override
+    public CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier) {
+        return FabricItemGroupBuilder.build(new ResourceLocation(modId, tabId), stackSupplier);
     }
 }

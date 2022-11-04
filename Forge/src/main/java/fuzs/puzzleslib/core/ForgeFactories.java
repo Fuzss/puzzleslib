@@ -12,6 +12,8 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.ForgeClientProxy;
 import fuzs.puzzleslib.proxy.ForgeServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -66,5 +68,16 @@ public final class ForgeFactories implements CommonFactories {
     @Override
     public CapabilityController capabilities(String modId) {
         return ForgeCapabilityController.of(modId);
+    }
+
+    @Override
+    public CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier) {
+        return new CreativeModeTab(modId + "." + tabId) {
+
+            @Override
+            public ItemStack makeIcon() {
+                return stackSupplier.get();
+            }
+        };
     }
 }

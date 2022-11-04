@@ -43,7 +43,10 @@ public interface ClientFactories {
      * @param modId             the mod this tab is used by
      * @param stackSupplier     the display stack
      * @return                  the creative mode tab
+     *
+     * @deprecated              moved to common package in {@link fuzs.puzzleslib.core.CommonFactories#creativeTab}
      */
+    @Deprecated(forRemoval = true)
     default CreativeModeTab creativeTab(String modId, Supplier<ItemStack> stackSupplier) {
         return this.creativeTab(modId, "main", stackSupplier);
     }
@@ -55,6 +58,9 @@ public interface ClientFactories {
      * @param tabId             the key for this tab, useful when the mod has multiple
      * @param stackSupplier     the display stack
      * @return                  the creative mode tab
+     *
+     * @deprecated              moved to common package in {@link fuzs.puzzleslib.core.CommonFactories#creativeTab}
      */
+    @Deprecated(forRemoval = true)
     CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier);
 }
