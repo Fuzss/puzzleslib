@@ -9,6 +9,7 @@ import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
 import fuzs.puzzleslib.init.builder.ModMenuSupplier;
 import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
@@ -118,12 +119,11 @@ public class FabricRegistryManager implements RegistryManager {
         return new FabricRegistryReference<>(value, key, registry);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
         return this.registerBlockEntityType(path, () -> {
             ModBlockEntityTypeBuilder<T> builder = entry.get();
-            return BlockEntityType.Builder.of(builder.factory()::create, builder.blocks()).build(null);
+            return FabricBlockEntityTypeBuilder.create(builder.factory()::create, builder.blocks()).build(null);
         });
     }
 

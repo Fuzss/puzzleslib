@@ -5,6 +5,7 @@
   "package": "fuzs.puzzleslib.mixin",
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
+    "accessor.SpawnPlacementsAccessor"
   ],
   "client": [
     "client.ItemRendererMixin",

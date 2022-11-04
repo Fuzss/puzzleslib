@@ -40,6 +40,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.searchtree.MutableSearchTree;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -171,7 +172,7 @@ public class FabricClientModConstructor {
         EntityModelLayerRegistry.registerModelLayer(layerLocation, supplier::get);
     }
 
-    private <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
+    private <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, MutableSearchTree<T> treeBuilder) {
         Objects.requireNonNull(searchRegistryKey, "search registry key is null");
         Objects.requireNonNull(treeBuilder, "search registry tree builder is null");
         SearchRegistry searchTreeManager = ((MinecraftAccessor) Minecraft.getInstance()).getSearchRegistry();

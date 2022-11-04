@@ -119,7 +119,7 @@ public class ForgeRegistryManager implements RegistryManager {
     public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
         return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, () -> {
             ModPoiTypeBuilder builder = entry.get();
-            return new PoiType(ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
+            return new PoiType(path, ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
         });
     }
 

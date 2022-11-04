@@ -3,6 +3,7 @@ package fuzs.puzzleslib.core;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.commands.Commands;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -133,7 +134,7 @@ public class ForgeModConstructor {
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
         MinecraftForge.EVENT_BUS.addListener((final RegisterCommandsEvent evt) -> {
-           constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection()));
+           constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(evt.getDispatcher(), evt.getEnvironment() != Commands.CommandSelection.INTEGRATED));
         });
         MinecraftForge.EVENT_BUS.addListener((final LootTableLoadEvent evt) -> {
             constructor.onLootTableReplacement(forgeModConstructor.getLootTablesReplaceContext(evt.getLootTableManager(), evt.getName(), evt.getTable(), evt::setTable));

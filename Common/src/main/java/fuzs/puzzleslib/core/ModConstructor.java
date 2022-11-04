@@ -1,9 +1,7 @@
 package fuzs.puzzleslib.core;
 
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -80,13 +78,12 @@ public interface ModConstructor {
      * register a new command, also supports replacing existing commands by default
      *
      * @param dispatcher    the dispatcher used for registering commands
-     * @param environment   command selection environment
-     * @param context       registry access context
+     * @param dedicated     is registration happening on the dedicated server
      *
      * @deprecated          use {@link #onRegisterCommands(RegisterCommandsContext)} instead
      */
     @Deprecated(forRemoval = true)
-    default void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
+    default void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
 
     }
 
@@ -96,7 +93,7 @@ public interface ModConstructor {
      * @param context context with helper objects for registering commands
      */
     default void onRegisterCommands(RegisterCommandsContext context) {
-        this.onRegisterCommands(context.dispatcher(), context.context(), context.environment());
+        this.onRegisterCommands(context.dispatcher(), context.dedicated());
     }
 
     /**
@@ -217,10 +214,9 @@ public interface ModConstructor {
      * register a new command, also supports replacing existing commands by default
      *
      * @param dispatcher    the dispatcher used for registering commands
-     * @param environment   command selection environment
-     * @param context       registry access context
+     * @param dedicated     is registration happening on the dedicated server
      */
-    record RegisterCommandsContext(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
+    record RegisterCommandsContext(CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) {
 
     }
 

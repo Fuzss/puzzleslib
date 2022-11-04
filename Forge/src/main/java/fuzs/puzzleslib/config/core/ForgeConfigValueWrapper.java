@@ -24,7 +24,7 @@ public record ForgeConfigValueWrapper<T>(ForgeConfigSpec.ConfigValue<T> value) i
 
     @Override
     public T getDefault() {
-        return this.value.getDefault();
+        return this.value.get();
     }
 
     @Override

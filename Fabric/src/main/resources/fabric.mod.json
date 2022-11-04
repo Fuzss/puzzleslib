@@ -35,7 +35,7 @@
   "depends": {
     "fabricloader": ">=${minFabricVersion}",
     "fabric-api": ">=${minFabricApiVersion}",
-    "forgeconfigapiport": ">=4.0.0",
+    "forgeconfigapiport": "*",
     "minecraft": ">=${minMinecraftVersion} <${nextMinecraftVersion}",
     "java": ">=17",
     "cardinal-components-base": "*",

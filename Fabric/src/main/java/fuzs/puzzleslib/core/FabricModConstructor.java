@@ -2,20 +2,18 @@ package fuzs.puzzleslib.core;
 
 import com.mojang.brigadier.CommandDispatcher;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import fuzs.puzzleslib.mixin.accessor.SpawnPlacementsAccessor;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
-import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -145,11 +143,11 @@ public class FabricModConstructor {
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
         constructor.onCommonSetup();
-        constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
+        constructor.onRegisterSpawnPlacements(SpawnPlacementsAccessor::callRegister);
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
         constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);
-        CommandRegistrationCallback.EVENT.register((CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) -> constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(dispatcher, context, environment)));
+        CommandRegistrationCallback.EVENT.register((CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) -> constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(dispatcher, dedicated)));
         LootTableEvents.REPLACE.register((ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
             // keep this the same as Forge, editing data pack specified loot tables is not supported
             if (source != LootTableSource.DATA_PACK) {

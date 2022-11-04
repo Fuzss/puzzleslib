@@ -2,6 +2,7 @@ package fuzs.puzzleslib.client.core;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import fuzs.puzzleslib.api.client.event.RegisterItemDecorationsEvent;
 import fuzs.puzzleslib.client.extension.WrappedClientItemExtension;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
@@ -35,6 +36,7 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.searchtree.MutableSearchTree;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
@@ -53,8 +55,11 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.IItemRenderProperties;
+import net.minecraftforge.client.MinecraftForgeClient;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -107,6 +112,19 @@ public class ForgeClientModConstructor {
         this.constructor.onRegisterModelBakingCompletedListeners(this.modelBakingListeners::add);
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
         this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
+        this.constructor.onRegisterClientTooltipComponents(new ClientModConstructor.ClientTooltipComponentsContext() {
+
+            @Override
+            public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
+                Objects.requireNonNull(type, "tooltip component type is null");
+                Objects.requireNonNull(factory, "tooltip component factory is null");
+                MinecraftForgeClient.registerTooltipComponentFactory(type, factory);
+            }
+        });
+        this.constructor.onRegisterKeyMappings((KeyMapping key) -> {
+            Objects.requireNonNull(key, "key mapping is null");
+            ClientRegistry.registerKeyBinding(key);
+        });
     }
 
     private ClientModConstructor.MenuScreensContext getMenuScreensContext() {
@@ -125,7 +143,7 @@ public class ForgeClientModConstructor {
         return new ClientModConstructor.SearchRegistryContext() {
 
             @Override
-            public <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
+            public <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, MutableSearchTree<T> treeBuilder) {
                 Objects.requireNonNull(searchRegistryKey, "search registry key is null");
                 Objects.requireNonNull(treeBuilder, "search registry tree builder is null");
                 SearchRegistry searchTreeManager = Minecraft.getInstance().getSearchTreeManager();
@@ -163,10 +181,10 @@ public class ForgeClientModConstructor {
             if (FMLLoader.getLaunchHandler().isData()) return;
             // this solution is very dangerous as it relies on internal stuff in Forge
             // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
-            final IClientItemExtensions clientItemExtension = new IClientItemExtensions() {
+            final IItemRenderProperties clientItemExtension = new IItemRenderProperties() {
 
                 @Override
-                public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
                     Minecraft minecraft = Minecraft.getInstance();
                     return new BlockEntityWithoutLevelRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels()) {
 
@@ -183,11 +201,11 @@ public class ForgeClientModConstructor {
                 }
             };
             Object currentClientItemExtension = ((ItemAccessor) item.asItem()).getRenderProperties();
-            ((ItemAccessor) item.asItem()).setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IClientItemExtensions) currentClientItemExtension) {
+            ((ItemAccessor) item.asItem()).setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IItemRenderProperties) currentClientItemExtension) {
 
                 @Override
-                public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                    return clientItemExtension.getCustomRenderer();
+                public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
+                    return clientItemExtension.getItemStackRenderer();
                 }
             } : clientItemExtension);
         };
@@ -216,34 +234,21 @@ public class ForgeClientModConstructor {
     }
 
     @SubscribeEvent
-    public void onRegisterClientTooltipComponentFactories(final RegisterClientTooltipComponentFactoriesEvent evt) {
-        this.constructor.onRegisterClientTooltipComponents(new ClientModConstructor.ClientTooltipComponentsContext() {
-
-            @Override
-            public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
-                Objects.requireNonNull(type, "tooltip component type is null");
-                Objects.requireNonNull(factory, "tooltip component factory is null");
-                evt.register(type, factory);
-            }
-        });
-    }
-
-    @SubscribeEvent
-    public void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
+    public void onRegisterParticleProviders(final ParticleFactoryRegisterEvent evt) {
         this.constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProvidersContext() {
 
             @Override
             public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
                 Objects.requireNonNull(type, "particle type is null");
                 Objects.requireNonNull(provider, "particle provider is null");
-                evt.register(type, provider);
+                Minecraft.getInstance().particleEngine.register(type, provider);
             }
 
             @Override
             public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ModSpriteParticleRegistration<T> factory) {
                 Objects.requireNonNull(type, "particle type is null");
                 Objects.requireNonNull(factory, "particle provider factory is null");
-                evt.register(type, factory::create);
+                Minecraft.getInstance().particleEngine.register(type, factory::create);
             }
         });
     }
@@ -269,15 +274,15 @@ public class ForgeClientModConstructor {
     }
 
     @SubscribeEvent
-    public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
-        final DynamicModelBakingContext context = new DynamicModelBakingContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()) {
+    public void onBakingCompleted(final ModelBakeEvent evt) {
+        final DynamicModelBakingContext context = new DynamicModelBakingContext(evt.getModelManager(), evt.getModelRegistry(), evt.getModelLoader()) {
 
             @Override
             public BakedModel bakeModel(ResourceLocation model) {
                 Objects.requireNonNull(model, "model location is null");
                 // this will never be null, if not present returns missing model
                 UnbakedModel unbakedModel = this.modelBakery.getModel(model);
-                return unbakedModel.bake(this.modelBakery, this.modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, model);
+                return unbakedModel.bake(this.modelBakery, this.modelBakery.getSpriteMap()::getSprite, BlockModelRotation.X0_Y0, model);
             }
         };
         for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
@@ -290,10 +295,10 @@ public class ForgeClientModConstructor {
     }
 
     @SubscribeEvent
-    public void onRegisterAdditional(final ModelEvent.RegisterAdditional evt) {
+    public void onRegisterAdditional(final ModelRegistryEvent evt) {
         this.constructor.onRegisterAdditionalModels((ResourceLocation model) -> {
             Objects.requireNonNull(model, "additional model is null");
-            evt.register(model);
+            ForgeModelBakery.addSpecialModel(model);
         });
     }
 
@@ -343,17 +348,9 @@ public class ForgeClientModConstructor {
             private <T extends LivingEntity> void actuallyRegisterRenderLayer(LivingEntityRenderer<T, EntityModel<T>> entityRenderer, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory) {
                 Minecraft minecraft = Minecraft.getInstance();
                 // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
-                EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, evt.getEntityModels(), minecraft.font);
+                EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), null, evt.getEntityModels(), minecraft.font);
                 entityRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(entityRenderer, context));
             }
-        });
-    }
-
-    @SubscribeEvent
-    public void onRegisterKeyMappings(final RegisterKeyMappingsEvent evt) {
-        this.constructor.onRegisterKeyMappings((KeyMapping key) -> {
-            Objects.requireNonNull(key, "key mapping is null");
-            evt.register(key);
         });
     }
 

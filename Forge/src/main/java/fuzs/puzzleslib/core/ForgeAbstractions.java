@@ -11,6 +11,6 @@ public final class ForgeAbstractions implements CommonAbstractions {
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {
-        NetworkHooks.openScreen(player, menuProvider, buf -> screenOpeningDataWriter.accept(player, buf));
+        NetworkHooks.openGui(player, menuProvider, buf -> screenOpeningDataWriter.accept(player, buf));
     }
 }

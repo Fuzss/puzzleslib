@@ -24,7 +24,7 @@ public record FabricConfigValueWrapper<T>(ForgeConfigSpec.ConfigValue<T> value) 
 
     @Override
     public T getDefault() {
-        return this.value.getDefault();
+        return this.value.get();
     }
 
     @Override

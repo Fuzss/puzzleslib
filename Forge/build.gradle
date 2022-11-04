@@ -114,8 +114,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3873264")
-    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:4.2.0")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3803098")
+    runtimeOnly fg.deobf("curse.maven:better-mods-button-541584:3963200")
+//    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:4.2.0")
 //    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
 //    runtimeOnly fg.deobf("curse.maven:configured-457570:3903908")
 

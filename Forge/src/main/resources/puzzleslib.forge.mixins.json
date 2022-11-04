@@ -9,6 +9,7 @@
     "accessor.IntegerValueAccessor"
   ],
   "client": [
+    "client.ItemRendererMixin",
     "client.accessor.ItemAccessor"
   ],
   "injectors": {

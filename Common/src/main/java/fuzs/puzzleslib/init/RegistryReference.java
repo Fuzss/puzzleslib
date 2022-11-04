@@ -111,7 +111,7 @@ public interface RegistryReference<T> {
 
             @Override
             public Holder<T> holder() {
-                return registry.getOrCreateHolderOrThrow(this.getResourceKey());
+                return registry.getOrCreateHolder(this.getResourceKey());
             }
         };
     }

@@ -1,63 +1,49 @@
 package fuzs.puzzleslib.client.extension;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.client.IItemRenderProperties;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * a wrapper for {@link IClientItemExtensions}
+ * a wrapper for {@link IItemRenderProperties}
  *
  * <p>we need this for {@link fuzs.puzzleslib.client.core.ClientModConstructor#onRegisterBuiltinModelItemRenderers}
- * in case an {@link IClientItemExtensions} is already present on the item
+ * in case an {@link IItemRenderProperties} is already present on the item
  */
-public class WrappedClientItemExtension implements IClientItemExtensions {
+public class WrappedClientItemExtension implements IItemRenderProperties {
     /**
-     * the wrapped {@link IClientItemExtensions}
+     * the wrapped {@link IItemRenderProperties}
      */
-    private final IClientItemExtensions wrapped;
+    private final IItemRenderProperties wrapped;
 
     /**
-     * @param wrapped create from wrapped {@link IClientItemExtensions}
+     * @param wrapped create from wrapped {@link IItemRenderProperties}
      */
-    public WrappedClientItemExtension(IClientItemExtensions wrapped) {
+    public WrappedClientItemExtension(IItemRenderProperties wrapped) {
         this.wrapped = wrapped;
     }
 
     @Override
-    public @Nullable Font getFont(ItemStack stack, FontContext context) {
-        return this.wrapped.getFont(stack, context);
+    public @Nullable Font getFont(ItemStack stack) {
+        return this.wrapped.getFont(stack);
     }
 
     @Override
-    public HumanoidModel.@Nullable ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-        return this.wrapped.getArmPose(entityLiving, hand, itemStack);
+    public @NotNull HumanoidModel<?> getArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
+        return this.wrapped.getArmorModel(livingEntity, itemStack, equipmentSlot, original);
     }
 
     @Override
-    public boolean applyForgeHandTransform(PoseStack poseStack, LocalPlayer player, HumanoidArm arm, ItemStack itemInHand, float partialTick, float equipProcess, float swingProcess) {
-        return this.wrapped.applyForgeHandTransform(poseStack, player, arm, itemInHand, partialTick, equipProcess, swingProcess);
-    }
-
-    @Override
-    public @NotNull HumanoidModel<?> getHumanoidArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-        return this.wrapped.getHumanoidArmorModel(livingEntity, itemStack, equipmentSlot, original);
-    }
-
-    @Override
-    public @NotNull Model getGenericArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
-        return this.wrapped.getGenericArmorModel(livingEntity, itemStack, equipmentSlot, original);
+    public @NotNull Model getBaseArmorModel(LivingEntity livingEntity, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
+        return this.wrapped.getBaseArmorModel(livingEntity, itemStack, equipmentSlot, original);
     }
 
     @Override
@@ -66,7 +52,7 @@ public class WrappedClientItemExtension implements IClientItemExtensions {
     }
 
     @Override
-    public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-        return this.wrapped.getCustomRenderer();
+    public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
+        return this.wrapped.getItemStackRenderer();
     }
 }
