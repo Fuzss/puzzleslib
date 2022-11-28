@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog].
 ## [v4.3.13-1.19.2] - 2022-11-04
 ### Added
 - Added interface with default implementation for containers
+- Added a helper method for checking if a `KeyMapping` is active
 ### Fixed
 - Moved `CreativeModeTab` factory to common packages
 
