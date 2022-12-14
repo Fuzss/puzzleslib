@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.14-1.19.2] - 2022-12-15
+### Added
+- Added `CreativeModeTabBuilder`, replacing previous factory methods while allowing for setting many more options on a tab
+
 ## [v4.3.13-1.19.2] - 2022-12-15
 ### Added
 - Added interface with default implementation for containers
