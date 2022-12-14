@@ -7,8 +7,6 @@ import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.util.PuzzlesUtil;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
@@ -132,26 +130,4 @@ public interface CommonFactories {
      * @return          the mod specific capability controller
      */
     CapabilityController capabilities(String modId);
-
-    /**
-     * creates a new creative mode tab, handles adding to the creative screen
-     * use this when one tab is enough for the mod, <code>tabId</code> defaults to "main"
-     *
-     * @param modId             the mod this tab is used by
-     * @param stackSupplier     the display stack
-     * @return                  the creative mode tab
-     */
-    default CreativeModeTab creativeTab(String modId, Supplier<ItemStack> stackSupplier) {
-        return this.creativeTab(modId, "main", stackSupplier);
-    }
-
-    /**
-     * creates a new creative mode tab, handles adding to the creative screen
-     *
-     * @param modId             the mod this tab is used by
-     * @param tabId             the key for this tab, useful when the mod has multiple
-     * @param stackSupplier     the display stack
-     * @return                  the creative mode tab
-     */
-    CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier);
 }

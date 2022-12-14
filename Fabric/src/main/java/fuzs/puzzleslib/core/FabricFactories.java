@@ -12,10 +12,6 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
-import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -70,10 +66,5 @@ public final class FabricFactories implements CommonFactories {
     @Override
     public CapabilityController capabilities(String modId) {
         return FabricCapabilityController.of(modId);
-    }
-
-    @Override
-    public CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier) {
-        return FabricItemGroupBuilder.build(new ResourceLocation(modId, tabId), stackSupplier);
     }
 }

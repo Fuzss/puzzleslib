@@ -3,12 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.3.13-1.19.2] - 2022-11-04
+## [v4.3.13-1.19.2] - 2022-12-15
 ### Added
 - Added interface with default implementation for containers
 - Added a helper method for checking if a `KeyMapping` is active
-### Fixed
-- Moved `CreativeModeTab` factory to common packages
+- Allow constructing `StairBlock` and `DamageSource` in common without an anonymous class
+### Changed
+- Moved `CreativeModeTab` factory to common packages, also add more options
 
 ## [v4.3.12-1.19.2] - 2022-10-19
 ### Added
