@@ -16,46 +16,56 @@ public class ForgeCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
 
             @Override
             public ItemStack getIconItem() {
-                if (ForgeCreativeModeTabBuilder.this.cacheIcon) {
-                    return super.getIconItem();
+                if (!ForgeCreativeModeTabBuilder.this.cacheIcon) {
+                    return this.makeIcon();
                 }
-                return this.makeIcon();
+                return super.getIconItem();
             }
 
             @Override
             public ItemStack makeIcon() {
-                return this.getIconItem();
+                return ForgeCreativeModeTabBuilder.this.getIcon();
             }
 
             @Override
             public boolean isAlignedRight() {
-                if (ForgeCreativeModeTabBuilder.this.alignRight) return true;
+                if (ForgeCreativeModeTabBuilder.this.alignRight) {
+                    return true;
+                }
                 return super.isAlignedRight();
             }
 
             @Override
             public void fillItemList(NonNullList<ItemStack> items) {
-                if (ForgeCreativeModeTabBuilder.this.stacksForDisplay == null) {
-                    super.fillItemList(items);
-                } else {
+                if (ForgeCreativeModeTabBuilder.this.stacksForDisplay != null) {
                     ForgeCreativeModeTabBuilder.this.stacksForDisplay.accept(items, this);
+                } else {
+                    super.fillItemList(items);
                 }
             }
 
             @Override
             public boolean hasSearchBar() {
-                if (ForgeCreativeModeTabBuilder.this.showSearch) return true;
+                if (ForgeCreativeModeTabBuilder.this.showSearch) {
+                    return true;
+                }
                 return super.hasSearchBar();
             }
 
             @Override
             public int getSearchbarWidth() {
-                if (ForgeCreativeModeTabBuilder.this.searchWidth != -1) return ForgeCreativeModeTabBuilder.this.searchWidth;
+                if (ForgeCreativeModeTabBuilder.this.searchWidth != -1) {
+                    return ForgeCreativeModeTabBuilder.this.searchWidth;
+                }
                 return super.getSearchbarWidth();
             }
         };
-        if (!this.showTitle) tab.hideTitle();
-        if (!this.showScrollbar) tab.hideScroll();
+        if (!this.showTitle) {
+            tab.hideTitle();
+        }
+        if (!this.showScrollbar) {
+            tab.hideScroll();
+        }
         return tab;
     }
 }

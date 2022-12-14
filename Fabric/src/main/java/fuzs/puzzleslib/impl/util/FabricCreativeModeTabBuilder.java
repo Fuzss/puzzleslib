@@ -13,7 +13,7 @@ public class FabricCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
     @Override
     public CreativeModeTab build() {
         // better not make this method reference, could result in early loading issue
-        FabricItemGroupBuilder builder = FabricItemGroupBuilder.create(this.identifier).icon(() -> this.getIconItem());
+        FabricItemGroupBuilder builder = FabricItemGroupBuilder.create(this.identifier).icon(() -> this.getIcon());
         if (this.stacksForDisplay != null) builder.appendItems(this.stacksForDisplay);
         return builder.build();
     }

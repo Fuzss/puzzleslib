@@ -26,7 +26,7 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
         this.identifier = new ResourceLocation(modId, identifier);
     }
 
-    ItemStack getIconItem() {
+    ItemStack getIcon() {
         ItemStack stack = this.iconSupplier.get();
         if (stack.isEmpty()) throw new IllegalStateException("creative tab icon cannot be empty");
         return stack;
