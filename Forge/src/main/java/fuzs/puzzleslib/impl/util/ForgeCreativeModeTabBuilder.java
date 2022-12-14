@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.util;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -16,10 +17,7 @@ public class ForgeCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
 
             @Override
             public ItemStack getIconItem() {
-                if (!ForgeCreativeModeTabBuilder.this.cacheIcon) {
-                    return this.makeIcon();
-                }
-                return super.getIconItem();
+                return !ForgeCreativeModeTabBuilder.this.cacheIcon ? this.makeIcon() : super.getIconItem();
             }
 
             @Override
@@ -29,10 +27,7 @@ public class ForgeCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
 
             @Override
             public boolean isAlignedRight() {
-                if (ForgeCreativeModeTabBuilder.this.alignRight) {
-                    return true;
-                }
-                return super.isAlignedRight();
+                return ForgeCreativeModeTabBuilder.this.alignRight || super.isAlignedRight();
             }
 
             @Override
@@ -46,18 +41,7 @@ public class ForgeCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
 
             @Override
             public boolean hasSearchBar() {
-                if (ForgeCreativeModeTabBuilder.this.showSearch) {
-                    return true;
-                }
-                return super.hasSearchBar();
-            }
-
-            @Override
-            public int getSearchbarWidth() {
-                if (ForgeCreativeModeTabBuilder.this.searchWidth != -1) {
-                    return ForgeCreativeModeTabBuilder.this.searchWidth;
-                }
-                return super.getSearchbarWidth();
+                return ForgeCreativeModeTabBuilder.this.showSearch || super.hasSearchBar();
             }
         };
         if (!this.showTitle) {
@@ -65,6 +49,9 @@ public class ForgeCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
         }
         if (!this.showScrollbar) {
             tab.hideScroll();
+        }
+        if (this.showSearch) {
+            tab.setBackgroundImage(new ResourceLocation("textures/gui/container/creative_inventory/tab_item_search.png"));
         }
         return tab;
     }

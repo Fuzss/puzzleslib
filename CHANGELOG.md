@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.16-1.19.2] - 2022-12-15
+### Changed
+- Refined enabling search bar in custom creative mode tabs
+
 ## [v4.3.15-1.19.2] - 2022-12-15
 ### Fixed
 - Fixed `java.lang.StackOverflowError` when rendering custom creative mode tab due to an oversight

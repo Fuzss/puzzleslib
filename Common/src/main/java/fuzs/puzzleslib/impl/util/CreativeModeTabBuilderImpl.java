@@ -20,7 +20,6 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
     @Nullable
     BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay;
     boolean showSearch;
-    int searchWidth = -1;
 
     public CreativeModeTabBuilderImpl(String modId, String identifier) {
         this.identifier = new ResourceLocation(modId, identifier);
@@ -71,13 +70,6 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
     @Override
     public CreativeModeTabBuilder showSearch() {
         this.showSearch = true;
-        return this;
-    }
-
-    @Override
-    public CreativeModeTabBuilder setSearchWidth(int width) {
-        if (width < 1) throw new IllegalArgumentException("search bar width of %s is not allowed".formatted(width));
-        this.searchWidth = width;
         return this;
     }
 }

@@ -68,14 +68,6 @@ public interface CreativeModeTabBuilder {
     CreativeModeTabBuilder showSearch();
 
     /**
-     * width of the search bar when present, defaults to 89
-     * <p>only supported on Forge
-     *
-     * @return  builder instance
-     */
-    CreativeModeTabBuilder setSearchWidth(int width);
-
-    /**
      * finishes this builder by building the creative mode tab
      *
      * @return  the built creative mode tab
