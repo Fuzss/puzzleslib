@@ -2,16 +2,10 @@ package fuzs.puzzleslib.proxy;
 
 import fuzs.puzzleslib.core.CommonFactories;
 import fuzs.puzzleslib.core.DistTypeExecutor;
-import fuzs.puzzleslib.network.Message;
-import fuzs.puzzleslib.network.NetworkHandler;
 import net.minecraft.network.Connection;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-
-import java.util.function.Function;
 
 /**
  * proxy base class for client and server implementations
@@ -48,24 +42,6 @@ public interface Proxy {
      * @return current game server, null when not in a world
      */
     MinecraftServer getGameServer();
-
-    /**
-     * only used by Fabric implementation of {@link NetworkHandler}
-     * @param channelName channel name
-     * @param factory message factory when received
-     */
-    default void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
-
-    }
-
-    /**
-     * only used by Fabric implementation of {@link NetworkHandler}
-     * @param channelName channel name
-     * @param factory message factory when received
-     */
-    default void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
-
-    }
 
     /**
      * useful for item tooltips

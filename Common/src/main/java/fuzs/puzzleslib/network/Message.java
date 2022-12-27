@@ -5,7 +5,10 @@ import net.minecraft.world.entity.player.Player;
 
 /**
  * network message template
+ *
+ * @deprecated migrate to {@link fuzs.puzzleslib.network.v2.Message}
  */
+@Deprecated(forRemoval = true)
 public interface Message<T extends Message<T>> {
 
     /**
@@ -21,17 +24,6 @@ public interface Message<T extends Message<T>> {
      * @param buf    network data byte buffer
      */
     void read(final FriendlyByteBuf buf);
-
-    /**
-     * handles message on receiving side
-     *
-     * @param player          server or client player
-     * @param gameInstance    server or client instance
-     */
-    @SuppressWarnings("unchecked")
-    default void handle(Player player, Object gameInstance) {
-        this.makeHandler().handle((T) this, player, gameInstance);
-    }
 
     /**
      * @return message handler for message, should be ok to implement as anonymous class
@@ -51,8 +43,8 @@ public interface Message<T extends Message<T>> {
          *
          * @param message       message to handle
          * @param player        server or client player
-         * @param gameInstance  server or client instance
+         * @param instance  server or client instance
          */
-        public abstract void handle(T message, Player player, Object gameInstance);
+        public abstract void handle(T message, Player player, Object instance);
     }
 }

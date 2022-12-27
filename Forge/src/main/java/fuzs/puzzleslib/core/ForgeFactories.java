@@ -31,6 +31,11 @@ public final class ForgeFactories implements CommonFactories {
         return ForgeNetworkHandler.of(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
+    @Override
+    public fuzs.puzzleslib.network.v2.NetworkHandler networkV2(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return fuzs.puzzleslib.network.v2.ForgeNetworkHandler.of(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    }
+
     @SuppressWarnings("Convert2MethodRef")
     @Override
     public Supplier<Proxy> clientProxy() {

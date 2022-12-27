@@ -22,7 +22,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     /**
      * strategy for syncing this capability data to remote
      */
-    private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
+    private SyncStrategy<?> syncStrategy = SyncStrategy.MANUAL;
 
     /**
      * @param id                capability id
@@ -55,7 +55,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
      * @param syncStrategy      strategy for syncing this capability data to remote
      * @return                  builder
      */
-    public ForgePlayerCapabilityKey<C> setSyncStrategy(SyncStrategy syncStrategy) {
+    public ForgePlayerCapabilityKey<C> setSyncStrategy(SyncStrategy<?> syncStrategy) {
         if (this.syncStrategy != SyncStrategy.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
         this.syncStrategy = syncStrategy;
         MinecraftForge.EVENT_BUS.addListener(this::onPlayerLoggedIn);

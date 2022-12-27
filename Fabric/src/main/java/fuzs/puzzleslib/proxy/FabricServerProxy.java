@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.proxy;
 
-import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.Message;
+import fuzs.puzzleslib.network.v2.ClientboundMessage;
+import fuzs.puzzleslib.network.v2.ServerboundMessage;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -16,20 +17,12 @@ import net.minecraft.world.level.Level;
 
 import java.util.function.Function;
 
-/**
- * server proxy class
- */
-public class FabricServerProxy implements Proxy {
-    /**
-     * stored {@link MinecraftServer} instance
-     */
+public class FabricServerProxy implements FabricProxy {
     private MinecraftServer gameServer;
 
-    /**
-     * registers for game server starting and stopping, so we can keep an instance of the server here so that
-     * {@link FabricNetworkHandler} can be implemented much more similarly to Forge
-     */
     public FabricServerProxy() {
+        // registers for game server starting and stopping, so we can keep an instance of the server here so that
+        // {@link FabricNetworkHandler} can be implemented much more similarly to Forge
         ServerLifecycleEvents.SERVER_STARTING.register(server -> this.gameServer = server);
         ServerLifecycleEvents.SERVER_STOPPED.register(server -> this.gameServer = null);
     }
@@ -60,14 +53,6 @@ public class FabricServerProxy implements Proxy {
     }
 
     @Override
-    public void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, Message<?>> factory) {
-        ServerPlayNetworking.registerGlobalReceiver(channelName, (MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) -> {
-            Message<?> message = factory.apply(buf);
-            server.execute(() -> message.handle(player, server));
-        });
-    }
-
-    @Override
     public boolean hasControlDown() {
         return false;
     }
@@ -80,5 +65,31 @@ public class FabricServerProxy implements Proxy {
     @Override
     public boolean hasAltDown() {
         return false;
+    }
+
+    @Override
+    public <T extends Message<T>> void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
+
+    }
+
+    @Override
+    public <T extends Message<T>> void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
+        ServerPlayNetworking.registerGlobalReceiver(channelName, (MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) -> {
+            T message = factory.apply(buf);
+            server.execute(() -> message.makeHandler().handle(message, player, server));
+        });
+    }
+
+    @Override
+    public <T extends Record & ClientboundMessage<T>> void registerClientReceiverV2(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
+
+    }
+
+    @Override
+    public <T extends Record & ServerboundMessage<T>> void registerServerReceiverV2(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
+        ServerPlayNetworking.registerGlobalReceiver(channelName, (MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) -> {
+            T message = factory.apply(buf);
+            server.execute(() -> message.getHandler().handle(message, server, handler, player, player.getLevel()));
+        });
     }
 }

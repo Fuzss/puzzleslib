@@ -105,7 +105,7 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, SyncStrategy syncStrategy);
+    <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, SyncStrategy<?> syncStrategy);
 
     /**
      * register capability to {@link BlockEntity} objects

@@ -1,5 +1,6 @@
-package fuzs.puzzleslib.network;
+package fuzs.puzzleslib.network.v2;
 
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
@@ -10,35 +11,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
-import java.util.function.Supplier;
+import java.util.Set;
 
 /**
  * handler for network communications of all puzzles lib mods
- *
- * @deprecated migrate to {@link fuzs.puzzleslib.network.v2.NetworkHandler}
  */
-@Deprecated(forRemoval = true)
 public interface NetworkHandler {
-
-    /**
-     * register a message for a side
-     *
-     * @param clazz     message class type
-     * @param supplier  supplier for message (called when receiving at executing end)
-     *                  we use this additional supplier to avoid having to invoke the class via reflection
-     *                  and so that a default constructor in every message cannot be forgotten
-     * @param direction side this message is to be executed at
-     * @param <T>       message implementation
-     */
-    <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction);
-
-    /**
-     * creates a packet heading to the server side
-     *
-     * @param message message to create packet from
-     * @return packet for message
-     */
-    Packet<?> toServerboundPacket(Message<?> message);
 
     /**
      * creates a packet heading to the client side
@@ -46,14 +24,22 @@ public interface NetworkHandler {
      * @param message message to create packet from
      * @return packet for message
      */
-    Packet<?> toClientboundPacket(Message<?> message);
+    <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message);
+
+    /**
+     * creates a packet heading to the server side
+     *
+     * @param message message to create packet from
+     * @return packet for message
+     */
+    <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message);
 
     /**
      * send message from client to server
      *
      * @param message message to send
      */
-    default void sendToServer(Message<?> message) {
+    default <T extends Record & ServerboundMessage<T>> void sendToServer(T message) {
         Proxy.INSTANCE.getClientConnection().send(this.toServerboundPacket(message));
     }
 
@@ -63,7 +49,7 @@ public interface NetworkHandler {
      * @param message message to send
      * @param player  client player to send to
      */
-    default void sendTo(Message<?> message, ServerPlayer player) {
+    default <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player) {
         player.connection.send(this.toClientboundPacket(message));
     }
 
@@ -72,7 +58,7 @@ public interface NetworkHandler {
      *
      * @param message message to send
      */
-    default void sendToAll(Message<?> message) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
     }
 
@@ -82,7 +68,7 @@ public interface NetworkHandler {
      * @param message message to send
      * @param exclude client to exclude
      */
-    default void sendToAllExcept(Message<?> message, ServerPlayer exclude) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(T message, ServerPlayer exclude) {
         for (ServerPlayer player : Proxy.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
             if (player != exclude) this.sendTo(message, player);
         }
@@ -95,7 +81,7 @@ public interface NetworkHandler {
      * @param pos     source position
      * @param level   dimension key provider level
      */
-    default void sendToAllNear(Message<?> message, BlockPos pos, Level level) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, BlockPos pos, Level level) {
         this.sendToAllNearExcept(message, null, pos.getX(), pos.getY(), pos.getZ(), 64.0, level);
     }
 
@@ -109,7 +95,7 @@ public interface NetworkHandler {
      * @param distance distance from source to receive message
      * @param level    dimension key provider level
      */
-    default void sendToAllNear(Message<?> message, double posX, double posY, double posZ, double distance, Level level) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, double posX, double posY, double posZ, double distance, Level level) {
         this.sendToAllNearExcept(message, null, posX, posY, posZ, 64.0, level);
     }
 
@@ -124,7 +110,7 @@ public interface NetworkHandler {
      * @param distance distance from source to receive message
      * @param level    dimension key provider level
      */
-    default void sendToAllNearExcept(Message<?> message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(T message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
@@ -134,7 +120,7 @@ public interface NetworkHandler {
      * @param message message to send
      * @param entity  the tracked entity
      */
-    default void sendToAllTracking(Message<?> message, Entity entity) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(T message, Entity entity) {
         ((ServerChunkCache) entity.getCommandSenderWorld().getChunkSource()).broadcast(entity, this.toClientboundPacket(message));
     }
 
@@ -144,7 +130,7 @@ public interface NetworkHandler {
      * @param message message to send
      * @param entity  the tracked entity
      */
-    default void sendToAllTrackingAndSelf(Message<?> message, Entity entity) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(T message, Entity entity) {
         ((ServerChunkCache) entity.getCommandSenderWorld().getChunkSource()).broadcastAndSend(entity, this.toClientboundPacket(message));
     }
 
@@ -154,7 +140,7 @@ public interface NetworkHandler {
      * @param message message to send
      * @param level   dimension key provider level
      */
-    default void sendToDimension(Message<?> message, Level level) {
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, Level level) {
         this.sendToDimension(message, level.dimension());
     }
 
@@ -164,7 +150,53 @@ public interface NetworkHandler {
      * @param message   message to send
      * @param dimension dimension to send message in
      */
-    default void sendToDimension(Message<?> message, ResourceKey<Level> dimension) {
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, ResourceKey<Level> dimension) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
+    }
+
+    abstract class Builder {
+        protected final String modId;
+        protected final Set<Class<? extends ClientboundMessage<?>>> clientboundMessages = Sets.newHashSet();
+        protected final Set<Class<? extends ServerboundMessage<?>>> serverboundMessages = Sets.newHashSet();
+        protected boolean clientAcceptsVanillaOrMissing;
+        protected boolean serverAcceptsVanillaOrMissing;
+
+        protected Builder(String modId) {
+            this.modId = modId;
+        }
+
+        /**
+         * register a message that will be sent to clients
+         *
+         * @param clazz message class type
+         * @param <T>   message implementation
+         */
+        public <T extends Record & ClientboundMessage<T>> Builder registerClientbound(Class<T> clazz) {
+            if (!this.clientboundMessages.add(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            return this;
+        }
+
+        /**
+         * register a message that will be sent to servers
+         *
+         * @param clazz message class type
+         * @param <T>   message implementation
+         */
+        public <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz) {
+            if (!this.serverboundMessages.add(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            return this;
+        }
+
+        public Builder clientAcceptsVanillaOrMissing() {
+            this.clientAcceptsVanillaOrMissing = true;
+            return this;
+        }
+
+        public Builder serverAcceptsVanillaOrMissing() {
+            this.serverAcceptsVanillaOrMissing = true;
+            return this;
+        }
+
+        public abstract NetworkHandler build();
     }
 }

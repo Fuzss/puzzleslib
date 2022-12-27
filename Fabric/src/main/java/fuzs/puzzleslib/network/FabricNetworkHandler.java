@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.network;
 
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.proxy.FabricProxy;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -18,7 +19,10 @@ import java.util.function.Supplier;
 
 /**
  * handler for network communications of all puzzles lib mods
+ *
+ * @deprecated migrate to {@link fuzs.puzzleslib.network.v2.FabricNetworkHandler}
  */
+@Deprecated(forRemoval = true)
 public class FabricNetworkHandler implements NetworkHandler {
     /**
      * store network handlers created for a mod to avoid duplicate channels
@@ -49,10 +53,10 @@ public class FabricNetworkHandler implements NetworkHandler {
     public <T extends Message<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction) {
         ResourceLocation channelName = this.nextIdentifier();
         this.messages.put(clazz, new MessageData(clazz, channelName, direction));
-        final Function<FriendlyByteBuf, Message<?>> decode = buf -> Util.make(supplier.get(), message -> message.read(buf));
+        final Function<FriendlyByteBuf, T> decode = buf -> Util.make(supplier.get(), message -> message.read(buf));
         switch (direction) {
-            case TO_CLIENT -> Proxy.INSTANCE.registerClientReceiver(channelName, decode);
-            case TO_SERVER -> Proxy.INSTANCE.registerServerReceiver(channelName, decode);
+            case TO_CLIENT -> ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(channelName, decode);
+            case TO_SERVER -> ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(channelName, decode);
         }
     }
 

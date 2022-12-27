@@ -25,19 +25,20 @@ public interface CommonFactories {
      * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
      * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
      *
-     * @param modId             the mod id for registering events on Forge to the correct mod event bus
-     *
-     * @return                  provides a consumer for loading a mod being provided the base class
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
+     * @return provides a consumer for loading a mod being provided the base class
      */
     Consumer<ModConstructor> modConstructor(String modId);
 
     /**
      * creates a new network handler
      *
-     * @param modId             id for channel name
+     * @param modId id for channel name
+     * @return mod specific network handler with default channel
      *
-     * @return                  mod specific network handler with default channel
+     * @deprecated migrate to {@link #networkV2(String)}
      */
+    @Deprecated(forRemoval = true)
     default NetworkHandler network(String modId) {
         return this.network(modId, false, false);
     }
@@ -45,18 +46,28 @@ public interface CommonFactories {
     /**
      * creates a new network handler
      *
-     * @param modId                             id for channel name
-     * @param clientAcceptsVanillaOrMissing     are servers without this mod or vanilla compatible
-     * @param serverAcceptsVanillaOrMissing     are clients without this mod or vanilla compatible
+     * @param modId                         id for channel name
+     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
+     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
+     * @return mod specific network handler with configured channel
      *
-     * @return                                  mod specific network handler with configured channel
+     * @deprecated migrate to {@link #networkV2(String)}
      */
+    @Deprecated(forRemoval = true)
     NetworkHandler network(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
+
+    /**
+     * creates a new network handler
+     *
+     * @param modId id for channel name
+     * @return mod specific network handler with default channel
+     */
+    fuzs.puzzleslib.network.v2.NetworkHandler.Builder networkV2(String modId);
 
     /**
      * internal factory for client proxy, use {@link Proxy#INSTANCE}
      *
-     * @return      provides the client proxy supplier
+     * @return provides the client proxy supplier
      */
     @ApiStatus.Internal
     Supplier<Proxy> clientProxy();
@@ -64,7 +75,7 @@ public interface CommonFactories {
     /**
      * internal factory for server proxy, use {@link Proxy#INSTANCE}
      *
-     * @return      provides the server proxy supplier
+     * @return provides the server proxy supplier
      */
     @ApiStatus.Internal
     Supplier<Proxy> serverProxy();
@@ -73,10 +84,10 @@ public interface CommonFactories {
      * register a new client config to the holder/builder
      * <p>just an overload for {@link ConfigHolder.Builder#clientConfig} that also creates a new builder instance
      *
-     * @param clazz         client config main class
-     * @param clientConfig  client config factory
-     * @param <T>           client config type
-     * @return              the builder we are working with
+     * @param clazz        client config main class
+     * @param clientConfig client config factory
+     * @param <T>          client config type
+     * @return the builder we are working with
      */
     <T extends ConfigCore> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
 
@@ -84,10 +95,10 @@ public interface CommonFactories {
      * register a new client config to the holder/builder
      * <p>just an overload for {@link ConfigHolder.Builder#commonConfig} that also creates a new builder instance
      *
-     * @param clazz         common config main class
-     * @param commonConfig  common config factory
-     * @param <T>           common config type
-     * @return              the builder we are working with
+     * @param clazz        common config main class
+     * @param commonConfig common config factory
+     * @param <T>          common config type
+     * @return the builder we are working with
      */
     <T extends ConfigCore> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
 
@@ -95,19 +106,18 @@ public interface CommonFactories {
      * register a new client config to the holder/builder
      * <p>just an overload for {@link ConfigHolder.Builder#serverConfig} that also creates a new builder instance
      *
-     * @param clazz         server config main class
-     * @param serverConfig  server config factory
-     * @param <T>           server config type
-     * @return              the builder we are working with
+     * @param clazz        server config main class
+     * @param serverConfig server config factory
+     * @param <T>          server config type
+     * @return the builder we are working with
      */
     <T extends ConfigCore> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
 
     /**
      * creates a new registry manager for <code>namespace</code> or returns an existing one
      *
-     * @param modId         namespace used for registration
-     *
-     * @return              new mod specific registry manager
+     * @param modId namespace used for registration
+     * @return new mod specific registry manager
      */
     default RegistryManager registration(String modId) {
         return this.registration(modId, false);
@@ -116,18 +126,17 @@ public interface CommonFactories {
     /**
      * creates a new registry manager for <code>namespace</code> or returns an existing one
      *
-     * @param modId         namespace used for registration
-     * @param deferred      defer registration for this manager until {@link RegistryManager#applyRegistration()} is called
-     *
-     * @return              new mod specific registry manager
+     * @param modId    namespace used for registration
+     * @param deferred defer registration for this manager until {@link RegistryManager#applyRegistration()} is called
+     * @return new mod specific registry manager
      */
     RegistryManager registration(String modId, boolean deferred);
 
     /**
      * creates a new capability controller for <code>namespace</code> or returns an existing one
      *
-     * @param modId     namespace used for registration
-     * @return          the mod specific capability controller
+     * @param modId namespace used for registration
+     * @return the mod specific capability controller
      */
     CapabilityController capabilities(String modId);
 }

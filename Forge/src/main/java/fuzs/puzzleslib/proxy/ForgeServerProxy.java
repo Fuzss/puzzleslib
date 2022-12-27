@@ -1,12 +1,19 @@
 package fuzs.puzzleslib.proxy;
 
+import fuzs.puzzleslib.network.v2.ClientboundMessage;
+import fuzs.puzzleslib.network.v2.ServerboundMessage;
 import net.minecraft.network.Connection;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class ForgeServerProxy implements Proxy {
+import java.util.Objects;
+import java.util.function.Supplier;
+
+public class ForgeServerProxy implements ForgeProxy {
 
     @Override
     public Player getClientPlayer() {
@@ -46,5 +53,21 @@ public class ForgeServerProxy implements Proxy {
     @Override
     public boolean hasAltDown() {
         return false;
+    }
+
+    @Override
+    public <T extends Record & ClientboundMessage<T>> void registerClientReceiverV2(T message, Supplier<NetworkEvent.Context> supplier) {
+
+    }
+
+    @Override
+    public <T extends Record & ServerboundMessage<T>> void registerServerReceiverV2(T message, Supplier<NetworkEvent.Context> supplier) {
+        NetworkEvent.Context context = supplier.get();
+        context.enqueueWork(() -> {
+            ServerPlayer player = context.getSender();
+            Objects.requireNonNull(player, "player is null");
+            message.getHandler().handle(message, this.getGameServer(), player.connection, player, player.getLevel());
+        });
+        context.setPacketHandled(true);
     }
 }

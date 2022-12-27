@@ -2,9 +2,8 @@ package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.core.CommonFactories;
 import fuzs.puzzleslib.core.ModConstructor;
-import fuzs.puzzleslib.impl.network.S2CSyncCapabilityMessage;
-import fuzs.puzzleslib.network.MessageDirection;
-import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.impl.network.ClientboundSyncCapabilityMessage;
+import fuzs.puzzleslib.network.v2.NetworkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +13,7 @@ public class PuzzlesLib implements ModConstructor {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     // set this to allow client only mods using this library
-    public static final NetworkHandler NETWORK = CommonFactories.INSTANCE.network(MOD_ID, true, true);
+    public static final NetworkHandler NETWORK = CommonFactories.INSTANCE.networkV2(MOD_ID).clientAcceptsVanillaOrMissing().serverAcceptsVanillaOrMissing().registerClientbound(ClientboundSyncCapabilityMessage.class).build();
 
     @Override
     public void onConstructMod() {
@@ -22,6 +21,6 @@ public class PuzzlesLib implements ModConstructor {
     }
 
     private static void registerMessages() {
-        NETWORK.register(S2CSyncCapabilityMessage.class, S2CSyncCapabilityMessage::new, MessageDirection.TO_CLIENT);
+        NETWORK.registerClientbound(ClientboundSyncCapabilityMessage.class);
     }
 }

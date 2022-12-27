@@ -31,6 +31,11 @@ public final class FabricFactories implements CommonFactories {
         return FabricNetworkHandler.of(modId);
     }
 
+    @Override
+    public fuzs.puzzleslib.network.v2.NetworkHandler.Builder networkV2(String modId) {
+        return new fuzs.puzzleslib.network.v2.FabricNetworkHandler.FabricBuilder(modId);
+    }
+
     @SuppressWarnings("Convert2MethodRef")
     @Override
     public Supplier<Proxy> clientProxy() {

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.capability.data;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.network.S2CSyncCapabilityMessage;
+import fuzs.puzzleslib.impl.network.ClientboundSyncCapabilityMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -33,7 +33,7 @@ public interface PlayerCapabilityKey<C extends CapabilityComponent> extends Capa
      * @param force             this is a forced sync (e.g. entity creation), so don't throw/log errors
      * @param <C>               capability type
      */
-    static <C extends CapabilityComponent> void syncCapabilityToRemote(Entity holder, ServerPlayer receiver, SyncStrategy syncStrategy, C capability, ResourceLocation id, boolean force) {
+    static <C extends CapabilityComponent> void syncCapabilityToRemote(Entity holder, ServerPlayer receiver, SyncStrategy<?> syncStrategy, C capability, ResourceLocation id, boolean force) {
         if (syncStrategy != SyncStrategy.MANUAL) {
             if (!(capability instanceof SyncedCapabilityComponent syncedCapability)) {
                 if (!force) {
@@ -43,7 +43,7 @@ public interface PlayerCapabilityKey<C extends CapabilityComponent> extends Capa
                 }
             }
             if (force || syncedCapability.isDirty()) {
-                syncStrategy.sender.accept(new S2CSyncCapabilityMessage(id, holder, capability.toCompoundTag()), receiver);
+                syncStrategy.accept(new ClientboundSyncCapabilityMessage(id, holder, capability.toCompoundTag()), receiver);
                 // always mark clean after syncing
                 syncedCapability.markClean();
             }

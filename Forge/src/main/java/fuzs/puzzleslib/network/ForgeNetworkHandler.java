@@ -22,7 +22,10 @@ import java.util.function.Supplier;
 
 /**
  * handler for network communications of all puzzles lib mods
+ *
+ * @deprecated migrate to {@link fuzs.puzzleslib.network.v2.ForgeNetworkHandler}
  */
+@Deprecated(forRemoval = true)
 public class ForgeNetworkHandler implements NetworkHandler {
     /**
      * store network handlers created for a mod to avoid duplicate channels
@@ -85,7 +88,7 @@ public class ForgeNetworkHandler implements NetworkHandler {
                 } else {
                     player = context.getSender();
                 }
-                message.handle(player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
+                message.makeHandler().handle(message, player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
             });
             context.setPacketHandled(true);
         };
