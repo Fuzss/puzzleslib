@@ -9,6 +9,7 @@ import fuzs.puzzleslib.init.ForgeRegistryManager;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.ForgeNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.network.v2.NetworkHandlerRegistry;
 import fuzs.puzzleslib.proxy.ForgeClientProxy;
 import fuzs.puzzleslib.proxy.ForgeServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
@@ -32,8 +33,8 @@ public final class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public fuzs.puzzleslib.network.v2.NetworkHandler networkV2(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return fuzs.puzzleslib.network.v2.ForgeNetworkHandler.of(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    public NetworkHandlerRegistry.Builder networkV2(String modId) {
+        return new fuzs.puzzleslib.network.v2.ForgeNetworkHandler.ForgeBuilder(modId);
     }
 
     @SuppressWarnings("Convert2MethodRef")

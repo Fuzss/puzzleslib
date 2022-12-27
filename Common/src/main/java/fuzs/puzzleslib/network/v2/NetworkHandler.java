@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.network.v2;
 
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
@@ -11,7 +10,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
-import java.util.Set;
 
 /**
  * handler for network communications of all puzzles lib mods
@@ -152,51 +150,5 @@ public interface NetworkHandler {
      */
     default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, ResourceKey<Level> dimension) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
-    }
-
-    abstract class Builder {
-        protected final String modId;
-        protected final Set<Class<? extends ClientboundMessage<?>>> clientboundMessages = Sets.newHashSet();
-        protected final Set<Class<? extends ServerboundMessage<?>>> serverboundMessages = Sets.newHashSet();
-        protected boolean clientAcceptsVanillaOrMissing;
-        protected boolean serverAcceptsVanillaOrMissing;
-
-        protected Builder(String modId) {
-            this.modId = modId;
-        }
-
-        /**
-         * register a message that will be sent to clients
-         *
-         * @param clazz message class type
-         * @param <T>   message implementation
-         */
-        public <T extends Record & ClientboundMessage<T>> Builder registerClientbound(Class<T> clazz) {
-            if (!this.clientboundMessages.add(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
-            return this;
-        }
-
-        /**
-         * register a message that will be sent to servers
-         *
-         * @param clazz message class type
-         * @param <T>   message implementation
-         */
-        public <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz) {
-            if (!this.serverboundMessages.add(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
-            return this;
-        }
-
-        public Builder clientAcceptsVanillaOrMissing() {
-            this.clientAcceptsVanillaOrMissing = true;
-            return this;
-        }
-
-        public Builder serverAcceptsVanillaOrMissing() {
-            this.serverAcceptsVanillaOrMissing = true;
-            return this;
-        }
-
-        public abstract NetworkHandler build();
     }
 }

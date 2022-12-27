@@ -5,6 +5,7 @@ import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.network.v2.NetworkHandlerRegistry;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import org.jetbrains.annotations.ApiStatus;
@@ -62,7 +63,7 @@ public interface CommonFactories {
      * @param modId id for channel name
      * @return mod specific network handler with default channel
      */
-    fuzs.puzzleslib.network.v2.NetworkHandler.Builder networkV2(String modId);
+    NetworkHandlerRegistry.Builder networkV2(String modId);
 
     /**
      * internal factory for client proxy, use {@link Proxy#INSTANCE}

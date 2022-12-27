@@ -18,9 +18,7 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class FabricNetworkHandler implements NetworkHandler {
-    private static final Map<String, FabricNetworkHandler> MOD_TO_NETWORK = Maps.newConcurrentMap();
-
+public class FabricNetworkHandler implements NetworkHandlerRegistry {
     private final Map<Class<?>, ResourceLocation> messageChannelNames = Maps.newIdentityHashMap();
     private final String modId;
     private final AtomicInteger discriminator = new AtomicInteger();
@@ -30,16 +28,17 @@ public class FabricNetworkHandler implements NetworkHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Record & ClientboundMessage<T>> void registerClientbound(Class<?> clazz) {
+    public <T extends Record & ClientboundMessage<T>> void registerClientbound(Class<?> clazz) {
         this.register((Class<T>) clazz, ((FabricProxy) Proxy.INSTANCE)::registerClientReceiverV2);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Record & ServerboundMessage<T>> void registerServerbound(Class<?> clazz) {
+    public <T extends Record & ServerboundMessage<T>> void registerServerbound(Class<?> clazz) {
         this.register((Class<T>) clazz, ((FabricProxy) Proxy.INSTANCE)::registerServerReceiverV2);
     }
 
     private <T> void register(Class<T> clazz, BiConsumer<ResourceLocation, Function<FriendlyByteBuf, T>> register) {
+        if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         ResourceLocation channelName = this.nextIdentifier();
         if (this.messageChannelNames.put(clazz, channelName) != null) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
         register.accept(channelName, MessageSerializers.findByType(clazz)::read);
@@ -70,10 +69,6 @@ public class FabricNetworkHandler implements NetworkHandler {
         return packetFactory.apply(channelName, byteBuf);
     }
 
-    public synchronized static NetworkHandler of(String modId) {
-        return MOD_TO_NETWORK.computeIfAbsent(modId, FabricNetworkHandler::new);
-    }
-
     public static class FabricBuilder extends Builder {
 
         public FabricBuilder(String modId) {
@@ -81,15 +76,8 @@ public class FabricNetworkHandler implements NetworkHandler {
         }
 
         @Override
-        public NetworkHandler build() {
-            FabricNetworkHandler networkHandler = MOD_TO_NETWORK.computeIfAbsent(this.modId, FabricNetworkHandler::new);
-            for (Class<? extends ClientboundMessage<?>> message : this.clientboundMessages) {
-                networkHandler.registerClientbound(message);
-            }
-            for (Class<? extends ServerboundMessage<?>> message : this.serverboundMessages) {
-                networkHandler.registerServerbound(message);
-            }
-            return networkHandler;
+        public NetworkHandlerRegistry getHandler() {
+            return new FabricNetworkHandler(this.modId);
         }
     }
 }

@@ -8,7 +8,7 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 /**
  * this is a class, so it cannot be implemented as a functional interface to avoid client only calls somehow running into problems on a dedicated server
  */
-public interface ServerMessageListener<T extends Record> {
+public abstract class ServerMessageListener<T extends Record> {
 
     /**
      * handle given message
@@ -16,5 +16,5 @@ public interface ServerMessageListener<T extends Record> {
      * @param message message to handle
      * @param player  server or client player
      */
-    void handle(T message, MinecraftServer server, ServerGamePacketListenerImpl handler, ServerPlayer player, ServerLevel level);
+    public abstract void handle(T message, MinecraftServer server, ServerGamePacketListenerImpl handler, ServerPlayer player, ServerLevel level);
 }

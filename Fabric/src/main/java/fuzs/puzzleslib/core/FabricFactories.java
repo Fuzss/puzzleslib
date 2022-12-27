@@ -9,6 +9,7 @@ import fuzs.puzzleslib.init.FabricRegistryManager;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.network.v2.NetworkHandlerRegistry;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
@@ -32,7 +33,7 @@ public final class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public fuzs.puzzleslib.network.v2.NetworkHandler.Builder networkV2(String modId) {
+    public NetworkHandlerRegistry.Builder networkV2(String modId) {
         return new fuzs.puzzleslib.network.v2.FabricNetworkHandler.FabricBuilder(modId);
     }
 
