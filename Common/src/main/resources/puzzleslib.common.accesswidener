@@ -1,0 +1,11 @@
+accessWidener	v2	named
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	<init>	(Ljava/lang/String;)V
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassArmor	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	damageHelmet	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassInvul	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassMagic	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassEnchantments	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	setIsFire	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/level/block/StairBlock	<init>	(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
+transitive-accessible   method  net/minecraft/client/renderer/RenderType    create  (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
+transitive-accessible   class   net/minecraft/client/renderer/RenderType$CompositeState

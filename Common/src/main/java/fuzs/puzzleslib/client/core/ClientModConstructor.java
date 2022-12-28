@@ -3,6 +3,7 @@ package fuzs.puzzleslib.client.core;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
+import fuzs.puzzleslib.client.renderer.blockentity.SkullRenderersFactory;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import net.minecraft.client.KeyMapping;
@@ -187,6 +188,20 @@ public interface ClientModConstructor {
      * @param context register additional renders to run after stack count and durability have been drawn for an item stack
      */
     default void onRegisterItemDecorations(ItemDecorationContext context) {
+
+    }
+
+    /**
+     * @param context register a custom shader that is applied when spectating a certain entity type
+     */
+    default void onRegisterEntitySpectatorShader(EntitySpectatorShaderContext context) {
+
+    }
+
+    /**
+     * @param context register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations
+     */
+    default void onRegisterSkullRenderers(SkullRenderersContext context) {
 
     }
 
@@ -449,6 +464,34 @@ public interface ClientModConstructor {
          * @param decorator         renderer implementation
          */
         void register(ItemLike item, DynamicItemDecorator decorator);
+    }
+
+    /**
+     * register a custom shader that is applied when spectating a certain entity type
+     */
+    @FunctionalInterface
+    interface EntitySpectatorShaderContext {
+
+        /**
+         * Register the custom shader.
+         *
+         * @param entityType the entity type being spectated
+         * @param shaderLocation location to the shader file, usually <code>shaders/post/&lt;file&gt;.json</code>
+         */
+        void register(EntityType<?> entityType, ResourceLocation shaderLocation);
+    }
+
+    /**
+     * register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations
+     */
+    interface SkullRenderersContext {
+
+        /**
+         * add models for specific skull types
+         *
+         * @param factory factory for the model(s)
+         */
+        void register(SkullRenderersFactory factory);
     }
 
     /**

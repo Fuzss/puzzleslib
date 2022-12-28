@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 
 @Mixin(ModelManager.class)
-public abstract class ModelManagerMixin extends SimplePreparableReloadListener<ModelBakery> {
+public abstract class ModelManagerFabricMixin extends SimplePreparableReloadListener<ModelBakery> {
     @Shadow
     private Map<ResourceLocation, BakedModel> bakedRegistry;
 

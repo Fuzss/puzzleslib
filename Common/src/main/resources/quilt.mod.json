@@ -4,5 +4,9 @@
 		"group": "${modGroup}",
 		"id": "${modId}",
 		"version": "${modVersion}"
-	}
+	},
+
+	"accessWidener": [
+		"${modId}.common.accesswidener"
+	]
 }

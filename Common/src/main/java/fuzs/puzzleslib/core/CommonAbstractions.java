@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.util.CreativeModeTabBuilder;
 import fuzs.puzzleslib.util.PuzzlesUtil;
+import fuzs.puzzleslib.util.CreativeModeTabBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -48,16 +50,38 @@ public interface CommonAbstractions {
      * @param blockState parent default block state as supplier for Forge
      * @param properties properties from parent
      * @return the new stair block
+     *
+     * @deprecated removed in favor of access widener
      */
-    StairBlock stairBlock(Supplier<BlockState> blockState, BlockBehaviour.Properties properties);
+    @Deprecated(forRemoval = true)
+    default StairBlock stairBlock(Supplier<BlockState> blockState, BlockBehaviour.Properties properties) {
+        return new StairBlock(blockState.get(), properties);
+    }
 
     /**
      * simple access to new {@link DamageSource} instance, as vanilla constructor is protected, both mod loaders use an access transformer for this
      *
      * @param messageId id for the translation key
      * @return the new damage source
+     *
+     * @deprecated removed in favor of access widener
      */
-    DamageSource damageSource(String messageId);
+    @Deprecated(forRemoval = true)
+    default DamageSource damageSource(String messageId) {
+        return new DamageSource(messageId);
+    }
+
+    /**
+     * creates a new creative mode tab, handles adding to the creative screen
+     * use this when one tab is enough for the mod, <code>tabId</code> defaults to "main"
+     *
+     * @param modId             the mod this tab is used by
+     * @param stackSupplier     the display stack
+     * @return                  the creative mode tab
+     */
+    default CreativeModeTab creativeModeTab(String modId, Supplier<ItemStack> stackSupplier) {
+        return this.creativeModeTabBuilder(modId).setIcon(stackSupplier).build();
+    }
 
     /**
      * creates a builder for a new creative mode tab, the implementation handles adding to the creative screen

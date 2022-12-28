@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Item.class)
-public interface ItemAccessor {
+public interface ItemForgeAccessor {
 
     @Accessor(remap = false)
     Object getRenderProperties();

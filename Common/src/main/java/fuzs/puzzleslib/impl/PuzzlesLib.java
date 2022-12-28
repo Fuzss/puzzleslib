@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.core.CommonFactories;
 import fuzs.puzzleslib.core.ModConstructor;
-import fuzs.puzzleslib.impl.network.ClientboundSyncCapabilityMessage;
+import fuzs.puzzleslib.impl.networking.ClientboundSyncCapabilityMessage;
 import fuzs.puzzleslib.network.v2.NetworkHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

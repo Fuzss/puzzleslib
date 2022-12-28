@@ -18,6 +18,7 @@
   "icon": "mod_logo.png",
 
   "environment": "${modFabricEnvironment}",
+
   "entrypoints": {
     "main": [
       "${modGroup}.impl.PuzzlesLibFabric"
@@ -28,8 +29,13 @@
       "${modGroup}.capability.FabricCapabilityController"
     ]
   },
+
   "mixins": [
     "${modId}.fabric.mixins.json"
+  ],
+
+  "accessWidener": [
+    "${modId}.fabric.accesswidener"
   ],
 
   "depends": {

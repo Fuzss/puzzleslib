@@ -7,10 +7,13 @@
   "mixins": [
   ],
   "client": [
-    "client.ItemRendererMixin",
-    "client.ModelManagerMixin",
-    "client.accessor.AbstractContainerScreenAccessor",
-    "client.accessor.MinecraftAccessor"
+    "client.GameRendererFabricMixin",
+    "client.ItemRendererFabricMixin",
+    "client.ModelManagerFabricMixin",
+    "client.SkullBlockRendererFabricMixin",
+    "client.accessor.AbstractContainerScreenFabricAccessor",
+    "client.accessor.MinecraftFabricAccessor",
+    "client.accessor.SkullBlockRendererFabricAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.client.gui.screens;
 
-import fuzs.puzzleslib.mixin.client.accessor.AbstractContainerScreenAccessor;
+import fuzs.puzzleslib.mixin.client.accessor.AbstractContainerScreenFabricAccessor;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -48,30 +48,30 @@ public final class FabricScreens implements CommonScreens {
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenAccessor) screen).getXSize();
+        return ((AbstractContainerScreenFabricAccessor) screen).getXSize();
     }
 
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenAccessor) screen).getYSize();
+        return ((AbstractContainerScreenFabricAccessor) screen).getYSize();
     }
 
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenAccessor) screen).getGuiLeft();
+        return ((AbstractContainerScreenFabricAccessor) screen).getGuiLeft();
     }
 
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenAccessor) screen).getGuiTop();
+        return ((AbstractContainerScreenFabricAccessor) screen).getGuiTop();
     }
 
     @Override
     public @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenAccessor) screen).getSlotUnderMouse();
+        return ((AbstractContainerScreenFabricAccessor) screen).getSlotUnderMouse();
     }
 }

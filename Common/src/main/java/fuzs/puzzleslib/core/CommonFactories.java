@@ -8,6 +8,7 @@ import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.network.v2.NetworkHandlerRegistry;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.util.PuzzlesUtil;
+import fuzs.puzzleslib.init.PotionBrewingRegistry;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.Consumer;
@@ -140,4 +141,11 @@ public interface CommonFactories {
      * @return the mod specific capability controller
      */
     CapabilityController capabilities(String modId);
+
+    /**
+     * Provides a mod loader specific {@link PotionBrewingRegistry} singleton instance.
+     *
+     * @return the instance
+     */
+    PotionBrewingRegistry getPotionBrewingRegistry();
 }

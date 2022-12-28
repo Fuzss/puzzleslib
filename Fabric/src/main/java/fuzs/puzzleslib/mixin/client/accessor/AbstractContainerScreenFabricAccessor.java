@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(AbstractContainerScreen.class)
-public interface AbstractContainerScreenAccessor {
+public interface AbstractContainerScreenFabricAccessor {
 
     @Accessor("imageWidth")
     int getXSize();

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.init;
 
-import fuzs.puzzleslib.mixin.accessor.BooleanValueAccessor;
-import fuzs.puzzleslib.mixin.accessor.IntegerValueAccessor;
+import fuzs.puzzleslib.mixin.accessor.BooleanValueForgeAccessor;
+import fuzs.puzzleslib.mixin.accessor.IntegerValueForgeAccessor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
@@ -19,21 +19,21 @@ public final class ForgeGameRuleFactory implements CommonGameRuleFactory {
 
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue) {
-        return BooleanValueAccessor.callCreate(defaultValue, (minecraftServer, booleanValue) -> {});
+        return BooleanValueForgeAccessor.callCreate(defaultValue, (minecraftServer, booleanValue) -> {});
     }
 
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changedCallback) {
-        return BooleanValueAccessor.callCreate(defaultValue, changedCallback);
+        return BooleanValueForgeAccessor.callCreate(defaultValue, changedCallback);
     }
 
     @Override
     public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue) {
-        return IntegerValueAccessor.callCreate(defaultValue, (minecraftServer, integerValue) -> {});
+        return IntegerValueForgeAccessor.callCreate(defaultValue, (minecraftServer, integerValue) -> {});
     }
 
     @Override
     public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changedCallback) {
-        return IntegerValueAccessor.callCreate(defaultValue, changedCallback);
+        return IntegerValueForgeAccessor.callCreate(defaultValue, changedCallback);
     }
 }

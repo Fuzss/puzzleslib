@@ -10,7 +10,7 @@ import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.mixin.client.accessor.ItemAccessor;
+import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -42,6 +42,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -86,6 +87,10 @@ public class ForgeClientModConstructor {
      * actions to run each time after baked models have been reloaded
      */
     private final List<Consumer<DynamicModelBakingContext>> modelBakingListeners = Lists.newArrayList();
+    /**
+     * custom built-in item model renderers to reload after each resource reload
+     */
+    private final List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers = Lists.newArrayList();
 
     /**
      * only calls {@link ModConstructor#onConstructMod()}, everything else is done via events later
@@ -174,22 +179,18 @@ public class ForgeClientModConstructor {
                         public void renderByItem(ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
                             renderer.renderByItem(stack, mode, matrices, vertexConsumers, light, overlay);
                         }
-
-                        @Override
-                        public void onResourceManagerReload(ResourceManager resourceManager) {
-
-                        }
                     };
                 }
             };
-            Object currentClientItemExtension = ((ItemAccessor) item.asItem()).getRenderProperties();
-            ((ItemAccessor) item.asItem()).setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IClientItemExtensions) currentClientItemExtension) {
+            Object currentClientItemExtension = ((ItemForgeAccessor) item.asItem()).getRenderProperties();
+            ((ItemForgeAccessor) item.asItem()).setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IClientItemExtensions) currentClientItemExtension) {
 
                 @Override
                 public BlockEntityWithoutLevelRenderer getCustomRenderer() {
                     return clientItemExtension.getCustomRenderer();
                 }
             } : clientItemExtension);
+            this.dynamicBuiltinModelItemRenderers.add(renderer);
         };
     }
 
@@ -307,12 +308,36 @@ public class ForgeClientModConstructor {
     }
 
     @SubscribeEvent
+    public void onRegisterEntitySpectatorShaders(final RegisterEntitySpectatorShadersEvent evt) {
+        this.constructor.onRegisterEntitySpectatorShader((EntityType<?> entityType, ResourceLocation shader) -> {
+            Objects.requireNonNull(entityType, "entity type is null");
+            Objects.requireNonNull(shader, "shader location is null");
+            evt.register(entityType, shader);
+        });
+    }
+
+    @SubscribeEvent
+    public void onCreateSkullModels(final EntityRenderersEvent.CreateSkullModels evt) {
+        this.constructor.onRegisterSkullRenderers(factory -> {
+            Objects.requireNonNull(factory, "factory is null");
+            factory.createSkullRenderers(evt.getEntityModelSet(), evt::registerSkullModel);
+        });
+    }
+
+    @SubscribeEvent
     public void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent evt) {
         this.constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> {
             Objects.requireNonNull(id, "reload listener id is null");
             Objects.requireNonNull(reloadListener, "reload listener is null");
             evt.registerReloadListener(reloadListener);
         });
+        if (!this.dynamicBuiltinModelItemRenderers.isEmpty()) {
+            evt.registerReloadListener((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+                for (ResourceManagerReloadListener listener : this.dynamicBuiltinModelItemRenderers) {
+                    listener.onResourceManagerReload(resourceManager);
+                }
+            });
+        }
     }
 
     @SubscribeEvent

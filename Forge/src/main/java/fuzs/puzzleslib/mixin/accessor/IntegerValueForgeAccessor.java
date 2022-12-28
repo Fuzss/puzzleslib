@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import java.util.function.BiConsumer;
 
 @Mixin(GameRules.IntegerValue.class)
-public interface IntegerValueAccessor {
+public interface IntegerValueForgeAccessor {
 
     @Invoker
     static GameRules.Type<GameRules.IntegerValue> callCreate(int i, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer) {

@@ -3,14 +3,15 @@ package fuzs.puzzleslib.client.core;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.event.ModelEvents;
+import fuzs.puzzleslib.api.client.renderer.EntitySpectatorShaderRegistry;
 import fuzs.puzzleslib.api.client.renderer.ItemDecoratorRegistry;
+import fuzs.puzzleslib.api.client.renderer.SkullRenderersRegistry;
 import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
-import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
+import fuzs.puzzleslib.mixin.client.accessor.MinecraftFabricAccessor;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -47,6 +48,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -83,10 +85,6 @@ public class FabricClientModConstructor {
      * the mod id
      */
     private final String modId;
-    /**
-     * actions to run each time after baked models have been reloaded
-     */
-    private final List<Consumer<DynamicModelBakingContext>> modelBakingListeners = Lists.newArrayList();
 
     /**
      * @param modId         the mod id
@@ -174,7 +172,7 @@ public class FabricClientModConstructor {
     private <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
         Objects.requireNonNull(searchRegistryKey, "search registry key is null");
         Objects.requireNonNull(treeBuilder, "search registry tree builder is null");
-        SearchRegistry searchTreeManager = ((MinecraftAccessor) Minecraft.getInstance()).getSearchRegistry();
+        SearchRegistry searchTreeManager = ((MinecraftFabricAccessor) Minecraft.getInstance()).getSearchRegistry();
         Objects.requireNonNull(searchTreeManager, "search tree manager is null");
         searchTreeManager.register(searchRegistryKey, treeBuilder);
     }
@@ -199,7 +197,7 @@ public class FabricClientModConstructor {
         };
     }
 
-    private void onBakingCompleted(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+    private void onBakingCompleted(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery, List<Consumer<DynamicModelBakingContext>> modelBakingListeners) {
         final DynamicModelBakingContext context = new DynamicModelBakingContext(modelManager, models, modelBakery) {
 
             @Override
@@ -208,7 +206,7 @@ public class FabricClientModConstructor {
                 return BakedModelManagerHelper.getModel(this.modelManager, model);
             }
         };
-        for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
+        for (Consumer<DynamicModelBakingContext> listener : modelBakingListeners) {
             try {
                 listener.accept(context);
             } catch (Exception e) {
@@ -274,9 +272,10 @@ public class FabricClientModConstructor {
         constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
         constructor.onRegisterSearchTrees(fabricClientModConstructor::registerSearchTree);
-        constructor.onRegisterModelBakingCompletedListeners(fabricClientModConstructor.modelBakingListeners::add);
-        if (!fabricClientModConstructor.modelBakingListeners.isEmpty()) {
-            ModelEvents.BAKING_COMPLETED.register(fabricClientModConstructor::onBakingCompleted);
+        final List<Consumer<DynamicModelBakingContext>> modelBakingListeners = Lists.newArrayList();
+        constructor.onRegisterModelBakingCompletedListeners(modelBakingListeners::add);
+        if (!modelBakingListeners.isEmpty()) {
+            ModelEvents.BAKING_COMPLETED.register((modelManager, models, modelBakery) -> fabricClientModConstructor.onBakingCompleted(modelManager, models, modelBakery, modelBakingListeners));
         }
         constructor.onRegisterAdditionalModels((ResourceLocation model) -> {
             Objects.requireNonNull(model, "model location is null");
@@ -285,21 +284,35 @@ public class FabricClientModConstructor {
             });
         });
         constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
+        constructor.onRegisterEntitySpectatorShader(EntitySpectatorShaderRegistry.INSTANCE::register);
+        final List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers = Lists.newArrayList();
         constructor.onRegisterBuiltinModelItemRenderers((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
             Objects.requireNonNull(item, "item is null");
             Objects.requireNonNull(renderer, "renderer is null");
             BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
+            dynamicBuiltinModelItemRenderers.add(renderer);
         });
+        if (!dynamicBuiltinModelItemRenderers.isEmpty()) {
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener("built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+                for (ResourceManagerReloadListener listener : dynamicBuiltinModelItemRenderers) {
+                    listener.onResourceManagerReload(resourceManager);
+                }
+            }));
+        }
         constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> {
             Objects.requireNonNull(id, "reload listener id is null");
             Objects.requireNonNull(reloadListener, "reload listener is null");
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener(id, reloadListener));
         });
         constructor.onRegisterLivingEntityRenderLayers(fabricClientModConstructor.getLivingEntityRenderLayersContext());
-        constructor.onRegisterItemDecorations((ItemLike item, DynamicItemDecorator decorator) -> {
+        constructor.onRegisterItemDecorations((item, decorator) -> {
             Objects.requireNonNull(item, "item is null");
             Objects.requireNonNull(decorator, "item decorator is null");
             ItemDecoratorRegistry.INSTANCE.register(item, decorator);
+        });
+        constructor.onRegisterSkullRenderers(factory -> {
+            Objects.requireNonNull(factory, "factory is null");
+            SkullRenderersRegistry.INSTANCE.register(factory);
         });
         constructor.onRegisterKeyMappings((KeyMapping keyBinding) -> {
             Objects.requireNonNull(keyBinding, "key mapping is null");

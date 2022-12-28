@@ -5,12 +5,9 @@
   "package": "fuzs.puzzleslib.mixin",
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
-    "accessor.BooleanValueForgeAccessor",
-    "accessor.IntegerValueForgeAccessor",
-    "accessor.PotionBrewingForgeAccessor"
+    "accessor.PotionBrewingAccessor"
   ],
   "client": [
-    "client.accessor.ItemForgeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

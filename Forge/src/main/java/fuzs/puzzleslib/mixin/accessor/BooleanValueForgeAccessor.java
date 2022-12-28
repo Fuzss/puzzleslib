@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 import java.util.function.BiConsumer;
 
 @Mixin(GameRules.BooleanValue.class)
-public interface BooleanValueAccessor {
+public interface BooleanValueForgeAccessor {
 
     @Invoker
     static GameRules.Type<GameRules.BooleanValue> callCreate(boolean bl, BiConsumer<MinecraftServer, GameRules.BooleanValue> biConsumer) {

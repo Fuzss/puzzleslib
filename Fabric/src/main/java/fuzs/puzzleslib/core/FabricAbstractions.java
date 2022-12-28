@@ -7,17 +7,12 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public final class FabricAbstractions implements CommonAbstractions {
 
@@ -49,16 +44,6 @@ public final class FabricAbstractions implements CommonAbstractions {
                 });
             }
         }.run();
-    }
-
-    @Override
-    public StairBlock stairBlock(Supplier<BlockState> blockState, BlockBehaviour.Properties properties) {
-        return new StairBlock(blockState.get(), properties);
-    }
-
-    @Override
-    public DamageSource damageSource(String messageId) {
-        return new DamageSource(messageId);
     }
 
     @Override
