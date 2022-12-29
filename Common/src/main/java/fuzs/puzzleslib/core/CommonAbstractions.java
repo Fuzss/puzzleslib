@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.util.PuzzlesUtil;
 import fuzs.puzzleslib.util.CreativeModeTabBuilder;
+import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -11,7 +11,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -69,6 +71,56 @@ public interface CommonAbstractions {
     @Deprecated(forRemoval = true)
     default DamageSource damageSource(String messageId) {
         return new DamageSource(messageId);
+    }
+
+    /**
+     * creates a new creative mode tab, handles adding to the creative screen
+     * use this when one tab is enough for the mod, <code>tabId</code> defaults to "main"
+     *
+     * @param modId         the mod this tab is used by
+     * @param stackSupplier the display stack
+     * @return the creative mode tab
+     *
+     * @deprecated renamed to {@link #creativeModeTab(String, Supplier)}
+     */
+    @Deprecated(forRemoval = true)
+    default CreativeModeTab creativeTab(String modId, Supplier<ItemStack> stackSupplier) {
+        return this.creativeModeTab(modId, stackSupplier);
+    }
+
+    /**
+     * creates a new creative mode tab, handles adding to the creative screen
+     *
+     * @param modId         the mod this tab is used by
+     * @param tabId         the key for this tab, useful when the mod has multiple
+     * @param stackSupplier the display stack
+     * @return the creative mode tab
+     *
+     * @deprecated functionality moved to {@link #creativeModeTabBuilder(String, String)}
+     */
+    @Deprecated(forRemoval = true)
+    default CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier) {
+        return this.creativeModeTabBuilder(modId, tabId).setIcon(stackSupplier).build();
+    }
+
+    /**
+     * creates a new creative mode tab, handles adding to the creative screen
+     *
+     * @param modId            the mod this tab is used by
+     * @param tabId            the key for this tab, useful when the mod has multiple
+     * @param stackSupplier    the display stack
+     * @param cacheIcon        should the result from <code>stackSupplier</code> be cached, enabled by default, allows for a cycling icon when disabled; not supported on Fabric
+     * @param stacksForDisplay manually add stacks to show in tab, allows for sorting
+     * @return the creative mode tab
+     *
+     * @deprecated functionality moved to {@link #creativeModeTabBuilder(String, String)}
+     */
+    @Deprecated(forRemoval = true)
+    default CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier, boolean cacheIcon, @Nullable BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay) {
+        CreativeModeTabBuilder tabBuilder = this.creativeModeTabBuilder(modId, tabId).setIcon(stackSupplier);
+        if (!cacheIcon) tabBuilder.disableIconCache();
+        if (stacksForDisplay != null) tabBuilder.appendItems(stacksForDisplay);
+        return tabBuilder.build();
     }
 
     /**

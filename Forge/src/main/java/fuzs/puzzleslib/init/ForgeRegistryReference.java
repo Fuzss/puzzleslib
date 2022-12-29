@@ -53,4 +53,9 @@ public class ForgeRegistryReference<T> implements RegistryReference<T> {
     public Holder<T> holder() {
         return this.registryObject.getHolder().orElseThrow();
     }
+
+    @Override
+    public boolean isPresent() {
+        return this.registryObject.isPresent();
+    }
 }

@@ -64,7 +64,11 @@ public final class MessageSerializers {
     }
 
     public static <T> void registerSerializer(Class<T> type, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
-        if (SERIALIZERS.put(type, new MessageSerializerImpl<>(writer, reader)) != null) throw new IllegalStateException("Duplicate serializer registered for type %s".formatted(type));
+        registerSerializer(type, new MessageSerializerImpl<T>(writer, reader));
+    }
+
+    private static <T> void registerSerializer(Class<T> type, MessageSerializer<T> value) {
+        if (SERIALIZERS.put(type, value) != null) throw new IllegalStateException("Duplicate serializer registered for type %s".formatted(type));
     }
 
     @SuppressWarnings("unchecked")
@@ -171,7 +175,7 @@ public final class MessageSerializers {
     }
 
     @SuppressWarnings("unchecked")
-    public static MessageSerializer<?> createArraySerializer(Class<?> clazz) {
+    private static MessageSerializer<?> createArraySerializer(Class<?> clazz) {
         MessageSerializer<Object> serializer = (MessageSerializer<Object>) findByType(clazz);
         return new MessageSerializerImpl<>((buf, t) -> {
             final int length = Array.getLength(t);
@@ -262,6 +266,7 @@ public final class MessageSerializers {
         registerSerializer(FriendlyByteBuf.class, (buf, other) -> {
             buf.writeVarInt(other.readableBytes());
             buf.writeBytes(other);
+            buf.release();
         }, buf -> new FriendlyByteBuf(buf.readBytes(buf.readVarInt())));
 
         registerSerializer(SoundEvent.class, Registry.SOUND_EVENT_REGISTRY);

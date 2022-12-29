@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -27,12 +28,13 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
 
     ItemStack getIcon() {
         ItemStack stack = this.iconSupplier.get();
-        if (stack.isEmpty()) throw new IllegalStateException("creative tab icon cannot be empty");
+        if (stack.isEmpty()) throw new IllegalStateException("Creative tab icon cannot be empty");
         return stack;
     }
 
     @Override
     public CreativeModeTabBuilder setIcon(Supplier<ItemStack> icon) {
+        Objects.requireNonNull(icon, "icon supplier was null");
         this.iconSupplier = icon;
         return this;
     }
@@ -63,6 +65,7 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
 
     @Override
     public CreativeModeTabBuilder appendItems(BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay) {
+        Objects.requireNonNull(stacksForDisplay, "stacks for display consumer was null");
         this.stacksForDisplay = stacksForDisplay;
         return this;
     }

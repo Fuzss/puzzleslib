@@ -11,7 +11,10 @@ The format is based on [Keep a Changelog].
 - Added methods in `ClientModConstructor` for registering custom skull type renderers and entity shaders for spectator mode
 - Added `SkullRenderersRegistry` on Fabric for registering models for custom skull types
 - Added `EntitySpectatorShaderRegistry` on Fabric for registering entity shaders for spectator mode
+- Added `AdditionalAddEntityData` interface for sending extra data to clients when an entity is added
+### Changed
 - `CommonAbstractions` now includes a simplified methods for creating a new `CreativeModeTab`
+- `RegistryReference` now includes two helper methods to check whether the reference is present or empty
 
 ## [v4.3.16-1.19.2] - 2022-12-15
 ### Changed

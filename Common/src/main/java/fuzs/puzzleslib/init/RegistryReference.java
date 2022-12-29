@@ -4,6 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Represents a lazy wrapper for registry object.
@@ -36,7 +37,7 @@ public interface RegistryReference<T> {
 
     /**
      * Gets the object behind this wrapper. Calling this method too early
-     * might result in crashes.
+     * might result in crashes. Use {@link #isPresent()} to test if the wrapped object is available.
      *
      * @return the object behind this wrapper
      */
@@ -48,6 +49,22 @@ public interface RegistryReference<T> {
      * @return the holder
      */
     Holder<T> holder();
+
+    /**
+     * Test if the wrapped object is available.
+     *
+     * @return is available
+     */
+    boolean isPresent();
+
+    /**
+     * Test if the wrapped object is not yet available.
+     *
+     * @return is not available
+     */
+    default boolean isEmpty() {
+        return !this.isPresent();
+    }
 
     /**
      * creates a placeholder {@link RegistryReference} for game content that needs to be registered as a mod loader specific implementation
@@ -78,9 +95,7 @@ public interface RegistryReference<T> {
         }
         ResourceKey<T> resourceKey = ResourceKey.create((ResourceKey<? extends Registry<T>>) registryKey, resourceLocation);
         return new RegistryReference<>() {
-            /**
-             * the referenced value
-             */
+            @Nullable
             private T value;
 
             @Override
@@ -112,6 +127,11 @@ public interface RegistryReference<T> {
             @Override
             public Holder<T> holder() {
                 return registry.getOrCreateHolderOrThrow(this.getResourceKey());
+            }
+
+            @Override
+            public boolean isPresent() {
+                return this.value != null || registry.containsKey(resourceLocation);
             }
         };
     }

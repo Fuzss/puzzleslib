@@ -21,25 +21,9 @@ public final class RecordSerializer<T extends Record> implements MessageSerializ
         this.recordAccess = recordAccess;
     }
 
-    public Class<T> getRecordType() {
-        return this.recordType;
-    }
-
-    @Override
-    public void write(FriendlyByteBuf buf, T instance) {
-        for (RecordAccess<?, T> access : this.recordAccess) {
-            access.write(buf, instance);
-        }
-    }
-
-    @Override
-    public T read(FriendlyByteBuf buf) {
-        Object[] values = this.recordAccess.stream().map(r -> r.read(buf)).toArray();
-        return this.instanceFactory.apply(values);
-    }
-
     static <T extends Record> MessageSerializer<T> createRecordSerializer(Class<T> clazz) {
-        if (!clazz.isRecord()) throw new IllegalArgumentException("Message is not a record");
+        if (!clazz.isRecord())
+            throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         ImmutableList.Builder<RecordAccess<?, T>> builder = ImmutableList.builder();
         for (RecordComponent component : clazz.getRecordComponents()) {
             builder.add(RecordAccess.fromRecordComponent(component));
@@ -60,8 +44,25 @@ public final class RecordSerializer<T extends Record> implements MessageSerializ
         }
     }
 
-    private record RecordAccess<T, R extends Record>(Class<? extends T> type, Function<R, T> fieldAccess, MessageSerializer<T> serializer) {
+    public Class<T> getRecordType() {
+        return this.recordType;
+    }
 
+    @Override
+    public void write(FriendlyByteBuf buf, T instance) {
+        for (RecordAccess<?, T> access : this.recordAccess) {
+            access.write(buf, instance);
+        }
+    }
+
+    @Override
+    public T read(FriendlyByteBuf buf) {
+        Object[] values = this.recordAccess.stream().map(recordAccess -> recordAccess.read(buf)).toArray();
+        return this.instanceFactory.apply(values);
+    }
+
+    private record RecordAccess<T, R extends Record>(Class<? extends T> type, Function<R, T> fieldAccess,
+                                                     MessageSerializer<T> serializer) {
 
         @SuppressWarnings("unchecked")
         static <T, R extends Record> RecordAccess<T, R> fromRecordComponent(RecordComponent component) {
@@ -78,11 +79,11 @@ public final class RecordSerializer<T extends Record> implements MessageSerializ
             return new RecordAccess<>(type, fieldAccess, serializer);
         }
 
-        void write(FriendlyByteBuf buf, R instance) {
+        public void write(FriendlyByteBuf buf, R instance) {
             this.serializer.write(buf, this.fieldAccess.apply(instance));
         }
 
-        T read(FriendlyByteBuf buf) {
+        public T read(FriendlyByteBuf buf) {
             return this.serializer.read(buf);
         }
     }

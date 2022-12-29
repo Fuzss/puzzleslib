@@ -28,6 +28,7 @@ public class FabricRegistryReference<T> implements RegistryReference<T> {
      * @param resourceLocation  resource location to create {@link ResourceKey} from
      * @param registry          the {@link Registry} {@link #value} is registered to
      */
+    @SuppressWarnings("unchecked")
     public FabricRegistryReference(T value, ResourceLocation resourceLocation, Registry<? super T> registry) {
         this(value, (ResourceKey<T>) ResourceKey.create(registry.key(), resourceLocation), registry);
     }
@@ -63,8 +64,14 @@ public class FabricRegistryReference<T> implements RegistryReference<T> {
         return this.value;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Holder<T> holder() {
         return ((Registry<T>) this.registry).getOrCreateHolderOrThrow(this.key);
+    }
+
+    @Override
+    public boolean isPresent() {
+        return true;
     }
 }
