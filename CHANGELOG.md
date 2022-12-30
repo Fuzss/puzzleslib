@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.18-1.19.2] - 2022-12-30
+### Fixed
+- Fixed access widener in `quilt.mod.json`
+
 ## [v4.3.17-1.19.2] - 2022-12-30
 ### Added
 - Puzzles Lib now includes a few transitive access wideners in the Common and Fabric projects

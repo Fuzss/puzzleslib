@@ -6,7 +6,7 @@
 		"version": "${modVersion}"
 	},
 
-	"accessWidener": [
+	"access_widener": [
 		"${modId}.common.accesswidener"
 	]
 }
