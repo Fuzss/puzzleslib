@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.proxy;
 
 import fuzs.puzzleslib.network.Message;
-import fuzs.puzzleslib.network.v2.ClientboundMessage;
-import fuzs.puzzleslib.network.v2.ServerboundMessage;
+import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

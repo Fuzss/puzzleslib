@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.impl.util.FabricCreativeModeTabBuilder;
+import fuzs.puzzleslib.impl.creativetab.FabricCreativeModeTabBuilder;
 import fuzs.puzzleslib.util.CreativeModeTabBuilder;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.network.FriendlyByteBuf;

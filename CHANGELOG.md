@@ -3,17 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.3.17-1.19.2] - 2022-12-28
+## [v4.3.17-1.19.2] - 2022-12-30
 ### Added
 - Puzzles Lib now includes a few transitive access wideners in the Common and Fabric projects
-- Added a new networking system based on Java's records, heavily inspired by the networking system found in [Owo Lib](https://www.curseforge.com/minecraft/mc-mods/owo-lib)
+- Added a new networking system based on Java's records, heavily inspired by the networking system found in [Owo Lib](https://www.curseforge.com/minecraft/mc-mods/owo-lib) by [Glisco](https://github.com/gliscowo)
 - Added `PotionBrewingRegistry` for registering potions using `Ingredient` instead of `Item`, while also providing access in the Common project
 - Added methods in `ClientModConstructor` for registering custom skull type renderers and entity shaders for spectator mode
 - Added `SkullRenderersRegistry` on Fabric for registering models for custom skull types
 - Added `EntitySpectatorShaderRegistry` on Fabric for registering entity shaders for spectator mode
 - Added `AdditionalAddEntityData` interface for sending extra data to clients when an entity is added
 ### Changed
-- `CommonAbstractions` now includes a simplified methods for creating a new `CreativeModeTab`
+- `CommonAbstractions` now includes simplified methods for creating a new `CreativeModeTab`
 - `RegistryReference` now includes two helper methods to check whether the reference is present or empty
 
 ## [v4.3.16-1.19.2] - 2022-12-15

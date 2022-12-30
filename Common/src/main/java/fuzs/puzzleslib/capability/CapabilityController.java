@@ -15,7 +15,7 @@ import java.util.function.Predicate;
 
 /**
  * class for registering and attaching mod capabilities, every mod gets their own instance,
- * mostly due to Forge requiring to register some events which should be done on a per mod basis
+ * mostly due to Forge requiring to register some events which should be done on a per-mod basis
  */
 public interface CapabilityController {
     /**

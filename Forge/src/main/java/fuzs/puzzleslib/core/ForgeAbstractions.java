@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.core;
 
-import fuzs.puzzleslib.impl.util.ForgeCreativeModeTabBuilder;
+import fuzs.puzzleslib.impl.creativetab.ForgeCreativeModeTabBuilder;
 import fuzs.puzzleslib.util.CreativeModeTabBuilder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;

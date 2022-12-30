@@ -10,6 +10,7 @@ import java.nio.file.Path;
 /**
  * implementation of {@link ModLoaderEnvironment} for Forge
  */
+@SuppressWarnings("UnstableApiUsage")
 public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override

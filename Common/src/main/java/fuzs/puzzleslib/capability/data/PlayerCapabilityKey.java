@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.capability.data;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.networking.ClientboundSyncCapabilityMessage;
+import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;

@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.client.model.geom.ModelLayerRegistry;
+import fuzs.puzzleslib.core.CommonAbstractions;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -48,7 +49,7 @@ public interface ClientFactories {
      */
     @Deprecated(forRemoval = true)
     default CreativeModeTab creativeTab(String modId, Supplier<ItemStack> stackSupplier) {
-        return this.creativeTab(modId, "main", stackSupplier);
+        return CommonAbstractions.INSTANCE.creativeModeTab(modId, stackSupplier);
     }
 
     /**
@@ -62,5 +63,7 @@ public interface ClientFactories {
      * @deprecated moved to common package in {@link fuzs.puzzleslib.core.CommonAbstractions#creativeModeTabBuilder}
      */
     @Deprecated(forRemoval = true)
-    CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier);
+    default CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier) {
+        return CommonAbstractions.INSTANCE.creativeModeTabBuilder(modId, tabId).setIcon(stackSupplier).build();
+    }
 }

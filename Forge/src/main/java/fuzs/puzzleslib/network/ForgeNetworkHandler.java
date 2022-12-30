@@ -23,7 +23,7 @@ import java.util.function.Supplier;
 /**
  * handler for network communications of all puzzles lib mods
  *
- * @deprecated migrate to {@link fuzs.puzzleslib.network.v2.ForgeNetworkHandler}
+ * @deprecated migrate to {@link fuzs.puzzleslib.impl.networking.ForgeNetworkHandler}
  */
 @Deprecated(forRemoval = true)
 public class ForgeNetworkHandler implements NetworkHandler {

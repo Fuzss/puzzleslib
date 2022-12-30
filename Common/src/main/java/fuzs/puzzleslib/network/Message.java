@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 /**
  * network message template
  *
- * @deprecated migrate to {@link fuzs.puzzleslib.network.v2.Message}
+ * @deprecated migrate to {@link fuzs.puzzleslib.api.networking.v3.Message}
  */
 @Deprecated(forRemoval = true)
 public interface Message<T extends Message<T>> {

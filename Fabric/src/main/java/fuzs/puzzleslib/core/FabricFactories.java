@@ -5,12 +5,11 @@ import fuzs.puzzleslib.capability.FabricCapabilityController;
 import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.config.FabricConfigHolderImpl;
-import fuzs.puzzleslib.impl.init.PotionBrewingRegistryImplFabric;
+import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryImplFabric;
 import fuzs.puzzleslib.init.FabricRegistryManager;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
-import fuzs.puzzleslib.network.v2.NetworkHandlerRegistry;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
@@ -35,8 +34,8 @@ public final class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public NetworkHandlerRegistry.Builder networkV2(String modId) {
-        return new fuzs.puzzleslib.network.v2.FabricNetworkHandler.FabricBuilder(modId);
+    public fuzs.puzzleslib.api.networking.v3.NetworkHandler.Builder networkV2(String modId) {
+        return new fuzs.puzzleslib.impl.networking.FabricNetworkHandler.FabricBuilderImpl(modId);
     }
 
     @SuppressWarnings("Convert2MethodRef")

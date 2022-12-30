@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.proxy;
 
-import fuzs.puzzleslib.network.v2.ClientboundMessage;
-import fuzs.puzzleslib.network.v2.ServerboundMessage;
+import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;

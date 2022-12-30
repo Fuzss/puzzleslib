@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.proxy;
 
 import fuzs.puzzleslib.network.Message;
-import fuzs.puzzleslib.network.v2.ClientboundMessage;
-import fuzs.puzzleslib.network.v2.ServerboundMessage;
+import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 
