@@ -35,14 +35,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.presets.WorldPreset;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -93,7 +88,7 @@ public final class MessageSerializers {
     @SuppressWarnings("unchecked")
     public static <T> void registerSerializer(Class<? super T> type, ResourceKey<Registry<T>> resourceKey) {
         Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(resourceKey.location());
-        Objects.requireNonNull(registry, "Registry for key %s not found".formatted(registry));
+        Objects.requireNonNull(registry, "Registry for key %s not found".formatted(resourceKey));
         registerSerializer((Class<T>) type, (friendlyByteBuf, t) -> {
             friendlyByteBuf.writeVarInt(registry.getId(t));
         }, friendlyByteBuf -> {
@@ -318,11 +313,6 @@ public final class MessageSerializers {
         registerSerializer(VillagerType.class, Registry.VILLAGER_TYPE_REGISTRY);
         registerSerializer(VillagerProfession.class, Registry.VILLAGER_PROFESSION_REGISTRY);
         registerSerializer(PoiType.class, Registry.POINT_OF_INTEREST_TYPE_REGISTRY);
-        registerSerializer(DimensionType.class, Registry.DIMENSION_TYPE_REGISTRY);
-        registerSerializer(Level.class, Registry.DIMENSION_REGISTRY);
-        registerSerializer(Feature.class, Registry.FEATURE_REGISTRY);
-        registerSerializer(WorldPreset.class, Registry.WORLD_PRESET_REGISTRY);
-        registerSerializer(Biome.class, Registry.BIOME_REGISTRY);
 
         registerContainerProvider(Map.class, MessageSerializers::createMapSerializer);
         registerContainerProvider(List.class, typeArguments -> createCollectionSerializer(typeArguments, Lists::newArrayListWithExpectedSize));
