@@ -294,7 +294,7 @@ public final class MessageSerializers {
         registerSerializer(FriendlyByteBuf.class, (buf, other) -> {
             buf.writeVarInt(other.readableBytes());
             buf.writeBytes(other);
-            buf.release();
+            other.release();
         }, buf -> new FriendlyByteBuf(buf.readBytes(buf.readVarInt())));
 
         registerSerializer(SoundEvent.class, Registry.SOUND_EVENT_REGISTRY);

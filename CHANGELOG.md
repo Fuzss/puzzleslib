@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.21-1.19.2] - 2022-12-31
+### Fixed
+- Fixed byte buf serializer
+- Fixed `fabric.mod.json` access widener entry
+
 ## [v4.3.20-1.19.2] - 2022-12-31
 ### Fixed
 - Removed all invalid registry serializers
