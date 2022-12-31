@@ -160,6 +160,7 @@ public class ForgeClientModConstructor {
         };
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private ClientModConstructor.BuiltinModelItemRendererContext getBuiltinModelItemRendererContext() {
         return (ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
             Objects.requireNonNull(item, "item is null");
@@ -309,7 +310,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterEntitySpectatorShaders(final RegisterEntitySpectatorShadersEvent evt) {
-        this.constructor.onRegisterEntitySpectatorShader((EntityType<?> entityType, ResourceLocation shader) -> {
+        this.constructor.onRegisterEntitySpectatorShaders((EntityType<?> entityType, ResourceLocation shader) -> {
             Objects.requireNonNull(entityType, "entity type is null");
             Objects.requireNonNull(shader, "shader location is null");
             evt.register(entityType, shader);

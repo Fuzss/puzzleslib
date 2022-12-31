@@ -16,7 +16,7 @@ public interface SkullRenderersFactory {
      * Adds the baked model to the context.
      *
      * @param entityModelSet model set for retrieving baked models
-     * @param context        add model to context
+     * @param consumer        add model to context
      */
-    void createSkullRenderers(EntityModelSet entityModelSet, BiConsumer<SkullBlock.Type, SkullModelBase> context);
+    void createSkullRenderers(EntityModelSet entityModelSet, BiConsumer<SkullBlock.Type, SkullModelBase> consumer);
 }

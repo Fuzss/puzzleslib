@@ -266,7 +266,6 @@ public final class MessageSerializers {
         registerSerializer(Date.class, FriendlyByteBuf::writeDate, FriendlyByteBuf::readDate);
         registerSerializer(Instant.class, FriendlyByteBuf::writeInstant, FriendlyByteBuf::readInstant);
         registerSerializer(UUID.class, FriendlyByteBuf::writeUUID, FriendlyByteBuf::readUUID);
-        registerSerializer(Date.class, FriendlyByteBuf::writeDate, FriendlyByteBuf::readDate);
 
         registerSerializer(Component.class, EntityDataSerializers.COMPONENT);
         registerSerializer(ItemStack.class, EntityDataSerializers.ITEM_STACK);

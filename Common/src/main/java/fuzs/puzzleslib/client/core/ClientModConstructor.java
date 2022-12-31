@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
@@ -194,7 +193,7 @@ public interface ClientModConstructor {
     /**
      * @param context register a custom shader that is applied when spectating a certain entity type
      */
-    default void onRegisterEntitySpectatorShader(EntitySpectatorShaderContext context) {
+    default void onRegisterEntitySpectatorShaders(EntitySpectatorShaderContext context) {
 
     }
 

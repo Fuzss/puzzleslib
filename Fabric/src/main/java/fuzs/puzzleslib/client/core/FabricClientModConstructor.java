@@ -284,7 +284,7 @@ public class FabricClientModConstructor {
             });
         });
         constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
-        constructor.onRegisterEntitySpectatorShader(EntitySpectatorShaderRegistry.INSTANCE::register);
+        constructor.onRegisterEntitySpectatorShaders(EntitySpectatorShaderRegistry.INSTANCE::register);
         final List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers = Lists.newArrayList();
         constructor.onRegisterBuiltinModelItemRenderers((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
             Objects.requireNonNull(item, "item is null");

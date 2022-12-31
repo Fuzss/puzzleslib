@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.19-1.19.2] - 2022-12-31
+### Fixed
+- Fixed duplicate message serializer
+
 ## [v4.3.18-1.19.2] - 2022-12-30
 ### Fixed
 - Fixed access widener in `quilt.mod.json`
