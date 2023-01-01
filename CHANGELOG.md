@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.23-1.19.2] - 2023-01-01
+### Changed
+- Use `NonNullList`s when filling in creative mode tab items
+
 ## [v4.3.22-1.19.2] - 2022-12-31
 ### Fixed
 - Fixed common mixins on Fabric

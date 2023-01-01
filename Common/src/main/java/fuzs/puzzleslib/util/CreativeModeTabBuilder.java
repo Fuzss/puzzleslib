@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.util;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -56,8 +57,20 @@ public interface CreativeModeTabBuilder {
      * fill this tab with custom items, fully overrides vanilla, useful for sorting purposes
      *
      * @return  builder instance
+     *
+     * @deprecated migrate to {@link #appendItemsV2(BiConsumer)}
      */
-    CreativeModeTabBuilder appendItems(BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay);
+    @Deprecated(forRemoval = true)
+    default CreativeModeTabBuilder appendItems(BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay) {
+        return this.appendItemsV2(stacksForDisplay::accept);
+    }
+
+    /**
+     * fill this tab with custom items, fully overrides vanilla, useful for sorting purposes
+     *
+     * @return  builder instance
+     */
+    CreativeModeTabBuilder appendItemsV2(BiConsumer<NonNullList<ItemStack>, CreativeModeTab> stacksForDisplay);
 
     /**
      * show a search bar in this tab like vanilla's search tab

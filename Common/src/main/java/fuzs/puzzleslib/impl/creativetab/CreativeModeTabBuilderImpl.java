@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.creativetab;
 
 import fuzs.puzzleslib.util.CreativeModeTabBuilder;
+import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +20,7 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
     boolean showScrollbar = true;
     boolean alignRight;
     @Nullable
-    BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay;
+    BiConsumer<NonNullList<ItemStack>, CreativeModeTab> stacksForDisplay;
     boolean showSearch;
 
     public CreativeModeTabBuilderImpl(String modId, String identifier) {
@@ -64,7 +65,7 @@ public abstract class CreativeModeTabBuilderImpl implements CreativeModeTabBuild
     }
 
     @Override
-    public CreativeModeTabBuilder appendItems(BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay) {
+    public CreativeModeTabBuilder appendItemsV2(BiConsumer<NonNullList<ItemStack>, CreativeModeTab> stacksForDisplay) {
         Objects.requireNonNull(stacksForDisplay, "stacks for display consumer was null");
         this.stacksForDisplay = stacksForDisplay;
         return this;

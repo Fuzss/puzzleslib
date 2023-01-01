@@ -119,7 +119,7 @@ public interface CommonAbstractions {
     default CreativeModeTab creativeTab(String modId, String tabId, Supplier<ItemStack> stackSupplier, boolean cacheIcon, @Nullable BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay) {
         CreativeModeTabBuilder tabBuilder = this.creativeModeTabBuilder(modId, tabId).setIcon(stackSupplier);
         if (!cacheIcon) tabBuilder.disableIconCache();
-        if (stacksForDisplay != null) tabBuilder.appendItems(stacksForDisplay);
+        if (stacksForDisplay != null) tabBuilder.appendItemsV2(stacksForDisplay::accept);
         return tabBuilder.build();
     }
 
