@@ -167,6 +167,8 @@ public class ForgeClientModConstructor {
             Objects.requireNonNull(renderer, "renderer is null");
             // copied from Forge, supposed to break data gen otherwise
             if (FMLLoader.getLaunchHandler().isData()) return;
+            // store this to enable listening to resource reloads
+            this.dynamicBuiltinModelItemRenderers.add(renderer);
             // this solution is very dangerous as it relies on internal stuff in Forge
             // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
             final IClientItemExtensions clientItemExtension = new IClientItemExtensions() {
@@ -191,7 +193,6 @@ public class ForgeClientModConstructor {
                     return clientItemExtension.getCustomRenderer();
                 }
             } : clientItemExtension);
-            this.dynamicBuiltinModelItemRenderers.add(renderer);
         };
     }
 
@@ -332,13 +333,12 @@ public class ForgeClientModConstructor {
             Objects.requireNonNull(reloadListener, "reload listener is null");
             evt.registerReloadListener(reloadListener);
         });
-        if (!this.dynamicBuiltinModelItemRenderers.isEmpty()) {
-            evt.registerReloadListener((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-                for (ResourceManagerReloadListener listener : this.dynamicBuiltinModelItemRenderers) {
-                    listener.onResourceManagerReload(resourceManager);
-                }
-            });
-        }
+        // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
+        evt.registerReloadListener((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+            for (ResourceManagerReloadListener listener : this.dynamicBuiltinModelItemRenderers) {
+                listener.onResourceManagerReload(resourceManager);
+            }
+        });
     }
 
     @SubscribeEvent

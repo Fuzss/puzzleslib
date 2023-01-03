@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.24-1.19.2] - 2023-01-03
+### Added
+- Added `ItemModelOverrides` for registering custom item models for certain `ItemTransforms.TransformType`s (like trident and spyglass)
+### Fixed
+- Fixed custom `BlockEntityWithoutLevelRenderer`s not reloading when the resource listener does on Forge
+
 ## [v4.3.23-1.19.2] - 2023-01-01
 ### Changed
 - Use `NonNullList`s when filling in creative mode tab items
