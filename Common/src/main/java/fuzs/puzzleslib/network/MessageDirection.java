@@ -5,10 +5,7 @@ import fuzs.puzzleslib.core.DistType;
 /**
  * just like net.minecraftforge.network.NetworkDirection, only for registering messages
  * we use this because the naming is very intuitive, and it stores some useful information
- *
- * @deprecated no longer needed in new implementation
  */
-@Deprecated(forRemoval = true)
 public enum MessageDirection {
     /**
      * message heading to client

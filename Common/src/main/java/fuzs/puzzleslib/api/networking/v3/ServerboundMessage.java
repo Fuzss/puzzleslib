@@ -5,6 +5,6 @@ package fuzs.puzzleslib.api.networking.v3;
  *
  * @param <T> message type
  */
-public interface ServerboundMessage<T extends Record> extends Message<ServerMessageListener<T>> {
+public interface ServerboundMessage<T extends Record> extends MessageV3<ServerMessageListener<T>> {
 
 }

@@ -2,12 +2,12 @@ package fuzs.puzzleslib.impl.networking;
 
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.networking.v3.NetworkHandler;
+import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
 
 import java.util.Set;
 
-public interface NetworkHandlerRegistry extends NetworkHandler {
+public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     /**
      * register a message that will be sent to clients
@@ -61,7 +61,7 @@ public interface NetworkHandlerRegistry extends NetworkHandler {
         }
 
         @Override
-        public NetworkHandler build() {
+        public NetworkHandlerV3 build() {
             NetworkHandlerRegistry networkHandler = this.getHandler();
             this.registerAll(networkHandler);
             return networkHandler;

@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.capability.CapabilityController;
 import fuzs.puzzleslib.capability.ForgeCapabilityController;
 import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.config.ForgeConfigHolderImpl;
+import fuzs.puzzleslib.impl.networking.NetworkHandlerForge;
 import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryImplForge;
 import fuzs.puzzleslib.init.ForgeRegistryManager;
 import fuzs.puzzleslib.init.RegistryManager;
@@ -34,8 +36,8 @@ public final class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public fuzs.puzzleslib.api.networking.v3.NetworkHandler.Builder networkV2(String modId) {
-        return new fuzs.puzzleslib.impl.networking.ForgeNetworkHandler.ForgeBuilderImpl(modId);
+    public NetworkHandlerV3.Builder networkingV3(String modId) {
+        return new NetworkHandlerForge.ForgeBuilderImpl(modId);
     }
 
     @SuppressWarnings("Convert2MethodRef")

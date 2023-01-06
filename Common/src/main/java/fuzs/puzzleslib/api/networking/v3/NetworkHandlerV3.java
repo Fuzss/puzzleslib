@@ -171,7 +171,7 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return CommonFactories.INSTANCE.networkV2(modId);
+        return CommonFactories.INSTANCE.networkingV3(modId);
     }
 
     /**

@@ -14,10 +14,7 @@ import java.util.function.Supplier;
 
 /**
  * handler for network communications of all puzzles lib mods
- *
- * @deprecated migrate to {@link fuzs.puzzleslib.api.networking.v3.NetworkHandler}
  */
-@Deprecated(forRemoval = true)
 public interface NetworkHandler {
 
     /**

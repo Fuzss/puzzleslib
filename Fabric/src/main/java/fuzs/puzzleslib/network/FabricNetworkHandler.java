@@ -19,10 +19,7 @@ import java.util.function.Supplier;
 
 /**
  * handler for network communications of all puzzles lib mods
- *
- * @deprecated migrate to {@link fuzs.puzzleslib.impl.networking.FabricNetworkHandler}
  */
-@Deprecated(forRemoval = true)
 public class FabricNetworkHandler implements NetworkHandler {
     /**
      * store network handlers created for a mod to avoid duplicate channels
