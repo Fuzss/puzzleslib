@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.biome;
 import fuzs.puzzleslib.api.biome.v1.ClimateSettingsContext;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.world.ClimateSettingsBuilder;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
@@ -14,7 +15,7 @@ public class ClimateSettingsContextForge implements ClimateSettingsContext {
     }
 
     @Override
-    public void setPrecipitation(Biome.Precipitation precipitation) {
+    public void setPrecipitation(@NotNull Biome.Precipitation precipitation) {
         Objects.requireNonNull(precipitation);
         this.context.setPrecipitation(precipitation);
     }
@@ -35,7 +36,7 @@ public class ClimateSettingsContextForge implements ClimateSettingsContext {
     }
 
     @Override
-    public void setTemperatureModifier(Biome.TemperatureModifier temperatureModifier) {
+    public void setTemperatureModifier(@NotNull Biome.TemperatureModifier temperatureModifier) {
         Objects.requireNonNull(temperatureModifier);
         this.context.setTemperatureModifier(temperatureModifier);
     }

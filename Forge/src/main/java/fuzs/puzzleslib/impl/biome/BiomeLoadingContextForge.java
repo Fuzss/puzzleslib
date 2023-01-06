@@ -99,7 +99,7 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
     }
 
     @Override
-    public boolean hasTag(TagKey<Biome> tag) {
+    public boolean is(TagKey<Biome> tag) {
         Registry<Biome> biomeRegistry = this.registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
         return biomeRegistry.getHolderOrThrow(this.getResourceKey()).is(tag);
     }

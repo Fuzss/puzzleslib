@@ -9,6 +9,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
+/**
+ * The modification context for the biomes spawn settings.
+ *
+ * <p>Mostly copied from Fabric API's Biome API, specifically <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext$SpawnSettingsContext</code>
+ * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification system.
+ *
+ * <p>Copyright (c) FabricMC
+ * <p>SPDX-License-Identifier: Apache-2.0
+ */
 public interface MobSpawnSettingsContext {
 
     /**
@@ -17,7 +26,7 @@ public interface MobSpawnSettingsContext {
      * @see MobSpawnSettings#getCreatureProbability()
      * @see MobSpawnSettings.Builder#creatureGenerationProbability(float)
      */
-    void setCreatureSpawnProbability(float probability);
+    void setCreatureGenerationProbability(float probability);
 
     /**
      * Associated JSON property: <code>spawners</code>.
@@ -75,18 +84,30 @@ public interface MobSpawnSettingsContext {
      * Removes a spawn cost entry for a given entity type.
      *
      * <p>Associated JSON property: <code>spawn_costs</code>.
-     *
-     * @return
      */
     boolean clearSpawnCost(EntityType<?> entityType);
 
-    Set<MobCategory> getSpawnerMobCategories();
+    /**
+     * @return all {@link MobCategory}s that have any spawns registered for them
+     */
+    Set<MobCategory> getMobCategoriesWithSpawns();
 
+    /**
+     * @param type mob category
+     * @return all {@link net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData} registered for the given <code>type</code>
+     */
     List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory type);
 
-    Set<EntityType<?>> getSpawnCostEntityTypes();
+    /**
+     * @return all {@link EntityType}s with a registered spawn cost
+     */
+    Set<EntityType<?>> getEntityTypesWithSpawnCost();
 
-    @Nullable MobSpawnSettings.MobSpawnCost getMobSpawnCost(EntityType<?> type);
+    /**
+     * @param type entity type
+     * @return the {@link net.minecraft.world.level.biome.MobSpawnSettings.MobSpawnCost} for the given <code>type</code>
+     */
+    @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> type);
 
     /**
      * Associated JSON property: <code>creature_spawn_probability</code>.
@@ -94,5 +115,5 @@ public interface MobSpawnSettingsContext {
      * @see MobSpawnSettings#getCreatureProbability()
      * @see MobSpawnSettings.Builder#creatureGenerationProbability(float)
      */
-    float getCreatureSpawnProbability();
+    float getCreatureGenerationProbability();
 }

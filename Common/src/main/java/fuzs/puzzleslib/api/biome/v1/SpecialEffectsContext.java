@@ -10,6 +10,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
+/**
+ * The modification context for the biomes effects.
+ *
+ * <p>Mostly copied from Fabric API's Biome API, specifically <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext$GenerationSettingsContext</code>
+ * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification system.
+ *
+ * <p>Copyright (c) FabricMC
+ * <p>SPDX-License-Identifier: Apache-2.0
+ */
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public interface SpecialEffectsContext {
 

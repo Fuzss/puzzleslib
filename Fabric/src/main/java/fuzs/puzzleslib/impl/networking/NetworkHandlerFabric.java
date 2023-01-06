@@ -20,12 +20,12 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class FabricNetworkHandler implements NetworkHandlerRegistry {
+public class NetworkHandlerFabric implements NetworkHandlerRegistry {
     private final Map<Class<?>, ResourceLocation> messageChannelNames = Maps.newIdentityHashMap();
     private final String modId;
     private final AtomicInteger discriminator = new AtomicInteger();
 
-    private FabricNetworkHandler(String modId) {
+    private NetworkHandlerFabric(String modId) {
         this.modId = modId;
     }
 
@@ -79,7 +79,7 @@ public class FabricNetworkHandler implements NetworkHandlerRegistry {
 
         @Override
         protected NetworkHandlerRegistry getHandler() {
-            return new FabricNetworkHandler(this.modId);
+            return new NetworkHandlerFabric(this.modId);
         }
     }
 }

@@ -12,7 +12,11 @@ package fuzs.puzzleslib.api.biome.v1;
  *     <li>Generic post-processing of biomes</li>
  * </ol>
  *
- * <p><b>Experimental feature</b>, may be removed or changed without further notice.
+ * <p>Mostly copied from Fabric API's Biome API, specifically <code>net.fabricmc.fabric.api.biome.v1.ModificationPhase</code>
+ * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification system.
+ *
+ * <p>Copyright (c) FabricMC
+ * <p>SPDX-License-Identifier: Apache-2.0
  */
 public enum BiomeLoadingPhase {
     /**

@@ -65,7 +65,7 @@ public class BiomeLoadingContextFabric implements BiomeLoadingContext {
     }
 
     @Override
-    public boolean hasTag(TagKey<Biome> tag) {
+    public boolean is(TagKey<Biome> tag) {
         return this.context.hasTag(tag);
     }
 }

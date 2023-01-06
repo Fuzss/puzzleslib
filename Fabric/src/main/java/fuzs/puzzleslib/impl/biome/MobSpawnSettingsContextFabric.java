@@ -25,7 +25,7 @@ public class MobSpawnSettingsContextFabric implements MobSpawnSettingsContext {
     }
 
     @Override
-    public void setCreatureSpawnProbability(float probability) {
+    public void setCreatureGenerationProbability(float probability) {
         this.context.setCreatureSpawnProbability(probability);
     }
 
@@ -54,39 +54,41 @@ public class MobSpawnSettingsContextFabric implements MobSpawnSettingsContext {
     }
 
     @Override
-    public Set<MobCategory> getSpawnerMobCategories() {
-        // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes
-        // also note that vanilla only represents the initial state and does not reflect any changes, so using the fallback is not desirable
-        Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> optional = this.getFabricSpawners();
-        return optional.map(map -> Collections.unmodifiableSet(map.keySet())).orElseGet(() -> Stream.of(MobCategory.values()).filter(mobCategory -> !this.mobSpawnSettings.getMobs(mobCategory).isEmpty()).collect(ImmutableSet.toImmutableSet()));
+    public Set<MobCategory> getMobCategoriesWithSpawns() {
+        // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes.
+        // Also note that vanilla only represents the initial state and does not reflect any changes made while the builder is 'active', so using the fallback is not desirable (it's not a view).
+        // The implementation based on the fabricSpawners field also does not provide a view, which is necessary to be able to filter out empty mob categories.
+        // Otherwise, the implementation would simply return MobCategory::values.
+        Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> optional = this.findFabricSpawners();
+        return optional.map(map -> map.entrySet().stream().filter(e -> !e.getValue().isEmpty()).map(Map.Entry::getKey)).orElseGet(() -> Stream.of(MobCategory.values()).filter(mobCategory -> !this.mobSpawnSettings.getMobs(mobCategory).isEmpty())).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
     public List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory type) {
-        // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes
-        // also note that vanilla only represents the initial state and does not reflect any changes, so using the fallback is not desirable
-        Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> optional = this.getFabricSpawners();
+        // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes.
+        // Also note that vanilla only represents the initial state and does not reflect any changes made while the builder is 'active', so using the fallback is not desirable (it's not a view).
+        Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> optional = this.findFabricSpawners();
         return optional.map(map -> Collections.unmodifiableList(map.get(type))).orElseGet(() -> this.mobSpawnSettings.getMobs(type).unwrap());
     }
 
-    private Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> getFabricSpawners() {
+    private Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> findFabricSpawners() {
         Field field = ReflectionHelperV2.findField("net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl", "fabricSpawners", true);
         return ReflectionHelperV2.getValue(field, this.context);
     }
 
     @Override
-    public Set<EntityType<?>> getSpawnCostEntityTypes() {
-        // be careful: does not provide a view
+    public Set<EntityType<?>> getEntityTypesWithSpawnCost() {
+        // be careful: does not provide a view, but a copy, so avoid caching this result
         return Registry.ENTITY_TYPE.stream().filter(entityType -> this.mobSpawnSettings.getMobSpawnCost(entityType) != null).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public @Nullable MobSpawnSettings.MobSpawnCost getMobSpawnCost(EntityType<?> type) {
+    public @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> type) {
         return this.mobSpawnSettings.getMobSpawnCost(type);
     }
 
     @Override
-    public float getCreatureSpawnProbability() {
+    public float getCreatureGenerationProbability() {
         return this.mobSpawnSettings.getCreatureProbability();
     }
 }

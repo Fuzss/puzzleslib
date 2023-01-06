@@ -3,11 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.3.25-1.19.2] - 2023-01-05
+## [v4.3.25-1.19.2] - 2023-01-06
 ### Added
-- Added `ModConstructor::onRegisterBiomeModifications` similar to Forge's old `BiomeLoadingEvent` for applying biome modifications in code in the common project rather than via data packs (like Forge)
+- Added `ModConstructor::onRegisterBiomeModifications` similar to Forge's old `BiomeLoadingEvent` from before Minecraft 1.19 for applying biome modifications in code in the common project rather than via data packs (like Forge does now)
+- This includes a port of a big portion of Fabric API's biome api to the common workspace, so that Forge's current biome modification system can be implemented on top of it
 ### Changed
-- Expanded `ReflectionHelperV2` to allow for passing target classes in as a raw type name to handle classes that may not be present at runtime
+- Expanded `ReflectionHelperV2` to allow for passing target classes in as a raw type name to handle classes that may not be accessible or not present at runtime
+- Networking classes related to the V2 implementation are no longer marked deprecated as they are still wildly used and the new system does not provide an advantage in most use cases
 
 ## [v4.3.24-1.19.2] - 2023-01-03
 ### Added

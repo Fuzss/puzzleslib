@@ -18,13 +18,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public class ForgeNetworkHandler implements NetworkHandlerRegistry {
+public class NetworkHandlerForge implements NetworkHandlerRegistry {
     private static final String PROTOCOL_VERSION = Integer.toString(1);
 
     private final SimpleChannel channel;
     private final AtomicInteger discriminator = new AtomicInteger();
 
-    private ForgeNetworkHandler(SimpleChannel channel) {
+    private NetworkHandlerForge(SimpleChannel channel) {
         this.channel = channel;
     }
 
@@ -65,7 +65,7 @@ public class ForgeNetworkHandler implements NetworkHandlerRegistry {
 
         @Override
         protected NetworkHandlerRegistry getHandler() {
-            return new ForgeNetworkHandler(buildSimpleChannel(this.modId, this.clientAcceptsVanillaOrMissing, this.serverAcceptsVanillaOrMissing));
+            return new NetworkHandlerForge(buildSimpleChannel(this.modId, this.clientAcceptsVanillaOrMissing, this.serverAcceptsVanillaOrMissing));
         }
 
         private static SimpleChannel buildSimpleChannel(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {

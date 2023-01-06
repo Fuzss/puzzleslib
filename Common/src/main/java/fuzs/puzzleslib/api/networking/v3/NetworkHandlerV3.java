@@ -26,7 +26,7 @@ import java.util.function.Function;
 /**
  * Handler for network communications between clients and a server.
  */
-public interface NetworkHandler {
+public interface NetworkHandlerV3 {
 
     /**
      * creates a packet heading to the client side
@@ -275,6 +275,6 @@ public interface NetworkHandler {
          *
          * @return the network handler
          */
-        NetworkHandler build();
+        NetworkHandlerV3 build();
     }
 }

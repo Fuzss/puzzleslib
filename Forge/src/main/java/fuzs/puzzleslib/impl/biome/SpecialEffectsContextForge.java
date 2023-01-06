@@ -14,6 +14,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * This implementation uses an accessor mixin to directly set {@link Optional}s to valid fields to allow for clearing certain options that are already present.
+ * Resetting a value to an empty optional would otherwise not be possible.
+ */
 public class SpecialEffectsContextForge implements SpecialEffectsContext {
     private final BiomeSpecialEffectsBuilder context;
 

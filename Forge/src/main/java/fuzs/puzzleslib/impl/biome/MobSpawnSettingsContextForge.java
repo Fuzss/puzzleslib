@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.biome;
 
+import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
 import fuzs.puzzleslib.mixin.accessor.MobSpawnSettingsBuilderForgeAccessor;
 import net.minecraft.world.entity.EntityType;
@@ -20,7 +21,7 @@ public class MobSpawnSettingsContextForge implements MobSpawnSettingsContext {
     }
 
     @Override
-    public void setCreatureSpawnProbability(float probability) {
+    public void setCreatureGenerationProbability(float probability) {
         this.context.creatureGenerationProbability(probability);
     }
 
@@ -53,8 +54,10 @@ public class MobSpawnSettingsContextForge implements MobSpawnSettingsContext {
     }
 
     @Override
-    public Set<MobCategory> getSpawnerMobCategories() {
-        return this.context.getSpawnerTypes();
+    public Set<MobCategory> getMobCategoriesWithSpawns() {
+        // This implementation does not provide a view, which is necessary to be able to filter out empty mob categories.
+        // Otherwise, the implementation would simply return MobCategory::values.
+        return this.context.getSpawnerTypes().stream().filter(mobCategory -> !this.context.getSpawner(mobCategory).isEmpty()).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
@@ -63,17 +66,17 @@ public class MobSpawnSettingsContextForge implements MobSpawnSettingsContext {
     }
 
     @Override
-    public Set<EntityType<?>> getSpawnCostEntityTypes() {
+    public Set<EntityType<?>> getEntityTypesWithSpawnCost() {
         return this.context.getEntityTypes();
     }
 
     @Override
-    public @Nullable MobSpawnSettings.MobSpawnCost getMobSpawnCost(EntityType<?> type) {
+    public @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> type) {
         return this.context.getCost(type);
     }
 
     @Override
-    public float getCreatureSpawnProbability() {
+    public float getCreatureGenerationProbability() {
         return this.context.getProbability();
     }
 }

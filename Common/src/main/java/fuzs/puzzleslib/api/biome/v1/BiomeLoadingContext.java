@@ -16,6 +16,12 @@ import java.util.Optional;
 
 /**
  * Context given to a biome selector for deciding whether it applies to a biome or not.
+ *
+ * <p>Mostly copied from Fabric API's Biome API, specifically <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext</code>
+ * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification system.
+ *
+ * <p>Copyright (c) FabricMC
+ * <p>SPDX-License-Identifier: Apache-2.0
  */
 public interface BiomeLoadingContext {
 
@@ -110,7 +116,7 @@ public interface BiomeLoadingContext {
      * Returns true if the given built-in configured structure from {@link net.minecraft.data.BuiltinRegistries}
      * can start in this biome in any of the chunk generators used by the current world-save.
      *
-     * <p>This method is intended for use with the Vanilla configured structures found in {@link net.minecraft.world.gen.structure.StructureTypes}.
+     * <p>This method is intended for use with the Vanilla configured structures found in {@link net.minecraft.data.worldgen.Structures}.
      */
     default boolean validForBuiltInStructure(Structure structureFeature) {
         ResourceKey<Structure> key = BuiltinRegistries.STRUCTURES.getResourceKey(structureFeature).orElseThrow();
@@ -139,7 +145,32 @@ public interface BiomeLoadingContext {
     boolean canGenerateIn(ResourceKey<LevelStem> dimensionKey);
 
     /**
-     * {@return true if this biome is in the given {@link TagKey }}.
+     * @param tag tag key to check for biome
+     * @return is the biome in this context contained in the given <code>tag</code> key
      */
-    boolean hasTag(TagKey<Biome> tag);
+    boolean is(TagKey<Biome> tag);
+
+    /**
+     * @param biome biome to check for equality
+     * @return is the biome in this context equal to the given <code>biome</code>
+     */
+    default boolean is(Biome biome) {
+        return this.getBiome() == biome;
+    }
+
+    /**
+     * @param holder holder to check for equality
+     * @return is the holder for the biome in this context equal to the given <code>holder</code>
+     */
+    default boolean is(Holder<Biome> holder) {
+        return this.holder() == holder;
+    }
+
+    /**
+     * @param resourceKey resourceKey to check for equality
+     * @return is the resource key for the biome in this context equal to the given <code>resourceKey</code>
+     */
+    default boolean is(ResourceKey<Biome> resourceKey) {
+        return this.getResourceKey() == resourceKey;
+    }
 }

@@ -20,6 +20,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+/**
+ * Forge implementation based on <a href="https://github.com/teamfusion/rottencreatures/blob/1.19.2/forge/src/main/java/com/github/teamfusion/platform/common/worldgen/forge/BiomeManagerImpl.java">BiomeManager</a> from <a href="https://github.com/teamfusion/rottencreatures">Rotten Creatures mod</a>
+ */
 public class BiomeLoadingHandler {
     @SuppressWarnings("RedundantTypeArguments")
     private static final Map<BiomeModifier.Phase, BiomeLoadingPhase> BIOME_MODIFIER_PHASE_CONVERSIONS = Maps.<BiomeModifier.Phase, BiomeLoadingPhase>immutableEnumMap(new HashMap<>() {{
@@ -39,6 +42,14 @@ public class BiomeLoadingHandler {
         biomeModifiersRegistry.register("biome_modifiers", () -> biomeModifier);
     }
 
+    private static BiomeModificationContext getBiomeModificationContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+        ClimateSettingsContextForge climateSettings = new ClimateSettingsContextForge(builder.getClimateSettings());
+        SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(builder.getSpecialEffects());
+        GenerationSettingsContextForge generationSettings = GenerationSettingsContextForge.create(builder.getGenerationSettings());
+        MobSpawnSettingsContextForge mobSpawnSettings = new MobSpawnSettingsContextForge(builder.getMobSpawnSettings());
+        return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
+    }
+
     private static class BiomeModifierImpl implements BiomeModifier {
         private final Codec<? extends BiomeModifier> codec = Codec.unit(this);
         private final Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeLoadingEntries;
@@ -50,13 +61,15 @@ public class BiomeLoadingHandler {
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             BiomeLoadingPhase loadingPhase = BIOME_MODIFIER_PHASE_CONVERSIONS.get(phase);
-            Collection<BiomeModificationData> modifications = this.biomeLoadingEntries.get(loadingPhase);
-            if (!modifications.isEmpty()) {
-                BiomeLoadingContext loadingContext = BiomeLoadingContextForge.create(biome);
-                BiomeModificationContext modificationContext = getBiomeModificationContext(builder);
-                for (BiomeModificationData modification : modifications) {
-                    if (modification.selector().test(loadingContext)) {
-                        modification.modifier().accept(modificationContext);
+            if (loadingPhase != null) {
+                Collection<BiomeModificationData> modifications = this.biomeLoadingEntries.get(loadingPhase);
+                if (!modifications.isEmpty()) {
+                    BiomeLoadingContext loadingContext = BiomeLoadingContextForge.create(biome);
+                    BiomeModificationContext modificationContext = getBiomeModificationContext(builder);
+                    for (BiomeModificationData modification : modifications) {
+                        if (modification.selector().test(loadingContext)) {
+                            modification.modifier().accept(modificationContext);
+                        }
                     }
                 }
             }
@@ -68,15 +81,8 @@ public class BiomeLoadingHandler {
         }
     }
 
-    private static BiomeModificationContext getBiomeModificationContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-        ClimateSettingsContextForge climateSettings = new ClimateSettingsContextForge(builder.getClimateSettings());
-        SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(builder.getSpecialEffects());
-        GenerationSettingsContextForge generationSettings = GenerationSettingsContextForge.create(builder.getGenerationSettings());
-        MobSpawnSettingsContextForge mobSpawnSettings = new MobSpawnSettingsContextForge(builder.getMobSpawnSettings());
-        return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
-    }
-
-    public record BiomeModificationData(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier) {
+    public record BiomeModificationData(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector,
+                                        Consumer<BiomeModificationContext> modifier) {
 
     }
 }
