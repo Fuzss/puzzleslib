@@ -10,8 +10,8 @@ import java.util.function.BiConsumer;
 @Mixin(GameRules.BooleanValue.class)
 public interface BooleanValueForgeAccessor {
 
-    @Invoker
-    static GameRules.Type<GameRules.BooleanValue> callCreate(boolean bl, BiConsumer<MinecraftServer, GameRules.BooleanValue> biConsumer) {
+    @Invoker("create")
+    static GameRules.Type<GameRules.BooleanValue> puzzleslib$callCreate(boolean bl, BiConsumer<MinecraftServer, GameRules.BooleanValue> biConsumer) {
         throw new IllegalStateException();
     }
 }

@@ -13,6 +13,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.Rotations;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -87,8 +88,15 @@ public final class MessageSerializers {
      */
     @SuppressWarnings("unchecked")
     public static <T> void registerSerializer(Class<? super T> type, ResourceKey<Registry<T>> resourceKey) {
-        Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(resourceKey.location());
-        Objects.requireNonNull(registry, "Registry for key %s not found".formatted(resourceKey));
+        Registry<T> registry;
+        if (Registry.REGISTRY.containsKey(resourceKey.location())) {
+            registry = (Registry<T>) Registry.REGISTRY.get(resourceKey.location());
+        } else if (BuiltinRegistries.REGISTRY.containsKey(resourceKey.location())) {
+            registry = (Registry<T>) BuiltinRegistries.REGISTRY.get(resourceKey.location());
+        } else {
+            registry = null;
+        }
+        Objects.requireNonNull(registry, "Registry for key %s not found".formatted(resourceKey.location()));
         registerSerializer((Class<T>) type, (friendlyByteBuf, t) -> {
             friendlyByteBuf.writeVarInt(registry.getId(t));
         }, friendlyByteBuf -> {
@@ -119,6 +127,13 @@ public final class MessageSerializers {
         if (CONTAINER_PROVIDERS.put(type, (Function<Type[], MessageSerializer<?>>) (Function<?, ?>) factory) != null) throw new IllegalStateException("Duplicate collection provider registered for type %s".formatted(type));
     }
 
+    /**
+     * Find a serializer for a given type. Some serializers (for records, arrays, and enums) can be created dynamically.
+     *
+     * @param type serializable type
+     * @param <T>  data type
+     * @return serializer for this type
+     */
     @SuppressWarnings("unchecked")
     public static <T> MessageSerializer<T> findByType(Class<T> type) {
         return (MessageSerializer<T>) SERIALIZERS.computeIfAbsent(type, MessageSerializers::computeIfAbsent);

@@ -20,15 +20,15 @@ import java.util.StringJoiner;
 @SuppressWarnings("unchecked")
 public final class ReflectionHelperV2 {
     /**
-     * cache for all fields found in {@link #findField}
+     * cache for all fields found by {@link #findField}
      */
     private static final Map<String, Field> FIELDS_CACHE = Maps.newIdentityHashMap();
     /**
-     * cache for all methods found in {@link #findMethod}
+     * cache for all methods found by {@link #findMethod}
      */
     private static final Map<String, Method> METHODS_CACHE = Maps.newIdentityHashMap();
     /**
-     * cache for all constructors found in {@link #findConstructor}
+     * cache for all constructors found by {@link #findConstructor}
      */
     private static final Map<String, Constructor<?>> CONSTRUCTORS_CACHE = Maps.newIdentityHashMap();
 
@@ -50,18 +50,29 @@ public final class ReflectionHelperV2 {
      */
     @Nullable
     public static Field findField(Class<?> clazz, String name, boolean allowCache) {
-        Objects.requireNonNull(clazz, "clazz was null");
+        return findField(clazz.getTypeName(), name, allowCache);
+    }
+
+    /**
+     * @param typeName clazz to get field from
+     * @param name field name
+     * @param allowCache should the returned value be recreated instead of possibly returning from cache, since cache may contain a null value
+     * @return the field
+     */
+    @Nullable
+    public static Field findField(String typeName, String name, boolean allowCache) {
+        Objects.requireNonNull(typeName, "clazz name was null");
         Objects.requireNonNull(name, "field name was null");
-        String fieldName = getFieldName(clazz, name);
+        String fieldName = getClassMemberName(typeName, name);
         if (allowCache && FIELDS_CACHE.containsKey(fieldName)) {
             return FIELDS_CACHE.get(fieldName);
         }
         try {
-            Field field = clazz.getDeclaredField(name);
+            Field field = Class.forName(typeName).getDeclaredField(name);
             field.setAccessible(true);
             FIELDS_CACHE.put(fieldName, field);
             return field;
-        } catch (NoSuchFieldException e) {
+        } catch (NoSuchFieldException | ClassNotFoundException e) {
             PuzzlesLib.LOGGER.warn("Unable to find field {}", fieldName, e);
         }
         FIELDS_CACHE.put(fieldName, null);
@@ -88,18 +99,30 @@ public final class ReflectionHelperV2 {
      */
     @Nullable
     public static Method findMethod(Class<?> clazz, String name, boolean allowCache, Class<?>... parameterTypes) {
-        Objects.requireNonNull(clazz, "clazz was null");
+        return findMethod(clazz.getTypeName(), name, allowCache, parameterTypes);
+    }
+
+    /**
+     * @param typeName clazz to get method from
+     * @param name method name
+     * @param allowCache should the returned value be recreated instead of possibly returning from cache, since cache may contain a null value
+     * @param parameterTypes method arguments
+     * @return the method
+     */
+    @Nullable
+    public static Method findMethod(String typeName, String name, boolean allowCache, Class<?>... parameterTypes) {
+        Objects.requireNonNull(typeName, "clazz name was null");
         Objects.requireNonNull(name, "method name was null");
-        String methodName = getMethodName(clazz, name, parameterTypes);
+        String methodName = getMethodName(typeName, name, parameterTypes);
         if (allowCache && METHODS_CACHE.containsKey(methodName)) {
             return METHODS_CACHE.get(methodName);
         }
         try {
-            Method method = clazz.getDeclaredMethod(name, parameterTypes);
+            Method method = Class.forName(typeName).getDeclaredMethod(name, parameterTypes);
             method.setAccessible(true);
             METHODS_CACHE.put(methodName, method);
             return method;
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
             PuzzlesLib.LOGGER.warn("Unable to find method {}", methodName, e);
         }
         METHODS_CACHE.put(methodName, null);
@@ -126,27 +149,60 @@ public final class ReflectionHelperV2 {
      */
     @Nullable
     public static <T> Constructor<T> findConstructor(Class<?> clazz, boolean allowCache, Class<?>... parameterTypes) {
-        Objects.requireNonNull(clazz, "clazz was null");
-        String constructorName = getConstructorName(clazz, parameterTypes);
+        return findConstructor(clazz.getTypeName(), allowCache, parameterTypes);
+    }
+
+    /**
+     * @param typeName clazz to get constructor from
+     * @param parameterTypes constructor arguments
+     * @param allowCache should the returned value be recreated instead of possibly returning from cache, since cache may contain a null value
+     * @param <T> class object type
+     * @return the constructor
+     */
+    @Nullable
+    public static <T> Constructor<T> findConstructor(String typeName, boolean allowCache, Class<?>... parameterTypes) {
+        Objects.requireNonNull(typeName, "clazz name was null");
+        String constructorName = getConstructorName(typeName, parameterTypes);
         if (allowCache && CONSTRUCTORS_CACHE.containsKey(constructorName)) {
             return (Constructor<T>) CONSTRUCTORS_CACHE.get(constructorName);
         }
         try {
-            Constructor<T> constructor = (Constructor<T>) clazz.getDeclaredConstructor(parameterTypes);
+            Constructor<T> constructor = (Constructor<T>) Class.forName(typeName).getDeclaredConstructor(parameterTypes);
             constructor.setAccessible(true);
             CONSTRUCTORS_CACHE.put(constructorName, constructor);
             return constructor;
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException | ClassNotFoundException e) {
             PuzzlesLib.LOGGER.warn("Unable to find constructor {}", constructorName, e);
         }
         CONSTRUCTORS_CACHE.put(constructorName, null);
         return null;
     }
 
+    /**
+     * get a {@code value} from a field in a provided {@code instance}
+     *
+     * @param clazz target class containing field
+     * @param name name of field
+     * @param instance clazz instance to get field value from
+     * @param <T> field value type
+     * @param <E> instance type
+     * @return the field value
+     */
     public static <T, E> Optional<T> getValue(Class<? super E> clazz, String name, E instance) {
         return getValue(findField(clazz, name), instance);
     }
 
+    /**
+     * set a {@code value} to a field in a provided {@code instance}
+     *
+     * @param clazz target class containing field
+     * @param name name of field
+     * @param instance clazz instance to set field value on
+     * @param value value to set to field
+     * @param <T> field value type
+     * @param <E> instance type
+     * @return was setting the value to the field successful
+     */
     public static <T, E> boolean setValue(Class<? super E> clazz, String name, E instance, T value) {
         return setValue(findField(clazz, name), instance, value);
     }
@@ -257,17 +313,6 @@ public final class ReflectionHelperV2 {
     }
 
     /**
-     * creates and interns the name of a field to be used in an identity map
-     *
-     * @param clazz parent class
-     * @param field field name
-     * @return full field name
-     */
-    private static String getFieldName(Class<?> clazz, String field) {
-        return getClassMemberName(clazz, field);
-    }
-
-    /**
      * @param method the method
      * @return full method name
      */
@@ -294,7 +339,19 @@ public final class ReflectionHelperV2 {
      * @return full constructor name
      */
     private static String getConstructorName(Class<?> clazz, Class<?>... parameterTypes) {
-        return getMethodName(clazz, "<init>", parameterTypes);
+        return getConstructorName(clazz.getTypeName(), parameterTypes);
+    }
+
+    /**
+     * creates and interns the name of a constructor to be used in an identity map
+     * <p>same as {@link #getMethodName}, with name set to <init>
+     *
+     * @param typeName parent class
+     * @param parameterTypes parameter types
+     * @return full constructor name
+     */
+    private static String getConstructorName(String typeName, Class<?>... parameterTypes) {
+        return getMethodName(typeName, "<init>", parameterTypes);
     }
 
     /**
@@ -306,7 +363,19 @@ public final class ReflectionHelperV2 {
      * @return full method name
      */
     private static String getMethodName(Class<?> clazz, String method, Class<?>... parameterTypes) {
-        return getClassMemberName(clazz, toMethodSignature(method, parameterTypes));
+        return getMethodName(clazz.getTypeName(), method, parameterTypes);
+    }
+
+    /**
+     * creates and interns the name of a method to be used in an identity map
+     *
+     * @param typeName parent class
+     * @param method method name
+     * @param parameterTypes parameter types
+     * @return full method name
+     */
+    private static String getMethodName(String typeName, String method, Class<?>... parameterTypes) {
+        return getClassMemberName(typeName, toMethodSignature(method, parameterTypes));
     }
 
     /**
@@ -330,6 +399,17 @@ public final class ReflectionHelperV2 {
      * @return full member name
      */
     private static String getClassMemberName(Class<?> clazz, String member) {
-        return (clazz.getTypeName() + "." + member).intern();
+        return getClassMemberName(clazz.getTypeName(), member);
+    }
+
+    /**
+     * creates and interns the name of a class member to be used in an identity map
+     *
+     * @param typeName class containing member
+     * @param member prepared member name
+     * @return full member name
+     */
+    private static String getClassMemberName(String typeName, String member) {
+        return (typeName + "." + member).intern();
     }
 }

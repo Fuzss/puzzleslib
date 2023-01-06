@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.25-1.19.2] - 2023-01-05
+### Added
+- Added `ModConstructor::onRegisterBiomeModifications` similar to Forge's old `BiomeLoadingEvent` for applying biome modifications in code in the common project rather than via data packs (like Forge)
+### Changed
+- Expanded `ReflectionHelperV2` to allow for passing target classes in as a raw type name to handle classes that may not be present at runtime
+
 ## [v4.3.24-1.19.2] - 2023-01-03
 ### Added
 - Added `ItemModelOverrides` for registering custom item models for certain `ItemTransforms.TransformType`s (like trident and spyglass)

@@ -185,8 +185,8 @@ public class ForgeClientModConstructor {
                     };
                 }
             };
-            Object currentClientItemExtension = ((ItemForgeAccessor) item.asItem()).getRenderProperties();
-            ((ItemForgeAccessor) item.asItem()).setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IClientItemExtensions) currentClientItemExtension) {
+            Object currentClientItemExtension = ((ItemForgeAccessor) item.asItem()).puzzleslib$getRenderProperties();
+            ((ItemForgeAccessor) item.asItem()).puzzleslib$setRenderProperties(currentClientItemExtension != null ? new WrappedClientItemExtension((IClientItemExtensions) currentClientItemExtension) {
 
                 @Override
                 public BlockEntityWithoutLevelRenderer getCustomRenderer() {

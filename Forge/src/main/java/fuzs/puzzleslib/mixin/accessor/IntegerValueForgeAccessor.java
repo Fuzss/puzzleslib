@@ -10,8 +10,8 @@ import java.util.function.BiConsumer;
 @Mixin(GameRules.IntegerValue.class)
 public interface IntegerValueForgeAccessor {
 
-    @Invoker
-    static GameRules.Type<GameRules.IntegerValue> callCreate(int i, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer) {
+    @Invoker("create")
+    static GameRules.Type<GameRules.IntegerValue> puzzleslib$callCreate(int i, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer) {
         throw new IllegalStateException();
     }
 }

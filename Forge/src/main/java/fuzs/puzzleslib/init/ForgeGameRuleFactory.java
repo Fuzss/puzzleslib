@@ -19,21 +19,21 @@ public final class ForgeGameRuleFactory implements CommonGameRuleFactory {
 
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue) {
-        return BooleanValueForgeAccessor.callCreate(defaultValue, (minecraftServer, booleanValue) -> {});
+        return BooleanValueForgeAccessor.puzzleslib$callCreate(defaultValue, (minecraftServer, booleanValue) -> {});
     }
 
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changedCallback) {
-        return BooleanValueForgeAccessor.callCreate(defaultValue, changedCallback);
+        return BooleanValueForgeAccessor.puzzleslib$callCreate(defaultValue, changedCallback);
     }
 
     @Override
     public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue) {
-        return IntegerValueForgeAccessor.callCreate(defaultValue, (minecraftServer, integerValue) -> {});
+        return IntegerValueForgeAccessor.puzzleslib$callCreate(defaultValue, (minecraftServer, integerValue) -> {});
     }
 
     @Override
     public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changedCallback) {
-        return IntegerValueForgeAccessor.callCreate(defaultValue, changedCallback);
+        return IntegerValueForgeAccessor.puzzleslib$callCreate(defaultValue, changedCallback);
     }
 }

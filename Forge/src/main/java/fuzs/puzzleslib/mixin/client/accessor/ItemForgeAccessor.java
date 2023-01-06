@@ -7,9 +7,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Item.class)
 public interface ItemForgeAccessor {
 
-    @Accessor(remap = false)
-    Object getRenderProperties();
+    @Accessor(value = "renderProperties", remap = false)
+    Object puzzleslib$getRenderProperties();
 
-    @Accessor(remap = false)
-    void setRenderProperties(Object renderProperties);
+    @Accessor(value = "renderProperties", remap = false)
+    void puzzleslib$setRenderProperties(Object renderProperties);
 }

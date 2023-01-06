@@ -1,7 +1,15 @@
 package fuzs.puzzleslib.core;
 
+import com.google.common.collect.Maps;
 import com.mojang.brigadier.CommandDispatcher;
+import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
+import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
+import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.biome.*;
+import net.fabricmc.fabric.api.biome.v1.BiomeModification;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
@@ -21,6 +29,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
@@ -30,8 +39,11 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.apache.commons.lang3.mutable.MutableObject;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -42,6 +54,13 @@ import java.util.stream.Collectors;
  * (this doesn't really matter on Fabric)
  */
 public class FabricModConstructor {
+    @SuppressWarnings("RedundantTypeArguments")
+    private static final Map<BiomeLoadingPhase, ModificationPhase> MODIFICATION_PHASE_CONVERSIONS = Maps.<BiomeLoadingPhase, ModificationPhase>immutableEnumMap(new HashMap<>() {{
+        this.put(BiomeLoadingPhase.ADDITIONS, ModificationPhase.ADDITIONS);
+        this.put(BiomeLoadingPhase.REMOVALS, ModificationPhase.REMOVALS);
+        this.put(BiomeLoadingPhase.MODIFICATIONS, ModificationPhase.REPLACEMENTS);
+        this.put(BiomeLoadingPhase.POST_PROCESSING, ModificationPhase.POST_PROCESSING);
+    }});
 
     /**
      * @param constructor the common mod main class implementation
@@ -132,6 +151,21 @@ public class FabricModConstructor {
         };
     }
 
+    private void registerBiomeModification(BiomeModification biomeModification, BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier) {
+        ModificationPhase modificationPhase = MODIFICATION_PHASE_CONVERSIONS.get(phase);
+        biomeModification.add(modificationPhase, selectionContext -> selector.test(BiomeLoadingContextFabric.create(selectionContext)), (selectionContext, modificationContext) -> {
+            modifier.accept(getBiomeModificationContext(modificationContext, selectionContext.getBiome()));
+        });
+    }
+
+    private static BiomeModificationContext getBiomeModificationContext(net.fabricmc.fabric.api.biome.v1.BiomeModificationContext modificationContext, Biome biome) {
+        ClimateSettingsContextFabric climateSettings = new ClimateSettingsContextFabric(biome, modificationContext.getWeather());
+        SpecialEffectsContextFabric specialEffects = new SpecialEffectsContextFabric(biome.getSpecialEffects(), modificationContext.getEffects());
+        GenerationSettingsContextFabric generationSettings = new GenerationSettingsContextFabric(biome.getGenerationSettings(), modificationContext.getGenerationSettings());
+        MobSpawnSettingsContextFabric mobSpawnSettings = new MobSpawnSettingsContextFabric(biome.getMobSettings(), modificationContext.getSpawnSettings());
+        return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
+    }
+
     /**
      * construct the mod, calling all necessary registration methods (we don't need the object, it's only useful on Forge)
      *
@@ -163,6 +197,10 @@ public class FabricModConstructor {
         LootTableEvents.MODIFY.register((ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
             // keep this the same as Forge, editing data pack specified loot tables is not supported
             if (source != LootTableSource.DATA_PACK) constructor.onLootTableModification(fabricModConstructor.getLootTablesModifyContext(lootManager, id, tableBuilder));
+        });
+        BiomeModification biomeModification = BiomeModifications.create(new ResourceLocation(modId, "biome_modifiers"));
+        constructor.onRegisterBiomeModifications((phase, selector, modifier) -> {
+            fabricModConstructor.registerBiomeModification(biomeModification, phase, selector, modifier);
         });
     }
 }

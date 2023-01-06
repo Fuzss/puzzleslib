@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.core;
 
 import com.mojang.brigadier.CommandDispatcher;
+import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
+import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -18,6 +20,9 @@ import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
+
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * a base class for a mods main common class, contains a bunch of methods for registering various things
@@ -114,6 +119,13 @@ public interface ModConstructor {
      * @param context add or remove a {@link LootPool}
      */
     default void onLootTableModification(LootTablesModifyContext context) {
+
+    }
+
+    /**
+     * Allows for registering modifications (including additions and removals) to biomes loaded from the current data pack.
+     */
+    default void onRegisterBiomeModifications(BiomeModificationsContext context) {
 
     }
 
@@ -316,5 +328,20 @@ public interface ModConstructor {
          * @return          was removing the pool successful (has a pool at <code>index</code> been found)
          */
         public abstract boolean removeLootPool(int index);
+    }
+
+    /**
+     * Allows for registering modifications (including additions and removals) to biomes loaded from the current data pack.
+     */
+    interface BiomeModificationsContext {
+
+        /**
+         * Add a modification to this context.
+         *
+         * @param phase the loading phase, mainly to separate additions and removals
+         * @param selector selection context for current biome
+         * @param modifier modification context
+         */
+        void register(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<fuzs.puzzleslib.api.biome.v1.BiomeModificationContext> modifier);
     }
 }

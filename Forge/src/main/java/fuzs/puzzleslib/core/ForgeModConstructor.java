@@ -1,6 +1,10 @@
 package fuzs.puzzleslib.core;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
@@ -18,6 +22,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.logging.log4j.util.Strings;
@@ -37,6 +42,7 @@ public class ForgeModConstructor {
      * stored burn times
      */
     private final Object2IntOpenHashMap<Item> fuelBurnTimes = new Object2IntOpenHashMap<>();
+    private final Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeLoadingEntries = HashMultimap.create();
 
     /**
      * only calls {@link ModConstructor#onConstructMod()}, everything else is done via events later
@@ -53,6 +59,9 @@ public class ForgeModConstructor {
         this.constructor.onCommonSetup();
         this.constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
         this.constructor.onRegisterFuelBurnTimes(this::registerFuelItem);
+        this.constructor.onRegisterBiomeModifications((phase, selector, modifier) -> {
+            this.biomeLoadingEntries.put(phase, new BiomeLoadingHandler.BiomeModificationData(phase, selector, modifier));
+        });
     }
 
     @SubscribeEvent
@@ -128,7 +137,8 @@ public class ForgeModConstructor {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
-        PuzzlesUtilForge.findModEventBus(modId).register(forgeModConstructor);
+        IEventBus modEventBus = PuzzlesUtilForge.findModEventBus(modId);
+        modEventBus.register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
@@ -139,5 +149,6 @@ public class ForgeModConstructor {
             constructor.onLootTableReplacement(forgeModConstructor.getLootTablesReplaceContext(evt.getLootTableManager(), evt.getName(), evt.getTable(), evt::setTable));
             constructor.onLootTableModification(forgeModConstructor.getLootTablesModifyContext(evt.getLootTableManager(), evt.getName(), evt.getTable()));
         });
+        BiomeLoadingHandler.register(modId, modEventBus, forgeModConstructor.biomeLoadingEntries);
     }
 }
