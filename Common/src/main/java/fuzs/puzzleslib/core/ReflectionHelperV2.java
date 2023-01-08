@@ -193,6 +193,20 @@ public final class ReflectionHelperV2 {
     }
 
     /**
+     * get a {@code value} from a field in a provided {@code instance}
+     *
+     * @param typeName target class containing field
+     * @param name name of field
+     * @param instance clazz instance to get field value from
+     * @param <T> field value type
+     * @param <E> instance type
+     * @return the field value
+     */
+    public static <T, E> Optional<T> getValue(String typeName, String name, E instance) {
+        return getValue(findField(typeName, name, true), instance);
+    }
+
+    /**
      * set a {@code value} to a field in a provided {@code instance}
      *
      * @param clazz target class containing field
@@ -205,6 +219,21 @@ public final class ReflectionHelperV2 {
      */
     public static <T, E> boolean setValue(Class<? super E> clazz, String name, E instance, T value) {
         return setValue(findField(clazz, name), instance, value);
+    }
+
+    /**
+     * set a {@code value} to a field in a provided {@code instance}
+     *
+     * @param typeName target class containing field
+     * @param name name of field
+     * @param instance clazz instance to set field value on
+     * @param value value to set to field
+     * @param <T> field value type
+     * @param <E> instance type
+     * @return was setting the value to the field successful
+     */
+    public static <T, E> boolean setValue(String typeName, String name, E instance, T value) {
+        return setValue(findField(typeName, name, true), instance, value);
     }
 
     /**
