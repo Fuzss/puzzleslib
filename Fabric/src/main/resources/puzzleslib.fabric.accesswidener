@@ -1,6 +1,5 @@
 accessWidener	v2	named
 transitive-accessible   method  net/minecraft/client/renderer/RenderType    create  (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
 transitive-accessible   class   net/minecraft/client/renderer/RenderType$CompositeState
-transitive-accessible   class   net/minecraft/world/item/alchemy/PotionBrewing$Mix
 transitive-accessible   method  net/minecraft/core/particles/ParticleType   <init>  (ZLnet/minecraft/core/particles/ParticleOptions$Deserializer;)V
 transitive-accessible   method  net/minecraft/core/particles/SimpleParticleType     <init>  (Z)V

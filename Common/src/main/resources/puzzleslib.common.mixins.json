@@ -5,7 +5,6 @@
   "package": "fuzs.puzzleslib.mixin",
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
-    "accessor.PotionBrewingAccessor"
   ],
   "client": [
     "client.ItemRendererMixin"
