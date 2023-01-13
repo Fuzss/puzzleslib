@@ -3,6 +3,7 @@ package fuzs.puzzleslib.core;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * easy access to various mod loader methods and fields for forge
@@ -74,4 +75,12 @@ public interface ModLoaderEnvironment {
     default boolean isModLoadedSafe(String modId) {
         return this.isModLoaded(modId);
     }
+
+    /**
+     * Finds the display name associated with a certain <code>modId</code>
+     *
+     * @param modId the mod id
+     * @return the corresponding display name
+     */
+    Optional<String> getModName(String modId);
 }

@@ -1,11 +1,15 @@
 package fuzs.puzzleslib.core;
 
+import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.forgespi.language.IModInfo;
 
 import java.nio.file.Path;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * implementation of {@link ModLoaderEnvironment} for Forge
@@ -40,11 +44,19 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isModLoaded(String modId) {
+        Objects.requireNonNull(ModList.get(), "mod list is null, use isModLoadedSafe instead");
         return ModList.get().isLoaded(modId);
     }
 
     @Override
     public boolean isModLoadedSafe(String modId) {
-        return FMLLoader.getLoadingModList() == null || FMLLoader.getLoadingModList().getModFileById(modId) != null;
+        Objects.requireNonNull(FMLLoader.getLoadingModList(), "loading mod list is null");
+        return FMLLoader.getLoadingModList().getModFileById(modId) != null;
+    }
+
+    @Override
+    public Optional<String> getModName(String modId) {
+        Objects.requireNonNull(ModList.get(), "mod list is null");
+        return ModList.get().getModContainerById(modId).map(ModContainer::getModInfo).map(IModInfo::getDisplayName);
     }
 }

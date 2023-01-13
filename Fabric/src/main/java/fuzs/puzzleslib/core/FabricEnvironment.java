@@ -1,8 +1,11 @@
 package fuzs.puzzleslib.core;
 
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 
 import java.nio.file.Path;
+import java.util.Optional;
 
 /**
  * implementation of {@link ModLoaderEnvironment} for Fabric
@@ -37,5 +40,10 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     @Override
     public boolean isModLoaded(String modId) {
         return FabricLoader.getInstance().isModLoaded(modId);
+    }
+
+    @Override
+    public Optional<String> getModName(String modId) {
+        return FabricLoader.getInstance().getModContainer(modId).map(ModContainer::getMetadata).map(ModMetadata::getName);
     }
 }
