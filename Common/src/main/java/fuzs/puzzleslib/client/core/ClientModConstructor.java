@@ -487,7 +487,7 @@ public interface ClientModConstructor {
          * @param entityType the entity type being spectated
          * @param shaderLocation location to the shader file, usually <code>shaders/post/&lt;file&gt;.json</code>
          */
-        void register(EntityType<?> entityType, ResourceLocation shaderLocation);
+        void registerSpectatorShader(EntityType<?> entityType, ResourceLocation shaderLocation);
     }
 
     /**
@@ -500,7 +500,7 @@ public interface ClientModConstructor {
          *
          * @param factory factory for the model(s)
          */
-        void register(SkullRenderersFactory factory);
+        void registerSkullRenderer(SkullRenderersFactory factory);
     }
 
     /**
@@ -547,26 +547,41 @@ public interface ClientModConstructor {
         /**
          * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
          *
-         * @param key the key mapping to register
+         * @param keyMapping the key mapping to register
          */
-        void registerKeyMappings(KeyMapping key);
+        void registerKeyMapping(KeyMapping keyMapping);
+
+        /**
+         * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
+         *
+         * @param keyMappings the key mapping to register
+         */
+        default void registerKeyMappings(KeyMapping... keyMappings) {
+            for (KeyMapping keyMapping : keyMappings) {
+                this.registerKeyMapping(keyMapping);
+            }
+        }
     }
 
     /**
      * register custom {@link RenderType}s for blocks and fluids
      */
-    abstract class BlockRenderTypesContext {
+    interface BlockRenderTypesContext {
 
         /**
+         * Register a {@link RenderType} for a {@link Block}.
+         *
          * @param block the block with a custom render type
          * @param renderType the render type
          */
-        abstract void registerBlock(Block block, RenderType renderType);
+        void registerBlock(Block block, RenderType renderType);
 
         /**
+         * Register a {@link RenderType} for a {@link Fluid}.
+         *
          * @param fluid the fluid with a custom render type
          * @param renderType the render type
          */
-        abstract void registerFluid(Fluid fluid, RenderType renderType);
+        void registerFluid(Fluid fluid, RenderType renderType);
     }
 }

@@ -125,14 +125,14 @@ public class ForgeClientModConstructor {
 
             @SuppressWarnings("removal")
             @Override
-            void registerBlock(Block block, RenderType renderType) {
+            public void registerBlock(Block block, RenderType renderType) {
                 Objects.requireNonNull(block, "block is null");
                 Objects.requireNonNull(renderType, "render type is null");
                 ItemBlockRenderTypes.setRenderLayer(block, renderType);
             }
 
             @Override
-            void registerFluid(Fluid fluid, RenderType renderType) {
+            public void registerFluid(Fluid fluid, RenderType renderType) {
                 Objects.requireNonNull(fluid, "fluid is null");
                 Objects.requireNonNull(renderType, "render type is null");
                 ItemBlockRenderTypes.setRenderLayer(fluid, renderType);

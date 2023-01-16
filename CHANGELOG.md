@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.29-1.19.2] - 2023-01-17
+### Fixed
+- Fix access level of methods in `BlockRenderTypesContext`
+
 ## [v4.3.28-1.19.2] - 2023-01-16
 ### Added
 - Added a method for registering `RenderType`s for blocks and fluids in the common project
