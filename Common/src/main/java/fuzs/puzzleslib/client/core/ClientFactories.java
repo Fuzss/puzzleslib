@@ -2,6 +2,7 @@ package fuzs.puzzleslib.client.core;
 
 import fuzs.puzzleslib.client.model.geom.ModelLayerRegistry;
 import fuzs.puzzleslib.core.CommonAbstractions;
+import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -23,9 +24,10 @@ public interface ClientFactories {
      * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
      *
      * @param modId the mod id for registering events on Forge to the correct mod event bus
+     * @param contentRegistrations specific content this mod uses that needs to be additionally registered
      * @return provides a consumer for loading a mod being provided the base class
      */
-    Consumer<ClientModConstructor> clientModConstructor(String modId);
+    Consumer<ClientModConstructor> clientModConstructor(String modId, ContentRegistrationFlags... contentRegistrations);
 
     /**
      * helper for creating {@link ModelLayerRegistry} objects with a provided <code>modId</code>>

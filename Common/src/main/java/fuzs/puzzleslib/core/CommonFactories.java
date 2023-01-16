@@ -27,10 +27,11 @@ public interface CommonFactories {
      * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
      * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
      *
-     * @param modId the mod id for registering events on Forge to the correct mod event bus
+     * @param modId                the mod id for registering events on Forge to the correct mod event bus
+     * @param contentRegistrations specific content this mod uses that needs to be additionally registered
      * @return provides a consumer for loading a mod being provided the base class
      */
-    Consumer<ModConstructor> modConstructor(String modId);
+    Consumer<ModConstructor> modConstructor(String modId, ContentRegistrationFlags... contentRegistrations);
 
     /**
      * creates a new network handler

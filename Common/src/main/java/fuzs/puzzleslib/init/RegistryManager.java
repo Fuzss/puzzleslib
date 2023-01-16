@@ -19,6 +19,8 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -314,6 +316,23 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      */
     RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry);
+
+    /**
+     * register a new type of recipe
+     * @param path path for new entry
+     * @param <T> recipe type
+     * @return registry object for <code>entry</code>
+     */
+    default <T extends Recipe<?>> RegistryReference<RecipeType<T>> registerRecipeType(String path) {
+        return this.register(Registry.RECIPE_TYPE_REGISTRY, path, () -> new RecipeType<>() {
+            private final String id = RegistryManager.this.makeKey(path).toString();
+
+            @Override
+            public String toString() {
+                return this.id;
+            }
+        });
+    }
 
     /**
      * @param path path for location

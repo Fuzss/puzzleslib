@@ -172,7 +172,7 @@ public class FabricModConstructor {
      * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(String modId, ModConstructor constructor) {
+    public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         FabricModConstructor fabricModConstructor = new FabricModConstructor(constructor);
@@ -185,7 +185,7 @@ public class FabricModConstructor {
         constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);
         CommandRegistrationCallback.EVENT.register((CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) -> constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(dispatcher, context, environment)));
         LootTableEvents.REPLACE.register((ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
-            // keep this the same as Forge, editing data pack specified loot tables is not supported
+            // keep this the same as Forge where editing data pack specified loot tables is not supported
             if (source != LootTableSource.DATA_PACK) {
                 MutableObject<LootTable> replacement = new MutableObject<>();
                 constructor.onLootTableReplacement(fabricModConstructor.getLootTablesReplaceContext(lootManager, id, original, replacement));
@@ -195,7 +195,7 @@ public class FabricModConstructor {
             return null;
         });
         LootTableEvents.MODIFY.register((ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
-            // keep this the same as Forge, editing data pack specified loot tables is not supported
+            // keep this the same as Forge where editing data pack specified loot tables is not supported
             if (source != LootTableSource.DATA_PACK) constructor.onLootTableModification(fabricModConstructor.getLootTablesModifyContext(lootManager, id, tableBuilder));
         });
         BiomeModification biomeModification = BiomeModifications.create(new ResourceLocation(modId, "biome_modifiers"));

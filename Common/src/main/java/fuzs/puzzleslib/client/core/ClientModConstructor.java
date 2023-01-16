@@ -14,6 +14,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -36,8 +37,10 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -222,6 +225,13 @@ public interface ClientModConstructor {
      * @param context register a {@link KeyMapping} so it can be saved to and loaded from game options
      */
     default void onRegisterKeyMappings(KeyMappingsContext context) {
+
+    }
+
+    /**
+     * @param context register custom {@link RenderType}s for blocks and fluids
+     */
+    default void onRegisterBlockRenderTypes(BlockRenderTypesContext context) {
 
     }
 
@@ -540,5 +550,23 @@ public interface ClientModConstructor {
          * @param key the key mapping to register
          */
         void registerKeyMappings(KeyMapping key);
+    }
+
+    /**
+     * register custom {@link RenderType}s for blocks and fluids
+     */
+    abstract class BlockRenderTypesContext {
+
+        /**
+         * @param block the block with a custom render type
+         * @param renderType the render type
+         */
+        abstract void registerBlock(Block block, RenderType renderType);
+
+        /**
+         * @param fluid the fluid with a custom render type
+         * @param renderType the render type
+         */
+        abstract void registerFluid(Fluid fluid, RenderType renderType);
     }
 }

@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.28-1.19.2] - 2023-01-16
+### Added
+- Added a method for registering `RenderType`s for blocks and fluids in the common project
+- Added a helper method for registering new recipe types
+- Added `ContentRegistrationFlags` so a mod can request specific features that need to be registered to work to be enabled
+
 ## [v4.3.27-1.19.2] - 2023-01-13
 ### Added
 - Added a utility method for getting a mod's display name in common

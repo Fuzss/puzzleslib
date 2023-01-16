@@ -25,6 +25,7 @@ import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Consumer;
@@ -133,7 +134,7 @@ public class ForgeModConstructor {
      * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(String modId, ModConstructor constructor) {
+    public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
@@ -149,6 +150,8 @@ public class ForgeModConstructor {
             constructor.onLootTableReplacement(forgeModConstructor.getLootTablesReplaceContext(evt.getLootTableManager(), evt.getName(), evt.getTable(), evt::setTable));
             constructor.onLootTableModification(forgeModConstructor.getLootTablesModifyContext(evt.getLootTableManager(), evt.getName(), evt.getTable()));
         });
-        BiomeLoadingHandler.register(modId, modEventBus, forgeModConstructor.biomeLoadingEntries);
+        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOMES)) {
+            BiomeLoadingHandler.register(modId, modEventBus, forgeModConstructor.biomeLoadingEntries);
+        }
     }
 }

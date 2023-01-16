@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.client.core;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.client.extension.WrappedClientItemExtension;
@@ -9,6 +10,7 @@ import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.core.ModConstructor;
+import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
@@ -23,7 +25,9 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -52,8 +56,10 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -63,6 +69,7 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -83,6 +90,7 @@ public class ForgeClientModConstructor {
      * mod base class
      */
     private final ClientModConstructor constructor;
+    private final Set<ContentRegistrationFlags> contentRegistrations;
     /**
      * actions to run each time after baked models have been reloaded
      */
@@ -98,9 +106,10 @@ public class ForgeClientModConstructor {
      * @param modId         the mod id
      * @param constructor   mod base class
      */
-    private ForgeClientModConstructor(String modId, ClientModConstructor constructor) {
+    private ForgeClientModConstructor(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         this.modId = modId;
         this.constructor = constructor;
+        this.contentRegistrations = ImmutableSet.copyOf(contentRegistrations);
         constructor.onConstructMod();
     }
 
@@ -112,6 +121,23 @@ public class ForgeClientModConstructor {
         this.constructor.onRegisterModelBakingCompletedListeners(this.modelBakingListeners::add);
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
         this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
+        this.constructor.onRegisterBlockRenderTypes(new ClientModConstructor.BlockRenderTypesContext() {
+
+            @SuppressWarnings("removal")
+            @Override
+            void registerBlock(Block block, RenderType renderType) {
+                Objects.requireNonNull(block, "block is null");
+                Objects.requireNonNull(renderType, "render type is null");
+                ItemBlockRenderTypes.setRenderLayer(block, renderType);
+            }
+
+            @Override
+            void registerFluid(Fluid fluid, RenderType renderType) {
+                Objects.requireNonNull(fluid, "fluid is null");
+                Objects.requireNonNull(renderType, "render type is null");
+                ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
+            }
+        });
     }
 
     private ClientModConstructor.MenuScreensContext getMenuScreensContext() {
@@ -333,12 +359,14 @@ public class ForgeClientModConstructor {
             Objects.requireNonNull(reloadListener, "reload listener is null");
             evt.registerReloadListener(reloadListener);
         });
-        // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
-        evt.registerReloadListener((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-            for (ResourceManagerReloadListener listener : this.dynamicBuiltinModelItemRenderers) {
-                listener.onResourceManagerReload(resourceManager);
-            }
-        });
+        if (this.contentRegistrations.contains(ContentRegistrationFlags.BUILT_IN_ITEM_MODEL_RENDERERS)) {
+            // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
+            evt.registerReloadListener((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+                for (ResourceManagerReloadListener listener : this.dynamicBuiltinModelItemRenderers) {
+                    listener.onResourceManagerReload(resourceManager);
+                }
+            });
+        }
     }
 
     @SubscribeEvent
@@ -390,10 +418,10 @@ public class ForgeClientModConstructor {
      * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param constructor mod base class
      */
-    public static void construct(String modId, ClientModConstructor constructor) {
+    public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(modId, constructor);
+        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor, modId, contentRegistrations);
         PuzzlesUtilForge.findModEventBus(modId).register(forgeModConstructor);
     }
 }

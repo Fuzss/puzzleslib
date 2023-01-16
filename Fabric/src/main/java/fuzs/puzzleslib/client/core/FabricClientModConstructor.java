@@ -10,8 +10,10 @@ import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
+import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftFabricAccessor;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
@@ -30,6 +32,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -58,8 +61,10 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collection;
@@ -87,10 +92,10 @@ public class FabricClientModConstructor {
     private final String modId;
 
     /**
-     * @param modId         the mod id
-     * @param constructor   the common mod main class implementation
+     * @param constructor the common mod main class implementation
+     * @param modId       the mod id
      */
-    private FabricClientModConstructor(String modId, ClientModConstructor constructor) {
+    private FabricClientModConstructor(ClientModConstructor constructor, String modId) {
         this.modId = modId;
         // only call ModConstructor::onConstructMod during object construction to be similar to Forge
         constructor.onConstructMod();
@@ -257,10 +262,10 @@ public class FabricClientModConstructor {
      * @param modId         the mod id for registering events on Forge to the correct mod event bus
      * @param constructor   mod base class
      */
-    public static void construct(String modId, ClientModConstructor constructor) {
+    public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-        FabricClientModConstructor fabricClientModConstructor = new FabricClientModConstructor(modId, constructor);
+        FabricClientModConstructor fabricClientModConstructor = new FabricClientModConstructor(constructor, modId);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
         constructor.onClientSetup();
@@ -317,6 +322,22 @@ public class FabricClientModConstructor {
         constructor.onRegisterKeyMappings((KeyMapping keyBinding) -> {
             Objects.requireNonNull(keyBinding, "key mapping is null");
             KeyBindingHelper.registerKeyBinding(keyBinding);
+        });
+        constructor.onRegisterBlockRenderTypes(new ClientModConstructor.BlockRenderTypesContext() {
+
+            @Override
+            void registerBlock(Block block, RenderType renderType) {
+                Objects.requireNonNull(block, "block is null");
+                Objects.requireNonNull(renderType, "render type is null");
+                BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
+            }
+
+            @Override
+            void registerFluid(Fluid fluid, RenderType renderType) {
+                Objects.requireNonNull(fluid, "fluid is null");
+                Objects.requireNonNull(renderType, "render type is null");
+                BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
+            }
         });
     }
 }

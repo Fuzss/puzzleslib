@@ -9,13 +9,13 @@ import fuzs.puzzleslib.config.FabricConfigHolderImpl;
 import fuzs.puzzleslib.impl.networking.NetworkHandlerFabric;
 import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryImplFabric;
 import fuzs.puzzleslib.init.FabricRegistryManager;
+import fuzs.puzzleslib.init.PotionBrewingRegistry;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
 import fuzs.puzzleslib.network.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
-import fuzs.puzzleslib.init.PotionBrewingRegistry;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -26,8 +26,8 @@ import java.util.function.Supplier;
 public final class FabricFactories implements CommonFactories {
 
     @Override
-    public Consumer<ModConstructor> modConstructor(String modId) {
-        return constructor -> FabricModConstructor.construct(modId, constructor);
+    public Consumer<ModConstructor> modConstructor(String modId, ContentRegistrationFlags... contentRegistrations) {
+        return constructor -> FabricModConstructor.construct(constructor, modId, contentRegistrations);
     }
 
     @Override
