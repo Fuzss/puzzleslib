@@ -554,6 +554,18 @@ public interface ClientModConstructor {
         /**
          * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
          *
+         * @param keyMapping the key mapping to register
+         *
+         * @deprecated renamed to singular, see {@link #registerKeyMapping}
+         */
+        @Deprecated(forRemoval = true)
+        default void registerKeyMappings(KeyMapping keyMapping) {
+            this.registerKeyMapping(keyMapping);
+        }
+
+        /**
+         * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
+         *
          * @param keyMappings the key mapping to register
          */
         default void registerKeyMappings(KeyMapping... keyMappings) {
