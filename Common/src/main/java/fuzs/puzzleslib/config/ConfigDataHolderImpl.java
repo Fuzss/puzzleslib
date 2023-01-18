@@ -35,7 +35,7 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
     /**
      * custom syncs to perform when config reloads
      */
-    protected final List<Runnable> additionalCallbacks = Lists.newArrayList();
+    protected final List<Consumer<T>> additionalCallbacks = Lists.newArrayList();
     /**
      * list of config value callbacks created from annotated configs for syncing changes
      * this is replaced with an immutable list after config setup is done
@@ -69,6 +69,10 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
         if (this.defaultConfig == null) {
             this.testAvailable();
             this.defaultConfig = this.defaultConfigSupplier.get();
+            this.defaultConfig.afterConfigReload();
+            for (Consumer<T> callback : this.additionalCallbacks) {
+                callback.accept(this.defaultConfig);
+            }
         }
         return this.defaultConfig;
     }
@@ -79,7 +83,7 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
     }
 
     @Override
-    public void accept(Runnable callback) {
+    public void accept(Consumer<T> callback) {
         this.additionalCallbacks.add(callback);
     }
 

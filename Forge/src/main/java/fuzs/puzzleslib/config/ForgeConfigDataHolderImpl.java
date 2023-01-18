@@ -11,6 +11,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -73,7 +74,9 @@ class ForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderIm
                 this.available = true;
                 loading = reloading ? "Reloading" : "Loading";
                 this.configValueCallbacks.forEach(Runnable::run);
-                this.additionalCallbacks.forEach(Runnable::run);
+                for (Consumer<T> callback : this.additionalCallbacks) {
+                    callback.accept(this.config);
+                }
             } else {
                 this.available = false;
                 loading = "Unloading";
