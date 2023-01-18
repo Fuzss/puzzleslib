@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.31-1.19.2] - 2023-01-18
+### Changed
+- Server mod configs are now stored in the global `.minecraft/config` directory instead of locally per world
+- This effectively disables local per-world server configs, but helps a lot with user confusion and frustration
+
 ## [v4.3.30-1.19.2] - 2023-01-17
 ### Fixed
 - Fixed backwards compatibility for a few changed method signatures

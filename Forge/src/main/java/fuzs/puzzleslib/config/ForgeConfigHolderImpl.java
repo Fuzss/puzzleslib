@@ -2,7 +2,7 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.impl.PuzzlesLibForge;
+import fuzs.puzzleslib.config.core.ForgeModConfig;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
@@ -79,18 +79,14 @@ public class ForgeConfigHolderImpl implements ConfigHolder.Builder {
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
             modBus.addListener((final ModConfigEvent.Loading evt) -> {
-                if (evt.getConfig().getModId().equals(modId)) {
-                    holder.onModConfig(evt.getConfig(), false);
-                }
+                holder.onModConfig(evt.getConfig(), false);
             });
             modBus.addListener((final ModConfigEvent.Reloading evt) -> {
-                if (evt.getConfig().getModId().equals(modId)) {
-                    holder.onModConfig(evt.getConfig(), true);
-                }
+                holder.onModConfig(evt.getConfig(), true);
             });
             holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
                 ModContainer modContainer = PuzzlesUtilForge.findModContainer(modId);
-                ModConfig modConfig = new ModConfig(type, spec, modContainer, fileName.apply(modId));
+                ModConfig modConfig = new ForgeModConfig(type, spec, modContainer, fileName.apply(modId));
                 modContainer.addConfig(modConfig);
                 return modConfig;
             });

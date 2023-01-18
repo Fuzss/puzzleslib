@@ -2,10 +2,12 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.config.core.FabricModConfig;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
-import net.minecraftforge.api.ModLoadingContext;
-import net.minecraftforge.api.fml.event.config.ModConfigEvent;
+import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
+import net.minecraftforge.api.fml.event.config.ModConfigEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -74,18 +76,15 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
             if (holder.config == null) continue;
             // this is fired on ModEventBus, so mod id check is not necessary here
             // we keep this as it's required on Fabric though due to a dedicated ModEventBus being absent
-            ModConfigEvent.LOADING.register((ModConfig config) -> {
-                if (config.getModId().equals(modId)) {
-                    holder.onModConfig(config, false);
-                }
+            ModConfigEvents.loading(modId).register((ModConfig config) -> {
+                holder.onModConfig(config, false);
             });
-            ModConfigEvent.RELOADING.register((ModConfig config) -> {
-                if (config.getModId().equals(modId)) {
-                    holder.onModConfig(config, true);
-                }
+            ModConfigEvents.reloading(modId).register((ModConfig config) -> {
+                holder.onModConfig(config, true);
             });
             holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-                return ModLoadingContext.registerConfig(modId, type, spec, fileName.apply(modId));
+                ModContainer modContainer = FabricLoader.getInstance().getModContainer(modId).orElseThrow(() -> new IllegalArgumentException(String.format("No mod with mod id %s", modId)));
+                return new FabricModConfig(type, spec, modContainer, fileName.apply(modId));
             });
         }
     }
