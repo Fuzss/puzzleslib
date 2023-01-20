@@ -43,6 +43,14 @@ subprojects {
             name = "Fuzs Mod Resources"
             url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
         }
+        maven {
+            name = "Progwml6 maven"
+            url = "https://dvs1.progwml6.com/files/maven/"
+        }
+        maven {
+            name = "ModMaven"
+            url = "https://modmaven.dev"
+        }
         flatDir {
             dirs 'libs'
         }
@@ -104,11 +112,4 @@ task incrementBuildNumber {
         def propertiesContent = buildNumberMatcher.replaceAll("uniqueBuildNumber=" + ++versionCode)
         propertiesFile.write(propertiesContent)
     }
-}
-
-def static getNextVersion(String puzzlesVersion) {
-    def puzzlesVersionMatcher = Pattern.compile("(\\d+\\.\\d+)").matcher(puzzlesVersion)
-    puzzlesVersionMatcher.find()
-    def currentVersion = puzzlesVersionMatcher.group(1)
-    return currentVersion.substring(0, currentVersion.indexOf(".") + 1).concat(String.valueOf(Integer.parseInt(currentVersion.substring(currentVersion.indexOf(".") + 1, currentVersion.size())) + 1))
 }

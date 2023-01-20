@@ -17,12 +17,12 @@ public class ForgeModConfig extends ModConfig {
 
     public ForgeModConfig(Type type, IConfigSpec<?> spec, ModContainer container, String fileName) {
         super(type, spec, container, fileName);
-        this.configHandler = ForgeConfigFileTypeHandler.INSTANCE;
+        this.configHandler = ForgeConfigFileTypeHandler.TOML;
     }
 
     public ForgeModConfig(Type type, IConfigSpec<?> spec, ModContainer activeContainer) {
         super(type, spec, activeContainer);
-        this.configHandler = ForgeConfigFileTypeHandler.INSTANCE;
+        this.configHandler = ForgeConfigFileTypeHandler.TOML;
     }
 
     @Override

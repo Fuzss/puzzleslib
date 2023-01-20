@@ -17,12 +17,12 @@ public class FabricModConfig extends ModConfig {
 
     public FabricModConfig(Type type, IConfigSpec<?> spec, ModContainer container, String fileName) {
         super(type, spec, container, fileName);
-        this.configHandler = FabricConfigFileTypeHandler.INSTANCE;
+        this.configHandler = FabricConfigFileTypeHandler.TOML;
     }
 
     public FabricModConfig(Type type, IConfigSpec<?> spec, ModContainer activeContainer) {
         super(type, spec, activeContainer);
-        this.configHandler = FabricConfigFileTypeHandler.INSTANCE;
+        this.configHandler = FabricConfigFileTypeHandler.TOML;
     }
 
     @Override

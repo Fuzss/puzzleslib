@@ -1,6 +1,6 @@
 modLoader="javafml"
 loaderVersion="[${minFMLVersion},)"
-license="MPL-2"
+license="MPL-2.0"
 issueTrackerURL="${modIssueUrl}"
 
 [[mods]]
@@ -25,7 +25,7 @@ issueTrackerURL="${modIssueUrl}"
 [[dependencies.${modId}]]
     modId="minecraft"
     mandatory=true
-    versionRange="[${minMinecraftVersion},${nextMinecraftVersion})"
+    versionRange="[${minecraftVersion}]"
     ordering="NONE"
     side="BOTH"
 

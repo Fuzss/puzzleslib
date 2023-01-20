@@ -3,9 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v4.3.32-1.19.2] - 2023-01-18
+## [v4.3.32-1.19.2] - 2023-01-20
 ### Changed
 - Improved handling of configs with default values (those are loaded when a config is accessed before it has been loaded)
+- Built-in protection for `com.electronwill.nightconfig.core.io.ParsingException: Not enough data available`
+- Puzzles Lib now explicitly requires the Minecraft version it's been compiled on (which is 1.19.2 currently)
 
 ## [v4.3.31-1.19.2] - 2023-01-18
 ### Changed
