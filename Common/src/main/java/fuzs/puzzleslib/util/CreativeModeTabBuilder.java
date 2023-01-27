@@ -61,8 +61,8 @@ public interface CreativeModeTabBuilder {
      * @deprecated migrate to {@link #appendItemsV2(BiConsumer)}
      */
     @Deprecated(forRemoval = true)
-    default CreativeModeTabBuilder appendItems(BiConsumer<List<ItemStack>, CreativeModeTab> stacksForDisplay) {
-        return this.appendItemsV2(stacksForDisplay::accept);
+    default CreativeModeTabBuilder appendItems(BiConsumer<List<ItemStack>, CreativeModeTab> itemStacks) {
+        return this.appendItemsV2(itemStacks::accept);
     }
 
     /**
@@ -70,7 +70,23 @@ public interface CreativeModeTabBuilder {
      *
      * @return  builder instance
      */
-    CreativeModeTabBuilder appendItemsV2(BiConsumer<NonNullList<ItemStack>, CreativeModeTab> stacksForDisplay);
+    CreativeModeTabBuilder appendItemsV2(BiConsumer<NonNullList<ItemStack>, CreativeModeTab> itemStacks);
+
+    /**
+     * Add all highest level enchantments in the form of enchanted books to this tab.
+     * <p>Vanilla will still add the books to search and the dedicated enchantment category tab.
+     *
+     * @return builder instance
+     */
+    CreativeModeTabBuilder appendAllEnchantments();
+
+    /**
+     * Add all potions in the form of drinkable potions, splash potions, lingering potions and tipped arrows to this tab.
+     * <p>Vanilla will still add the potions to search and the dedicated potions tab (combat tab for tipped arrows).
+     *
+     * @return builder instance
+     */
+    CreativeModeTabBuilder appendAllPotions();
 
     /**
      * show a search bar in this tab like vanilla's search tab

@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.33-1.19.2] - 2023-01-27
+### Added
+- Added utility methods to creative tab builder to automatically add all enchantments and potions from a mod
+### Changed
+- Applied transitive access widener to `AbstractSkeleton::getStepSound` to make the class extensible 
+
 ## [v4.3.32-1.19.2] - 2023-01-20
 ### Changed
 - Improved handling of configs with default values (those are loaded when a config is accessed before it has been loaded)

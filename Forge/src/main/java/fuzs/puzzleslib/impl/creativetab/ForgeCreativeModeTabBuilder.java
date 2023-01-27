@@ -31,12 +31,13 @@ public class ForgeCreativeModeTabBuilder extends CreativeModeTabBuilderImpl {
             }
 
             @Override
-            public void fillItemList(NonNullList<ItemStack> items) {
+            public void fillItemList(NonNullList<ItemStack> itemStacks) {
                 if (ForgeCreativeModeTabBuilder.this.stacksForDisplay != null) {
-                    ForgeCreativeModeTabBuilder.this.stacksForDisplay.accept(items, this);
+                    ForgeCreativeModeTabBuilder.this.stacksForDisplay.accept(itemStacks, this);
                 } else {
-                    super.fillItemList(items);
+                    super.fillItemList(itemStacks);
                 }
+                ForgeCreativeModeTabBuilder.this.appendAdditionals(itemStacks);
             }
 
             @Override
