@@ -76,9 +76,9 @@ public class PotionBrewingRegistryImplForge implements PotionBrewingRegistry {
             if (!input.isEmpty()) {
                 Potion potion = PotionUtils.getPotion(input);
                 Item item = input.getItem();
-                return this.mix(this.mix, ingredient, potion, item).orElse(input);
+                return this.mix(this.mix, ingredient, potion, item).orElse(ItemStack.EMPTY);
             }
-            return input;
+            return ItemStack.EMPTY;
         }
 
         abstract Optional<ItemStack> mix(PotionBrewing.Mix<T> mix, ItemStack ingredient, Potion potion, Item item);
