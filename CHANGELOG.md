@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.36-1.19.2] - 2023-02-01
+### Fixed
+- Fixed an issue when registering client and common configs on Fabric due to a forward reference
+
 ## [v4.3.35-1.19.2] - 2023-01-28
 ### Fixed
 - Fixed potion recipes on Forge being broken
