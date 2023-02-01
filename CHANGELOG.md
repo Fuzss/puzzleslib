@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.37-1.19.2] - 2023-02-01
+### Fixed
+- Fixed server configs failing to unload
+
 ## [v4.3.36-1.19.2] - 2023-02-01
 ### Fixed
 - Fixed an issue when registering client and common configs on Fabric due to a forward reference

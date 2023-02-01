@@ -86,7 +86,7 @@ public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
         // Puzzles Lib: make server configs global
         final Path configPath = ModLoaderEnvironment.INSTANCE.getConfigDir().resolve(config.getFileName());
         try {
-            FileWatcher.defaultInstance().removeWatch(configBasePath.resolve(config.getFileName()));
+            FileWatcher.defaultInstance().removeWatch(configPath);
         } catch (RuntimeException e) {
             LOGGER.error("Failed to remove config {} from tracker!", configPath, e);
         }
