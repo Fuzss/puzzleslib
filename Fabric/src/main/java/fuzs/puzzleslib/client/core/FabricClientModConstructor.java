@@ -253,6 +253,16 @@ public class FabricClientModConstructor {
                     if (entityType == entityType1) registrationHelper.register(factory.apply((RenderLayerParent<T, ? extends EntityModel<T>>) entityRenderer, context));
                 });
             }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayerV2(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+                Objects.requireNonNull(entityType, "entity type is null");
+                Objects.requireNonNull(factory, "render layer factory is null");
+                LivingEntityFeatureRendererRegistrationCallback.EVENT.register((EntityType<? extends LivingEntity> entityType1, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
+                    if (entityType == entityType1) registrationHelper.register(factory.apply((RenderLayerParent<T, M>) entityRenderer, context));
+                });
+            }
         };
     }
 

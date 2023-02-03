@@ -525,7 +525,6 @@ public interface ClientModConstructor {
     /**
      * register additional {@link RenderLayer}s for a living entity, supports players like any other entity
      */
-    @FunctionalInterface
     interface LivingEntityRenderLayersContext {
 
         /**
@@ -534,8 +533,23 @@ public interface ClientModConstructor {
          * @param entityType        entity type to register for
          * @param factory           the new layer factory
          * @param <T>               entity type
+         *
+         * @deprecated migrate to {@link #registerRenderLayerV2(EntityType, BiFunction)} with improved type parameters
          */
+        @Deprecated(forRemoval = true)
         <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory);
+
+
+        /**
+         * register the additional layer
+         *
+         * @param entityType        entity type to register for
+         * @param factory           the new layer factory
+         * @param <E>               the entity type
+         * @param <T>               entity type used for the model, should only really be different for players
+         * @param <M>               the entity model
+         */
+        <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayerV2(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory);
     }
 
     /**

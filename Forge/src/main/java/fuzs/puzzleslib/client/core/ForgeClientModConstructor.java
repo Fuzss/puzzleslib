@@ -9,8 +9,8 @@ import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
-import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.core.ContentRegistrationFlags;
+import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
@@ -65,6 +65,7 @@ import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
@@ -399,6 +400,33 @@ public class ForgeClientModConstructor {
                 // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
                 EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, evt.getEntityModels(), minecraft.font);
                 entityRenderer.addLayer((RenderLayer<T, EntityModel<T>>) factory.apply(entityRenderer, context));
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayerV2(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+                Objects.requireNonNull(entityType, "entity type is null");
+                Objects.requireNonNull(factory, "render layer factory is null");
+                if (entityType == EntityType.PLAYER) {
+                    evt.getSkins().stream()
+                            .map(evt::getSkin)
+                            .filter(Objects::nonNull)
+                            .map(entityRenderer -> ((LivingEntityRenderer<T, M>) entityRenderer))
+                            .forEach(entityRenderer -> {
+                                this.actuallyRegisterRenderLayerV2(entityRenderer, factory);
+                            });
+                } else {
+                    LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) evt.getRenderer(entityType);
+                    Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(ForgeRegistries.ENTITY_TYPES.getKey(entityType).toString()));
+                    this.actuallyRegisterRenderLayerV2(entityRenderer, factory);
+                }
+            }
+
+            private <T extends LivingEntity, M extends EntityModel<T>> void actuallyRegisterRenderLayerV2(LivingEntityRenderer<T, M> entityRenderer, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+                Minecraft minecraft = Minecraft.getInstance();
+                // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
+                EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, evt.getEntityModels(), minecraft.font);
+                entityRenderer.addLayer(factory.apply(entityRenderer, context));
             }
         });
     }

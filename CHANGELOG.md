@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.38-1.19.2] - 2023-02-03
+### Changed
+- Improved type parameters in `LivingEntityRenderLayersContext`
+
 ## [v4.3.37-1.19.2] - 2023-02-01
 ### Fixed
 - Fixed server configs failing to unload
