@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.39-1.19.2] - 2023-02-04
+### Added
+- Added a method for registering item and block colors in the common project
+### Changed
+- Refactored a few client-side registration methods to accept a varargs parameter
+### Fixed
+- Fixed an issue where networking messages would be registered in a different order on client/server
+
 ## [v4.3.38-1.19.2] - 2023-02-03
 ### Changed
 - Improved type parameters in `LivingEntityRenderLayersContext`

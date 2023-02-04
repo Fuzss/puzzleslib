@@ -186,18 +186,21 @@ public class FabricClientModConstructor {
         return new ClientModConstructor.ItemModelPropertiesContext() {
 
             @Override
-            public void register(ResourceLocation name, ClampedItemPropertyFunction function) {
-                Objects.requireNonNull(name, "property name is null");
+            public void registerGlobalProperty(ResourceLocation identifier, ClampedItemPropertyFunction function) {
+                Objects.requireNonNull(identifier, "property name is null");
                 Objects.requireNonNull(function, "property function is null");
-                ItemProperties.registerGeneric(name, function);
+                ItemProperties.registerGeneric(identifier, function);
             }
 
             @Override
-            public void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function) {
-                Objects.requireNonNull(item, "item is null");
-                Objects.requireNonNull(name, "property name is null");
+            public void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike... items) {
+                Objects.requireNonNull(identifier, "property name is null");
                 Objects.requireNonNull(function, "property function is null");
-                ItemProperties.register(item, name, function);
+                Objects.requireNonNull(items, "items is null");
+                for (ItemLike item : items) {
+                    Objects.requireNonNull(item, "item is null");
+                    ItemProperties.register(item.asItem(), identifier, function);
+                }
             }
         };
     }
@@ -320,10 +323,13 @@ public class FabricClientModConstructor {
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener(id, reloadListener));
         });
         constructor.onRegisterLivingEntityRenderLayers(fabricClientModConstructor.getLivingEntityRenderLayersContext());
-        constructor.onRegisterItemDecorations((item, decorator) -> {
-            Objects.requireNonNull(item, "item is null");
+        constructor.onRegisterItemDecorations((decorator, items) -> {
             Objects.requireNonNull(decorator, "item decorator is null");
-            ItemDecoratorRegistry.INSTANCE.register(item, decorator);
+            Objects.requireNonNull(items, "items is null");
+            for (ItemLike item : items) {
+                Objects.requireNonNull(item, "item is null");
+                ItemDecoratorRegistry.INSTANCE.register(item, decorator);
+            }
         });
         constructor.onRegisterSkullRenderers(factory -> {
             Objects.requireNonNull(factory, "factory is null");
@@ -348,6 +354,38 @@ public class FabricClientModConstructor {
                 Objects.requireNonNull(renderType, "render type is null");
                 BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
             }
+        });
+        constructor.onRegisterBlockRenderTypesV2((renderType, objects) -> {
+            Objects.requireNonNull(renderType, "render type is null");
+            Objects.requireNonNull(objects, "blocks is null");
+            for (Block object : objects) {
+                Objects.requireNonNull(object, "block is null");
+                BlockRenderLayerMap.INSTANCE.putBlock(object, renderType);
+            }
+        });
+        constructor.onRegisterFluidRenderTypes((renderType, objects) -> {
+            Objects.requireNonNull(renderType, "render type is null");
+            Objects.requireNonNull(objects, "fluids is null");
+            for (Fluid object : objects) {
+                Objects.requireNonNull(object, "fluid is null");
+                BlockRenderLayerMap.INSTANCE.putFluid(object, renderType);
+            }
+        });
+        constructor.onRegisterBlockColorHandlers((provider, objects) -> {
+            Objects.requireNonNull(provider, "provider is null");
+            Objects.requireNonNull(objects, "blocks is null");
+            for (Block object : objects) {
+                Objects.requireNonNull(object, "block is null");
+            }
+            ColorProviderRegistry.BLOCK.register(provider, objects);
+        });
+        constructor.onRegisterItemColorHandlers((provider, objects) -> {
+            Objects.requireNonNull(provider, "provider is null");
+            Objects.requireNonNull(objects, "items is null");
+            for (Item object : objects) {
+                Objects.requireNonNull(object, "item is null");
+            }
+            ColorProviderRegistry.ITEM.register(provider, objects);
         });
     }
 }

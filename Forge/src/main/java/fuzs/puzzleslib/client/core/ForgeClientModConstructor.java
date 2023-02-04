@@ -114,6 +114,7 @@ public class ForgeClientModConstructor {
         constructor.onConstructMod();
     }
 
+    @SuppressWarnings("removal")
     @SubscribeEvent
     public void onClientSetup(final FMLClientSetupEvent evt) {
         this.constructor.onClientSetup();
@@ -124,7 +125,6 @@ public class ForgeClientModConstructor {
         this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
         this.constructor.onRegisterBlockRenderTypes(new ClientModConstructor.BlockRenderTypesContext() {
 
-            @SuppressWarnings("removal")
             @Override
             public void registerBlock(Block block, RenderType renderType) {
                 Objects.requireNonNull(block, "block is null");
@@ -137,6 +137,22 @@ public class ForgeClientModConstructor {
                 Objects.requireNonNull(fluid, "fluid is null");
                 Objects.requireNonNull(renderType, "render type is null");
                 ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
+            }
+        });
+        this.constructor.onRegisterBlockRenderTypesV2((renderType, objects) -> {
+            Objects.requireNonNull(renderType, "render type is null");
+            Objects.requireNonNull(objects, "blocks is null");
+            for (Block object : objects) {
+                Objects.requireNonNull(object, "block is null");
+                ItemBlockRenderTypes.setRenderLayer(object, renderType);
+            }
+        });
+        this.constructor.onRegisterFluidRenderTypes((renderType, objects) -> {
+            Objects.requireNonNull(renderType, "render type is null");
+            Objects.requireNonNull(objects, "fluids is null");
+            for (Fluid object : objects) {
+                Objects.requireNonNull(object, "fluid is null");
+                ItemBlockRenderTypes.setRenderLayer(object, renderType);
             }
         });
     }
@@ -171,18 +187,21 @@ public class ForgeClientModConstructor {
         return new ClientModConstructor.ItemModelPropertiesContext() {
 
             @Override
-            public void register(ResourceLocation name, ClampedItemPropertyFunction function) {
-                Objects.requireNonNull(name, "property name is null");
+            public void registerGlobalProperty(ResourceLocation identifier, ClampedItemPropertyFunction function) {
+                Objects.requireNonNull(identifier, "property name is null");
                 Objects.requireNonNull(function, "property function is null");
-                ItemProperties.registerGeneric(name, function);
+                ItemProperties.registerGeneric(identifier, function);
             }
 
             @Override
-            public void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function) {
-                Objects.requireNonNull(item, "item is null");
-                Objects.requireNonNull(name, "property name is null");
+            public void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike... items) {
+                Objects.requireNonNull(identifier, "property name is null");
                 Objects.requireNonNull(function, "property function is null");
-                ItemProperties.register(item, name, function);
+                Objects.requireNonNull(items, "items is null");
+                for (ItemLike item : items) {
+                    Objects.requireNonNull(item, "item is null");
+                    ItemProperties.register(item.asItem(), identifier, function);
+                }
             }
         };
     }
@@ -329,10 +348,13 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterItemDecorations(final RegisterItemDecorationsEvent evt) {
-        this.constructor.onRegisterItemDecorations((ItemLike item, DynamicItemDecorator decorator) -> {
-            Objects.requireNonNull(item, "item is null");
+        this.constructor.onRegisterItemDecorations((DynamicItemDecorator decorator, ItemLike... items) -> {
             Objects.requireNonNull(decorator, "item decorator is null");
-            evt.register(item, decorator::renderItemDecorations);
+            Objects.requireNonNull(items, "items is null");
+            for (ItemLike item : items) {
+                Objects.requireNonNull(item, "item is null");
+                evt.register(item, decorator::renderItemDecorations);
+            }
         });
     }
 
@@ -436,6 +458,30 @@ public class ForgeClientModConstructor {
         this.constructor.onRegisterKeyMappings((KeyMapping key) -> {
             Objects.requireNonNull(key, "key mapping is null");
             evt.register(key);
+        });
+    }
+
+    @SubscribeEvent
+    public void onRegisterBlockColorHandlers(final RegisterColorHandlersEvent.Block evt) {
+        this.constructor.onRegisterBlockColorHandlers((provider, objects) -> {
+            Objects.requireNonNull(provider, "provider is null");
+            Objects.requireNonNull(objects, "blocks is null");
+            for (Block object : objects) {
+                Objects.requireNonNull(object, "block is null");
+            }
+            evt.register(provider, objects);
+        });
+    }
+
+    @SubscribeEvent
+    public void onRegisterItemColorHandlers(final RegisterColorHandlersEvent.Item evt) {
+        this.constructor.onRegisterItemColorHandlers((provider, objects) -> {
+            Objects.requireNonNull(provider, "provider is null");
+            Objects.requireNonNull(objects, "items is null");
+            for (Item object : objects) {
+                Objects.requireNonNull(object, "item is null");
+            }
+            evt.register(provider, objects);
         });
     }
 

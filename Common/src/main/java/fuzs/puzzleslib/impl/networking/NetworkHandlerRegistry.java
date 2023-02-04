@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.impl.networking;
 
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
 
-import java.util.Set;
+import java.util.List;
 
 public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
@@ -27,8 +27,8 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     abstract class BuilderImpl implements Builder {
         protected final String modId;
-        private final Set<Class<?>> clientboundMessages = Sets.newHashSet();
-        private final Set<Class<?>> serverboundMessages = Sets.newHashSet();
+        private final List<Class<?>> clientboundMessages = Lists.newArrayList();
+        private final List<Class<?>> serverboundMessages = Lists.newArrayList();
         protected boolean clientAcceptsVanillaOrMissing;
         protected boolean serverAcceptsVanillaOrMissing;
 
@@ -38,13 +38,15 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
         @Override
         public <T extends Record & ClientboundMessage<T>> Builder registerClientbound(Class<T> clazz) {
-            if (!this.clientboundMessages.add(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            if (this.clientboundMessages.contains(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            this.clientboundMessages.add(clazz);
             return this;
         }
 
         @Override
         public <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz) {
-            if (!this.serverboundMessages.add(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            if (this.serverboundMessages.contains(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            this.serverboundMessages.add(clazz);
             return this;
         }
 

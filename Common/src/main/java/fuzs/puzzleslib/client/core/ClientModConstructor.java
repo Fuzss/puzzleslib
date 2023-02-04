@@ -7,6 +7,8 @@ import fuzs.puzzleslib.client.renderer.blockentity.SkullRenderersFactory;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -230,8 +232,39 @@ public interface ClientModConstructor {
 
     /**
      * @param context register custom {@link RenderType}s for blocks and fluids
+     *
+     * @deprecated split into {@link #onRegisterBlockRenderTypesV2(RenderTypesContext)} and {@link #onRegisterFluidRenderTypes(RenderTypesContext)}
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterBlockRenderTypes(BlockRenderTypesContext context) {
+
+    }
+
+    /**
+     * @param context register custom {@link RenderType}s for blocks
+     */
+    default void onRegisterBlockRenderTypesV2(RenderTypesContext<Block> context) {
+
+    }
+
+    /**
+     * @param context register custom {@link RenderType}s for fluids
+     */
+    default void onRegisterFluidRenderTypes(RenderTypesContext<Fluid> context) {
+
+    }
+
+    /**
+     * @param context register custom block color handlers
+     */
+    default void onRegisterBlockColorHandlers(ColorHandlersContext<Block, BlockColor> context) {
+
+    }
+
+    /**
+     * @param context register custom item color handlers
+     */
+    default void onRegisterItemColorHandlers(ColorHandlersContext<Item, ItemColor> context) {
 
     }
 
@@ -432,8 +465,21 @@ public interface ClientModConstructor {
          *
          * @param name          predicate name
          * @param function      handler for this predicate
+         *
+         * @deprecated moved to {@link #registerGlobalProperty(ResourceLocation, ClampedItemPropertyFunction)}
          */
-        void register(ResourceLocation name, ClampedItemPropertyFunction function);
+        @Deprecated(forRemoval = true)
+        default void register(ResourceLocation name, ClampedItemPropertyFunction function) {
+            this.registerGlobalProperty(name, function);
+        }
+
+        /**
+         * register a predicate for all items
+         *
+         * @param identifier          predicate name
+         * @param function      handler for this predicate
+         */
+        void registerGlobalProperty(ResourceLocation identifier, ClampedItemPropertyFunction function);
 
         /**
          * register a predicate for an <code>item</code>
@@ -441,8 +487,22 @@ public interface ClientModConstructor {
          * @param item          the item
          * @param name          predicate name
          * @param function      handler for this predicate
+         *
+         * @deprecated moved to {@link #registerItemProperty(ResourceLocation, ClampedItemPropertyFunction, ItemLike...)}
          */
-        void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function);
+        @Deprecated(forRemoval = true)
+        default void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function) {
+            this.registerItemProperty(name, function, item);
+        }
+
+        /**
+         * register a predicate for an <code>item</code>
+         *
+         * @param items         the item(s)
+         * @param identifier          predicate name
+         * @param function      handler for this predicate
+         */
+        void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike... items);
     }
 
     /**
@@ -456,8 +516,21 @@ public interface ClientModConstructor {
          *
          * @param item      the item to register for
          * @param renderer  dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
+         *
+         * @deprecated renamed to {@link #registerItemRenderer(ItemLike, DynamicBuiltinModelItemRenderer)}
          */
-        void register(ItemLike item, DynamicBuiltinModelItemRenderer renderer);
+        @Deprecated(forRemoval = true)
+        default void register(ItemLike item, DynamicBuiltinModelItemRenderer renderer) {
+            this.registerItemRenderer(item, renderer);
+        }
+
+        /**
+         * register a <code>renderer</code> for an <code>item</code>
+         *
+         * @param item      the item to register for
+         * @param renderer  dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
+         */
+        void registerItemRenderer(ItemLike item, DynamicBuiltinModelItemRenderer renderer);
     }
 
     /**
@@ -471,8 +544,21 @@ public interface ClientModConstructor {
          *
          * @param item              the item to draw for
          * @param decorator         renderer implementation
+         *
+         * @deprecated renamed to {@link #registerItemDecoration(DynamicItemDecorator, ItemLike...)}
          */
-        void register(ItemLike item, DynamicItemDecorator decorator);
+        @Deprecated(forRemoval = true)
+        default void register(ItemLike item, DynamicItemDecorator decorator) {
+            this.registerItemDecoration(decorator, item);
+        }
+
+        /**
+         * register a {@link DynamicItemDecorator} for an <code>item</code>
+         *
+         * @param decorator         renderer implementation
+         * @param items              the item to draw for
+         */
+        void registerItemDecoration(DynamicItemDecorator decorator, ItemLike... items);
     }
 
     /**
@@ -591,7 +677,10 @@ public interface ClientModConstructor {
 
     /**
      * register custom {@link RenderType}s for blocks and fluids
+     *
+     * @deprecated separated for blocks and fluids in {@link RenderTypesContext}
      */
+    @Deprecated(forRemoval = true)
     interface BlockRenderTypesContext {
 
         /**
@@ -609,5 +698,41 @@ public interface ClientModConstructor {
          * @param renderType the render type
          */
         void registerFluid(Fluid fluid, RenderType renderType);
+    }
+
+    /**
+     * Register custom {@link RenderType}s for blocks and fluids.
+     *
+     * @param <T> object type supported by provider, either {@link Block} or {@link Fluid}
+     */
+    interface RenderTypesContext<T> {
+
+        /**
+         * Register a <code>renderType</code> for an <code>object</code>
+         *
+         * @param objects object type supporting render type, either {@link Block} or {@link Fluid}
+         * @param renderType the {@link RenderType} for <code>object</code>
+         */
+        @SuppressWarnings("unchecked")
+        void registerRenderType(RenderType renderType, T... objects);
+    }
+
+    /**
+     * Register custom item/block color handlers, like tint getters for leaves or grass.
+     *
+     * @param <T> provider type, either {@link BlockColor} or {@link ItemColor}
+     * @param <P> object type supported by provider, either {@link Block} or {@link Item}
+     */
+    @FunctionalInterface
+    interface ColorHandlersContext<T, P> {
+
+        /**
+         * Register a new <code>provider</code> for a number of <code>objects</code>.
+         *
+         * @param provider provider type, either {@link BlockColor} or {@link ItemColor}
+         * @param objects object type supported by provider, either {@link Block} or {@link Item}
+         */
+        @SuppressWarnings("unchecked")
+        void registerColorHandler(P provider, T... objects);
     }
 }
