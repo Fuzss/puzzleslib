@@ -14,6 +14,7 @@ import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -123,9 +124,16 @@ public interface ModConstructor {
     }
 
     /**
-     * Allows for registering modifications (including additions and removals) to biomes loaded from the current data pack.
+     * @param context allows for registering modifications (including additions and removals) to biomes loaded from the current data pack
      */
     default void onRegisterBiomeModifications(BiomeModificationsContext context) {
+
+    }
+
+    /**
+     * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
+     */
+    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
 
     }
 
@@ -191,35 +199,53 @@ public interface ModConstructor {
     }
 
     /**
-     * applies fuel burn times instead of implementing this on the item side
-     * heavily inspired by FuelHandler found in Vazkii's Quark mod
+     * Applies fuel burn times instead of implementing this on the item side.
      */
     @FunctionalInterface
     interface FuelBurnTimesContext {
+
+        /**
+         * Registers an <code>item</code> as a fuel with the given <code>burnTime</code>.
+         *
+         * @param items items to add
+         * @param burnTime burn time in ticks
+         */
+        void registerFuel(int burnTime, ItemLike... items);
 
         /**
          * base method, registers a fuel item
          *
          * @param item item to add
          * @param burnTime burn time in ticks
+         *
+         * @deprecated simplified to {@link #registerFuel(int, ItemLike...)}
          */
-        void registerFuelItem(Item item, int burnTime);
+        @Deprecated(forRemoval = true)
+        default void registerFuelItem(Item item, int burnTime) {
+            this.registerFuel(burnTime, item);
+        }
 
         /**
          * overload method for blocks
          *
          * @param block block to add
          * @param burnTime burn time in ticks
+         *
+         * @deprecated simplified to {@link #registerFuel(int, ItemLike...)}
          */
+        @Deprecated(forRemoval = true)
         default void registerFuelBlock(Block block, int burnTime) {
-            this.registerFuelItem(block.asItem(), burnTime);
+            this.registerFuel(burnTime, block);
         }
 
         /**
          * add wooden block with default vanilla times
          *
          * @param block block to add with burn time of 300 ticks
+         *
+         * @deprecated simplified to {@link #registerFuel(int, ItemLike...)}
          */
+        @Deprecated(forRemoval = true)
         default void registerWoodenBlock(Block block) {
             this.registerFuelBlock(block, block instanceof SlabBlock ? 150 : 300);
         }
@@ -333,6 +359,7 @@ public interface ModConstructor {
     /**
      * Allows for registering modifications (including additions and removals) to biomes loaded from the current data pack.
      */
+    @FunctionalInterface
     interface BiomeModificationsContext {
 
         /**
@@ -343,5 +370,21 @@ public interface ModConstructor {
          * @param modifier modification context
          */
         void register(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<fuzs.puzzleslib.api.biome.v1.BiomeModificationContext> modifier);
+    }
+
+    /**
+     * Register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to.
+     */
+    @FunctionalInterface
+    interface FlammableBlocksContext {
+
+        /**
+         * Register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to.
+         *
+         * @param encouragement a value determining how fast this block will spread fire to other nearby flammable blocks
+         * @param flammability a value determining how easily this block catches on fire from nearby fires
+         * @param blocks blocks to register <code>encouragement</code> and <code>flammability</code> for
+         */
+        void registerFlammable(int encouragement, int flammability, Block... blocks);
     }
 }

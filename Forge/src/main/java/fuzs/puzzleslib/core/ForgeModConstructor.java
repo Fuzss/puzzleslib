@@ -5,14 +5,21 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
+import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
@@ -21,6 +28,7 @@ import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
+import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,6 +36,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -35,21 +44,10 @@ import java.util.function.Consumer;
  * <p>we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  */
 public class ForgeModConstructor {
-    /**
-     * mod base class
-     */
     private final ModConstructor constructor;
-    /**
-     * stored burn times
-     */
     private final Object2IntOpenHashMap<Item> fuelBurnTimes = new Object2IntOpenHashMap<>();
     private final Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeLoadingEntries = HashMultimap.create();
 
-    /**
-     * only calls {@link ModConstructor#onConstructMod()}, everything else is done via events later
-     *
-     * @param constructor mod base class
-     */
     private ForgeModConstructor(ModConstructor constructor) {
         this.constructor = constructor;
         constructor.onConstructMod();
@@ -58,10 +56,34 @@ public class ForgeModConstructor {
     @SubscribeEvent
     public void onCommonSetup(final FMLCommonSetupEvent evt) {
         this.constructor.onCommonSetup();
-        this.constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
-        this.constructor.onRegisterFuelBurnTimes(this::registerFuelItem);
+        this.constructor.onRegisterFuelBurnTimes((burnTime, items) -> {
+            if (Mth.clamp(burnTime, 1, 32767) != burnTime) throw new IllegalArgumentException("fuel burn time is out of bounds");
+            Objects.requireNonNull(items, "items is null");
+            for (ItemLike item : items) {
+                Objects.requireNonNull(item, "item is null");
+                this.fuelBurnTimes.put(item.asItem(), burnTime);
+            }
+        });
         this.constructor.onRegisterBiomeModifications((phase, selector, modifier) -> {
             this.biomeLoadingEntries.put(phase, new BiomeLoadingHandler.BiomeModificationData(phase, selector, modifier));
+        });
+        this.constructor.onRegisterFlammableBlocks((encouragement, flammability, blocks) -> {
+            Objects.requireNonNull(blocks, "blocks is null");
+            for (Block block : blocks) {
+                Objects.requireNonNull(block, "block is null");
+                ((FireBlockForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(block, encouragement, flammability);
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public void onRegisterSpawnPlacement(final SpawnPlacementRegisterEvent evt) {
+        this.constructor.onRegisterSpawnPlacements(new ModConstructor.SpawnPlacementsContext() {
+
+            @Override
+            public <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
+                evt.register(entityType, location, heightmap, spawnPredicate, SpawnPlacementRegisterEvent.Operation.REPLACE);
+            }
         });
     }
 
@@ -73,29 +95,6 @@ public class ForgeModConstructor {
     @SubscribeEvent
     public void onEntityAttributeModification(final EntityAttributeModificationEvent evt) {
         this.constructor.onEntityAttributeModification(evt::add);
-    }
-
-    /**
-     * helper method for registering fuel item burn time
-     *
-     * @param item     the item
-     * @param burnTime burn time in ticks
-     */
-    private void registerFuelItem(Item item, int burnTime) {
-        if (burnTime > 0 && item != null) this.fuelBurnTimes.put(item, burnTime);
-    }
-
-    /**
-     * event for setting burn time, Forge wants this to be implemented on the item using {@link net.minecraftforge.common.extensions.IForgeItem#getBurnTime},
-     * but this isn't very nice for instances of {@link net.minecraft.world.item.BlockItem}, so we do this instead
-     *
-     * @param evt the Forge event
-     */
-    private void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
-        Item item = evt.getItemStack().getItem();
-        if (this.fuelBurnTimes.containsKey(item)) {
-            evt.setBurnTime(this.fuelBurnTimes.getInt(item));
-        }
     }
 
     private ModConstructor.LootTablesReplaceContext getLootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable lootTable, Consumer<LootTable> lootTableSetter) {
@@ -135,14 +134,19 @@ public class ForgeModConstructor {
      * @param constructor mod base class
      */
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
         IEventBus modEventBus = PuzzlesUtilForge.findModEventBus(modId);
         modEventBus.register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
-        MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
+        MinecraftForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
+            Item item = evt.getItemStack().getItem();
+            if (forgeModConstructor.fuelBurnTimes.containsKey(item)) {
+                evt.setBurnTime(forgeModConstructor.fuelBurnTimes.getInt(item));
+            }
+        });
         MinecraftForge.EVENT_BUS.addListener((final RegisterCommandsEvent evt) -> {
            constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection()));
         });

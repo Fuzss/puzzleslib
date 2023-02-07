@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
+import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
@@ -21,6 +22,7 @@ import net.minecraft.commands.Commands;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.SpawnPlacements;
@@ -29,7 +31,9 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
@@ -173,7 +177,7 @@ public class FabricModConstructor {
      * @param constructor mod base class
      */
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id cannot be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         FabricModConstructor fabricModConstructor = new FabricModConstructor(constructor);
         // everything after this is done on Forge using events called by the mod event bus
@@ -182,7 +186,14 @@ public class FabricModConstructor {
         constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
-        constructor.onRegisterFuelBurnTimes(fabricModConstructor::registerFuelItem);
+        constructor.onRegisterFuelBurnTimes((burnTime, items) -> {
+            if (Mth.clamp(burnTime, 1, 32767) != burnTime) throw new IllegalArgumentException("fuel burn time is out of bounds");
+            Objects.requireNonNull(items, "items is null");
+            for (ItemLike item : items) {
+                Objects.requireNonNull(item, "item is null");
+                FuelRegistry.INSTANCE.add(item.asItem(), burnTime);
+            }
+        });
         CommandRegistrationCallback.EVENT.register((CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) -> constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(dispatcher, context, environment)));
         LootTableEvents.REPLACE.register((ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
             // keep this the same as Forge where editing data pack specified loot tables is not supported
@@ -201,6 +212,14 @@ public class FabricModConstructor {
         BiomeModification biomeModification = BiomeModifications.create(new ResourceLocation(modId, "biome_modifiers"));
         constructor.onRegisterBiomeModifications((phase, selector, modifier) -> {
             fabricModConstructor.registerBiomeModification(biomeModification, phase, selector, modifier);
+        });
+        constructor.onRegisterFlammableBlocks((encouragement, flammability, blocks) -> {
+            Objects.requireNonNull(blocks, "blocks is null");
+            for (Block block : blocks) {
+                Objects.requireNonNull(block, "block is null");
+                // flammability == burn, encouragement == spread
+                FlammableBlockRegistry.getDefaultInstance().add(block, flammability, encouragement);
+            }
         });
     }
 }
