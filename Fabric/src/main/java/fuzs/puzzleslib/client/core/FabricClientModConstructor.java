@@ -24,6 +24,8 @@ import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
@@ -371,21 +373,55 @@ public class FabricClientModConstructor {
                 BlockRenderLayerMap.INSTANCE.putFluid(object, renderType);
             }
         });
-        constructor.onRegisterBlockColorHandlers((provider, objects) -> {
-            Objects.requireNonNull(provider, "provider is null");
-            Objects.requireNonNull(objects, "blocks is null");
-            for (Block object : objects) {
-                Objects.requireNonNull(object, "block is null");
+        constructor.onRegisterBlockColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
+
+            @Override
+            public void registerColorProvider(BlockColor provider, Block object, Block... objects) {
+                Objects.requireNonNull(provider, "provider is null");
+                this.registerItemColorProvider(object, provider);
+                Objects.requireNonNull(objects, "blocks is null");
+                for (Block block : objects) {
+                    this.registerItemColorProvider(block, provider);
+                }
             }
-            ColorProviderRegistry.BLOCK.register(provider, objects);
+
+            private void registerItemColorProvider(Block block, BlockColor provider) {
+                Objects.requireNonNull(block, "block is null");
+                ColorProviderRegistry.BLOCK.register(provider, block);
+            }
+
+            @Override
+            public BlockColor getProviders() {
+                return (blockState, blockAndTintGetter, blockPos, i) -> {
+                    BlockColor blockColor = ColorProviderRegistry.BLOCK.get(blockState.getBlock());
+                    return blockColor == null ? -1 : blockColor.getColor(blockState, blockAndTintGetter, blockPos, i);
+                };
+            }
         });
-        constructor.onRegisterItemColorHandlers((provider, objects) -> {
-            Objects.requireNonNull(provider, "provider is null");
-            Objects.requireNonNull(objects, "items is null");
-            for (Item object : objects) {
-                Objects.requireNonNull(object, "item is null");
+        constructor.onRegisterItemColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
+
+            @Override
+            public void registerColorProvider(ItemColor provider, Item object, Item... objects) {
+                Objects.requireNonNull(provider, "provider is null");
+                this.registerItemColorProvider(object, provider);
+                Objects.requireNonNull(objects, "items is null");
+                for (Item item : objects) {
+                    this.registerItemColorProvider(item, provider);
+                }
             }
-            ColorProviderRegistry.ITEM.register(provider, objects);
+
+            private void registerItemColorProvider(Item item, ItemColor provider) {
+                Objects.requireNonNull(item, "item is null");
+                ColorProviderRegistry.ITEM.register(provider, item);
+            }
+
+            @Override
+            public ItemColor getProviders() {
+                return (itemStack, i) -> {
+                    ItemColor itemColor = ColorProviderRegistry.ITEM.get(itemStack.getItem());
+                    return itemColor == null ? -1 : itemColor.getColor(itemStack, i);
+                };
+            }
         });
     }
 }

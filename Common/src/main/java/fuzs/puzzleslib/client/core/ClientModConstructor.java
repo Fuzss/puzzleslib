@@ -255,16 +255,16 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context register custom block color handlers
+     * @param context register custom block color providers
      */
-    default void onRegisterBlockColorHandlers(ColorHandlersContext<Block, BlockColor> context) {
+    default void onRegisterBlockColorProviders(ColorProvidersContext<Block, BlockColor> context) {
 
     }
 
     /**
-     * @param context register custom item color handlers
+     * @param context register custom item color providers
      */
-    default void onRegisterItemColorHandlers(ColorHandlersContext<Item, ItemColor> context) {
+    default void onRegisterItemColorProviders(ColorProvidersContext<Item, ItemColor> context) {
 
     }
 
@@ -718,13 +718,12 @@ public interface ClientModConstructor {
     }
 
     /**
-     * Register custom item/block color handlers, like tint getters for leaves or grass.
+     * Register custom item/block color providers, like tint getters for leaves or grass.
      *
      * @param <T> provider type, either {@link BlockColor} or {@link ItemColor}
      * @param <P> object type supported by provider, either {@link Block} or {@link Item}
      */
-    @FunctionalInterface
-    interface ColorHandlersContext<T, P> {
+    interface ColorProvidersContext<T, P> {
 
         /**
          * Register a new <code>provider</code> for a number of <code>objects</code>.
@@ -733,6 +732,14 @@ public interface ClientModConstructor {
          * @param objects object type supported by provider, either {@link Block} or {@link Item}
          */
         @SuppressWarnings("unchecked")
-        void registerColorHandler(P provider, T... objects);
+        void registerColorProvider(P provider, T object, T... objects);
+
+        /**
+         * Provides access to already registered providers, might be incomplete during registration,
+         * but is good to use in either {@link BlockColor} or {@link ItemColor}.
+         *
+         * @return access to {@link net.minecraft.client.color.block.BlockColors} or {@link net.minecraft.client.color.item.ItemColors}
+         */
+        P getProviders();
     }
 }

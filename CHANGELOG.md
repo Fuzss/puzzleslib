@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.42-1.19.2] - 2023-02-13
+### Changed
+- Added access to vanilla `BlockColors` and `ItemColors` to `ColorProvidersContext`
+
 ## [v4.3.41-1.19.2] - 2023-02-13
 ### Fixed
 - Fixed vanilla item model overrides not being applied for items with different models depending on `TransformType`

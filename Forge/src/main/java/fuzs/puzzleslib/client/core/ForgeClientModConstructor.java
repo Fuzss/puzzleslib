@@ -16,6 +16,8 @@ import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockColor;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.MenuAccess;
@@ -463,25 +465,53 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterBlockColorHandlers(final RegisterColorHandlersEvent.Block evt) {
-        this.constructor.onRegisterBlockColorHandlers((provider, objects) -> {
-            Objects.requireNonNull(provider, "provider is null");
-            Objects.requireNonNull(objects, "blocks is null");
-            for (Block object : objects) {
-                Objects.requireNonNull(object, "block is null");
+        this.constructor.onRegisterBlockColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
+
+            @Override
+            public void registerColorProvider(BlockColor provider, Block object, Block... objects) {
+                Objects.requireNonNull(provider, "provider is null");
+                this.registerItemColorProvider(object, provider);
+                Objects.requireNonNull(objects, "blocks is null");
+                for (Block block : objects) {
+                    this.registerItemColorProvider(block, provider);
+                }
             }
-            evt.register(provider, objects);
+
+            private void registerItemColorProvider(Block block, BlockColor provider) {
+                Objects.requireNonNull(block, "block is null");
+                evt.register(provider, block);
+            }
+
+            @Override
+            public BlockColor getProviders() {
+                return evt.getBlockColors()::getColor;
+            }
         });
     }
 
     @SubscribeEvent
     public void onRegisterItemColorHandlers(final RegisterColorHandlersEvent.Item evt) {
-        this.constructor.onRegisterItemColorHandlers((provider, objects) -> {
-            Objects.requireNonNull(provider, "provider is null");
-            Objects.requireNonNull(objects, "items is null");
-            for (Item object : objects) {
-                Objects.requireNonNull(object, "item is null");
+        this.constructor.onRegisterItemColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
+
+            @Override
+            public void registerColorProvider(ItemColor provider, Item object, Item... objects) {
+                Objects.requireNonNull(provider, "provider is null");
+                this.registerItemColorProvider(object, provider);
+                Objects.requireNonNull(objects, "items is null");
+                for (Item item : objects) {
+                    this.registerItemColorProvider(item, provider);
+                }
             }
-            evt.register(provider, objects);
+
+            private void registerItemColorProvider(Item item, ItemColor provider) {
+                Objects.requireNonNull(item, "item is null");
+                evt.register(provider, item);
+            }
+
+            @Override
+            public ItemColor getProviders() {
+                return evt.getItemColors()::getColor;
+            }
         });
     }
 
