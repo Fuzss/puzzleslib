@@ -3,31 +3,50 @@ package fuzs.puzzleslib.impl.client.renderer.item;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.client.renderer.item.v1.ItemModelOverrides;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.Registry;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 public class ItemModelOverridesImpl implements ItemModelOverrides {
     private static final Map<Item, ItemModelData> ITEM_MODEL_PROVIDERS = Maps.newIdentityHashMap();
 
-    public static Optional<BakedModel> getModelByType(ItemStack stack, ItemModelShaper itemModelShaper, @Nullable ItemTransforms.TransformType transformType) {
-        if (!stack.isEmpty()) {
-            ItemModelData itemModelData = ITEM_MODEL_PROVIDERS.get(stack.getItem());
-            if (itemModelData != null) {
-                ModelResourceLocation modelLocation = itemModelData.getModelLocationByType(transformType);
-                return Optional.of(itemModelShaper.getModelManager().getModel(modelLocation));
-            }
-        }
-        return Optional.empty();
+    public static Optional<BakedModel> getSpecificModelOverride(ItemModelShaper itemModelShaper, ItemStack stack, ItemTransforms.TransformType transformType) {
+        return getModelOverride(itemModelShaper, stack, Minecraft.getInstance().level, null, 0, data -> data.getModelLocationByType(transformType));
+    }
+
+    public static Optional<BakedModel> getGenericModelOverride(ItemModelShaper itemModelShaper, ItemStack stack, @Nullable Level level, @Nullable LivingEntity livingEntity, int seed) {
+        return getModelOverride(itemModelShaper, stack, level, livingEntity, seed, ItemModelData::customModel);
+    }
+
+    public static Optional<BakedModel> getModelOverride(ItemModelShaper itemModelShaper, ItemStack stack, @Nullable Level level, @Nullable LivingEntity livingEntity, int seed, Function<ItemModelData, ModelResourceLocation> modelGetter) {
+        return getItemModelData(stack).map(modelGetter)
+                .map(itemModelShaper.getModelManager()::getModel)
+                .map(model -> resolveVanillaModelOverrides(model, itemModelShaper, stack, level, livingEntity, seed));
+    }
+
+    private static Optional<ItemModelData> getItemModelData(ItemStack stack) {
+        if (stack.isEmpty()) return Optional.empty();
+        return Optional.ofNullable(ITEM_MODEL_PROVIDERS.get(stack.getItem()));
+    }
+
+    private static BakedModel resolveVanillaModelOverrides(BakedModel bakedModel, ItemModelShaper itemModelShaper, ItemStack itemStack, @Nullable Level level, @Nullable LivingEntity livingEntity, int seed) {
+        ClientLevel clientLevel = level instanceof ClientLevel ? (ClientLevel) level : null;
+        BakedModel modelOverride = bakedModel.getOverrides().resolve(bakedModel, itemStack, clientLevel, livingEntity, seed);
+        return modelOverride == null ? itemModelShaper.getModelManager().getMissingModel() : modelOverride;
     }
 
     @Override
@@ -42,12 +61,9 @@ public class ItemModelOverridesImpl implements ItemModelOverrides {
 
     private record ItemModelData(ModelResourceLocation itemModel, ModelResourceLocation customModel, Set<ItemTransforms.TransformType> itemModelTransforms) {
 
-        public ModelResourceLocation getModelLocationByType(@Nullable ItemTransforms.TransformType transformType) {
-            if (transformType != null && this.itemModelTransforms.contains(transformType)) {
-                return this.itemModel;
-            } else {
-                return this.customModel;
-            }
+        @Nullable
+        public ModelResourceLocation getModelLocationByType(ItemTransforms.TransformType transformType) {
+            return this.itemModelTransforms.contains(transformType) ? this.itemModel : null;
         }
     }
 }

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.41-1.19.2] - 2023-02-13
+### Fixed
+- Fixed vanilla item model overrides not being applied for items with different models depending on `TransformType`
+
 ## [v4.3.40-1.19.2] - 2023-02-07
 ### Added
 - Added a method for registering flammable block properties in the common project
