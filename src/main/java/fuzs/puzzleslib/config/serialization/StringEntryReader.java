@@ -84,36 +84,13 @@ public class StringEntryReader<T extends IForgeRegistryEntry<T>> {
      * @param <R> content type of registry
      */
     private static <R extends IForgeRegistryEntry<R>> List<R> getWildcardEntries(String source, IForgeRegistry<R> activeRegistry) {
-        String[] splitSource = source.split(":");
-        switch (splitSource.length) {
-            case 1:
-                // no colon found, so this must be an entry from Minecraft
-                return getListFromRegistry("minecraft", splitSource[0], activeRegistry);
-            case 2:
-                return getListFromRegistry(splitSource[0], splitSource[1], activeRegistry);
-            default:
-                log(source, "Invalid resource location format");
-                return Lists.newArrayList();
-        }
-    }
-
-    /**
-     * create list with entries from given namespace matching given wildcard path
-     * @param namespace namespace to check
-     * @param path path string including wildcard
-     * @param activeRegistry registry to work with
-     * @return all entries found
-     * @param <R> content type of registry
-     */
-    private static <R extends IForgeRegistryEntry<R>> List<R> getListFromRegistry(String namespace, String path, IForgeRegistry<R> activeRegistry) {
-        String regexPath = path.replace("*", "[a-z0-9/._-]*");
+        if (!source.contains(":")) source = "minecraft:" + source;
+        String regexSource = source.replace("*", "[a-z0-9/._-]*");
         List<R> entries = activeRegistry.getEntries().stream()
-                .filter(entry -> entry.getKey().getRegistryName().getNamespace().equals(namespace))
-                .filter(entry -> entry.getKey().getRegistryName().getPath().matches(regexPath))
-                .map(Map.Entry::getValue).collect(Collectors.toList());
-        if (entries.isEmpty()) {
-            log(new ResourceLocation(namespace, path).toString(), "Entry not found");
-        }
+                .filter(entry -> entry.getKey().location().toString().matches(regexSource))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+        if (entries.isEmpty()) log(source, "Entry not found");
         return entries;
     }
 

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.3.6-1.18.2] - 2023-02-26
+### Fixed
+- Fixed a bug where deserializing a list of ids always yields nothing if the ids don't use the `minecraft` namespace
+
 ## [v3.3.5-1.18.2] - 2022-05-25
 ### Fixed
 - Fixed configs not properly being loaded
