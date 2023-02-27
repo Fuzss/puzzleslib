@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.3.44-1.19.2] - 2023-02-27
+### Fixed
+- Actually implement new events accepting enqueued work haha
+
+## [v4.3.43-1.19.2] - 2023-02-27
+### Changed
+- Allow for enqueuing work during mod construct and setup events
+
 ## [v4.3.42-1.19.2] - 2023-02-13
 ### Changed
 - Added access to vanilla `BlockColors` and `ItemColors` to `ColorProvidersContext`

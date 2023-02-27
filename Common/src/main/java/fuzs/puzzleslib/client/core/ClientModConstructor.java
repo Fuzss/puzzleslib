@@ -6,6 +6,7 @@ import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.blockentity.SkullRenderersFactory;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
 import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
+import fuzs.puzzleslib.core.ModConstructor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -65,9 +66,22 @@ public interface ClientModConstructor {
     /**
      * runs after content has been registered, so it's safe to use here
      * used to set various values and settings for already registered content
+     *
+     * @deprecated migrate to {@link #onClientSetup(ModConstructor.ModLifecycleContext)}
      */
+    @Deprecated(forRemoval = true)
     default void onClientSetup() {
 
+    }
+
+    /**
+     * runs after content has been registered, so it's safe to use here
+     * used to set various values and settings for already registered content
+     *
+     * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
+     */
+    default void onClientSetup(ModConstructor.ModLifecycleContext context) {
+        this.onClientSetup();
     }
 
     /**

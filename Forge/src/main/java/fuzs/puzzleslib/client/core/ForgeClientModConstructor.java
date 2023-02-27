@@ -119,7 +119,7 @@ public class ForgeClientModConstructor {
     @SuppressWarnings("removal")
     @SubscribeEvent
     public void onClientSetup(final FMLClientSetupEvent evt) {
-        this.constructor.onClientSetup();
+        this.constructor.onClientSetup(evt::enqueueWork);
         this.constructor.onRegisterMenuScreens(this.getMenuScreensContext());
         this.constructor.onRegisterSearchTrees(this.getSearchRegistryContext());
         this.constructor.onRegisterModelBakingCompletedListeners(this.modelBakingListeners::add);

@@ -55,7 +55,7 @@ public class ForgeModConstructor {
 
     @SubscribeEvent
     public void onCommonSetup(final FMLCommonSetupEvent evt) {
-        this.constructor.onCommonSetup();
+        this.constructor.onCommonSetup(evt::enqueueWork);
         this.constructor.onRegisterFuelBurnTimes((burnTime, items) -> {
             if (Mth.clamp(burnTime, 1, 32767) != burnTime) throw new IllegalArgumentException("fuel burn time is out of bounds");
             Objects.requireNonNull(items, "items is null");

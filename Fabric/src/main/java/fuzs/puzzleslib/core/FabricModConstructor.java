@@ -182,7 +182,7 @@ public class FabricModConstructor {
         FabricModConstructor fabricModConstructor = new FabricModConstructor(constructor);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
-        constructor.onCommonSetup();
+        constructor.onCommonSetup(Runnable::run);
         constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);

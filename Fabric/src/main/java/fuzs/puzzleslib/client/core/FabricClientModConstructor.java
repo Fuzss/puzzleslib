@@ -283,7 +283,7 @@ public class FabricClientModConstructor {
         FabricClientModConstructor fabricClientModConstructor = new FabricClientModConstructor(constructor, modId);
         // everything after this is done on Forge using events called by the mod event bus
         // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
-        constructor.onClientSetup();
+        constructor.onClientSetup(Runnable::run);
         constructor.onRegisterEntityRenderers(fabricClientModConstructor.getEntityRenderersContext());
         constructor.onRegisterBlockEntityRenderers(fabricClientModConstructor.getBlockEntityRenderersContext());
         constructor.onRegisterClientTooltipComponents(fabricClientModConstructor::registerClientTooltipComponent);

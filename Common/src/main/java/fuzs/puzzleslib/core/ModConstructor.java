@@ -40,9 +40,22 @@ public interface ModConstructor {
     /**
      * runs after content has been registered, so it's safe to use here
      * used to set various values and settings for already registered content
+     *
+     * @deprecated migrate to {@link #onCommonSetup(ModLifecycleContext)}
      */
+    @Deprecated(forRemoval = true)
     default void onCommonSetup() {
 
+    }
+
+    /**
+     * runs after content has been registered, so it's safe to use here
+     * used to set various values and settings for already registered content
+     *
+     * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
+     */
+    default void onCommonSetup(ModLifecycleContext context) {
+        this.onCommonSetup();
     }
 
     /**
@@ -135,6 +148,19 @@ public interface ModConstructor {
      */
     default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
 
+    }
+
+    /**
+     * enqueue work to be run sequentially for all mods as the construct/setup phase runs in parallel on Forge
+     */
+    interface ModLifecycleContext {
+
+        /**
+         * enqueue work to be run sequentially for all mods as the construct/setup phase runs in parallel on Forge
+         *
+         * @param runnable the work
+         */
+        void enqueueWork(Runnable runnable);
     }
 
     /**
