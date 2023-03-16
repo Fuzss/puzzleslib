@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'fabric-loom' version '1.0.+'
     id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
     // this depends on an older version of guava, which loom is incompatible with, so make sure to apply this plugin after loom
     // haven't found a proper way to manage plugin dependencies otherwise
@@ -32,8 +32,10 @@ repositories {
 }
 
 dependencies {
-    // Include Common Project
-    compileOnly project(":Common")
+    // Common Project
+    implementation(project(path: ":Common", configuration: "namedElements")) {
+        transitive = false
+    }
 
     // Minecraft
     minecraft "com.mojang:minecraft:${minecraftVersion}"
@@ -43,29 +45,29 @@ dependencies {
     }
 
     // Fabric
-    modImplementation "net.fabricmc:fabric-loader:${fabricVersion}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+    modApi "net.fabricmc:fabric-loader:${fabricVersion}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 
-    // Forge Configs
-    modImplementation "net.minecraftforge:forgeconfigapiport-fabric:4.2.10"
+    // Forge Config API Port
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:5.0.10"
 
     // Cardinal Components
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.0.2"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.0.2"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.0.2"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.0.2"))
-    modImplementation(include("dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.0.2"))
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.1.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.1.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.1.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.1.0"
+    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.1.0"
 
     // Quality of Life Mods
-    modRuntimeOnly "com.terraformersmc:modmenu:4.0.6"
-    modRuntimeOnly "curse.maven:tooltipfix-411557:3820437"
+    modLocalRuntime "com.terraformersmc:modmenu:5.0.2"
+    modLocalRuntime "curse.maven:configured-fabric-667378:4166864"
 
     // Puzzles Lib
-//    modImplementation "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
+//    modApi "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/${modId}.fabric.accesswidener")
+    accessWidenerPath = project(":Common").file("src/main/resources/${modId}.accesswidener")
     mixin.defaultRefmapName = "${modId}.refmap.json"
 
     runs {
@@ -193,18 +195,6 @@ publishing {
                     }
                 }
             }
-            afterEvaluate {
-                // exclude certain dependencies when publishing to maven
-                // from https://stackoverflow.com/a/50121790
-                pom.withXml {
-                    asNode().dependencies.dependency.each { dep ->
-                        // use this approach to make excluding dependencies from Curse Maven more convenient
-                        if (["curse.maven:", "com.terraformersmc:modmenu"].stream().anyMatch(mod -> "${dep.groupId.last().value().last()}:${dep.artifactId.last().value().last()}".startsWith(mod))) {
-                            assert dep.parent().remove(dep)
-                        }
-                    }
-                }
-            }
         }
     }
     repositories {
@@ -237,7 +227,6 @@ curseforge {
                 requiredDependency 'fabric-api'
                 requiredDependency 'forge-config-api-port-fabric'
 //                requiredDependency 'puzzles-lib'
-                embeddedLibrary 'cardinal-components'
             }
         }
 //        addArtifact sourcesJar
@@ -267,7 +256,6 @@ modrinth {
         required.project 'fabric-api'
         required.project 'forge-config-api-port'
 //        required.project 'puzzles-lib'
-        embedded.project 'cardinal-components-api'
     }
 //	debugMode = true
 }

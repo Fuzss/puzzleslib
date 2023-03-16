@@ -2,6 +2,9 @@ package fuzs.puzzleslib.network;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.core.DistTypeConverter;
+import fuzs.puzzleslib.api.networking.v2.Message;
+import fuzs.puzzleslib.api.networking.v2.MessageDirection;
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;

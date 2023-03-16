@@ -1,17 +1,13 @@
 package fuzs.puzzleslib.client.core;
 
-import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.blockentity.SkullRenderersFactory;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
-import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.core.ModConstructor;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -24,7 +20,6 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
@@ -35,8 +30,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -47,7 +40,6 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.Map;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -67,21 +59,10 @@ public interface ClientModConstructor {
      * runs after content has been registered, so it's safe to use here
      * used to set various values and settings for already registered content
      *
-     * @deprecated migrate to {@link #onClientSetup(ModConstructor.ModLifecycleContext)}
-     */
-    @Deprecated(forRemoval = true)
-    default void onClientSetup() {
-
-    }
-
-    /**
-     * runs after content has been registered, so it's safe to use here
-     * used to set various values and settings for already registered content
-     *
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
      */
     default void onClientSetup(ModConstructor.ModLifecycleContext context) {
-        this.onClientSetup();
+
     }
 
     /**
@@ -113,20 +94,6 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context register a screen for a menu type
-     */
-    default void onRegisterMenuScreens(MenuScreensContext context) {
-
-    }
-
-    /**
-     * @param context add a sprite to a texture atlas
-     */
-    default void onRegisterAtlasSprites(AtlasSpritesContext context) {
-
-    }
-
-    /**
      * @param context add a layer definition for a {@link ModelLayerLocation}
      */
     default void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
@@ -141,34 +108,10 @@ public interface ClientModConstructor {
     }
 
     /**
-     * context for modifying baked models right after they've been loaded
-     *
-     * @param modelManager      the model manager
-     * @param models            map of all baked models, useful to add or replace models
-     * @param modelBakery       the bakery
-     *
-     * @deprecated              use {@link #onLoadModels(LoadModelsContext)}
-     */
-    @Deprecated(forRemoval = true)
-    default void onLoadModels(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
-
-    }
-
-    /**
-     * @param context           context for modifying baked models right after they've been loaded
-     *
-     * @deprecated              use {@link #onRegisterModelBakingCompletedListeners}
-     */
-    @Deprecated(forRemoval = true)
-    default void onLoadModels(LoadModelsContext context) {
-        this.onLoadModels(context.modelManager(), context.models(), context.modelBakery());
-    }
-
-    /**
      * @param context context for registering a listener that runs right after baked models have been reloaded
      */
-    default void onRegisterModelBakingCompletedListeners(ModelBakingCompletedListenersContext context) {
-        context.registerReloadListener(c -> this.onLoadModels(new LoadModelsContext(c.modelManager, c.models, c.modelBakery)));
+    default void onRegisterModelBakingListeners(ModelBakingListenersContext context) {
+
     }
 
     /**
@@ -186,20 +129,10 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context   register a custom inventory renderer for an item belonging to a block entity
-     *
-     * @deprecated      use {@link #onRegisterBuiltinModelItemRenderers}
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterBuiltinModelItemRenderer(BuiltinModelItemRendererContext context) {
-
-    }
-
-    /**
      * @param context register a custom inventory renderer for an item belonging to a block entity
      */
     default void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
-        this.onRegisterBuiltinModelItemRenderer(context);
+
     }
 
     /**
@@ -355,48 +288,6 @@ public interface ClientModConstructor {
     }
 
     /**
-     * register a screen for a menu type
-     */
-    @FunctionalInterface
-    interface MenuScreensContext {
-
-        /**
-         * register a factory for a {@link MenuType}
-         * implementation is the same on Fabric and Forge, as both use and accesswidener/accesstransformer, which is not applied in common though
-         *
-         * @param menuType the menu type
-         * @param factory  the factory to create a screen from when the menu is opened on the server
-         * @param <M>      type of menu
-         * @param <U>      type of screen
-         */
-        <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory);
-    }
-
-    /**
-     * stitch a custom sprite onto an atlas
-     */
-    @FunctionalInterface
-    interface AtlasSpritesContext {
-
-        /**
-         * convenient overload for directly registering a material
-         *
-         * @param material a texture material
-         */
-        default void registerMaterial(Material material) {
-            this.registerAtlasSprite(material.atlasLocation(), material.texture());
-        }
-
-        /**
-         * registers a sprite for being stitched onto an atlas
-         *
-         * @param atlasId the atlas to register to, since 1.14 there are multiples
-         * @param spriteId the sprite to register
-         */
-        void registerAtlasSprite(ResourceLocation atlasId, ResourceLocation spriteId);
-    }
-
-    /**
      * register layer definitions for entity models
      */
     @FunctionalInterface
@@ -434,7 +325,7 @@ public interface ClientModConstructor {
      * @param models            map of all baked models, useful to add or replace models
      * @param modelBakery       the bakery
      *
-     * @deprecated              replaced with {@link DynamicModelBakingContext} in {@link #onRegisterModelBakingCompletedListeners}
+     * @deprecated              replaced with {@link DynamicModelBakingContext} in {@link #onRegisterModelBakingListeners}
      */
     @Deprecated(forRemoval = true)
     record LoadModelsContext(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
@@ -459,14 +350,30 @@ public interface ClientModConstructor {
      * context for registering a listener that runs right after baked models have been reloaded
      */
     @FunctionalInterface
-    interface ModelBakingCompletedListenersContext {
+    interface ModelBakingListenersContext {
 
         /**
          * register a reload listener
          *
-         * @param action    action that runs everytime baked models are reloaded
+         * @param modelBakingContext    action that runs everytime baked models are reloaded
          */
-        void registerReloadListener(Consumer<DynamicModelBakingContext> action);
+        void registerReloadListener(DynamicModelBakingContext modelBakingContext);
+    }
+
+    /**
+     * Context for modifying baked models right after they've been loaded.
+     */
+    @FunctionalInterface
+    interface DynamicModelBakingContext {
+
+        /**
+         * Pass reloaded model related instances.
+         *
+         * @param modelManager      the model manager
+         * @param models            map of all baked models, useful to add or replace models
+         * @param modelBakery       the bakery
+         */
+        void onModelBakingCompleted(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery);
     }
 
     /**

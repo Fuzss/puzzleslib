@@ -15,11 +15,11 @@ import java.util.function.BiConsumer;
  *
  * <p>name includes common as it would otherwise be the same as in Fabric Api
  */
-public interface CommonGameRuleFactory {
+public interface GameRulesFactory {
     /**
      * instance of the game rule factory SPI
      */
-    CommonGameRuleFactory INSTANCE = PuzzlesUtil.loadServiceProvider(CommonGameRuleFactory.class);
+    GameRulesFactory INSTANCE = PuzzlesUtil.loadServiceProvider(GameRulesFactory.class);
 
     /**
      * register a new game rule

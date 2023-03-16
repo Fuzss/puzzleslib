@@ -13,7 +13,6 @@
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.MinecraftFabricAccessor",
-    "client.accessor.SkullBlockRendererFabricAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

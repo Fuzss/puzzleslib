@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.config.serialization;
 
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
@@ -113,7 +114,7 @@ public interface ConfigDataSet<T> {
      */
     @SuppressWarnings("unchecked")
     private static <T> Registry<T> getRegistryFromKey(ResourceKey<? extends Registry<T>> registryKey) {
-        Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(registryKey.location());
+        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
         Objects.requireNonNull(registry, String.format("Registry for key %s not found", registryKey));
         return registry;
     }

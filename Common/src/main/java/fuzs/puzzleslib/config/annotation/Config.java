@@ -6,8 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * config annotation for individual config fields
- * a file containing these annotations needs to be registered via a {@link fuzs.puzzleslib.config.ConfigHolder}
+ * Config annotation for individual config fields.
+ * <p>A file containing these annotations needs to be registered via a {@link fuzs.puzzleslib.config.ConfigHolder}.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)

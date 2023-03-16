@@ -4,11 +4,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.client.extension.WrappedClientItemExtension;
-import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
-import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.core.ModConstructor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -18,9 +16,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -38,13 +33,10 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.client.searchtree.SearchRegistry;
-import net.minecraft.core.Registry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
@@ -52,8 +44,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -74,7 +64,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -97,7 +86,7 @@ public class ForgeClientModConstructor {
     /**
      * actions to run each time after baked models have been reloaded
      */
-    private final List<Consumer<DynamicModelBakingContext>> modelBakingListeners = Lists.newArrayList();
+    private final List<ClientModConstructor.DynamicModelBakingContext> modelBakingListeners = Lists.newArrayList();
     /**
      * custom built-in item model renderers to reload after each resource reload
      */
@@ -120,9 +109,8 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onClientSetup(final FMLClientSetupEvent evt) {
         this.constructor.onClientSetup(evt::enqueueWork);
-        this.constructor.onRegisterMenuScreens(this.getMenuScreensContext());
         this.constructor.onRegisterSearchTrees(this.getSearchRegistryContext());
-        this.constructor.onRegisterModelBakingCompletedListeners(this.modelBakingListeners::add);
+        this.constructor.onRegisterModelBakingListeners(this.modelBakingListeners::add);
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
         this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
         this.constructor.onRegisterBlockRenderTypes(new ClientModConstructor.BlockRenderTypesContext() {
@@ -157,18 +145,6 @@ public class ForgeClientModConstructor {
                 ItemBlockRenderTypes.setRenderLayer(object, renderType);
             }
         });
-    }
-
-    private ClientModConstructor.MenuScreensContext getMenuScreensContext() {
-        return new ClientModConstructor.MenuScreensContext() {
-
-            @Override
-            public <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory) {
-                Objects.requireNonNull(menuType, "menu type is null");
-                Objects.requireNonNull(factory, "screen constructor is null");
-                MenuScreens.register(menuType, factory::create);
-            }
-        };
     }
 
     private ClientModConstructor.SearchRegistryContext getSearchRegistryContext() {
@@ -300,17 +276,6 @@ public class ForgeClientModConstructor {
     }
 
     @SubscribeEvent
-    public void onTextureStitch(final TextureStitchEvent.Pre evt) {
-        this.constructor.onRegisterAtlasSprites((ResourceLocation atlasId, ResourceLocation spriteId) -> {
-            Objects.requireNonNull(atlasId, "atlas id is null");
-            Objects.requireNonNull(spriteId, "sprite id is null");
-            if (evt.getAtlas().location().equals(atlasId)) {
-                evt.addSprite(spriteId);
-            }
-        });
-    }
-
-    @SubscribeEvent
     public void onRegisterLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions evt) {
         this.constructor.onRegisterLayerDefinitions((ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier) -> {
             Objects.requireNonNull(layerLocation, "layer location is null");
@@ -321,19 +286,9 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
-        final DynamicModelBakingContext context = new DynamicModelBakingContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()) {
-
-            @Override
-            public BakedModel bakeModel(ResourceLocation model) {
-                Objects.requireNonNull(model, "model location is null");
-                // this will never be null, if not present returns missing model
-                UnbakedModel unbakedModel = this.modelBakery.getModel(model);
-                return unbakedModel.bake(this.modelBakery, this.modelBakery.getAtlasSet()::getSprite, BlockModelRotation.X0_Y0, model);
-            }
-        };
-        for (Consumer<DynamicModelBakingContext> listener : this.modelBakingListeners) {
+        for (ClientModConstructor.DynamicModelBakingContext listener : this.modelBakingListeners) {
             try {
-                listener.accept(context);
+                listener.onModelBakingCompleted(evt.getModelManager(), evt.getModels(), evt.getModelBakery());
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
             }
@@ -413,7 +368,7 @@ public class ForgeClientModConstructor {
                             });
                 } else {
                     LivingEntityRenderer<T, EntityModel<T>> entityRenderer = evt.getRenderer(entityType);
-                    Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(Registry.ENTITY_TYPE.getKey(entityType).toString()));
+                    Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString()));
                     this.actuallyRegisterRenderLayer(entityRenderer, factory);
                 }
             }

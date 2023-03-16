@@ -344,7 +344,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         @Override
         protected Optional<TagKey<E>> toValue(ResourceLocation identifier) {
             TagKey<E> tag = TagKey.create(this.activeRegistry.key(), identifier);
-            if (!this.activeRegistry.isKnownTagName(tag)) return Optional.empty();
+            if (this.activeRegistry.getTag(tag).isEmpty()) return Optional.empty();
             return Optional.of(tag);
         }
 

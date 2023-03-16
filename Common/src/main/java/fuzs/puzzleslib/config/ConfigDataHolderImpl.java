@@ -3,6 +3,7 @@ package fuzs.puzzleslib.config;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
+import net.minecraftforge.common.ForgeConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -88,8 +89,9 @@ public abstract class ConfigDataHolderImpl<T extends ConfigCore> implements Conf
     }
 
     @Override
-    public <V> void accept(Supplier<V> entry, Consumer<V> save) {
+    public <S, V extends ForgeConfigSpec.ConfigValue<S>> V accept(V entry, Consumer<S> save) {
         this.configValueCallbacks.add(() -> save.accept(entry.get()));
+        return entry;
     }
 
     /**

@@ -6,7 +6,7 @@ import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.init.PotionBrewingRegistry;
 import fuzs.puzzleslib.init.RegistryManager;
-import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import org.jetbrains.annotations.ApiStatus;

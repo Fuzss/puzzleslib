@@ -4,14 +4,12 @@ import fuzs.puzzleslib.mixin.client.accessor.AbstractContainerScreenFabricAccess
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -39,39 +37,33 @@ public final class FabricScreens implements CommonScreens {
         return Screens.getItemRenderer(screen);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<Widget> getRenderableButtons(Screen screen) {
-        return (List<Widget>) (List<?>) Screens.getButtons(screen);
-    }
-
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).getXSize();
+        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getXSize();
     }
 
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).getYSize();
+        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getYSize();
     }
 
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).getGuiLeft();
+        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getGuiLeft();
     }
 
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).getGuiTop();
+        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getGuiTop();
     }
 
     @Override
     public @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).getSlotUnderMouse();
+        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getSlotUnderMouse();
     }
 }

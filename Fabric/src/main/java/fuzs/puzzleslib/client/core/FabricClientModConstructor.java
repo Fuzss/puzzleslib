@@ -6,29 +6,22 @@ import fuzs.puzzleslib.api.client.event.ModelEvents;
 import fuzs.puzzleslib.api.client.renderer.EntitySpectatorShaderRegistry;
 import fuzs.puzzleslib.api.client.renderer.ItemDecoratorRegistry;
 import fuzs.puzzleslib.api.client.renderer.SkullRenderersRegistry;
-import fuzs.puzzleslib.client.init.builder.ModScreenConstructor;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
-import fuzs.puzzleslib.client.resources.model.DynamicModelBakingContext;
 import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftFabricAccessor;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
-import net.fabricmc.fabric.api.event.client.ClientSpriteRegistryCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.MenuAccess;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -42,10 +35,6 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -58,8 +47,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
@@ -71,7 +58,6 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -156,20 +142,6 @@ public class FabricClientModConstructor {
         };
     }
 
-    private <M extends AbstractContainerMenu, U extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, ModScreenConstructor<M, U> factory) {
-        Objects.requireNonNull(menuType, "menu type is null");
-        Objects.requireNonNull(factory, "screen constructor is null");
-        MenuScreens.register(menuType, factory::create);
-    }
-
-    private void registerAtlasSprite(ResourceLocation atlasId, ResourceLocation spriteId) {
-        Objects.requireNonNull(atlasId, "atlas id is null");
-        Objects.requireNonNull(spriteId, "sprite id is null");
-        ClientSpriteRegistryCallback.event(atlasId).register((TextureAtlas atlasTexture, ClientSpriteRegistryCallback.Registry registry) -> {
-            registry.register(spriteId);
-        });
-    }
-
     private void registerLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier) {
         Objects.requireNonNull(layerLocation, "layer location is null");
         Objects.requireNonNull(supplier, "layer supplier is null");
@@ -179,7 +151,7 @@ public class FabricClientModConstructor {
     private <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
         Objects.requireNonNull(searchRegistryKey, "search registry key is null");
         Objects.requireNonNull(treeBuilder, "search registry tree builder is null");
-        SearchRegistry searchTreeManager = ((MinecraftFabricAccessor) Minecraft.getInstance()).getSearchRegistry();
+        SearchRegistry searchTreeManager = ((MinecraftFabricAccessor) Minecraft.getInstance()).puzzleslib$getSearchRegistry();
         Objects.requireNonNull(searchTreeManager, "search tree manager is null");
         searchTreeManager.register(searchRegistryKey, treeBuilder);
     }
@@ -205,24 +177,6 @@ public class FabricClientModConstructor {
                 }
             }
         };
-    }
-
-    private void onBakingCompleted(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery, List<Consumer<DynamicModelBakingContext>> modelBakingListeners) {
-        final DynamicModelBakingContext context = new DynamicModelBakingContext(modelManager, models, modelBakery) {
-
-            @Override
-            public BakedModel bakeModel(ResourceLocation model) {
-                Objects.requireNonNull(model, "model location is null");
-                return BakedModelManagerHelper.getModel(this.modelManager, model);
-            }
-        };
-        for (Consumer<DynamicModelBakingContext> listener : modelBakingListeners) {
-            try {
-                listener.accept(context);
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
-            }
-        }
     }
 
     private IdentifiableResourceReloadListener getFabricResourceReloadListener(String id, PreparableReloadListener reloadListener, ResourceLocation... dependencies) {
@@ -288,14 +242,20 @@ public class FabricClientModConstructor {
         constructor.onRegisterBlockEntityRenderers(fabricClientModConstructor.getBlockEntityRenderersContext());
         constructor.onRegisterClientTooltipComponents(fabricClientModConstructor::registerClientTooltipComponent);
         constructor.onRegisterParticleProviders(fabricClientModConstructor.getParticleProvidersContext());
-        constructor.onRegisterMenuScreens(fabricClientModConstructor::registerMenuScreen);
-        constructor.onRegisterAtlasSprites(fabricClientModConstructor::registerAtlasSprite);
         constructor.onRegisterLayerDefinitions(fabricClientModConstructor::registerLayerDefinition);
         constructor.onRegisterSearchTrees(fabricClientModConstructor::registerSearchTree);
-        final List<Consumer<DynamicModelBakingContext>> modelBakingListeners = Lists.newArrayList();
-        constructor.onRegisterModelBakingCompletedListeners(modelBakingListeners::add);
+        final List<ClientModConstructor.DynamicModelBakingContext> modelBakingListeners = Lists.newArrayList();
+        constructor.onRegisterModelBakingListeners(modelBakingListeners::add);
         if (!modelBakingListeners.isEmpty()) {
-            ModelEvents.BAKING_COMPLETED.register((modelManager, models, modelBakery) -> fabricClientModConstructor.onBakingCompleted(modelManager, models, modelBakery, modelBakingListeners));
+            ModelEvents.BAKING_COMPLETED.register((modelManager, models, modelBakery) -> {
+                for (ClientModConstructor.DynamicModelBakingContext listener : modelBakingListeners) {
+                    try {
+                        listener.onModelBakingCompleted(modelManager, models, modelBakery);
+                    } catch (Exception e) {
+                        PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", modId, e);
+                    }
+                }
+            });
         }
         constructor.onRegisterAdditionalModels((ResourceLocation model) -> {
             Objects.requireNonNull(model, "model location is null");

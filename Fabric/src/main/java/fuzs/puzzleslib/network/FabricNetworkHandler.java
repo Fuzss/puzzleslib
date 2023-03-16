@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.network;
 
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.networking.v2.Message;
+import fuzs.puzzleslib.api.networking.v2.MessageDirection;
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricProxy;
 import fuzs.puzzleslib.proxy.Proxy;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

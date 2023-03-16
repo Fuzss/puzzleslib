@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
  * @param <T> type of menu
  */
 @FunctionalInterface
-public interface ExtendedModMenuSupplier<T extends AbstractContainerMenu> {
+public interface ExtendedMenuSupplier<T extends AbstractContainerMenu> {
 
     /**
      * container menu factory method

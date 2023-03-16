@@ -8,6 +8,6 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(Minecraft.class)
 public interface MinecraftFabricAccessor {
 
-    @Accessor
-    SearchRegistry getSearchRegistry();
+    @Accessor("searchRegistry")
+    SearchRegistry puzzleslib$getSearchRegistry();
 }

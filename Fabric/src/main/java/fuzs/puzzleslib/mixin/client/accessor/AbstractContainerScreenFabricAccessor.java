@@ -9,17 +9,17 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface AbstractContainerScreenFabricAccessor {
 
     @Accessor("imageWidth")
-    int getXSize();
+    int puzzleslib$getXSize();
 
     @Accessor("imageHeight")
-    int getYSize();
+    int puzzleslib$getYSize();
 
     @Accessor("leftPos")
-    int getGuiLeft();
+    int puzzleslib$getGuiLeft();
 
     @Accessor("topPos")
-    int getGuiTop();
+    int puzzleslib$getGuiTop();
 
     @Accessor("hoveredSlot")
-    Slot getSlotUnderMouse();
+    Slot puzzleslib$getSlotUnderMouse();
 }

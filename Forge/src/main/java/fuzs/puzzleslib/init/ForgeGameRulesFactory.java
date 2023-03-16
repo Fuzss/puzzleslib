@@ -1,39 +1,39 @@
 package fuzs.puzzleslib.init;
 
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
-import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
+import fuzs.puzzleslib.mixin.accessor.BooleanValueForgeAccessor;
+import fuzs.puzzleslib.mixin.accessor.IntegerValueForgeAccessor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
 import java.util.function.BiConsumer;
 
 /**
- * implementation on Fabric using methods conveniently provided by Fabric Api
+ * implementation on Forge, we need to use custom accessors as Forge has nothing to help us unfortunately
  */
-public final class FabricGameRuleFactory implements CommonGameRuleFactory {
+public final class ForgeGameRulesFactory implements GameRulesFactory {
 
     @Override
     public <T extends GameRules.Value<T>> GameRules.Key<T> register(String name, GameRules.Category category, GameRules.Type<T> type) {
-        return GameRuleRegistry.register(name, category, type);
+        return GameRules.register(name, category, type);
     }
 
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue) {
-        return GameRuleFactory.createBooleanRule(defaultValue);
+        return BooleanValueForgeAccessor.puzzleslib$callCreate(defaultValue, (minecraftServer, booleanValue) -> {});
     }
 
     @Override
     public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changedCallback) {
-        return GameRuleFactory.createBooleanRule(defaultValue, changedCallback);
+        return BooleanValueForgeAccessor.puzzleslib$callCreate(defaultValue, changedCallback);
     }
 
     @Override
     public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue) {
-        return GameRuleFactory.createIntRule(defaultValue);
+        return IntegerValueForgeAccessor.puzzleslib$callCreate(defaultValue, (minecraftServer, integerValue) -> {});
     }
 
     @Override
     public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changedCallback) {
-        return GameRuleFactory.createIntRule(defaultValue, changedCallback);
+        return IntegerValueForgeAccessor.puzzleslib$callCreate(defaultValue, changedCallback);
     }
 }

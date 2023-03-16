@@ -3,18 +3,19 @@ package fuzs.puzzleslib.init;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.core.ModLoader;
-import fuzs.puzzleslib.init.builder.ExtendedModMenuSupplier;
-import fuzs.puzzleslib.init.builder.ModBlockEntityTypeBuilder;
-import fuzs.puzzleslib.init.builder.ModMenuSupplier;
-import fuzs.puzzleslib.init.builder.ModPoiTypeBuilder;
+import fuzs.puzzleslib.init.builder.ExtendedMenuSupplier;
+import fuzs.puzzleslib.init.builder.PoiTypeBuilder;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.item.Item;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.network.IContainerFactory;
 import net.minecraftforge.registries.DeferredRegister;
@@ -96,29 +97,21 @@ public class ForgeRegistryManager implements RegistryManager {
         return new ForgeRegistryReference<>(registryObject, (ResourceKey<? extends Registry<T>>) registryKey);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
-    public <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityTypeBuilder(String path, Supplier<ModBlockEntityTypeBuilder<T>> entry) {
-        return this.registerBlockEntityType(path, () -> {
-            ModBlockEntityTypeBuilder<T> builder = entry.get();
-            return BlockEntityType.Builder.of(builder.factory()::create, builder.blocks()).build(null);
-        });
+    public RegistryReference<Item> registerSpawnEggItem(RegistryReference<EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
+        return this.registerItem(entityTypeReference.getResourceLocation().getPath() + "_spawn_egg", () -> new ForgeSpawnEggItem(entityTypeReference::get, backgroundColor, highlightColor, itemProperties));
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>((IContainerFactory<T>) (containerId, inventory, data) -> entry.get().create(containerId, inventory, data)));
     }
 
     @Override
-    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuTypeSupplier(String path, Supplier<ModMenuSupplier<T>> entry) {
-        return this.registerMenuType(path, () -> new MenuType<>(entry.get()::create));
-    }
-
-    @Override
-    public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuTypeSupplier(String path, Supplier<ExtendedModMenuSupplier<T>> entry) {
-        return this.registerMenuType(path, () -> new MenuType<>((IContainerFactory<T>) (containerId, inventory, data) -> entry.get().create(containerId, inventory, data)));
-    }
-
-    @Override
-    public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<ModPoiTypeBuilder> entry) {
-        return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, () -> {
-            ModPoiTypeBuilder builder = entry.get();
+    public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry) {
+        return this.register(Registries.POINT_OF_INTEREST_TYPE, path, () -> {
+            PoiTypeBuilder builder = entry.get();
             return new PoiType(ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
         });
     }

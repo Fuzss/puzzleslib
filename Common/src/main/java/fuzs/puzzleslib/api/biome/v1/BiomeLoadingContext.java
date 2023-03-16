@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.biome.v1;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
@@ -39,30 +38,6 @@ public interface BiomeLoadingContext {
      * Returns this biome wrapped in a holder.
      */
     Holder<Biome> holder();
-
-    /**
-     * Returns true if this biome has the given configured feature, which must be registered
-     * in the {@link net.minecraft.data.BuiltinRegistries}.
-     *
-     * <p>This method is intended for use with the Vanilla configured features found in
-     * classes such as {@link net.minecraft.data.worldgen.features.OreFeatures}.
-     */
-    default boolean hasBuiltInFeature(ConfiguredFeature<?, ?> configuredFeature) {
-        ResourceKey<ConfiguredFeature<?, ?>> key = BuiltinRegistries.CONFIGURED_FEATURE.getResourceKey(configuredFeature).orElseThrow();
-        return this.hasFeature(key);
-    }
-
-    /**
-     * Returns true if this biome has the given placed feature, which must be registered
-     * in the {@link net.minecraft.data.BuiltinRegistries}.
-     *
-     * <p>This method is intended for use with the Vanilla placed features found in
-     * classes such as {@link net.minecraft.data.worldgen.placement.OrePlacements}.
-     */
-    default boolean hasBuiltInPlacedFeature(PlacedFeature placedFeature) {
-        ResourceKey<PlacedFeature> key = BuiltinRegistries.PLACED_FEATURE.getResourceKey(placedFeature).orElseThrow();
-        return this.hasPlacedFeature(key);
-    }
 
     /**
      * Returns true if this biome contains a placed feature referencing a configured feature with the given key.
@@ -111,17 +86,6 @@ public interface BiomeLoadingContext {
      * from this biomes feature list.
      */
     Optional<ResourceKey<PlacedFeature>> getPlacedFeatureKey(PlacedFeature placedFeature);
-
-    /**
-     * Returns true if the given built-in configured structure from {@link net.minecraft.data.BuiltinRegistries}
-     * can start in this biome in any of the chunk generators used by the current world-save.
-     *
-     * <p>This method is intended for use with the Vanilla configured structures found in {@link net.minecraft.data.worldgen.Structures}.
-     */
-    default boolean validForBuiltInStructure(Structure structureFeature) {
-        ResourceKey<Structure> key = BuiltinRegistries.STRUCTURES.getResourceKey(structureFeature).orElseThrow();
-        return this.validForStructure(key);
-    }
 
     /**
      * Returns true if the configured structure with the given key can start in this biome in any chunk generator

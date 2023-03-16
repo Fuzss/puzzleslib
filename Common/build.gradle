@@ -1,5 +1,6 @@
 plugins {
-    id 'org.quiltmc.loom' version '0.12.+'
+    id 'fabric-loom' version '1.0.+'
+    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
 }
 
 archivesBaseName = rootProject.name
@@ -14,22 +15,21 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
-    // Mixin Dependencies
-    implementation 'org.ow2.asm:asm-tree:9.2'
-    implementation 'org.ow2.asm:asm-commons:9.2'
-    implementation 'org.ow2.asm:asm-util:9.2'
-    implementation 'org.spongepowered:mixin:0.8.5'
+    // Fabric
+    modImplementation "net.fabricmc:fabric-loader:${fabricVersion}"
+    modImplementation fabricApi.module("fabric-api-base", "${fabricApiVersion}")
+    modImplementation fabricApi.module("fabric-transitive-access-wideners-v1", "${fabricApiVersion}")
 
-    // Config Dependencies
-    implementation 'com.electronwill.night-config:core:3.6.5'
-    implementation 'com.electronwill.night-config:toml:3.6.5'
+    // Forge Config API Port
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:5.0.10"
 
     // Puzzles Lib
-//    modImplementation "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}"
+//    modApi "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}"
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/${modId}.common.accesswidener")
+    accessWidenerPath = file("src/main/resources/${modId}.accesswidener")
+
     mixin {
         // not sure if this is necessary for common...
         defaultRefmapName = "${modId}.refmap.json"
@@ -114,18 +114,6 @@ publishing {
                     }
                 }
             }
-            afterEvaluate {
-                // exclude certain dependencies when publishing to maven
-                // from https://stackoverflow.com/a/50121790
-                pom.withXml {
-                    asNode().dependencies.dependency.each { dep ->
-                        // use this approach to make excluding dependencies from Curse Maven more convenient
-                        if ([].stream().anyMatch(mod -> "${dep.groupId.last().value().last()}:${dep.artifactId.last().value().last()}".startsWith(mod))) {
-                            assert dep.parent().remove(dep)
-                        }
-                    }
-                }
-            }
         }
     }
     repositories {
@@ -134,6 +122,14 @@ publishing {
             url "file://" + project.hasProperty('modResources') ? "${project.findProperty('modResources')}/maven" : System.getenv('local_maven')
         }
     }
+}
+
+// thanks to lukebemish for this comment: https://github.com/jaredlll08/MultiLoader-Template/issues/17#issuecomment-1221598082
+
+import net.fabricmc.loom.task.AbstractRemapJarTask
+
+tasks.withType(AbstractRemapJarTask).each {
+    it.targetNamespace = "named"
 }
 
 signing {

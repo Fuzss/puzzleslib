@@ -2,14 +2,12 @@ package fuzs.puzzleslib.client.gui.screens;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -38,12 +36,6 @@ public final class ForgeScreens implements CommonScreens {
     public ItemRenderer getItemRenderer(Screen screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
         return this.getMinecraft(screen).getItemRenderer();
-    }
-
-    @Override
-    public List<Widget> getRenderableButtons(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
-        return screen.renderables;
     }
 
     @Override

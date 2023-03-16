@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.config;
 
-import fuzs.puzzleslib.config.core.AbstractConfigBuilder;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 /**
  * config template interface for each config category, can be nested (fields in a subclass can be once again of type {@link ConfigCore})
@@ -13,7 +13,7 @@ public interface ConfigCore {
      * @param builder builder to add entries to
      * @param callback register save callback
      */
-    default void addToBuilder(AbstractConfigBuilder builder, ValueCallback callback) {
+    default void addToBuilder(ForgeConfigSpec.Builder builder, ValueCallback callback) {
 
     }
 

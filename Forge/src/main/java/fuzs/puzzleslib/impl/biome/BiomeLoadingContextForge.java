@@ -5,6 +5,7 @@ import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
@@ -60,19 +61,19 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
 
     @Override
     public Optional<ResourceKey<ConfiguredFeature<?, ?>>> getFeatureKey(ConfiguredFeature<?, ?> configuredFeature) {
-        Registry<ConfiguredFeature<?, ?>> registry = this.registryAccess.registryOrThrow(Registry.CONFIGURED_FEATURE_REGISTRY);
+        Registry<ConfiguredFeature<?, ?>> registry = this.registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE);
         return registry.getResourceKey(configuredFeature);
     }
 
     @Override
     public Optional<ResourceKey<PlacedFeature>> getPlacedFeatureKey(PlacedFeature placedFeature) {
-        Registry<PlacedFeature> registry = this.registryAccess.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
+        Registry<PlacedFeature> registry = this.registryAccess.registryOrThrow(Registries.PLACED_FEATURE);
         return registry.getResourceKey(placedFeature);
     }
 
     @Override
     public boolean validForStructure(ResourceKey<Structure> key) {
-        Structure instance = this.registryAccess.registryOrThrow(Registry.STRUCTURE_REGISTRY).get(key);
+        Structure instance = this.registryAccess.registryOrThrow(Registries.STRUCTURE).get(key);
 
         if (instance == null) {
             return false;
@@ -83,13 +84,13 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
 
     @Override
     public Optional<ResourceKey<Structure>> getStructureKey(Structure structure) {
-        Registry<Structure> registry = this.registryAccess.registryOrThrow(Registry.STRUCTURE_REGISTRY);
+        Registry<Structure> registry = this.registryAccess.registryOrThrow(Registries.STRUCTURE);
         return registry.getResourceKey(structure);
     }
 
     @Override
     public boolean canGenerateIn(ResourceKey<LevelStem> dimensionKey) {
-        LevelStem dimension = this.levelData.worldGenSettings().dimensions().get(dimensionKey);
+        LevelStem dimension = this.registryAccess.registryOrThrow(Registries.LEVEL_STEM).get(dimensionKey);
 
         if (dimension == null) {
             return false;
@@ -100,7 +101,7 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
 
     @Override
     public boolean is(TagKey<Biome> tag) {
-        Registry<Biome> biomeRegistry = this.registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+        Registry<Biome> biomeRegistry = this.registryAccess.registryOrThrow(Registries.BIOME);
         return biomeRegistry.getHolderOrThrow(this.getResourceKey()).is(tag);
     }
 }

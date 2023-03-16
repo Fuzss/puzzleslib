@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.network;
+package fuzs.puzzleslib.api.networking.v2;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;

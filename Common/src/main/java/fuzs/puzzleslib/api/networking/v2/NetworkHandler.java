@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.network;
+package fuzs.puzzleslib.api.networking.v2;
 
 import fuzs.puzzleslib.proxy.Proxy;
 import net.minecraft.core.BlockPos;
@@ -8,8 +8,8 @@ import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 /**

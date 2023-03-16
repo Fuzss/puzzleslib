@@ -9,7 +9,7 @@ import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -54,7 +54,7 @@ public class ItemModelOverridesImpl implements ItemModelOverrides {
         // avoid making map concurrent, as synchronization is only necessary during registration and will needlessly slow down item rendering...
         synchronized (ItemModelOverridesImpl.class) {
             if (ITEM_MODEL_PROVIDERS.put(item, new ItemModelData(itemModel, customModel, ImmutableSet.copyOf(itemModelTransforms))) != null) {
-                throw new IllegalStateException("Duplicate custom item model provider registered for item %s".formatted(Registry.ITEM.getKey(item)));
+                throw new IllegalStateException("Duplicate custom item model provider registered for item %s".formatted(BuiltInRegistries.ITEM.getKey(item)));
             }
         }
     }

@@ -7,15 +7,15 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.ObjectArrays;
 import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigDataHolderImpl;
-import fuzs.puzzleslib.config.core.AbstractConfigBuilder;
+import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * build config values from given class, values are marked via {@link Config} annotation
@@ -28,7 +28,7 @@ public class AnnotatedConfigBuilder {
      * @param context callback
      * @param target object instance
      */
-    public static <T extends ConfigCore> void serialize(AbstractConfigBuilder builder, ConfigDataHolderImpl<?> context, @NotNull T target) {
+    public static <T extends ConfigCore> void serialize(ForgeConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @NotNull T target) {
         serialize(builder, context, target.getClass(), target);
     }
 
@@ -37,7 +37,7 @@ public class AnnotatedConfigBuilder {
      * @param context callback
      * @param target target class
      */
-    public static <T extends ConfigCore> void serialize(AbstractConfigBuilder builder, ConfigDataHolderImpl<?> context, Class<? extends T> target) {
+    public static <T extends ConfigCore> void serialize(ForgeConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, Class<? extends T> target) {
         serialize(builder, context, target, null);
     }
 
@@ -48,7 +48,7 @@ public class AnnotatedConfigBuilder {
      * @param instance object instance, null when static
      * @param <T> <code>instance</code> type
      */
-    public static <T extends ConfigCore> void serialize(final AbstractConfigBuilder builder, final ConfigDataHolderImpl<?> context, Class<? extends T> target, @Nullable T instance) {
+    public static <T extends ConfigCore> void serialize(final ForgeConfigSpec.Builder builder, final ConfigDataHolderImpl<?> context, Class<? extends T> target, @Nullable T instance) {
         // add config reload callback first to make sure it's called when initially loading configs
         // (since on some systems reload event doesn't trigger during startup, resulting in configs only being loaded here)
         if (instance != null) context.accept(instance::afterConfigReload);
@@ -115,7 +115,7 @@ public class AnnotatedConfigBuilder {
      * @param annotation config annotation for config value data
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void buildConfig(final AbstractConfigBuilder builder, final ConfigDataHolderImpl<?> context, @Nullable Object instance, Field field, Config annotation) {
+    private static void buildConfig(final ForgeConfigSpec.Builder builder, final ConfigDataHolderImpl<?> context, @Nullable Object instance, Field field, Config annotation) {
         // get the name from the config, often this is left blank, so instead we create it from the field's name with an underscore format
         String name = annotation.name();
         if (StringUtils.isBlank(name)) {
@@ -231,11 +231,11 @@ public class AnnotatedConfigBuilder {
      * @param field field to save to
      * @param instance object instance, null when static
      */
-    private static void addCallback(ConfigDataHolderImpl<?> context, Supplier<?> configValue, Field field, @Nullable Object instance) {
+    private static void addCallback(ConfigDataHolderImpl<?> context, ForgeConfigSpec.ConfigValue<?> configValue, Field field, @Nullable Object instance) {
         context.accept(configValue, v -> {
             try {
-                field.set(instance, configValue.get());
-            } catch(IllegalAccessException e) {
+                MethodHandles.publicLookup().unreflectSetter(field).invoke(instance, configValue.get());
+            } catch(Throwable e) {
                 throw new RuntimeException(e);
             }
         });

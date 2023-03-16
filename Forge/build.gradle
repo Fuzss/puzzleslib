@@ -106,21 +106,22 @@ minecraft {
 }
 
 dependencies {
-    // Include Common Project
-    compileOnly project(":Common")
+    // Common Project
+    implementation(project(":Common")) {
+        transitive = false
+    }
 
     // Minecraft
     minecraft "net.minecraftforge:forge:${forgeVersion}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3873264")
-    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:4.2.0")
-//    runtimeOnly fg.deobf("curse.maven:configmenusforge-544048:3822820")
-//    runtimeOnly fg.deobf("curse.maven:configured-457570:3903908")
+    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:5.0.0")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4171025")
+    runtimeOnly fg.deobf("curse.maven:configured-457570:4166861")
 
     // Puzzles Lib
-//    implementation fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
+//    api fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
 }
 
 mixin {

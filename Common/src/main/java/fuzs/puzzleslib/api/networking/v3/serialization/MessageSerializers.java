@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import com.mojang.datafixers.util.Either;
-import com.mojang.math.Vector3f;
 import fuzs.puzzleslib.impl.networking.serialization.RecordSerializer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -13,7 +12,8 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.Rotations;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -44,6 +44,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
+import org.joml.Vector3f;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
@@ -89,10 +90,8 @@ public final class MessageSerializers {
     @SuppressWarnings("unchecked")
     public static <T> void registerSerializer(Class<? super T> type, ResourceKey<Registry<T>> resourceKey) {
         Registry<T> registry;
-        if (Registry.REGISTRY.containsKey(resourceKey.location())) {
-            registry = (Registry<T>) Registry.REGISTRY.get(resourceKey.location());
-        } else if (BuiltinRegistries.REGISTRY.containsKey(resourceKey.location())) {
-            registry = (Registry<T>) BuiltinRegistries.REGISTRY.get(resourceKey.location());
+        if (BuiltInRegistries.REGISTRY.containsKey(resourceKey.location())) {
+            registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(resourceKey.location());
         } else {
             registry = null;
         }
@@ -312,22 +311,22 @@ public final class MessageSerializers {
             other.release();
         }, buf -> new FriendlyByteBuf(buf.readBytes(buf.readVarInt())));
 
-        registerSerializer(SoundEvent.class, Registry.SOUND_EVENT_REGISTRY);
-        registerSerializer(Fluid.class, Registry.FLUID_REGISTRY);
-        registerSerializer(MobEffect.class, Registry.MOB_EFFECT_REGISTRY);
-        registerSerializer(Block.class, Registry.BLOCK_REGISTRY);
-        registerSerializer(Enchantment.class, Registry.ENCHANTMENT_REGISTRY);
-        registerSerializer(EntityType.class, Registry.ENTITY_TYPE_REGISTRY);
-        registerSerializer(Item.class, Registry.ITEM_REGISTRY);
-        registerSerializer(Potion.class, Registry.POTION_REGISTRY);
-        registerSerializer(ParticleType.class, Registry.PARTICLE_TYPE_REGISTRY);
-        registerSerializer(BlockEntityType.class, Registry.BLOCK_ENTITY_TYPE_REGISTRY);
-        registerSerializer(MenuType.class, Registry.MENU_REGISTRY);
-        registerSerializer(Attribute.class, Registry.ATTRIBUTE_REGISTRY);
-        registerSerializer(GameEvent.class, Registry.GAME_EVENT_REGISTRY);
-        registerSerializer(VillagerType.class, Registry.VILLAGER_TYPE_REGISTRY);
-        registerSerializer(VillagerProfession.class, Registry.VILLAGER_PROFESSION_REGISTRY);
-        registerSerializer(PoiType.class, Registry.POINT_OF_INTEREST_TYPE_REGISTRY);
+        registerSerializer(SoundEvent.class, Registries.SOUND_EVENT);
+        registerSerializer(Fluid.class, Registries.FLUID);
+        registerSerializer(MobEffect.class, Registries.MOB_EFFECT);
+        registerSerializer(Block.class, Registries.BLOCK);
+        registerSerializer(Enchantment.class, Registries.ENCHANTMENT);
+        registerSerializer(EntityType.class, Registries.ENTITY_TYPE);
+        registerSerializer(Item.class, Registries.ITEM);
+        registerSerializer(Potion.class, Registries.POTION);
+        registerSerializer(ParticleType.class, Registries.PARTICLE_TYPE);
+        registerSerializer(BlockEntityType.class, Registries.BLOCK_ENTITY_TYPE);
+        registerSerializer(MenuType.class, Registries.MENU);
+        registerSerializer(Attribute.class, Registries.ATTRIBUTE);
+        registerSerializer(GameEvent.class, Registries.GAME_EVENT);
+        registerSerializer(VillagerType.class, Registries.VILLAGER_TYPE);
+        registerSerializer(VillagerProfession.class, Registries.VILLAGER_PROFESSION);
+        registerSerializer(PoiType.class, Registries.POINT_OF_INTEREST_TYPE);
 
         registerContainerProvider(Map.class, MessageSerializers::createMapSerializer);
         registerContainerProvider(List.class, typeArguments -> createCollectionSerializer(typeArguments, Lists::newArrayListWithExpectedSize));

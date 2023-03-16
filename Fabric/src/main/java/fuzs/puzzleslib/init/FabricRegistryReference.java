@@ -67,7 +67,7 @@ public class FabricRegistryReference<T> implements RegistryReference<T> {
     @SuppressWarnings("unchecked")
     @Override
     public Holder<T> holder() {
-        return ((Registry<T>) this.registry).getOrCreateHolderOrThrow(this.key);
+        return ((Registry<T>) this.registry).getHolderOrThrow(this.key);
     }
 
     @Override

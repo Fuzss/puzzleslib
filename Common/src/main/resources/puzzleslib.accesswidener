@@ -9,3 +9,5 @@ transitive-extendable   method  net/minecraft/world/entity/monster/AbstractSkele
 transitive-extendable   method  net/minecraft/world/entity/monster/Skeleton getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
 transitive-extendable   method  net/minecraft/world/entity/monster/Stray    getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
 transitive-extendable   method  net/minecraft/world/entity/monster/WitherSkeleton   getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
+transitive-accessible   field   net/minecraft/client/gui/screens/Screen     renderables     Ljava/util/List;
+transitive-accessible   field   net/minecraft/client/renderer/blockentity/SkullBlockRenderer    SKIN_BY_TYPE    Ljava/util/Map;

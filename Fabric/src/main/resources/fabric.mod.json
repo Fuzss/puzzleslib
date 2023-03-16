@@ -9,7 +9,7 @@
   "authors": [
     "${modAuthor}"
   ],
-
+  
   "contact": {
     "homepage": "${modPageUrl}",
     "issues": "${modIssueUrl}",
@@ -23,12 +23,10 @@
 
   "entrypoints": {
     "main": [
-      "${modGroup}.impl.PuzzlesLibFabric"
+      "${mainEntryPoint}"
     ],
     "client": [
-    ],
-    "cardinal-components": [
-      "${modGroup}.capability.FabricCapabilityController"
+      "${clientEntryPoint}"
     ]
   },
 
@@ -37,19 +35,14 @@
     "${modId}.fabric.mixins.json"
   ],
 
-  "accessWidener": "${modId}.fabric.accesswidener",
+  "accessWidener": "${modId}.accesswidener",
 
   "depends": {
     "fabricloader": ">=${minFabricVersion}",
     "fabric-api": ">=${minFabricApiVersion}",
     "forgeconfigapiport": "*",
     "minecraft": "${minecraftVersion}",
-    "java": ">=17",
-    "cardinal-components-base": "*",
-    "cardinal-components-entity": "*",
-    "cardinal-components-block": "*",
-    "cardinal-components-chunk": "*",
-    "cardinal-components-world": "*"
+    "java": ">=17"
   },
 
   "custom": {

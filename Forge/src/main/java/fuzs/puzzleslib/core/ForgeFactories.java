@@ -11,7 +11,7 @@ import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryImplForge;
 import fuzs.puzzleslib.init.ForgeRegistryManager;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.ForgeNetworkHandler;
-import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.ForgeClientProxy;
 import fuzs.puzzleslib.proxy.ForgeServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;

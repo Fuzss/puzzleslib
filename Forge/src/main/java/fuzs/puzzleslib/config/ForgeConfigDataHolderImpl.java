@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.config.annotation.AnnotatedConfigBuilder;
-import fuzs.puzzleslib.config.core.ForgeConfigBuilderWrapper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
@@ -103,7 +102,7 @@ class ForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderIm
      */
     private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
-        AnnotatedConfigBuilder.serialize(new ForgeConfigBuilderWrapper(builder),this, this.config);
+        AnnotatedConfigBuilder.serialize(builder,this, this.config);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }

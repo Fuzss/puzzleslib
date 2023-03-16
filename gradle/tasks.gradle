@@ -206,7 +206,7 @@ task fabricGenSources(type: GradleBuild) {
 task forgeClient(type: GradleBuild) {
     group = '_main'
     tasks = [
-            ':Forge:runClient'
+            ':Forge:Client'
     ]
 }
 
@@ -220,7 +220,7 @@ task fabricClient(type: GradleBuild) {
 task forgeServer(type: GradleBuild) {
     group = '_main'
     tasks = [
-            ':Forge:runServer'
+            ':Forge:Server'
     ]
 }
 
@@ -228,5 +228,12 @@ task fabricServer(type: GradleBuild) {
     group = '_main'
     tasks = [
             ':Fabric:runServer'
+    ]
+}
+
+task forgeData(type: GradleBuild) {
+    group = '_main'
+    tasks = [
+            ':Forge:Data'
     ]
 }

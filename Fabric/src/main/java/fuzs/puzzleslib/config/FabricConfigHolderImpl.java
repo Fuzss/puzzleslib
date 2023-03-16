@@ -2,12 +2,10 @@ package fuzs.puzzleslib.config;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.config.core.FabricModConfig;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
+import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
 import fuzs.puzzleslib.core.DistType;
 import fuzs.puzzleslib.core.DistTypeExecutor;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.minecraftforge.api.fml.event.config.ModConfigEvents;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -83,8 +81,7 @@ public class FabricConfigHolderImpl implements ConfigHolder.Builder {
                 holder.onModConfig(config, true);
             });
             holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-                ModContainer modContainer = FabricLoader.getInstance().getModContainer(modId).orElseThrow(() -> new IllegalArgumentException(String.format("No mod with mod id %s", modId)));
-                return new FabricModConfig(type, spec, modContainer, fileName.apply(modId));
+                return ForgeConfigRegistry.INSTANCE.register(modId, type, spec, fileName.apply(modId));
             });
         }
     }

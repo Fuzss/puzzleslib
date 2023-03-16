@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.json;
+package fuzs.puzzleslib.config.json;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

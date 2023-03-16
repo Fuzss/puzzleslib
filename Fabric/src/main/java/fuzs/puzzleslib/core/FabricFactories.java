@@ -12,7 +12,7 @@ import fuzs.puzzleslib.init.FabricRegistryManager;
 import fuzs.puzzleslib.init.PotionBrewingRegistry;
 import fuzs.puzzleslib.init.RegistryManager;
 import fuzs.puzzleslib.network.FabricNetworkHandler;
-import fuzs.puzzleslib.network.NetworkHandler;
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.FabricClientProxy;
 import fuzs.puzzleslib.proxy.FabricServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;

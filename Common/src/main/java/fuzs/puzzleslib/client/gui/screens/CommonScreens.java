@@ -3,14 +3,11 @@ package fuzs.puzzleslib.client.gui.screens;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.Widget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 /**
  * a helper class for accessing encapsulated fields on a screen
@@ -43,12 +40,6 @@ public interface CommonScreens {
      * @return item renderer
      */
     ItemRenderer getItemRenderer(Screen screen);
-
-    /**
-     * @param screen    screen instance
-     * @return          the renderable buttons (different from children, also there are narratable widgets)
-     */
-    List<Widget> getRenderableButtons(Screen screen);
 
     /**
      * @param screen container screen instance

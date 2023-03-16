@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.network;
+package fuzs.puzzleslib.api.networking.v2;
 
 import fuzs.puzzleslib.core.DistType;
 
