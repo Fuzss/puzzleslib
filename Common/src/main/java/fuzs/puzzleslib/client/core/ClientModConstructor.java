@@ -4,7 +4,9 @@ import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
 import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.client.renderer.blockentity.SkullRenderersFactory;
 import fuzs.puzzleslib.client.renderer.entity.DynamicItemDecorator;
+import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.core.ModConstructor;
+import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -31,6 +33,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -49,6 +52,18 @@ import java.util.function.Supplier;
 public interface ClientModConstructor {
 
     /**
+     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
+     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     *
+     * @param modId the mod id for registering events on Forge to the correct mod event bus
+     * @param modConstructor       the main mod instance for mod setup
+     * @param contentRegistrations specific content this mod uses that needs to be additionally registered
+     */
+    static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+        ClientFactories.INSTANCE.constructClientMod(modId, modConstructor, contentRegistrations);
+    }
+
+    /**
      * runs when the mod is first constructed, on the client only really used for registering event callbacks
      */
     default void onConstructMod() {
@@ -61,157 +76,154 @@ public interface ClientModConstructor {
      *
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
      */
-    default void onClientSetup(ModConstructor.ModLifecycleContext context) {
+    default void onClientSetup(final ModConstructor.ModLifecycleContext context) {
 
     }
 
     /**
      * @param context add a renderer to an entity
      */
-    default void onRegisterEntityRenderers(EntityRenderersContext context) {
+    default void onRegisterEntityRenderers(final EntityRenderersContext context) {
 
     }
 
     /**
      * @param context add a renderer to a block entity
      */
-    default void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {
+    default void onRegisterBlockEntityRenderers(final BlockEntityRenderersContext context) {
 
     }
 
     /**
      * @param context add a client tooltip component to a common tooltip component
      */
-    default void onRegisterClientTooltipComponents(ClientTooltipComponentsContext context) {
+    default void onRegisterClientTooltipComponents(final ClientTooltipComponentsContext context) {
 
     }
 
     /**
      * @param context add particle providers for a particle type
      */
-    default void onRegisterParticleProviders(ParticleProvidersContext context) {
+    default void onRegisterParticleProviders(final ParticleProvidersContext context) {
 
     }
 
     /**
      * @param context add a layer definition for a {@link ModelLayerLocation}
      */
-    default void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
+    default void onRegisterLayerDefinitions(final LayerDefinitionsContext context) {
 
     }
 
     /**
      * @param context add a search tree builder together with a token
      */
-    default void onRegisterSearchTrees(SearchRegistryContext context) {
+    default void onRegisterSearchTrees(final SearchRegistryContext context) {
 
     }
 
     /**
      * @param context context for registering a listener that runs right after baked models have been reloaded
      */
-    default void onRegisterModelBakingListeners(ModelBakingListenersContext context) {
+    default void onRegisterModelBakingListeners(final ModelBakingListenersContext context) {
 
     }
 
     /**
      * @param context add external models to be loaded
      */
-    default void onRegisterAdditionalModels(AdditionalModelsContext context) {
+    default void onRegisterAdditionalModels(final AdditionalModelsContext context) {
 
     }
 
     /**
      * @param context register model predicates for custom item models
      */
-    default void onRegisterItemModelProperties(ItemModelPropertiesContext context) {
+    default void onRegisterItemModelProperties(final ItemModelPropertiesContext context) {
 
     }
 
     /**
      * @param context register a custom inventory renderer for an item belonging to a block entity
      */
-    default void onRegisterBuiltinModelItemRenderers(BuiltinModelItemRendererContext context) {
+    default void onRegisterBuiltinModelItemRenderers(final BuiltinModelItemRendererContext context) {
 
     }
 
     /**
      * @param context register additional renders to run after stack count and durability have been drawn for an item stack
      */
-    default void onRegisterItemDecorations(ItemDecorationContext context) {
+    default void onRegisterItemDecorations(final ItemDecorationContext context) {
 
     }
 
     /**
      * @param context register a custom shader that is applied when spectating a certain entity type
      */
-    default void onRegisterEntitySpectatorShaders(EntitySpectatorShaderContext context) {
+    default void onRegisterEntitySpectatorShaders(final EntitySpectatorShaderContext context) {
 
     }
 
     /**
      * @param context register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations
      */
-    default void onRegisterSkullRenderers(SkullRenderersContext context) {
+    default void onRegisterSkullRenderers(final SkullRenderersContext context) {
 
     }
 
     /**
      * @param context adds a listener to the client resource manager to reload at the end of all resources
      */
-    default void onRegisterClientReloadListeners(ClientReloadListenersContext context) {
+    default void onRegisterClientReloadListeners(final ClientReloadListenersContext context) {
 
     }
 
     /**
      * @param context register additional {@link RenderLayer}s for a living entity
      */
-    default void onRegisterLivingEntityRenderLayers(LivingEntityRenderLayersContext context) {
+    default void onRegisterLivingEntityRenderLayers(final LivingEntityRenderLayersContext context) {
 
     }
 
     /**
      * @param context register a {@link KeyMapping} so it can be saved to and loaded from game options
      */
-    default void onRegisterKeyMappings(KeyMappingsContext context) {
-
-    }
-
-    /**
-     * @param context register custom {@link RenderType}s for blocks and fluids
-     *
-     * @deprecated split into {@link #onRegisterBlockRenderTypesV2(RenderTypesContext)} and {@link #onRegisterFluidRenderTypes(RenderTypesContext)}
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterBlockRenderTypes(BlockRenderTypesContext context) {
+    default void onRegisterKeyMappings(final KeyMappingsContext context) {
 
     }
 
     /**
      * @param context register custom {@link RenderType}s for blocks
      */
-    default void onRegisterBlockRenderTypesV2(RenderTypesContext<Block> context) {
+    default void onRegisterBlockRenderTypes(final RenderTypesContext<Block> context) {
 
     }
 
     /**
      * @param context register custom {@link RenderType}s for fluids
      */
-    default void onRegisterFluidRenderTypes(RenderTypesContext<Fluid> context) {
+    default void onRegisterFluidRenderTypes(final RenderTypesContext<Fluid> context) {
 
     }
 
     /**
      * @param context register custom block color providers
      */
-    default void onRegisterBlockColorProviders(ColorProvidersContext<Block, BlockColor> context) {
+    default void onRegisterBlockColorProviders(final ColorProvidersContext<Block, BlockColor> context) {
 
     }
 
     /**
      * @param context register custom item color providers
      */
-    default void onRegisterItemColorProviders(ColorProvidersContext<Item, ItemColor> context) {
+    default void onRegisterItemColorProviders(final ColorProvidersContext<Item, ItemColor> context) {
+
+    }
+
+    /**
+     * @param context add items to a creative tab
+     */
+    default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
 
     }
 
@@ -319,20 +331,6 @@ public interface ClientModConstructor {
     }
 
     /**
-     * context for modifying baked models right after they've been loaded
-     *
-     * @param modelManager      the model manager
-     * @param models            map of all baked models, useful to add or replace models
-     * @param modelBakery       the bakery
-     *
-     * @deprecated              replaced with {@link DynamicModelBakingContext} in {@link #onRegisterModelBakingListeners}
-     */
-    @Deprecated(forRemoval = true)
-    record LoadModelsContext(ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
-
-    }
-
-    /**
      * get access to registering additional models
      */
     @FunctionalInterface
@@ -384,19 +382,6 @@ public interface ClientModConstructor {
         /**
          * register a predicate for all items
          *
-         * @param name          predicate name
-         * @param function      handler for this predicate
-         *
-         * @deprecated moved to {@link #registerGlobalProperty(ResourceLocation, ClampedItemPropertyFunction)}
-         */
-        @Deprecated(forRemoval = true)
-        default void register(ResourceLocation name, ClampedItemPropertyFunction function) {
-            this.registerGlobalProperty(name, function);
-        }
-
-        /**
-         * register a predicate for all items
-         *
          * @param identifier          predicate name
          * @param function      handler for this predicate
          */
@@ -405,25 +390,12 @@ public interface ClientModConstructor {
         /**
          * register a predicate for an <code>item</code>
          *
-         * @param item          the item
-         * @param name          predicate name
-         * @param function      handler for this predicate
-         *
-         * @deprecated moved to {@link #registerItemProperty(ResourceLocation, ClampedItemPropertyFunction, ItemLike...)}
-         */
-        @Deprecated(forRemoval = true)
-        default void registerItem(Item item, ResourceLocation name, ClampedItemPropertyFunction function) {
-            this.registerItemProperty(name, function, item);
-        }
-
-        /**
-         * register a predicate for an <code>item</code>
-         *
-         * @param items         the item(s)
          * @param identifier          predicate name
          * @param function      handler for this predicate
+         * @param object         item to apply the model property to
+         * @param objects         more items to apply the model property to
          */
-        void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike... items);
+        void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike object, ItemLike... objects);
     }
 
     /**
@@ -435,23 +407,11 @@ public interface ClientModConstructor {
         /**
          * register a <code>renderer</code> for an <code>item</code>
          *
-         * @param item      the item to register for
          * @param renderer  dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
-         *
-         * @deprecated renamed to {@link #registerItemRenderer(ItemLike, DynamicBuiltinModelItemRenderer)}
+         * @param object      the item to register for
+         * @param objects      more items to register for
          */
-        @Deprecated(forRemoval = true)
-        default void register(ItemLike item, DynamicBuiltinModelItemRenderer renderer) {
-            this.registerItemRenderer(item, renderer);
-        }
-
-        /**
-         * register a <code>renderer</code> for an <code>item</code>
-         *
-         * @param item      the item to register for
-         * @param renderer  dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
-         */
-        void registerItemRenderer(ItemLike item, DynamicBuiltinModelItemRenderer renderer);
+        void registerItemRenderer(DynamicBuiltinModelItemRenderer renderer, ItemLike object, ItemLike... objects);
     }
 
     /**
@@ -463,23 +423,11 @@ public interface ClientModConstructor {
         /**
          * register a {@link DynamicItemDecorator} for an <code>item</code>
          *
-         * @param item              the item to draw for
          * @param decorator         renderer implementation
-         *
-         * @deprecated renamed to {@link #registerItemDecoration(DynamicItemDecorator, ItemLike...)}
+         * @param object              the item to draw for
+         * @param objects              more items to draw for
          */
-        @Deprecated(forRemoval = true)
-        default void register(ItemLike item, DynamicItemDecorator decorator) {
-            this.registerItemDecoration(decorator, item);
-        }
-
-        /**
-         * register a {@link DynamicItemDecorator} for an <code>item</code>
-         *
-         * @param decorator         renderer implementation
-         * @param items              the item to draw for
-         */
-        void registerItemDecoration(DynamicItemDecorator decorator, ItemLike... items);
+        void registerItemDecorator(DynamicItemDecorator decorator, ItemLike object, ItemLike... objects);
     }
 
     /**
@@ -491,10 +439,11 @@ public interface ClientModConstructor {
         /**
          * Register the custom shader.
          *
-         * @param entityType the entity type being spectated
          * @param shaderLocation location to the shader file, usually <code>shaders/post/&lt;file&gt;.json</code>
+         * @param object the entity type being spectated
+         * @param objects more entity types being spectated
          */
-        void registerSpectatorShader(EntityType<?> entityType, ResourceLocation shaderLocation);
+        void registerSpectatorShader(ResourceLocation shaderLocation, EntityType<?> object, EntityType<?>... objects);
     }
 
     /**
@@ -532,19 +481,8 @@ public interface ClientModConstructor {
     /**
      * register additional {@link RenderLayer}s for a living entity, supports players like any other entity
      */
+    @FunctionalInterface
     interface LivingEntityRenderLayersContext {
-
-        /**
-         * register the additional layer
-         *
-         * @param entityType        entity type to register for
-         * @param factory           the new layer factory
-         * @param <T>               entity type
-         *
-         * @deprecated migrate to {@link #registerRenderLayerV2(EntityType, BiFunction)} with improved type parameters
-         */
-        @Deprecated(forRemoval = true)
-        <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory);
 
 
         /**
@@ -556,7 +494,7 @@ public interface ClientModConstructor {
          * @param <T>               entity type used for the model, should only really be different for players
          * @param <M>               the entity model
          */
-        <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayerV2(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory);
+        <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory);
     }
 
     /**
@@ -568,57 +506,9 @@ public interface ClientModConstructor {
         /**
          * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
          *
-         * @param keyMapping the key mapping to register
+         * @param keyMappings the key mappings to register
          */
-        void registerKeyMapping(KeyMapping keyMapping);
-
-        /**
-         * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
-         *
-         * @param keyMapping the key mapping to register
-         *
-         * @deprecated renamed to singular, see {@link #registerKeyMapping}
-         */
-        @Deprecated(forRemoval = true)
-        default void registerKeyMappings(KeyMapping keyMapping) {
-            this.registerKeyMapping(keyMapping);
-        }
-
-        /**
-         * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
-         *
-         * @param keyMappings the key mapping to register
-         */
-        default void registerKeyMappings(KeyMapping... keyMappings) {
-            for (KeyMapping keyMapping : keyMappings) {
-                this.registerKeyMapping(keyMapping);
-            }
-        }
-    }
-
-    /**
-     * register custom {@link RenderType}s for blocks and fluids
-     *
-     * @deprecated separated for blocks and fluids in {@link RenderTypesContext}
-     */
-    @Deprecated(forRemoval = true)
-    interface BlockRenderTypesContext {
-
-        /**
-         * Register a {@link RenderType} for a {@link Block}.
-         *
-         * @param block the block with a custom render type
-         * @param renderType the render type
-         */
-        void registerBlock(Block block, RenderType renderType);
-
-        /**
-         * Register a {@link RenderType} for a {@link Fluid}.
-         *
-         * @param fluid the fluid with a custom render type
-         * @param renderType the render type
-         */
-        void registerFluid(Fluid fluid, RenderType renderType);
+        void registerKeyMappings(KeyMapping... keyMappings);
     }
 
     /**
@@ -626,16 +516,18 @@ public interface ClientModConstructor {
      *
      * @param <T> object type supported by provider, either {@link Block} or {@link Fluid}
      */
+    @FunctionalInterface
     interface RenderTypesContext<T> {
 
         /**
          * Register a <code>renderType</code> for an <code>object</code>
          *
-         * @param objects object type supporting render type, either {@link Block} or {@link Fluid}
          * @param renderType the {@link RenderType} for <code>object</code>
+         * @param object object type supporting render type, either {@link Block} or {@link Fluid}
+         * @param objects more object types supporting render type, either {@link Block} or {@link Fluid}
          */
         @SuppressWarnings("unchecked")
-        void registerRenderType(RenderType renderType, T... objects);
+        void registerRenderType(RenderType renderType, T object, T... objects);
     }
 
     /**
@@ -650,7 +542,8 @@ public interface ClientModConstructor {
          * Register a new <code>provider</code> for a number of <code>objects</code>.
          *
          * @param provider provider type, either {@link BlockColor} or {@link ItemColor}
-         * @param objects object type supported by provider, either {@link Block} or {@link Item}
+         * @param object object type supported by provider, either {@link Block} or {@link Item}
+         * @param objects more object types supported by provider, either {@link Block} or {@link Item}
          */
         @SuppressWarnings("unchecked")
         void registerColorProvider(P provider, T object, T... objects);
@@ -662,5 +555,27 @@ public interface ClientModConstructor {
          * @return access to {@link net.minecraft.client.color.block.BlockColors} or {@link net.minecraft.client.color.item.ItemColors}
          */
         P getProviders();
+    }
+
+    /**
+     * Add items to a creative tab.
+     */
+    interface BuildCreativeModeTabContentsContext {
+
+        /**
+         * Add items to a creative tab referenced by internal id.
+         *
+         * @param identifier       the creative mode tab to add items to
+         * @param displayItemsGenerator context for adding items to the creative mode tab
+         */
+        void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator);
+
+        /**
+         * Add items to a creative tab referenced by instance.
+         *
+         * @param creativeModeTab       the creative mode tab to add items to
+         * @param displayItemsGenerator context for adding items to the creative mode tab
+         */
+        void registerBuildListener(CreativeModeTab creativeModeTab, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator);
     }
 }

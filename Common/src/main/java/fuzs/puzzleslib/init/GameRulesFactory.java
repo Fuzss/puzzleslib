@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.init;
 
-import fuzs.puzzleslib.util.PuzzlesUtil;
+import fuzs.puzzleslib.core.CommonFactories;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
@@ -19,7 +19,7 @@ public interface GameRulesFactory {
     /**
      * instance of the game rule factory SPI
      */
-    GameRulesFactory INSTANCE = PuzzlesUtil.loadServiceProvider(GameRulesFactory.class);
+    GameRulesFactory INSTANCE = CommonFactories.INSTANCE.getGameRulesFactory();
 
     /**
      * register a new game rule

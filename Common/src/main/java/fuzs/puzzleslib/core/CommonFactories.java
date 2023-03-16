@@ -1,17 +1,17 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.capability.CapabilityController;
 import fuzs.puzzleslib.config.ConfigCore;
 import fuzs.puzzleslib.config.ConfigHolder;
+import fuzs.puzzleslib.init.GameRulesFactory;
 import fuzs.puzzleslib.init.PotionBrewingRegistry;
 import fuzs.puzzleslib.init.RegistryManager;
-import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.Proxy;
 import fuzs.puzzleslib.util.PuzzlesUtil;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -28,21 +28,10 @@ public interface CommonFactories {
      * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
      *
      * @param modId                the mod id for registering events on Forge to the correct mod event bus
-     * @return provides a consumer for loading a mod being provided the base class
-     */
-    default Consumer<ModConstructor> modConstructor(String modId) {
-        return this.modConstructor(modId, new ContentRegistrationFlags[0]);
-    }
-
-    /**
-     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
-     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
-     *
-     * @param modId                the mod id for registering events on Forge to the correct mod event bus
+     * @param modConstructor       the main mod instance for mod setup
      * @param contentRegistrations specific content this mod uses that needs to be additionally registered
-     * @return provides a consumer for loading a mod being provided the base class
      */
-    Consumer<ModConstructor> modConstructor(String modId, ContentRegistrationFlags... contentRegistrations);
+    void constructMod(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations);
 
     /**
      * creates a new network handler
@@ -155,4 +144,11 @@ public interface CommonFactories {
      * @return the instance
      */
     PotionBrewingRegistry getPotionBrewingRegistry();
+
+    /**
+     * Provides a mod loader specific {@link GameRulesFactory} singleton instance.
+     *
+     * @return the instance
+     */
+    GameRulesFactory getGameRulesFactory();
 }

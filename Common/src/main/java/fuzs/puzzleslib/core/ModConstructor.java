@@ -3,6 +3,7 @@ package fuzs.puzzleslib.core;
 import com.mojang.brigadier.CommandDispatcher;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
+import fuzs.puzzleslib.util.CreativeModeTabConfigurator;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -13,10 +14,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -24,11 +23,24 @@ import net.minecraft.world.level.storage.loot.LootTables;
 
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * a base class for a mods main common class, contains a bunch of methods for registering various things
  */
 public interface ModConstructor {
+
+    /**
+     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
+     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     *
+     * @param modId                the mod id for registering events on Forge to the correct mod event bus
+     * @param modConstructor       the main mod instance for mod setup
+     * @param contentRegistrations specific content this mod uses that needs to be additionally registered
+     */
+    static void construct(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+        CommonFactories.INSTANCE.constructMod(modId, modConstructor, contentRegistrations);
+    }
 
     /**
      * runs when the mod is first constructed, mainly used for registering game content, configs, network packages, and event callbacks
@@ -41,21 +53,10 @@ public interface ModConstructor {
      * runs after content has been registered, so it's safe to use here
      * used to set various values and settings for already registered content
      *
-     * @deprecated migrate to {@link #onCommonSetup(ModLifecycleContext)}
-     */
-    @Deprecated(forRemoval = true)
-    default void onCommonSetup() {
-
-    }
-
-    /**
-     * runs after content has been registered, so it's safe to use here
-     * used to set various values and settings for already registered content
-     *
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
      */
-    default void onCommonSetup(ModLifecycleContext context) {
-        this.onCommonSetup();
+    default void onCommonSetup(final ModLifecycleContext context) {
+
     }
 
     /**
@@ -63,7 +64,7 @@ public interface ModConstructor {
      *
      * @param context add to spawn placement register
      */
-    default void onRegisterSpawnPlacements(SpawnPlacementsContext context) {
+    default void onRegisterSpawnPlacements(final SpawnPlacementsContext context) {
 
     }
 
@@ -73,7 +74,7 @@ public interface ModConstructor {
      *
      * @param context add to entity attribute map
      */
-    default void onEntityAttributeCreation(EntityAttributesCreateContext context) {
+    default void onEntityAttributeCreation(final EntityAttributesCreateContext context) {
 
     }
 
@@ -82,7 +83,7 @@ public interface ModConstructor {
      *
      * @param context replace/add attribute to entity attribute map
      */
-    default void onEntityAttributeModification(EntityAttributesModifyContext context) {
+    default void onEntityAttributeModification(final EntityAttributesModifyContext context) {
 
     }
 
@@ -91,21 +92,7 @@ public interface ModConstructor {
      *
      * @param context add fuel burn time for items/blocks
      */
-    default void onRegisterFuelBurnTimes(FuelBurnTimesContext context) {
-
-    }
-
-    /**
-     * register a new command, also supports replacing existing commands by default
-     *
-     * @param dispatcher    the dispatcher used for registering commands
-     * @param environment   command selection environment
-     * @param context       registry access context
-     *
-     * @deprecated          use {@link #onRegisterCommands(RegisterCommandsContext)} instead
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterCommands(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) {
+    default void onRegisterFuelBurnTimes(final FuelBurnTimesContext context) {
 
     }
 
@@ -114,8 +101,8 @@ public interface ModConstructor {
      *
      * @param context context with helper objects for registering commands
      */
-    default void onRegisterCommands(RegisterCommandsContext context) {
-        this.onRegisterCommands(context.dispatcher(), context.context(), context.environment());
+    default void onRegisterCommands(final RegisterCommandsContext context) {
+
     }
 
     /**
@@ -123,7 +110,7 @@ public interface ModConstructor {
      *
      * @param context replace a whole {@link LootTable}
      */
-    default void onLootTableReplacement(LootTablesReplaceContext context) {
+    default void onLootTableReplacement(final LootTablesReplaceContext context) {
 
     }
 
@@ -132,27 +119,35 @@ public interface ModConstructor {
      *
      * @param context add or remove a {@link LootPool}
      */
-    default void onLootTableModification(LootTablesModifyContext context) {
+    default void onLootTableModification(final LootTablesModifyContext context) {
 
     }
 
     /**
      * @param context allows for registering modifications (including additions and removals) to biomes loaded from the current data pack
      */
-    default void onRegisterBiomeModifications(BiomeModificationsContext context) {
+    default void onRegisterBiomeModifications(final BiomeModificationsContext context) {
 
     }
 
     /**
      * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
      */
-    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
+    default void onRegisterFlammableBlocks(final FlammableBlocksContext context) {
+
+    }
+
+    /**
+     * @param context register new creative mode tabs via the respective builder
+     */
+    default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {
 
     }
 
     /**
      * enqueue work to be run sequentially for all mods as the construct/setup phase runs in parallel on Forge
      */
+    @FunctionalInterface
     interface ModLifecycleContext {
 
         /**
@@ -236,45 +231,7 @@ public interface ModConstructor {
          * @param items items to add
          * @param burnTime burn time in ticks
          */
-        void registerFuel(int burnTime, ItemLike... items);
-
-        /**
-         * base method, registers a fuel item
-         *
-         * @param item item to add
-         * @param burnTime burn time in ticks
-         *
-         * @deprecated simplified to {@link #registerFuel(int, ItemLike...)}
-         */
-        @Deprecated(forRemoval = true)
-        default void registerFuelItem(Item item, int burnTime) {
-            this.registerFuel(burnTime, item);
-        }
-
-        /**
-         * overload method for blocks
-         *
-         * @param block block to add
-         * @param burnTime burn time in ticks
-         *
-         * @deprecated simplified to {@link #registerFuel(int, ItemLike...)}
-         */
-        @Deprecated(forRemoval = true)
-        default void registerFuelBlock(Block block, int burnTime) {
-            this.registerFuel(burnTime, block);
-        }
-
-        /**
-         * add wooden block with default vanilla times
-         *
-         * @param block block to add with burn time of 300 ticks
-         *
-         * @deprecated simplified to {@link #registerFuel(int, ItemLike...)}
-         */
-        @Deprecated(forRemoval = true)
-        default void registerWoodenBlock(Block block) {
-            this.registerFuelBlock(block, block instanceof SlabBlock ? 150 : 300);
-        }
+        void registerFuel(int burnTime, ItemLike item, ItemLike... items);
     }
 
     /**
@@ -412,5 +369,19 @@ public interface ModConstructor {
          * @param blocks blocks to register <code>encouragement</code> and <code>flammability</code> for
          */
         void registerFlammable(int encouragement, int flammability, Block... blocks);
+    }
+
+    /**
+     * Register new creative mode tabs via the respective builder.
+     */
+    @FunctionalInterface
+    interface CreativeModeTabContext {
+
+        /**
+         * Register a {@link CreativeModeTabConfigurator} which is used to configure a {@link net.minecraft.world.item.CreativeModeTab.Builder}
+         *
+         * @param configurator the configurator instance
+         */
+        void registerCreativeModeTab(CreativeModeTabConfigurator configurator);
     }
 }

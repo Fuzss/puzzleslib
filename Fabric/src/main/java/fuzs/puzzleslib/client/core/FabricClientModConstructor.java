@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.client.renderer.EntitySpectatorShaderRegistry;
 import fuzs.puzzleslib.api.client.renderer.ItemDecoratorRegistry;
 import fuzs.puzzleslib.api.client.renderer.SkullRenderersRegistry;
 import fuzs.puzzleslib.client.init.builder.ModSpriteParticleRegistration;
-import fuzs.puzzleslib.client.renderer.DynamicBuiltinModelItemRenderer;
 import fuzs.puzzleslib.core.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftFabricAccessor;
@@ -16,6 +15,7 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.*;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.KeyMapping;
@@ -27,8 +27,8 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -48,6 +48,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
@@ -89,18 +90,6 @@ public class FabricClientModConstructor {
         constructor.onConstructMod();
     }
 
-    private ClientModConstructor.BlockEntityRenderersContext getBlockEntityRenderersContext() {
-        return new ClientModConstructor.BlockEntityRenderersContext() {
-
-            @Override
-            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider) {
-                Objects.requireNonNull(blockEntityType, "block entity type is null");
-                Objects.requireNonNull(blockEntityRendererProvider, "block entity renderer provider is null");
-                BlockEntityRendererRegistry.register(blockEntityType, blockEntityRendererProvider);
-            }
-        };
-    }
-
     private ClientModConstructor.EntityRenderersContext getEntityRenderersContext() {
         return new ClientModConstructor.EntityRenderersContext() {
 
@@ -109,6 +98,18 @@ public class FabricClientModConstructor {
                 Objects.requireNonNull(entityType, "entity type is null");
                 Objects.requireNonNull(entityRendererProvider, "entity renderer provider is null");
                 EntityRendererRegistry.register(entityType, entityRendererProvider);
+            }
+        };
+    }
+
+    private ClientModConstructor.BlockEntityRenderersContext getBlockEntityRenderersContext() {
+        return new ClientModConstructor.BlockEntityRenderersContext() {
+
+            @Override
+            public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider) {
+                Objects.requireNonNull(blockEntityType, "block entity type is null");
+                Objects.requireNonNull(blockEntityRendererProvider, "block entity renderer provider is null");
+                BlockEntityRenderers.register(blockEntityType, blockEntityRendererProvider);
             }
         };
     }
@@ -167,11 +168,13 @@ public class FabricClientModConstructor {
             }
 
             @Override
-            public void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike... items) {
+            public void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike object, ItemLike... objects) {
                 Objects.requireNonNull(identifier, "property name is null");
                 Objects.requireNonNull(function, "property function is null");
-                Objects.requireNonNull(items, "items is null");
-                for (ItemLike item : items) {
+                Objects.requireNonNull(object, "item is null");
+                ItemProperties.register(object.asItem(), identifier, function);
+                Objects.requireNonNull(objects, "items is null");
+                for (ItemLike item : objects) {
                     Objects.requireNonNull(item, "item is null");
                     ItemProperties.register(item.asItem(), identifier, function);
                 }
@@ -205,17 +208,7 @@ public class FabricClientModConstructor {
 
             @SuppressWarnings("unchecked")
             @Override
-            public <T extends LivingEntity> void registerRenderLayer(EntityType<? extends T> entityType, BiFunction<RenderLayerParent<T, ? extends EntityModel<T>>, EntityRendererProvider.Context, RenderLayer<T, ? extends EntityModel<T>>> factory) {
-                Objects.requireNonNull(entityType, "entity type is null");
-                Objects.requireNonNull(factory, "render layer factory is null");
-                LivingEntityFeatureRendererRegistrationCallback.EVENT.register((EntityType<? extends LivingEntity> entityType1, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
-                    if (entityType == entityType1) registrationHelper.register(factory.apply((RenderLayerParent<T, ? extends EntityModel<T>>) entityRenderer, context));
-                });
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayerV2(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+            public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
                 Objects.requireNonNull(entityType, "entity type is null");
                 Objects.requireNonNull(factory, "render layer factory is null");
                 LivingEntityFeatureRendererRegistrationCallback.EVENT.register((EntityType<? extends LivingEntity> entityType1, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
@@ -264,13 +257,27 @@ public class FabricClientModConstructor {
             });
         });
         constructor.onRegisterItemModelProperties(fabricClientModConstructor.getItemPropertiesContext());
-        constructor.onRegisterEntitySpectatorShaders(EntitySpectatorShaderRegistry.INSTANCE::register);
+        constructor.onRegisterEntitySpectatorShaders((shaderLocation, object, objects) -> {
+            Objects.requireNonNull(shaderLocation, "shader location is null");
+            Objects.requireNonNull(object, "entity type is null");
+            EntitySpectatorShaderRegistry.INSTANCE.register(object, shaderLocation);
+            Objects.requireNonNull(objects, "entity types is null");
+            for (EntityType<?> entityType : objects) {
+                Objects.requireNonNull(entityType, "entity type is null");
+                EntitySpectatorShaderRegistry.INSTANCE.register(entityType, shaderLocation);
+            }
+        });
         final List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers = Lists.newArrayList();
-        constructor.onRegisterBuiltinModelItemRenderers((ItemLike item, DynamicBuiltinModelItemRenderer renderer) -> {
-            Objects.requireNonNull(item, "item is null");
+        constructor.onRegisterBuiltinModelItemRenderers((renderer, object, objects) -> {
             Objects.requireNonNull(renderer, "renderer is null");
-            BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
             dynamicBuiltinModelItemRenderers.add(renderer);
+            Objects.requireNonNull(object, "item is null");
+            BuiltinItemRendererRegistry.INSTANCE.register(object, renderer::renderByItem);
+            Objects.requireNonNull(objects, "items is null");
+            for (ItemLike item : objects) {
+                Objects.requireNonNull(item, "item is null");
+                BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
+            }
         });
         if (!dynamicBuiltinModelItemRenderers.isEmpty()) {
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener("built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
@@ -285,10 +292,12 @@ public class FabricClientModConstructor {
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(fabricClientModConstructor.getFabricResourceReloadListener(id, reloadListener));
         });
         constructor.onRegisterLivingEntityRenderLayers(fabricClientModConstructor.getLivingEntityRenderLayersContext());
-        constructor.onRegisterItemDecorations((decorator, items) -> {
+        constructor.onRegisterItemDecorations((decorator, object, objects) -> {
             Objects.requireNonNull(decorator, "item decorator is null");
-            Objects.requireNonNull(items, "items is null");
-            for (ItemLike item : items) {
+            Objects.requireNonNull(object, "item is null");
+            ItemDecoratorRegistry.INSTANCE.register(object, decorator);
+            Objects.requireNonNull(objects, "items is null");
+            for (ItemLike item : objects) {
                 Objects.requireNonNull(item, "item is null");
                 ItemDecoratorRegistry.INSTANCE.register(item, decorator);
             }
@@ -297,40 +306,31 @@ public class FabricClientModConstructor {
             Objects.requireNonNull(factory, "factory is null");
             SkullRenderersRegistry.INSTANCE.register(factory);
         });
-        constructor.onRegisterKeyMappings((KeyMapping keyBinding) -> {
-            Objects.requireNonNull(keyBinding, "key mapping is null");
-            KeyBindingHelper.registerKeyBinding(keyBinding);
+        constructor.onRegisterKeyMappings((KeyMapping... keyMappings) -> {
+            Objects.requireNonNull(keyMappings, "key mappings is null");
+            for (KeyMapping keyMapping : keyMappings) {
+                Objects.requireNonNull(keyMapping, "key mapping is null");
+                KeyBindingHelper.registerKeyBinding(keyMapping);
+            }
         });
-        constructor.onRegisterBlockRenderTypes(new ClientModConstructor.BlockRenderTypesContext() {
-
-            @Override
-            public void registerBlock(Block block, RenderType renderType) {
+        constructor.onRegisterBlockRenderTypes((renderType, object, objects) -> {
+            Objects.requireNonNull(renderType, "render type is null");
+            Objects.requireNonNull(object, "block is null");
+            BlockRenderLayerMap.INSTANCE.putBlock(object, renderType);
+            Objects.requireNonNull(objects, "blocks is null");
+            for (Block block : objects) {
                 Objects.requireNonNull(block, "block is null");
-                Objects.requireNonNull(renderType, "render type is null");
                 BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
             }
-
-            @Override
-            public void registerFluid(Fluid fluid, RenderType renderType) {
-                Objects.requireNonNull(fluid, "fluid is null");
-                Objects.requireNonNull(renderType, "render type is null");
-                BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
-            }
         });
-        constructor.onRegisterBlockRenderTypesV2((renderType, objects) -> {
+        constructor.onRegisterFluidRenderTypes((renderType, object, objects) -> {
             Objects.requireNonNull(renderType, "render type is null");
-            Objects.requireNonNull(objects, "blocks is null");
-            for (Block object : objects) {
-                Objects.requireNonNull(object, "block is null");
-                BlockRenderLayerMap.INSTANCE.putBlock(object, renderType);
-            }
-        });
-        constructor.onRegisterFluidRenderTypes((renderType, objects) -> {
-            Objects.requireNonNull(renderType, "render type is null");
+            Objects.requireNonNull(object, "fluid is null");
+            BlockRenderLayerMap.INSTANCE.putFluid(object, renderType);
             Objects.requireNonNull(objects, "fluids is null");
-            for (Fluid object : objects) {
-                Objects.requireNonNull(object, "fluid is null");
-                BlockRenderLayerMap.INSTANCE.putFluid(object, renderType);
+            for (Fluid fluid : objects) {
+                Objects.requireNonNull(fluid, "fluid is null");
+                BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
             }
         });
         constructor.onRegisterBlockColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
@@ -381,6 +381,22 @@ public class FabricClientModConstructor {
                     ItemColor itemColor = ColorProviderRegistry.ITEM.get(itemStack.getItem());
                     return itemColor == null ? -1 : itemColor.getColor(itemStack, i);
                 };
+            }
+        });
+        constructor.onBuildCreativeModeTabContents(new ClientModConstructor.BuildCreativeModeTabContentsContext() {
+
+            @Override
+            public void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
+                Objects.requireNonNull(identifier, "identifier is null");
+                Objects.requireNonNull(displayItemsGenerator, "display items generator is null");
+                ItemGroupEvents.modifyEntriesEvent(identifier).register(entries -> displayItemsGenerator.accept(entries.getEnabledFeatures(), entries, entries.shouldShowOpRestrictedItems()));
+            }
+
+            @Override
+            public void registerBuildListener(CreativeModeTab creativeModeTab, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
+                Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
+                Objects.requireNonNull(displayItemsGenerator, "display items generator is null");
+                ItemGroupEvents.modifyEntriesEvent(creativeModeTab).register(entries -> displayItemsGenerator.accept(entries.getEnabledFeatures(), entries, entries.shouldShowOpRestrictedItems()));
             }
         });
     }

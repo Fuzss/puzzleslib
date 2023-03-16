@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.client.gui.screens;
 
-import fuzs.puzzleslib.mixin.client.accessor.AbstractContainerScreenFabricAccessor;
-import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -20,50 +18,53 @@ import java.util.Objects;
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */
-public final class FabricScreens implements CommonScreens {
+public final class ForgeScreenHelper implements ScreenHelper {
 
     @Override
     public Minecraft getMinecraft(Screen screen) {
-        return Screens.getClient(screen);
+        Objects.requireNonNull(screen, "Screen cannot be null");
+        return screen.getMinecraft();
     }
 
     @Override
     public Font getFont(Screen screen) {
-        return Screens.getTextRenderer(screen);
+        Objects.requireNonNull(screen, "Screen cannot be null");
+        return this.getMinecraft(screen).font;
     }
 
     @Override
     public ItemRenderer getItemRenderer(Screen screen) {
-        return Screens.getItemRenderer(screen);
+        Objects.requireNonNull(screen, "Screen cannot be null");
+        return this.getMinecraft(screen).getItemRenderer();
     }
 
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getXSize();
+        return screen.getXSize();
     }
 
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getYSize();
+        return screen.getYSize();
     }
 
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getGuiLeft();
+        return screen.getGuiLeft();
     }
 
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getGuiTop();
+        return screen.getGuiTop();
     }
 
     @Override
     public @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
         Objects.requireNonNull(screen, "Screen cannot be null");
-        return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getSlotUnderMouse();
+        return screen.getSlotUnderMouse();
     }
 }

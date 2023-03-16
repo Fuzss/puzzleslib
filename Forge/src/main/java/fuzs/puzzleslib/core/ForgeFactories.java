@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.core;
 
+import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.capability.CapabilityController;
 import fuzs.puzzleslib.capability.ForgeCapabilityController;
@@ -8,16 +9,12 @@ import fuzs.puzzleslib.config.ConfigHolder;
 import fuzs.puzzleslib.config.ForgeConfigHolderImpl;
 import fuzs.puzzleslib.impl.networking.NetworkHandlerForge;
 import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryImplForge;
-import fuzs.puzzleslib.init.ForgeRegistryManager;
-import fuzs.puzzleslib.init.RegistryManager;
+import fuzs.puzzleslib.init.*;
 import fuzs.puzzleslib.network.ForgeNetworkHandler;
-import fuzs.puzzleslib.api.networking.v2.NetworkHandler;
 import fuzs.puzzleslib.proxy.ForgeClientProxy;
 import fuzs.puzzleslib.proxy.ForgeServerProxy;
 import fuzs.puzzleslib.proxy.Proxy;
-import fuzs.puzzleslib.init.PotionBrewingRegistry;
 
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -26,8 +23,8 @@ import java.util.function.Supplier;
 public final class ForgeFactories implements CommonFactories {
 
     @Override
-    public Consumer<ModConstructor> modConstructor(String modId, ContentRegistrationFlags... contentRegistrations) {
-        return constructor -> ForgeModConstructor.construct(constructor, modId, contentRegistrations);
+    public void constructMod(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+        ForgeModConstructor.construct(modConstructor.get(), modId, contentRegistrations);
     }
 
     @Override
@@ -80,5 +77,10 @@ public final class ForgeFactories implements CommonFactories {
     @Override
     public PotionBrewingRegistry getPotionBrewingRegistry() {
         return new PotionBrewingRegistryImplForge();
+    }
+
+    @Override
+    public GameRulesFactory getGameRulesFactory() {
+        return new ForgeGameRulesFactory();
     }
 }

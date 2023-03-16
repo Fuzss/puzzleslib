@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.impl;
 
-import fuzs.puzzleslib.core.CommonFactories;
+import fuzs.puzzleslib.core.ModConstructor;
 import net.fabricmc.api.ModInitializer;
 
 public class PuzzlesLibFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        CommonFactories.INSTANCE.modConstructor(PuzzlesLib.MOD_ID).accept(new PuzzlesLib());
+        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLib::new);
     }
 }

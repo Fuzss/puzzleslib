@@ -5,9 +5,11 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
+import fuzs.puzzleslib.impl.creativetab.CreativeModeTabConfiguratorImpl;
 import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
 import fuzs.puzzleslib.util.PuzzlesUtilForge;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
@@ -15,7 +17,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -24,6 +28,7 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
@@ -35,6 +40,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.util.Strings;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -56,12 +62,14 @@ public class ForgeModConstructor {
     @SubscribeEvent
     public void onCommonSetup(final FMLCommonSetupEvent evt) {
         this.constructor.onCommonSetup(evt::enqueueWork);
-        this.constructor.onRegisterFuelBurnTimes((burnTime, items) -> {
+        this.constructor.onRegisterFuelBurnTimes((burnTime, item, items) -> {
             if (Mth.clamp(burnTime, 1, 32767) != burnTime) throw new IllegalArgumentException("fuel burn time is out of bounds");
+            Objects.requireNonNull(item, "item is null");
+            this.fuelBurnTimes.put(item.asItem(), burnTime);
             Objects.requireNonNull(items, "items is null");
-            for (ItemLike item : items) {
-                Objects.requireNonNull(item, "item is null");
-                this.fuelBurnTimes.put(item.asItem(), burnTime);
+            for (ItemLike other : items) {
+                Objects.requireNonNull(other, "item is null");
+                this.fuelBurnTimes.put(other.asItem(), burnTime);
             }
         });
         this.constructor.onRegisterBiomeModifications((phase, selector, modifier) -> {
@@ -95,6 +103,35 @@ public class ForgeModConstructor {
     @SubscribeEvent
     public void onEntityAttributeModification(final EntityAttributeModificationEvent evt) {
         this.constructor.onEntityAttributeModification(evt::add);
+    }
+
+    @SubscribeEvent
+    public void onCreativeModeTab$Register(final CreativeModeTabEvent.Register evt) {
+        this.constructor.onRegisterCreativeModeTabs(configurator -> {
+            evt.registerCreativeModeTab(((CreativeModeTabConfiguratorImpl) configurator).getIdentifier(), this.configureCreativeModeTabBuilder((CreativeModeTabConfiguratorImpl) configurator));
+        });
+    }
+
+    private Consumer<CreativeModeTab.Builder> configureCreativeModeTabBuilder(CreativeModeTabConfiguratorImpl configurator) {
+        return builder -> {
+            configurator.configure(builder);
+            builder.title(Component.translatable("itemGroup.%s.%s".formatted(configurator.getIdentifier().getNamespace(), configurator.getIdentifier().getPath())));
+            if (configurator.isHasSearchBar()) builder.withSearchBar();
+            if (configurator.getIcons() != null) {
+                builder.withTabFactory(other -> new CreativeModeTab(other) {
+                    @Nullable
+                    private ItemStack[] itemStacks;
+
+                    @Override
+                    public ItemStack getIconItem() {
+                        // stolen from XFactHD, thanks :)
+                        if (this.itemStacks == null) this.itemStacks = configurator.getIcons().get();
+                        int index = (int) (System.currentTimeMillis() / 2000) % this.itemStacks.length;
+                        return this.itemStacks[index];
+                    }
+                });
+            }
+        };
     }
 
     private ModConstructor.LootTablesReplaceContext getLootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable lootTable, Consumer<LootTable> lootTableSetter) {

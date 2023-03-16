@@ -11,8 +11,9 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import sun.misc.Unsafe;
 
-import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.*;
@@ -22,6 +23,21 @@ import java.util.*;
  * large based upon <a href="https://github.com/VazkiiMods/Quark">Quark's</a> <code>vazkii.quark.base.module.config.ConfigObjectSerializer</code> class
  */
 public class AnnotatedConfigBuilder {
+    /**
+     * Unsafe instance for setting final fields in configs, so they may remain effectively read-only.
+     */
+    private static final Unsafe UNSAFE;
+
+    static {
+        try {
+            Constructor<?> constructor = Unsafe.class.getDeclaredConstructors()[0];
+            constructor.setAccessible(true);
+            UNSAFE = (Unsafe) constructor.newInstance();
+        }
+        catch (Throwable e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * @param builder forge builder for creating forge config values, setting comments, etc.
@@ -66,6 +82,8 @@ public class AnnotatedConfigBuilder {
                 field.setAccessible(true);
                 final boolean isStatic = Modifier.isStatic(field.getModifiers());
                 if (!isStatic) Objects.requireNonNull(instance, "Null instance for non-static field");
+                // final fields are enforced since config values are read-only
+                if (!Modifier.isFinal(field.getModifiers())) throw new RuntimeException("Field must be final");
                 buildConfig(builder, context, isStatic ? null : instance, field, field.getDeclaredAnnotation(Config.class));
             }
             if (!path.isEmpty()) builder.pop(path.size());
@@ -83,7 +101,7 @@ public class AnnotatedConfigBuilder {
      */
     private static Map<List<String>, Collection<Field>> setupFields(Class<?> target) {
         Multimap<List<String>, Field> pathToField = HashMultimap.create();
-        for (Field field : getAllFields(target)) {
+        for (Field field : collectFieldsRecursive(target)) {
             Config annotation = field.getDeclaredAnnotation(Config.class);
             if (annotation != null) {
                 pathToField.put(Lists.newArrayList(annotation.category()), field);
@@ -98,7 +116,7 @@ public class AnnotatedConfigBuilder {
      * @param clazz class to get fields for
      * @return all fields from class and all superclasses
      */
-    private static List<Field> getAllFields(Class<?> clazz) {
+    private static List<Field> collectFieldsRecursive(Class<?> clazz) {
         List<Field> list = new LinkedList<>();
         while (clazz != Object.class) {
             list.addAll(Arrays.asList(clazz.getDeclaredFields()));
@@ -141,10 +159,6 @@ public class AnnotatedConfigBuilder {
             builder.pop();
             return;
         }
-
-        // final fields are permitted until here, since values must be able to change
-        // previously only new config categories are handled, those instances never change
-        if (Modifier.isFinal(field.getModifiers())) throw new RuntimeException("Field may not be final");
 
         // does this require a world restart? just an indicator, doesn't actually do something
         if (annotation.worldRestart()) builder.worldRestart();
@@ -233,11 +247,8 @@ public class AnnotatedConfigBuilder {
      */
     private static void addCallback(ConfigDataHolderImpl<?> context, ForgeConfigSpec.ConfigValue<?> configValue, Field field, @Nullable Object instance) {
         context.accept(configValue, v -> {
-            try {
-                MethodHandles.publicLookup().unreflectSetter(field).invoke(instance, configValue.get());
-            } catch(Throwable e) {
-                throw new RuntimeException(e);
-            }
+            long fieldOffset = UNSAFE.objectFieldOffset(field);
+            UNSAFE.putObject(instance, fieldOffset, configValue.get());
         });
     }
 }

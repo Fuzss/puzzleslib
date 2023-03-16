@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
 import fuzs.puzzleslib.mixin.accessor.BiomeSpecialEffectsBuilderForgeAccessor;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
@@ -107,12 +108,12 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientLoopSoundEvent(Optional<SoundEvent> sound) {
+    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound) {
         ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(sound);
     }
 
     @Override
-    public Optional<SoundEvent> getAmbientLoopSoundEvent() {
+    public Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent() {
         return this.context.getAmbientLoopSound();
     }
 

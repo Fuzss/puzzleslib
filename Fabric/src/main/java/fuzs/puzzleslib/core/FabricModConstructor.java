@@ -7,10 +7,12 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.biome.*;
+import fuzs.puzzleslib.impl.creativetab.CreativeModeTabConfiguratorImpl;
 import net.fabricmc.fabric.api.biome.v1.BiomeModification;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
@@ -19,7 +21,7 @@ import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.Mth;
@@ -99,7 +101,7 @@ public class FabricModConstructor {
         // Forge makes this very simple by patching in a couple of helper methods, but Fabric should work like this
         AttributeSupplier supplier = DefaultAttributes.getSupplier(type);
         // there aren't many attributes anyway, so iterating the whole registry isn't costly
-        Map<Attribute, Double> attributeToBaseValueMap = Registry.ATTRIBUTE.stream()
+        Map<Attribute, Double> attributeToBaseValueMap = BuiltInRegistries.ATTRIBUTE.stream()
                 .filter(supplier::hasAttribute)
                 .map(attribute1 -> supplier.createInstance(instance -> {}, attribute1))
                 .filter(Objects::nonNull)
@@ -186,12 +188,14 @@ public class FabricModConstructor {
         constructor.onRegisterSpawnPlacements(SpawnPlacements::register);
         constructor.onEntityAttributeCreation(fabricModConstructor::registerEntityAttribute);
         constructor.onEntityAttributeModification(fabricModConstructor::modifyEntityAttribute);
-        constructor.onRegisterFuelBurnTimes((burnTime, items) -> {
+        constructor.onRegisterFuelBurnTimes((burnTime, item, items) -> {
             if (Mth.clamp(burnTime, 1, 32767) != burnTime) throw new IllegalArgumentException("fuel burn time is out of bounds");
+            Objects.requireNonNull(item, "item is null");
+            FuelRegistry.INSTANCE.add(item.asItem(), burnTime);
             Objects.requireNonNull(items, "items is null");
-            for (ItemLike item : items) {
-                Objects.requireNonNull(item, "item is null");
-                FuelRegistry.INSTANCE.add(item.asItem(), burnTime);
+            for (ItemLike other : items) {
+                Objects.requireNonNull(other, "item is null");
+                FuelRegistry.INSTANCE.add(other.asItem(), burnTime);
             }
         });
         CommandRegistrationCallback.EVENT.register((CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context, Commands.CommandSelection environment) -> constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(dispatcher, context, environment)));
@@ -220,6 +224,9 @@ public class FabricModConstructor {
                 // flammability == burn, encouragement == spread
                 FlammableBlockRegistry.getDefaultInstance().add(block, flammability, encouragement);
             }
+        });
+        constructor.onRegisterCreativeModeTabs(configurator -> {
+            ((CreativeModeTabConfiguratorImpl) configurator).configure(FabricItemGroup.builder(((CreativeModeTabConfiguratorImpl) configurator).getIdentifier()));
         });
     }
 }

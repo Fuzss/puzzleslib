@@ -4,9 +4,9 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * helper class for creating {@link ModelLayerRegistry} objects with a provided namespace
+ * helper class for creating {@link ModelLayerFactory} objects with a provided namespace
  */
-public class ModelLayerRegistry {
+public final class ModelLayerFactory {
     /**
      * namespace used for {@link ResourceLocation}
      */
@@ -15,7 +15,7 @@ public class ModelLayerRegistry {
     /**
      * @param namespace registry namespace
      */
-    private ModelLayerRegistry(String namespace) {
+    private ModelLayerFactory(String namespace) {
         this.namespace = namespace;
     }
 
@@ -56,7 +56,7 @@ public class ModelLayerRegistry {
      * @param namespace registry namespace
      * @return new registry from <code>namespace</code>
      */
-    public static ModelLayerRegistry of(String namespace) {
-        return new ModelLayerRegistry(namespace);
+    public static ModelLayerFactory of(String namespace) {
+        return new ModelLayerFactory(namespace);
     }
 }

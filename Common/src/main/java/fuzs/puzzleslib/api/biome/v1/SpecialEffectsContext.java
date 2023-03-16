@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.biome.v1;
 
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
@@ -168,27 +169,27 @@ public interface SpecialEffectsContext {
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    void setAmbientLoopSoundEvent(Optional<SoundEvent> sound);
+    void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound);
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    Optional<SoundEvent> getAmbientLoopSoundEvent();
+    Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent();
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    default void setAmbientLoopSoundEvent(@NotNull SoundEvent sound) {
+    default void setAmbientLoopSoundEvent(@NotNull Holder<SoundEvent> sound) {
         this.setAmbientLoopSoundEvent(Optional.of(sound));
     }
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
     default void clearAmbientLoopSoundEvent() {
         this.setAmbientLoopSoundEvent(Optional.empty());

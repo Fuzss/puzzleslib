@@ -2,9 +2,13 @@ package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
+import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.level.biome.*;
+import net.minecraft.world.level.biome.AmbientAdditionsSettings;
+import net.minecraft.world.level.biome.AmbientMoodSettings;
+import net.minecraft.world.level.biome.AmbientParticleSettings;
+import net.minecraft.world.level.biome.BiomeSpecialEffects;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -99,12 +103,12 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientLoopSoundEvent(Optional<SoundEvent> sound) {
+    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound) {
         this.context.setAmbientSound(sound);
     }
 
     @Override
-    public Optional<SoundEvent> getAmbientLoopSoundEvent() {
+    public Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent() {
         return this.specialEffects.getAmbientLoopSoundEvent();
     }
 

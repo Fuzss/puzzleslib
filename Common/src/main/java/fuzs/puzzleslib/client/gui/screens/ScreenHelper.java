@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.client.gui.screens;
 
-import fuzs.puzzleslib.util.PuzzlesUtil;
+import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,11 +17,11 @@ import org.jetbrains.annotations.Nullable;
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */
-public interface CommonScreens {
+public interface ScreenHelper {
     /**
      * instance of this SPI
      */
-    CommonScreens INSTANCE = PuzzlesUtil.loadServiceProvider(CommonScreens.class);
+    ScreenHelper INSTANCE = ClientFactories.INSTANCE.getScreenHelper();
 
     /**
      * @param screen screen instance
