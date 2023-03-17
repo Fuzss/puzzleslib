@@ -27,8 +27,9 @@ public final class RecordSerializer<T extends Record> implements MessageSerializ
     }
 
     public static <T extends Record> MessageSerializer<T> createRecordSerializer(Class<T> clazz) {
-        if (!clazz.isRecord())
+        if (!clazz.isRecord()) {
             throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
+        }
         ImmutableList.Builder<RecordAccess<?, T>> builder = ImmutableList.builder();
         for (RecordComponent component : clazz.getRecordComponents()) {
             builder.add(RecordAccess.fromRecordComponent(component));

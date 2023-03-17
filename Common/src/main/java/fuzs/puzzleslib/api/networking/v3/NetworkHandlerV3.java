@@ -2,8 +2,8 @@ package fuzs.puzzleslib.api.networking.v3;
 
 import fuzs.puzzleslib.api.networking.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.networking.v3.serialization.MessageSerializers;
-import fuzs.puzzleslib.core.CommonFactories;
-import fuzs.puzzleslib.proxy.Proxy;
+import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
@@ -27,6 +27,11 @@ import java.util.function.Function;
  * Handler for network communications between clients and a server.
  */
 public interface NetworkHandlerV3 {
+
+    /**
+     * Registers all packets provided by the original builder.
+     */
+    void initialize();
 
     /**
      * creates a packet heading to the client side

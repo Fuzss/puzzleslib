@@ -2,9 +2,9 @@ package fuzs.puzzleslib.impl.biome;
 
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
-import fuzs.puzzleslib.core.ReflectionHelperV2;
+import fuzs.puzzleslib.api.core.v1.ReflectionHelper;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -72,14 +72,14 @@ public class MobSpawnSettingsContextFabric implements MobSpawnSettingsContext {
     }
 
     private Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> findFabricSpawners() {
-        Field field = ReflectionHelperV2.findField("net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl", "fabricSpawners", true);
-        return ReflectionHelperV2.getValue(field, this.context);
+        Field field = ReflectionHelper.findField("net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl", "fabricSpawners", true);
+        return ReflectionHelper.getValue(field, this.context);
     }
 
     @Override
     public Set<EntityType<?>> getEntityTypesWithSpawnCost() {
         // be careful: does not provide a view, but a copy, so avoid caching this result
-        return Registry.ENTITY_TYPE.stream().filter(entityType -> this.mobSpawnSettings.getMobSpawnCost(entityType) != null).collect(ImmutableSet.toImmutableSet());
+        return BuiltInRegistries.ENTITY_TYPE.stream().filter(entityType -> this.mobSpawnSettings.getMobSpawnCost(entityType) != null).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override

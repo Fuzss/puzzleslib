@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.impl.client.renderer.SkullRenderersRegistryImpl;
+import fuzs.puzzleslib.impl.client.events.SkullRenderersRegistryImpl;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;

@@ -1,14 +1,14 @@
 package fuzs.puzzleslib.impl.client.core;
 
-import fuzs.puzzleslib.client.core.ClientModConstructor;
-import fuzs.puzzleslib.client.gui.screens.ScreenHelper;
-import fuzs.puzzleslib.core.ContentRegistrationFlags;
-import fuzs.puzzleslib.util.PuzzlesUtil;
+import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.api.client.screens.v2.ScreenHelper;
+import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 
 import java.util.function.Supplier;
 
 public interface ClientFactories {
-    ClientFactories INSTANCE = PuzzlesUtil.loadServiceProvider(ClientFactories.class);
+    ClientFactories INSTANCE = ServiceProviderHelper.loadServiceProvider(ClientFactories.class);
 
     void constructClientMod(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations);
 

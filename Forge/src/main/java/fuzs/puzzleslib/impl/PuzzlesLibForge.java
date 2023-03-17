@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl;
 
-import fuzs.puzzleslib.core.CommonFactories;
-import fuzs.puzzleslib.core.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;

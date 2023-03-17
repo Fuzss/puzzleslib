@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.capability;
 
-import fuzs.puzzleslib.capability.CapabilityController;
+import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.networking.v3.ClientMessageListener;
 import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
 import net.minecraft.client.Minecraft;

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
-import fuzs.puzzleslib.proxy.Proxy;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
-import fuzs.puzzleslib.impl.client.renderer.ItemDecoratorRegistryImpl;
+import fuzs.puzzleslib.impl.client.events.ItemDecoratorRegistryImpl;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.item.ItemStack;

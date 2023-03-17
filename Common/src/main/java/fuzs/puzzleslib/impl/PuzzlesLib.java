@@ -1,10 +1,11 @@
 package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.core.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
-import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
+import fuzs.puzzleslib.impl.entitydata.ClientboundAddEntityDataMessage;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,4 +21,13 @@ public class PuzzlesLib implements ModConstructor {
             .registerClientbound(ClientboundSyncCapabilityMessage.class)
             .registerClientbound(ClientboundAddEntityDataMessage.class)
             .build();
+
+    @Override
+    public void onConstructMod() {
+        NETWORK.initialize();
+    }
+
+    public static ResourceLocation id(String path) {
+        return new ResourceLocation(MOD_ID, path);
+    }
 }

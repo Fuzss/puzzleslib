@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.networking.v2;
 
-import fuzs.puzzleslib.core.DistType;
+import fuzs.puzzleslib.api.core.v1.DistType;
 
 /**
  * just like net.minecraftforge.network.NetworkDirection, only for registering messages

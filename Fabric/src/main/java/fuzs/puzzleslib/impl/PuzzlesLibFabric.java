@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl;
 
-import fuzs.puzzleslib.core.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import net.fabricmc.api.ModInitializer;
 
 public class PuzzlesLibFabric implements ModInitializer {

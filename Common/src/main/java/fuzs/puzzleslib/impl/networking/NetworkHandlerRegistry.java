@@ -7,7 +7,21 @@ import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
 
 import java.util.List;
 
-public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
+public abstract class NetworkHandlerRegistry implements NetworkHandlerV3 {
+    private final List<Class<?>> clientboundMessages = Lists.newArrayList();
+    private final List<Class<?>> serverboundMessages = Lists.newArrayList();
+
+    @Override
+    public void initialize() {
+        for (Class<?> message : this.clientboundMessages) {
+            this.registerClientbound(message);
+        }
+        for (Class<?> message : this.serverboundMessages) {
+            this.registerServerbound(message);
+        }
+        this.clientboundMessages.clear();
+        this.serverboundMessages.clear();
+    }
 
     /**
      * register a message that will be sent to clients
@@ -15,7 +29,7 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
      * @param clazz message class type
      * @param <T>   message implementation
      */
-    <T extends Record & ClientboundMessage<T>> void registerClientbound(Class<?> clazz);
+    public abstract <T extends Record & ClientboundMessage<T>> void registerClientbound(Class<?> clazz);
 
     /**
      * register a message that will be sent to servers
@@ -23,9 +37,9 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
      * @param clazz message class type
      * @param <T>   message implementation
      */
-    <T extends Record & ServerboundMessage<T>> void registerServerbound(Class<?> clazz);
+    public abstract <T extends Record & ServerboundMessage<T>> void registerServerbound(Class<?> clazz);
 
-    abstract class BuilderImpl implements Builder {
+    public static abstract class BuilderImpl implements Builder {
         protected final String modId;
         private final List<Class<?>> clientboundMessages = Lists.newArrayList();
         private final List<Class<?>> serverboundMessages = Lists.newArrayList();
@@ -65,19 +79,11 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
         @Override
         public NetworkHandlerV3 build() {
             NetworkHandlerRegistry networkHandler = this.getHandler();
-            this.registerAll(networkHandler);
+            networkHandler.clientboundMessages.addAll(this.clientboundMessages);
+            networkHandler.serverboundMessages.addAll(this.serverboundMessages);
             return networkHandler;
         }
 
         protected abstract NetworkHandlerRegistry getHandler();
-
-        private void registerAll(NetworkHandlerRegistry networkHandler) {
-            for (Class<?> message : this.clientboundMessages) {
-                networkHandler.registerClientbound(message);
-            }
-            for (Class<?> message : this.serverboundMessages) {
-                networkHandler.registerServerbound(message);
-            }
-        }
     }
 }

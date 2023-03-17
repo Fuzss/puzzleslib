@@ -52,11 +52,11 @@ dependencies {
     modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:5.0.10"
 
     // Cardinal Components
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.1.0"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.1.0"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.1.0"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.1.0"
-    modImplementation "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.1.0"
 
     // Quality of Life Mods
     modLocalRuntime "com.terraformersmc:modmenu:5.0.2"
