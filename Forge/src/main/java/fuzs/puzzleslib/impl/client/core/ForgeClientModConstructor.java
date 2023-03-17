@@ -8,7 +8,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.contexts.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
@@ -76,31 +75,12 @@ import java.util.function.Supplier;
  * <p>we use this wrapper style to allow for already registered to be used within the registration methods instead of having to use suppliers
  */
 public class ForgeClientModConstructor {
-    /**
-     * the mod id
-     */
     private final String modId;
-    /**
-     * mod base class
-     */
     private final ClientModConstructor constructor;
     private final Set<ContentRegistrationFlags> contentRegistrations;
-    /**
-     * actions to run each time after baked models have been reloaded
-     */
-    private final List<DynamicModelBakingContext> modelBakingListeners = Lists.newArrayList();
-    /**
-     * custom built-in item model renderers to reload after each resource reload
-     */
     private final List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers = Lists.newArrayList();
     private final Multimap<ResourceLocation, CreativeModeTab.DisplayItemsGenerator> creativeModeTabBuildListeners = HashMultimap.create();
 
-    /**
-     * only calls {@link ModConstructor#onConstructMod()}, everything else is done via events later
-     *
-     * @param modId         the mod id
-     * @param constructor   mod base class
-     */
     private ForgeClientModConstructor(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         this.modId = modId;
         this.constructor = constructor;
@@ -113,9 +93,6 @@ public class ForgeClientModConstructor {
     public void onClientSetup(final FMLClientSetupEvent evt) {
         this.constructor.onClientSetup(evt::enqueueWork);
         this.constructor.onRegisterSearchTrees(this.getSearchRegistryContext());
-        // we store all those listeners in a list once, Forge is a bit odd here with firing the related model events on the mod event bus;
-        // that bus should only really be used for registering stuff once during game initialization, but models (resources in general) can reload plenty of times while the game is running
-        this.constructor.onRegisterModelBakingListeners(this.modelBakingListeners::add);
         this.constructor.onRegisterItemModelProperties(this.getItemPropertiesContext());
         this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
         this.constructor.onRegisterBlockRenderTypes((renderType, object, objects) -> {
@@ -307,25 +284,19 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onModifyBakingResult(final ModelEvent.ModifyBakingResult evt) {
-        for (DynamicModelBakingContext listener : this.modelBakingListeners) {
-            if (!(listener instanceof DynamicModelBakingContext.ModifyBakingResult modifyBakingResult)) return;
-            try {
-                modifyBakingResult.onModifyBakingResult(evt.getModels(), evt.getModelBakery());
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
-            }
+        try {
+            this.constructor.onModifyBakingResult(new DynamicModifyBakingResultContext(evt.getModels(), evt.getModelBakery()));
+        } catch (Exception e) {
+            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", this.modId, e);
         }
     }
 
     @SubscribeEvent
     public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
-        for (DynamicModelBakingContext listener : this.modelBakingListeners) {
-            if (!(listener instanceof DynamicModelBakingContext.BakingCompleted bakingCompleted)) return;
-            try {
-                bakingCompleted.onBakingCompleted(evt.getModelManager(), evt.getModels(), evt.getModelBakery());
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", this.modId, e);
-            }
+        try {
+            this.constructor.onBakingCompleted(new DynamicBakingCompletedContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()));
+        } catch (Exception e) {
+            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", this.modId, e);
         }
     }
 

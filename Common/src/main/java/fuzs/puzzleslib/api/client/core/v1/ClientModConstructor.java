@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.core.v1;
 import fuzs.puzzleslib.api.client.core.v1.contexts.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.contexts.ModLifecycleContext;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Supplier;
 
@@ -30,6 +32,8 @@ public interface ClientModConstructor {
      * @param contentRegistrations specific content this mod uses that needs to be additionally registered
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
+        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
         ClientFactories.INSTANCE.constructClientMod(modId, modConstructor, contentRegistrations);
     }
 
@@ -93,9 +97,16 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context context for registering a listener that runs right after baked models have been reloaded
+     * @param context Context for modifying baked models right after they've been reloaded.
      */
-    default void onRegisterModelBakingListeners(final ModelBakingListenersContext context) {
+    default void onModifyBakingResult(final DynamicModifyBakingResultContext context) {
+
+    }
+
+    /**
+     * @param context Context for retrieving baked models from the model manager after they've been reloaded.
+     */
+    default void onBakingCompleted(final DynamicBakingCompletedContext context) {
 
     }
 

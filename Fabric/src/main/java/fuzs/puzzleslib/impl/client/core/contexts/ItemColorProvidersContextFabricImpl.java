@@ -1,27 +1,16 @@
 package fuzs.puzzleslib.impl.client.core.contexts;
 
 import fuzs.puzzleslib.api.client.core.v1.contexts.ColorProvidersContext;
+import fuzs.puzzleslib.api.core.v1.contexts.MultiRegistrationContext;
 import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.item.Item;
 
-import java.util.Objects;
-
-public final class ItemColorProvidersContextFabricImpl implements ColorProvidersContext<Item, ItemColor> {
+public final class ItemColorProvidersContextFabricImpl implements ColorProvidersContext<Item, ItemColor>, MultiRegistrationContext<Item, ItemColor> {
 
     @Override
     public void registerColorProvider(ItemColor provider, Item object, Item... objects) {
-        Objects.requireNonNull(provider, "provider is null");
-        this.registerItemColorProvider(object, provider);
-        Objects.requireNonNull(objects, "items is null");
-        for (Item item : objects) {
-            this.registerItemColorProvider(item, provider);
-        }
-    }
-
-    private void registerItemColorProvider(Item item, ItemColor provider) {
-        Objects.requireNonNull(item, "item is null");
-        ColorProviderRegistry.ITEM.register(provider, item);
+        this.register(provider, object, objects);
     }
 
     @Override
@@ -30,5 +19,10 @@ public final class ItemColorProvidersContextFabricImpl implements ColorProviders
             ItemColor itemColor = ColorProviderRegistry.ITEM.get(itemStack.getItem());
             return itemColor == null ? -1 : itemColor.getColor(itemStack, i);
         };
+    }
+
+    @Override
+    public void register(Item object, ItemColor type) {
+        ColorProviderRegistry.ITEM.register(type, object);
     }
 }

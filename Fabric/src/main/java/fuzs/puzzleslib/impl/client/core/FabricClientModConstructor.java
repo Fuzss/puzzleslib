@@ -2,14 +2,20 @@ package fuzs.puzzleslib.impl.client.core;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.contexts.DynamicModelBakingContext;
+import fuzs.puzzleslib.api.client.core.v1.contexts.BuiltinModelItemRendererContext;
+import fuzs.puzzleslib.api.client.core.v1.contexts.DynamicBakingCompletedContext;
+import fuzs.puzzleslib.api.client.core.v1.contexts.DynamicModifyBakingResultContext;
 import fuzs.puzzleslib.api.client.events.v2.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.contexts.*;
-import org.apache.logging.log4j.util.Strings;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class FabricClientModConstructor {
 
@@ -18,10 +24,6 @@ public final class FabricClientModConstructor {
     }
 
     public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
-        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-        // everything after this is done on Forge using events called by the mod event bus
-        // this is done since Forge works with loading stages, Fabric doesn't have those stages, so everything is called immediately
         constructor.onConstructMod();
         constructor.onClientSetup(Runnable::run);
         constructor.onRegisterEntityRenderers(new EntityRenderersContextFabricImpl());
@@ -30,11 +32,11 @@ public final class FabricClientModConstructor {
         constructor.onRegisterParticleProviders(new ParticleProvidersContextFabricImpl());
         constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         constructor.onRegisterSearchTrees(new SearchRegistryContextFabricImpl());
-        registerModelBakingListeners(constructor, modId);
+        registerModelBakingListeners(constructor::onModifyBakingResult, constructor::onBakingCompleted, modId);
         constructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
         constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
-        registerBuiltinModelItemRenderers(constructor, modId);
+        registerBuiltinModelItemRenderers(constructor::onRegisterBuiltinModelItemRenderers, modId);
         constructor.onRegisterClientReloadListeners(new ClientReloadListenersContextFabricImpl(modId));
         constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
         constructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
@@ -47,36 +49,36 @@ public final class FabricClientModConstructor {
         constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
     }
 
-    private static void registerModelBakingListeners(ClientModConstructor constructor, String modId) {
-        List<DynamicModelBakingContext> modelBakingListeners = Lists.newArrayList();
-        constructor.onRegisterModelBakingListeners(modelBakingListeners::add);
-        if (modelBakingListeners.isEmpty()) return;
+    private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> consumer1, Consumer<DynamicBakingCompletedContext> consumer2, String modId) {
         ModelEvents.MODIFY_BAKING_RESULT.register((models, modelBakery) -> {
-            for (DynamicModelBakingContext listener : modelBakingListeners) {
-                if (!(listener instanceof DynamicModelBakingContext.ModifyBakingResult modifyBakingResult))
-                    continue;
-                try {
-                    modifyBakingResult.onModifyBakingResult(models, modelBakery);
-                } catch (Exception e) {
-                    PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", modId, e);
-                }
+            try {
+                consumer1.accept(new DynamicModifyBakingResultContext(models, modelBakery));
+            } catch (Exception e) {
+                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
             }
         });
         ModelEvents.BAKING_COMPLETED.register((modelManager, models, modelBakery) -> {
-            for (DynamicModelBakingContext listener : modelBakingListeners) {
-                if (!(listener instanceof DynamicModelBakingContext.BakingCompleted bakingCompleted)) continue;
-                try {
-                    bakingCompleted.onBakingCompleted(modelManager, models, modelBakery);
-                } catch (Exception e) {
-                    PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing provided by {}", modId, e);
-                }
+            try {
+                consumer2.accept(new DynamicBakingCompletedContext(modelManager, models, modelBakery));
+            } catch (Exception e) {
+                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
             }
         });
     }
 
-    private static void registerBuiltinModelItemRenderers(ClientModConstructor constructor, String modId) {
-        BuiltinModelItemRendererContextFabricImpl context = new BuiltinModelItemRendererContextFabricImpl(modId);
-        constructor.onRegisterBuiltinModelItemRenderers(context);
-        context.apply();
+    private static void registerBuiltinModelItemRenderers(Consumer<BuiltinModelItemRendererContext> consumer, String modId) {
+        List<ResourceManagerReloadListener> listeners = Lists.newArrayList();
+        BuiltinModelItemRendererContextFabricImpl context = new BuiltinModelItemRendererContextFabricImpl(listeners);
+        consumer.accept(context);
+        if (listeners.isEmpty()) return;
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricResourceReloadListener(modId, "built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+            for (ResourceManagerReloadListener listener : listeners) {
+                try {
+                    listener.onResourceManagerReload(resourceManager);
+                } catch (Exception e) {
+                    PuzzlesLib.LOGGER.error("Unable to execute dynamic built-in model item renderers reload provided by {}", modId, e);
+                }
+            }
+        }));
     }
 }
