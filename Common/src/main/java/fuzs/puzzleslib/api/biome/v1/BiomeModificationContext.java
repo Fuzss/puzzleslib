@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.api.biome.v1;
 
-import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.contexts.BiomeModificationsContext;
 
 /**
- * Context containing all biome related information passed in {@link ModConstructor.BiomeModificationsContext}.
+ * Context containing all biome related information passed in {@link BiomeModificationsContext}.
  *
  * @param climateSettings The modification context for the biomes weather properties.
  * @param specialEffects The modification context for the biomes effects.

@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.api.client.core.v1.contexts.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
@@ -87,7 +88,7 @@ public class ForgeClientModConstructor {
     /**
      * actions to run each time after baked models have been reloaded
      */
-    private final List<ClientModConstructor.DynamicModelBakingContext> modelBakingListeners = Lists.newArrayList();
+    private final List<DynamicModelBakingContext> modelBakingListeners = Lists.newArrayList();
     /**
      * custom built-in item model renderers to reload after each resource reload
      */
@@ -137,7 +138,7 @@ public class ForgeClientModConstructor {
                 ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
             }
         });
-        this.constructor.onBuildCreativeModeTabContents(new ClientModConstructor.BuildCreativeModeTabContentsContext() {
+        this.constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContext() {
 
             @Override
             public void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
@@ -157,8 +158,8 @@ public class ForgeClientModConstructor {
         });
     }
 
-    private ClientModConstructor.SearchRegistryContext getSearchRegistryContext() {
-        return new ClientModConstructor.SearchRegistryContext() {
+    private SearchRegistryContext getSearchRegistryContext() {
+        return new SearchRegistryContext() {
 
             @Override
             public <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder) {
@@ -171,8 +172,8 @@ public class ForgeClientModConstructor {
         };
     }
 
-    private ClientModConstructor.ItemModelPropertiesContext getItemPropertiesContext() {
-        return new ClientModConstructor.ItemModelPropertiesContext() {
+    private ItemModelPropertiesContext getItemPropertiesContext() {
+        return new ItemModelPropertiesContext() {
 
             @Override
             public void registerGlobalProperty(ResourceLocation identifier, ClampedItemPropertyFunction function) {
@@ -196,7 +197,7 @@ public class ForgeClientModConstructor {
         };
     }
 
-    private ClientModConstructor.BuiltinModelItemRendererContext getBuiltinModelItemRendererContext() {
+    private BuiltinModelItemRendererContext getBuiltinModelItemRendererContext() {
         return (renderer, object, objects) -> {
             // copied from Forge, seems to break data gen otherwise
             if (FMLLoader.getLaunchHandler().isData()) return;
@@ -242,7 +243,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterRenderers(final EntityRenderersEvent.RegisterRenderers evt) {
-        this.constructor.onRegisterEntityRenderers(new ClientModConstructor.EntityRenderersContext() {
+        this.constructor.onRegisterEntityRenderers(new EntityRenderersContext() {
 
             @Override
             public <T extends Entity> void registerEntityRenderer(EntityType<? extends T> entityType, EntityRendererProvider<T> entityRendererProvider) {
@@ -251,7 +252,7 @@ public class ForgeClientModConstructor {
                 evt.registerEntityRenderer(entityType, entityRendererProvider);
             }
         });
-        this.constructor.onRegisterBlockEntityRenderers(new ClientModConstructor.BlockEntityRenderersContext() {
+        this.constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContext() {
 
             @Override
             public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider) {
@@ -264,7 +265,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterClientTooltipComponentFactories(final RegisterClientTooltipComponentFactoriesEvent evt) {
-        this.constructor.onRegisterClientTooltipComponents(new ClientModConstructor.ClientTooltipComponentsContext() {
+        this.constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContext() {
 
             @Override
             public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
@@ -277,7 +278,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
-        this.constructor.onRegisterParticleProviders(new ClientModConstructor.ParticleProvidersContext() {
+        this.constructor.onRegisterParticleProviders(new ParticleProvidersContext() {
 
             @Override
             public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
@@ -306,8 +307,8 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onModifyBakingResult(final ModelEvent.ModifyBakingResult evt) {
-        for (ClientModConstructor.DynamicModelBakingContext listener : this.modelBakingListeners) {
-            if (!(listener instanceof ClientModConstructor.ModifyBakingResult modifyBakingResult)) return;
+        for (DynamicModelBakingContext listener : this.modelBakingListeners) {
+            if (!(listener instanceof DynamicModelBakingContext.ModifyBakingResult modifyBakingResult)) return;
             try {
                 modifyBakingResult.onModifyBakingResult(evt.getModels(), evt.getModelBakery());
             } catch (Exception e) {
@@ -318,8 +319,8 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
-        for (ClientModConstructor.DynamicModelBakingContext listener : this.modelBakingListeners) {
-            if (!(listener instanceof ClientModConstructor.BakingCompleted bakingCompleted)) return;
+        for (DynamicModelBakingContext listener : this.modelBakingListeners) {
+            if (!(listener instanceof DynamicModelBakingContext.BakingCompleted bakingCompleted)) return;
             try {
                 bakingCompleted.onBakingCompleted(evt.getModelManager(), evt.getModels(), evt.getModelBakery());
             } catch (Exception e) {
@@ -391,7 +392,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onAddLayers(final EntityRenderersEvent.AddLayers evt) {
-        this.constructor.onRegisterLivingEntityRenderLayers(new ClientModConstructor.LivingEntityRenderLayersContext() {
+        this.constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContext() {
 
             @SuppressWarnings("unchecked")
             @Override
@@ -435,7 +436,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterBlockColorHandlers(final RegisterColorHandlersEvent.Block evt) {
-        this.constructor.onRegisterBlockColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
+        this.constructor.onRegisterBlockColorProviders(new ColorProvidersContext<>() {
 
             @Override
             public void registerColorProvider(BlockColor provider, Block object, Block... objects) {
@@ -461,7 +462,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterItemColorHandlers(final RegisterColorHandlersEvent.Item evt) {
-        this.constructor.onRegisterItemColorProviders(new ClientModConstructor.ColorProvidersContext<>() {
+        this.constructor.onRegisterItemColorProviders(new ColorProvidersContext<>() {
 
             @Override
             public void registerColorProvider(ItemColor provider, Item object, Item... objects) {

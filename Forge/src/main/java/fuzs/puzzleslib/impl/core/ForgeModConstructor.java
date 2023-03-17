@@ -5,6 +5,9 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.contexts.LootTablesContext;
+import fuzs.puzzleslib.api.core.v1.contexts.RegisterCommandsContext;
+import fuzs.puzzleslib.api.core.v1.contexts.SpawnPlacementsContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
 import fuzs.puzzleslib.impl.creativemodetab.CreativeModeTabConfiguratorImpl;
@@ -88,7 +91,7 @@ public class ForgeModConstructor {
 
     @SubscribeEvent
     public void onRegisterSpawnPlacement(final SpawnPlacementRegisterEvent evt) {
-        this.constructor.onRegisterSpawnPlacements(new ModConstructor.SpawnPlacementsContext() {
+        this.constructor.onRegisterSpawnPlacements(new SpawnPlacementsContext() {
 
             @Override
             public <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
@@ -136,8 +139,8 @@ public class ForgeModConstructor {
         };
     }
 
-    private ModConstructor.LootTablesReplaceContext getLootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable lootTable, Consumer<LootTable> lootTableSetter) {
-        return new ModConstructor.LootTablesReplaceContext(lootManager, id, lootTable) {
+    private LootTablesContext.Replace getLootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable lootTable, Consumer<LootTable> lootTableSetter) {
+        return new LootTablesContext.Replace(lootManager, id, lootTable) {
 
             @Override
             public void setLootTable(LootTable table) {
@@ -146,8 +149,8 @@ public class ForgeModConstructor {
         };
     }
 
-    private ModConstructor.LootTablesModifyContext getLootTablesModifyContext(LootTables lootManager, ResourceLocation id, LootTable lootTable) {
-        return new ModConstructor.LootTablesModifyContext(lootManager, id) {
+    private LootTablesContext.Modify getLootTablesModifyContext(LootTables lootManager, ResourceLocation id, LootTable lootTable) {
+        return new LootTablesContext.Modify(lootManager, id) {
 
             @Override
             public void addLootPool(LootPool pool) {
@@ -187,7 +190,7 @@ public class ForgeModConstructor {
             }
         });
         MinecraftForge.EVENT_BUS.addListener((final RegisterCommandsEvent evt) -> {
-           constructor.onRegisterCommands(new ModConstructor.RegisterCommandsContext(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection()));
+           constructor.onRegisterCommands(new RegisterCommandsContext(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection()));
         });
         MinecraftForge.EVENT_BUS.addListener((final LootTableLoadEvent evt) -> {
             constructor.onLootTableReplacement(forgeModConstructor.getLootTablesReplaceContext(evt.getLootTableManager(), evt.getName(), evt.getTable(), evt::setTable));

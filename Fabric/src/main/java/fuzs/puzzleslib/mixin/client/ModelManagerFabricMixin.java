@@ -22,22 +22,21 @@ public abstract class ModelManagerFabricMixin {
     @Shadow
     private Map<ResourceLocation, BakedModel> bakedRegistry;
     @Unique
-    private ThreadLocal<ModelBakery> puzzleslib$modelBakery = new ThreadLocal<>();
+    private ModelBakery puzzleslib$modelBakery;
 
     // we cannot use inject as the return value is a package-private class, not sure how to deal with that other than access widener
     @ModifyVariable(method = "loadModels", at = @At("LOAD"), slice = @Slice(from = @At(value = "CONSTANT", args = "stringValue=dispatch")))
     private ModelBakery loadModels(ModelBakery modelBakery) {
         // we cannot capture the local later in apply since we pass on method parameters, so store this here for later use
-        this.puzzleslib$modelBakery.set(modelBakery);
+        this.puzzleslib$modelBakery = modelBakery;
         ModelEvents.MODIFY_BAKING_RESULT.invoker().onModifyBakingResult(modelBakery.getBakedTopLevelModels(), modelBakery);
         return modelBakery;
     }
 
     @Inject(method = "apply", at = @At(value = "FIELD", target = "Lnet/minecraft/client/resources/model/ModelManager;missingModel:Lnet/minecraft/client/resources/model/BakedModel;", shift = At.Shift.AFTER))
     private void apply(CallbackInfo callback) {
-        ModelBakery modelBakery = this.puzzleslib$modelBakery.get();
-        Objects.requireNonNull(modelBakery, "model bakery is null");
-        ModelEvents.BAKING_COMPLETED.invoker().onBakingCompleted(ModelManager.class.cast(this), this.bakedRegistry, modelBakery);
-        this.puzzleslib$modelBakery.remove();
+        Objects.requireNonNull(this.puzzleslib$modelBakery, "model bakery is null");
+        ModelEvents.BAKING_COMPLETED.invoker().onBakingCompleted(ModelManager.class.cast(this), this.bakedRegistry, this.puzzleslib$modelBakery);
+        this.puzzleslib$modelBakery = null;
     }
 }
