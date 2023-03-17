@@ -59,7 +59,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 import java.util.Objects;
@@ -474,8 +473,6 @@ public class ForgeClientModConstructor {
      * @param constructor mod base class
      */
     public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("modId cannot be empty");
-        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
         ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor, modId, contentRegistrations);
         ModContainerHelper.findModEventBus(modId).register(forgeModConstructor);
     }

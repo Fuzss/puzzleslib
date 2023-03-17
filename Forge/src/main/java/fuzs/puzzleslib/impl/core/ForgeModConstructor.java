@@ -5,18 +5,16 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.contexts.LootTablesContext;
 import fuzs.puzzleslib.api.core.v1.contexts.RegisterCommandsContext;
 import fuzs.puzzleslib.api.core.v1.contexts.SpawnPlacementsContext;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
 import fuzs.puzzleslib.impl.creativemodetab.CreativeModeTabConfiguratorImpl;
 import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
-import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -44,7 +42,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -68,7 +65,7 @@ public class ForgeModConstructor {
     public void onCommonSetup(final FMLCommonSetupEvent evt) {
         this.constructor.onCommonSetup(evt::enqueueWork);
         this.constructor.onRegisterFuelBurnTimes((burnTime, item, items) -> {
-            if (Mth.clamp(burnTime, 1, 32767) != burnTime) throw new IllegalArgumentException("fuel burn time is out of bounds");
+            if (burnTime <= 0) throw new IllegalArgumentException("burn time must be greater than 0");
             Objects.requireNonNull(item, "item is null");
             this.fuelBurnTimes.put(item.asItem(), burnTime);
             Objects.requireNonNull(items, "items is null");
@@ -80,9 +77,13 @@ public class ForgeModConstructor {
         this.constructor.onRegisterBiomeModifications((phase, selector, modifier) -> {
             this.biomeLoadingEntries.put(phase, new BiomeLoadingHandler.BiomeModificationData(phase, selector, modifier));
         });
-        this.constructor.onRegisterFlammableBlocks((encouragement, flammability, blocks) -> {
-            Objects.requireNonNull(blocks, "blocks is null");
-            for (Block block : blocks) {
+        this.constructor.onRegisterFlammableBlocks((encouragement, flammability, object, objects) -> {
+            if (encouragement <= 0) throw new IllegalArgumentException("encouragement must be greater than 0");
+            if (flammability <= 0) throw new IllegalArgumentException("flammability must be greater than 0");
+            Objects.requireNonNull(object, "block is null");
+            ((FireBlockForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(object, encouragement, flammability);
+            Objects.requireNonNull(objects, "blocks is null");
+            for (Block block : objects) {
                 Objects.requireNonNull(block, "block is null");
                 ((FireBlockForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(block, encouragement, flammability);
             }
@@ -176,8 +177,6 @@ public class ForgeModConstructor {
      * @param constructor mod base class
      */
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id cannot be empty");
-        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
         IEventBus modEventBus = ModContainerHelper.findModEventBus(modId);
         modEventBus.register(forgeModConstructor);

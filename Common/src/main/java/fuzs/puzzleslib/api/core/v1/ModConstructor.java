@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.core.v1.contexts.*;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Supplier;
 
@@ -21,6 +23,8 @@ public interface ModConstructor {
      * @param contentRegistrations specific content this mod uses that needs to be additionally registered
      */
     static void construct(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
+        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         CommonFactories.INSTANCE.constructMod(modId, modConstructor, contentRegistrations);
     }
 

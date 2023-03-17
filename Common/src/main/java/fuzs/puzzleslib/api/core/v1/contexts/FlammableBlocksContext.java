@@ -13,7 +13,8 @@ public interface FlammableBlocksContext {
      *
      * @param encouragement a value determining how fast this block will spread fire to other nearby flammable blocks
      * @param flammability  a value determining how easily this block catches on fire from nearby fires
-     * @param blocks        blocks to register <code>encouragement</code> and <code>flammability</code> for
+     * @param object         a block to register <code>encouragement</code> and <code>flammability</code> for
+     * @param objects        more blocks to register <code>encouragement</code> and <code>flammability</code> for
      */
-    void registerFlammable(int encouragement, int flammability, Block... blocks);
+    void registerFlammable(int encouragement, int flammability, Block object, Block... objects);
 }
