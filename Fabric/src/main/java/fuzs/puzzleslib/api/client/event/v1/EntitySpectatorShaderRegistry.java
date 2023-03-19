@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.event.v2;
+package fuzs.puzzleslib.api.client.event.v1;
 
 import fuzs.puzzleslib.impl.client.event.EntitySpectatorShaderRegistryImpl;
 import net.minecraft.resources.ResourceLocation;

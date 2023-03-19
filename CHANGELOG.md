@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog].
 ### Added
 - Added an experimental api for calling events in the common project, Forge events and Fabric callbacks are wrapped accordingly
 - Added new registration and helper methods for handling `CreativeModeTab`
-- Added some default data generators
+- Added a bunch of default data generators
 ### Changed
 - Split codebase into `api`, `impl` and `mixin` subpackages
 - `NetworkHandlerV3` instances must now call `#initialize` to prevent message registration running too early

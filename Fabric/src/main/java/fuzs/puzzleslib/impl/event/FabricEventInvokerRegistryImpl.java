@@ -11,7 +11,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
-import fuzs.puzzleslib.api.event.v1.world.FarmlandTrampleCallback;
+import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.world.InteractionResultHolder;
@@ -31,7 +31,7 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
-        INSTANCE.register(FarmlandTrampleCallback.class, FabricWorldEvents.FARMLAND_TRAMPLE);
+        INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricWorldEvents.FARMLAND_TRAMPLE);
     }
 
     @SuppressWarnings("unchecked")

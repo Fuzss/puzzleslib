@@ -89,7 +89,9 @@ loom {
 }
 
 processResources {
-    from project(":Common").sourceSets.main.resources
+    from(project(":Common").sourceSets.main.resources) {
+        exclude("fabric.mod.json")
+    }
     from(project(":Forge").file('src/generated/resources')) {
         exclude('.cache/')
     }

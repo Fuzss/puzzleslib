@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.event.v2;
+package fuzs.puzzleslib.api.client.event.v1;
 
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;

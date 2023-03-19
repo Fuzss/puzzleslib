@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Main event class for common events.
@@ -21,7 +22,19 @@ public interface EventInvoker<T> {
      * @return mod loader-specific invoker, will throw an exception is none is present
      */
     static <T> EventInvoker<T> lookup(Class<T> clazz) {
-        return CommonFactories.INSTANCE.lookupEvent(clazz);
+        // due to static initializers the invoker might not be present in the lookup just yet, so use memoization instead
+        return new EventInvoker<>() {
+            @Nullable
+            private EventInvoker<T> invoker;
+
+            @Override
+            public void register(EventPhase phase, T callback) {
+                if (this.invoker == null) {
+                    this.invoker = CommonFactories.INSTANCE.lookupEvent(clazz);
+                }
+                this.invoker.register(phase, callback);
+            }
+        };
     }
 
     /**

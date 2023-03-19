@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
-import fuzs.puzzleslib.api.event.v1.world.FarmlandTrampleCallback;
+import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import net.fabricmc.fabric.api.event.Event;
 
 /**
@@ -11,5 +11,5 @@ public final class FabricWorldEvents {
     /**
      * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block into dirt and destroying potential crops.
      */
-    public static final Event<FarmlandTrampleCallback> FARMLAND_TRAMPLE = FabricEventFactory.createResult(FarmlandTrampleCallback.class);
+    public static final Event<BlockEvents.FarmlandTrample> FARMLAND_TRAMPLE = FabricEventFactory.createResult(BlockEvents.FarmlandTrample.class);
 }

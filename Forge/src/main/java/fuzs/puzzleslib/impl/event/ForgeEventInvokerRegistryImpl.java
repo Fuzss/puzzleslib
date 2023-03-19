@@ -8,7 +8,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
-import fuzs.puzzleslib.api.event.v1.world.FarmlandTrampleCallback;
+import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -63,7 +63,7 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(FarmlandTrampleCallback.class, BlockEvent.FarmlandTrampleEvent.class, (FarmlandTrampleCallback callback, BlockEvent.FarmlandTrampleEvent evt) -> {
+        INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
             if (callback.onFarmlandTrample((Level) evt.getLevel(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }

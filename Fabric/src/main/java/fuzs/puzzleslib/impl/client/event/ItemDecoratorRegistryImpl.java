@@ -3,7 +3,7 @@ package fuzs.puzzleslib.impl.client.event;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.api.client.event.v2.ItemDecoratorRegistry;
+import fuzs.puzzleslib.api.client.event.v1.ItemDecoratorRegistry;
 import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
 import net.minecraft.client.gui.Font;
 import net.minecraft.world.item.Item;

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.ItemDecorationContext;
-import fuzs.puzzleslib.api.client.event.v2.ItemDecoratorRegistry;
+import fuzs.puzzleslib.api.client.event.v1.ItemDecoratorRegistry;
 import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
 import fuzs.puzzleslib.api.core.v1.context.MultiRegistrationContext;
 import net.minecraft.world.level.ItemLike;

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.EntitySpectatorShaderContext;
-import fuzs.puzzleslib.api.client.event.v2.EntitySpectatorShaderRegistry;
+import fuzs.puzzleslib.api.client.event.v1.EntitySpectatorShaderRegistry;
 import fuzs.puzzleslib.api.core.v1.context.MultiRegistrationContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;

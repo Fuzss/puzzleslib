@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.client.event;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.client.event.v2.EntitySpectatorShaderRegistry;
+import fuzs.puzzleslib.api.client.event.v1.EntitySpectatorShaderRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;

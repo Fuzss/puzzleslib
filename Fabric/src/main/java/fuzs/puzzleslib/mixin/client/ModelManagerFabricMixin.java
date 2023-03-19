@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
-import fuzs.puzzleslib.api.client.event.v2.ModelEvents;
+import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;

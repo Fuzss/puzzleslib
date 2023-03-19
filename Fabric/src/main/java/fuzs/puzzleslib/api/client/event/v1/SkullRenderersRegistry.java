@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.event.v2;
+package fuzs.puzzleslib.api.client.event.v1;
 
 import fuzs.puzzleslib.api.client.init.v1.SkullRenderersFactory;
 import fuzs.puzzleslib.impl.client.event.SkullRenderersRegistryImpl;
