@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.2-1.19.3] - 2023-03-19
+### Fixed
+- Fix access transformer remapping failing in common project
+
 ## [v5.0.1-1.19.3] - 2023-03-19
 ### Changed
 - Fabric Api now is an api dependency for the common project to allow access wideners to apply automatically

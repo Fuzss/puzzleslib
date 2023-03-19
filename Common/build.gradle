@@ -122,14 +122,6 @@ publishing {
     }
 }
 
-// thanks to lukebemish for this comment: https://github.com/jaredlll08/MultiLoader-Template/issues/17#issuecomment-1221598082
-
-import net.fabricmc.loom.task.AbstractRemapJarTask
-
-tasks.withType(AbstractRemapJarTask).each {
-    it.targetNamespace = "named"
-}
-
 signing {
     sign publishing.publications.mavenJava
 }
