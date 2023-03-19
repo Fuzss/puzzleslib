@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog].
 ## [v5.0.0-1.19.3] - 2023-03-16
 - Ported to Minecraft 1.19.3
 ### Added
+- Added an experimental api for calling events in the common project, Forge events and Fabric callbacks are wrapped accordingly
 - Added new registration and helper methods for handling `CreativeModeTab`
+- Added some default data generators
 ### Changed
 - Split codebase into `api`, `impl` and `mixin` subpackages
 - `NetworkHandlerV3` instances must now call `#initialize` to prevent message registration running too early

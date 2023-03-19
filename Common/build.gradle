@@ -17,7 +17,6 @@ dependencies {
 
     // Fabric
     modImplementation "net.fabricmc:fabric-loader:${fabricVersion}"
-    modImplementation fabricApi.module("fabric-api-base", "${fabricApiVersion}")
     modImplementation fabricApi.module("fabric-transitive-access-wideners-v1", "${fabricApiVersion}")
 
     // Forge Config API Port

@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.client.core.v1;
 
-import fuzs.puzzleslib.api.client.core.v1.contexts.*;
+import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.contexts.ModLifecycleContext;
+import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.KeyMapping;

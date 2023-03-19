@@ -7,11 +7,12 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
-import fuzs.puzzleslib.api.networking.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.api.registration.v2.GameRulesFactory;
-import fuzs.puzzleslib.api.registration.v2.PotionBrewingRegistry;
-import fuzs.puzzleslib.api.registration.v2.RegistryManager;
+import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
+import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
+import fuzs.puzzleslib.api.init.v2.RegistryManager;
 
 import java.util.function.Supplier;
 
@@ -106,4 +107,6 @@ public interface CommonFactories {
     PotionBrewingRegistry getPotionBrewingRegistry();
 
     GameRulesFactory getGameRulesFactory();
+
+    <T> EventInvoker<T> lookupEvent(Class<T> clazz);
 }

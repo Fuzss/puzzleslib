@@ -5,10 +5,10 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.impl.config.core.ForgeModConfig;
 import fuzs.puzzleslib.api.core.v1.DistType;
 import fuzs.puzzleslib.api.core.v1.DistTypeExecutor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.impl.config.core.ForgeModConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModContainer;
@@ -17,6 +17,7 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -75,16 +76,16 @@ public class ForgeConfigHolderImpl implements ConfigHolder.Builder {
     public void bakeConfigs(String modId) {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
-        final IEventBus modBus = ModContainerHelper.findModEventBus(modId);
+        Optional<IEventBus> optional = ModContainerHelper.findModEventBus(modId);
         for (ForgeConfigDataHolderImpl<? extends ConfigCore> holder : this.configsByClass.values()) {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
             if (holder.config == null) continue;
-            modBus.addListener((final ModConfigEvent.Loading evt) -> {
+            optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Loading evt) -> {
                 holder.onModConfig(evt.getConfig(), false);
-            });
-            modBus.addListener((final ModConfigEvent.Reloading evt) -> {
+            }));
+            optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Reloading evt) -> {
                 holder.onModConfig(evt.getConfig(), true);
-            });
+            }));
             holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
                 ModContainer modContainer = ModContainerHelper.findModContainer(modId);
                 ModConfig modConfig = new ForgeModConfig(type, spec, modContainer, fileName.apply(modId));

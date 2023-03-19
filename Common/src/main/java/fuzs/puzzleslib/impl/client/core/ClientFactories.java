@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.screens.v2.ScreenHelper;
+import fuzs.puzzleslib.api.client.screen.v2.ScreenHelper;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 

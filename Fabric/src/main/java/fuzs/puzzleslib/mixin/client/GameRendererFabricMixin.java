@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
-import fuzs.puzzleslib.impl.client.events.EntitySpectatorShaderRegistryImpl;
+import fuzs.puzzleslib.impl.client.event.EntitySpectatorShaderRegistryImpl;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;

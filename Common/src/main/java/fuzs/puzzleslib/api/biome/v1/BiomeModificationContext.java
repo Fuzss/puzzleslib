@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.biome.v1;
 
-import fuzs.puzzleslib.api.core.v1.contexts.BiomeModificationsContext;
+import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
 
 /**
  * Context containing all biome related information passed in {@link BiomeModificationsContext}.

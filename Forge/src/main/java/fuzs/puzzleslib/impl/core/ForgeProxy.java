@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraftforge.network.NetworkEvent;
 

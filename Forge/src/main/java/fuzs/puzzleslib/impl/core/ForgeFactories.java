@@ -6,24 +6,23 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.networking.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.api.registration.v2.GameRulesFactory;
-import fuzs.puzzleslib.api.registration.v2.PotionBrewingRegistry;
-import fuzs.puzzleslib.api.registration.v2.RegistryManager;
+import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
+import fuzs.puzzleslib.api.init.v2.RegistryManager;
+import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
+import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ForgeCapabilityController;
 import fuzs.puzzleslib.impl.config.ForgeConfigHolderImpl;
-import fuzs.puzzleslib.impl.networking.NetworkHandlerForgeV3;
-import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryForge;
-import fuzs.puzzleslib.impl.networking.NetworkHandlerForgeV2;
-import fuzs.puzzleslib.impl.registration.ForgeGameRulesFactory;
-import fuzs.puzzleslib.impl.registration.ForgeRegistryManager;
+import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
+import fuzs.puzzleslib.impl.init.ForgeGameRulesFactory;
+import fuzs.puzzleslib.impl.init.ForgeRegistryManager;
+import fuzs.puzzleslib.impl.init.PotionBrewingRegistryForge;
+import fuzs.puzzleslib.impl.network.NetworkHandlerForgeV2;
+import fuzs.puzzleslib.impl.network.NetworkHandlerForgeV3;
 
 import java.util.function.Supplier;
 
-/**
- * factories for various utilities on Forge
- */
 public final class ForgeFactories implements CommonFactories {
 
     @Override
@@ -86,5 +85,10 @@ public final class ForgeFactories implements CommonFactories {
     @Override
     public GameRulesFactory getGameRulesFactory() {
         return new ForgeGameRulesFactory();
+    }
+
+    @Override
+    public <T> EventInvoker<T> lookupEvent(Class<T> clazz) {
+        return ForgeEventInvokerRegistryImpl.INSTANCE.lookup(clazz);
     }
 }

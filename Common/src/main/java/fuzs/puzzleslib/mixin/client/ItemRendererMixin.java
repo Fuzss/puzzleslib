@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
-import fuzs.puzzleslib.impl.client.registration.ItemModelOverridesImpl;
+import fuzs.puzzleslib.impl.client.init.ItemModelOverridesImpl;
 import net.minecraft.client.renderer.ItemModelShaper;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;

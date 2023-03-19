@@ -5,6 +5,10 @@
   "package": "fuzs.puzzleslib.mixin",
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
+    "BoneMealItemFabricMixin",
+    "ExperienceOrbFabricMixin",
+    "FarmBlockFabricMixin",
+    "LivingEntityFabricMixin"
   ],
   "client": [
     "client.GameRendererFabricMixin",

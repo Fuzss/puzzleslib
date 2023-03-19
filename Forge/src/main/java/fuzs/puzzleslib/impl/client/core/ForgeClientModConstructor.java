@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.contexts.*;
+import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -474,6 +474,8 @@ public class ForgeClientModConstructor {
      */
     public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor, modId, contentRegistrations);
-        ModContainerHelper.findModEventBus(modId).register(forgeModConstructor);
+        ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
+            eventBus.register(forgeModConstructor);
+        });
     }
 }

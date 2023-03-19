@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.networking.v2.MessageV2;
-import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;

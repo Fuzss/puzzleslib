@@ -2,13 +2,13 @@ package fuzs.puzzleslib.impl.client.core;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.contexts.BuiltinModelItemRendererContext;
-import fuzs.puzzleslib.api.client.core.v1.contexts.DynamicBakingCompletedContext;
-import fuzs.puzzleslib.api.client.core.v1.contexts.DynamicModifyBakingResultContext;
-import fuzs.puzzleslib.api.client.events.v2.ModelEvents;
+import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
+import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
+import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
+import fuzs.puzzleslib.api.client.event.v2.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.core.contexts.*;
+import fuzs.puzzleslib.impl.client.core.context.*;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;

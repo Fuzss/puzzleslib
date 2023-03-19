@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;

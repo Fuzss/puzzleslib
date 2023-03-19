@@ -6,11 +6,11 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.core.v1.contexts.LootTablesContext;
-import fuzs.puzzleslib.api.core.v1.contexts.RegisterCommandsContext;
-import fuzs.puzzleslib.api.core.v1.contexts.SpawnPlacementsContext;
+import fuzs.puzzleslib.api.core.v1.context.LootTablesContext;
+import fuzs.puzzleslib.api.core.v1.context.RegisterCommandsContext;
+import fuzs.puzzleslib.api.core.v1.context.SpawnPlacementsContext;
 import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
-import fuzs.puzzleslib.impl.creativemodetab.CreativeModeTabConfiguratorImpl;
+import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
 import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.chat.Component;
@@ -45,6 +45,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
@@ -178,8 +179,10 @@ public class ForgeModConstructor {
      */
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         ForgeModConstructor forgeModConstructor = new ForgeModConstructor(constructor);
-        IEventBus modEventBus = ModContainerHelper.findModEventBus(modId);
-        modEventBus.register(forgeModConstructor);
+        Optional<IEventBus> optional = ModContainerHelper.findModEventBus(modId);
+        if (optional.isEmpty()) return;
+        IEventBus eventBus = optional.get();
+        eventBus.register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
         MinecraftForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
@@ -196,7 +199,7 @@ public class ForgeModConstructor {
             constructor.onLootTableModification(forgeModConstructor.getLootTablesModifyContext(evt.getLootTableManager(), evt.getName(), evt.getTable()));
         });
         if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOMES)) {
-            BiomeLoadingHandler.register(modId, modEventBus, forgeModConstructor.biomeLoadingEntries);
+            BiomeLoadingHandler.register(modId, eventBus, forgeModConstructor.biomeLoadingEntries);
         }
     }
 }

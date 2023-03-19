@@ -5,10 +5,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.capability.v2.data.*;
+import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.capability.data.CapabilityHolder;
 import fuzs.puzzleslib.impl.capability.data.ForgeCapabilityKey;
 import fuzs.puzzleslib.impl.capability.data.ForgePlayerCapabilityKey;
-import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -180,7 +180,9 @@ public class ForgeCapabilityController implements CapabilityController {
         return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
             final ForgeCapabilityController controller = new ForgeCapabilityController(namespace);
             // for registering capabilities
-            ModContainerHelper.findModEventBus(namespace).addListener(controller::onRegisterCapabilities);
+            ModContainerHelper.findModEventBus(namespace).ifPresent(eventBus -> {
+                eventBus.addListener(controller::onRegisterCapabilities);
+            });
             // for attaching capabilities
             MinecraftForge.EVENT_BUS.register(controller);
             return controller;

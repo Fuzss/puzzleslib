@@ -138,8 +138,8 @@ mixin {
 
 processResources {
     from(project(":Common").sourceSets.main.resources) {
-        // we need to have this in common so that in a non-production environment the common jar is correctly deobfuscated
-        exclude("quilt.mod.json")
+        exclude("fabric.mod.json")
+        exclude("${modId}.accesswidener")
     }
     from(file('src/generated/resources')) {
         exclude('.cache/')

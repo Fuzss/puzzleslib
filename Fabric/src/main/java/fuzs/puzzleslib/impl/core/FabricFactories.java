@@ -6,24 +6,23 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.networking.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.api.registration.v2.GameRulesFactory;
-import fuzs.puzzleslib.api.registration.v2.PotionBrewingRegistry;
-import fuzs.puzzleslib.api.registration.v2.RegistryManager;
+import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
+import fuzs.puzzleslib.api.init.v2.RegistryManager;
+import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
+import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.FabricCapabilityController;
 import fuzs.puzzleslib.impl.config.FabricConfigHolderImpl;
-import fuzs.puzzleslib.impl.networking.NetworkHandlerFabricV2;
-import fuzs.puzzleslib.impl.networking.NetworkHandlerFabricV3;
-import fuzs.puzzleslib.impl.registration.FabricGameRulesFactory;
-import fuzs.puzzleslib.impl.registration.FabricRegistryManager;
-import fuzs.puzzleslib.impl.registration.PotionBrewingRegistryFabric;
+import fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl;
+import fuzs.puzzleslib.impl.init.FabricGameRulesFactory;
+import fuzs.puzzleslib.impl.init.FabricRegistryManager;
+import fuzs.puzzleslib.impl.init.PotionBrewingRegistryFabric;
+import fuzs.puzzleslib.impl.network.NetworkHandlerFabricV2;
+import fuzs.puzzleslib.impl.network.NetworkHandlerFabricV3;
 
 import java.util.function.Supplier;
 
-/**
- * factories for various utilities on Fabric
- */
 public final class FabricFactories implements CommonFactories {
 
     @Override
@@ -86,5 +85,10 @@ public final class FabricFactories implements CommonFactories {
     @Override
     public GameRulesFactory getGameRulesFactory() {
         return new FabricGameRulesFactory();
+    }
+
+    @Override
+    public <T> EventInvoker<T> lookupEvent(Class<T> clazz) {
+        return FabricEventInvokerRegistryImpl.INSTANCE.lookup(clazz);
     }
 }

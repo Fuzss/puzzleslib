@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.impl;
 
-import fuzs.puzzleslib.api.networking.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
-import fuzs.puzzleslib.impl.entitydata.ClientboundAddEntityDataMessage;
+import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.resources.ResourceLocation;
 import org.slf4j.Logger;

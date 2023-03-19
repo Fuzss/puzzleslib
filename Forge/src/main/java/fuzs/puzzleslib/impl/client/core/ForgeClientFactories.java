@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.impl.client.screens.ForgeScreenHelper;
-import fuzs.puzzleslib.api.client.screens.v2.ScreenHelper;
+import fuzs.puzzleslib.impl.client.screen.ForgeScreenHelper;
+import fuzs.puzzleslib.api.client.screen.v2.ScreenHelper;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 
 import java.util.function.Supplier;

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.core.v1;
 
-import fuzs.puzzleslib.api.core.v1.contexts.*;
+import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.world.level.storage.loot.LootPool;

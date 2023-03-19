@@ -2,9 +2,9 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.contexts.LootTablesContext;
-import fuzs.puzzleslib.api.core.v1.contexts.RegisterCommandsContext;
-import fuzs.puzzleslib.impl.core.contexts.*;
+import fuzs.puzzleslib.api.core.v1.context.LootTablesContext;
+import fuzs.puzzleslib.api.core.v1.context.RegisterCommandsContext;
+import fuzs.puzzleslib.impl.core.context.*;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;

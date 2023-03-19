@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.networking.v2.MessageV2;
-import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.networking.v3.ServerboundMessage;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;

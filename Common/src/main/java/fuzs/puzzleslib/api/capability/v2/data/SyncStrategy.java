@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.capability.v2.data;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.api.networking.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.minecraft.server.level.ServerPlayer;
 
 import java.util.function.BiConsumer;
