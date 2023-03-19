@@ -13,7 +13,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 /**
- * implementation of {@link CapabilityKey} for players on Forge
+ * implementation of {@link fuzs.puzzleslib.api.capability.v2.data.CapabilityKey} for players on Forge
  *
  * @param <C> capability type
  */
