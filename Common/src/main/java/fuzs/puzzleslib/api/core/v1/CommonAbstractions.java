@@ -13,7 +13,7 @@ public interface CommonAbstractions {
     /**
      * instance of the common abstractions SPI
      */
-    CommonAbstractions INSTANCE = ServiceProviderHelper.loadServiceProvider(CommonAbstractions.class);
+    CommonAbstractions INSTANCE = ServiceProviderHelper.load(CommonAbstractions.class);
 
     /**
      * opens a menu on both client and server

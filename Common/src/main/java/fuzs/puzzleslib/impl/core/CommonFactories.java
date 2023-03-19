@@ -23,7 +23,7 @@ public interface CommonFactories {
     /**
      * instance of the common factories SPI
      */
-    CommonFactories INSTANCE = ServiceProviderHelper.loadServiceProvider(CommonFactories.class);
+    CommonFactories INSTANCE = ServiceProviderHelper.load(CommonFactories.class);
 
     /**
      * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have

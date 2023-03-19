@@ -10,7 +10,7 @@ public interface ClientAbstractions {
     /**
      * instance of the client factories SPI
      */
-    ClientAbstractions INSTANCE = ServiceProviderHelper.loadServiceProvider(ClientAbstractions.class);
+    ClientAbstractions INSTANCE = ServiceProviderHelper.load(ClientAbstractions.class);
 
     /**
      * checks if a <code>keyMapping</code> is active (=pressed), Forge replaces this everywhere, so we need an abstraction

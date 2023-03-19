@@ -1,14 +1,15 @@
 package fuzs.puzzleslib.api.init.v2;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
+import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -55,7 +56,7 @@ public interface RegistryManager {
      * Creates a new registry manager for <code>namespace</code> or returns an existing one.
      * <p>Registration is deferred for this manager until {@link RegistryManager#applyRegistration()} is called.
      *
-     * @param modId    namespace used for registration
+     * @param modId namespace used for registration
      * @return new mod specific registry manager
      */
     static RegistryManager deferred(String modId) {
@@ -322,6 +323,58 @@ public interface RegistryManager {
      */
     default RegistryReference<GameEvent> registerGameEvent(String path, int notificationRadius) {
         return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(path, notificationRadius));
+    }
+
+    /**
+     * Creates a new {@link TagKey} for any type of registry from a given path.
+     *
+     * @param registryKey key for registry to create key from
+     * @param path        path for new tag key
+     * @param <T>         registry type
+     * @return new tag key
+     */
+    default <T> TagKey<T> createTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return TagKey.create(registryKey, this.makeKey(path));
+    }
+
+    /**
+     * Creates a new {@link TagKey} for blocks.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<Block> createBlockTag(String path) {
+        return this.createTag(Registries.BLOCK, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for items.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<Item> createItemTag(String path) {
+        return this.createTag(Registries.ITEM, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for entity types.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<EntityType<?>> createEntityTypeTag(String path) {
+        return this.createTag(Registries.ENTITY_TYPE, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for game events.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<GameEvent> createGameEventTag(String path) {
+        return this.createTag(Registries.GAME_EVENT, path);
     }
 
     /**

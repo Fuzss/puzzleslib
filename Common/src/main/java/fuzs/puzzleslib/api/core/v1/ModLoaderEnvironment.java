@@ -10,7 +10,7 @@ public interface ModLoaderEnvironment {
     /**
      * instance of the mod loader environment SPI
      */
-    ModLoaderEnvironment INSTANCE = ServiceProviderHelper.loadServiceProvider(ModLoaderEnvironment.class);
+    ModLoaderEnvironment INSTANCE = ServiceProviderHelper.load(ModLoaderEnvironment.class);
 
     /**
      * @return the type of mod loader we are loaded on

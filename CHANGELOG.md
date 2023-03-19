@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.3-1.19.3] - 2023-03-19
+### Added
+- Added helper method to `RegistryManager` for creating new instances of `TagKey`
+### Changed
+- Remove `UNSAFE` again for handling config annotations and use method handles instead
+
 ## [v5.0.2-1.19.3] - 2023-03-19
 ### Fixed
 - Fix access transformer remapping failing in common project

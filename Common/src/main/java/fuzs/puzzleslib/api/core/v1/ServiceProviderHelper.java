@@ -3,19 +3,19 @@ package fuzs.puzzleslib.api.core.v1;
 import java.util.ServiceLoader;
 
 /**
- * small helper methods
+ * Small helper methods related to service provider interfaces.
  */
 public final class ServiceProviderHelper {
 
     /**
-     * loads a service provider interface yay
+     * Loads a service provider interface or throws an exception.
      *
      * @param clazz         service provider interface class to load
      * @param <T>           interface type
      *
      * @return loaded service
      */
-    public static <T> T loadServiceProvider(Class<T> clazz) {
+    public static <T> T load(Class<T> clazz) {
         return ServiceLoader.load(clazz)
                 .findFirst()
                 .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
