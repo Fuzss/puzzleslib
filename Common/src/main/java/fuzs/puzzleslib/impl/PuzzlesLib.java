@@ -19,13 +19,7 @@ public class PuzzlesLib implements ModConstructor {
             .registerSerializer(ClientboundAddEntityPacket.class, (friendlyByteBuf, clientboundAddEntityPacket) -> clientboundAddEntityPacket.write(friendlyByteBuf), ClientboundAddEntityPacket::new)
             .allAcceptVanillaOrMissing()
             .registerClientbound(ClientboundSyncCapabilityMessage.class)
-            .registerClientbound(ClientboundAddEntityDataMessage.class)
-            .build();
-
-    @Override
-    public void onConstructMod() {
-        NETWORK.initialize();
-    }
+            .registerClientbound(ClientboundAddEntityDataMessage.class);
 
     public static ResourceLocation id(String path) {
         return new ResourceLocation(MOD_ID, path);

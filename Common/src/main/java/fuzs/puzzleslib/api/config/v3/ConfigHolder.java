@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.api.config.v3;
 
+import fuzs.puzzleslib.api.core.v1.Buildable;
+import fuzs.puzzleslib.impl.config.ConfigHolderRegistry;
 import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.ModContext;
 
 import java.nio.file.Paths;
-import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 /**
@@ -15,42 +17,13 @@ import java.util.function.UnaryOperator;
 public interface ConfigHolder {
 
     /**
-     * register a new client config to the holder/builder
-     * <p>just an overload for {@link ConfigHolder.Builder#clientConfig} that also creates a new builder instance
+     * Creates a new builder for registering configs to this holder instance.
      *
-     * @param clazz        client config main class
-     * @param clientConfig client config factory
-     * @param <T>          client config type
-     * @return the builder we are working with
+     * @param modId id for registration and config name
+     * @return new builder instance
      */
-    static <T extends ConfigCore> ConfigHolder.Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig) {
-        return CommonFactories.INSTANCE.clientConfig(clazz, clientConfig);
-    }
-
-    /**
-     * register a new client config to the holder/builder
-     * <p>just an overload for {@link ConfigHolder.Builder#commonConfig} that also creates a new builder instance
-     *
-     * @param clazz        common config main class
-     * @param commonConfig common config factory
-     * @param <T>          common config type
-     * @return the builder we are working with
-     */
-    static <T extends ConfigCore> ConfigHolder.Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig) {
-        return CommonFactories.INSTANCE.commonConfig(clazz, commonConfig);
-    }
-
-    /**
-     * register a new client config to the holder/builder
-     * <p>just an overload for {@link ConfigHolder.Builder#serverConfig} that also creates a new builder instance
-     *
-     * @param clazz        server config main class
-     * @param serverConfig server config factory
-     * @param <T>          server config type
-     * @return the builder we are working with
-     */
-    static <T extends ConfigCore> ConfigHolder.Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig) {
-        return CommonFactories.INSTANCE.serverConfig(clazz, serverConfig);
+    static Builder builder(String modId) {
+        return ModContext.get(modId).getConfigHolder$Builder();
     }
 
     /**
@@ -66,15 +39,8 @@ public interface ConfigHolder {
      * @return      the actual config
      */
     default <T extends ConfigCore> T get(Class<T> clazz) {
-        return this.getHolder(clazz).config();
+        return this.getHolder(clazz).getConfig();
     }
-
-    /**
-     * register config event and configs themselves for <code>modId</code>
-     *
-     * @param modId modId to register for
-     */
-    void bakeConfigs(String modId);
 
     /**
      * @param modId mod id this config belongs to
@@ -106,41 +72,38 @@ public interface ConfigHolder {
      * builder interface for registering configs, not needed anymore after initial registration is complete,
      * but no new instance is created, so we only store the super type {@link ConfigHolder}
      */
-    interface Builder extends ConfigHolder {
+    interface Builder extends ConfigHolderRegistry, Buildable {
 
         /**
          * register a new client config to the holder/builder
          *
-         * @param clazz         client config main class
-         * @param clientConfig  client config factory
-         * @param <T>           client config type
-         * @return              the builder we are working with
+         * @param <T>   client config type
+         * @param clazz client config main class
+         * @return the builder we are working with
          */
-        <T extends ConfigCore> Builder clientConfig(Class<T> clazz, Supplier<T> clientConfig);
+        <T extends ConfigCore> Builder client(Class<T> clazz);
 
         /**
          * register a new client config to the holder/builder
          *
-         * @param clazz         common config main class
-         * @param commonConfig  common config factory
-         * @param <T>           common config type
-         * @return              the builder we are working with
+         * @param <T>   common config type
+         * @param clazz common config main class
+         * @return the builder we are working with
          */
-        <T extends ConfigCore> Builder commonConfig(Class<T> clazz, Supplier<T> commonConfig);
+        <T extends ConfigCore> Builder common(Class<T> clazz);
 
         /**
          * register a new client config to the holder/builder
          *
-         * @param clazz         server config main class
-         * @param serverConfig  server config factory
-         * @param <T>           server config type
-         * @return              the builder we are working with
+         * @param <T>   server config type
+         * @param clazz server config main class
+         * @return the builder we are working with
          */
-        <T extends ConfigCore> Builder serverConfig(Class<T> clazz, Supplier<T> serverConfig);
+        <T extends ConfigCore> Builder server(Class<T> clazz);
 
         /**
          * this sets the file name on {@link ConfigDataHolder}, it's only used for storing,
-         * since actually it's only ever need in this class when calling {@link #bakeConfigs}
+         * since actually it's only ever need in this class when calling {@link #build}
          *
          * by default this is set to {@link #defaultName}, otherwise {@link #simpleName} and {@link #moveToDir} exist for convenience
          *

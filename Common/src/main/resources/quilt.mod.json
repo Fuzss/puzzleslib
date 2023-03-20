@@ -1,0 +1,12 @@
+{
+	"schema_version": 1,
+	"quilt_loader": {
+		"group": "${modGroup}",
+		"id": "${modId}",
+		"version": "${modVersion}"
+	},
+
+	"access_widener": [
+		"${modId}.accesswidener"
+	]
+}

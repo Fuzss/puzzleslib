@@ -136,11 +136,13 @@ mixin {
     }
 }
 
+project(":Common").sourceSets.main.resources {
+    exclude("quilt.mod.json")
+    exclude("${modId}.accesswidener")
+}
+
 processResources {
-    from(project(":Common").sourceSets.main.resources) {
-        exclude("fabric.mod.json")
-        exclude("${modId}.accesswidener")
-    }
+    from(project(":Common").sourceSets.main.resources)
     from(file('src/generated/resources')) {
         exclude('.cache/')
     }
@@ -164,7 +166,7 @@ processResources {
     inputs.property "packFormat", "${packFormat}"
     inputs.property "modForgeDisplayTest", "${modForgeDisplayTest}"
 
-    // replace stuff in mods.toml and pack.mcmeta
+    // replace stuff in mods.toml
     filesMatching ('META-INF/mods.toml') {
         expand (
                 'modId':                "${modId}",
@@ -184,6 +186,7 @@ processResources {
         )
     }
 
+    // replace stuff in pack.mcmeta
     filesMatching ('pack.mcmeta') {
         expand (
                 'modDescription':       "${modDescription}",

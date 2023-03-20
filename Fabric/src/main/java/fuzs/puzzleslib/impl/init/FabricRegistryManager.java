@@ -2,11 +2,10 @@ package fuzs.puzzleslib.impl.init;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
@@ -38,19 +37,13 @@ import java.util.function.Supplier;
  */
 public class FabricRegistryManager implements RegistryManager {
     /**
-     * registry data is stored for each mod separately so when registry events are fired every mod is responsible for registering their own stuff
-     * this is important so that entries are registered for the proper namespace
-     */
-    private static final Map<String, FabricRegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
-
-    /**
      * namespace for this instance
      */
     private final String namespace;
     /**
      * defer registration for this manager until {@link #applyRegistration()} is called
      */
-    private final boolean deferred;
+    public final boolean deferred;
     /**
      * internal storage for collecting and registering registry entries
      */
@@ -61,13 +54,7 @@ public class FabricRegistryManager implements RegistryManager {
     @Nullable
     private Set<ModLoader> allowedModLoaders;
 
-    /**
-     * private constructor
-     *
-     * @param modId         namespace for this instance
-     * @param deferred      defer registration for this manager until {@link #applyRegistration()} is called
-     */
-    private FabricRegistryManager(String modId, boolean deferred) {
+    public FabricRegistryManager(String modId, boolean deferred) {
         this.namespace = modId;
         this.deferred = deferred;
     }
@@ -139,18 +126,5 @@ public class FabricRegistryManager implements RegistryManager {
         ResourceLocation key = this.makeKey(path);
         PoiType value = PointOfInterestHelper.register(key, builder.ticketCount(), builder.searchDistance(), builder.blocks());
         return new FabricRegistryReference<>(value, key, BuiltInRegistries.POINT_OF_INTEREST_TYPE);
-    }
-
-    /**
-     * creates a new registry manager for <code>modId</code> or returns an existing one
-     *
-     * @param modId         namespace used for registration
-     * @param deferred      defer registration for this manager until {@link #applyRegistration()} is called
-     * @return              new mod specific registry manager
-     */
-    public synchronized static RegistryManager of(String modId, boolean deferred) {
-        FabricRegistryManager registryManager = MOD_TO_REGISTRY.computeIfAbsent(modId, modId1 -> new FabricRegistryManager(modId1, deferred));
-        if (deferred != registryManager.deferred) throw new IllegalArgumentException("deferred: %s does not match value set for existing RegistryManager".formatted(deferred));
-        return registryManager;
     }
 }

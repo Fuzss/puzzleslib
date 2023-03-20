@@ -1,6 +1,21 @@
 accessWidener	v2	named
+transitive-accessible	class	net/minecraft/world/inventory/MenuType$MenuSupplier
+transitive-accessible	method	net/minecraft/world/inventory/MenuType	<init>	(Lnet/minecraft/world/inventory/MenuType$MenuSupplier;)V
+transitive-accessible	class	net/minecraft/client/gui/screens/MenuScreens$ScreenConstructor
+transitive-accessible	method	net/minecraft/client/gui/screens/MenuScreens	register	(Lnet/minecraft/world/inventory/MenuType;Lnet/minecraft/client/gui/screens/MenuScreens$ScreenConstructor;)V
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	<init>	(Ljava/lang/String;)V
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassArmor	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	damageHelmet	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassInvul	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassMagic	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassEnchantments	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	setIsFire	()Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible	method	net/minecraft/world/item/context/UseOnContext	<init>	(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
+transitive-accessible	method	net/minecraft/world/item/context/BlockPlaceContext	<init>	(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/InteractionHand;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/BlockHitResult;)V
 transitive-accessible   method  net/minecraft/client/renderer/RenderType    create  (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
 transitive-accessible   class   net/minecraft/client/renderer/RenderType$CompositeState
+transitive-extendable	class	net/minecraft/world/level/block/entity/BlockEntityType$BlockEntitySupplier
+transitive-accessible	method	net/minecraft/world/level/block/StairBlock	<init>	(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;)V
 transitive-accessible   method  net/minecraft/core/particles/ParticleType   <init>  (ZLnet/minecraft/core/particles/ParticleOptions$Deserializer;)V
 transitive-accessible   method  net/minecraft/core/particles/SimpleParticleType     <init>  (Z)V
 transitive-accessible   field   net/minecraft/world/entity/Mob  goalSelector    Lnet/minecraft/world/entity/ai/goal/GoalSelector;

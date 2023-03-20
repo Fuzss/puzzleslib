@@ -2,12 +2,12 @@ package fuzs.puzzleslib.impl.init;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
-import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -36,12 +36,6 @@ import java.util.function.Supplier;
  */
 public class ForgeRegistryManager implements RegistryManager {
     /**
-     * registry data is stored for each mod separately so when registry events are fired every mod is responsible for registering their own stuff
-     * this is important so that entries are registered for the proper namespace
-     */
-    private static final Map<String, ForgeRegistryManager> MOD_TO_REGISTRY = Maps.newConcurrentMap();
-
-    /**
      * namespace for this instance
      */
     private final String namespace;
@@ -59,12 +53,7 @@ public class ForgeRegistryManager implements RegistryManager {
     @Nullable
     private Set<ModLoader> allowedModLoaders;
 
-    /**
-     * private constructor
-     *
-     * @param modId     namespace for this instance
-     */
-    private ForgeRegistryManager(String modId) {
+    public ForgeRegistryManager(String modId) {
         this.namespace = modId;
         this.eventBus = ModContainerHelper.findModEventBus(modId).orElseThrow();
     }
@@ -116,15 +105,5 @@ public class ForgeRegistryManager implements RegistryManager {
             PoiTypeBuilder builder = entry.get();
             return new PoiType(ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
         });
-    }
-
-    /**
-     * creates a new registry manager for <code>modId</code> or returns an existing one
-     *
-     * @param modId     namespace used for registration
-     * @return          new mod specific registry manager
-     */
-    public synchronized static RegistryManager of(String modId) {
-        return MOD_TO_REGISTRY.computeIfAbsent(modId, ForgeRegistryManager::new);
     }
 }

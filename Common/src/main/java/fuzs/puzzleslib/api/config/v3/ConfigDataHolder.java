@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.config.v3;
 import java.util.function.Consumer;
 
 /**
- * a pretty basic holder for a config, {@link #config()} is all we want most of the time
+ * a pretty basic holder for a config, {@link #getConfig()} is all we want most of the time
  * @param <T> config type
  */
 public interface ConfigDataHolder<T extends ConfigCore> {
@@ -11,7 +11,7 @@ public interface ConfigDataHolder<T extends ConfigCore> {
     /**
      * @return config from this holder, possibly null
      */
-    T config();
+    T getConfig();
 
     /**
      * @return is the config full loaded and ready to be used

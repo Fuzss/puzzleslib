@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.capability;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
@@ -14,10 +13,10 @@ import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.capability.v2.data.*;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.capability.data.ComponentHolder;
 import fuzs.puzzleslib.impl.capability.data.FabricCapabilityKey;
 import fuzs.puzzleslib.impl.capability.data.FabricPlayerCapabilityKey;
+import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -39,10 +38,6 @@ import java.util.function.Function;
  */
 public class FabricCapabilityController implements CapabilityController {
     /**
-     * capability controllers are stored for each mod separately to avoid concurrency issues, might not be need though
-     */
-    private static final Map<String, FabricCapabilityController> MOD_TO_CAPABILITIES = Maps.newConcurrentMap();
-    /**
      * convert our own {@link PlayerRespawnStrategy} which is designed for Forge back to {@link RespawnCopyStrategy}
      */
     private static final Map<PlayerRespawnStrategy, RespawnCopyStrategy<Component>> STRATEGY_CONVERTER_MAP = ImmutableMap.<PlayerRespawnStrategy, RespawnCopyStrategy<Component>>builder()
@@ -61,12 +56,7 @@ public class FabricCapabilityController implements CapabilityController {
      */
     private final Multimap<Class<?>, Consumer<Object>> providerClazzToRegistration = ArrayListMultimap.create();
 
-    /**
-     * private constructor
-     *
-     * @param namespace     namespace for this instance
-     */
-    private FabricCapabilityController(String namespace) {
+    public FabricCapabilityController(String namespace) {
         this.namespace = namespace;
     }
 
@@ -143,33 +133,19 @@ public class FabricCapabilityController implements CapabilityController {
 
     /**
      * register for all CapabilityController's, static to not confuse with actual instance as they're separate kinda
-     * the instance this is called on is invoked by cardinal components, all other instances are created by mods themselves and need to be called upon here via {@link #MOD_TO_CAPABILITIES}
+     * the instance this is called on is invoked by cardinal components, all other instances are created by mods themselves and need to be called upon here
      *
      * @param baseType  clazz type in map (based on Forge's default capability providers)
      * @param registry  component factory registry, needs to match precisely what's been used during registration as there's an unchecked cast
      * @param <T>       the component factory registry type
      */
     public static <T> void registerComponentFactories(Class<?> baseType, T registry) {
-        Collection<FabricCapabilityController> capabilityControllers = MOD_TO_CAPABILITIES.values();
-        for (FabricCapabilityController controller : capabilityControllers) {
+        Collection<FabricCapabilityController> controllers = ModContext.getCapabilityControllers().map(controller -> (FabricCapabilityController) controller).toList();
+        for (FabricCapabilityController controller : controllers) {
             for (Consumer<Object> factoryRegistration : controller.providerClazzToRegistration.get(baseType)) {
                 factoryRegistration.accept(registry);
             }
+            controller.providerClazzToRegistration.clear();
         }
-        capabilityControllers.clear();
-    }
-
-    /**
-     * creates a new capability controller for <code>namespace</code> or returns an existing one
-     *
-     * @param namespace     namespace used for registration
-     * @return              the mod specific capability controller
-     */
-    public static synchronized CapabilityController of(String namespace) {
-        return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
-            final FabricCapabilityController controller = new FabricCapabilityController(namespace);
-            PuzzlesLib.LOGGER.info("Creating capability controller for mod id {}", namespace);
-            return controller;
-        });
     }
 }

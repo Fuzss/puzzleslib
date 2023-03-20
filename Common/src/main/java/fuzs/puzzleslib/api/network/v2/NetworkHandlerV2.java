@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.network.v2;
 
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceKey;
@@ -24,8 +24,8 @@ public interface NetworkHandlerV2 {
      * @param modId id for channel name
      * @return mod specific network handler with default channel
      */
-    static NetworkHandlerV2 of(String modId) {
-        return of(modId, false, false);
+    static NetworkHandlerV2 build(String modId) {
+        return build(modId, false, false);
     }
 
     /**
@@ -36,8 +36,8 @@ public interface NetworkHandlerV2 {
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
-    static NetworkHandlerV2 of(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return CommonFactories.INSTANCE.networkingV2(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    static NetworkHandlerV2 build(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return ModContext.get(modId).getNetworkHandlerV2(clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     /**

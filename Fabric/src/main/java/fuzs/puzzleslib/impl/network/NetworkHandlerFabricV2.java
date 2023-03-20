@@ -2,8 +2,8 @@ package fuzs.puzzleslib.impl.network;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.MessageDirection;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.impl.core.FabricProxy;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -25,11 +25,6 @@ import java.util.function.Supplier;
  */
 public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     /**
-     * store network handlers created for a mod to avoid duplicate channels
-     */
-    private static final Map<String, NetworkHandlerFabricV2> MOD_TO_NETWORK = Maps.newConcurrentMap();
-
-    /**
      * registry for class to identifier relation
      */
     private final Map<Class<? extends MessageV2<?>>, MessageData> messages = Maps.newIdentityHashMap();
@@ -45,7 +40,7 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     /**
      * @param modId mod id for channel identifier
      */
-    private NetworkHandlerFabricV2(String modId) {
+    public NetworkHandlerFabricV2(String modId) {
         this.modId = modId;
     }
 
@@ -91,16 +86,6 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
         FriendlyByteBuf byteBuf = PacketByteBufs.create();
         message.write(byteBuf);
         return packetFactory.apply(identifier, byteBuf);
-    }
-
-    /**
-     * creates a new network handler for <code>modId</code> or returns an existing one
-     *
-     * @param modId id for channel name
-     * @return mod specific network handler with default channel
-     */
-    public synchronized static NetworkHandlerV2 of(String modId) {
-        return MOD_TO_NETWORK.computeIfAbsent(modId, NetworkHandlerFabricV2::new);
     }
 
     /**

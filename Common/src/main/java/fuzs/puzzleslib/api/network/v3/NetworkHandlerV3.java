@@ -1,9 +1,12 @@
 package fuzs.puzzleslib.api.network.v3;
 
+import fuzs.puzzleslib.api.core.v1.Buildable;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.impl.core.CommonFactories;
-import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.network.NetworkHandlerRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
@@ -29,9 +32,14 @@ import java.util.function.Function;
 public interface NetworkHandlerV3 {
 
     /**
-     * Registers all packets provided by the original builder.
+     * Creates a new network handler builder.
+     *
+     * @param modId id for channel name
+     * @return builder for mod specific network handler with default channel
      */
-    void initialize();
+    static Builder builder(String modId) {
+        return ModContext.get(modId).getNetworkHandlerV3$Builder();
+    }
 
     /**
      * creates a packet heading to the client side
@@ -170,28 +178,18 @@ public interface NetworkHandlerV3 {
     }
 
     /**
-     * Creates a new network handler builder
-     *
-     * @param modId id for channel name
-     * @return builder for mod specific network handler with default channel
-     */
-    static Builder builder(String modId) {
-        return CommonFactories.INSTANCE.networkingV3(modId);
-    }
-
-    /**
      * A builder for a network handler, allows for registering messages.
      */
-    interface Builder {
+    interface Builder extends NetworkHandlerRegistry, Buildable {
 
         /**
          * Register a new {@link MessageSerializer} by providing a {@link net.minecraft.network.FriendlyByteBuf.Writer} and a {@link net.minecraft.network.FriendlyByteBuf.Reader},
          * similarly to vanilla's {@link EntityDataSerializer}
          *
-         * @param type type to serialize, inheritance is not supported
+         * @param type   type to serialize, inheritance is not supported
          * @param writer writer to byte buffer
          * @param reader reader from byte buffer
-         * @param <T> data type
+         * @param <T>    data type
          * @return this builder instance
          */
         default <T> Builder registerSerializer(Class<T> type, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
@@ -202,9 +200,9 @@ public interface NetworkHandlerV3 {
         /**
          * Register a serializer for a data type handled by vanilla's registry system.
          *
-         * @param type registry content type to serialize
+         * @param type        registry content type to serialize
          * @param resourceKey registry resource key
-         * @param <T> data type
+         * @param <T>         data type
          * @return this builder instance
          */
         default <T> Builder registerSerializer(Class<? super T> type, ResourceKey<Registry<T>> resourceKey) {
@@ -218,9 +216,9 @@ public interface NetworkHandlerV3 {
          * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a specific collection type, a unique serializer must be registered.
          * This is already done for {@link List}s, which are deserialized as {@link ArrayList}.
          *
-         * @param type container type
+         * @param type    container type
          * @param factory new empty collection provider (preferable with pre-configured size)
-         * @param <T> container type
+         * @param <T>     container type
          * @return this builder instance
          */
         default <T> Builder registerContainerProvider(Class<T> type, Function<Type[], MessageSerializer<? extends T>> factory) {
@@ -274,12 +272,5 @@ public interface NetworkHandlerV3 {
         default Builder allAcceptVanillaOrMissing() {
             return this.clientAcceptsVanillaOrMissing().serverAcceptsVanillaOrMissing();
         }
-
-        /**
-         * Finally builds the network handler being constructed.
-         *
-         * @return the network handler
-         */
-        NetworkHandlerV3 build();
     }
 }

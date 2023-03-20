@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.capability.v2;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.capability.v2.data.*;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -51,8 +51,8 @@ public interface CapabilityController {
      * @param modId namespace used for registration
      * @return the mod specific capability controller
      */
-    static CapabilityController of(String modId) {
-        return CommonFactories.INSTANCE.capabilities(modId);
+    static CapabilityController from(String modId) {
+        return ModContext.get(modId).getCapabilityController();
     }
 
     /**

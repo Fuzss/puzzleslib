@@ -30,7 +30,7 @@ public interface EventInvoker<T> {
             @Override
             public void register(EventPhase phase, T callback) {
                 if (this.invoker == null) {
-                    this.invoker = CommonFactories.INSTANCE.lookupEvent(clazz);
+                    this.invoker = CommonFactories.INSTANCE.getEventInvoker(clazz);
                 }
                 this.invoker.register(phase, callback);
             }

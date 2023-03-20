@@ -20,27 +20,28 @@ import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class NetworkHandlerFabricV3 extends NetworkHandlerRegistry {
+public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     private final Map<Class<?>, ResourceLocation> messageChannelNames = Maps.newIdentityHashMap();
-    private final String modId;
     private final AtomicInteger discriminator = new AtomicInteger();
+    private boolean building = true;
 
-    private NetworkHandlerFabricV3(String modId) {
-        this.modId = modId;
+    public NetworkHandlerFabricV3(String modId) {
+        super(modId);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Record & ClientboundMessage<T>> void registerClientbound(Class<?> clazz) {
+    public <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz) {
         this.register((Class<T>) clazz, ((FabricProxy) Proxy.INSTANCE)::registerClientReceiver);
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends Record & ServerboundMessage<T>> void registerServerbound(Class<?> clazz) {
+    public <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz) {
         this.register((Class<T>) clazz, ((FabricProxy) Proxy.INSTANCE)::registerServerReceiver);
     }
 
     private <T> void register(Class<T> clazz, BiConsumer<ResourceLocation, Function<FriendlyByteBuf, T>> register) {
         if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
+        if (this.building) throw new IllegalStateException("channel is null");
         ResourceLocation channelName = this.nextIdentifier();
         if (this.messageChannelNames.put(clazz, channelName) != null) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
         register.accept(channelName, MessageSerializers.findByType(clazz)::read);
@@ -52,11 +53,13 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistry {
 
     @Override
     public <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message) {
+        if (this.building) throw new IllegalStateException("channel is null");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     @Override
     public <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message) {
+        if (this.building) throw new IllegalStateException("channel is null");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
@@ -71,15 +74,9 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistry {
         return packetFactory.apply(channelName, byteBuf);
     }
 
-    public static class FabricBuilderImpl extends BuilderImpl {
-
-        public FabricBuilderImpl(String modId) {
-            super(modId);
-        }
-
-        @Override
-        protected NetworkHandlerRegistry getHandler() {
-            return new NetworkHandlerFabricV3(this.modId);
-        }
+    @Override
+    public void build() {
+        this.building = false;
+        super.build();
     }
 }

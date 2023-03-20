@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.init.v2;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -49,7 +49,7 @@ public interface RegistryManager {
      * @return new mod specific registry manager
      */
     static RegistryManager instant(String modId) {
-        return CommonFactories.INSTANCE.registration(modId, false);
+        return ModContext.get(modId).getRegistryManager(false);
     }
 
     /**
@@ -60,7 +60,7 @@ public interface RegistryManager {
      * @return new mod specific registry manager
      */
     static RegistryManager deferred(String modId) {
-        return CommonFactories.INSTANCE.registration(modId, true);
+        return ModContext.get(modId).getRegistryManager(true);
     }
 
     /**

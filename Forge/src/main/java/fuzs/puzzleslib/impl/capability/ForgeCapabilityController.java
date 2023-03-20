@@ -36,11 +36,6 @@ import java.util.function.Predicate;
  */
 public class ForgeCapabilityController implements CapabilityController {
     /**
-     * capability controllers are stored for each mod separately to avoid concurrency issues, might not be need though
-     */
-    private static final Map<String, ForgeCapabilityController> MOD_TO_CAPABILITIES = Maps.newConcurrentMap();
-
-    /**
      * namespace for this instance
      */
     private final String namespace;
@@ -53,12 +48,14 @@ public class ForgeCapabilityController implements CapabilityController {
      */
     private final Map<ResourceLocation, CapabilityData<?>> idToCapabilityData = Maps.newHashMap();
 
-    /**
-     * private constructor
-     * @param namespace namespace for this instance
-     */
-    private ForgeCapabilityController(String namespace) {
+    public ForgeCapabilityController(String namespace) {
         this.namespace = namespace;
+        // for registering capabilities
+        ModContainerHelper.findModEventBus(namespace).ifPresent(eventBus -> {
+            eventBus.addListener(this::onRegisterCapabilities);
+        });
+        // for attaching capabilities
+        MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
@@ -168,25 +165,6 @@ public class ForgeCapabilityController implements CapabilityController {
             Objects.requireNonNull(data, "No valid capability implementation registered for %s".formatted(key));
             return data;
         }).toList();
-    }
-
-    /**
-     * creates a new capability controller for <code>namespace</code> or returns an existing one
-     *
-     * @param namespace     namespace used for registration
-     * @return              the mod specific capability controller
-     */
-    public static synchronized ForgeCapabilityController of(String namespace) {
-        return MOD_TO_CAPABILITIES.computeIfAbsent(namespace, key -> {
-            final ForgeCapabilityController controller = new ForgeCapabilityController(namespace);
-            // for registering capabilities
-            ModContainerHelper.findModEventBus(namespace).ifPresent(eventBus -> {
-                eventBus.addListener(controller::onRegisterCapabilities);
-            });
-            // for attaching capabilities
-            MinecraftForge.EVENT_BUS.register(controller);
-            return controller;
-        });
     }
 
     /**

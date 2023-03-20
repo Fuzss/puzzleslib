@@ -1,11 +1,10 @@
 package fuzs.puzzleslib.impl.network;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.ForgeDistTypeConverter;
-import fuzs.puzzleslib.api.network.v2.MessageV2;
-import fuzs.puzzleslib.api.network.v2.MessageDirection;
-import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.network.v2.MessageDirection;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
+import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +16,6 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -28,10 +26,6 @@ import java.util.function.Supplier;
  */
 public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
     /**
-     * store network handlers created for a mod to avoid duplicate channels
-     */
-    private static final Map<String, NetworkHandlerForgeV2> MOD_TO_NETWORK = Maps.newConcurrentMap();
-    /**
      * protocol version for testing client-server compatibility of this mod
      */
     private static final String PROTOCOL_VERSION = Integer.toString(1);
@@ -41,27 +35,12 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
      */
     private final SimpleChannel channel;
     /**
-     * are servers without this mod or vanilla compatible
-     * <p>only stored to ensure other handlers for this mod are created validly
-     */
-    private final boolean clientAcceptsVanillaOrMissing;
-    /**
-     * are clients without this mod or vanilla compatible
-     * <p>only stored to ensure other handlers for this mod are created validly
-     */
-    private final boolean serverAcceptsVanillaOrMissing;
-    /**
      * message index
      */
     private final AtomicInteger discriminator = new AtomicInteger();
 
-    /**
-     * @param channel mod network channel
-     */
-    private NetworkHandlerForgeV2(SimpleChannel channel, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        this.channel = channel;
-        this.clientAcceptsVanillaOrMissing = clientAcceptsVanillaOrMissing;
-        this.serverAcceptsVanillaOrMissing = serverAcceptsVanillaOrMissing;
+    public NetworkHandlerForgeV2(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        this.channel = buildSimpleChannel(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     @SuppressWarnings("unchecked")
@@ -105,31 +84,6 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
         return this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    /**
-     * creates a new network handler for <code>modId</code> or returns an existing one
-     *
-     * @param modId id for channel name
-     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
-     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
-     * @return mod specific network handler with configured channel
-     */
-    public synchronized static NetworkHandlerV2 of(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        NetworkHandlerForgeV2 handler = MOD_TO_NETWORK.computeIfAbsent(modId, modId1 -> {
-            return new NetworkHandlerForgeV2(buildSimpleChannel(modId1, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
-        });
-        if (handler.clientAcceptsVanillaOrMissing != clientAcceptsVanillaOrMissing) throw new IllegalArgumentException("client channel settings mismatch, expected %s, but was %s".formatted(handler.clientAcceptsVanillaOrMissing, clientAcceptsVanillaOrMissing));
-        if (handler.serverAcceptsVanillaOrMissing != serverAcceptsVanillaOrMissing) throw new IllegalArgumentException("server channel settings mismatch, expected %s, but was %s".formatted(handler.serverAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing));
-        return handler;
-    }
-
-    /**
-     * creates a configured channel
-     *
-     * @param modId id for channel name
-     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
-     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
-     * @return configured channel
-     */
     private static SimpleChannel buildSimpleChannel(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         return NetworkRegistry.ChannelBuilder
                 .named(new ResourceLocation(modId, "play"))

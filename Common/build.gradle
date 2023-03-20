@@ -1,6 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.0.+'
-    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
+    id 'org.quiltmc.loom' version '1.0.+'
 }
 
 archivesBaseName = rootProject.name
@@ -15,10 +14,7 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
-    // Fabric
-    modApi "net.fabricmc:fabric-loader:${fabricVersion}"
-    modApi fabricApi.module("fabric-api-base", "${fabricApiVersion}")
-    modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${fabricApiVersion}")
+    compileOnly 'org.spongepowered:mixin:0.8.5'
 
     // Forge Config API Port
     modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:5.0.10"
@@ -60,14 +56,16 @@ processResources {
     // this will ensure that this task is redone when a value changes
     inputs.property "modId", 					"${modId}"
     inputs.property "modVersion", 				"${modVersion}"
+    inputs.property "modGroup", 				project.group
     inputs.property "modDescription", 			"${modDescription}"
     inputs.property "packFormat", 				"${packFormat}"
 
-    // replace stuff in fabric.mod.json and pack.mcmeta
-    filesMatching ('fabric.mod.json') {
+    // replace stuff in quilt.mod.json
+    filesMatching ('quilt.mod.json') {
         expand (
                 'modId':                	"${modId}",
-                'modVersion':           	"${modVersion}"
+                'modVersion':           	"${modVersion}",
+                'modGroup':             	project.group
         )
     }
 

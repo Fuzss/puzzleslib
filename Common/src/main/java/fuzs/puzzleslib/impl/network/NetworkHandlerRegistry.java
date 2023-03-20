@@ -1,89 +1,89 @@
 package fuzs.puzzleslib.impl.network;
 
-import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
-public abstract class NetworkHandlerRegistry implements NetworkHandlerV3 {
-    private final List<Class<?>> clientboundMessages = Lists.newArrayList();
-    private final List<Class<?>> serverboundMessages = Lists.newArrayList();
-
+    @Deprecated
     @Override
-    public void initialize() {
-        for (Class<?> message : this.clientboundMessages) {
-            this.registerClientbound(message);
-        }
-        for (Class<?> message : this.serverboundMessages) {
-            this.registerServerbound(message);
-        }
-        this.clientboundMessages.clear();
-        this.serverboundMessages.clear();
+    <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message);
+
+    @Deprecated
+    @Override
+    <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message);
+
+    @Deprecated
+    @Override
+    default <T extends Record & ServerboundMessage<T>> void sendToServer(T message) {
+        NetworkHandlerV3.super.sendToServer(message);
     }
 
-    /**
-     * register a message that will be sent to clients
-     *
-     * @param clazz message class type
-     * @param <T>   message implementation
-     */
-    public abstract <T extends Record & ClientboundMessage<T>> void registerClientbound(Class<?> clazz);
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player) {
+        NetworkHandlerV3.super.sendTo(message, player);
+    }
 
-    /**
-     * register a message that will be sent to servers
-     *
-     * @param clazz message class type
-     * @param <T>   message implementation
-     */
-    public abstract <T extends Record & ServerboundMessage<T>> void registerServerbound(Class<?> clazz);
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
+        NetworkHandlerV3.super.sendToAll(message);
+    }
 
-    public static abstract class BuilderImpl implements Builder {
-        protected final String modId;
-        private final List<Class<?>> clientboundMessages = Lists.newArrayList();
-        private final List<Class<?>> serverboundMessages = Lists.newArrayList();
-        protected boolean clientAcceptsVanillaOrMissing;
-        protected boolean serverAcceptsVanillaOrMissing;
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(T message, ServerPlayer exclude) {
+        NetworkHandlerV3.super.sendToAllExcept(message, exclude);
+    }
 
-        protected BuilderImpl(String modId) {
-            this.modId = modId;
-        }
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, BlockPos pos, Level level) {
+        NetworkHandlerV3.super.sendToAllNear(message, pos, level);
+    }
 
-        @Override
-        public <T extends Record & ClientboundMessage<T>> Builder registerClientbound(Class<T> clazz) {
-            if (this.clientboundMessages.contains(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
-            this.clientboundMessages.add(clazz);
-            return this;
-        }
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, double posX, double posY, double posZ, double distance, Level level) {
+        NetworkHandlerV3.super.sendToAllNear(message, posX, posY, posZ, distance, level);
+    }
 
-        @Override
-        public <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz) {
-            if (this.serverboundMessages.contains(clazz)) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
-            this.serverboundMessages.add(clazz);
-            return this;
-        }
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(T message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
+        NetworkHandlerV3.super.sendToAllNearExcept(message, exclude, posX, posY, posZ, distance, level);
+    }
 
-        @Override
-        public Builder clientAcceptsVanillaOrMissing() {
-            this.clientAcceptsVanillaOrMissing = true;
-            return this;
-        }
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(T message, Entity entity) {
+        NetworkHandlerV3.super.sendToAllTracking(message, entity);
+    }
 
-        @Override
-        public Builder serverAcceptsVanillaOrMissing() {
-            this.serverAcceptsVanillaOrMissing = true;
-            return this;
-        }
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(T message, Entity entity) {
+        NetworkHandlerV3.super.sendToAllTrackingAndSelf(message, entity);
+    }
 
-        @Override
-        public NetworkHandlerV3 build() {
-            NetworkHandlerRegistry networkHandler = this.getHandler();
-            networkHandler.clientboundMessages.addAll(this.clientboundMessages);
-            networkHandler.serverboundMessages.addAll(this.serverboundMessages);
-            return networkHandler;
-        }
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, Level level) {
+        NetworkHandlerV3.super.sendToDimension(message, level);
+    }
 
-        protected abstract NetworkHandlerRegistry getHandler();
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, ResourceKey<Level> dimension) {
+        NetworkHandlerV3.super.sendToDimension(message, dimension);
     }
 }
