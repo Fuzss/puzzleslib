@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 public final class ForgeFactories implements CommonFactories {
 
     @Override
-    public void constructMod(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
-        ForgeModConstructor.construct(modConstructor.get(), modId, contentRegistrations);
+    public void constructMod(String modId, ModConstructor modConstructor, ContentRegistrationFlags... contentRegistrations) {
+        ForgeModConstructor.construct(modConstructor, modId, contentRegistrations);
     }
 
     @Override

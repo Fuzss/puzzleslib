@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public interface CommonFactories {
     CommonFactories INSTANCE = ServiceProviderHelper.load(CommonFactories.class);
 
-    void constructMod(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations);
+    void constructMod(String modId, ModConstructor modConstructor, ContentRegistrationFlags... contentRegistrations);
 
     ModContext getModContext(String modId);
 

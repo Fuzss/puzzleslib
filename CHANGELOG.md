@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.5-1.19.3] - 2023-03-21
+### Fixed
+- Fixed a class loading order issue related to the execution of buildable mod-specific instances
+
 ## [v5.0.4-1.19.3] - 2023-03-21
 ### Added
 - Added `ModContext` internal helper class for managing mod-specific instances

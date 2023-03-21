@@ -20,12 +20,14 @@ public interface ModConstructor {
      * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
      *
      * @param modId                the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructor       the main mod instance for mod setup
+     * @param supplier       the main mod instance for mod setup
      * @param contentRegistrations specific content this mod uses that needs to be additionally registered
      */
-    static void construct(String modId, Supplier<ModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+    static void construct(String modId, Supplier<ModConstructor> supplier, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
+        // build first to force class being loaded for executing buildables
+        ModConstructor modConstructor = supplier.get();
         ModContext.get(modId).executeBuildables();
         CommonFactories.INSTANCE.constructMod(modId, modConstructor, contentRegistrations);
     }
