@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.4-1.19.3] - 2023-03-21
+### Added
+- Added `ModContext` internal helper class for managing mod-specific instances
+### Changed
+- Move most config system code to common project
+- `NetworkHandlerV3` and `ConfigHolder` are now built automatically at the appropriate time
+### Fixed
+- Fixed common publication containing an invalid `fabric.mod.json`
+
 ## [v5.0.3-1.19.3] - 2023-03-19
 ### Added
 - Added helper method to `RegistryManager` for creating new instances of `TagKey`

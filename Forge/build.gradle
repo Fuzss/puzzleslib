@@ -107,7 +107,7 @@ minecraft {
 
 dependencies {
     // Common Project
-    implementation(project(":Common")) {
+    compileOnly(project(":Common")) {
         transitive = false
     }
 
@@ -134,11 +134,6 @@ mixin {
     if (project.file("src/main/resources/${modId}.forge.mixins.json").exists()) {
         config "${modId}.forge.mixins.json"
     }
-}
-
-project(":Common").sourceSets.main.resources {
-    exclude("quilt.mod.json")
-    exclude("${modId}.accesswidener")
 }
 
 processResources {
@@ -330,7 +325,10 @@ modrinth {
 //	debugMode = true
 }
 
-import groovy.json.*
+
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 
 task copyJarToDir(type: Copy) {
     onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }

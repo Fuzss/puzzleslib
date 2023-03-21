@@ -1,5 +1,6 @@
 plugins {
-    id 'org.quiltmc.loom' version '1.0.+'
+    id 'fabric-loom' version '1.0.+'
+    id 'io.github.juuxel.loom-quiltflower' version '1.7.1'
 }
 
 archivesBaseName = rootProject.name
@@ -14,17 +15,20 @@ dependencies {
         parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
-    compileOnly 'org.spongepowered:mixin:0.8.5'
+    // Fabric
+    modApi "net.fabricmc:fabric-loader:${fabricVersion}"
+    modApi fabricApi.module("fabric-api-base", "${fabricApiVersion}")
+    modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${fabricApiVersion}")
 
     // Forge Config API Port
-    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-common:5.0.10"
+    api "fuzs.forgeconfigapiport:forgeconfigapiport-common:5.0.11"
 
     // Puzzles Lib
 //    modApi "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}"
 }
 
 loom {
-    accessWidenerPath = file("src/main/resources/${modId}.accesswidener")
+    accessWidenerPath = project(":Fabric").file("src/main/resources/${modId}.accesswidener")
 
     mixin {
         // not sure if this is necessary for common...
@@ -51,21 +55,49 @@ loom {
 }
 
 processResources {
+    from(project(":Fabric").sourceSets.main.resources) {
+        include("fabric.mod.json")
+        include("${modId}.accesswidener")
+    }
+
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
     inputs.property "modId", 					"${modId}"
+    inputs.property "modName", 					"${modName}"
     inputs.property "modVersion", 				"${modVersion}"
-    inputs.property "modGroup", 				project.group
     inputs.property "modDescription", 			"${modDescription}"
+    inputs.property "modGroup", 				project.group
+    inputs.property "modPageUrl", 				"${modSourceUrl}"
+    inputs.property "modIssueUrl", 				"${modIssueUrl}"
+    inputs.property "modAuthor", 				"${modAuthor}"
+    inputs.property "minFabricVersion", 		"${minFabricVersion}"
+    inputs.property "minFabricApiVersion", 		"${minFabricApiVersion}"
+    inputs.property "minecraftVersion", 		"${minecraftVersion}"
+    inputs.property "minPuzzlesVersion", 		"${minPuzzlesVersion}"
     inputs.property "packFormat", 				"${packFormat}"
+    inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}Fabric"
+    inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}FabricClient"
+    inputs.property "modFabricEnvironment", 	"${modFabricEnvironment}"
 
-    // replace stuff in quilt.mod.json
-    filesMatching ('quilt.mod.json') {
+    // replace stuff in fabric.mod.json
+    filesMatching ('fabric.mod.json') {
         expand (
                 'modId':                	"${modId}",
+                'modName':              	"${modName}",
                 'modVersion':           	"${modVersion}",
-                'modGroup':             	project.group
+                'modDescription':       	"${modDescription}",
+                'modGroup':             	project.group,
+                'modPageUrl':           	"${modSourceUrl}",
+                'modIssueUrl':          	"${modIssueUrl}",
+                'modAuthor':            	"${modAuthor}",
+                'minFabricVersion':     	"${minFabricVersion}",
+                'minFabricApiVersion':  	"${minFabricApiVersion}",
+                'minecraftVersion':  	    "${minecraftVersion}",
+                "minPuzzlesVersion":    	"${minPuzzlesVersion}",
+                "mainEntryPoint": 			"${project.group}.${rootProject.name}Fabric",
+                "clientEntryPoint": 		"${project.group}.client.${rootProject.name}FabricClient",
+                "modFabricEnvironment":		"${modFabricEnvironment}"
         )
     }
 
@@ -123,3 +155,16 @@ publishing {
 signing {
     sign publishing.publications.mavenJava
 }
+
+task copyJarToDir(type: Copy) {
+    onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
+    if (project.findProperty('copyBuildJar').toBoolean()) {
+        from remapJar
+        into project.findProperty('buildJarOutputDir')
+        // add build number to be able to distinguish jars when testing thorough official launcher
+        // build number is stored in global gradle.properties
+        rename { fileName -> fileName.replace("v${modVersion}", "v${modVersion}.${uniqueBuildNumber}") }
+    }
+}
+
+build.finalizedBy project.tasks.copyJarToDir, rootProject.tasks.incrementBuildNumber
