@@ -9,7 +9,10 @@ import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
+import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -59,7 +62,13 @@ public final class FabricClientModConstructor {
         });
         ModelEvents.BAKING_COMPLETED.register((modelManager, models, modelBakery) -> {
             try {
-                consumer2.accept(new DynamicBakingCompletedContext(modelManager, models, modelBakery));
+                consumer2.accept(new DynamicBakingCompletedContext(modelManager, models, modelBakery) {
+
+                    @Override
+                    public BakedModel getModel(ResourceLocation identifier) {
+                        return BakedModelManagerHelper.getModel(this.modelManager(), identifier);
+                    }
+                });
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
             }

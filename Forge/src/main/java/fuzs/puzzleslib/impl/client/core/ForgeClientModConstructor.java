@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ClampedItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -293,7 +294,14 @@ public class ForgeClientModConstructor {
     @SubscribeEvent
     public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
         try {
-            this.constructor.onBakingCompleted(new DynamicBakingCompletedContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()));
+            this.constructor.onBakingCompleted(new DynamicBakingCompletedContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()) {
+
+                @SuppressWarnings("resource")
+                @Override
+                public BakedModel getModel(ResourceLocation identifier) {
+                    return this.modelManager().getModel(identifier);
+                }
+            });
         } catch (Exception e) {
             PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", this.modId, e);
         }

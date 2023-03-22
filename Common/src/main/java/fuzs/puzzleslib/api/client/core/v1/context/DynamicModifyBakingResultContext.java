@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.core.v1.context;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
 
@@ -15,4 +16,11 @@ import java.util.Map;
  */
 public record DynamicModifyBakingResultContext(Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
 
+    /**
+     * internal constructor
+     */
+    @ApiStatus.Internal
+    public DynamicModifyBakingResultContext {
+
+    }
 }

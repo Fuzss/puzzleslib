@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.7-1.19.3] - 2023-03-22
+### Added
+- Added a helper method to `DynamicBakingCompletedContext` for retrieving baked models from a provided `ResourceLocation`
+
 ## [v5.0.6-1.19.3] - 2023-03-22
 ### Added
 - Added a few new events
