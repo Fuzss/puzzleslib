@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
+import fuzs.puzzleslib.api.event.v1.entity.player.AnvilRepairCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
@@ -16,11 +17,13 @@ import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -37,8 +40,11 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
     private static final Map<Class<?>, EventInvoker<?>> EVENT_INVOKER_LOOKUP = new MapMaker().weakKeys().makeMap();
 
     static {
+        INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
+            return (player, world, hand, hitResult) -> callback.onUseBlock(player, world, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
+        });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
-            return (player, level, hand) -> callback.onRightClickItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
+            return (player, level, hand) -> callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
         });
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
@@ -79,6 +85,7 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
                 });
             };
         });
+        INSTANCE.register(AnvilRepairCallback.class, FabricPlayerEvents.ANVIL_REPAIR);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

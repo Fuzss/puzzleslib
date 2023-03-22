@@ -12,11 +12,13 @@ import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
+import fuzs.puzzleslib.api.event.v1.entity.player.AnvilRepairCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -26,6 +28,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.player.AnvilRepairEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
@@ -46,8 +49,15 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
     private static final Map<Class<?>, EventInvoker<?>> EVENT_INVOKER_LOOKUP = new MapMaker().weakKeys().makeMap();
 
     static {
+        INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
+            EventResultHolder<InteractionResult> result = callback.onUseBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getHitVec());
+            if (result.isInterrupt()) {
+                evt.setCancellationResult(result.getInterrupt().orElseThrow());
+                evt.setCanceled(true);
+            }
+        });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
-            EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onRightClickItem(evt.getEntity(), evt.getLevel(), evt.getHand());
+            EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
             if (result.isInterrupt()) {
                 evt.setCancellationResult(result.getInterrupt().orElseThrow().getResult());
                 evt.setCanceled(true);
@@ -108,6 +118,9 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
                 }
                 return evt.getTable().removePool("pool" + index) != null;
             });
+        });
+        INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
+            callback.onAnvilRepair(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance));
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

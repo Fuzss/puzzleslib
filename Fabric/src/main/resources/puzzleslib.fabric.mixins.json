@@ -5,6 +5,7 @@
   "package": "fuzs.puzzleslib.mixin",
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
+    "AnvilMenuFabricMixin",
     "BoneMealItemFabricMixin",
     "ExperienceOrbFabricMixin",
     "FarmBlockFabricMixin",
