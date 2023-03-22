@@ -13,7 +13,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 
 import java.util.concurrent.CompletableFuture;
 
-public final class AbstractTagsProvider {
+public final class AbstractTagProvider {
 
     public abstract static class Blocks extends BlockTagsProvider {
 

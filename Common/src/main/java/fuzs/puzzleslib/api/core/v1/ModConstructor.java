@@ -4,8 +4,6 @@ import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Supplier;
@@ -16,8 +14,7 @@ import java.util.function.Supplier;
 public interface ModConstructor {
 
     /**
-     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
-     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     * Construct the main {@link ModConstructor} instance provided as <code>supplier</code> to begin initialization of a mod.
      *
      * @param modId                the mod id for registering events on Forge to the correct mod event bus
      * @param supplier       the main mod instance for mod setup
@@ -85,33 +82,6 @@ public interface ModConstructor {
      * @param context add fuel burn time for items/blocks
      */
     default void onRegisterFuelBurnTimes(final FuelBurnTimesContext context) {
-
-    }
-
-    /**
-     * register a new command, also natively supports replacing existing commands
-     *
-     * @param context context with helper objects for registering commands
-     */
-    default void onRegisterCommands(final RegisterCommandsContext context) {
-
-    }
-
-    /**
-     * allows for replacing built-in {@link LootTable}s on loading
-     *
-     * @param context replace a whole {@link LootTable}
-     */
-    default void onLootTableReplacement(final LootTablesContext.Replace context) {
-
-    }
-
-    /**
-     * allows changing of {@link LootPool}s in a {@link LootTable}
-     *
-     * @param context add or remove a {@link LootPool}
-     */
-    default void onLootTableModification(final LootTablesContext.Modify context) {
 
     }
 

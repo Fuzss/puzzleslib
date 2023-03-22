@@ -2,20 +2,27 @@ package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.event.v1.LootTableLoadEvents;
 import fuzs.puzzleslib.api.event.v1.PlayerTickEvents;
+import fuzs.puzzleslib.api.event.v1.RegisterCommandsCallback;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
+import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.LootTableLoadEvent;
+import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -88,6 +95,23 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
                 evt.setCanceled(true);
             }
         });
+        INSTANCE.register(RegisterCommandsCallback.class, RegisterCommandsEvent.class, (RegisterCommandsCallback callback, RegisterCommandsEvent evt) -> {
+            callback.onRegisterCommands(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection());
+        });
+        INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableLoadEvent.class, (LootTableLoadEvents.Replace callback, LootTableLoadEvent evt) -> {
+            callback.onReplaceLootTable(evt.getLootTableManager(), evt.getName(), MutableValue.fromEvent(evt::setTable, evt::getTable));
+        });
+        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
+            callback.onModifyLootTable(evt.getLootTableManager(), evt.getName(), evt.getTable()::addPool, index -> {
+                if (index == 0 && evt.getTable().removePool("main") != null) {
+                    return true;
+                }
+                return evt.getTable().removePool("pool" + index) != null;
+            });
+        });
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ForgeClientEventInvokers.register();
+        }
     }
 
     @SuppressWarnings("unchecked")

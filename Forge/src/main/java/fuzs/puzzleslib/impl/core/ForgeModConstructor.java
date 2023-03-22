@@ -6,15 +6,12 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.core.v1.context.LootTablesContext;
-import fuzs.puzzleslib.api.core.v1.context.RegisterCommandsContext;
 import fuzs.puzzleslib.api.core.v1.context.SpawnPlacementsContext;
 import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
 import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
 import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -27,13 +24,8 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.CreativeModeTabEvent;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
@@ -141,35 +133,6 @@ public class ForgeModConstructor {
         };
     }
 
-    private LootTablesContext.Replace getLootTablesReplaceContext(LootTables lootManager, ResourceLocation id, LootTable lootTable, Consumer<LootTable> lootTableSetter) {
-        return new LootTablesContext.Replace(lootManager, id, lootTable) {
-
-            @Override
-            public void setLootTable(LootTable table) {
-                lootTableSetter.accept(table);
-            }
-        };
-    }
-
-    private LootTablesContext.Modify getLootTablesModifyContext(LootTables lootManager, ResourceLocation id, LootTable lootTable) {
-        return new LootTablesContext.Modify(lootManager, id) {
-
-            @Override
-            public void addLootPool(LootPool pool) {
-                lootTable.addPool(pool);
-            }
-
-            @SuppressWarnings("ConstantConditions")
-            @Override
-            public boolean removeLootPool(int index) {
-                if (index == 0 && lootTable.removePool("main") != null) {
-                    return true;
-                }
-                return lootTable.removePool("pool" + index) != null;
-            }
-        };
-    }
-
     /**
      * construct the mod, calling all necessary registration methods
      * we don't need the object, it's only important for being registered to the necessary events buses
@@ -190,13 +153,6 @@ public class ForgeModConstructor {
             if (forgeModConstructor.fuelBurnTimes.containsKey(item)) {
                 evt.setBurnTime(forgeModConstructor.fuelBurnTimes.getInt(item));
             }
-        });
-        MinecraftForge.EVENT_BUS.addListener((final RegisterCommandsEvent evt) -> {
-           constructor.onRegisterCommands(new RegisterCommandsContext(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection()));
-        });
-        MinecraftForge.EVENT_BUS.addListener((final LootTableLoadEvent evt) -> {
-            constructor.onLootTableReplacement(forgeModConstructor.getLootTablesReplaceContext(evt.getLootTableManager(), evt.getName(), evt.getTable(), evt::setTable));
-            constructor.onLootTableModification(forgeModConstructor.getLootTablesModifyContext(evt.getLootTableManager(), evt.getName(), evt.getTable()));
         });
         if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOMES)) {
             BiomeLoadingHandler.register(modId, eventBus, forgeModConstructor.biomeLoadingEntries);

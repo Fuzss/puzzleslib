@@ -35,7 +35,7 @@ public final class AbstractLootProvider {
         private final LootTableProvider provider;
         private final String modId;
 
-        protected Blocks(PackOutput packOutput, String modId) {
+        public Blocks(PackOutput packOutput, String modId) {
             super(Set.of(), FeatureFlags.REGISTRY.allFlags());
             this.provider = createProvider(packOutput, this, LootContextParamSets.BLOCK);
             this.modId = modId;
@@ -67,7 +67,7 @@ public final class AbstractLootProvider {
         private final LootTableProvider provider;
         private final String modId;
 
-        protected EntityTypes(PackOutput packOutput, String modId) {
+        public EntityTypes(PackOutput packOutput, String modId) {
             super(FeatureFlags.REGISTRY.allFlags());
             this.provider = createProvider(packOutput, this, LootContextParamSets.ENTITY);
             this.modId = modId;
@@ -102,7 +102,7 @@ public final class AbstractLootProvider {
         private final LootTableProvider provider;
         private final Map<ResourceLocation, LootTable.Builder> values = Maps.newHashMap();
 
-        protected Simple(PackOutput packOutput, LootContextParamSet paramSet) {
+        public Simple(PackOutput packOutput, LootContextParamSet paramSet) {
             this.provider = createProvider(packOutput, this, paramSet);
         }
         @Override

@@ -5,7 +5,11 @@ The format is based on [Keep a Changelog].
 
 ## [v5.0.7-1.19.3] - 2023-03-22
 ### Added
+- Added a few new events
 - Added a helper method to `DynamicBakingCompletedContext` for retrieving baked models from a provided `ResourceLocation`
+- Added `AbstractModelProvider` for generating block state and block / item model assets
+### Changed
+- Migrated command registration and loot table load events to new event api implementation
 
 ## [v5.0.6-1.19.3] - 2023-03-22
 ### Added

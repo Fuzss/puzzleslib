@@ -25,8 +25,7 @@ import java.util.function.Supplier;
 public interface ClientModConstructor {
 
     /**
-     * this is very much unnecessary as the method is only ever called from loader specific code anyway which does have
-     * access to the specific mod constructor, but for simplifying things and having this method in a common place we keep it here
+     * Construct the {@link ClientModConstructor} instance provided as <code>supplier</code> to begin client-side initialization of a mod.
      *
      * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param modConstructor       the main mod instance for mod setup
@@ -34,6 +33,7 @@ public interface ClientModConstructor {
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
+        // not an issue on Fabric, but Forge might call client construction before common
         ModContext.get(modId).scheduleClientModConstruction(() -> {
             PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
             ClientFactories.INSTANCE.constructClientMod(modId, modConstructor, contentRegistrations);
