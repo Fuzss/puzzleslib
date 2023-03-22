@@ -28,8 +28,10 @@ public interface ModConstructor {
         PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         // build first to force class being loaded for executing buildables
         ModConstructor modConstructor = supplier.get();
-        ModContext.get(modId).executeBuildables();
+        ModContext modContext = ModContext.get(modId);
+        modContext.beforeModConstruction();
         CommonFactories.INSTANCE.constructMod(modId, modConstructor, contentRegistrations);
+        modContext.afterModConstruction();
     }
 
     /**

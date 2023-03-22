@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.6-1.19.3] - 2023-03-22
+### Added
+- Added a few new events
+### Fixed
+- Fixed client mod construction sometimes running before common mod construction on Forge
+- Fixed a typo in `DefaultedFloat`
+
 ## [v5.0.5-1.19.3] - 2023-03-21
 ### Fixed
 - Fixed a class loading order issue related to the execution of buildable mod-specific instances

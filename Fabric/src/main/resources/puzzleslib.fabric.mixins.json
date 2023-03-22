@@ -8,7 +8,8 @@
     "BoneMealItemFabricMixin",
     "ExperienceOrbFabricMixin",
     "FarmBlockFabricMixin",
-    "LivingEntityFabricMixin"
+    "LivingEntityFabricMixin",
+    "PlayerFabricMixin"
   ],
   "client": [
     "client.GameRendererFabricMixin",
@@ -16,7 +17,7 @@
     "client.ModelManagerFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
-    "client.accessor.MinecraftFabricAccessor",
+    "client.accessor.MinecraftFabricAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -51,7 +51,7 @@ public interface DefaultedFloat extends MutableFloat {
         if (this.getAsDefaultFloat() == this.getAsFloat()) {
             return Optional.empty();
         } else {
-            return Optional.of(this.getAsDefaultFloat());
+            return Optional.of(this.getAsFloat());
         }
     }
 

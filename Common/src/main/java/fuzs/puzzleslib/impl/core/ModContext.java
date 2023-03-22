@@ -19,12 +19,14 @@ public abstract class ModContext {
     private static final Map<String, ModContext> CONTEXTS = new MapMaker().weakKeys().makeMap();
 
     final String modId;
+    private final Set<Buildable> buildables = Sets.newHashSet();
     @Nullable NetworkHandlerV2 networkHandlerV2;
     @Nullable NetworkHandlerV3.Builder networkHandlerV3;
     @Nullable ConfigHolder.Builder configHolder;
     @Nullable RegistryManager registryManager;
     @Nullable CapabilityController capabilityController;
-    private Set<Buildable> buildables = Sets.newHashSet();
+    @Nullable Runnable clientModConstructor;
+    private boolean markConstructed;
 
     ModContext(String modId) {
         this.modId = modId;
@@ -49,14 +51,28 @@ public abstract class ModContext {
     public abstract CapabilityController getCapabilityController();
 
     <T extends Buildable> T addBuildable(T buildable) {
+        if (this.markConstructed) throw new IllegalStateException("mod is already constructed");
         Objects.requireNonNull(buildable, "buildable is null");
-        Objects.requireNonNull(this.buildables, "buildables have already executed");
         this.buildables.add(buildable);
         return buildable;
     }
 
-    public final void executeBuildables() {
+    public final void scheduleClientModConstruction(Runnable runnable) {
+        if (this.markConstructed) {
+            runnable.run();
+        } else {
+            this.clientModConstructor = runnable;
+        }
+    }
+
+    public final void beforeModConstruction() {
+        this.markConstructed = true;
         this.buildables.forEach(Buildable::build);
-        this.buildables = null;
+    }
+
+    public final void afterModConstruction() {
+        if (this.clientModConstructor != null) {
+            this.clientModConstructor.run();
+        }
     }
 }

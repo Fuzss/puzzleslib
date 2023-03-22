@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
+import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
@@ -33,8 +34,10 @@ public interface ClientModConstructor {
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
-        PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-        ClientFactories.INSTANCE.constructClientMod(modId, modConstructor, contentRegistrations);
+        ModContext.get(modId).scheduleClientModConstruction(() -> {
+            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+            ClientFactories.INSTANCE.constructClientMod(modId, modConstructor, contentRegistrations);
+        });
     }
 
     /**

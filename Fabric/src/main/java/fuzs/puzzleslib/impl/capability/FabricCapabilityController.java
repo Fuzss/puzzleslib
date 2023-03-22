@@ -145,7 +145,7 @@ public class FabricCapabilityController implements CapabilityController {
             for (Consumer<Object> factoryRegistration : controller.providerClazzToRegistration.get(baseType)) {
                 factoryRegistration.accept(registry);
             }
-            controller.providerClazzToRegistration.clear();
+            controller.providerClazzToRegistration.get(baseType).clear();
         }
     }
 }

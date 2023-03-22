@@ -1,13 +1,12 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.MapMaker;
-import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
-import fuzs.puzzleslib.api.event.v1.FabricWorldEvents;
+import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
+import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
@@ -32,6 +31,9 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricWorldEvents.FARMLAND_TRAMPLE);
+        INSTANCE.register(PlayerTickEvents.Start.class, FabricEvents.PLAYER_TICK_START);
+        INSTANCE.register(PlayerTickEvents.End.class, FabricEvents.PLAYER_TICK_END);
+        INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
     }
 
     @SuppressWarnings("unchecked")
