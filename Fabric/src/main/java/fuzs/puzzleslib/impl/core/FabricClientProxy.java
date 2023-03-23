@@ -4,12 +4,14 @@ import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -54,6 +56,11 @@ public class FabricClientProxy extends FabricServerProxy {
     @Override
     public boolean hasAltDown() {
         return Screen.hasAltDown();
+    }
+
+    @Override
+    public Component getKeyMappingComponent(String identifier) {
+        return KeyMapping.createNameSupplier(identifier).get();
     }
 
     @Override

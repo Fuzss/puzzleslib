@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.network.NetworkEvent;
@@ -50,6 +52,11 @@ public class ForgeClientProxy extends ForgeServerProxy {
     @Override
     public boolean hasAltDown() {
         return Screen.hasAltDown();
+    }
+
+    @Override
+    public Component getKeyMappingComponent(String identifier) {
+        return KeyMapping.createNameSupplier(identifier).get();
     }
 
     @Override

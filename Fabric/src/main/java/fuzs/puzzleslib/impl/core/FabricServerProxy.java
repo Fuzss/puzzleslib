@@ -8,6 +8,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,6 +66,11 @@ public class FabricServerProxy implements FabricProxy {
     @Override
     public boolean hasAltDown() {
         return false;
+    }
+
+    @Override
+    public Component getKeyMappingComponent(String identifier) {
+        return Component.empty();
     }
 
     @Override
