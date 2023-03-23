@@ -12,10 +12,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.AnvilRepairCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import net.minecraft.world.InteractionResult;
@@ -28,10 +25,7 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.player.AnvilRepairEvent;
-import net.minecraftforge.event.entity.player.BonemealEvent;
-import net.minecraftforge.event.entity.player.PlayerInteractEvent;
-import net.minecraftforge.event.entity.player.PlayerXpEvent;
+import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -121,6 +115,19 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
         });
         INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
             callback.onAnvilRepair(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance));
+        });
+        INSTANCE.register(ItemTouchCallback.class, EntityItemPickupEvent.class, (ItemTouchCallback callback, EntityItemPickupEvent evt) -> {
+            EventResult result = callback.onItemTouch(evt.getEntity(), evt.getItem());
+            if (result.isInterrupt()) {
+                if (result.getAsBoolean()) {
+                    evt.setResult(Event.Result.ALLOW);
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
+        });
+        INSTANCE.register(PlayerEvents.ItemPickup.class, PlayerEvent.ItemPickupEvent.class, (PlayerEvents.ItemPickup callback, PlayerEvent.ItemPickupEvent evt) -> {
+            callback.onItemPickup(evt.getEntity(), evt.getOriginalEntity(), evt.getStack());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

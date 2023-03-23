@@ -66,6 +66,16 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         return this.dissolved;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof ConfigDataSet<?> impl && this.toMap().equals(impl.toMap());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.toMap().hashCode();
+    }
+
     /**
      * dissolve {@link #values}, always call before retrieving any data from this set
      */

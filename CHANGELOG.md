@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.8-1.19.3] - 2023-03-23
+### Added
+- Added a few new events
+### Changed
+- `ConfigDataSet` now implements `java.util.Collection`
+- Minor refactors for `ModelLayerFactory`
+
 ## [v5.0.7-1.19.3] - 2023-03-22
 ### Added
 - Added a few new events

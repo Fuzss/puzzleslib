@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.impl.client.event;
 
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.ItemTooltipCallback;
 import fuzs.puzzleslib.api.client.event.v1.RenderGuiCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGuiEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 
 import static fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl.INSTANCE;
 
@@ -21,6 +23,9 @@ public class ForgeClientEventInvokers {
         });
         INSTANCE.register(RenderGuiCallback.class, RenderGuiEvent.Post.class, (RenderGuiCallback callback, RenderGuiEvent.Post evt) -> {
             callback.onRenderGui(Minecraft.getInstance(), evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+        });
+        INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
+            callback.onItemTooltip(evt.getItemStack(), evt.getEntity(), evt.getToolTip(), evt.getFlags());
         });
     }
 }

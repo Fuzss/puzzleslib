@@ -9,10 +9,7 @@ import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.AnvilRepairCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.BonemealCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerXpEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -86,6 +83,8 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
             };
         });
         INSTANCE.register(AnvilRepairCallback.class, FabricPlayerEvents.ANVIL_REPAIR);
+        INSTANCE.register(ItemTouchCallback.class, FabricPlayerEvents.ITEM_TOUCH);
+        INSTANCE.register(PlayerEvents.ItemPickup.class, FabricPlayerEvents.ITEM_PICKUP);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

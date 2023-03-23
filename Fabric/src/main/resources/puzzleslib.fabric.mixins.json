@@ -9,6 +9,7 @@
     "BoneMealItemFabricMixin",
     "ExperienceOrbFabricMixin",
     "FarmBlockFabricMixin",
+    "ItemEntityFabricMixin",
     "LivingEntityFabricMixin",
     "PlayerFabricMixin"
   ],

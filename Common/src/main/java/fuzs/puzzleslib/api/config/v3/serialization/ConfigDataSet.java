@@ -4,10 +4,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,7 +17,7 @@ import java.util.stream.Stream;
  *
  * @param <T> registry entry type for stored values
  */
-public interface ConfigDataSet<T> {
+public interface ConfigDataSet<T> extends Collection<T> {
     /**
      * default config option comment for options backed by {@link ConfigDataSet}
      */
@@ -30,17 +29,87 @@ public interface ConfigDataSet<T> {
     Map<T, Object[]> toMap();
 
     /**
-     * tests if this set contains a value
-     *
-     * @param entry entry to check
-     * @return does this set contain <code>entry</code>
+     * @return the dissolved entry set backing this config data set
      */
-    default boolean contains(T entry) {
-        return this.toMap().containsKey(entry);
+    default Set<T> toSet() {
+        return this.toMap().keySet();
+    }
+
+    @Override
+    default Iterator<T> iterator() {
+        return this.toSet().iterator();
+    }
+
+    @Override
+    default int size() {
+        return this.toMap().size();
+    }
+
+    @Override
+    default boolean isEmpty() {
+        return this.toMap().isEmpty();
+    }
+
+    @Override
+    default boolean contains(Object o) {
+        return this.toSet().contains(o);
+    }
+
+    @NotNull
+    @Override
+    default Object[] toArray() {
+        return this.toSet().toArray();
+    }
+
+    @NotNull
+    @Override
+    default <T1> T1[] toArray(@NotNull T1[] a) {
+        return this.toSet().toArray(a);
+    }
+
+    @Deprecated
+    @Override
+    default boolean add(T t) {
+        return this.toSet().add(t);
+    }
+
+    @Deprecated
+    @Override
+    default boolean remove(Object o) {
+        return this.toSet().remove(o);
+    }
+
+    @Override
+    default boolean containsAll(@NotNull Collection<?> c) {
+        return this.toSet().containsAll(c);
+    }
+
+    @Deprecated
+    @Override
+    default boolean addAll(@NotNull Collection<? extends T> c) {
+        return this.toSet().addAll(c);
+    }
+
+    @Deprecated
+    @Override
+    default boolean removeAll(@NotNull Collection<?> c) {
+        return this.toSet().removeAll(c);
+    }
+
+    @Deprecated
+    @Override
+    default boolean retainAll(@NotNull Collection<?> c) {
+        return this.toSet().retainAll(c);
+    }
+
+    @Deprecated
+    @Override
+    default void clear() {
+        this.toMap().clear();
     }
 
     /**
-     * queries data for a given value from this set
+     * Queries data for a given value from this set.
      *
      * @param entry entry to query data for
      * @return data array
@@ -53,27 +122,13 @@ public interface ConfigDataSet<T> {
     }
 
     /**
-     * @return is this set empty
-     */
-    default boolean isEmpty() {
-        return this.toMap().isEmpty();
-    }
-
-    /**
-     * @return size of this set
-     */
-    default int size() {
-        return this.toMap().size();
-    }
-
-    /**
      * @param registryKey registry for type
      * @param values values backing this set
      * @param <T> registry type
      * @return builder backed by <code>registry</code>
      */
-    static <T> ConfigDataSet<T> of(final ResourceKey<? extends Registry<T>> registryKey, List<String> values) {
-        return of(registryKey, values, (index, value) -> true);
+    static <T> ConfigDataSet<T> from(final ResourceKey<? extends Registry<T>> registryKey, List<String> values) {
+        return from(registryKey, values, (index, value) -> true);
     }
 
     /**
@@ -84,7 +139,7 @@ public interface ConfigDataSet<T> {
      * @param <T> registry type
      * @return builder backed by <code>registry</code>
      */
-    static <T> ConfigDataSet<T> of(final ResourceKey<? extends Registry<T>> registryKey, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
+    static <T> ConfigDataSet<T> from(final ResourceKey<? extends Registry<T>> registryKey, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
         return new ConfigDataSetImpl<>(getRegistryFromKey(registryKey), values, filter, types);
     }
 
