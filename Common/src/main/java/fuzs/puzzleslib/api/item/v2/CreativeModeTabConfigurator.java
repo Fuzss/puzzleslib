@@ -12,17 +12,16 @@ import java.util.function.Supplier;
  */
 public interface CreativeModeTabConfigurator {
 
-
     /**
      * creates a new creative mode tab, handles adding to the creative screen
      * use this when one tab is enough for the mod, <code>tabId</code> defaults to "main"
      *
-     * @param modId             the mod this tab is used by
-     * @param stackSupplier     the display stack
-     * @return                  the creative mode tab
+     * @param modId the mod this tab is used by
+     * @param icon  the display stack
+     * @return the creative mode tab
      */
-    default CreativeModeTabConfigurator simple(String modId, Supplier<ItemStack> stackSupplier) {
-        return of(modId).icon(stackSupplier);
+    static CreativeModeTabConfigurator from(String modId, Supplier<ItemStack> icon) {
+        return from(modId).icon(icon);
     }
 
     /**
@@ -32,8 +31,8 @@ public interface CreativeModeTabConfigurator {
      * @param modId the mod this tab is used by
      * @return builder instance
      */
-    static CreativeModeTabConfigurator of(String modId) {
-        return of(modId, "main");
+    static CreativeModeTabConfigurator from(String modId) {
+        return from(modId, "main");
     }
 
     /**
@@ -43,8 +42,8 @@ public interface CreativeModeTabConfigurator {
      * @param tabId the key for this tab, useful when the mod has multiple
      * @return builder instance
      */
-    static CreativeModeTabConfigurator of(String modId, String tabId) {
-        return of(new ResourceLocation(modId, tabId));
+    static CreativeModeTabConfigurator from(String modId, String tabId) {
+        return from(new ResourceLocation(modId, tabId));
     }
 
     /**
@@ -53,15 +52,15 @@ public interface CreativeModeTabConfigurator {
      * @param identifier the tab identifier
      * @return builder instance
      */
-    static CreativeModeTabConfigurator of(ResourceLocation identifier) {
+    static CreativeModeTabConfigurator from(ResourceLocation identifier) {
         return new CreativeModeTabConfiguratorImpl(identifier);
     }
 
     /**
      * set an item stack to display as tab icon
      *
-     * @param icon  the item stack displayed as tab icon
-     * @return      builder instance
+     * @param icon the item stack displayed as tab icon
+     * @return builder instance
      */
     CreativeModeTabConfigurator icon(Supplier<ItemStack> icon);
 
@@ -69,15 +68,15 @@ public interface CreativeModeTabConfigurator {
      * Makes icons cycle every two seconds.
      * <p>Only supported on Forge!
      *
-     * @param icons     multiple item stacks displayed as tab icon, they are cycled through
-     * @return  builder instance
+     * @param icons multiple item stacks displayed as tab icon, they are cycled through
+     * @return builder instance
      */
     CreativeModeTabConfigurator icons(Supplier<ItemStack[]> icons);
 
     /**
      * fill this tab with custom items, fully overrides vanilla, useful for sorting purposes
      *
-     * @return  builder instance
+     * @return builder instance
      */
     CreativeModeTabConfigurator displayItems(CreativeModeTab.DisplayItemsGenerator displayItemsGenerator);
 
@@ -85,7 +84,7 @@ public interface CreativeModeTabConfigurator {
      * show a search bar in this tab like vanilla's search tab
      * <p>Only supported on Forge!
      *
-     * @return  builder instance
+     * @return builder instance
      */
     CreativeModeTabConfigurator withSearchBar();
 

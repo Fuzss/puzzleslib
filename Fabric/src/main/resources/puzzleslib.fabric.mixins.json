@@ -11,6 +11,8 @@
     "FarmBlockFabricMixin",
     "ItemEntityFabricMixin",
     "LivingEntityFabricMixin",
+    "LootingEnchantFunctionFabricMixin",
+    "LootItemRandomChanceWithLootingConditionFabricMixin",
     "PlayerFabricMixin"
   ],
   "client": [

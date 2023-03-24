@@ -12,6 +12,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -27,7 +28,9 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     };
 
     private final ResourceLocation identifier;
+    @Nullable
     private Supplier<ItemStack> icon;
+    @Nullable
     private Supplier<ItemStack[]> icons;
     private CreativeModeTab.DisplayItemsGenerator displayItemsGenerator = EMPTY_GENERATOR;
     private boolean hasSearchBar;

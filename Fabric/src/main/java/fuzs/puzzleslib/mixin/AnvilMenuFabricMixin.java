@@ -1,19 +1,22 @@
 package fuzs.puzzleslib.mixin;
 
+import fuzs.puzzleslib.api.event.v1.FabricEvents;
 import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AnvilMenu;
-import net.minecraft.world.inventory.ContainerLevelAccess;
-import net.minecraft.world.inventory.ItemCombinerMenu;
-import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -22,6 +25,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(AnvilMenu.class)
 abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
+    @Shadow
+    private int repairItemCountCost;
+    @Shadow
+    private String itemName;
+    @Shadow
+    @Final
+    private DataSlot cost;
     @Unique
     private MutableFloat puzzleslib$breakChance;
 
@@ -56,5 +66,22 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
         });
         // always cancel vanilla, we handle everything
         callback.cancel();
+    }
+
+    @Inject(method = "createResult", at = @At("HEAD"), cancellable = true)
+    public void createResult(CallbackInfo callback) {
+        ItemStack leftInput = this.inputSlots.getItem(0);
+        if (leftInput.isEmpty()) return;
+        ItemStack rightInput = this.inputSlots.getItem(1);
+        MutableValue<ItemStack> output = MutableValue.fromValue(ItemStack.EMPTY);
+        MutableInt enchantmentCost = MutableInt.fromValue(leftInput.getBaseRepairCost() + rightInput.getBaseRepairCost());
+        MutableInt materialCost = MutableInt.fromValue(0);
+        EventResult result = FabricEvents.ANVIL_UPDATE.invoker().onAnvilUpdate(leftInput, rightInput, output, this.itemName, enchantmentCost, materialCost, this.player);
+        if (result.isPass()) return;
+        callback.cancel();
+        if (!result.getAsBoolean()) return;
+        this.resultSlots.setItem(0, output.get());
+        this.cost.set(enchantmentCost.getAsInt());
+        this.repairItemCountCost = materialCost.getAsInt();
     }
 }

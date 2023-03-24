@@ -3,15 +3,18 @@ package fuzs.puzzleslib.impl.event;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.event.v1.AnvilUpdateCallback;
 import fuzs.puzzleslib.api.event.v1.LootTableLoadEvents;
 import fuzs.puzzleslib.api.event.v1.PlayerTickEvents;
 import fuzs.puzzleslib.api.event.v1.RegisterCommandsCallback;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
+import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
@@ -20,11 +23,13 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -128,6 +133,24 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
         });
         INSTANCE.register(PlayerEvents.ItemPickup.class, PlayerEvent.ItemPickupEvent.class, (PlayerEvents.ItemPickup callback, PlayerEvent.ItemPickupEvent evt) -> {
             callback.onItemPickup(evt.getEntity(), evt.getOriginalEntity(), evt.getStack());
+        });
+        INSTANCE.register(LootingLevelCallback.class, LootingLevelEvent.class, (LootingLevelCallback callback, LootingLevelEvent evt) -> {
+            callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), MutableInt.fromEvent(evt::setLootingLevel, evt::getLootingLevel));
+        });
+        INSTANCE.register(AnvilUpdateCallback.class, AnvilUpdateEvent.class, (AnvilUpdateCallback callback, AnvilUpdateEvent evt) -> {
+            MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
+            MutableInt enchantmentCost = MutableInt.fromEvent(evt::setCost, evt::getCost);
+            MutableInt materialCost = MutableInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost);
+            EventResult result = callback.onAnvilUpdate(evt.getLeft(), evt.getRight(), output, evt.getName(), enchantmentCost, materialCost, evt.getPlayer());
+            if (result.isInterrupt()) {
+                // interruption for allow will run properly as long as output is changed from an empty stack
+                if (!result.getAsBoolean()) {
+                    evt.setCanceled(true);
+                }
+            } else {
+                // revert to an empty stack to allow vanilla behavior to execute
+                evt.setOutput(ItemStack.EMPTY);
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

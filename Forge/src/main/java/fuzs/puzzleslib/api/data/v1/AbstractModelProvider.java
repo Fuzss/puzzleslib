@@ -23,6 +23,11 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
     @Override
     protected abstract void registerStatesAndModels();
 
+    public void builtInBlock(Block block, Block texture) {
+        this.simpleBlock(block, this.models().getBuilder(this.name(block))
+                .texture("particle", this.blockTexture(texture)));
+    }
+
     public void cubeBottomTopBlock(Block block) {
         this.cubeBottomTopBlock(block, this.extend(this.blockTexture(block), "_side"), this.extend(this.blockTexture(block), "_bottom"), this.extend(this.blockTexture(block), "_top"));
         this.itemModels().withExistingParent(this.name(block), this.extendKey(block, ModelProvider.BLOCK_FOLDER));
@@ -38,6 +43,20 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
 
     public String name(Block block) {
         return this.key(block).getPath();
+    }
+
+    public String itemName(Item item) {
+        return ForgeRegistries.ITEMS.getKey(item).getPath();
+    }
+
+    public ItemModelBuilder builtInItem(Item item, Block texture) {
+        return this.builtInItem(item, texture, this.mcLoc("builtin/entity"));
+    }
+
+    public ItemModelBuilder builtInItem(Item item, Block texture, ResourceLocation parent) {
+        return this.itemModels().getBuilder(this.itemName(item))
+                .parent(this.itemModels().getExistingFile(parent))
+                .texture("particle", this.blockTexture(texture));
     }
 
     public ResourceLocation extendKey(Block block, String... extensions) {

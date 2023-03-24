@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
+import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
@@ -85,6 +86,8 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
         INSTANCE.register(AnvilRepairCallback.class, FabricPlayerEvents.ANVIL_REPAIR);
         INSTANCE.register(ItemTouchCallback.class, FabricPlayerEvents.ITEM_TOUCH);
         INSTANCE.register(PlayerEvents.ItemPickup.class, FabricPlayerEvents.ITEM_PICKUP);
+        INSTANCE.register(LootingLevelCallback.class, FabricLivingEvents.LOOTING_LEVEL);
+        INSTANCE.register(AnvilUpdateCallback.class, FabricEvents.ANVIL_UPDATE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

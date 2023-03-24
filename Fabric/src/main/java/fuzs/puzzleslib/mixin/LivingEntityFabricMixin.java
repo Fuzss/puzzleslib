@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +35,13 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     public LivingEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
+    }
+
+    @ModifyVariable(method = "dropAllDeathLoot", at = @At("STORE"), ordinal = 0)
+    protected int dropAllDeathLoot(int lootingLevel, DamageSource damageSource) {
+        MutableInt mutableLootingLevel = MutableInt.fromValue(lootingLevel);
+        FabricLivingEvents.LOOTING_LEVEL.invoker().onLootingLevel(LivingEntity.class.cast(this), damageSource, mutableLootingLevel);
+        return mutableLootingLevel.getAsInt();
     }
 
     @Inject(method = "dropExperience", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"), cancellable = true)
