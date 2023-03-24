@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.10-1.19.3] - 2023-03-24
+### Added
+- Added some more helper methods to `AbstractLanguageProvider`
+
 ## [v5.0.9-1.19.3] - 2023-03-24
 ### Added
 - Added a few new events
