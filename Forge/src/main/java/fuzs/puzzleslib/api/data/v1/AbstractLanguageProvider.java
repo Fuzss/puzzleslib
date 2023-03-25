@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.data.v1;
 
+import net.minecraft.client.KeyMapping;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
@@ -64,6 +65,10 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
 
     public void add(SoundEvent soundEvent, String value) {
         this.add("subtitles." + soundEvent.getLocation().getPath(), value);
+    }
+
+    public void add(KeyMapping keyMapping, String value) {
+        this.add(keyMapping.getName(), value);
     }
 
     public void add(ResourceLocation identifier, String value) {
