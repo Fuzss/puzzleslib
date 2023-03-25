@@ -22,7 +22,7 @@ public abstract class LootingEnchantFunctionFabricMixin {
         if (!(target instanceof LivingEntity livingEntity)) return lootingLevel;
         DamageSource damageSource = lootContext.getParamOrNull(LootContextParams.DAMAGE_SOURCE);
         MutableInt mutableLootingLevel = MutableInt.fromValue(lootingLevel);
-        FabricLivingEvents.LOOTING_LEVEL.invoker().onLootingLevel(LivingEntity.class.cast(this), damageSource, mutableLootingLevel);
+        FabricLivingEvents.LOOTING_LEVEL.invoker().onLootingLevel(livingEntity, damageSource, mutableLootingLevel);
         return mutableLootingLevel.getAsInt();
     }
 }
