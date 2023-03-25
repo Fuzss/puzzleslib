@@ -47,6 +47,11 @@ abstract class LivingEntityFabricMixin extends Entity {
         super(entityType, level);
     }
 
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
+    public void tick(CallbackInfo callback) {
+        if (FabricLivingEvents.LIVING_TICK.invoker().onLivingTick(LivingEntity.class.cast(this)).isInterrupt()) callback.cancel();
+    }
+
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
     protected void dropAllDeathLoot$0(DamageSource damageSource, CallbackInfo callback) {
         this.puzzleslib$lootingLevel = 0;

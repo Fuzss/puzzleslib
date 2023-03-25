@@ -3,10 +3,16 @@ package fuzs.puzzleslib.impl.client.event;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.ItemTooltipCallback;
 import fuzs.puzzleslib.api.client.event.v1.RenderGuiCallback;
+import fuzs.puzzleslib.api.client.event.v1.RenderNameTagCallback;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.event.RenderGuiEvent;
+import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.Event;
 
 import static fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl.INSTANCE;
 
@@ -26,6 +32,13 @@ public class ForgeClientEventInvokers {
         });
         INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
             callback.onItemTooltip(evt.getItemStack(), evt.getEntity(), evt.getToolTip(), evt.getFlags());
+        });
+        INSTANCE.register(RenderNameTagCallback.class, RenderNameTagEvent.class, (RenderNameTagCallback callback, RenderNameTagEvent evt) -> {
+            DefaultedValue<Component> content = DefaultedValue.fromEvent(evt::setContent, evt::getContent, evt::getOriginalContent);
+            EventResult result = callback.onRenderNameTag(evt.getEntity(), content, evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick());
+            if (result.isInterrupt()) {
+                evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+            }
         });
     }
 }

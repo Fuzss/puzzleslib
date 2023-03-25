@@ -1,9 +1,7 @@
 package fuzs.puzzleslib.impl.client.event;
 
 import com.mojang.blaze3d.platform.Window;
-import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.ItemTooltipCallback;
-import fuzs.puzzleslib.api.client.event.v1.RenderGuiCallback;
+import fuzs.puzzleslib.api.client.event.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 
@@ -28,5 +26,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, callback -> {
             return (stack, context, lines) -> callback.onItemTooltip(stack, Minecraft.getInstance().player, lines, context);
         });
+        INSTANCE.register(RenderNameTagCallback.class, FabricClientEvents.RENDER_NAME_TAG);
     }
 }

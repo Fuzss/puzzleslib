@@ -12,10 +12,7 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingDropsCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
+import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
@@ -29,10 +26,7 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.living.LootingLevelEvent;
+import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -158,10 +152,13 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
                 evt.setOutput(ItemStack.EMPTY);
             }
         });
-        INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (callback, evt) -> {
+        INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (LivingDropsCallback callback, LivingDropsEvent evt) -> {
             if (callback.onLivingDrops(evt.getEntity(), evt.getSource(), evt.getDrops(), evt.getLootingLevel(), evt.isRecentlyHit()).isInterrupt()) {
                 evt.setCanceled(true);
             }
+        });
+        INSTANCE.register(LivingEvents.Tick.class, LivingEvent.LivingTickEvent.class, (LivingEvents.Tick callback, LivingEvent.LivingTickEvent evt) -> {
+            if (callback.onLivingTick(evt.getEntity()).isInterrupt()) evt.setCanceled(true);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

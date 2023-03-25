@@ -2,10 +2,12 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEntityTypeTags;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -35,5 +37,10 @@ public final class FabricAbstractions implements CommonAbstractions {
                 return menuProvider.createMenu(i, inventory, player);
             }
         });
+    }
+
+    @Override
+    public boolean isBossMob(EntityType<?> type) {
+        return type.is(ConventionalEntityTypeTags.BOSSES);
     }
 }

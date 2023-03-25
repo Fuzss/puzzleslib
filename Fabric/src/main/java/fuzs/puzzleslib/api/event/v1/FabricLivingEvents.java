@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingDropsCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
+import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
@@ -33,4 +30,8 @@ public final class FabricLivingEvents {
      * <p><code>drops</code> can be modified to change the loot that is dropped.
      */
     public static final Event<LivingDropsCallback> LIVING_DROPS = FabricEventFactory.createResult(LivingDropsCallback.class);
+    /**
+     * Called at the beginning of {@link LivingEntity#tick()}, allows cancelling ticking the entity.
+     */
+    public static final Event<LivingEvents.Tick> LIVING_TICK = FabricEventFactory.createResult(LivingEvents.Tick.class);
 }

@@ -17,6 +17,7 @@
     "PlayerFabricMixin"
   ],
   "client": [
+    "client.EntityRendererFabricMixin",
     "client.GameRendererFabricMixin",
     "client.ItemRendererFabricMixin",
     "client.ModelManagerFabricMixin",

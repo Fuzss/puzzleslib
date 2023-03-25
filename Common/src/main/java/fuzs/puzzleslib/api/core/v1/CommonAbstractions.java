@@ -3,6 +3,8 @@ package fuzs.puzzleslib.api.core.v1;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 
 import java.util.function.BiConsumer;
 
@@ -35,4 +37,13 @@ public interface CommonAbstractions {
      * @param screenOpeningDataWriter additional data added via {@link FriendlyByteBuf}
      */
     void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter);
+
+    /**
+     * Is <code>entityType</code> considered a boss mob like {@link EntityType#ENDER_DRAGON} and {@link EntityType#WITHER} in vanilla.
+     * <p>A common property of such entities usually is {@link LivingEntity#canChangeDimensions()} returns <code>false</code>.
+     *
+     * @param type the entity type
+     * @return is it a boss mob
+     */
+    boolean isBossMob(EntityType<?> type);
 }

@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.12-1.19.3] - 2023-03-25
+### Added
+- Added a few new events
+- Added a helper method for checking if a mob is a boss mob
+
 ## [v5.0.11-1.19.3] - 2023-03-25
 ### Added
 - Added `LivingDropsCallback`
