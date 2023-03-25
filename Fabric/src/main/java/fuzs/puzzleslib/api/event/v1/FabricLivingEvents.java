@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
+import fuzs.puzzleslib.api.event.v1.entity.living.LivingDropsCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 
 /**
@@ -25,4 +27,10 @@ public final class FabricLivingEvents {
      * of {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} that should be applied to the drops.
      */
     public static final Event<LootingLevelCallback> LOOTING_LEVEL = FabricEventFactory.create(LootingLevelCallback.class);
+    /**
+     * Called right before drops from a killed entity are spawned in the world.
+     * <p>This event is fired whenever an Entity dies and drops items in {@link LivingEntity#die(DamageSource)}.
+     * <p><code>drops</code> can be modified to change the loot that is dropped.
+     */
+    public static final Event<LivingDropsCallback> LIVING_DROPS = FabricEventFactory.createResult(LivingDropsCallback.class);
 }

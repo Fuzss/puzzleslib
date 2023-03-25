@@ -12,6 +12,7 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.api.event.v1.entity.living.LivingDropsCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
@@ -22,11 +23,13 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
@@ -108,7 +111,8 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
             callback.onRegisterCommands(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection());
         });
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableLoadEvent.class, (LootTableLoadEvents.Replace callback, LootTableLoadEvent evt) -> {
-            callback.onReplaceLootTable(evt.getLootTableManager(), evt.getName(), MutableValue.fromEvent(evt::setTable, evt::getTable));
+            MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
+            callback.onReplaceLootTable(evt.getLootTableManager(), evt.getName(), table);
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
             callback.onModifyLootTable(evt.getLootTableManager(), evt.getName(), evt.getTable()::addPool, index -> {
@@ -119,7 +123,8 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
             });
         });
         INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
-            callback.onAnvilRepair(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance));
+            MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
+            callback.onAnvilRepair(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
         });
         INSTANCE.register(ItemTouchCallback.class, EntityItemPickupEvent.class, (ItemTouchCallback callback, EntityItemPickupEvent evt) -> {
             EventResult result = callback.onItemTouch(evt.getEntity(), evt.getItem());
@@ -135,7 +140,8 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
             callback.onItemPickup(evt.getEntity(), evt.getOriginalEntity(), evt.getStack());
         });
         INSTANCE.register(LootingLevelCallback.class, LootingLevelEvent.class, (LootingLevelCallback callback, LootingLevelEvent evt) -> {
-            callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), MutableInt.fromEvent(evt::setLootingLevel, evt::getLootingLevel));
+            MutableInt lootingLevel = MutableInt.fromEvent(evt::setLootingLevel, evt::getLootingLevel);
+            callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), lootingLevel);
         });
         INSTANCE.register(AnvilUpdateCallback.class, AnvilUpdateEvent.class, (AnvilUpdateCallback callback, AnvilUpdateEvent evt) -> {
             MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
@@ -150,6 +156,11 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
             } else {
                 // revert to an empty stack to allow vanilla behavior to execute
                 evt.setOutput(ItemStack.EMPTY);
+            }
+        });
+        INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (callback, evt) -> {
+            if (callback.onLivingDrops(evt.getEntity(), evt.getSource(), evt.getDrops(), evt.getLootingLevel(), evt.isRecentlyHit()).isInterrupt()) {
+                evt.setCanceled(true);
             }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {

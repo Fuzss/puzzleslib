@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.api.event.v1.entity.living.LivingDropsCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingExperienceDropCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingFallCallback;
 import fuzs.puzzleslib.api.event.v1.entity.living.LootingLevelCallback;
@@ -88,6 +89,7 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
         INSTANCE.register(PlayerEvents.ItemPickup.class, FabricPlayerEvents.ITEM_PICKUP);
         INSTANCE.register(LootingLevelCallback.class, FabricLivingEvents.LOOTING_LEVEL);
         INSTANCE.register(AnvilUpdateCallback.class, FabricEvents.ANVIL_UPDATE);
+        INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

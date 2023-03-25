@@ -28,9 +28,9 @@ public final class LootTableLoadEvents {
          *
          * @param lootManager access to all loot tables
          * @param identifier  the loot table id
-         * @param lootTable   the loot table that can be replaced
+         * @param table       the loot table that can be replaced
          */
-        void onReplaceLootTable(LootTables lootManager, ResourceLocation identifier, MutableValue<LootTable> lootTable);
+        void onReplaceLootTable(LootTables lootManager, ResourceLocation identifier, MutableValue<LootTable> table);
     }
 
     @FunctionalInterface
