@@ -3,15 +3,9 @@ package fuzs.puzzleslib.impl.event;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapMaker;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.event.v1.AnvilUpdateCallback;
-import fuzs.puzzleslib.api.event.v1.LootTableLoadEvents;
-import fuzs.puzzleslib.api.event.v1.PlayerTickEvents;
-import fuzs.puzzleslib.api.event.v1.RegisterCommandsCallback;
+import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.*;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
-import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
@@ -22,10 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.LootTableLoadEvent;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
@@ -158,7 +149,53 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
             }
         });
         INSTANCE.register(LivingEvents.Tick.class, LivingEvent.LivingTickEvent.class, (LivingEvents.Tick callback, LivingEvent.LivingTickEvent evt) -> {
-            if (callback.onLivingTick(evt.getEntity()).isInterrupt()) evt.setCanceled(true);
+            if (callback.onLivingTick(evt.getEntity()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(ArrowLooseCallback.class, ArrowLooseEvent.class, (ArrowLooseCallback callback, ArrowLooseEvent evt) -> {
+            MutableInt charge = MutableInt.fromEvent(evt::setCharge, evt::getCharge);
+            if (callback.onArrowLoose(evt.getEntity(), evt.getBow(), evt.getLevel(), charge, evt.hasAmmo()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(LivingHurtCallback.class, LivingHurtEvent.class, (LivingHurtCallback callback, LivingHurtEvent evt) -> {
+            MutableFloat amount = MutableFloat.fromEvent(evt::setAmount, evt::getAmount);
+            if (callback.onLivingHurt(evt.getEntity(), evt.getSource(), amount).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(UseItemEvents.Start.class, LivingEntityUseItemEvent.Start.class, (UseItemEvents.Start callback, LivingEntityUseItemEvent.Start evt) -> {
+            MutableInt useDuration = MutableInt.fromEvent(evt::setDuration, evt::getDuration);
+            if (callback.onUseItemStart(evt.getEntity(), evt.getItem(), useDuration).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(UseItemEvents.Tick.class, LivingEntityUseItemEvent.Tick.class, (UseItemEvents.Tick callback, LivingEntityUseItemEvent.Tick evt) -> {
+            MutableInt useItemRemaining = MutableInt.fromEvent(evt::setDuration, evt::getDuration);
+            if (callback.onUseItemTick(evt.getEntity(), evt.getItem(), useItemRemaining).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(UseItemEvents.Stop.class, LivingEntityUseItemEvent.Stop.class, (UseItemEvents.Stop callback, LivingEntityUseItemEvent.Stop evt) -> {
+            // Forge event also supports changing duration, but it remains unused
+            if (callback.onUseItemStop(evt.getEntity(), evt.getItem(), evt.getDuration()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(UseItemEvents.Finish.class, LivingEntityUseItemEvent.Finish.class, (UseItemEvents.Finish callback, LivingEntityUseItemEvent.Finish evt) -> {
+            MutableValue<ItemStack> useItemResult = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
+            callback.onUseItemFinish(evt.getEntity(), evt.getItem(), evt.getDuration(), useItemResult);
+        });
+        INSTANCE.register(ShieldBlockCallback.class, ShieldBlockEvent.class, (ShieldBlockCallback callback, ShieldBlockEvent evt) -> {
+            DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(evt::setBlockedDamage, evt::getBlockedDamage, evt::getOriginalBlockedDamage);
+            // Forge event can also prevent the shield taking durability damage, but that's hard to implement...
+            if (callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), blockedDamage).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(TagsUpdatedCallback.class, TagsUpdatedEvent.class, (TagsUpdatedCallback callback, TagsUpdatedEvent evt) -> {
+            callback.onTagsUpdated(evt.getRegistryAccess(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

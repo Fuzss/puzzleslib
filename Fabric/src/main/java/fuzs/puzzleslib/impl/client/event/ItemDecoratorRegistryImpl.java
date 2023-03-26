@@ -10,6 +10,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 
+import java.util.Collection;
 import java.util.Objects;
 
 public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
@@ -24,8 +25,10 @@ public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
     }
 
     public static void render(Font font, ItemStack stack, int itemPosX, int itemPosY, float blitOffset) {
+        Collection<DynamicItemDecorator> dynamicItemDecorators = DECORATORS.get(stack.getItem());
+        if (dynamicItemDecorators.isEmpty()) return;
         resetRenderState();
-        for (DynamicItemDecorator itemDecorator : DECORATORS.get(stack.getItem())) {
+        for (DynamicItemDecorator itemDecorator : dynamicItemDecorators) {
             if (itemDecorator.renderItemDecorations(font, stack, itemPosX, itemPosY, blitOffset)) {
                 resetRenderState();
             }
@@ -34,7 +37,8 @@ public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
 
     private static void resetRenderState() {
         RenderSystem.enableTexture();
-        RenderSystem.enableDepthTest();
+        // this breaks trading discount strikethrough bar which will display behind the old price
+//        RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
     }

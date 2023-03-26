@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Mixin(ModelManager.class)
-public abstract class ModelManagerFabricMixin {
+abstract class ModelManagerFabricMixin {
     @Shadow
     private Map<ResourceLocation, BakedModel> bakedRegistry;
     @Unique

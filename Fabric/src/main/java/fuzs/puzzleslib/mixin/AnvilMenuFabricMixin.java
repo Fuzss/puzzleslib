@@ -23,6 +23,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
+
 @Mixin(AnvilMenu.class)
 abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
     @Shadow
@@ -50,7 +52,10 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
         // just copy this part from vanilla, not in the mood to mixin into this lambda
         this.access.execute((level, blockPos) -> {
             BlockState blockState = level.getBlockState(blockPos);
-            if (!player.getAbilities().instabuild && blockState.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < this.puzzleslib$breakChance.getAsFloat()) {
+            Objects.requireNonNull(this.puzzleslib$breakChance, "break chance is null");
+            float breakChance = this.puzzleslib$breakChance.getAsFloat();
+            this.puzzleslib$breakChance = null;
+            if (!player.getAbilities().instabuild && blockState.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
                 BlockState blockState2 = AnvilBlock.damage(blockState);
                 if (blockState2 == null) {
                     level.removeBlock(blockPos, false);

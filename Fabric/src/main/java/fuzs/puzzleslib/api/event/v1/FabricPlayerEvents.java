@@ -34,4 +34,8 @@ public final class FabricPlayerEvents {
      * <p>This events main purpose is to notify that the item pickup has happened.
      */
     public static final Event<PlayerEvents.ItemPickup> ITEM_PICKUP = FabricEventFactory.create(PlayerEvents.ItemPickup.class);
+    /**
+     * Called when the player stops using a bow, just before the arrow is fired.
+     */
+    public static final Event<ArrowLooseCallback> ARROW_LOOSE = FabricEventFactory.createResult(ArrowLooseCallback.class);
 }

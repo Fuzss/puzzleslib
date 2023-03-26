@@ -12,12 +12,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemRenderer.class)
-public abstract class ItemRendererFabricMixin {
+abstract class ItemRendererFabricMixin {
     @Shadow
     public float blitOffset;
 
     @Inject(method = "renderGuiItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At("TAIL"))
-    public void puzzleslib$renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text, CallbackInfo callback) {
+    public void renderGuiItemDecorations(Font fr, ItemStack stack, int xPosition, int yPosition, @Nullable String text, CallbackInfo callback) {
         if (!stack.isEmpty()) ItemDecoratorRegistryImpl.render(fr, stack, xPosition, yPosition, this.blitOffset);
     }
 }

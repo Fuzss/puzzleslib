@@ -3,6 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.14-1.19.3] - 2023-03-26
+### Added
+- Added a few new events
+### Fixed
+- Fixed `FarmlandTrample` not being accessible
+
+## [v5.0.13-1.19.3] - 2023-03-26
+### Added
+- Added a few new events
+- Added `MutableBoolean` and `DefaultedBoolean` data classes
+### Fixed
+- No longer breaks trading discount strikethrough bar on Fabric, which would display behind the old price instead of on top
+
 ## [v5.0.12-1.19.3] - 2023-03-25
 ### Added
 - Added a few new events
