@@ -50,6 +50,20 @@ public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry 
                 evt.setCanceled(true);
             }
         });
+        INSTANCE.register(PlayerInteractEvents.UseEntity.class, PlayerInteractEvent.EntityInteract.class, (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract evt) -> {
+            EventResultHolder<InteractionResult> result = callback.onUseEntity(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget());
+            if (result.isInterrupt()) {
+                evt.setCancellationResult(result.getInterrupt().orElseThrow());
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, PlayerInteractEvent.EntityInteractSpecific.class, (PlayerInteractEvents.UseEntityAt callback, PlayerInteractEvent.EntityInteractSpecific evt) -> {
+            EventResultHolder<InteractionResult> result = callback.onUseEntityAt(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget(), evt.getLocalPos());
+            if (result.isInterrupt()) {
+                evt.setCancellationResult(result.getInterrupt().orElseThrow());
+                evt.setCanceled(true);
+            }
+        });
         INSTANCE.register(PlayerXpEvents.PickupXp.class, PlayerXpEvent.PickupXp.class, (PlayerXpEvents.PickupXp callback, PlayerXpEvent.PickupXp evt) -> {
             if (callback.onPickupXp(evt.getEntity(), evt.getOrb()).isInterrupt()) {
                 evt.setCanceled(true);

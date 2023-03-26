@@ -15,19 +15,27 @@ import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
@@ -38,10 +46,26 @@ public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistr
 
     static {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
-            return (player, world, hand, hitResult) -> callback.onUseBlock(player, world, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
+            return (Player player, Level world, InteractionHand hand, BlockHitResult hitResult) -> {
+                return callback.onUseBlock(player, world, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
+            };
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
-            return (player, level, hand) -> callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
+            return (Player player, Level level, InteractionHand hand) -> {
+                return callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
+            };
+        });
+        INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, callback -> {
+            return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                if (hitResult != null) return InteractionResult.PASS;
+                return callback.onUseEntity(player, world, hand, entity).getInterrupt().orElse(InteractionResult.PASS);
+            };
+        });
+        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, callback -> {
+            return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                if (hitResult == null) return InteractionResult.PASS;
+                return callback.onUseEntityAt(player, world, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
+            };
         });
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);

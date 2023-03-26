@@ -5,6 +5,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.data.tags.GameEventTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -27,9 +28,18 @@ public final class AbstractTagProvider {
 
     public abstract static class Items extends ItemTagsProvider {
 
-        @SuppressWarnings("DataFlowIssue")
         public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, lookupProvider, null, modId, fileHelper);
+            super(packOutput, lookupProvider, new Blocks(packOutput, lookupProvider, modId, fileHelper) {
+
+                @Override
+                protected void addTags(HolderLookup.Provider provider) {
+
+                }
+            }, modId, fileHelper);
+        }
+
+        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, TagsProvider<Block> blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, lookupProvider, blockTagsProvider, modId, fileHelper);
         }
 
         @Override
