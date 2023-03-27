@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.core.v1;
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
+import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -12,6 +13,7 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -208,6 +210,13 @@ public interface ClientModConstructor {
      * @param context add items to a creative tab
      */
     default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
+
+    }
+
+    /**
+     * @param context register additional resource pack sources
+     */
+    default void onAddResourcePackFinders(final PackRepositorySourcesContext context) {
 
     }
 }

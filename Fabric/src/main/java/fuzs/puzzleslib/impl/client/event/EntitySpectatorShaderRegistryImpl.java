@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-public class EntitySpectatorShaderRegistryImpl implements EntitySpectatorShaderRegistry {
+public final class EntitySpectatorShaderRegistryImpl implements EntitySpectatorShaderRegistry {
     private static final Map<EntityType<?>, ResourceLocation> SHADER_LOCATIONS = Maps.newHashMap();
 
     @Override

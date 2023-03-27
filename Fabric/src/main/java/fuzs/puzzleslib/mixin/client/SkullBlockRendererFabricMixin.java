@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.impl.client.event.SkullRenderersRegistryImpl;
+import fuzs.puzzleslib.impl.client.event.SkullRendererRegistryImpl;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
@@ -15,7 +15,7 @@ abstract class SkullBlockRendererFabricMixin {
 
     @ModifyVariable(method = "createSkullRenderers", at = @At("STORE"))
     private static ImmutableMap.Builder<SkullBlock.Type, SkullModelBase> puzzleslib$createSkullRenderers(ImmutableMap.Builder<SkullBlock.Type, SkullModelBase> builder, EntityModelSet entityModelSet) {
-        SkullRenderersRegistryImpl.addAll(entityModelSet, builder);
+        SkullRendererRegistryImpl.addAll(entityModelSet, builder);
         return builder;
     }
 }

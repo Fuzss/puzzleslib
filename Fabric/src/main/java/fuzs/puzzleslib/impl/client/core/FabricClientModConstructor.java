@@ -50,6 +50,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
         constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
         constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
+        constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
     }
 
     private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> consumer1, Consumer<DynamicBakingCompletedContext> consumer2, String modId) {

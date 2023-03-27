@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
+public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
     public static final ForgeEventInvokerRegistryImpl INSTANCE = new ForgeEventInvokerRegistryImpl();
     private static final Map<Class<?>, EventInvoker<?>> EVENT_INVOKER_LOOKUP = new MapMaker().weakKeys().makeMap();
 

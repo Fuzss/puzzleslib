@@ -40,7 +40,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Function;
 
-public class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
+public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
     public static final FabricEventInvokerRegistryImpl INSTANCE = new FabricEventInvokerRegistryImpl();
     private static final Map<Class<?>, EventInvoker<?>> EVENT_INVOKER_LOOKUP = new MapMaker().weakKeys().makeMap();
 

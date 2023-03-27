@@ -14,7 +14,10 @@
     "LivingEntityFabricMixin",
     "LootingEnchantFunctionFabricMixin",
     "LootItemRandomChanceWithLootingConditionFabricMixin",
-    "PlayerFabricMixin"
+    "PackRepositoryFabricMixin",
+    "PlayerFabricMixin",
+    "accessor.BuiltInPackSourceAccessor",
+    "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [
     "client.EntityRendererFabricMixin",

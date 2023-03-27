@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.16-1.19.3] - 2023-03-27
+### Added
+- Added support for dynamically adding new data / resource pack finders
+
 ## [v5.0.15-1.19.3] - 2023-03-26
 ### Added
 - Added a few new events

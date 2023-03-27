@@ -37,6 +37,8 @@ import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -55,6 +57,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.CreativeModeTabRegistry;
+import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -471,6 +474,20 @@ public class ForgeClientModConstructor {
         for (CreativeModeTab.DisplayItemsGenerator itemsGenerator : this.creativeModeTabBuildListeners.get(identifier)) {
             itemsGenerator.accept(evt.getFlags(), evt, evt.hasPermissions());
         }
+    }
+
+    @SubscribeEvent
+    public void onAddPackFinders(final AddPackFindersEvent evt) {
+        if (evt.getPackType() != PackType.CLIENT_RESOURCES) return;
+        this.constructor.onAddResourcePackFinders((repositorySource, repositorySources) -> {
+            Objects.requireNonNull(repositorySource, "repository source is null");
+            evt.addRepositorySource(repositorySource);
+            Objects.requireNonNull(repositorySources, "repository sources is null");
+            for (RepositorySource source : repositorySources) {
+                Objects.requireNonNull(source, "repository source is null");
+                evt.addRepositorySource(source);
+            }
+        });
     }
 
     /**

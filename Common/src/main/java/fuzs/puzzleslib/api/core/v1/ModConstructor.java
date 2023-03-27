@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
+import net.minecraft.server.packs.repository.RepositorySource;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Supplier;
@@ -103,6 +104,13 @@ public interface ModConstructor {
      * @param context register new creative mode tabs via the respective builder
      */
     default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {
+
+    }
+
+    /**
+     * @param context register additional data pack sources
+     */
+    default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
 
     }
 }

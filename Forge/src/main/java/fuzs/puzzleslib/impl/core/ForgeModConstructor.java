@@ -12,6 +12,8 @@ import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
 import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -25,6 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
@@ -131,6 +134,20 @@ public class ForgeModConstructor {
                 });
             }
         };
+    }
+
+    @SubscribeEvent
+    public void onAddPackFinders(final AddPackFindersEvent evt) {
+        if (evt.getPackType() != PackType.SERVER_DATA) return;
+        this.constructor.onAddDataPackFinders((repositorySource, repositorySources) -> {
+            Objects.requireNonNull(repositorySource, "repository source is null");
+            evt.addRepositorySource(repositorySource);
+            Objects.requireNonNull(repositorySources, "repository sources is null");
+            for (RepositorySource source : repositorySources) {
+                Objects.requireNonNull(source, "repository source is null");
+                evt.addRepositorySource(source);
+            }
+        });
     }
 
     /**

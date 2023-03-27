@@ -21,5 +21,6 @@ public final class FabricModConstructor {
         constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
         constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
+        constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
     }
 }

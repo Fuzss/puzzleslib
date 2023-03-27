@@ -16,7 +16,7 @@ import net.minecraftforge.eventbus.api.Event;
 
 import static fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl.INSTANCE;
 
-public class ForgeClientEventInvokers {
+public final class ForgeClientEventInvokers {
 
     public static void register() {
         INSTANCE.register(ClientTickEvents.Start.class, TickEvent.ClientTickEvent.class, (ClientTickEvents.Start callback, TickEvent.ClientTickEvent evt) -> {
