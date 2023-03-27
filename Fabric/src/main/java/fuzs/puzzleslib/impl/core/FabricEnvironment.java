@@ -37,6 +37,11 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
+    public Optional<Path> findModResource(String id, String... pathName) {
+        return FabricLoader.getInstance().getModContainer(id).flatMap(modContainer -> modContainer.findPath(String.join("/", pathName)));
+    }
+
+    @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
     }

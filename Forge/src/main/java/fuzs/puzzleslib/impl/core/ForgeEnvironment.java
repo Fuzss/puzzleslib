@@ -11,6 +11,7 @@ import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
@@ -41,19 +42,25 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
+    public Optional<Path> findModResource(String id, String... pathName) {
+        Objects.requireNonNull(ModList.get(), "mod list is null");
+        return Optional.of(ModList.get().getModFileById(id).getFile().findResource(pathName)).filter(Files::exists);
+    }
+
+    @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.production;
     }
 
     @Override
     public boolean isModLoaded(String modId) {
-        Objects.requireNonNull(ModList.get(), "mod list is null, use isModLoadedSafe instead");
+        Objects.requireNonNull(ModList.get(), "mod list is null");
         return ModList.get().isLoaded(modId);
     }
 
     @Override
     public boolean isModLoadedSafe(String modId) {
-        Objects.requireNonNull(FMLLoader.getLoadingModList(), "loading mod list is null");
+        Objects.requireNonNull(FMLLoader.getLoadingModList(), "mod loading list is null");
         return FMLLoader.getLoadingModList().getModFileById(modId) != null;
     }
 

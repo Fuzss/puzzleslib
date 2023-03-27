@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.17-1.19.3] - 2023-03-27
+### Added
+- Added some utilities for creating runtime generated data / resource packs
+
 ## [v5.0.16-1.19.3] - 2023-03-27
 ### Added
 - Added support for dynamically adding new data / resource pack finders

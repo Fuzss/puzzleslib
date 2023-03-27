@@ -18,6 +18,27 @@ public interface ModLoaderEnvironment {
     ModLoader getModLoader();
 
     /**
+     * @return is this Forge
+     */
+    default boolean isForge() {
+        return this.getModLoader().isForge();
+    }
+
+    /**
+     * @return is this Fabric
+     */
+    default boolean isFabric() {
+        return this.getModLoader().isFabric();
+    }
+
+    /**
+     * @return is this Quilt
+     */
+    default boolean isQuilt() {
+        return this.getModLoader().isQuilt();
+    }
+
+    /**
      * @return current physical environment
      */
     DistType getEnvironmentType();
@@ -55,6 +76,15 @@ public interface ModLoaderEnvironment {
     Path getConfigDir();
 
     /**
+     * Finds a resource in a mod jar file.
+     *
+     * @param id       the mod id to check the jar file from
+     * @param pathName resource name, if entered as single string path components are separated using "/"
+     * @return path to the resource if it exists, otherwise empty
+     */
+    Optional<Path> findModResource(String id, String... pathName);
+
+    /**
      * @return is this running in a development environment
      */
     boolean isDevelopmentEnvironment();
@@ -67,6 +97,7 @@ public interface ModLoaderEnvironment {
 
     /**
      * safe version of {@link #isModLoaded} on fml
+     *
      * @param modId mod id to check
      * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
      */
