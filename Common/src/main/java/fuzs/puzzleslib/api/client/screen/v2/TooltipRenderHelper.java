@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.api.client.screen.v2;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
@@ -11,11 +13,14 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 /**
  * A helper class for rendering tooltips without a screen, additionally allows for rendering multiple image components whereas vanilla only supports one.
@@ -29,6 +34,71 @@ public final class TooltipRenderHelper extends GuiComponent {
     }
 
     /**
+     * Creates individual tooltip lines from an item stack.
+     * <p>{@link TooltipFlag} defaults to the value set in <code>options.txt</code>.
+     * <p>This only includes text tooltip components, for the image component an item may provide see {@link #getTooltip}.
+     *
+     * @param itemStack the item stack to retrieve the tooltip from
+     * @return the tooltip lines as list
+     */
+    public static List<Component> getTooltipLines(ItemStack itemStack) {
+        return getTooltipLines(itemStack, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+    }
+
+    /**
+     * Creates individual tooltip lines from an item stack.
+     * <p>This only includes text tooltip components, for the image component an item may provide see {@link #getTooltip}.
+     *
+     * @param itemStack   the item stack to retrieve the tooltip from
+     * @param tooltipFlag the tooltip flag to use
+     * @return the tooltip lines as list
+     */
+    public static List<Component> getTooltipLines(ItemStack itemStack, TooltipFlag tooltipFlag) {
+        Objects.requireNonNull(itemStack, "item stack is null");
+        Objects.requireNonNull(tooltipFlag, "tooltip flag is null");
+        return itemStack.getTooltipLines(Minecraft.getInstance().player, tooltipFlag);
+    }
+
+    /**
+     * Creates all client tooltip components for an item stack, including a possibly present image component.
+     * <p>{@link TooltipFlag} defaults to the value set in <code>options.txt</code>.
+     *
+     * @param itemStack the item stack to retrieve the tooltip from
+     * @return client tooltip components
+     */
+    public static List<ClientTooltipComponent> getTooltip(ItemStack itemStack) {
+        return getTooltip(itemStack, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+    }
+
+    /**
+     * Creates all client tooltip components for an item stack, including a possibly present image component.
+     *
+     * @param itemStack   the item stack to retrieve the tooltip from
+     * @param tooltipFlag the tooltip flag to use
+     * @return client tooltip components
+     */
+    public static List<ClientTooltipComponent> getTooltip(ItemStack itemStack, TooltipFlag tooltipFlag) {
+        Objects.requireNonNull(itemStack, "item stack is null");
+        Objects.requireNonNull(tooltipFlag, "tooltip flag is null");
+        List<Component> components = getTooltipLines(itemStack, tooltipFlag);
+        List<TooltipComponent> imageComponents = itemStack.getTooltipImage().map(List::of).orElse(List.of());
+        return createClientComponents(components, imageComponents);
+    }
+
+    /**
+     * Renders a tooltip, accepts an item stack.
+     *
+     * @param poseStack the pose stack
+     * @param posX      position on x-axis, would be mouse cursor x for vanilla
+     * @param posY      position on y-axis, would be mouse cursor y for vanilla
+     * @param itemStack the item stack to retrieve the tooltip from
+     */
+    public static void renderTooltip(PoseStack poseStack, int posX, int posY, ItemStack itemStack) {
+        Objects.requireNonNull(itemStack, "item stack is null");
+        renderTooltipInternal(poseStack, posX, posY, getTooltip(itemStack));
+    }
+
+    /**
      * Renders a tooltip, accepts a single text component and a single image component.
      *
      * @param poseStack      the pose stack
@@ -37,7 +107,7 @@ public final class TooltipRenderHelper extends GuiComponent {
      * @param component      component to render in the tooltip
      * @param imageComponent image component to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, Component component, ClientTooltipComponent imageComponent) {
+    public static void renderTooltip(PoseStack poseStack, int posX, int posY, Component component, TooltipComponent imageComponent) {
         Objects.requireNonNull(component, "component is null");
         Objects.requireNonNull(imageComponent, "image component is null");
         renderTooltip(poseStack, posX, posY, List.of(component), imageComponent);
@@ -52,7 +122,7 @@ public final class TooltipRenderHelper extends GuiComponent {
      * @param components     components to render in the tooltip
      * @param imageComponent image component to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components, ClientTooltipComponent imageComponent) {
+    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components, TooltipComponent imageComponent) {
         Objects.requireNonNull(imageComponent, "image component is null");
         renderTooltip(poseStack, posX, posY, components, List.of(imageComponent));
     }
@@ -78,8 +148,39 @@ public final class TooltipRenderHelper extends GuiComponent {
      * @param components      components to render in the tooltip
      * @param imageComponents image components to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components, List<ClientTooltipComponent> imageComponents) {
-        renderTooltipInternal(poseStack, posX, posY, Stream.concat(components.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create), imageComponents.stream()).toList());
+    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components, List<TooltipComponent> imageComponents) {
+        renderTooltipInternal(poseStack, posX, posY, createClientComponents(components, imageComponents));
+    }
+
+    /**
+     * Creates a list of {@link ClientTooltipComponent}s from text and image components to be rendered on a tooltip.
+     * <p><code>imageComponents</code> are inserted into <code>components</code> at index <code>1</code>, just like vanilla.
+     *
+     * @param components      components to render on the tooltip
+     * @param imageComponents image components to render on the tooltip
+     * @return the client tooltip components
+     */
+    public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents) {
+        return createClientComponents(components, imageComponents, 1);
+    }
+
+    /**
+     * Creates a list of {@link ClientTooltipComponent}s from text and image components to be rendered on a tooltip.
+     *
+     * @param components      components to render on the tooltip
+     * @param imageComponents image components to render on the tooltip
+     * @param insertAt        index to insert <code>imageComponents</code> into <code>components</code>, set to <code>-1</code> to insert at the end
+     * @return the client tooltip components
+     */
+    public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents, int insertAt) {
+        List<ClientTooltipComponent> clientComponents = components.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create).collect(Collectors.toList());
+        List<ClientTooltipComponent> clientImageComponents = imageComponents.stream().map(ClientAbstractions.INSTANCE::createImageComponent).toList();
+        if (insertAt == -1) {
+            clientComponents.addAll(clientImageComponents);
+        } else {
+            clientComponents.addAll(insertAt, clientImageComponents);
+        }
+        return ImmutableList.copyOf(clientComponents);
     }
 
     /**
