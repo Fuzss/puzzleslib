@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.18-1.19.3] - 2023-03-28
+### Added
+- Added `TooltipRenderHelper`
+
 ## [v5.0.17-1.19.3] - 2023-03-27
 ### Added
 - Added some utilities for creating runtime generated data / resource packs
