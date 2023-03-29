@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
+import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -70,7 +71,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
-        INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricWorldEvents.FARMLAND_TRAMPLE);
+        INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricLevelEvents.FARMLAND_TRAMPLE);
         INSTANCE.register(PlayerTickEvents.Start.class, FabricEvents.PLAYER_TICK_START);
         INSTANCE.register(PlayerTickEvents.End.class, FabricEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
@@ -123,6 +124,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, callback -> {
             return callback::onTagsUpdated;
         });
+        INSTANCE.register(ExplosionEvents.Start.class, FabricLevelEvents.EXPLOSION_START);
+        INSTANCE.register(ExplosionEvents.Detonate.class, FabricLevelEvents.EXPLOSION_DETONATE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin;
 
-import fuzs.puzzleslib.api.event.v1.FabricWorldEvents;
+import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -22,7 +22,7 @@ abstract class FarmBlockFabricMixin extends Block {
 
     @Inject(method = "fallOn", at = @At("HEAD"), cancellable = true)
     public void fallOn(Level level, BlockState blockState, BlockPos blockPos, Entity entity, float fallDistance, CallbackInfo callback) {
-        if (FabricWorldEvents.FARMLAND_TRAMPLE.invoker().onFarmlandTrample(level, blockPos, Blocks.DIRT.defaultBlockState(), fallDistance, entity).isInterrupt()) {
+        if (FabricLevelEvents.FARMLAND_TRAMPLE.invoker().onFarmlandTrample(level, blockPos, Blocks.DIRT.defaultBlockState(), fallDistance, entity).isInterrupt()) {
             super.fallOn(level, blockState, blockPos, entity, fallDistance);
             callback.cancel();
         }

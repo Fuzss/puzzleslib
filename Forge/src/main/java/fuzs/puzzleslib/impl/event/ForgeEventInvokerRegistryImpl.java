@@ -8,6 +8,7 @@ import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
+import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import net.minecraft.world.InteractionResult;
@@ -20,6 +21,7 @@ import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -210,6 +212,12 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(TagsUpdatedCallback.class, TagsUpdatedEvent.class, (TagsUpdatedCallback callback, TagsUpdatedEvent evt) -> {
             callback.onTagsUpdated(evt.getRegistryAccess(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
+        });
+        INSTANCE.register(ExplosionEvents.Start.class, ExplosionEvent.Start.class, (ExplosionEvents.Start callback, ExplosionEvent.Start evt) -> {
+            if (callback.onExplosionStart(evt.getLevel(), evt.getExplosion()).isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(ExplosionEvents.Detonate.class, ExplosionEvent.Detonate.class, (ExplosionEvents.Detonate callback, ExplosionEvent.Detonate evt) -> {
+            callback.onExplosionDetonate(evt.getLevel(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
