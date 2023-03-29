@@ -24,7 +24,7 @@ import java.util.Objects;
 @Mixin(EffectRenderingInventoryScreen.class)
 abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractContainerMenu> extends AbstractContainerScreen<T> {
     @Unique
-    private DefaultedBoolean puzzleslib$fullSizeRendering;
+    private DefaultedBoolean puzzleslib$smallWidgets;
     @Unique
     private DefaultedInt puzzleslib$horizontalOffset;
 
@@ -38,17 +38,17 @@ abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractConta
         int j = this.width - i;
         Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
         if (collection.isEmpty() || j < 32) return;
-        this.puzzleslib$fullSizeRendering = DefaultedBoolean.fromValue(j >= 120);
+        this.puzzleslib$smallWidgets = DefaultedBoolean.fromValue(j < 120);
         this.puzzleslib$horizontalOffset = DefaultedInt.fromValue(i);
-        EventResult result = FabricScreenEvents.INVENTORY_MOB_EFFECTS.invoker().onInventoryMobEffects(this, j, this.puzzleslib$fullSizeRendering, this.puzzleslib$horizontalOffset);
+        EventResult result = FabricScreenEvents.INVENTORY_MOB_EFFECTS.invoker().onInventoryMobEffects(this, j, this.puzzleslib$smallWidgets, this.puzzleslib$horizontalOffset);
         if (result.isInterrupt()) callback.cancel();
     }
 
     @ModifyVariable(method = "renderEffects", at = @At("STORE"), ordinal = 0)
     private boolean renderEffects$1(boolean fullSize) {
-        Objects.requireNonNull(this.puzzleslib$fullSizeRendering, "full size rendering is null");
-        fullSize = this.puzzleslib$fullSizeRendering.getAsOptionalBoolean().orElse(fullSize);
-        this.puzzleslib$fullSizeRendering = null;
+        Objects.requireNonNull(this.puzzleslib$smallWidgets, "full size rendering is null");
+        fullSize = this.puzzleslib$smallWidgets.getAsOptionalBoolean().orElse(fullSize);
+        this.puzzleslib$smallWidgets = null;
         return fullSize;
     }
 

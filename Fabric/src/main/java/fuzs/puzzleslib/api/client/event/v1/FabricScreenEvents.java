@@ -8,6 +8,14 @@ import net.fabricmc.fabric.api.event.Event;
  */
 public final class FabricScreenEvents {
     /**
+     * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the screen background is drawn (like menu texture).
+     */
+    public static final Event<ContainerScreenEvents.Background> CONTAINER_SCREEN_BACKGROUND = FabricEventFactory.create(ContainerScreenEvents.Background.class);
+    /**
+     * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the screen foreground is drawn (like text labels).
+     */
+    public static final Event<ContainerScreenEvents.Foreground> CONTAINER_SCREEN_FOREGROUND = FabricEventFactory.create(ContainerScreenEvents.Foreground.class);
+    /**
      * Called before mob effects are drawn next to the inventory menu, used to force a rendering mode, or to cancel the rendering completely.
      */
     public static final Event<InventoryMobEffectsCallback> INVENTORY_MOB_EFFECTS = FabricEventFactory.createResult(InventoryMobEffectsCallback.class);

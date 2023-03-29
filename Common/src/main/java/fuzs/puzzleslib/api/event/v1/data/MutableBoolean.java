@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.event.v1.data;
 import fuzs.puzzleslib.impl.event.data.EventMutableBoolean;
 import fuzs.puzzleslib.impl.event.data.ValueMutableBoolean;
 
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -10,7 +11,7 @@ import java.util.function.UnaryOperator;
 /**
  * A mutable boolean implementation useful for events.
  */
-public interface MutableBoolean {
+public interface MutableBoolean extends BooleanSupplier {
 
     /**
      * Creates a new instance from an initial value.
@@ -39,13 +40,6 @@ public interface MutableBoolean {
      * @param value new value to set
      */
     void accept(boolean value);
-
-    /**
-     * A getter for the contained value.
-     *
-     * @return contained value
-     */
-    boolean getAsBoolean();
 
     /**
      * Maps the contained value to something new.
