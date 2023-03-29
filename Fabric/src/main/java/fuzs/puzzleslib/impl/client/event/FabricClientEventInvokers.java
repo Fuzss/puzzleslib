@@ -30,7 +30,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ContainerScreenEvents.Background.class, FabricClientEvents.CONTAINER_SCREEN_BACKGROUND);
         INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricClientEvents.CONTAINER_SCREEN_FOREGROUND);
         INSTANCE.register(InventoryMobEffectsCallback.class, FabricScreenEvents.INVENTORY_MOB_EFFECTS);
-        INSTANCE.register(OpenScreenEvents.Opening.class, FabricScreenEvents.SCREEN_OPENING);
-        INSTANCE.register(OpenScreenEvents.Closing.class, FabricScreenEvents.SCREEN_CLOSING);
+        INSTANCE.register(ScreenOpeningCallback.class, FabricScreenEvents.SCREEN_OPENING);
     }
 }

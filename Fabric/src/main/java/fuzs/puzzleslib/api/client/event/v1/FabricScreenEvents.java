@@ -15,9 +15,5 @@ public final class FabricScreenEvents {
      * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in {@link net.minecraft.client.Minecraft#setScreen},
      * allows for exchanging the new screen with a different one, or can prevent a new screen from opening, effectively forcing the old screen to remain.
      */
-    public static final Event<OpenScreenEvents.Opening> SCREEN_OPENING = FabricEventFactory.createResult(OpenScreenEvents.Opening.class);
-    /**
-     * Called just before a screen is closed in {@link net.minecraft.client.Minecraft#setScreen}, {@link net.minecraft.client.Minecraft#screen} still has the old screen.
-     */
-    public static final Event<OpenScreenEvents.Closing> SCREEN_CLOSING = FabricEventFactory.create(OpenScreenEvents.Closing.class);
+    public static final Event<ScreenOpeningCallback> SCREEN_OPENING = FabricEventFactory.createResult(ScreenOpeningCallback.class);
 }
