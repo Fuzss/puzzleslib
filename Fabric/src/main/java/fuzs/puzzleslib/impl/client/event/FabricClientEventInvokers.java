@@ -27,5 +27,10 @@ public final class FabricClientEventInvokers {
             return (stack, context, lines) -> callback.onItemTooltip(stack, Minecraft.getInstance().player, lines, context);
         });
         INSTANCE.register(RenderNameTagCallback.class, FabricClientEvents.RENDER_NAME_TAG);
+        INSTANCE.register(ContainerScreenEvents.Background.class, FabricClientEvents.CONTAINER_SCREEN_BACKGROUND);
+        INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricClientEvents.CONTAINER_SCREEN_FOREGROUND);
+        INSTANCE.register(InventoryMobEffectsCallback.class, FabricScreenEvents.INVENTORY_MOB_EFFECTS);
+        INSTANCE.register(OpenScreenEvents.Opening.class, FabricScreenEvents.SCREEN_OPENING);
+        INSTANCE.register(OpenScreenEvents.Closing.class, FabricScreenEvents.SCREEN_CLOSING);
     }
 }

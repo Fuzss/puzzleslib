@@ -20,9 +20,12 @@
     "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [
+    "client.AbstractContainerScreenFabricMixin",
+    "client.EffectRenderingInventoryScreenFabricMixin",
     "client.EntityRendererFabricMixin",
     "client.GameRendererFabricMixin",
     "client.ItemRendererFabricMixin",
+    "client.MinecraftFabricMixin",
     "client.ModelManagerFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
