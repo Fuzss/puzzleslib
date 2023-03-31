@@ -3,7 +3,17 @@ package fuzs.puzzleslib.impl.client.event;
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
 
 import static fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl.INSTANCE;
 
@@ -32,5 +42,40 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InventoryMobEffectsCallback.class, FabricScreenEvents.INVENTORY_MOB_EFFECTS);
         INSTANCE.register(ScreenOpeningCallback.class, FabricScreenEvents.SCREEN_OPENING);
         INSTANCE.register(ComputeFovModifierCallback.class, FabricClientEvents.COMPUTE_FOV_MODIFIER);
+        INSTANCE.register(ScreenEvents.BeforeInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, callback -> {
+            return (client, screen, scaledWidth, scaledHeight) -> {
+                callback.onBeforeInit(client, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(Screens.getButtons(screen)));
+            };
+        });
+        INSTANCE.register(ScreenEvents.AfterInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT, callback -> {
+            return (client, screen, scaledWidth, scaledHeight) -> {
+                List<AbstractWidget> widgets = Screens.getButtons(screen);
+                callback.onAfterInit(client, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
+            };
+        });
+        registerScreenEvent(MouseScreenEvents.BeforeMouseScroll.class, ScreenMouseEvents.AllowMouseScroll.class, callback -> {
+            return (screen, mouseX, mouseY, horizontalAmount, verticalAmount) -> {
+                return callback.onBeforeMouseScroll(screen, mouseX, mouseY, horizontalAmount, verticalAmount).isPass();
+            };
+        }, ScreenMouseEvents::allowMouseScroll);
+        registerScreenEvent(MouseScreenEvents.AfterMouseScroll.class, ScreenMouseEvents.AfterMouseScroll.class, callback -> {
+            return callback::onAfterMouseScroll;
+        }, ScreenMouseEvents::afterMouseScroll);
+        INSTANCE.register(RenderGuiElementEvents.Before.class, (context, invoker) -> {
+            invoker.accept(FabricClientEvents.beforeRenderGuiElement((ResourceLocation) context));
+        });
+        INSTANCE.register(RenderGuiElementEvents.After.class, (context, invoker) -> {
+            invoker.accept(FabricClientEvents.afterRenderGuiElement((ResourceLocation) context));
+        });
+    }
+
+    private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> event, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
+        INSTANCE.register(clazz, event, converter, (context, invoker) -> {
+            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+                if (((Class<?>) context).isInstance(screen)) {
+                    invoker.accept(eventGetter.apply(screen));
+                }
+            });
+        });
     }
 }

@@ -18,10 +18,22 @@ public interface EventInvoker<T> {
      * Retrieves the actually implemented event from the mod loader-specific subproject.
      *
      * @param clazz event type
-     * @param <T> event type
+     * @param <T>   event type
      * @return mod loader-specific invoker, will throw an exception is none is present
      */
     static <T> EventInvoker<T> lookup(Class<T> clazz) {
+        return lookup(clazz, null);
+    }
+
+    /**
+     * Retrieves the actually implemented event from the mod loader-specific subproject.
+     *
+     * @param clazz   event type
+     * @param context additional context for the event invoker to look up, like a screen class for screen events
+     * @param <T>     event type
+     * @return mod loader-specific invoker, will throw an exception is none is present
+     */
+    static <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
         // due to static initializers the invoker might not be present in the lookup just yet, so use memoization instead
         return new EventInvoker<>() {
             @Nullable
@@ -30,7 +42,7 @@ public interface EventInvoker<T> {
             @Override
             public void register(EventPhase phase, T callback) {
                 if (this.invoker == null) {
-                    this.invoker = CommonFactories.INSTANCE.getEventInvoker(clazz);
+                    this.invoker = CommonFactories.INSTANCE.getEventInvoker(clazz, context);
                 }
                 this.invoker.register(phase, callback);
             }

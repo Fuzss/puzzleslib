@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 
 public class ValueDefaultedInt extends ValueMutableInt implements DefaultedInt {
     private final int defaultValue;
+    private boolean dirty;
 
     public ValueDefaultedInt(int value) {
         super(value);
@@ -11,7 +12,18 @@ public class ValueDefaultedInt extends ValueMutableInt implements DefaultedInt {
     }
 
     @Override
+    public void accept(int value) {
+        this.dirty = true;
+        super.accept(value);
+    }
+
+    @Override
     public int getAsDefaultInt() {
         return this.defaultValue;
+    }
+
+    @Override
+    public boolean markedDirty() {
+        return this.dirty;
     }
 }

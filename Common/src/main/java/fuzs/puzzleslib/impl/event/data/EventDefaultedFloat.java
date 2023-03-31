@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 public class EventDefaultedFloat extends EventMutableFloat implements DefaultedFloat {
     private final Supplier<Float> defaultSupplier;
+    private boolean dirty;
 
     public EventDefaultedFloat(Consumer<Float> consumer, Supplier<Float> supplier, Supplier<Float> defaultSupplier) {
         super(consumer, supplier);
@@ -14,7 +15,18 @@ public class EventDefaultedFloat extends EventMutableFloat implements DefaultedF
     }
 
     @Override
+    public void accept(float value) {
+        this.dirty = true;
+        super.accept(value);
+    }
+
+    @Override
     public float getAsDefaultFloat() {
         return this.defaultSupplier.get();
+    }
+
+    @Override
+    public boolean markedDirty() {
+        return this.dirty;
     }
 }

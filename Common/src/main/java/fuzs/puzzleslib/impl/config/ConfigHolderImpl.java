@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.config;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
@@ -18,7 +18,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     private final String modId;
-    private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = new MapMaker().weakKeys().makeMap();
+    private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = Maps.newIdentityHashMap();
 
     protected ConfigHolderImpl(String modId) {
         this.modId = modId;

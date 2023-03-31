@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
@@ -10,13 +10,14 @@ import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
 public abstract class ModContext {
-    private static final Map<String, ModContext> CONTEXTS = new MapMaker().weakKeys().makeMap();
+    private static final Map<String, ModContext> CONTEXTS = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
     final String modId;
     private final Set<Buildable> buildables = Sets.newHashSet();

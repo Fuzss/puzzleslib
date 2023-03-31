@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
 import fuzs.puzzleslib.impl.init.ForgeGameRulesFactory;
 import fuzs.puzzleslib.impl.init.PotionBrewingRegistryForge;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -47,7 +48,7 @@ public final class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public <T> EventInvoker<T> getEventInvoker(Class<T> clazz) {
-        return ForgeEventInvokerRegistryImpl.INSTANCE.lookup(clazz);
+    public <T> EventInvoker<T> getEventInvoker(Class<T> clazz, @Nullable Object context) {
+        return ForgeEventInvokerRegistryImpl.INSTANCE.lookup(clazz, context);
     }
 }

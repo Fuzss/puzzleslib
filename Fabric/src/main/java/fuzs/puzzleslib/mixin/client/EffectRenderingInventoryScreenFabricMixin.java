@@ -44,15 +44,15 @@ abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractConta
         if (result.isInterrupt()) callback.cancel();
     }
 
-    @ModifyVariable(method = "renderEffects", at = @At("STORE"), ordinal = 0)
+    @ModifyVariable(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), ordinal = 0)
     private boolean renderEffects$1(boolean fullSize) {
         Objects.requireNonNull(this.puzzleslib$smallWidgets, "full size rendering is null");
-        fullSize = this.puzzleslib$smallWidgets.getAsOptionalBoolean().orElse(fullSize);
+        fullSize = this.puzzleslib$smallWidgets.getAsOptionalBoolean().map(t -> !t).orElse(fullSize);
         this.puzzleslib$smallWidgets = null;
         return fullSize;
     }
 
-    @ModifyVariable(method = "renderEffects", at = @At("STORE"), ordinal = 2)
+    @ModifyVariable(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), ordinal = 2)
     private int renderEffects$2(int horizontalOffset) {
         Objects.requireNonNull(this.puzzleslib$horizontalOffset, "horizontal offset is null");
         horizontalOffset = this.puzzleslib$horizontalOffset.getAsOptionalInt().orElse(horizontalOffset);

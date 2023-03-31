@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 public class EventDefaultedBoolean extends EventMutableBoolean implements DefaultedBoolean {
     private final Supplier<Boolean> defaultSupplier;
+    private boolean dirty;
 
     public EventDefaultedBoolean(Consumer<Boolean> consumer, Supplier<Boolean> supplier, Supplier<Boolean> defaultSupplier) {
         super(consumer, supplier);
@@ -14,7 +15,18 @@ public class EventDefaultedBoolean extends EventMutableBoolean implements Defaul
     }
 
     @Override
+    public void accept(boolean value) {
+        this.dirty = true;
+        super.accept(value);
+    }
+
+    @Override
     public boolean getAsDefaultBoolean() {
         return this.defaultSupplier.get();
+    }
+
+    @Override
+    public boolean markedDirty() {
+        return this.dirty;
     }
 }

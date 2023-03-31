@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 public class EventDefaultedValue<T> extends EventMutableValue<T> implements DefaultedValue<T> {
     private final Supplier<T> defaultSupplier;
+    private boolean dirty;
 
     public EventDefaultedValue(Consumer<T> consumer, Supplier<T> supplier, Supplier<T> defaultSupplier) {
         super(consumer, supplier);
@@ -14,7 +15,18 @@ public class EventDefaultedValue<T> extends EventMutableValue<T> implements Defa
     }
 
     @Override
+    public void accept(T value) {
+        this.dirty = true;
+        super.accept(value);
+    }
+
+    @Override
     public T getAsDefault() {
         return this.defaultSupplier.get();
+    }
+
+    @Override
+    public boolean markedDirty() {
+        return this.dirty;
     }
 }

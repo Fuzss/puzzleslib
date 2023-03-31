@@ -7,6 +7,7 @@ import java.util.function.DoubleSupplier;
 
 public class EventDefaultedDouble extends EventMutableDouble implements DefaultedDouble {
     private final DoubleSupplier defaultSupplier;
+    private boolean dirty;
 
     public EventDefaultedDouble(DoubleConsumer consumer, DoubleSupplier supplier, DoubleSupplier defaultSupplier) {
         super(consumer, supplier);
@@ -14,7 +15,18 @@ public class EventDefaultedDouble extends EventMutableDouble implements Defaulte
     }
 
     @Override
+    public void accept(double value) {
+        this.dirty = true;
+        super.accept(value);
+    }
+
+    @Override
     public double getAsDefaultDouble() {
         return this.defaultSupplier.getAsDouble();
+    }
+
+    @Override
+    public boolean markedDirty() {
+        return this.dirty;
     }
 }

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.*;
@@ -11,6 +11,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
+import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.ItemStack;
@@ -28,14 +29,16 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
     public static final ForgeEventInvokerRegistryImpl INSTANCE = new ForgeEventInvokerRegistryImpl();
-    private static final Map<Class<?>, EventInvoker<?>> EVENT_INVOKER_LOOKUP = new MapMaker().weakKeys().makeMap();
+    private static final Map<Class<?>, EventInvokerLike<?>> EVENT_INVOKER_LOOKUP = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
     static {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
@@ -214,7 +217,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onTagsUpdated(evt.getRegistryAccess(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
         });
         INSTANCE.register(ExplosionEvents.Start.class, ExplosionEvent.Start.class, (ExplosionEvents.Start callback, ExplosionEvent.Start evt) -> {
-            if (callback.onExplosionStart(evt.getLevel(), evt.getExplosion()).isInterrupt()) evt.setCanceled(true);
+            if (callback.onExplosionStart(evt.getLevel(), evt.getExplosion()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         INSTANCE.register(ExplosionEvents.Detonate.class, ExplosionEvent.Detonate.class, (ExplosionEvents.Detonate callback, ExplosionEvent.Detonate evt) -> {
             callback.onExplosionDetonate(evt.getLevel(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
@@ -225,9 +230,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
     }
 
     @SuppressWarnings("unchecked")
-    public <T> EventInvoker<T> lookup(Class<T> clazz) {
+    public <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
         Objects.requireNonNull(clazz, "type is null");
-        EventInvoker<T> invoker = (EventInvoker<T>) EVENT_INVOKER_LOOKUP.get(clazz);
+        EventInvokerLike<T> invokerLike = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
+        Objects.requireNonNull(invokerLike, "invoker for type %s is null or has been called without context".formatted(clazz));
+        EventInvoker<T> invoker = invokerLike.asEventInvoker(context);
         Objects.requireNonNull(invoker, "invoker for type %s is null".formatted(clazz));
         return invoker;
     }
@@ -245,13 +252,16 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         } else {
             eventBus = MinecraftForge.EVENT_BUS;
         }
-        EventInvoker<T> invoker = new ForgeEventInvoker<>(eventBus, event, converter);
+        register(clazz, new ForgeEventInvoker<>(eventBus, event, converter));
+    }
+
+    private static <T> void register(Class<T> clazz, EventInvokerLike<T> invoker) {
         if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null) {
             throw new IllegalArgumentException("duplicate event invoker for type %s".formatted(clazz));
         }
     }
 
-    private record ForgeEventInvoker<T, E extends Event>(IEventBus eventBus, Class<E> event, BiConsumer<T, E> converter) implements EventInvoker<T> {
+    private record ForgeEventInvoker<T, E extends Event>(IEventBus eventBus, Class<E> event, BiConsumer<T, E> converter) implements EventInvoker<T>, EventInvokerLike<T> {
         private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = ImmutableMap.<EventPhase, EventPriority>builder().put(EventPhase.FIRST, EventPriority.HIGHEST).put(EventPhase.BEFORE, EventPriority.HIGH).put(EventPhase.DEFAULT, EventPriority.NORMAL).put(EventPhase.AFTER, EventPriority.LOW).put(EventPhase.LAST, EventPriority.LOWEST).build();
 
         @Override
@@ -260,6 +270,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             Objects.requireNonNull(callback, "callback is null");
             EventPriority eventPriority = PHASE_TO_PRIORITY.getOrDefault(phase, EventPriority.NORMAL);
             this.eventBus.addListener(eventPriority, false, this.event, (E evt) -> this.converter.accept(callback, evt));
+        }
+
+        @Override
+        public EventInvoker<T> asEventInvoker(@Nullable Object context) {
+            return this;
         }
     }
 }

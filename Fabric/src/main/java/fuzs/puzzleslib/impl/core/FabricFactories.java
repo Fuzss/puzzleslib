@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.impl.init.FabricGameRulesFactory;
 import fuzs.puzzleslib.impl.init.PotionBrewingRegistryFabric;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
@@ -47,7 +48,7 @@ public final class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public <T> EventInvoker<T> getEventInvoker(Class<T> clazz) {
-        return FabricEventInvokerRegistryImpl.INSTANCE.lookup(clazz);
+    public <T> EventInvoker<T> getEventInvoker(Class<T> clazz, @Nullable Object context) {
+        return FabricEventInvokerRegistryImpl.INSTANCE.lookup(clazz, context);
     }
 }

@@ -3,6 +3,8 @@ package fuzs.puzzleslib.api.event.v1.core;
 import fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl;
 import net.fabricmc.fabric.api.event.Event;
 
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -38,4 +40,10 @@ public interface FabricEventInvokerRegistry {
      * @param <E> Fabric event type
      */
     <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter);
+
+    default <T> void register(Class<T> clazz, BiConsumer<Object, Consumer<Event<T>>> consumer) {
+        this.register(clazz, clazz, Function.identity(), consumer);
+    }
+
+    <T, E> void register(Class<T> clazz, Class<E> event, Function<T, E> converter, BiConsumer<Object, Consumer<Event<E>>> consumer);
 }

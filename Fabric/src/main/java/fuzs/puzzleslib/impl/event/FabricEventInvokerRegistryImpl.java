@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
@@ -12,6 +14,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
+import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
@@ -39,11 +42,13 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
     public static final FabricEventInvokerRegistryImpl INSTANCE = new FabricEventInvokerRegistryImpl();
-    private static final Map<Class<?>, EventInvoker<?>> EVENT_INVOKER_LOOKUP = new MapMaker().weakKeys().makeMap();
+    private static final Map<Class<?>, EventInvokerLike<?>> EVENT_INVOKER_LOOKUP = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
     static {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
@@ -132,9 +137,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     @SuppressWarnings("unchecked")
-    public <T> EventInvoker<T> lookup(Class<T> clazz) {
+    public <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
         Objects.requireNonNull(clazz, "type is null");
-        EventInvoker<T> invoker = (EventInvoker<T>) EVENT_INVOKER_LOOKUP.get(clazz);
+        EventInvokerLike<T> invokerLike = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
+        Objects.requireNonNull(invokerLike, "invoker for type %s is null or has been called without context".formatted(clazz));
+        EventInvoker<T> invoker = invokerLike.asEventInvoker(context);
         Objects.requireNonNull(invoker, "invoker for type %s is null".formatted(clazz));
         return invoker;
     }
@@ -144,16 +151,33 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(event, "event is null");
         Objects.requireNonNull(converter, "converter is null");
-        EventInvoker<T> invoker = new FabricEventInvoker<>(event, converter);
+        register(clazz, new FabricEventInvoker<>(event, converter));
+    }
+
+    @Override
+    public <T, E> void register(Class<T> clazz, Class<E> event, Function<T, E> converter, BiConsumer<Object, Consumer<Event<E>>> consumer) {
+        Objects.requireNonNull(clazz, "type is null");
+        Objects.requireNonNull(event, "event type is null");
+        Objects.requireNonNull(converter, "converter is null");
+        Objects.requireNonNull(consumer, "consumer is null");
+        register(clazz, new FabricForwardingEventInvoker<>(converter, consumer));
+    }
+
+    private static <T> void register(Class<T> clazz, EventInvokerLike<T> invoker) {
         if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null) {
             throw new IllegalArgumentException("duplicate event invoker for type %s".formatted(clazz));
         }
     }
 
-    private record FabricEventInvoker<T, E>(Event<E> event, Function<T, E> converter, Set<EventPhase> knownEventPhases) implements EventInvoker<T> {
+    private record FabricEventInvoker<T, E>(Event<E> event, Function<T, E> converter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerLike<T> {
 
         public FabricEventInvoker(Event<E> event, Function<T, E> converter) {
-            this(event, converter, Collections.newSetFromMap(new MapMaker().weakKeys().makeMap()));
+            this(event, converter, Collections.synchronizedSet(Sets.newIdentityHashSet()));
+        }
+
+        @Override
+        public EventInvoker<T> asEventInvoker(@Nullable Object context) {
+            return this;
         }
 
         @Override
@@ -164,7 +188,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             if (phase.parent() == null) {
                 this.event.register(this.converter.apply(callback));
             } else {
-                // make sure phase has a phase ordering, we keep track of phases we have already added an ordering for in this event in #knownEventPhases
+                // make sure phase has consumer phase ordering, we keep track of phases we have already added an ordering for in this event in #knownEventPhases
                 this.testEventPhase(phase);
                 this.event.register(phase.identifier(), this.converter.apply(callback));
             }
@@ -177,12 +201,29 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 stack.push(phase);
                 phase = phase.parent();
             }
-            // add a phase ordering for all parents in reverse order until we reach the phase we want to add
+            // add consumer phase ordering for all parents in reverse order until we reach the phase we want to add
             while (!stack.isEmpty()) {
                 phase = stack.pop();
                 phase.applyOrdering(this.event::addPhaseOrdering);
                 this.knownEventPhases.add(phase);
             }
+        }
+    }
+
+    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, BiConsumer<Object, Consumer<Event<E>>> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerLike<T> {
+
+        public FabricForwardingEventInvoker(Function<T, E> converter, BiConsumer<Object, Consumer<Event<E>>> consumer) {
+            this(event -> new FabricEventInvoker<>(event, converter), consumer, new MapMaker().weakKeys().makeMap());
+        }
+
+        @Override
+        public EventInvoker<T> asEventInvoker(Object context) {
+            Objects.requireNonNull(context, "context is null");
+            return (EventPhase phase, T callback) -> {
+                this.consumer.accept(context, event -> {
+                    this.events.computeIfAbsent(event, this.factory).register(phase, callback);
+                });
+            };
         }
     }
 }

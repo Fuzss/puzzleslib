@@ -18,7 +18,6 @@
     "LootItemRandomChanceWithLootingConditionFabricMixin",
     "PackRepositoryFabricMixin",
     "PlayerFabricMixin",
-    "ServerLevelFabricMixin",
     "accessor.BuiltInPackSourceAccessor",
     "accessor.PackRepositoryFabricAccessor"
   ],
@@ -28,6 +27,7 @@
     "client.EffectRenderingInventoryScreenFabricMixin",
     "client.EntityRendererFabricMixin",
     "client.GameRendererFabricMixin",
+    "client.GuiFabricMixin",
     "client.ItemRendererFabricMixin",
     "client.MinecraftFabricMixin",
     "client.ModelManagerFabricMixin",

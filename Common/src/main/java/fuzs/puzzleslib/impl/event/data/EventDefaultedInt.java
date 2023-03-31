@@ -7,6 +7,7 @@ import java.util.function.IntSupplier;
 
 public class EventDefaultedInt extends EventMutableInt implements DefaultedInt {
     private final IntSupplier defaultSupplier;
+    private boolean dirty;
 
     public EventDefaultedInt(IntConsumer consumer, IntSupplier supplier, IntSupplier defaultSupplier) {
         super(consumer, supplier);
@@ -14,7 +15,18 @@ public class EventDefaultedInt extends EventMutableInt implements DefaultedInt {
     }
 
     @Override
+    public void accept(int value) {
+        this.dirty = true;
+        super.accept(value);
+    }
+
+    @Override
     public int getAsDefaultInt() {
         return this.defaultSupplier.getAsInt();
+    }
+
+    @Override
+    public boolean markedDirty() {
+        return this.dirty;
     }
 }
