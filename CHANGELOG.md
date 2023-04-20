@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.4.0-1.19.2] - 2023-04-20
+- Public release for all new features added since v4.3.12
+
 ## [v4.3.44-1.19.2] - 2023-02-27
 ### Fixed
 - Actually implement new events accepting enqueued work haha
