@@ -34,6 +34,8 @@
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",
     "client.ModelManagerFabricMixin",
+    "client.MouseHandlerFabricMixin",
+    "client.ScreenMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.MinecraftFabricAccessor"

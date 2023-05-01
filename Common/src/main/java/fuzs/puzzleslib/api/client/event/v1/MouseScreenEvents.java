@@ -30,8 +30,8 @@ public final class MouseScreenEvents {
          * Called before a mouse has scrolled on a screen.
          *
          * @param screen           the screen the mouse is scrolling on
-         * @param mouseX           x position of the mouse cursor
-         * @param mouseY           y position of the mouse cursor
+         * @param mouseX           x-position of the mouse cursor
+         * @param mouseY           y-position of the mouse cursor
          * @param horizontalAmount horizontal scroll amount
          * @param verticalAmount   vertical scroll amount
          * @return {@link EventResult#INTERRUPT} for marking the scroll event as handled, it will not be passed to other listeners and vanilla behavior will not run,
@@ -46,8 +46,9 @@ public final class MouseScreenEvents {
         /**
          * Called after a mouse has scrolled on a screen.
          *
-         * @param mouseX           x position of the mouse cursor
-         * @param mouseY           y position of the mouse cursor
+         * @param screen           the screen the mouse is scrolling on
+         * @param mouseX           x-position of the mouse cursor
+         * @param mouseY           y-position of the mouse cursor
          * @param horizontalAmount horizontal scroll amount
          * @param verticalAmount   vertical scroll amount
          */
