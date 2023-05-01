@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
 import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -159,9 +160,19 @@ public interface ClientModConstructor {
 
     /**
      * @param context adds a listener to the client resource manager to reload at the end of all resources
+     *
+     * @deprecated migrate to {@link #onRegisterResourcePackReloadListeners(AddReloadListenersContext)}
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterClientReloadListeners(final ClientReloadListenersContext context) {
 
+    }
+
+    /**
+     * @param context adds a listener to the client resource manager to reload at the end of all resources
+     */
+    default void onRegisterResourcePackReloadListeners(final AddReloadListenersContext context) {
+        this.onRegisterClientReloadListeners(context::registerReloadListener);
     }
 
     /**

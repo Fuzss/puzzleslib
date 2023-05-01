@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
-import net.minecraft.server.packs.repository.RepositorySource;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Supplier;
@@ -111,6 +110,13 @@ public interface ModConstructor {
      * @param context register additional data pack sources
      */
     default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
+
+    }
+
+    /**
+     * @param context adds a listener to the server resource manager to reload at the end of all resources
+     */
+    default void onRegisterDataPackReloadListeners(final AddReloadListenersContext context) {
 
     }
 }

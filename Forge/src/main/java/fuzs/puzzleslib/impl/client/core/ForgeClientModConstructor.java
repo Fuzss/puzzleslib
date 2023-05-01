@@ -356,7 +356,7 @@ public class ForgeClientModConstructor {
 
     @SubscribeEvent
     public void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent evt) {
-        this.constructor.onRegisterClientReloadListeners((String id, PreparableReloadListener reloadListener) -> {
+        this.constructor.onRegisterResourcePackReloadListeners((String id, PreparableReloadListener reloadListener) -> {
             Objects.requireNonNull(id, "reload listener id is null");
             Objects.requireNonNull(reloadListener, "reload listener is null");
             evt.registerReloadListener(reloadListener);

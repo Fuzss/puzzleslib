@@ -68,12 +68,33 @@ public interface ModLoaderEnvironment {
     /**
      * @return main minecraft game dir
      */
-    Path getGameDir();
+    @Deprecated(forRemoval = true)
+    default Path getGameDir() {
+        return this.getGameDirectory();
+    }
+
+    /**
+     * @return the minecraft game directory (<code>.minecraft</code> for clients, otherwise the server directory)
+     */
+    Path getGameDirectory();
+
+    /**
+     * @return <code>mods</code> directory for all installed mod jars inside the game directory
+     */
+    Path getModsDirectory();
 
     /**
      * @return config dir within game dir
      */
-    Path getConfigDir();
+    @Deprecated(forRemoval = true)
+    default Path getConfigDir() {
+        return this.getConfigDirectory();
+    }
+
+    /**
+     * @return <code>config</code> directory inside the game directory
+     */
+    Path getConfigDirectory();
 
     /**
      * Finds a resource in a mod jar file.

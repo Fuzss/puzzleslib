@@ -212,7 +212,7 @@ public class JsonConfigFileUtil {
      * @return file
      */
     public static File getConfigPath(String jsonName) {
-        return ModLoaderEnvironment.INSTANCE.getConfigDir().resolve(jsonName).toFile();
+        return ModLoaderEnvironment.INSTANCE.getConfigDirectory().resolve(jsonName).toFile();
     }
 
     /**
@@ -222,6 +222,6 @@ public class JsonConfigFileUtil {
      * @return file
      */
     public static File getSpecialConfigPath(String jsonName, String modId) {
-        return ModLoaderEnvironment.INSTANCE.getConfigDir().resolve(modId).resolve(jsonName).toFile();
+        return ModLoaderEnvironment.INSTANCE.getConfigDirectory().resolve(modId).resolve(jsonName).toFile();
     }
 }

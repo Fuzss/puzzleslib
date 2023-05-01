@@ -38,7 +38,7 @@ public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
     static final Marker CONFIG = MarkerFactory.getMarker("CONFIG");
     private static final Logger LOGGER = LogUtils.getLogger();
     static final ConfigFileTypeHandler TOML = new ForgeConfigFileTypeHandler();
-    private static final Path DEFAULT_CONFIGS_PATH = ModLoaderEnvironment.INSTANCE.getGameDir().resolve(FMLConfig.defaultConfigPath());
+    private static final Path DEFAULT_CONFIGS_PATH = ModLoaderEnvironment.INSTANCE.getGameDirectory().resolve(FMLConfig.defaultConfigPath());
 
     // Puzzles Lib: custom method from Forge Config API Port to better handle config loading when a ParsingException occurs
     private static void tryLoadConfigFile(FileConfig configData) {
@@ -61,7 +61,7 @@ public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
     public Function<ModConfig, CommentedFileConfig> reader(Path configBasePath) {
         return (c) -> {
             // Puzzles Lib: make server configs global
-            final Path configPath = ModLoaderEnvironment.INSTANCE.getConfigDir().resolve(c.getFileName());
+            final Path configPath = ModLoaderEnvironment.INSTANCE.getConfigDirectory().resolve(c.getFileName());
             final CommentedFileConfig configData = CommentedFileConfig.builder(configPath).sync().preserveInsertionOrder().autosave().onFileNotFound((newfile, configFormat) -> this.setupConfigFile(c, newfile, configFormat)).writingMode(WritingMode.REPLACE).build();
             LOGGER.debug(CONFIG, "Built TOML config for {}", configPath);
             try {
@@ -84,7 +84,7 @@ public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
     @Override
     public void unload(Path configBasePath, ModConfig config) {
         // Puzzles Lib: make server configs global
-        final Path configPath = ModLoaderEnvironment.INSTANCE.getConfigDir().resolve(config.getFileName());
+        final Path configPath = ModLoaderEnvironment.INSTANCE.getConfigDirectory().resolve(config.getFileName());
         try {
             FileWatcher.defaultInstance().removeWatch(configPath);
         } catch (RuntimeException e) {

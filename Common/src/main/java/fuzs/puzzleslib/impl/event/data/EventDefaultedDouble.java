@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.event.data;
 
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
 
+import java.util.OptionalDouble;
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
 
@@ -26,7 +27,7 @@ public class EventDefaultedDouble extends EventMutableDouble implements Defaulte
     }
 
     @Override
-    public boolean markedDirty() {
-        return this.dirty;
+    public OptionalDouble getAsOptionalDouble() {
+        return this.dirty ? OptionalDouble.of(this.getAsDouble()) : OptionalDouble.empty();
     }
 }

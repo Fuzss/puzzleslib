@@ -13,6 +13,8 @@ import java.util.Objects;
  * Events originally found on Forge in the <code>net.minecraftforge.client.event</code> package.
  */
 public final class FabricClientEvents {
+    private static final Map<String, Event<RenderGuiElementEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
+    private static final Map<String, Event<RenderGuiElementEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
     /**
      * Fires before the name tag of an entity is tried to be rendered, in addition to preventing the name tag from rendering, rendering can also be forced.
      */
@@ -22,8 +24,10 @@ public final class FabricClientEvents {
      * but also changes for certain actions such as when drawing a bow.
      */
     public static final Event<ComputeFovModifierCallback> COMPUTE_FOV_MODIFIER = FabricEventFactory.createResult(ComputeFovModifierCallback.class);
-    private static final Map<String, Event<RenderGuiElementEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
-    private static final Map<String, Event<RenderGuiElementEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
+    /**
+     * Called before the chat panel is drawn, allows for changing x- and y-position.
+     */
+    public static final Event<CustomizeChatPanelCallback> CUSTOMIZE_CHAT_PANEL = FabricEventFactory.create(CustomizeChatPanelCallback.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

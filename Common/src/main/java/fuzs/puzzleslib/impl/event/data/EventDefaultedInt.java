@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.event.data;
 
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 
+import java.util.OptionalInt;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 
@@ -26,7 +27,7 @@ public class EventDefaultedInt extends EventMutableInt implements DefaultedInt {
     }
 
     @Override
-    public boolean markedDirty() {
-        return this.dirty;
+    public OptionalInt getAsOptionalInt() {
+        return this.dirty ? OptionalInt.of(this.getAsInt()) : OptionalInt.empty();
     }
 }

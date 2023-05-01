@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
+import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
@@ -40,7 +41,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
         constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
         registerBuiltinModelItemRenderers(constructor::onRegisterBuiltinModelItemRenderers, modId);
-        constructor.onRegisterClientReloadListeners(new ClientReloadListenersContextFabricImpl(modId));
+        constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.CLIENT_RESOURCES, modId));
         constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
         constructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
         constructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());

@@ -14,6 +14,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.RepositorySource;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -28,6 +29,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
@@ -150,6 +152,21 @@ public class ForgeModConstructor {
         });
     }
 
+    public void onAddReloadListenerEvent(final AddReloadListenerEvent evt) {
+        this.constructor.onRegisterDataPackReloadListeners((String id, PreparableReloadListener reloadListener) -> {
+            Objects.requireNonNull(id, "reload listener id is null");
+            Objects.requireNonNull(reloadListener, "reload listener is null");
+            evt.addListener(reloadListener);
+        });
+    }
+
+    public void onFurnaceFuelBurnTime(final FurnaceFuelBurnTimeEvent evt) {
+        Item item = evt.getItemStack().getItem();
+        if (this.fuelBurnTimes.containsKey(item)) {
+            evt.setBurnTime(this.fuelBurnTimes.getInt(item));
+        }
+    }
+
     /**
      * construct the mod, calling all necessary registration methods
      * we don't need the object, it's only important for being registered to the necessary events buses
@@ -165,12 +182,8 @@ public class ForgeModConstructor {
         eventBus.register(forgeModConstructor);
         // we need to manually register events for the normal event bus
         // as you cannot have both event bus types going through SubscribeEvent annotated methods in the same class
-        MinecraftForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
-            Item item = evt.getItemStack().getItem();
-            if (forgeModConstructor.fuelBurnTimes.containsKey(item)) {
-                evt.setBurnTime(forgeModConstructor.fuelBurnTimes.getInt(item));
-            }
-        });
+        MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onAddReloadListenerEvent);
+        MinecraftForge.EVENT_BUS.addListener(forgeModConstructor::onFurnaceFuelBurnTime);
         if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOMES)) {
             BiomeLoadingHandler.register(modId, eventBus, forgeModConstructor.biomeLoadingEntries);
         }

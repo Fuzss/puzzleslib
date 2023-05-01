@@ -5,13 +5,17 @@ import fuzs.puzzleslib.api.client.event.v1.MouseScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.RenderGuiElementEvents;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
 import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
+import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.animal.Sheep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +37,15 @@ public class PuzzlesLib implements ModConstructor {
         MouseScreenEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
             return EventResult.INTERRUPT;
         });
+        MouseScreenEvents.beforeMouseScroll(TitleScreen.class).register((TitleScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+            return EventResult.INTERRUPT;
+        });
+        MouseScreenEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+            return EventResult.INTERRUPT;
+        });
+        MouseScreenEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+            return EventResult.INTERRUPT;
+        });
         RenderGuiElementEvents.before(RenderGuiElementEvents.POTION_ICONS).register((poseStack, screenWidth, screenHeight) -> {
             return EventResult.INTERRUPT;
         });
@@ -42,6 +55,15 @@ public class PuzzlesLib implements ModConstructor {
         });
         ExplosionEvents.START.register((level, explosion) -> {
             return EventResult.INTERRUPT;
+        });
+        EntityLevelEvents.LOAD.register((entity, level, spawnType) -> {
+            if (entity instanceof Sheep) {
+                LOGGER.info("spawning sheep with reason {}", spawnType);
+                if (spawnType == MobSpawnType.SPAWN_EGG) {
+                    return EventResult.INTERRUPT;
+                }
+            }
+            return EventResult.PASS;
         });
     }
 

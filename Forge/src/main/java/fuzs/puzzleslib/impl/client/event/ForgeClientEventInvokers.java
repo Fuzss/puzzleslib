@@ -6,10 +6,13 @@ import fuzs.puzzleslib.api.event.v1.data.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.Event;
 
@@ -73,6 +76,39 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (ScreenEvents.AfterInit callback, ScreenEvent.Init.Post evt) -> {
             List<AbstractWidget> widgets = evt.getListenersList().stream().filter(listener -> listener instanceof AbstractWidget).map(listener -> (AbstractWidget) listener).toList();
             callback.onAfterInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, widgets, evt::addListener, evt::removeListener);
+        });
+        // TODO implement this properly
+//        INSTANCE.register(MouseScreenEvents.BeforeMouseScroll.class, ScreenEvent.MouseScrolled.Pre.class, (callback, evt) -> {
+//            EventResult result = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDelta(), evt.getScrollDelta());
+//            if (result.isInterrupt()) evt.setCanceled(true);
+//        }, (Object context, Runnable applyToInvoker, Runnable removeInvoker) -> {
+//            MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ScreenEvent.Init.Pre.class, (final ScreenEvent.Init.Pre evt) -> {
+//                if (((Class<?>) context).isInstance(evt.getScreen())) {
+//                    applyToInvoker.run();
+//                    // lowest priority since screen closing / remove callback is also implemented this way and won't run if this is called before
+////                    MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, ScreenEvent.Init.Pre.class, (final ScreenEvent.Closing evt1) -> {
+////                        if (evt.getScreen() == evt1.getScreen()) {
+////                            removeInvoker.run();
+//////                            MinecraftForge.EVENT_BUS.unregister();
+////                        }
+////                    });
+//                }
+//            });
+//        });
+        INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {
+            MutableInt posX = MutableInt.fromEvent(evt::setPosX, evt::getPosX);
+            MutableInt posY = MutableInt.fromEvent(evt::setPosY, evt::getPosY);
+            callback.onRenderChatPanel(evt.getWindow(), evt.getPoseStack(), evt.getPartialTick(), posX, posY);
+        });
+        INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
+            if (!evt.getLevel().isClientSide) return;
+            if (callback.onLoad(evt.getEntity(), (ClientLevel) evt.getLevel()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
+            if (!evt.getLevel().isClientSide) return;
+            callback.onUnload(evt.getEntity(), (ClientLevel) evt.getLevel());
         });
     }
 }

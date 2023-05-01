@@ -43,20 +43,11 @@ public interface DefaultedBoolean extends MutableBoolean {
     boolean getAsDefaultBoolean();
 
     /**
-     * A flag keeping track if the mutable value has changed at least once from calling {@link #accept}.
-     *
-     * @return has the value changed at least once
-     */
-    boolean markedDirty();
-
-    /**
      * An optional getter for the contained value which will return empty if the value has not changed from the default value (determined via reference comparison).
      *
      * @return container value as optional
      */
-    default Optional<Boolean> getAsOptionalBoolean() {
-        return this.markedDirty() ? Optional.of(this.getAsBoolean()) : Optional.empty();
-    }
+    Optional<Boolean> getAsOptionalBoolean();
 
     /**
      * Applies to default value to this instance.

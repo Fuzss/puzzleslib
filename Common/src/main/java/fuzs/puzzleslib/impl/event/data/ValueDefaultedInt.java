@@ -2,6 +2,8 @@ package fuzs.puzzleslib.impl.event.data;
 
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 
+import java.util.OptionalInt;
+
 public class ValueDefaultedInt extends ValueMutableInt implements DefaultedInt {
     private final int defaultValue;
     private boolean dirty;
@@ -23,7 +25,7 @@ public class ValueDefaultedInt extends ValueMutableInt implements DefaultedInt {
     }
 
     @Override
-    public boolean markedDirty() {
-        return this.dirty;
+    public OptionalInt getAsOptionalInt() {
+        return this.dirty ? OptionalInt.of(this.getAsInt()) : OptionalInt.empty();
     }
 }

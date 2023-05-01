@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
@@ -18,12 +19,15 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -42,8 +46,6 @@ import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
@@ -131,6 +133,33 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(ExplosionEvents.Start.class, FabricLevelEvents.EXPLOSION_START);
         INSTANCE.register(ExplosionEvents.Detonate.class, FabricLevelEvents.EXPLOSION_DETONATE);
+        INSTANCE.register(SyncDataPackContentsCallback.class, ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS, callback -> {
+            return callback::onSyncDataPackContents;
+        });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
+            return callback::onServerStarting;
+        });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
+            return callback::onServerStarted;
+        });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping.class, ServerLifecycleEvents.SERVER_STOPPING, callback -> {
+            return callback::onServerStopping;
+        });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped.class, ServerLifecycleEvents.SERVER_STOPPED, callback -> {
+            return callback::onServerStopped;
+        });
+        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricEvents.PLAY_LEVEL_SOUND_AT_POSITION);
+        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
+        INSTANCE.register(EntityLevelEvents.Load.class, ServerEntityEvents.ENTITY_LOAD, callback -> {
+            return (Entity entity, ServerLevel world) -> {
+                if (callback.onLoad(entity, world, entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
+                    entity.setRemoved(Entity.RemovalReason.DISCARDED);
+                }
+            };
+        });
+        INSTANCE.register(EntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
+            return callback::onUnload;
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }
@@ -140,7 +169,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     public <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
         Objects.requireNonNull(clazz, "type is null");
         EventInvokerLike<T> invokerLike = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
-        Objects.requireNonNull(invokerLike, "invoker for type %s is null or has been called without context".formatted(clazz));
+        Objects.requireNonNull(invokerLike, "invoker for type %s is null".formatted(clazz));
         EventInvoker<T> invoker = invokerLike.asEventInvoker(context);
         Objects.requireNonNull(invoker, "invoker for type %s is null".formatted(clazz));
         return invoker;
@@ -155,9 +184,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     @Override
-    public <T, E> void register(Class<T> clazz, Class<E> event, Function<T, E> converter, BiConsumer<Object, Consumer<Event<E>>> consumer) {
+    public <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer) {
         Objects.requireNonNull(clazz, "type is null");
-        Objects.requireNonNull(event, "event type is null");
+        Objects.requireNonNull(eventType, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
         Objects.requireNonNull(consumer, "consumer is null");
         register(clazz, new FabricForwardingEventInvoker<>(converter, consumer));
@@ -210,9 +239,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
     }
 
-    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, BiConsumer<Object, Consumer<Event<E>>> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerLike<T> {
+    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerLike<T> {
 
-        public FabricForwardingEventInvoker(Function<T, E> converter, BiConsumer<Object, Consumer<Event<E>>> consumer) {
+        public FabricForwardingEventInvoker(Function<T, E> converter, FabricEventContextConsumer<E> consumer) {
             this(event -> new FabricEventInvoker<>(event, converter), consumer, new MapMaker().weakKeys().makeMap());
         }
 
@@ -222,7 +251,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (EventPhase phase, T callback) -> {
                 this.consumer.accept(context, event -> {
                     this.events.computeIfAbsent(event, this.factory).register(phase, callback);
-                });
+                }, this.events::remove);
             };
         }
     }

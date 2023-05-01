@@ -2,6 +2,8 @@ package fuzs.puzzleslib.impl.event.data;
 
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 
+import java.util.Optional;
+
 public class ValueDefaultedFloat extends ValueMutableFloat implements DefaultedFloat {
     private final float defaultValue;
     private boolean dirty;
@@ -23,7 +25,7 @@ public class ValueDefaultedFloat extends ValueMutableFloat implements DefaultedF
     }
 
     @Override
-    public boolean markedDirty() {
-        return this.dirty;
+    public Optional<Float> getAsOptionalFloat() {
+        return this.dirty ? Optional.of(this.getAsFloat()) : Optional.empty();
     }
 }

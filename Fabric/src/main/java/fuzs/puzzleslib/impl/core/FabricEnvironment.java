@@ -18,7 +18,7 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
 
     @Override
     public ModLoader getModLoader() {
-        return ModLoader.FABRIC;
+        return FabricLoader.getInstance().isModLoaded("quilt_loader") ? ModLoader.QUILT : ModLoader.FABRIC;
     }
 
     @Override
@@ -27,12 +27,17 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
-    public Path getGameDir() {
+    public Path getGameDirectory() {
         return FabricLoader.getInstance().getGameDir();
     }
 
     @Override
-    public Path getConfigDir() {
+    public Path getModsDirectory() {
+        return FabricLoader.getInstance().getGameDir().resolve("mods");
+    }
+
+    @Override
+    public Path getConfigDirectory() {
         return FabricLoader.getInstance().getConfigDir();
     }
 

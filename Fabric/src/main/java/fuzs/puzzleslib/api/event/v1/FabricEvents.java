@@ -21,4 +21,12 @@ public final class FabricEvents {
      * Called before a result item is generated from the two input slots in an anvil in {@link AnvilMenu#createResult()}.
      */
     public static final Event<AnvilUpdateCallback> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilUpdateCallback.class);
+    /**
+     * Called when a sound event is played at a specific position in the world, allows for cancelling the sound.
+     */
+    public static final Event<PlayLevelSoundEvents.AtPosition> PLAY_LEVEL_SOUND_AT_POSITION = FabricEventFactory.createResult(PlayLevelSoundEvents.AtPosition.class);
+    /**
+     * Called when a sound event is played at a specific entity, allows for cancelling the sound.
+     */
+    public static final Event<PlayLevelSoundEvents.AtEntity> PLAY_LEVEL_SOUND_AT_ENTITY = FabricEventFactory.createResult(PlayLevelSoundEvents.AtEntity.class);
 }

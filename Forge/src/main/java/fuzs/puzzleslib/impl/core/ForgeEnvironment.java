@@ -32,19 +32,25 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
-    public Path getGameDir() {
+    public Path getGameDirectory() {
         return FMLPaths.GAMEDIR.get();
     }
 
     @Override
-    public Path getConfigDir() {
+    public Path getModsDirectory() {
+        return FMLPaths.MODSDIR.get();
+    }
+
+    @Override
+    public Path getConfigDirectory() {
         return FMLPaths.CONFIGDIR.get();
     }
 
     @Override
     public Optional<Path> findModResource(String id, String... pathName) {
-        Objects.requireNonNull(ModList.get(), "mod list is null");
-        return Optional.of(ModList.get().getModFileById(id).getFile().findResource(pathName)).filter(Files::exists);
+        ModList modList = ModList.get();
+        Objects.requireNonNull(modList, "mod list is null");
+        return Optional.of(modList.getModFileById(id).getFile().findResource(pathName)).filter(Files::exists);
     }
 
     @Override
@@ -54,8 +60,9 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isModLoaded(String modId) {
-        Objects.requireNonNull(ModList.get(), "mod list is null");
-        return ModList.get().isLoaded(modId);
+        ModList modList = ModList.get();
+        Objects.requireNonNull(modList, "mod list is null");
+        return modList.isLoaded(modId);
     }
 
     @Override
@@ -66,7 +73,8 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public Optional<String> getModName(String modId) {
-        Objects.requireNonNull(ModList.get(), "mod list is null");
-        return ModList.get().getModContainerById(modId).map(ModContainer::getModInfo).map(IModInfo::getDisplayName);
+        ModList modList = ModList.get();
+        Objects.requireNonNull(modList, "mod list is null");
+        return modList.getModContainerById(modId).map(ModContainer::getModInfo).map(IModInfo::getDisplayName);
     }
 }

@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.core;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.impl.core.context.*;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.entity.SpawnPlacements;
 
 public final class FabricModConstructor {
@@ -22,5 +23,6 @@ public final class FabricModConstructor {
         constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
         constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
+        constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.SERVER_DATA, modId));
     }
 }

@@ -43,20 +43,11 @@ public interface DefaultedDouble extends MutableDouble {
     double getAsDefaultDouble();
 
     /**
-     * A flag keeping track if the mutable value has changed at least once from calling {@link #accept}.
-     *
-     * @return has the value changed at least once
-     */
-    boolean markedDirty();
-
-    /**
      * An optional getter for the contained value which will return empty if the value has not changed from the default value (determined via reference comparison).
      *
      * @return container value as optional
      */
-    default OptionalDouble getAsOptionalDouble() {
-        return this.markedDirty() ? OptionalDouble.of(this.getAsDouble()) : OptionalDouble.empty();
-    }
+    OptionalDouble getAsOptionalDouble();
 
     /**
      * Applies to default value to this instance.

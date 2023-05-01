@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.event.data;
 
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -26,7 +27,7 @@ public class EventDefaultedValue<T> extends EventMutableValue<T> implements Defa
     }
 
     @Override
-    public boolean markedDirty() {
-        return this.dirty;
+    public Optional<T> getAsOptional() {
+        return this.dirty ? Optional.of(this.get()) : Optional.empty();
     }
 }

@@ -8,7 +8,10 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
  * <p>(the resource manager uses a list for keeping track, so it's pretty safe to assume it'll load after vanilla,
  * Fabric has a very limited way of setting some sort of resource dependencies,
  * but they don't work for most stuff and Forge doesn't have them anyway)
+ *
+ * @deprecated migrate to {@link fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext}
  */
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface ClientReloadListenersContext {
 
