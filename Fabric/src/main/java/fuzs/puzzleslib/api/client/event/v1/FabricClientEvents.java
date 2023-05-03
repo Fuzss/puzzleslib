@@ -28,6 +28,30 @@ public final class FabricClientEvents {
      * Called before the chat panel is drawn, allows for changing x- and y-position.
      */
     public static final Event<CustomizeChatPanelCallback> CUSTOMIZE_CHAT_PANEL = FabricEventFactory.create(CustomizeChatPanelCallback.class);
+    /**
+     * Called before a mouse button is pressed without a screen being open.
+     */
+    public static final Event<InputEvents.BeforeMouseClick> BEFORE_MOUSE_CLICK = FabricEventFactory.createResult(InputEvents.BeforeMouseClick.class);
+    /**
+     * Called after a mouse button is pressed without a screen being open.
+     */
+    public static final Event<InputEvents.AfterMouseClick> AFTER_MOUSE_CLICK = FabricEventFactory.create(InputEvents.AfterMouseClick.class);
+    /**
+     * Called before a mouse click has released without a screen being open.
+     */
+    public static final Event<InputEvents.BeforeMouseRelease> BEFORE_MOUSE_RELEASE = FabricEventFactory.createResult(InputEvents.BeforeMouseRelease.class);
+    /**
+     * Called after a mouse click has released without a screen being open.
+     */
+    public static final Event<InputEvents.AfterMouseRelease> AFTER_MOUSE_RELEASE = FabricEventFactory.create(InputEvents.AfterMouseRelease.class);
+    /**
+     * Called before a mouse has scrolled without a screen being open.
+     */
+    public static final Event<InputEvents.BeforeMouseScroll> BEFORE_MOUSE_SCROLL = FabricEventFactory.createResult(InputEvents.BeforeMouseScroll.class);
+    /**
+     * Called after a mouse has scrolled without a screen being open.
+     */
+    public static final Event<InputEvents.AfterMouseScroll> AFTER_MOUSE_SCROLL = FabricEventFactory.create(InputEvents.AfterMouseScroll.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

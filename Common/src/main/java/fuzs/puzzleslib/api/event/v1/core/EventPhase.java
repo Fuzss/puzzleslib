@@ -8,7 +8,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.function.BiConsumer;
 
 /**
- * Event phases useful for handling net.fabricmc.fabric.api.event.Event on Fabric, equivalent to net.minecraftforge.eventbus.api.EventPriority on Forge.
+ * Event phases useful for handling <code>net.fabricmc.fabric.api.event.Event</code> on Fabric, equivalent to <code>net.minecraftforge.eventbus.api.EventPriority</code> on Forge.
  */
 @ApiStatus.NonExtendable
 public interface EventPhase {

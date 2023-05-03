@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.impl;
 
+import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.event.v1.InventoryMobEffectsCallback;
-import fuzs.puzzleslib.api.client.event.v1.MouseScreenEvents;
+import fuzs.puzzleslib.api.client.event.v1.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.RenderGuiElementEvents;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -34,16 +35,16 @@ public class PuzzlesLib implements ModConstructor {
     @Override
     public void onConstructMod() {
         // TODO remove test code
-        MouseScreenEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+        ScreenMouseEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
             return EventResult.INTERRUPT;
         });
-        MouseScreenEvents.beforeMouseScroll(TitleScreen.class).register((TitleScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+        ScreenMouseEvents.beforeMouseScroll(TitleScreen.class).register((TitleScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
             return EventResult.INTERRUPT;
         });
-        MouseScreenEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+        ScreenMouseEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
             return EventResult.INTERRUPT;
         });
-        MouseScreenEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
+        ScreenMouseEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
             return EventResult.INTERRUPT;
         });
         RenderGuiElementEvents.before(RenderGuiElementEvents.POTION_ICONS).register((poseStack, screenWidth, screenHeight) -> {
@@ -64,6 +65,9 @@ public class PuzzlesLib implements ModConstructor {
                 }
             }
             return EventResult.PASS;
+        });
+        InputEvents.BEFORE_MOUSE_SCROLL.register((leftDown, middleDown, rightDown, horizontalAmount, verticalAmount) -> {
+            return EventResult.INTERRUPT;
         });
     }
 

@@ -41,8 +41,6 @@ public interface FabricEventInvokerRegistry {
      */
     <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter);
 
-    // TODO check this all works correctly
-
     /**
      * Registers an event that uses the same type in both common and Fabric subprojects and depends on a certain context.
      * <p>See {@link FabricEventFactory} for easily creating dedicated Fabric events from common event implementations to use here.
@@ -81,6 +79,8 @@ public interface FabricEventInvokerRegistry {
     interface FabricEventContextConsumer<E> {
 
         /**
+         * Runs the consumer.
+         *
          * @param context        the context object, can be anything, but ideally an identifier such as a {@link Class} or {@link net.minecraft.resources.ResourceLocation}
          * @param applyToInvoker a consumer that runs immediately upon event invoker creation, responsible for registering the actual event to run whenever it is triggered
          * @param removeInvoker  an action for internally discarding the {@link EventInvoker} created in <code>applyToInvoker</code> that can be scheduled,

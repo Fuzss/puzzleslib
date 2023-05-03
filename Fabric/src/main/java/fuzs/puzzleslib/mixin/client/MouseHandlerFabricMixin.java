@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import fuzs.puzzleslib.api.client.event.v1.ExtraScreenMouseEvents;
+import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
@@ -12,6 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Objects;
+
 // run before Mouse Tweaks mod
 @Mixin(value = MouseHandler.class, priority = 900)
 abstract class MouseHandlerFabricMixin {
@@ -19,9 +22,65 @@ abstract class MouseHandlerFabricMixin {
     @Final
     private Minecraft minecraft;
     @Shadow
+    private double xpos;
+    @Shadow
+    private double ypos;
+    @Shadow
     private int activeButton;
     @Unique
     private Screen puzzleslib$currentScreen;
+    @Unique
+    private Double puzzleslib$verticalScrollAmount;
+    @Unique
+    private Double puzzleslib$horizontalScrollAmount;
+
+    @Inject(method = "onPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;"), cancellable = true)
+    private void onPress$0(long windowPointer, int button, int action, int modifiers, CallbackInfo callback) {
+        boolean cancel;
+        if (action == 1) {
+            cancel = FabricClientEvents.BEFORE_MOUSE_CLICK.invoker().onBeforeMouseClick(button, modifiers).isInterrupt();
+        } else {
+            cancel = FabricClientEvents.BEFORE_MOUSE_RELEASE.invoker().onBeforeMouseRelease(button, modifiers).isInterrupt();
+        }
+        if (cancel) callback.cancel();
+    }
+
+    @Inject(method = "onPress", at = @At("TAIL"))
+    private void onPress$1(long windowPointer, int button, int action, int modifiers, CallbackInfo callback) {
+        if (windowPointer == Minecraft.getInstance().getWindow().getWindow()) {
+            if (action == 1) {
+                FabricClientEvents.AFTER_MOUSE_CLICK.invoker().onAfterMouseClick(button, modifiers);
+            } else {
+                FabricClientEvents.AFTER_MOUSE_RELEASE.invoker().onAfterMouseRelease(button, modifiers);
+            }
+        }
+    }
+
+    @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z", shift = At.Shift.BEFORE), cancellable = true)
+    private void onScroll$0(long windowPointer, double xOffset, double yOffset, CallbackInfo callback) {
+        // just recalculate this instead of capturing local, shouldn't be able to change in the meantime
+        this.puzzleslib$verticalScrollAmount = this.minecraft.options.discreteMouseScroll().get() ? Math.signum(yOffset) : yOffset * this.minecraft.options.mouseWheelSensitivity().get();
+        // apply same calculations to horizontal scroll as vertical scroll amount has
+        this.puzzleslib$horizontalScrollAmount = this.minecraft.options.discreteMouseScroll().get() ? Math.signum(xOffset) : xOffset * this.minecraft.options.mouseWheelSensitivity().get();
+        if (FabricClientEvents.BEFORE_MOUSE_SCROLL.invoker().onBeforeMouseScroll(this.isLeftPressed(), this.isMiddlePressed(), this.isRightPressed(), this.puzzleslib$horizontalScrollAmount, this.puzzleslib$verticalScrollAmount).isInterrupt()) {
+            this.puzzleslib$verticalScrollAmount = null;
+            this.puzzleslib$horizontalScrollAmount = null;
+            callback.cancel();
+        }
+    }
+
+    @Inject(method = "onScroll", at = @At("TAIL"))
+    private void onScroll$1(long windowPointer, double xOffset, double yOffset, CallbackInfo callback) {
+        if (windowPointer == Minecraft.getInstance().getWindow().getWindow() && this.minecraft.getOverlay() == null) {
+            if (this.minecraft.screen == null && this.minecraft.player != null) {
+                Objects.requireNonNull(this.puzzleslib$verticalScrollAmount, "vertical scroll amount is null");
+                Objects.requireNonNull(this.puzzleslib$horizontalScrollAmount, "horizontal scroll amount is null");
+                FabricClientEvents.AFTER_MOUSE_SCROLL.invoker().onAfterMouseScroll(this.isLeftPressed(), this.isMiddlePressed(), this.isRightPressed(), this.puzzleslib$horizontalScrollAmount, this.puzzleslib$verticalScrollAmount);
+                this.puzzleslib$verticalScrollAmount = null;
+                this.puzzleslib$horizontalScrollAmount = null;
+            }
+        }
+    }
 
     @SuppressWarnings("target")
     @Inject(method = "method_1602(Lnet/minecraft/client/gui/screens/Screen;DDDD)V", at = @At("HEAD"), cancellable = true)
@@ -54,4 +113,13 @@ abstract class MouseHandlerFabricMixin {
         ExtraScreenMouseEvents.afterMouseDrag(this.puzzleslib$currentScreen).invoker().afterMouseDrag(this.puzzleslib$currentScreen, mouseX, mouseY, this.activeButton, dragX, dragY);
         this.puzzleslib$currentScreen = null;
     }
+
+    @Shadow
+    public abstract boolean isLeftPressed();
+
+    @Shadow
+    public abstract boolean isMiddlePressed();
+
+    @Shadow
+    public abstract boolean isRightPressed();
 }

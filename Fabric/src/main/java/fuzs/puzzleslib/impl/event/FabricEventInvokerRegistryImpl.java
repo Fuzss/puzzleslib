@@ -43,6 +43,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -206,6 +207,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
         @Override
         public EventInvoker<T> asEventInvoker(@Nullable Object context) {
+            if (context != null) throw new IllegalStateException("context must be null");
             return this;
         }
 
@@ -246,8 +248,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
 
         @Override
-        public EventInvoker<T> asEventInvoker(Object context) {
+        public EventInvoker<T> asEventInvoker(@NotNull Object context) {
             Objects.requireNonNull(context, "context is null");
+            // keeping track of events and corresponding invoker is not so important since there is only ever one event per context anyway which is guaranteed by the underlying implementation
+            // but for managing event phases it becomes necessary to use our FabricEventInvoker to keep track
             return (EventPhase phase, T callback) -> {
                 this.consumer.accept(context, event -> {
                     this.events.computeIfAbsent(event, this.factory).register(phase, callback);

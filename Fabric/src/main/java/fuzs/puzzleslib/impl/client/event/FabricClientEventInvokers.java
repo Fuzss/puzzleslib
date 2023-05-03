@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
@@ -20,6 +19,7 @@ import java.util.function.Function;
 
 import static fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl.INSTANCE;
 
+@SuppressWarnings("unchecked")
 public final class FabricClientEventInvokers {
 
     public static void register() {
@@ -56,15 +56,63 @@ public final class FabricClientEventInvokers {
                 callback.onAfterInit(client, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
             };
         });
-        // TODO expand screen events
-        registerScreenEvent(MouseScreenEvents.BeforeMouseScroll.class, ScreenMouseEvents.AllowMouseScroll.class, callback -> {
+        registerScreenEvent(ScreenEvents.Remove.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.Remove.class, callback -> {
+            return callback::onRemove;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::remove);
+        registerScreenEvent(ScreenEvents.BeforeRender.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BeforeRender.class, callback -> {
+            return callback::onBeforeRender;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::beforeRender);
+        registerScreenEvent(ScreenEvents.AfterRender.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterRender.class, callback -> {
+            return callback::onAfterRender;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterRender);
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseClick.class, callback -> {
+            return (screen, mouseX, mouseY, button) -> {
+                return callback.onBeforeMouseClick(screen, mouseX, mouseY, button).isPass();
+            };
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseClick);
+        registerScreenEvent(ScreenMouseEvents.AfterMouseClick.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseClick.class, callback -> {
+            return callback::onAfterMouseClick;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseClick);
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseRelease.class, callback -> {
+            return (screen, mouseX, mouseY, button) -> {
+                return callback.onBeforeMouseRelease(screen, mouseX, mouseY, button).isPass();
+            };
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseRelease);
+        registerScreenEvent(ScreenMouseEvents.AfterMouseRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseRelease.class, callback -> {
+            return callback::onAfterMouseRelease;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseRelease);
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseScroll.class, callback -> {
             return (screen, mouseX, mouseY, horizontalAmount, verticalAmount) -> {
                 return callback.onBeforeMouseScroll(screen, mouseX, mouseY, horizontalAmount, verticalAmount).isPass();
             };
-        }, ScreenMouseEvents::allowMouseScroll);
-        registerScreenEvent(MouseScreenEvents.AfterMouseScroll.class, ScreenMouseEvents.AfterMouseScroll.class, callback -> {
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseScroll);
+        registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseScroll.class, callback -> {
             return callback::onAfterMouseScroll;
-        }, ScreenMouseEvents::afterMouseScroll);
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseScroll);
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ExtraScreenMouseEvents.AllowMouseDrag.class, callback -> {
+            return (screen, mouseX, mouseY, button, dragX, dragY) -> {
+                return callback.onBeforeMouseDrag(screen, mouseX, mouseY, button, dragX, dragY).isPass();
+            };
+        }, ExtraScreenMouseEvents::allowMouseDrag);
+        registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, ExtraScreenMouseEvents.AfterMouseDrag.class, callback -> {
+            return callback::onAfterMouseDrag;
+        }, ExtraScreenMouseEvents::afterMouseDrag);
+        registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowKeyPress.class, callback -> {
+            return (screen, key, scancode, modifiers) -> {
+                return callback.onBeforeKeyPress(screen, key, scancode, modifiers).isPass();
+            };
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowKeyPress);
+        registerScreenEvent(ScreenKeyboardEvents.AfterKeyPress.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AfterKeyPress.class, callback -> {
+            return callback::onAfterKeyPress;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyPress);
+        registerScreenEvent(ScreenKeyboardEvents.BeforeKeyRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowKeyRelease.class, callback -> {
+            return (screen, key, scancode, modifiers) -> {
+                return callback.onBeforeKeyRelease(screen, key, scancode, modifiers).isPass();
+            };
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowKeyRelease);
+        registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AfterKeyRelease.class, callback -> {
+            return callback::onAfterKeyRelease;
+        }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
         INSTANCE.register(RenderGuiElementEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
             applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement((ResourceLocation) context));
         });
@@ -82,6 +130,12 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onUnload;
         });
+        INSTANCE.register(InputEvents.BeforeMouseClick.class, FabricClientEvents.BEFORE_MOUSE_CLICK);
+        INSTANCE.register(InputEvents.AfterMouseClick.class, FabricClientEvents.AFTER_MOUSE_CLICK);
+        INSTANCE.register(InputEvents.BeforeMouseRelease.class, FabricClientEvents.BEFORE_MOUSE_RELEASE);
+        INSTANCE.register(InputEvents.AfterMouseRelease.class, FabricClientEvents.AFTER_MOUSE_RELEASE);
+        INSTANCE.register(InputEvents.BeforeMouseScroll.class, FabricClientEvents.BEFORE_MOUSE_SCROLL);
+        INSTANCE.register(InputEvents.AfterMouseScroll.class, FabricClientEvents.AFTER_MOUSE_SCROLL);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
@@ -90,7 +144,7 @@ public final class FabricClientEventInvokers {
                 if (((Class<?>) context).isInstance(screen)) {
                     Event<E> event = eventGetter.apply(screen);
                     applyToInvoker.accept(event);
-                    // TODO use LAST event phase
+                    // TODO is it ok to run this during the normal phase?
                     net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.remove(screen).register($ -> {
                         removeInvoker.accept(event);
                     });

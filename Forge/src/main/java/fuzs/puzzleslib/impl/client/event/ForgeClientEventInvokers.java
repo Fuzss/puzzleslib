@@ -110,5 +110,34 @@ public final class ForgeClientEventInvokers {
             if (!evt.getLevel().isClientSide) return;
             callback.onUnload(evt.getEntity(), (ClientLevel) evt.getLevel());
         });
+        INSTANCE.register(InputEvents.BeforeMouseClick.class, InputEvent.MouseButton.Pre.class, (InputEvents.BeforeMouseClick callback, InputEvent.MouseButton.Pre evt) -> {
+            if (evt.getAction() != 1) return;
+            if (callback.onBeforeMouseClick(evt.getButton(), evt.getModifiers()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(InputEvents.AfterMouseClick.class, InputEvent.MouseButton.Post.class, (InputEvents.AfterMouseClick callback, InputEvent.MouseButton.Post evt) -> {
+            if (evt.getAction() != 1) return;
+            callback.onAfterMouseClick(evt.getButton(), evt.getModifiers());
+        });
+        INSTANCE.register(InputEvents.BeforeMouseRelease.class, InputEvent.MouseButton.Pre.class, (InputEvents.BeforeMouseRelease callback, InputEvent.MouseButton.Pre evt) -> {
+            if (evt.getAction() == 1) return;
+            if (callback.onBeforeMouseRelease(evt.getButton(), evt.getModifiers()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(InputEvents.AfterMouseRelease.class, InputEvent.MouseButton.Post.class, (InputEvents.AfterMouseRelease callback, InputEvent.MouseButton.Post evt) -> {
+            if (evt.getAction() == 1) return;
+            callback.onAfterMouseRelease(evt.getButton(), evt.getModifiers());
+        });
+        INSTANCE.register(InputEvents.BeforeMouseScroll.class, InputEvent.MouseScrollingEvent.class, (InputEvents.BeforeMouseScroll callback, InputEvent.MouseScrollingEvent evt) -> {
+            if (callback.onBeforeMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDelta(), evt.getScrollDelta()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(InputEvents.AfterMouseScroll.class, InputEvent.MouseScrollingEvent.class, (InputEvents.AfterMouseScroll callback, InputEvent.MouseScrollingEvent evt) -> {
+            // Forge doesn't have this, but shouldn't be important really
+            callback.onAfterMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDelta(), evt.getScrollDelta());
+        });
     }
 }
