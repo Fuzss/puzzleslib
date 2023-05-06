@@ -12,9 +12,6 @@ import java.util.function.Function;
  * <p>See {@link FabricEventFactory} for easily creating dedicated Fabric events from common event implementations.
  */
 public interface FabricEventInvokerRegistry {
-    /**
-     * the instance
-     */
     FabricEventInvokerRegistry INSTANCE = FabricEventInvokerRegistryImpl.INSTANCE;
 
     /**

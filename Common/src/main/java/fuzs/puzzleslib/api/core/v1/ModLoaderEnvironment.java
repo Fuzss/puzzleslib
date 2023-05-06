@@ -4,12 +4,9 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 /**
- * easy access to various mod loader methods and fields for forge
+ * Common access to various mod loader methods and fields.
  */
 public interface ModLoaderEnvironment {
-    /**
-     * instance of the mod loader environment SPI
-     */
     ModLoaderEnvironment INSTANCE = ServiceProviderHelper.load(ModLoaderEnvironment.class);
 
     /**
@@ -127,10 +124,15 @@ public interface ModLoaderEnvironment {
     }
 
     /**
-     * Finds the display name associated with a certain <code>modId</code>
+     * Finds the display name associated with a certain <code>modId</code>.
      *
      * @param modId the mod id
      * @return the corresponding display name
      */
     Optional<String> getModName(String modId);
+
+    /**
+     * @return a wrapper for Fabric's object share, will return a dummy wrapper on Forge
+     */
+    ObjectShareAccess getObjectShareAccess();
 }

@@ -140,12 +140,13 @@ public final class RenderGuiElementEvents {
          * Called before a gui element is rendered, allows for cancelling rendering.
          *
          * @param poseStack    the pose stack
+         * @param tickDelta    partial tick time
          * @param screenWidth  width of the window's screen
          * @param screenHeight height of the window's screen
          * @return {@link EventResult#INTERRUPT} to prevent the element from rendering,
          * {@link EventResult#PASS} to allow the element to render normally
          */
-        EventResult onBeforeRenderGuiElement(PoseStack poseStack, int screenWidth, int screenHeight);
+        EventResult onBeforeRenderGuiElement(PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
     }
 
     @FunctionalInterface
@@ -155,9 +156,10 @@ public final class RenderGuiElementEvents {
          * Called after a gui element is rendered.
          *
          * @param poseStack    the pose stack
+         * @param tickDelta    partial tick time
          * @param screenWidth  width of the window's screen
          * @param screenHeight height of the window's screen
          */
-        void onAfterRenderGuiElement(PoseStack poseStack, int screenWidth, int screenHeight);
+        void onAfterRenderGuiElement(PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
     }
 }

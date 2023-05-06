@@ -34,7 +34,7 @@ abstract class MouseHandlerFabricMixin {
     @Unique
     private Double puzzleslib$horizontalScrollAmount;
 
-    @Inject(method = "onPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;"), cancellable = true)
+    @Inject(method = "onPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0), cancellable = true)
     private void onPress$0(long windowPointer, int button, int action, int modifiers, CallbackInfo callback) {
         boolean cancel;
         if (action == 1) {

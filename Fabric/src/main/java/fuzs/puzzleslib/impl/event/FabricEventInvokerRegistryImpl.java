@@ -207,7 +207,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
         @Override
         public EventInvoker<T> asEventInvoker(@Nullable Object context) {
-            if (context != null) throw new IllegalStateException("context must be null");
+            if (context != null) {
+                throw new IllegalStateException("context must be null");
+            }
             return this;
         }
 

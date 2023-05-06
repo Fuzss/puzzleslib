@@ -10,6 +10,7 @@ import net.minecraft.client.gui.GuiComponent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -23,9 +24,16 @@ public abstract class GuiFabricMixin extends GuiComponent {
     private int screenWidth;
     @Shadow
     private int screenHeight;
+    @Unique
+    private float puzzleslib$partialTick;
+
+    @Inject(method = "render", at = @At("HEAD"))
+    public void render$0(PoseStack poseStack, float partialTick, CallbackInfo callback) {
+        this.puzzleslib$partialTick = partialTick;
+    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;III)V"))
-    public void render(PoseStack poseStack, float partialTick, CallbackInfo callback) {
+    public void render$1(PoseStack poseStack, float partialTick, CallbackInfo callback) {
         DefaultedInt posX = DefaultedInt.fromValue(0);
         DefaultedInt posY = DefaultedInt.fromValue(this.screenHeight - 48);
         FabricClientEvents.CUSTOMIZE_CHAT_PANEL.invoker().onRenderChatPanel(this.minecraft.getWindow(), poseStack, partialTick, posX, posY);
@@ -36,13 +44,13 @@ public abstract class GuiFabricMixin extends GuiComponent {
 
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     protected void renderEffects$0(PoseStack poseStack, CallbackInfo callback) {
-        if (FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.POTION_ICONS).invoker().onBeforeRenderGuiElement(poseStack, this.screenWidth, this.screenHeight).isInterrupt()) {
+        if (FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.POTION_ICONS).invoker().onBeforeRenderGuiElement(poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt()) {
             callback.cancel();
         }
     }
 
     @Inject(method = "renderEffects", at = @At("TAIL"))
     protected void renderEffects$1(PoseStack poseStack, CallbackInfo callback) {
-        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.POTION_ICONS).invoker().onAfterRenderGuiElement(poseStack, this.screenWidth, this.screenHeight);
+        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.POTION_ICONS).invoker().onAfterRenderGuiElement(poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 }

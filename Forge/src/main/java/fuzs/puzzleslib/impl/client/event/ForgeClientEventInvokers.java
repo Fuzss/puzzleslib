@@ -17,9 +17,12 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.BiConsumer;
 
 import static fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl.INSTANCE;
 
+@SuppressWarnings("unchecked")
 public final class ForgeClientEventInvokers {
 
     public static void register() {
@@ -77,24 +80,68 @@ public final class ForgeClientEventInvokers {
             List<AbstractWidget> widgets = evt.getListenersList().stream().filter(listener -> listener instanceof AbstractWidget).map(listener -> (AbstractWidget) listener).toList();
             callback.onAfterInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, widgets, evt::addListener, evt::removeListener);
         });
-        // TODO implement this properly
-//        INSTANCE.register(MouseScreenEvents.BeforeMouseScroll.class, ScreenEvent.MouseScrolled.Pre.class, (callback, evt) -> {
-//            EventResult result = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDelta(), evt.getScrollDelta());
-//            if (result.isInterrupt()) evt.setCanceled(true);
-//        }, (Object context, Runnable applyToInvoker, Runnable removeInvoker) -> {
-//            MinecraftForge.EVENT_BUS.addListener(EventPriority.NORMAL, false, ScreenEvent.Init.Pre.class, (final ScreenEvent.Init.Pre evt) -> {
-//                if (((Class<?>) context).isInstance(evt.getScreen())) {
-//                    applyToInvoker.run();
-//                    // lowest priority since screen closing / remove callback is also implemented this way and won't run if this is called before
-////                    MinecraftForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, ScreenEvent.Init.Pre.class, (final ScreenEvent.Closing evt1) -> {
-////                        if (evt.getScreen() == evt1.getScreen()) {
-////                            removeInvoker.run();
-//////                            MinecraftForge.EVENT_BUS.unregister();
-////                        }
-////                    });
-//                }
-//            });
-//        });
+        registerScreenEvent(ScreenEvents.Remove.class, ScreenEvent.Closing.class, (callback, evt) -> {
+            callback.onRemove(evt.getScreen());
+        });
+        registerScreenEvent(ScreenEvents.BeforeRender.class, ScreenEvent.Render.Pre.class, (callback, evt) -> {
+            callback.onBeforeRender(evt.getScreen(), evt.getPoseStack(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
+        });
+        registerScreenEvent(ScreenEvents.AfterRender.class, ScreenEvent.Render.Post.class, (callback, evt) -> {
+            callback.onAfterRender(evt.getScreen(), evt.getPoseStack(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
+        });
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class, ScreenEvent.MouseButtonPressed.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeMouseClick(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        registerScreenEvent(ScreenMouseEvents.AfterMouseClick.class, ScreenEvent.MouseButtonPressed.Post.class, (callback, evt) -> {
+            callback.onAfterMouseClick(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
+        });
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseRelease.class, ScreenEvent.MouseButtonReleased.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeMouseRelease(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        registerScreenEvent(ScreenMouseEvents.AfterMouseRelease.class, ScreenEvent.MouseButtonReleased.Post.class, (callback, evt) -> {
+            callback.onAfterMouseRelease(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
+        });
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class, ScreenEvent.MouseScrolled.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDelta(), evt.getScrollDelta());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class, ScreenEvent.MouseScrolled.Post.class, (callback, evt) -> {
+            callback.onAfterMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDelta(), evt.getScrollDelta());
+        });
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ScreenEvent.MouseDragged.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, ScreenEvent.MouseDragged.Post.class, (callback, evt) -> {
+            callback.onAfterMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
+        });
+        registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class, ScreenEvent.KeyPressed.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeKeyPress(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        registerScreenEvent(ScreenKeyboardEvents.AfterKeyPress.class, ScreenEvent.KeyPressed.Post.class, (callback, evt) -> {
+            callback.onAfterKeyPress(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
+        });
+        registerScreenEvent(ScreenKeyboardEvents.BeforeKeyRelease.class, ScreenEvent.KeyReleased.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, ScreenEvent.KeyReleased.Post.class, (callback, evt) -> {
+            callback.onAfterKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
+        });
+        INSTANCE.register(RenderGuiElementEvents.Before.class, RenderGuiOverlayEvent.Pre.class, (callback, evt, context) -> {
+            Objects.requireNonNull(context, "context is null");
+            if (!evt.getOverlay().id().equals(context)) return;
+            EventResult result = callback.onBeforeRenderGuiElement(evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderGuiElementEvents.After.class, RenderGuiOverlayEvent.Post.class, (callback, evt, context) -> {
+            Objects.requireNonNull(context, "context is null");
+            if (!evt.getOverlay().id().equals(context)) return;
+            callback.onAfterRenderGuiElement(evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+        });
         INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {
             MutableInt posX = MutableInt.fromEvent(evt::setPosX, evt::getPosX);
             MutableInt posY = MutableInt.fromEvent(evt::setPosY, evt::getPosY);
@@ -102,9 +149,8 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
-            if (callback.onLoad(evt.getEntity(), (ClientLevel) evt.getLevel()).isInterrupt()) {
-                evt.setCanceled(true);
-            }
+            EventResult result = callback.onLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
+            if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
@@ -138,6 +184,14 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(InputEvents.AfterMouseScroll.class, InputEvent.MouseScrollingEvent.class, (InputEvents.AfterMouseScroll callback, InputEvent.MouseScrollingEvent evt) -> {
             // Forge doesn't have this, but shouldn't be important really
             callback.onAfterMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDelta(), evt.getScrollDelta());
+        });
+    }
+
+    private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
+        INSTANCE.register(clazz, event, (callback, evt, context) -> {
+            Objects.requireNonNull(context, "context is null");
+            if (!((Class<?>) context).isInstance(evt.getScreen())) return;
+            converter.accept(callback, evt);
         });
     }
 }

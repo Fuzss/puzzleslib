@@ -47,7 +47,7 @@ public class PuzzlesLib implements ModConstructor {
         ScreenMouseEvents.beforeMouseScroll(SelectWorldScreen.class).register((SelectWorldScreen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
             return EventResult.INTERRUPT;
         });
-        RenderGuiElementEvents.before(RenderGuiElementEvents.POTION_ICONS).register((poseStack, screenWidth, screenHeight) -> {
+        RenderGuiElementEvents.before(RenderGuiElementEvents.POTION_ICONS).register((poseStack, tickDelta, screenWidth, screenHeight) -> {
             return EventResult.INTERRUPT;
         });
         InventoryMobEffectsCallback.EVENT.register((screen, availableSpace, smallWidgets, horizontalOffset) -> {
@@ -68,6 +68,10 @@ public class PuzzlesLib implements ModConstructor {
         });
         InputEvents.BEFORE_MOUSE_SCROLL.register((leftDown, middleDown, rightDown, horizontalAmount, verticalAmount) -> {
             return EventResult.INTERRUPT;
+        });
+        InputEvents.BEFORE_MOUSE_RELEASE.register((button, modifiers) -> {
+            LOGGER.info("clickyyyyy");
+            return EventResult.PASS;
         });
     }
 

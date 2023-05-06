@@ -9,12 +9,12 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import static fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl.INSTANCE;
@@ -114,14 +114,16 @@ public final class FabricClientEventInvokers {
             return callback::onAfterKeyRelease;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
         INSTANCE.register(RenderGuiElementEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
+            Objects.requireNonNull(context, "context is null");
             applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement((ResourceLocation) context));
         });
         INSTANCE.register(RenderGuiElementEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
+            Objects.requireNonNull(context, "context is null");
             applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement((ResourceLocation) context));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, ClientEntityEvents.ENTITY_LOAD, callback -> {
-            return (Entity entity, ClientLevel world) -> {
+            return (entity, world) -> {
                 if (callback.onLoad(entity, world).isInterrupt()) {
                     entity.setRemoved(Entity.RemovalReason.DISCARDED);
                 }
@@ -140,6 +142,7 @@ public final class FabricClientEventInvokers {
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
         INSTANCE.register(clazz, eventType, converter, (context, applyToInvoker, removeInvoker) -> {
+            Objects.requireNonNull(context, "context is null");
             net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
                 if (((Class<?>) context).isInstance(screen)) {
                     Event<E> event = eventGetter.apply(screen);

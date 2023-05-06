@@ -1,9 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.DistType;
-import fuzs.puzzleslib.api.core.v1.ForgeDistTypeConverter;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.*;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -16,9 +13,6 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * implementation of {@link ModLoaderEnvironment} for Forge
- */
 public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
@@ -76,5 +70,10 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
         ModList modList = ModList.get();
         Objects.requireNonNull(modList, "mod list is null");
         return modList.getModContainerById(modId).map(ModContainer::getModInfo).map(IModInfo::getDisplayName);
+    }
+
+    @Override
+    public ObjectShareAccess getObjectShareAccess() {
+        return ForgeObjectShareAccess.INSTANCE;
     }
 }

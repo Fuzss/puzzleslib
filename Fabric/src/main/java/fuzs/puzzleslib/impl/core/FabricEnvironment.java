@@ -1,9 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.DistType;
-import fuzs.puzzleslib.api.core.v1.FabricDistTypeConverter;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.*;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -11,9 +8,6 @@ import net.fabricmc.loader.api.metadata.ModMetadata;
 import java.nio.file.Path;
 import java.util.Optional;
 
-/**
- * implementation of {@link ModLoaderEnvironment} for Fabric
- */
 public final class FabricEnvironment implements ModLoaderEnvironment {
 
     @Override
@@ -59,5 +53,10 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     @Override
     public Optional<String> getModName(String modId) {
         return FabricLoader.getInstance().getModContainer(modId).map(ModContainer::getMetadata).map(ModMetadata::getName);
+    }
+
+    @Override
+    public ObjectShareAccess getObjectShareAccess() {
+        return FabricObjectShareAccess.INSTANCE;
     }
 }
