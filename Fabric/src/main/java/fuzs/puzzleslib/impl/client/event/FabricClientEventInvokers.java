@@ -132,26 +132,25 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onUnload;
         });
-        INSTANCE.register(InputEvents.BeforeMouseClick.class, FabricClientEvents.BEFORE_MOUSE_CLICK);
-        INSTANCE.register(InputEvents.AfterMouseClick.class, FabricClientEvents.AFTER_MOUSE_CLICK);
-        INSTANCE.register(InputEvents.BeforeMouseRelease.class, FabricClientEvents.BEFORE_MOUSE_RELEASE);
-        INSTANCE.register(InputEvents.AfterMouseRelease.class, FabricClientEvents.AFTER_MOUSE_RELEASE);
+        INSTANCE.register(InputEvents.BeforeMouseAction.class, FabricClientEvents.BEFORE_MOUSE_ACTION);
+        INSTANCE.register(InputEvents.AfterMouseAction.class, FabricClientEvents.AFTER_MOUSE_ACTION);
         INSTANCE.register(InputEvents.BeforeMouseScroll.class, FabricClientEvents.BEFORE_MOUSE_SCROLL);
         INSTANCE.register(InputEvents.AfterMouseScroll.class, FabricClientEvents.AFTER_MOUSE_SCROLL);
+        INSTANCE.register(InputEvents.BeforeKeyAction.class, FabricClientEvents.BEFORE_KEY_ACTION);
+        INSTANCE.register(InputEvents.AfterKeyAction.class, FabricClientEvents.AFTER_KEY_ACTION);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
         INSTANCE.register(clazz, eventType, converter, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
+            // we need to keep our own event invokers during the whole pre-init phase to guarantee phase ordering is applied correctly,
+            // since this is managed in the event invokers and there seems to be no way to handle it with just the Fabric event,
+            // so we register all screen events during pre-init, which allows post-init to already clear our internal map again
             net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-                if (((Class<?>) context).isInstance(screen)) {
-                    Event<E> event = eventGetter.apply(screen);
-                    applyToInvoker.accept(event);
-                    // TODO is it ok to run this during the normal phase?
-                    net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.remove(screen).register($ -> {
-                        removeInvoker.accept(event);
-                    });
-                }
+                if (((Class<?>) context).isInstance(screen)) applyToInvoker.accept(eventGetter.apply(screen));
+            });
+            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+                if (((Class<?>) context).isInstance(screen)) removeInvoker.accept(eventGetter.apply(screen));
             });
         });
     }

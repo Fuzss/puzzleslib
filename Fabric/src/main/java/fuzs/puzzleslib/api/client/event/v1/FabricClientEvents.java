@@ -29,21 +29,13 @@ public final class FabricClientEvents {
      */
     public static final Event<CustomizeChatPanelCallback> CUSTOMIZE_CHAT_PANEL = FabricEventFactory.create(CustomizeChatPanelCallback.class);
     /**
-     * Called before a mouse button is pressed without a screen being open.
+     * Called before a mouse button is clicked or released without a screen being open.
      */
-    public static final Event<InputEvents.BeforeMouseClick> BEFORE_MOUSE_CLICK = FabricEventFactory.createResult(InputEvents.BeforeMouseClick.class);
+    public static final Event<InputEvents.BeforeMouseAction> BEFORE_MOUSE_ACTION = FabricEventFactory.createResult(InputEvents.BeforeMouseAction.class);
     /**
-     * Called after a mouse button is pressed without a screen being open.
+     * Called after a mouse button is clicked or released without a screen being open.
      */
-    public static final Event<InputEvents.AfterMouseClick> AFTER_MOUSE_CLICK = FabricEventFactory.create(InputEvents.AfterMouseClick.class);
-    /**
-     * Called before a mouse click has released without a screen being open.
-     */
-    public static final Event<InputEvents.BeforeMouseRelease> BEFORE_MOUSE_RELEASE = FabricEventFactory.createResult(InputEvents.BeforeMouseRelease.class);
-    /**
-     * Called after a mouse click has released without a screen being open.
-     */
-    public static final Event<InputEvents.AfterMouseRelease> AFTER_MOUSE_RELEASE = FabricEventFactory.create(InputEvents.AfterMouseRelease.class);
+    public static final Event<InputEvents.AfterMouseAction> AFTER_MOUSE_ACTION = FabricEventFactory.create(InputEvents.AfterMouseAction.class);
     /**
      * Called before a mouse has scrolled without a screen being open.
      */
@@ -52,6 +44,14 @@ public final class FabricClientEvents {
      * Called after a mouse has scrolled without a screen being open.
      */
     public static final Event<InputEvents.AfterMouseScroll> AFTER_MOUSE_SCROLL = FabricEventFactory.create(InputEvents.AfterMouseScroll.class);
+    /**
+     * Called before a key press, release or repeat action is handled.
+     */
+    public static final Event<InputEvents.BeforeKeyAction> BEFORE_KEY_ACTION = FabricEventFactory.createResult(InputEvents.BeforeKeyAction.class);
+    /**
+     * Called after a key press, release or repeat action is handled.
+     */
+    public static final Event<InputEvents.AfterKeyAction> AFTER_KEY_ACTION = FabricEventFactory.create(InputEvents.AfterKeyAction.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

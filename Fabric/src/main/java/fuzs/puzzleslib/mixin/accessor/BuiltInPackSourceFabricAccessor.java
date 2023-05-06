@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(BuiltInPackSource.class)
-public interface BuiltInPackSourceAccessor {
+public interface BuiltInPackSourceFabricAccessor {
 
     @Accessor("packType")
     PackType puzzleslib$getPackType();

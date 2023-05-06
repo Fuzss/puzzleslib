@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
 import fuzs.puzzleslib.impl.event.DataPackFinderRegistryImpl;
-import fuzs.puzzleslib.mixin.accessor.BuiltInPackSourceAccessor;
+import fuzs.puzzleslib.mixin.accessor.BuiltInPackSourceFabricAccessor;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.repository.PackRepository;
@@ -28,7 +28,7 @@ abstract class PackRepositoryFabricMixin {
         boolean serverData = false;
         for (RepositorySource source : this.sources) {
             if (source instanceof BuiltInPackSource) {
-                if (((BuiltInPackSourceAccessor) source).puzzleslib$getPackType() == PackType.SERVER_DATA) {
+                if (((BuiltInPackSourceFabricAccessor) source).puzzleslib$getPackType() == PackType.SERVER_DATA) {
                     serverData = true;
                     break;
                 }

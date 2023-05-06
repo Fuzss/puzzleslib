@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Objects;
 
 @Mixin(Screen.class)
-abstract class ScreenMixin extends AbstractContainerEventHandler implements ExtraScreenExtensions {
+abstract class ScreenFabricMixin extends AbstractContainerEventHandler implements ExtraScreenExtensions {
     @Unique
     private Event<ExtraScreenMouseEvents.AllowMouseDrag> allowMouseDragEvent;
     @Unique

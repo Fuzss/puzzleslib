@@ -19,7 +19,7 @@
     "PackRepositoryFabricMixin",
     "PlayerFabricMixin",
     "ServerLevelFabricMixin",
-    "accessor.BuiltInPackSourceAccessor",
+    "accessor.BuiltInPackSourceFabricAccessor",
     "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [
@@ -31,11 +31,12 @@
     "client.GameRendererFabricMixin",
     "client.GuiFabricMixin",
     "client.ItemRendererFabricMixin",
+    "client.KeyboardHandlerFabricMixin",
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",
     "client.ModelManagerFabricMixin",
     "client.MouseHandlerFabricMixin",
-    "client.ScreenMixin",
+    "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.MinecraftFabricAccessor"

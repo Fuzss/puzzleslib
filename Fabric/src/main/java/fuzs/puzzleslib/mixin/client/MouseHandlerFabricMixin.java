@@ -2,6 +2,7 @@ package fuzs.puzzleslib.mixin.client;
 
 import fuzs.puzzleslib.api.client.event.v1.ExtraScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
@@ -36,23 +37,14 @@ abstract class MouseHandlerFabricMixin {
 
     @Inject(method = "onPress", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;", ordinal = 0), cancellable = true)
     private void onPress$0(long windowPointer, int button, int action, int modifiers, CallbackInfo callback) {
-        boolean cancel;
-        if (action == 1) {
-            cancel = FabricClientEvents.BEFORE_MOUSE_CLICK.invoker().onBeforeMouseClick(button, modifiers).isInterrupt();
-        } else {
-            cancel = FabricClientEvents.BEFORE_MOUSE_RELEASE.invoker().onBeforeMouseRelease(button, modifiers).isInterrupt();
-        }
-        if (cancel) callback.cancel();
+        EventResult result = FabricClientEvents.BEFORE_MOUSE_ACTION.invoker().onBeforeMouseAction(button, action, modifiers);
+        if (result.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "onPress", at = @At("TAIL"))
     private void onPress$1(long windowPointer, int button, int action, int modifiers, CallbackInfo callback) {
         if (windowPointer == Minecraft.getInstance().getWindow().getWindow()) {
-            if (action == 1) {
-                FabricClientEvents.AFTER_MOUSE_CLICK.invoker().onAfterMouseClick(button, modifiers);
-            } else {
-                FabricClientEvents.AFTER_MOUSE_RELEASE.invoker().onAfterMouseRelease(button, modifiers);
-            }
+            FabricClientEvents.AFTER_MOUSE_ACTION.invoker().onAfterMouseAction(button, action, modifiers);
         }
     }
 

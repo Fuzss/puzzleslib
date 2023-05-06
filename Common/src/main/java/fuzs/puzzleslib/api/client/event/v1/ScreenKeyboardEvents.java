@@ -38,53 +38,57 @@ public final class ScreenKeyboardEvents {
 
     @FunctionalInterface
     public interface BeforeKeyPress<T extends Screen> {
+
         /**
          * Called before a key press is handled.
          *
-         * @param key the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scancode the unique/platform-specific scan code of the keyboard input
+         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param scanCode  the unique/platform-specific scan code of the keyboard input
          * @param modifiers a GLFW bitfield describing the modifier keys that are held down
          * @return {@link EventResult#INTERRUPT} for marking the press event as handled, it will not be passed to other listeners and vanilla behavior will not run,
          * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
          */
-        EventResult onBeforeKeyPress(T screen, int key, int scancode, int modifiers);
+        EventResult onBeforeKeyPress(T screen, int key, int scanCode, int modifiers);
     }
 
     @FunctionalInterface
     public interface AfterKeyPress<T extends Screen> {
+
         /**
          * Called after a key press is handled.
          *
-         * @param key the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scancode the unique/platform-specific scan code of the keyboard input
+         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param scanCode  the unique/platform-specific scan code of the keyboard input
          * @param modifiers a GLFW bitfield describing the modifier keys that are held down
          */
-        void onAfterKeyPress(T screen, int key, int scancode, int modifiers);
+        void onAfterKeyPress(T screen, int key, int scanCode, int modifiers);
     }
 
     @FunctionalInterface
     public interface BeforeKeyRelease<T extends Screen> {
+
         /**
          * Called before a pressed key has been released.
          *
-         * @param key the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scancode the unique/platform-specific scan code of the keyboard input
+         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param scanCode  the unique/platform-specific scan code of the keyboard input
          * @param modifiers a GLFW bitfield describing the modifier keys that are held down
          * @return {@link EventResult#INTERRUPT} for marking the release event as handled, it will not be passed to other listeners and vanilla behavior will not run,
          * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
          */
-        EventResult onBeforeKeyRelease(T screen, int key, int scancode, int modifiers);
+        EventResult onBeforeKeyRelease(T screen, int key, int scanCode, int modifiers);
     }
 
     @FunctionalInterface
     public interface AfterKeyRelease<T extends Screen> {
+
         /**
          * Called after a pressed key has been released.
          *
-         * @param key the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scancode the unique/platform-specific scan code of the keyboard input
+         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param scanCode  the unique/platform-specific scan code of the keyboard input
          * @param modifiers a GLFW bitfield describing the modifier keys that are held down
          */
-        void onAfterKeyRelease(T screen, int key, int scancode, int modifiers);
+        void onAfterKeyRelease(T screen, int key, int scanCode, int modifiers);
     }
 }

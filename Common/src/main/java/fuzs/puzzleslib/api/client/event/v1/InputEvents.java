@@ -1,73 +1,51 @@
 package fuzs.puzzleslib.api.client.event.v1;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 
 /**
  * Very similar to {@link ScreenMouseEvents} and {@link ScreenKeyboardEvents}, but fires when no screen is open to handle input events in the {@link net.minecraft.client.gui.Gui}.
+ * Some events even fire before a screen has had a chance to handle the input, depends on the exact implementation which follows Forge.
  */
 public final class InputEvents {
-    public static final EventInvoker<BeforeMouseClick> BEFORE_MOUSE_CLICK = EventInvoker.lookup(BeforeMouseClick.class);
-    public static final EventInvoker<AfterMouseClick> AFTER_MOUSE_CLICK = EventInvoker.lookup(AfterMouseClick.class);
-    public static final EventInvoker<BeforeMouseRelease> BEFORE_MOUSE_RELEASE = EventInvoker.lookup(BeforeMouseRelease.class);
-    public static final EventInvoker<AfterMouseRelease> AFTER_MOUSE_RELEASE = EventInvoker.lookup(AfterMouseRelease.class);
+    public static final EventInvoker<BeforeMouseAction> BEFORE_MOUSE_ACTION = EventInvoker.lookup(BeforeMouseAction.class);
+    public static final EventInvoker<AfterMouseAction> AFTER_MOUSE_ACTION = EventInvoker.lookup(AfterMouseAction.class);
     public static final EventInvoker<BeforeMouseScroll> BEFORE_MOUSE_SCROLL = EventInvoker.lookup(BeforeMouseScroll.class);
     public static final EventInvoker<AfterMouseScroll> AFTER_MOUSE_SCROLL = EventInvoker.lookup(AfterMouseScroll.class);
+    public static final EventInvoker<BeforeKeyAction> BEFORE_KEY_ACTION = EventInvoker.lookup(BeforeKeyAction.class);
+    public static final EventInvoker<AfterKeyAction> AFTER_KEY_ACTION = EventInvoker.lookup(AfterKeyAction.class);
 
     private InputEvents() {
 
     }
 
     @FunctionalInterface
-    public interface BeforeMouseClick {
+    public interface BeforeMouseAction {
 
         /**
-         * Called before a mouse button is pressed without a screen being open.
+         * Called before a mouse button is clicked or released without a screen being open.
          *
          * @param button    the button input code, see {@link org.lwjgl.glfw.GLFW}
+         * @param action    the mouse button action, see {@link InputConstants}
          * @param modifiers a bit field representing the active modifier keys
-         * @return {@link EventResult#INTERRUPT} for marking the click event as handled, it will not be passed to other listeners and vanilla behavior will not run,
+         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run,
          * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
          */
-        EventResult onBeforeMouseClick(int button, int modifiers);
+        EventResult onBeforeMouseAction(int button, int action, int modifiers);
     }
 
     @FunctionalInterface
-    public interface AfterMouseClick {
+    public interface AfterMouseAction {
 
         /**
-         * Called after a mouse button is pressed without a screen being open.
+         * Called after a mouse button is clicked or released without a screen being open.
          *
          * @param button    the button input code, see {@link org.lwjgl.glfw.GLFW}
+         * @param action    the mouse button action, see {@link InputConstants}
          * @param modifiers a bit field representing the active modifier keys
          */
-        void onAfterMouseClick(int button, int modifiers);
-    }
-
-    @FunctionalInterface
-    public interface BeforeMouseRelease {
-
-        /**
-         * Called before a mouse click has released without a screen being open.
-         *
-         * @param button    the button input code, see {@link org.lwjgl.glfw.GLFW}
-         * @param modifiers a bit field representing the active modifier keys
-         * @return {@link EventResult#INTERRUPT} for marking the release event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
-         */
-        EventResult onBeforeMouseRelease(int button, int modifiers);
-    }
-
-    @FunctionalInterface
-    public interface AfterMouseRelease {
-
-        /**
-         * Called after a mouse click has released without a screen being open.
-         *
-         * @param button    the button input code, see {@link org.lwjgl.glfw.GLFW}
-         * @param modifiers a bit field representing the active modifier keys
-         */
-        void onAfterMouseRelease(int button, int modifiers);
+        void onAfterMouseAction(int button, int action, int modifiers);
     }
 
     @FunctionalInterface
@@ -81,7 +59,7 @@ public final class InputEvents {
          * @param rightDown        is the right mouse button pressed
          * @param horizontalAmount horizontal scroll amount
          * @param verticalAmount   vertical scroll amount
-         * @return {@link EventResult#INTERRUPT} for marking the scroll event as handled, it will not be passed to other listeners and vanilla behavior will not run,
+         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run,
          * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
          */
         EventResult onBeforeMouseScroll(boolean leftDown, boolean middleDown, boolean rightDown, double horizontalAmount, double verticalAmount);
@@ -100,5 +78,35 @@ public final class InputEvents {
          * @param verticalAmount   vertical scroll amount
          */
         void onAfterMouseScroll(boolean leftDown, boolean middleDown, boolean rightDown, double horizontalAmount, double verticalAmount);
+    }
+
+    @FunctionalInterface
+    public interface BeforeKeyAction {
+
+        /**
+         * Called before a key press, release or repeat action is handled.
+         *
+         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param scanCode  the unique/platform-specific scan code of the keyboard input
+         * @param action    the key action, see {@link InputConstants}
+         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
+         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run,
+         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         */
+        EventResult onBeforeKeyAction(int key, int scanCode, int action, int modifiers);
+    }
+
+    @FunctionalInterface
+    public interface AfterKeyAction {
+
+        /**
+         * Called after a key press, release or repeat action is handled.
+         *
+         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param scanCode  the unique/platform-specific scan code of the keyboard input
+         * @param action    the key action, see {@link InputConstants}
+         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
+         */
+        void onAfterKeyAction(int key, int scanCode, int action, int modifiers);
     }
 }
