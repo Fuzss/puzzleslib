@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.21-1.19.3] - 2023-05-08
+### Added
+- Added `LivingDeathCallback`
+
 ## [v5.0.20-1.19.3] - 2023-05-06
 ### Added
 - Many new events, mainly support for context based events like events that only run for a specific screen instance

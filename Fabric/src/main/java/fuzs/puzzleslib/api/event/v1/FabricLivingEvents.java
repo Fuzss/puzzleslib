@@ -59,4 +59,8 @@ public final class FabricLivingEvents {
      * Called right before damage from an incoming attack is negated via blocking using a shield.
      */
     public static final Event<ShieldBlockCallback> SHIELD_BLOCK = FabricEventFactory.createResult(ShieldBlockCallback.class);
+    /**
+     * Fires whenever a living entity dies, allows for preventing the death.
+     */
+    public static final Event<LivingDeathCallback> LIVING_DEATH = FabricEventFactory.createResult(LivingDeathCallback.class);
 }

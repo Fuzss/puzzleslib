@@ -19,6 +19,7 @@
     "PackRepositoryFabricMixin",
     "PlayerFabricMixin",
     "ServerLevelFabricMixin",
+    "ServerPlayerFabricMixin",
     "accessor.BuiltInPackSourceFabricAccessor",
     "accessor.PackRepositoryFabricAccessor"
   ],

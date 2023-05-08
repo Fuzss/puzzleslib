@@ -161,6 +161,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(EntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onUnload;
         });
+        INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

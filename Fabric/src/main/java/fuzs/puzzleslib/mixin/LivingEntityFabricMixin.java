@@ -243,4 +243,11 @@ abstract class LivingEntityFabricMixin extends Entity {
         this.puzzleslib$damageMultiplier = null;
         return damageMultiplier;
     }
+
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
+    public void die(DamageSource damageSource, CallbackInfo callback) {
+        if (FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource).isInterrupt()) {
+            callback.cancel();
+        }
+    }
 }

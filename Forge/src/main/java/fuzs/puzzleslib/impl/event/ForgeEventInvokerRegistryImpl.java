@@ -285,6 +285,10 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             if (evt.getLevel().isClientSide) return;
             callback.onUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
         });
+        INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
+            EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
         }
