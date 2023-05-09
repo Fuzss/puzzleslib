@@ -8,6 +8,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -40,6 +41,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      * filter for when {@link EntryHolder}s are constructed, first argument is index (only index 0 when no data is specified), second is entry/data value
      */
     private final BiPredicate<Integer, Object> filter;
+    private final int dataSize;
     /**
      * dissolved {@link #values}
      */
@@ -55,9 +57,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         this.activeRegistry = registry;
         this.filter = filter;
         for (Class<?> clazz : types) {
-            if (!SUPPORTED_DATA_TYPES.contains(clazz))
+            if (!SUPPORTED_DATA_TYPES.contains(clazz)) {
                 throw new IllegalArgumentException("Data type of clazz %s is not supported".formatted(clazz));
+            }
         }
+        this.dataSize = types.length;
         for (String value : values) {
             this.deserialize(value, types).ifPresent(this.values::add);
         }
@@ -141,10 +145,17 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         this.toMap().clear();
     }
 
+    @Nullable
     @Override
     public Object[] get(T entry) {
-        if (this.contains(entry)) return this.toMap().get(entry);
-        throw new NullPointerException("no data found for %s".formatted(entry));
+        return this.toMap().get(entry);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <V> Optional<V> getOptional(T entry, int index) {
+        if (index < 0 || index >= this.dataSize) throw new IndexOutOfBoundsException(index);
+        return Optional.ofNullable(this.get(entry)).map(data -> (V) data[index]);
     }
 
     @Override

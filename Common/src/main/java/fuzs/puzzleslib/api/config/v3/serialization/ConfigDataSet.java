@@ -7,6 +7,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -35,14 +36,21 @@ public interface ConfigDataSet<T> extends Collection<T> {
     Set<T> toSet();
 
     /**
-     * Queries data for a given value from this set.
+     * Queries data for a given value from this config data set.
      *
      * @param entry entry to query data for
-     * @return data array
-     *
-     * @throws NullPointerException if <code>entry</code> is not present for this set
+     * @return data array or <code>null</code>
      */
+    @Nullable
     Object[] get(T entry);
+
+    /**
+     * @param entry entry to query data for
+     * @param index index to get data at
+     * @param <V> type of data
+     * @return the data
+     */
+    <V> Optional<V> getOptional(T entry, int index);
 
     @Deprecated
     @Override
