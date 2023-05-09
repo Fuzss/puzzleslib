@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.22-1.19.3] - 2023-05-09
+### Changed
+- Small improvements to `ConfigDataSet`
+
 ## [v5.0.21-1.19.3] - 2023-05-08
 ### Added
 - Added `LivingDeathCallback`
