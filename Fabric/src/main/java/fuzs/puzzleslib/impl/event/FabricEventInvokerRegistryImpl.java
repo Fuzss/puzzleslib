@@ -187,6 +187,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerEvents.AfterChangeDimension.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, callback -> {
             return callback::onAfterChangeDimension;
         });
+        INSTANCE.register(BabyEntitySpawnCallback.class, FabricLivingEvents.BABY_ENTITY_SPAWN);
+        INSTANCE.register(AnimalTameCallback.class, FabricLivingEvents.ANIMAL_TAME);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

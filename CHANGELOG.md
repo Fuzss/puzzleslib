@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.24-1.19.3] - 2023-05-10
+### Added
+- Added a few new animal related events
+
 ## [v5.0.23-1.19.3] - 2023-05-10
 ### Added
 - Added a few new player related events

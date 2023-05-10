@@ -63,4 +63,12 @@ public final class FabricLivingEvents {
      * Fires whenever a living entity dies, allows for preventing the death.
      */
     public static final Event<LivingDeathCallback> LIVING_DEATH = FabricEventFactory.createResult(LivingDeathCallback.class);
+    /**
+     * Called when a child is created from breeding two parents, allows for replacing the child or for preventing any offspring from being spawned.
+     */
+    public static final Event<BabyEntitySpawnCallback> BABY_ENTITY_SPAWN = FabricEventFactory.createResult(BabyEntitySpawnCallback.class);
+    /**
+     * Called when a player is about to tame an animal, allows for preventing taming.
+     */
+    public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(AnimalTameCallback.class);
 }

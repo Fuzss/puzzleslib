@@ -23,6 +23,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -310,6 +311,17 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             Objects.requireNonNull(from, "level origin is null");
             Objects.requireNonNull(to, "level destination is null");
             callback.onAfterChangeDimension((ServerPlayer) evt.getEntity(), from, to);
+        });
+        INSTANCE.register(BabyEntitySpawnCallback.class, BabyEntitySpawnEvent.class, (BabyEntitySpawnCallback callback, BabyEntitySpawnEvent evt) -> {
+            MutableValue<AgeableMob> child = MutableValue.fromEvent(evt::setChild, evt::getChild);
+            if (callback.onBabyEntitySpawn(evt.getParentA(), evt.getParentB(), child).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(AnimalTameCallback.class, AnimalTameEvent.class, (AnimalTameCallback callback, AnimalTameEvent evt) -> {
+            if (callback.onAnimalTame(evt.getAnimal(), evt.getTamer()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
