@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.event;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -15,6 +16,7 @@ import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.minecraft.core.Holder;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -288,6 +290,26 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
             if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(PlayerEvents.StartTracking.class, PlayerEvent.StartTracking.class, (PlayerEvents.StartTracking callback, PlayerEvent.StartTracking evt) -> {
+            callback.onStartTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
+        });
+        INSTANCE.register(PlayerEvents.StopTracking.class, PlayerEvent.StopTracking.class, (PlayerEvents.StopTracking callback, PlayerEvent.StopTracking evt) -> {
+            callback.onStopTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
+        });
+        INSTANCE.register(PlayerEvents.LoggedIn.class, PlayerEvent.PlayerLoggedInEvent.class, (PlayerEvents.LoggedIn callback, PlayerEvent.PlayerLoggedInEvent evt) -> {
+            callback.onLoggedIn((ServerPlayer) evt.getEntity());
+        });
+        INSTANCE.register(PlayerEvents.LoggedOut.class, PlayerEvent.PlayerLoggedOutEvent.class, (PlayerEvents.LoggedOut callback, PlayerEvent.PlayerLoggedOutEvent evt) -> {
+            callback.onLoggedOut((ServerPlayer) evt.getEntity());
+        });
+        INSTANCE.register(PlayerEvents.AfterChangeDimension.class, PlayerEvent.PlayerChangedDimensionEvent.class, (PlayerEvents.AfterChangeDimension callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
+            MinecraftServer server = Proxy.INSTANCE.getGameServer();
+            ServerLevel from = server.getLevel(evt.getFrom());
+            ServerLevel to = server.getLevel(evt.getTo());
+            Objects.requireNonNull(from, "level origin is null");
+            Objects.requireNonNull(to, "level destination is null");
+            callback.onAfterChangeDimension((ServerPlayer) evt.getEntity(), from, to);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

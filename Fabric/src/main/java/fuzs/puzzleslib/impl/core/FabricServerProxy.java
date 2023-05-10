@@ -1,9 +1,10 @@
 package fuzs.puzzleslib.impl.core;
 
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.Connection;
@@ -24,8 +25,8 @@ public class FabricServerProxy implements FabricProxy {
     public FabricServerProxy() {
         // registers for game server starting and stopping, so we can keep an instance of the server here so that
         // {@link FabricNetworkHandler} can be implemented much more similarly to Forge
-        ServerLifecycleEvents.SERVER_STARTING.register(server -> this.gameServer = server);
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> this.gameServer = null);
+        ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, server -> this.gameServer = server);
+        ServerLifecycleEvents.STOPPED.register(EventPhase.LAST, server -> this.gameServer = null);
     }
 
     @Override

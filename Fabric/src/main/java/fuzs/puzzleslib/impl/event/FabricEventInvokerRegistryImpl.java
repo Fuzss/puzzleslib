@@ -17,6 +17,7 @@ import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -26,8 +27,13 @@ import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
+import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -162,6 +168,25 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return callback::onUnload;
         });
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
+        INSTANCE.register(PlayerEvents.StartTracking.class, EntityTrackingEvents.START_TRACKING, callback -> {
+            return callback::onStartTracking;
+        });
+        INSTANCE.register(PlayerEvents.StopTracking.class, EntityTrackingEvents.STOP_TRACKING, callback -> {
+            return callback::onStopTracking;
+        });
+        INSTANCE.register(PlayerEvents.LoggedIn.class, ServerPlayConnectionEvents.JOIN, callback -> {
+            return (ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) -> {
+                callback.onLoggedIn(handler.getPlayer());
+            };
+        });
+        INSTANCE.register(PlayerEvents.LoggedOut.class, ServerPlayConnectionEvents.DISCONNECT, callback -> {
+            return (ServerGamePacketListenerImpl handler, MinecraftServer server) -> {
+                callback.onLoggedOut(handler.getPlayer());
+            };
+        });
+        INSTANCE.register(PlayerEvents.AfterChangeDimension.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, callback -> {
+            return callback::onAfterChangeDimension;
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }
