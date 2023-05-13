@@ -5,7 +5,7 @@
   "count_children": true,
   "mods_button_style": "classic",
   "count_hidden_mods": true,
-  "mod_count_location": "title_screen_and_mods_button",
+  "mod_count_location": "title_screen",
   "hide_mod_links": false,
   "show_libraries": false,
   "hide_mod_license": false,
