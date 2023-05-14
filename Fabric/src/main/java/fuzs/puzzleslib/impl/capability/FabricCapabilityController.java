@@ -63,14 +63,14 @@ public class FabricCapabilityController implements CapabilityController {
     @Override
     public <T extends Entity, C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<T> entityType) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, componentKey -> o -> {
-            if (o instanceof EntityComponentFactoryRegistry registry) registry.registerFor(entityType, componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+            if (o instanceof EntityComponentFactoryRegistry registry) registry.registerFor(entityType, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1)));
         });
     }
 
     @Override
     public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, componentKey -> o -> {
-            if (o instanceof EntityComponentFactoryRegistry registry) registry.registerForPlayers(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)), STRATEGY_CONVERTER_MAP.get(respawnStrategy));
+            if (o instanceof EntityComponentFactoryRegistry registry) registry.registerForPlayers(componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1)), STRATEGY_CONVERTER_MAP.get(respawnStrategy));
         }, FabricPlayerCapabilityKey<C>::new);
     }
 
@@ -82,21 +82,21 @@ public class FabricCapabilityController implements CapabilityController {
     @Override
     public <T extends BlockEntity, C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<T> blockEntityType) {
         return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, componentKey -> o -> {
-            if (o instanceof BlockComponentFactoryRegistry registry) registry.registerFor(blockEntityType, componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+            if (o instanceof BlockComponentFactoryRegistry registry) registry.registerFor(blockEntityType, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1)));
         });
     }
 
     @Override
     public <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory) {
         return this.registerCapability(LevelChunk.class, capabilityKey, capabilityType, componentKey -> o -> {
-            if (o instanceof ChunkComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+            if (o instanceof ChunkComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1)));
         });
     }
 
     @Override
     public <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory) {
         return this.registerCapability(Level.class, capabilityKey, capabilityType, componentKey -> o -> {
-            if (o instanceof WorldComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.createComponent(o1)));
+            if (o instanceof WorldComponentFactoryRegistry registry) registry.register(componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1)));
         });
     }
 

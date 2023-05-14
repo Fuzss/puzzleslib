@@ -10,12 +10,16 @@ public interface CapabilityComponent {
     /**
      * @param tag tag to write to
      */
-    void write(CompoundTag tag);
+    default void write(CompoundTag tag) {
+
+    }
 
     /**
      * @param tag tag to read from
      */
-    void read(CompoundTag tag);
+    default void read(CompoundTag tag) {
+        
+    }
 
     /**
      * @return this capability serialized to {@link CompoundTag}

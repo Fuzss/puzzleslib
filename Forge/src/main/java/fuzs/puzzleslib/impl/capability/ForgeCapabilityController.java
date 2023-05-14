@@ -121,7 +121,7 @@ public class ForgeCapabilityController implements CapabilityController {
         this.providerClazzToIds.put(providerType, key);
         return capabilityKeyFactory.apply(key, capabilityType, token -> {
             final Capability<C> capability = CapabilityManager.get(token);
-            this.idToCapabilityData.put(key, new CapabilityData<>(key, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.createComponent(provider)), filter));
+            this.idToCapabilityData.put(key, new CapabilityData<>(key, capabilityType, provider -> new CapabilityHolder<>(capability, capabilityFactory.apply(provider)), filter));
             return capability;
         });
     }
@@ -136,7 +136,7 @@ public class ForgeCapabilityController implements CapabilityController {
     public void onAttachCapabilities(final AttachCapabilitiesEvent<?> evt) {
         for (CapabilityData<?> data : this.toCapabilityData((Class<?>) evt.getGenericType())) {
             if (data.filter().test(evt.getObject())) {
-                evt.addCapability(data.capabilityKey(), data.capabilityFactory().createComponent(evt.getObject()));
+                evt.addCapability(data.capabilityKey(), data.capabilityFactory().apply(evt.getObject()));
             }
         }
     }
