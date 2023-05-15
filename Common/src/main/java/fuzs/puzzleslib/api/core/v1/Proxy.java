@@ -29,11 +29,6 @@ public interface Proxy {
     Level getClientLevel();
 
     /**
-     * @return Minecraft singleton instance on physical client, otherwise null
-     */
-    Object getClientInstance();
-
-    /**
      * @return the connection to the server on physical client, otherwise null
      */
     Connection getClientConnection();

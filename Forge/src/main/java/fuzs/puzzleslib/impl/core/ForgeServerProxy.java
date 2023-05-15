@@ -18,22 +18,17 @@ public class ForgeServerProxy implements ForgeProxy {
 
     @Override
     public Player getClientPlayer() {
-        return null;
+        throw new RuntimeException("Client player accessed for wrong side!");
     }
 
     @Override
     public Level getClientLevel() {
-        return null;
-    }
-
-    @Override
-    public Object getClientInstance() {
-        return null;
+        throw new RuntimeException("Client level accessed for wrong side!");
     }
 
     @Override
     public Connection getClientConnection() {
-        return null;
+        throw new RuntimeException("Client connection accessed for wrong side!");
     }
 
     @Override

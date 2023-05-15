@@ -11,6 +11,8 @@ public interface LivingDeathCallback {
 
     /**
      * Fires whenever a living entity dies, allows for preventing the death.
+     * <p>Note that on Fabric this runs before the totem of undying check,
+     * so may want to special case that depending on loader and include an additional check.
      *
      * @param entity the entity that has been killed
      * @param source the {@link DamageSource} <code>entity</code> has been killed by

@@ -35,11 +35,6 @@ public class ForgeClientProxy extends ForgeServerProxy {
     }
 
     @Override
-    public Object getClientInstance() {
-        return Minecraft.getInstance();
-    }
-
-    @Override
     public boolean hasControlDown() {
         return Screen.hasControlDown();
     }
