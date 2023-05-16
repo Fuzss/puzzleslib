@@ -7,45 +7,43 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * A simple {@code Inventory} implementation with only default methods + an item list getter.
- * <p>Originally by Juuz.
+ * A simple {@link Container} implementation with only default methods and an item list getter.
  */
 @FunctionalInterface
 public interface ContainerImpl extends Container {
 
     /**
-     * Retrieves the item list of this inventory.
-     * Must return the same instance every time it's called.
-     */
-    NonNullList<ItemStack> items();
-
-    /**
-     * Creates an inventory from the item list.
+     * Creates a container backed by the item list.
      */
     static ContainerImpl of(NonNullList<ItemStack> items) {
         return () -> items;
     }
 
     /**
-     * Creates a new inventory with the specified size.
+     * Creates a new empty container with the specified size.
      */
     static ContainerImpl of(int size) {
         return of(NonNullList.withSize(size, ItemStack.EMPTY));
     }
 
     /**
-     * Returns the inventory size.
+     * Retrieves the item list backing this inventory.
      */
+    @Deprecated(forRemoval = true)
+    default NonNullList<ItemStack> items() {
+        return this.getItems();
+    }
+
+    /**
+     * Retrieves the item list backing this inventory.
+     */
+    NonNullList<ItemStack> getItems();
+
     @Override
     default int getContainerSize() {
         return this.items().size();
     }
 
-    /**
-     * Checks if the inventory is empty.
-     *
-     * @return true if this inventory has only empty stacks, false otherwise.
-     */
     @Override
     default boolean isEmpty() {
         for (ItemStack stack : this.items()) {
@@ -56,21 +54,11 @@ public interface ContainerImpl extends Container {
         return true;
     }
 
-    /**
-     * Retrieves the item in the slot.
-     */
     @Override
     default ItemStack getItem(int slot) {
         return slot >= 0 && slot < this.items().size() ? this.items().get(slot) : ItemStack.EMPTY;
     }
 
-    /**
-     * Removes items from an inventory slot.
-     *
-     * @param slot  The slot to remove from.
-     * @param count How many items to remove. If there are less items in the slot than what are requested,
-     *              takes all items in that slot.
-     */
     @Override
     default ItemStack removeItem(int slot, int count) {
         ItemStack result = ContainerHelper.removeItem(this.items(), slot, count);
@@ -78,29 +66,17 @@ public interface ContainerImpl extends Container {
         return result;
     }
 
-    /**
-     * Removes all items from an inventory slot.
-     *
-     * @param slot The slot to remove from.
-     */
     @Override
     default ItemStack removeItemNoUpdate(int slot) {
         return ContainerHelper.takeItem(this.items(), slot);
     }
 
-    /**
-     * Replaces the current stack in an inventory slot with the provided stack.
-     *
-     * @param slot  The inventory slot of which to replace the itemstack.
-     * @param stack The replacing itemstack. If the stack is too big for
-     *              this inventory ({@link Container#getMaxStackSize()}),
-     *              it gets resized to this inventory's maximum amount.
-     */
     @Override
     default void setItem(int slot, ItemStack stack) {
         if (slot >= 0 && slot < this.items().size()) {
+            stack = stack.isEmpty() ? ItemStack.EMPTY : stack;
             if (this.items().set(slot, stack) != stack) {
-                if (stack.getCount() > this.getMaxStackSize()) {
+                if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
                     stack.setCount(this.getMaxStackSize());
                 }
                 this.setChanged();
@@ -108,27 +84,17 @@ public interface ContainerImpl extends Container {
         }
     }
 
-    /**
-     * Clears the inventory.
-     */
     @Override
     default void clearContent() {
         this.items().clear();
+        this.setChanged();
     }
 
-    /**
-     * Marks the state as dirty.
-     * Must be called after changes in the inventory, so that the game can properly save
-     * the inventory contents and notify neighboring blocks of inventory changes.
-     */
     @Override
     default void setChanged() {
-        // Override if you want behavior.
+
     }
 
-    /**
-     * @return true if the player can use the inventory, false otherwise.
-     */
     @Override
     default boolean stillValid(Player player) {
         return true;
