@@ -41,12 +41,12 @@ public interface ContainerImpl extends Container {
 
     @Override
     default int getContainerSize() {
-        return this.items().size();
+        return this.getItems().size();
     }
 
     @Override
     default boolean isEmpty() {
-        for (ItemStack stack : this.items()) {
+        for (ItemStack stack : this.getItems()) {
             if (!stack.isEmpty()) {
                 return false;
             }
@@ -56,37 +56,35 @@ public interface ContainerImpl extends Container {
 
     @Override
     default ItemStack getItem(int slot) {
-        return slot >= 0 && slot < this.items().size() ? this.items().get(slot) : ItemStack.EMPTY;
+        return slot >= 0 && slot < this.getContainerSize() ? this.getItems().get(slot) : ItemStack.EMPTY;
     }
 
     @Override
     default ItemStack removeItem(int slot, int count) {
-        ItemStack result = ContainerHelper.removeItem(this.items(), slot, count);
+        ItemStack result = ContainerHelper.removeItem(this.getItems(), slot, count);
         if (!result.isEmpty()) this.setChanged();
         return result;
     }
 
     @Override
     default ItemStack removeItemNoUpdate(int slot) {
-        return ContainerHelper.takeItem(this.items(), slot);
+        return ContainerHelper.takeItem(this.getItems(), slot);
     }
 
     @Override
     default void setItem(int slot, ItemStack stack) {
-        if (slot >= 0 && slot < this.items().size()) {
-            stack = stack.isEmpty() ? ItemStack.EMPTY : stack;
-            if (this.items().set(slot, stack) != stack) {
-                if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
-                    stack.setCount(this.getMaxStackSize());
-                }
-                this.setChanged();
+        if (slot >= 0 && slot < this.getContainerSize()) {
+            this.getItems().set(slot, stack);
+            if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
+                stack.setCount(this.getMaxStackSize());
             }
+            this.setChanged();
         }
     }
 
     @Override
     default void clearContent() {
-        this.items().clear();
+        this.getItems().clear();
         this.setChanged();
     }
 
