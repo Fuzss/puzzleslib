@@ -15,7 +15,11 @@ public record FabricResourceReloadListener(ResourceLocation identifier, Collecti
                                     PreparableReloadListener reloadListener) implements IdentifiableResourceReloadListener {
 
     public FabricResourceReloadListener(String modId, String id, PreparableReloadListener reloadListener, ResourceLocation... dependencies) {
-        this(new ResourceLocation(modId, id), ImmutableSet.copyOf(dependencies), reloadListener);
+        this(new ResourceLocation(modId, id), reloadListener, dependencies);
+    }
+
+    public FabricResourceReloadListener(ResourceLocation id, PreparableReloadListener reloadListener, ResourceLocation... dependencies) {
+        this(id, ImmutableSet.copyOf(dependencies), reloadListener);
     }
 
     @Override
