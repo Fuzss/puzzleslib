@@ -9,7 +9,7 @@ import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
-import fuzs.puzzleslib.impl.core.FabricResourceReloadListener;
+import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
 import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;

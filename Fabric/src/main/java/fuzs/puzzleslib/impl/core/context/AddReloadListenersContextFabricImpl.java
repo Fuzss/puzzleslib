@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.core.context;
 
 import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
-import fuzs.puzzleslib.impl.core.FabricResourceReloadListener;
+import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
