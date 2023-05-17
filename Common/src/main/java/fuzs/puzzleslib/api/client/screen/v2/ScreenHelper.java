@@ -10,17 +10,10 @@ import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * a helper class for accessing encapsulated fields on a screen
- * on Forge those are all exposed, but Fabric requires special accessors
- *
- * <p>for adding buttons, those are handled very different on both mod loaders:
- * on Forge add buttons during init event with appropriate helper methods
- * on Fabric adding is done via custom ButtonList
+ * A helper class for accessing encapsulated fields on a screen.
+ * On Forge those are all exposed via added getter methods, but Fabric requires mixin accessors.
  */
 public interface ScreenHelper {
-    /**
-     * instance of this SPI
-     */
     ScreenHelper INSTANCE = ClientFactories.INSTANCE.getScreenHelper();
 
     /**

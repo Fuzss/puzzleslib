@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.client.core;
+package fuzs.puzzleslib.impl.core;
 
 import com.google.common.collect.ImmutableSet;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
