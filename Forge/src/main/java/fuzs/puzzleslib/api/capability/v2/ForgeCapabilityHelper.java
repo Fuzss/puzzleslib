@@ -12,9 +12,6 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
  */
 public final class ForgeCapabilityHelper {
 
-    /**
-     * private constructor
-     */
     private ForgeCapabilityHelper() {
 
     }
@@ -23,9 +20,9 @@ public final class ForgeCapabilityHelper {
      * After creating {@link fuzs.puzzleslib.api.capability.v2.data.CapabilityKey} in common project, the Forge project
      * must call this method for creating the actual {@link Capability}.
      *
-     * @param key       the {@link fuzs.puzzleslib.api.capability.v2.data.CapabilityKey} to add the <code>token</code> to
-     * @param token     the token, created with an anonymous class
-     * @param <C>       capability type
+     * @param key   the {@link fuzs.puzzleslib.api.capability.v2.data.CapabilityKey} to add the <code>token</code> to
+     * @param token the token, created with an anonymous class
+     * @param <C>   capability type
      */
     public static <C extends CapabilityComponent> void setCapabilityToken(CapabilityKey<C> key, CapabilityToken<C> token) {
         ((ForgeCapabilityKey<C>) key).createCapability(token);

@@ -14,7 +14,6 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -160,19 +159,9 @@ public interface ClientModConstructor {
 
     /**
      * @param context adds a listener to the client resource manager to reload at the end of all resources
-     *
-     * @deprecated migrate to {@link #onRegisterResourcePackReloadListeners(AddReloadListenersContext)}
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterClientReloadListeners(final ClientReloadListenersContext context) {
-
-    }
-
-    /**
-     * @param context adds a listener to the client resource manager to reload at the end of all resources
      */
     default void onRegisterResourcePackReloadListeners(final AddReloadListenersContext context) {
-        this.onRegisterClientReloadListeners(context::registerReloadListener);
+
     }
 
     /**

@@ -12,7 +12,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
-import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
+import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.minecraft.core.Holder;

@@ -1,43 +1,33 @@
 package fuzs.puzzleslib.api.capability.v2.data;
 
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.capability.SyncStrategyImpl;
 import net.minecraft.server.level.ServerPlayer;
 
-import java.util.function.BiConsumer;
-
 /**
- * different behaviours for automatically syncing this capability
+ * Different behaviours for automatically syncing this capability to players.
  */
-public final class SyncStrategy<T extends Record & ClientboundMessage<T>> {
+public interface SyncStrategy {
     /**
-     * default state, no syncing is done automatically
+     * Default state, no syncing is done automatically.
      */
-    public static final SyncStrategy<?> MANUAL = new SyncStrategy<>((o1, o2) -> {});
-    /**
-     * syncing is done automatically, but only with the capability holder
-     */
-    public static final SyncStrategy<?> SELF = new SyncStrategy<>((message, player) -> PuzzlesLib.NETWORK.sendTo(message, player));
-    /**
-     * syncing is done automatically, with the capability holder and every player tracking them
-     * useful for capabilities that affect rendering (e.g. a glider is gliding)
-     */
-    public static final SyncStrategy<?> SELF_AND_TRACKING = new SyncStrategy<>((message, entity) -> PuzzlesLib.NETWORK.sendToAllTrackingAndSelf(message, entity));
+    SyncStrategy MANUAL = new SyncStrategyImpl((message, player) -> {
 
+    });
     /**
-     * message handler
+     * Syncing is done automatically with the capability holder.
      */
-    private final BiConsumer<T, ServerPlayer> sender;
-
+    SyncStrategy SELF = new SyncStrategyImpl((message, player) -> {
+        PuzzlesLib.NETWORK.sendTo(message, player);
+    });
     /**
-     * @param sender message handler
+     * Syncing is done automatically with the capability holder and every player tracking them.
+     * <p>Useful for capabilities that affect rendering (e.g. a glider is gliding).
      */
-    private SyncStrategy(BiConsumer<T, ServerPlayer> sender) {
-        this.sender = sender;
-    }
+    SyncStrategy SELF_AND_TRACKING = new SyncStrategyImpl((message, entity) -> {
+        PuzzlesLib.NETWORK.sendToAllTrackingAndSelf(message, entity);
+    });
 
-    @SuppressWarnings("unchecked")
-    public <S extends Record & ClientboundMessage<S>> void accept(S message, ServerPlayer player) {
-        this.sender.accept((T) message, player);
-    }
+    <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player);
 }

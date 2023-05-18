@@ -5,12 +5,15 @@ import fuzs.puzzleslib.api.capability.v2.data.*;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
+import java.util.function.Function;
 
 /**
  * class for registering and attaching mod capabilities, every mod gets their own instance,
@@ -66,7 +69,7 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <T extends Entity, C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<T> entityType);
+    <T extends Entity, C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Class<T> entityType);
 
     /**
      * register capability to {@link Entity} objects
@@ -78,7 +81,7 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy);
+    <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, PlayerRespawnStrategy respawnStrategy);
 
     /**
      * register capability to {@link Entity} objects
@@ -91,7 +94,7 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, SyncStrategy<?> syncStrategy);
+    <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, PlayerRespawnStrategy respawnStrategy, SyncStrategy syncStrategy);
 
     /**
      * register capability to {@link BlockEntity} objects
@@ -104,7 +107,7 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <T extends BlockEntity, C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory, Class<T> blockEntityType);
+    <T extends BlockEntity, C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Class<T> blockEntityType);
 
     /**
      * register capability to {@link LevelChunk} objects
@@ -115,7 +118,7 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory);
+    <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, Function<ChunkAccess, C> capabilityFactory);
 
     /**
      * register capability to {@link Level} objects
@@ -126,5 +129,5 @@ public interface CapabilityController {
      * @param <C>                   capability type
      * @return                      capability instance from capability manager
      */
-    <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, CapabilityFactory<C> capabilityFactory);
+    <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, Function<Level, C> capabilityFactory);
 }

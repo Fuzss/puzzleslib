@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
-import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
+import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.level.Explosion;
 

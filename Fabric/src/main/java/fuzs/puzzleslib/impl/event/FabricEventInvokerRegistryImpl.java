@@ -13,7 +13,7 @@ import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
-import fuzs.puzzleslib.api.event.v1.world.BlockEvents;
+import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;

@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Objects;
 
 // run before Mouse Tweaks mod
-@Mixin(value = MouseHandler.class, priority = 900)
+@Mixin(value = MouseHandler.class, priority = 500)
 abstract class MouseHandlerFabricMixin {
     @Shadow
     @Final
@@ -74,6 +74,15 @@ abstract class MouseHandlerFabricMixin {
         }
     }
 
+    @Shadow
+    public abstract boolean isLeftPressed();
+
+    @Shadow
+    public abstract boolean isMiddlePressed();
+
+    @Shadow
+    public abstract boolean isRightPressed();
+
     @SuppressWarnings("target")
     @Inject(method = "method_1602(Lnet/minecraft/client/gui/screens/Screen;DDDD)V", at = @At("HEAD"), cancellable = true)
     private void onMove$0(Screen screen, double mouseX, double mouseY, double dragX, double dragY, CallbackInfo callback) {
@@ -105,13 +114,4 @@ abstract class MouseHandlerFabricMixin {
         ExtraScreenMouseEvents.afterMouseDrag(this.puzzleslib$currentScreen).invoker().afterMouseDrag(this.puzzleslib$currentScreen, mouseX, mouseY, this.activeButton, dragX, dragY);
         this.puzzleslib$currentScreen = null;
     }
-
-    @Shadow
-    public abstract boolean isLeftPressed();
-
-    @Shadow
-    public abstract boolean isMiddlePressed();
-
-    @Shadow
-    public abstract boolean isRightPressed();
 }

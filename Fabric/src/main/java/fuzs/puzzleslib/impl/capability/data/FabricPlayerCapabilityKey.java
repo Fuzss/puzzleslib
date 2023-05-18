@@ -23,7 +23,7 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
     /**
      * strategy for syncing this capability data to remote
      */
-    private SyncStrategy<?> syncStrategy = SyncStrategy.MANUAL;
+    private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
 
     /**
      * @param capability     the wrapped {@link ComponentKey}
@@ -37,7 +37,7 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
      * @param syncStrategy      strategy for syncing this capability data to remote
      * @return                  builder
      */
-    public FabricPlayerCapabilityKey<C> setSyncStrategy(SyncStrategy<?> syncStrategy) {
+    public FabricPlayerCapabilityKey<C> setSyncStrategy(SyncStrategy syncStrategy) {
         if (this.syncStrategy != SyncStrategy.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
         this.syncStrategy = syncStrategy;
         ServerEntityEvents.ENTITY_LOAD.register((Entity entity, ServerLevel world) -> {

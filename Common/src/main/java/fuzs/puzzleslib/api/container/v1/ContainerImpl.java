@@ -29,14 +29,6 @@ public interface ContainerImpl extends Container {
     /**
      * Retrieves the item list backing this inventory.
      */
-    @Deprecated(forRemoval = true)
-    default NonNullList<ItemStack> items() {
-        return this.getItems();
-    }
-
-    /**
-     * Retrieves the item list backing this inventory.
-     */
     NonNullList<ItemStack> getItems();
 
     @Override
