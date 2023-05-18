@@ -144,7 +144,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(clazz, eventType, converter, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
             // we need to keep our own event invokers during the whole pre-init phase to guarantee phase ordering is applied correctly,
-            // since this is managed in the event invokers and there seems to be no way to handle it with just the Fabric event,
+            // since this is managed in the event invokers and there seems to be no way to handle it with just the Fabric event
+            // (since the Fabric event doesn't allow for retrieving already applied event phase orders),
             // so we register all screen events during pre-init, which allows post-init to already clear our internal map again
             net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
                 if (((Class<?>) context).isInstance(screen)) applyToInvoker.accept(eventGetter.apply(screen));

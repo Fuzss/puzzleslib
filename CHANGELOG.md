@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.25-1.19.3] - 2023-05-18
+### Added
+- Added `LivingAttackCallback`
+### Changed
+- Turned serialization methods for capabilities default
+- `LivingDeathCallback` now uses an event from Fabric Api instead of its own implementation
+- Minor improvements to `ContainerImpl`
+- Allow `FabricResourceReloadListener` to be used as part of the api module
+### Fixed
+- Fixed mouse drag events being created after Fabric Api's before-init callback runs, making them only usable in after-init which is not ideal
+
 ## [v5.0.24-1.19.3] - 2023-05-10
 ### Added
 - Added a few new animal related events
