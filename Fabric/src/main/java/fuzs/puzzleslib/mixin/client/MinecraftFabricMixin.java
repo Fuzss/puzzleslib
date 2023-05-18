@@ -60,7 +60,7 @@ public abstract class MinecraftFabricMixin {
         return newScreen;
     }
 
-    @ModifyVariable(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;", shift = At.Shift.BEFORE), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;respawn()V")), ordinal = 0)
+    @ModifyVariable(method = "setScreen", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;screen:Lnet/minecraft/client/gui/screens/Screen;", shift = At.Shift.BEFORE, ordinal = 0), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;respawn()V")), ordinal = 0)
     public Screen setScreen$1(@Nullable Screen newScreen) {
         Objects.requireNonNull(this.puzzleslib$newScreen, "new screen is null");
         // problematic for our own title / death screen instances, in case event listeners depend on the exact reference

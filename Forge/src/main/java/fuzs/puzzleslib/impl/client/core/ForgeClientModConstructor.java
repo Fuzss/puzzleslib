@@ -15,6 +15,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -24,7 +25,6 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -48,12 +48,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.client.IItemDecorator;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.CreativeModeTabRegistry;
@@ -194,7 +196,7 @@ public class ForgeClientModConstructor {
                     return new BlockEntityWithoutLevelRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels()) {
 
                         @Override
-                        public void renderByItem(ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+                        public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
                             renderer.renderByItem(stack, mode, matrices, vertexConsumers, light, overlay);
                         }
                     };
@@ -264,14 +266,14 @@ public class ForgeClientModConstructor {
             public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> type, ParticleProvider<T> provider) {
                 Objects.requireNonNull(type, "particle type is null");
                 Objects.requireNonNull(provider, "particle provider is null");
-                evt.register(type, provider);
+                evt.registerSpecial(type, provider);
             }
 
             @Override
             public <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> type, ParticleEngine.SpriteParticleRegistration<T> factory) {
                 Objects.requireNonNull(type, "particle type is null");
                 Objects.requireNonNull(factory, "particle provider factory is null");
-                evt.register(type, factory);
+                evt.registerSpriteSet(type, factory);
             }
         });
     }
@@ -323,11 +325,18 @@ public class ForgeClientModConstructor {
         this.constructor.onRegisterItemDecorations((decorator, object, objects) -> {
             Objects.requireNonNull(decorator, "item decorator is null");
             Objects.requireNonNull(object, "item is null");
-            evt.register(object, decorator::renderItemDecorations);
+            IItemDecorator itemDecorator = new IItemDecorator() {
+
+                @Override
+                public boolean render(PoseStack poseStack, Font font, ItemStack stack, int xOffset, int yOffset) {
+                    return decorator.renderItemDecorations(poseStack, font, stack, xOffset, yOffset);
+                }
+            };
+            evt.register(object, itemDecorator);
             Objects.requireNonNull(objects, "items is null");
             for (ItemLike item : objects) {
                 Objects.requireNonNull(item, "item is null");
-                evt.register(item, decorator::renderItemDecorations);
+                evt.register(item, itemDecorator);
             }
         });
     }
@@ -472,7 +481,7 @@ public class ForgeClientModConstructor {
         ResourceLocation identifier = CreativeModeTabRegistry.getName(evt.getTab());
         if (identifier == null) return;
         for (CreativeModeTab.DisplayItemsGenerator itemsGenerator : this.creativeModeTabBuildListeners.get(identifier)) {
-            itemsGenerator.accept(evt.getFlags(), evt, evt.hasPermissions());
+            itemsGenerator.accept(evt.getParameters(), evt);
         }
     }
 

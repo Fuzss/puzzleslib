@@ -27,8 +27,8 @@ version = "v${modVersion}-${minecraftVersion}-Forge"
 group = modMavenGroup
 
 minecraft {
-    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${parchmentMinecraftVersion}"
-//    mappings channel: 'official', version: "${minecraftVersion}"
+//    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${minecraftVersion}"
+    mappings channel: 'official', version: "${minecraftVersion}"
 
     runs {
         client {
@@ -116,9 +116,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:5.0.0")
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4171025")
-    runtimeOnly fg.deobf("curse.maven:configured-457570:4166861")
+    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:6.0.0")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4496718")
+    runtimeOnly fg.deobf("curse.maven:configured-457570:4462894")
 
     // Puzzles Lib
 //    api fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
@@ -145,21 +145,22 @@ processResources {
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
-    inputs.property "modId", "${modId}"
-    inputs.property "modName", "${modName}"
-    inputs.property "modVersion", "${modVersion}"
-    inputs.property "modDescription", "${modDescription}"
-    inputs.property "modGroup", project.group
-    inputs.property "modPageUrl", "${modSourceUrl}"
-    inputs.property "modUpdateUrl", "${modUpdateUrl}"
-    inputs.property "modIssueUrl", "${modIssueUrl}"
-    inputs.property "modAuthor", "${modAuthor}"
-    inputs.property "minFMLVersion", "${minForgeVersion}".replaceAll("\\..*", "")
-    inputs.property "minForgeVersion", "${minForgeVersion}"
-    inputs.property "minecraftVersion", "${minecraftVersion}"
-    inputs.property "minPuzzlesVersion", "${minPuzzlesVersion}"
-    inputs.property "packFormat", "${packFormat}"
-    inputs.property "modForgeDisplayTest", "${modForgeDisplayTest}"
+    inputs.property "modId",                    "${modId}"
+    inputs.property "modName",                  "${modName}"
+    inputs.property "modVersion",               "${modVersion}"
+    inputs.property "modDescription",           "${modDescription}"
+    inputs.property "modGroup",                 project.group
+    inputs.property "modPageUrl",               "${modSourceUrl}"
+    inputs.property "modUpdateUrl",             "${modUpdateUrl}"
+    inputs.property "modIssueUrl",              "${modIssueUrl}"
+    inputs.property "modAuthor",                "${modAuthor}"
+    inputs.property "minFMLVersion",            "${minForgeVersion}".replaceAll("\\..*", "")
+    inputs.property "minForgeVersion",          "${minForgeVersion}"
+    inputs.property "minecraftVersion",         "${minecraftVersion}"
+    inputs.property "minPuzzlesVersion",        "${minPuzzlesVersion}"
+    inputs.property "resourcePackFormat",       "${resourcePackFormat}"
+    inputs.property "dataPackFormat", 			"${dataPackFormat}"
+    inputs.property "modForgeDisplayTest",      "${modForgeDisplayTest}"
 
     // replace stuff in mods.toml
     filesMatching ('META-INF/mods.toml') {
@@ -185,7 +186,8 @@ processResources {
     filesMatching ('pack.mcmeta') {
         expand (
                 'modDescription':       "${modDescription}",
-                "packFormat":           "${packFormat}"
+                "resourcePackFormat":   "${resourcePackFormat}",
+                "dataPackFormat":       "${dataPackFormat}"
         )
     }
 }
@@ -325,10 +327,7 @@ modrinth {
 //	debugMode = true
 }
 
-
-import groovy.json.JsonBuilder
-import groovy.json.JsonOutput
-import groovy.json.JsonSlurper
+import groovy.json.*
 
 task copyJarToDir(type: Copy) {
     onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }

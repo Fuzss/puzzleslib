@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.client.event;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.event.v1.ItemDecoratorRegistry;
 import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
 import net.minecraft.client.gui.Font;
@@ -24,21 +25,19 @@ public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
         DECORATORS.put(item.asItem(), itemDecorator);
     }
 
-    public static void render(Font font, ItemStack stack, int itemPosX, int itemPosY, float blitOffset) {
+    public static void render(PoseStack poseStack, Font font, ItemStack stack, int itemPosX, int itemPosY) {
         Collection<DynamicItemDecorator> dynamicItemDecorators = DECORATORS.get(stack.getItem());
         if (dynamicItemDecorators.isEmpty()) return;
         resetRenderState();
         for (DynamicItemDecorator itemDecorator : dynamicItemDecorators) {
-            if (itemDecorator.renderItemDecorations(font, stack, itemPosX, itemPosY, blitOffset)) {
+            if (itemDecorator.renderItemDecorations(poseStack, font, stack, itemPosX, itemPosY)) {
                 resetRenderState();
             }
         }
     }
 
     private static void resetRenderState() {
-        RenderSystem.enableTexture();
-        // this breaks trading discount strikethrough bar which will display behind the old price
-//        RenderSystem.enableDepthTest();
+        RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
     }

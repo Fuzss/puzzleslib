@@ -35,10 +35,10 @@ public final class AbstractTagProvider {
                 protected void addTags(HolderLookup.Provider provider) {
 
                 }
-            }, modId, fileHelper);
+            }.contentsGetter(), modId, fileHelper);
         }
 
-        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, TagsProvider<Block> blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
+        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagsProvider.TagLookup<Block>> blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
             super(packOutput, lookupProvider, blockTagsProvider, modId, fileHelper);
         }
 

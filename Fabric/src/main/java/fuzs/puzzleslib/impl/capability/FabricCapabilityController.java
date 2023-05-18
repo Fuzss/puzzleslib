@@ -75,7 +75,7 @@ public final class FabricCapabilityController implements CapabilityController {
     }
 
     public static <T> void registerComponentFactories(Class<?> baseType, T registry) {
-        Collection<FabricCapabilityController> controllers = ModContext.getCapabilityControllers().map(controller -> (FabricCapabilityController) controller).toList();
+        Collection<FabricCapabilityController> controllers = ModContext.getCapabilityControllers().map(FabricCapabilityController.class::cast).toList();
         for (FabricCapabilityController controller : controllers) {
             for (Consumer<Object> factoryRegistration : controller.providerClazzToRegistration.get(baseType)) {
                 factoryRegistration.accept(registry);

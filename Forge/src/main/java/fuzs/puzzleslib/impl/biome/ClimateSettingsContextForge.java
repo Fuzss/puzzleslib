@@ -7,22 +7,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-public class ClimateSettingsContextForge implements ClimateSettingsContext {
-    private final ClimateSettingsBuilder context;
+public record ClimateSettingsContextForge(ClimateSettingsBuilder context) implements ClimateSettingsContext {
 
-    public ClimateSettingsContextForge(ClimateSettingsBuilder context) {
-        this.context = context;
+    @Override
+    public void hasPrecipitation(boolean hasPrecipitation) {
+        this.context.setHasPrecipitation(hasPrecipitation);
     }
 
     @Override
-    public void setPrecipitation(@NotNull Biome.Precipitation precipitation) {
-        Objects.requireNonNull(precipitation);
-        this.context.setPrecipitation(precipitation);
-    }
-
-    @Override
-    public Biome.Precipitation getPrecipitation() {
-        return this.context.getPrecipitation();
+    public boolean hasPrecipitation() {
+        return this.context.hasPrecipitation();
     }
 
     @Override
@@ -44,10 +38,5 @@ public class ClimateSettingsContextForge implements ClimateSettingsContext {
     @Override
     public void setDownfall(float downfall) {
         this.context.setDownfall(downfall);
-    }
-
-    @Override
-    public float getDownfall() {
-        return this.context.getDownfall();
     }
 }

@@ -14,13 +14,13 @@ public final class BuildCreativeModeTabContentsContextFabricImpl implements Buil
     public void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(displayItemsGenerator, "display items generator is null");
-        ItemGroupEvents.modifyEntriesEvent(identifier).register(entries -> displayItemsGenerator.accept(entries.getEnabledFeatures(), entries, entries.shouldShowOpRestrictedItems()));
+        ItemGroupEvents.modifyEntriesEvent(identifier).register(entries -> displayItemsGenerator.accept(entries.getContext(), entries));
     }
 
     @Override
     public void registerBuildListener(CreativeModeTab creativeModeTab, CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
         Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
         Objects.requireNonNull(displayItemsGenerator, "display items generator is null");
-        ItemGroupEvents.modifyEntriesEvent(creativeModeTab).register(entries -> displayItemsGenerator.accept(entries.getEnabledFeatures(), entries, entries.shouldShowOpRestrictedItems()));
+        ItemGroupEvents.modifyEntriesEvent(creativeModeTab).register(entries -> displayItemsGenerator.accept(entries.getContext(), entries));
     }
 }

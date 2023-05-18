@@ -194,14 +194,14 @@ public final class TooltipRenderHelper extends GuiComponent {
      * @param components components to render in the tooltip
      */
     public static void renderTooltipInternal(PoseStack poseStack, int posX, int posY, List<ClientTooltipComponent> components) {
-        if (components.isEmpty()) return;
 
-        Font font = Minecraft.getInstance().font;
-        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+        if (components.isEmpty()) return;
 
         int i = 0;
         int j = components.size() == 1 ? -2 : 0;
 
+        Minecraft minecraft = Minecraft.getInstance();
+        Font font = minecraft.font;
         for (ClientTooltipComponent component : components) {
             int k = component.getWidth(font);
             if (k > i) {
@@ -213,8 +213,6 @@ public final class TooltipRenderHelper extends GuiComponent {
         int l = posX + 12;
         int m = posY - 12;
         poseStack.pushPose();
-        float f = itemRenderer.blitOffset;
-        itemRenderer.blitOffset = 400.0F;
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -222,12 +220,9 @@ public final class TooltipRenderHelper extends GuiComponent {
         Matrix4f matrix4f = poseStack.last().pose();
         TooltipRenderUtil.renderTooltipBackground(GuiComponent::fillGradient, matrix4f, bufferBuilder, l, m, i, j, 400);
         RenderSystem.enableDepthTest();
-        RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         BufferUploader.drawWithShader(bufferBuilder.end());
-        RenderSystem.disableBlend();
-        RenderSystem.enableTexture();
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         poseStack.translate(0.0F, 0.0F, 400.0F);
         int p = m;
@@ -241,15 +236,15 @@ public final class TooltipRenderHelper extends GuiComponent {
         }
 
         bufferSource.endBatch();
-        poseStack.popPose();
         p = m;
 
+        ItemRenderer itemRenderer = minecraft.getItemRenderer();
         for (q = 0; q < components.size(); ++q) {
-            clientTooltipComponent2 = (ClientTooltipComponent) components.get(q);
-            clientTooltipComponent2.renderImage(font, l, p, poseStack, itemRenderer, 400);
+            clientTooltipComponent2 = components.get(q);
+            clientTooltipComponent2.renderImage(font, l, p, poseStack, itemRenderer);
             p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
         }
 
-        itemRenderer.blitOffset = f;
+        poseStack.popPose();
     }
 }

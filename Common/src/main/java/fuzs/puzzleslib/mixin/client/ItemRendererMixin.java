@@ -2,10 +2,10 @@ package fuzs.puzzleslib.mixin.client;
 
 import fuzs.puzzleslib.impl.client.init.ItemModelOverridesImpl;
 import net.minecraft.client.renderer.ItemModelShaper;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +23,7 @@ abstract class ItemRendererMixin {
     private ItemModelShaper itemModelShaper;
 
     @ModifyVariable(method = "render", at = @At("HEAD"), argsOnly = true)
-    public BakedModel render(BakedModel bakedModel, ItemStack stack, ItemTransforms.TransformType transformType) {
+    public BakedModel render(BakedModel bakedModel, ItemStack stack, ItemDisplayContext transformType) {
         return ItemModelOverridesImpl.getSpecificModelOverride(this.itemModelShaper, stack, transformType).orElse(bakedModel);
     }
 

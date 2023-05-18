@@ -5,23 +5,16 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.world.level.biome.Biome;
 import org.jetbrains.annotations.NotNull;
 
-public class ClimateSettingsContextFabric implements ClimateSettingsContext {
-    private final Biome biome;
-    private final BiomeModificationContext.WeatherContext context;
+public record ClimateSettingsContextFabric(Biome biome, BiomeModificationContext.WeatherContext context) implements ClimateSettingsContext {
 
-    public ClimateSettingsContextFabric(Biome biome, BiomeModificationContext.WeatherContext context) {
-        this.biome = biome;
-        this.context = context;
+    @Override
+    public void hasPrecipitation(boolean hasPrecipitation) {
+        this.context.setPrecipitation(hasPrecipitation);
     }
 
     @Override
-    public void setPrecipitation(@NotNull Biome.Precipitation precipitation) {
-        this.context.setPrecipitation(precipitation);
-    }
-
-    @Override
-    public Biome.Precipitation getPrecipitation() {
-        return this.biome.getPrecipitation();
+    public boolean hasPrecipitation() {
+        return this.biome.hasPrecipitation();
     }
 
     @Override
@@ -42,10 +35,5 @@ public class ClimateSettingsContextFabric implements ClimateSettingsContext {
     @Override
     public void setDownfall(float downfall) {
         this.context.setDownfall(downfall);
-    }
-
-    @Override
-    public float getDownfall() {
-        return this.biome.getDownfall();
     }
 }

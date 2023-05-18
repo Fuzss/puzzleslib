@@ -12,7 +12,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
     // Fabric
@@ -21,7 +21,7 @@ dependencies {
     modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${fabricApiVersion}")
 
     // Forge Config API Port
-    api "fuzs.forgeconfigapiport:forgeconfigapiport-common:5.0.11"
+    api "fuzs.forgeconfigapiport:forgeconfigapiport-common:6.0.2"
 
     // Puzzles Lib
 //    modApi "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}"
@@ -75,7 +75,8 @@ processResources {
     inputs.property "minFabricApiVersion", 		"${minFabricApiVersion}"
     inputs.property "minecraftVersion", 		"${minecraftVersion}"
     inputs.property "minPuzzlesVersion", 		"${minPuzzlesVersion}"
-    inputs.property "packFormat", 				"${packFormat}"
+    inputs.property "resourcePackFormat",       "${resourcePackFormat}"
+    inputs.property "dataPackFormat", 			"${dataPackFormat}"
     inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}Fabric"
     inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}FabricClient"
     inputs.property "modFabricEnvironment", 	"${modFabricEnvironment}"
@@ -105,7 +106,8 @@ processResources {
     filesMatching ('pack.mcmeta') {
         expand (
                 'modDescription':       "${modDescription}",
-                "packFormat":           "${packFormat}"
+                "resourcePackFormat":   "${resourcePackFormat}",
+                "dataPackFormat":       "${dataPackFormat}"
         )
     }
 }

@@ -208,7 +208,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         return amount;
     }
 
-    @ModifyVariable(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;animationSpeed:F", shift = At.Shift.BEFORE), ordinal = 0)
+    @ModifyVariable(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;walkAnimation:Lnet/minecraft/world/entity/WalkAnimationState;", shift = At.Shift.BEFORE), ordinal = 0)
     public float hurt$1(float amount, DamageSource source) {
         // this is only present if the damage source could be blocked
         if (this.puzzleslib$hurtAmount != 0.0F) {

@@ -1,12 +1,14 @@
 package fuzs.puzzleslib.impl.item;
 
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -23,9 +25,7 @@ import java.util.stream.Stream;
 
 public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabConfigurator {
     private static final Item[] POTION_ITEMS = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION, Items.TIPPED_ARROW};
-    private static final CreativeModeTab.DisplayItemsGenerator EMPTY_GENERATOR = (FeatureFlagSet enabledFeatures, CreativeModeTab.Output entries, boolean operatorEnabled) -> {
-
-    };
+    private static final CreativeModeTab.DisplayItemsGenerator EMPTY_GENERATOR = (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {};
 
     private final ResourceLocation identifier;
     @Nullable
@@ -89,32 +89,44 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
             Objects.requireNonNull(this.icons, "both icon suppliers are null");
         }
         if (this.appendEnchantmentsAndPotions) {
-            builder.displayItems((FeatureFlagSet enabledFeatures, CreativeModeTab.Output entries, boolean operatorEnabled) -> {
-                this.displayItemsGenerator.accept(enabledFeatures, entries, operatorEnabled);
-                appendAllEnchantments(this.identifier.getNamespace(), entries::accept);
-                appendAllPotions(this.identifier.getNamespace(), entries::accept);
+            builder.displayItems((CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
+                this.displayItemsGenerator.accept(itemDisplayParameters, output);
+                appendAllEnchantments(this.identifier.getNamespace(), itemDisplayParameters.holders(), output::accept);
+                appendAllPotions(this.identifier.getNamespace(), itemDisplayParameters.holders(), output::accept);
             });
         } else {
             builder.displayItems(this.displayItemsGenerator);
         }
     }
 
-    private static void appendAllEnchantments(String namespace, Consumer<ItemStack> itemStacks) {
-        Comparator<Map.Entry<ResourceKey<Enchantment>, Enchantment>> comparator = Comparator.comparing(entry -> entry.getKey().location().getPath());
-        getNamespacedEntries(BuiltInRegistries.ENCHANTMENT, namespace).sorted(comparator).map(Map.Entry::getValue).forEach(enchantment -> {
-            itemStacks.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, enchantment.getMaxLevel())));
-        });
+    private static void appendAllEnchantments(String namespace, HolderLookup.Provider holders, Consumer<ItemStack> itemStacks) {
+        Comparator<Holder.Reference<Enchantment>> comparator = Comparator.comparing(entry -> entry.key().location().getPath());
+        holders.lookup(Registries.ENCHANTMENT).stream()
+                .flatMap(HolderLookup::listElements)
+                .filter(entry -> entry.key().location().getNamespace().equals(namespace))
+                .sorted(comparator)
+                .map(Holder.Reference::value)
+                .forEach(enchantment -> {
+                    itemStacks.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, enchantment.getMaxLevel())));
+                });
     }
 
-    private static void appendAllPotions(String namespace, Consumer<ItemStack> itemStacks) {
+    private static void appendAllPotions(String namespace, HolderLookup.Provider holders, Consumer<ItemStack> itemStacks) {
         Comparator<Potion> comparator = Comparator.<Potion, String>comparing(potion -> {
             if (potion.getEffects().isEmpty()) throw new IllegalArgumentException("Cannot compare potions with empty effects!");
             MobEffect effect = potion.getEffects().get(0).getEffect();
             ResourceLocation key = BuiltInRegistries.MOB_EFFECT.getKey(effect);
             Objects.requireNonNull(key, "Mob effect key for class %s is null".formatted(effect.getClass()));
             return key.getPath();
-        }).thenComparingInt(potion -> potion.getEffects().get(0).getAmplifier()).thenComparingInt(potion -> potion.getEffects().get(0).getDuration());
-        Potion[] potions = getNamespacedEntries(BuiltInRegistries.POTION, namespace).map(Map.Entry::getValue).filter(potion -> !potion.getEffects().isEmpty()).sorted(comparator).toArray(Potion[]::new);
+        }).thenComparingInt(potion -> potion.getEffects().get(0).getAmplifier())
+                .thenComparingInt(potion -> potion.getEffects().get(0).getDuration());
+        Potion[] potions = holders.lookup(Registries.POTION).stream()
+                .flatMap(HolderLookup::listElements)
+                .filter(entry -> entry.key().location().getNamespace().equals(namespace))
+                .map(Holder.Reference::value)
+                .filter(potion -> !potion.getEffects().isEmpty())
+                .sorted(comparator)
+                .toArray(Potion[]::new);
         for (Item item : POTION_ITEMS) {
             for (Potion potion : potions) {
                 itemStacks.accept(PotionUtils.setPotion(new ItemStack(item), potion));

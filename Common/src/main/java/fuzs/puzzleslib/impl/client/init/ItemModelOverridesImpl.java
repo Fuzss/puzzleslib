@@ -6,12 +6,12 @@ import fuzs.puzzleslib.api.client.init.v1.ItemModelOverrides;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemModelShaper;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +24,7 @@ import java.util.function.Function;
 public class ItemModelOverridesImpl implements ItemModelOverrides {
     private static final Map<Item, ItemModelData> ITEM_MODEL_PROVIDERS = Maps.newIdentityHashMap();
 
-    public static Optional<BakedModel> getSpecificModelOverride(ItemModelShaper itemModelShaper, ItemStack stack, ItemTransforms.TransformType transformType) {
+    public static Optional<BakedModel> getSpecificModelOverride(ItemModelShaper itemModelShaper, ItemStack stack, ItemDisplayContext transformType) {
         return getModelOverride(itemModelShaper, stack, Minecraft.getInstance().level, null, 0, data -> data.getModelLocationByType(transformType));
     }
 
@@ -50,7 +50,7 @@ public class ItemModelOverridesImpl implements ItemModelOverrides {
     }
 
     @Override
-    public void register(Item item, ModelResourceLocation itemModel, ModelResourceLocation customModel, ItemTransforms.TransformType... itemModelTransforms) {
+    public void register(Item item, ModelResourceLocation itemModel, ModelResourceLocation customModel, ItemDisplayContext... itemModelTransforms) {
         // avoid making map concurrent, as synchronization is only necessary during registration and will needlessly slow down item rendering...
         synchronized (ItemModelOverridesImpl.class) {
             if (ITEM_MODEL_PROVIDERS.put(item, new ItemModelData(itemModel, customModel, ImmutableSet.copyOf(itemModelTransforms))) != null) {
@@ -59,10 +59,10 @@ public class ItemModelOverridesImpl implements ItemModelOverrides {
         }
     }
 
-    private record ItemModelData(ModelResourceLocation itemModel, ModelResourceLocation customModel, Set<ItemTransforms.TransformType> itemModelTransforms) {
+    private record ItemModelData(ModelResourceLocation itemModel, ModelResourceLocation customModel, Set<ItemDisplayContext> itemModelTransforms) {
 
         @Nullable
-        public ModelResourceLocation getModelLocationByType(ItemTransforms.TransformType transformType) {
+        public ModelResourceLocation getModelLocationByType(ItemDisplayContext transformType) {
             return this.itemModelTransforms.contains(transformType) ? this.itemModel : null;
         }
     }

@@ -26,7 +26,7 @@ abstract class ItemEntityFabricMixin extends Entity {
     private int pickupDelay;
     @Shadow
     @Nullable
-    private UUID owner;
+    private UUID target;
     @Unique
     private ItemStack puzzleslib$originalItem = ItemStack.EMPTY;
 
@@ -54,7 +54,7 @@ abstract class ItemEntityFabricMixin extends Entity {
                     return;
                 }
             }
-            if (this.pickupDelay == 0 && (this.owner == null || this.owner.equals(player.getUUID()))) {
+            if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID()))) {
                 FabricPlayerEvents.ITEM_PICKUP.invoker().onItemPickup(player, ItemEntity.class.cast(this), itemStack.copy());
                 player.take(this, i);
                 if (itemStack.isEmpty()) {

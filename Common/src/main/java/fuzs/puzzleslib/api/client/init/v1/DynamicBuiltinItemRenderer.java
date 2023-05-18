@@ -2,9 +2,9 @@ package fuzs.puzzleslib.api.client.init.v1;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -23,7 +23,7 @@ public interface DynamicBuiltinItemRenderer extends ResourceManagerReloadListene
      * @param light             packed lightmap coordinates
      * @param overlay           the overlay UV passed to {@link com.mojang.blaze3d.vertex.VertexConsumer#overlayCoords}
      */
-    void renderByItem(ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay);
+    void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay);
 
     @Override
     default void onResourceManagerReload(ResourceManager resourceManager) {

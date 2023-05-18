@@ -42,7 +42,7 @@ public final class ForgeCapabilityController implements CapabilityController {
             eventBus.addListener(this::onRegisterCapabilities);
         });
         // for attaching capabilities via AttachCapabilitiesEvent, this is the only method that supports using
-        // a wildcard for the generic event, listening to all subtypes simultaneously
+        // a wildcard for the generic event, allowing to listen to all subtypes simultaneously
         MinecraftForge.EVENT_BUS.register(this);
     }
 

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -83,6 +84,7 @@ public interface RegistryManager {
      * @return this manager as a builder
      */
     default RegistryManager whenNotOn(ModLoader... forbiddenModLoaders) {
+        if (forbiddenModLoaders.length == 0) throw new IllegalArgumentException("Must provide at least one mod loader to not register on");
         ModLoader[] allowedModLoaders = Stream.of(ModLoader.values()).filter(modLoader -> !ArrayUtils.contains(forbiddenModLoaders, modLoader)).toArray(ModLoader[]::new);
         return this.whenOn(allowedModLoaders);
     }
@@ -274,7 +276,7 @@ public interface RegistryManager {
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>(entry.get()));
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>(entry.get(), FeatureFlags.VANILLA_SET));
     }
 
     /**

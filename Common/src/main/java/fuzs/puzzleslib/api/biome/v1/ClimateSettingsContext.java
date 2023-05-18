@@ -15,16 +15,16 @@ import org.jetbrains.annotations.NotNull;
 public interface ClimateSettingsContext {
 
     /**
-     * @see Biome#getPrecipitation()
-     * @see Biome.BiomeBuilder#precipitation(Biome.Precipitation)
+     * @see Biome#hasPrecipitation()
+     * @see Biome.BiomeBuilder#hasPrecipitation(boolean)
      */
-    void setPrecipitation(@NotNull Biome.Precipitation precipitation);
+    void hasPrecipitation(boolean hasPrecipitation);
 
     /**
-     * @see Biome#getPrecipitation()
-     * @see Biome.BiomeBuilder#precipitation(Biome.Precipitation)
+     * @see Biome#hasPrecipitation()
+     * @see Biome.BiomeBuilder#hasPrecipitation(boolean)
      */
-    Biome.Precipitation getPrecipitation();
+    boolean hasPrecipitation();
 
     /**
      * @see Biome#getBaseTemperature()
@@ -44,14 +44,7 @@ public interface ClimateSettingsContext {
     void setTemperatureModifier(@NotNull Biome.TemperatureModifier temperatureModifier);
 
     /**
-     * @see Biome#getDownfall()
      * @see Biome.BiomeBuilder#downfall(float)
      */
     void setDownfall(float downfall);
-
-    /**
-     * @see Biome#getDownfall()
-     * @see Biome.BiomeBuilder#downfall(float)
-     */
-    float getDownfall();
 }
