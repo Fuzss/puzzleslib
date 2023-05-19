@@ -23,7 +23,7 @@ public final class ScreenMouseEvents {
 
     public static <T extends Screen> EventInvoker<AfterMouseClick<T>> afterMouseClick(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
-        return EventInvoker.lookup((Class<AfterMouseClick<T>>) (Class<?>) BeforeMouseClick.class, screen);
+        return EventInvoker.lookup((Class<AfterMouseClick<T>>) (Class<?>) AfterMouseClick.class, screen);
     }
 
     public static <T extends Screen> EventInvoker<BeforeMouseRelease<T>> beforeMouseRelease(Class<T> screen) {
@@ -33,7 +33,7 @@ public final class ScreenMouseEvents {
 
     public static <T extends Screen> EventInvoker<AfterMouseRelease<T>> afterMouseRelease(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
-        return EventInvoker.lookup((Class<AfterMouseRelease<T>>) (Class<?>) BeforeMouseRelease.class, screen);
+        return EventInvoker.lookup((Class<AfterMouseRelease<T>>) (Class<?>) AfterMouseRelease.class, screen);
     }
 
     public static <T extends Screen> EventInvoker<BeforeMouseScroll<T>> beforeMouseScroll(Class<T> screen) {
@@ -43,7 +43,7 @@ public final class ScreenMouseEvents {
 
     public static <T extends Screen> EventInvoker<AfterMouseScroll<T>> afterMouseScroll(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
-        return EventInvoker.lookup((Class<AfterMouseScroll<T>>) (Class<?>) BeforeMouseScroll.class, screen);
+        return EventInvoker.lookup((Class<AfterMouseScroll<T>>) (Class<?>) AfterMouseScroll.class, screen);
     }
 
     public static <T extends Screen> EventInvoker<BeforeMouseDrag<T>> beforeMouseDrag(Class<T> screen) {
@@ -53,7 +53,7 @@ public final class ScreenMouseEvents {
 
     public static <T extends Screen> EventInvoker<AfterMouseDrag<T>> afterMouseDrag(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
-        return EventInvoker.lookup((Class<AfterMouseDrag<T>>) (Class<?>) BeforeMouseDrag.class, screen);
+        return EventInvoker.lookup((Class<AfterMouseDrag<T>>) (Class<?>) AfterMouseDrag.class, screen);
     }
 
     @FunctionalInterface
