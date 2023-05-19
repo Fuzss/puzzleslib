@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.3-1.19.4] - 2023-05-20
+### Fixed
+- Fixed `ClassCastException` for `RenderGuiElementEvents`
+
 ## [v6.0.2-1.19.4] - 2023-05-20
 ### Changed
 - Implemented `RenderGuiElementEvents` for item name

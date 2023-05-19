@@ -9,7 +9,6 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
 import java.util.Collections;
@@ -115,11 +114,13 @@ public final class FabricClientEventInvokers {
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
         INSTANCE.register(RenderGuiElementEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement((ResourceLocation) context));
+            RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
+            applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement(overlay.id()));
         });
         INSTANCE.register(RenderGuiElementEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement((ResourceLocation) context));
+            RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
+            applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement(overlay.id()));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, ClientEntityEvents.ENTITY_LOAD, callback -> {
