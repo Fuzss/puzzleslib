@@ -19,14 +19,14 @@ public interface SyncStrategy {
      * Syncing is done automatically with the capability holder.
      */
     SyncStrategy SELF = new SyncStrategyImpl((message, player) -> {
-        PuzzlesLib.NETWORK.sendTo(message, player);
+        PuzzlesLib.NETWORK.sendTo(player, message);
     });
     /**
      * Syncing is done automatically with the capability holder and every player tracking them.
      * <p>Useful for capabilities that affect rendering (e.g. a glider is gliding).
      */
     SyncStrategy SELF_AND_TRACKING = new SyncStrategyImpl((message, entity) -> {
-        PuzzlesLib.NETWORK.sendToAllTrackingAndSelf(message, entity);
+        PuzzlesLib.NETWORK.sendToAllTrackingAndSelf(entity, message);
     });
 
     <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player);

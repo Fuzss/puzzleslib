@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.capability.data;
 
 import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v2.data.PlayerCapabilityKey;
-import fuzs.puzzleslib.api.capability.v2.data.PlayerRespawnStrategy;
+import fuzs.puzzleslib.api.capability.v2.data.PlayerRespawnCopyStrategy;
 import fuzs.puzzleslib.api.capability.v2.data.SyncStrategy;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,7 +41,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
      * @param respawnStrategy   respawn strategy for players for copying capability data
      * @return                  builder
      */
-    public ForgePlayerCapabilityKey<C> setRespawnStrategy(PlayerRespawnStrategy respawnStrategy) {
+    public ForgePlayerCapabilityKey<C> setRespawnStrategy(PlayerRespawnCopyStrategy respawnStrategy) {
         // do this to avoid registering the event multiple times accidentally somehow
         if (this.respawnStrategy) throw new IllegalStateException("Attempting to set new player respawn strategy when it has already been set");
         this.respawnStrategy = true;
@@ -75,7 +75,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
         PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, this.orThrow(player), this.getId(), false);
     }
 
-    private void onPlayerClone(final PlayerEvent.Clone evt, PlayerRespawnStrategy respawnStrategy) {
+    private void onPlayerClone(final PlayerEvent.Clone evt, PlayerRespawnCopyStrategy respawnStrategy) {
         // we have to revive caps and then invalidate them again since 1.17+
         evt.getOriginal().reviveCaps();
         this.maybeGet(evt.getOriginal()).ifPresent(oldCapability -> {

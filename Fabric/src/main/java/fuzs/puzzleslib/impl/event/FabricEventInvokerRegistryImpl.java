@@ -12,13 +12,14 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
-import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
+import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -34,6 +35,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
@@ -199,6 +201,14 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingAttackCallback.class, ServerLivingEntityEvents.ALLOW_DAMAGE, callback -> {
             return (LivingEntity entity, DamageSource source, float amount) -> {
                 return callback.onLivingAttack(entity, source, amount).isPass();
+            };
+        });
+        INSTANCE.register(PlayerEvents.Copy.class, ServerPlayerEvents.COPY_FROM, callback -> {
+            return callback::onCopy;
+        });
+        INSTANCE.register(PlayerEvents.Respawn.class, ServerPlayerEvents.AFTER_RESPAWN, callback -> {
+            return (ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) -> {
+                callback.onRespawn(newPlayer, alive);
             };
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {

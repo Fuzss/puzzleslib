@@ -29,8 +29,8 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player) {
-        NetworkHandlerV3.super.sendTo(message, player);
+    default <T extends Record & ClientboundMessage<T>> void sendTo(ServerPlayer player, T message) {
+        NetworkHandlerV3.super.sendTo(player, message);
     }
 
     @Deprecated
@@ -41,49 +41,49 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(T message, ServerPlayer exclude) {
-        NetworkHandlerV3.super.sendToAllExcept(message, exclude);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(ServerPlayer exclude, T message) {
+        NetworkHandlerV3.super.sendToAllExcept(exclude, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, BlockPos pos, Level level) {
-        NetworkHandlerV3.super.sendToAllNear(message, pos, level);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(BlockPos pos, Level level, T message) {
+        NetworkHandlerV3.super.sendToAllNear(pos, level, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, double posX, double posY, double posZ, double distance, Level level) {
-        NetworkHandlerV3.super.sendToAllNear(message, posX, posY, posZ, distance, level);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, double distance, Level level, T message) {
+        NetworkHandlerV3.super.sendToAllNear(posX, posY, posZ, distance, level, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(T message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
-        NetworkHandlerV3.super.sendToAllNearExcept(message, exclude, posX, posY, posZ, distance, level);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level, T message) {
+        NetworkHandlerV3.super.sendToAllNearExcept(exclude, posX, posY, posZ, distance, level, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(T message, Entity entity) {
-        NetworkHandlerV3.super.sendToAllTracking(message, entity);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message) {
+        NetworkHandlerV3.super.sendToAllTracking(entity, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(T message, Entity entity) {
-        NetworkHandlerV3.super.sendToAllTrackingAndSelf(message, entity);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(Entity entity, T message) {
+        NetworkHandlerV3.super.sendToAllTrackingAndSelf(entity, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, Level level) {
-        NetworkHandlerV3.super.sendToDimension(message, level);
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(Level level, T message) {
+        NetworkHandlerV3.super.sendToDimension(level, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, ResourceKey<Level> dimension) {
-        NetworkHandlerV3.super.sendToDimension(message, dimension);
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(ResourceKey<Level> dimension, T message) {
+        NetworkHandlerV3.super.sendToDimension(dimension, message);
     }
 }

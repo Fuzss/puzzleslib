@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.core.v1.Buildable;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
-import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistry;
 import net.minecraft.core.BlockPos;
@@ -69,10 +68,10 @@ public interface NetworkHandlerV3 {
     /**
      * send message from server to client
      *
-     * @param message message to send
      * @param player  client player to send to
+     * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player) {
+    default <T extends Record & ClientboundMessage<T>> void sendTo(ServerPlayer player, T message) {
         player.connection.send(this.toClientboundPacket(message));
     }
 
@@ -88,92 +87,92 @@ public interface NetworkHandlerV3 {
     /**
      * send message from server to all clients except one
      *
-     * @param message message to send
      * @param exclude client to exclude
+     * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(T message, ServerPlayer exclude) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(ServerPlayer exclude, T message) {
         for (ServerPlayer player : Proxy.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
-            if (player != exclude) this.sendTo(message, player);
+            if (player != exclude) this.sendTo(player, message);
         }
     }
 
     /**
      * send message from server to all clients near given position
      *
-     * @param message message to send
      * @param pos     source position
      * @param level   dimension key provider level
+     * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, BlockPos pos, Level level) {
-        this.sendToAllNearExcept(message, null, pos.getX(), pos.getY(), pos.getZ(), 64.0, level);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(BlockPos pos, Level level, T message) {
+        this.sendToAllNearExcept(null, pos.getX(), pos.getY(), pos.getZ(), 64.0, level, message);
     }
 
     /**
      * send message from server to all clients near given position
      *
-     * @param message  message to send
      * @param posX     source position x
      * @param posY     source position y
      * @param posZ     source position z
      * @param distance distance from source to receive message
      * @param level    dimension key provider level
+     * @param message  message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(T message, double posX, double posY, double posZ, double distance, Level level) {
-        this.sendToAllNearExcept(message, null, posX, posY, posZ, 64.0, level);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, double distance, Level level, T message) {
+        this.sendToAllNearExcept(null, posX, posY, posZ, 64.0, level, message);
     }
 
     /**
      * send message from server to all clients near given position
      *
-     * @param message  message to send
      * @param exclude  exclude player having caused this event
      * @param posX     source position x
      * @param posY     source position y
      * @param posZ     source position z
      * @param distance distance from source to receive message
      * @param level    dimension key provider level
+     * @param message  message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(T message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level, T message) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
     /**
      * send message from server to all clients tracking <code>entity</code>
      *
-     * @param message message to send
      * @param entity  the tracked entity
+     * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(T message, Entity entity) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message) {
         ((ServerChunkCache) entity.getCommandSenderWorld().getChunkSource()).broadcast(entity, this.toClientboundPacket(message));
     }
 
     /**
      * send message from server to all clients tracking <code>entity</code> including the entity itself
      *
-     * @param message message to send
      * @param entity  the tracked entity
+     * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(T message, Entity entity) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(Entity entity, T message) {
         ((ServerChunkCache) entity.getCommandSenderWorld().getChunkSource()).broadcastAndSend(entity, this.toClientboundPacket(message));
     }
 
     /**
      * send message from server to all clients in dimension
      *
-     * @param message message to send
      * @param level   dimension key provider level
+     * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, Level level) {
-        this.sendToDimension(message, level.dimension());
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(Level level, T message) {
+        this.sendToDimension(level.dimension(), message);
     }
 
     /**
      * send message from server to all clients in dimension
      *
-     * @param message   message to send
      * @param dimension dimension to send message in
+     * @param message   message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToDimension(T message, ResourceKey<Level> dimension) {
+    default <T extends Record & ClientboundMessage<T>> void sendToDimension(ResourceKey<Level> dimension, T message) {
         Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
     }
 

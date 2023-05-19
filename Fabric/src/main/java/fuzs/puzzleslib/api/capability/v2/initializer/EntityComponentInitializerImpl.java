@@ -6,7 +6,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
-import fuzs.puzzleslib.api.capability.v2.data.PlayerRespawnStrategy;
+import fuzs.puzzleslib.api.capability.v2.data.PlayerRespawnCopyStrategy;
 import fuzs.puzzleslib.impl.capability.ComponentFactoryRegistry;
 import fuzs.puzzleslib.impl.capability.FabricCapabilityController;
 import fuzs.puzzleslib.impl.capability.data.ComponentHolder;
@@ -33,11 +33,11 @@ import java.util.function.Function;
  */
 @ApiStatus.Internal
 public final class EntityComponentInitializerImpl implements EntityComponentInitializer {
-    private static final Map<PlayerRespawnStrategy, RespawnCopyStrategy<Component>> STRATEGY_CONVERTER_MAP = ImmutableMap.<PlayerRespawnStrategy, RespawnCopyStrategy<Component>>builder()
-            .put(PlayerRespawnStrategy.ALWAYS_COPY, RespawnCopyStrategy.ALWAYS_COPY)
-            .put(PlayerRespawnStrategy.INVENTORY, RespawnCopyStrategy.INVENTORY)
-            .put(PlayerRespawnStrategy.LOSSLESS, RespawnCopyStrategy.LOSSLESS_ONLY)
-            .put(PlayerRespawnStrategy.NEVER, RespawnCopyStrategy.NEVER_COPY)
+    private static final Map<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>> STRATEGY_CONVERTER_MAP = ImmutableMap.<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>>builder()
+            .put(PlayerRespawnCopyStrategy.ALWAYS, RespawnCopyStrategy.ALWAYS_COPY)
+            .put(PlayerRespawnCopyStrategy.KEEP_INVENTORY, RespawnCopyStrategy.INVENTORY)
+            .put(PlayerRespawnCopyStrategy.RETURNING_FROM_END, RespawnCopyStrategy.LOSSLESS_ONLY)
+            .put(PlayerRespawnCopyStrategy.NEVER, RespawnCopyStrategy.NEVER_COPY)
             .build();
 
     @Override
@@ -52,7 +52,7 @@ public final class EntityComponentInitializerImpl implements EntityComponentInit
         };
     }
 
-    public static ComponentFactoryRegistry<Player> getPlayerFactory(PlayerRespawnStrategy respawnStrategy) {
+    public static ComponentFactoryRegistry<Player> getPlayerFactory(PlayerRespawnCopyStrategy respawnStrategy) {
         return (Object o, ComponentKey<ComponentHolder> componentKey, Function<Player, ComponentHolder> factory) -> {
             RespawnCopyStrategy<Component> copyStrategy = STRATEGY_CONVERTER_MAP.get(respawnStrategy);
             Objects.requireNonNull(copyStrategy, "copy strategy is null");

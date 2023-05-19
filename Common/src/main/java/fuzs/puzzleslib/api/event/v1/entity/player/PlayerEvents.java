@@ -9,6 +9,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public final class PlayerEvents {
+    public static final EventInvoker<Copy> COPY = EventInvoker.lookup(Copy.class);
+    public static final EventInvoker<Respawn> RESPAWN = EventInvoker.lookup(Respawn.class);
     public static final EventInvoker<StartTracking> START_TRACKING = EventInvoker.lookup(StartTracking.class);
     public static final EventInvoker<StopTracking> STOP_TRACKING = EventInvoker.lookup(StopTracking.class);
     public static final EventInvoker<LoggedIn> LOGGED_IN = EventInvoker.lookup(LoggedIn.class);
@@ -18,6 +20,31 @@ public final class PlayerEvents {
 
     private PlayerEvents() {
 
+    }
+
+    @FunctionalInterface
+    public interface Copy {
+
+        /**
+         * Called when player data is copied to a new player.
+         *
+         * @param oldPlayer the old player
+         * @param newPlayer the new player
+         * @param alive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         */
+        void onCopy(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive);
+    }
+
+    @FunctionalInterface
+    public interface Respawn {
+
+        /**
+         * Called after player a has been respawned.
+         *
+         * @param player the player
+         * @param alive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         */
+        void onRespawn(ServerPlayer player, boolean alive);
     }
 
     @FunctionalInterface
