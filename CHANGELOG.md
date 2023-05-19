@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.1-1.19.4] - 2023-05-19
+### Added
+- Added events for when the player is being cloned and for after respawning
+### Changed
+- Some internal clean-up for capabilities and networking
+
 ## [v6.0.0-1.19.4] - 2023-05-18
 - Ported to Minecraft 1.19.4
 ### Changed

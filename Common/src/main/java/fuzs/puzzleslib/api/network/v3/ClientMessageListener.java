@@ -18,7 +18,7 @@ public abstract class ClientMessageListener<T extends Record> {
      * @param client  minecraft client instance
      * @param handler handler for vanilla packets
      * @param player  client player entity
-     * @param level the local client level
+     * @param level   the local client level
      */
     public abstract void handle(T message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level);
 }

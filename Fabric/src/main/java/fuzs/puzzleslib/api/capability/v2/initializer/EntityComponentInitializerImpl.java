@@ -33,7 +33,7 @@ import java.util.function.Function;
  */
 @ApiStatus.Internal
 public final class EntityComponentInitializerImpl implements EntityComponentInitializer {
-    private static final Map<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>> STRATEGY_CONVERTER_MAP = ImmutableMap.<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>>builder()
+    private static final Map<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>> COPY_STRATEGY_CONVERSIONS = ImmutableMap.<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>>builder()
             .put(PlayerRespawnCopyStrategy.ALWAYS, RespawnCopyStrategy.ALWAYS_COPY)
             .put(PlayerRespawnCopyStrategy.KEEP_INVENTORY, RespawnCopyStrategy.INVENTORY)
             .put(PlayerRespawnCopyStrategy.RETURNING_FROM_END, RespawnCopyStrategy.LOSSLESS_ONLY)
@@ -52,11 +52,12 @@ public final class EntityComponentInitializerImpl implements EntityComponentInit
         };
     }
 
-    public static ComponentFactoryRegistry<Player> getPlayerFactory(PlayerRespawnCopyStrategy respawnStrategy) {
+    public static ComponentFactoryRegistry<Player> getPlayerFactory(PlayerRespawnCopyStrategy playerRespawnCopyStrategy) {
+        Objects.requireNonNull(playerRespawnCopyStrategy, "player respawn copy strategy is null");
         return (Object o, ComponentKey<ComponentHolder> componentKey, Function<Player, ComponentHolder> factory) -> {
-            RespawnCopyStrategy<Component> copyStrategy = STRATEGY_CONVERTER_MAP.get(respawnStrategy);
-            Objects.requireNonNull(copyStrategy, "copy strategy is null");
-            ((EntityComponentFactoryRegistry) o).registerForPlayers(componentKey, factory::apply, copyStrategy);
+            RespawnCopyStrategy<Component> respawnCopyStrategy = COPY_STRATEGY_CONVERSIONS.get(playerRespawnCopyStrategy);
+            Objects.requireNonNull(respawnCopyStrategy, "respawn copy strategy is null");
+            ((EntityComponentFactoryRegistry) o).registerForPlayers(componentKey, factory::apply, respawnCopyStrategy);
         };
     }
 }

@@ -18,7 +18,7 @@ public abstract class ServerMessageListener<T extends Record> {
      * @param server  minecraft server instance
      * @param handler handler for vanilla packets
      * @param player  server player entity
-     * @param level the current level of <code>player</code>
+     * @param level   the current level of <code>player</code>
      */
     public abstract void handle(T message, MinecraftServer server, ServerGamePacketListenerImpl handler, ServerPlayer player, ServerLevel level);
 }

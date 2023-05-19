@@ -14,6 +14,7 @@ import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -32,23 +33,23 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, ((ForgeProxy) Proxy.INSTANCE)::registerClientReceiverV2);
+        this.register((Class<T>) clazz, ((ForgeProxy) Proxy.INSTANCE)::registerClientReceiverV2, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, ((ForgeProxy) Proxy.INSTANCE)::registerServerReceiverV2);
+        this.register((Class<T>) clazz, ((ForgeProxy) Proxy.INSTANCE)::registerServerReceiverV2, NetworkDirection.PLAY_TO_SERVER);
     }
 
-    private <T> void register(Class<T> clazz, BiConsumer<T, Supplier<NetworkEvent.Context>> handle) {
+    private <T> void register(Class<T> clazz, BiConsumer<T, Supplier<NetworkEvent.Context>> handle, NetworkDirection networkDirection) {
         if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         Objects.requireNonNull(this.channel, "channel is null");
         BiConsumer<T, FriendlyByteBuf> encode = (t, friendlyByteBuf) -> {
             MessageSerializers.findByType(clazz).write(friendlyByteBuf, t);
         };
         Function<FriendlyByteBuf, T> decode = MessageSerializers.findByType(clazz)::read;
-        this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle);
+        this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle, Optional.of(networkDirection));
     }
 
     @Override
