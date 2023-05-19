@@ -24,6 +24,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -280,7 +281,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(EntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (EntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            if (callback.onLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
+            if (callback.onLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });

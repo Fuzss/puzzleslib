@@ -19,6 +19,7 @@
     "LivingEntityFabricMixin",
     "LootingEnchantFunctionFabricMixin",
     "LootItemRandomChanceWithLootingConditionFabricMixin",
+    "MobFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",
     "ParrotFabricMixin",
