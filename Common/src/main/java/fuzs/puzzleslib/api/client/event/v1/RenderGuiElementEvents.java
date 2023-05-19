@@ -3,9 +3,12 @@ package fuzs.puzzleslib.api.client.event.v1;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.GameType;
 
 import java.util.Objects;
+import java.util.function.Predicate;
 
 /**
  * Events for managing all the rendering done in {@link net.minecraft.client.gui.Gui}.
@@ -17,120 +20,146 @@ public final class RenderGuiElementEvents {
     /**
      * The dark fading circle that shows around the whole gui.
      */
-    public static final ResourceLocation VIGNETTE = new ResourceLocation("vignette");
+    public static final GuiOverlay VIGNETTE = new GuiOverlay("vignette");
     /**
      * The overlay that shows when zooming in using a spyglass.
      */
-    public static final ResourceLocation SPYGLASS = new ResourceLocation("spyglass");
+    public static final GuiOverlay SPYGLASS = new GuiOverlay("spyglass");
     /**
      * The pumpkin overlay that shows while wearing a pumpkin.
      */
-    public static final ResourceLocation HELMET = new ResourceLocation("helmet");
+    public static final GuiOverlay HELMET = new GuiOverlay("helmet");
     /**
      * The frost effect shown around the screen border when freezing, aka when standing in powdered snow.
      */
-    public static final ResourceLocation FROSTBITE = new ResourceLocation("frostbite");
+    public static final GuiOverlay FROSTBITE = new GuiOverlay("frostbite");
     /**
      * The purple portal overlay distorting the screen when standing inside a nether portal.
      */
-    public static final ResourceLocation PORTAL = new ResourceLocation("portal");
+    public static final GuiOverlay PORTAL = new GuiOverlay("portal");
     /**
      * The hotbar shown on the bottom screen.
      */
-    public static final ResourceLocation HOTBAR = new ResourceLocation("hotbar");
+    public static final GuiOverlay HOTBAR = new GuiOverlay("hotbar");
     /**
      * The cross-hair shown in the center of the screen, includes the cross-hair attack indicator.
      */
-    public static final ResourceLocation CROSSHAIR = new ResourceLocation("crosshair");
+    public static final GuiOverlay CROSSHAIR = new GuiOverlay("crosshair");
     /**
      * The colorful health bar that shows while near a boss mob (ender dragon and wither in vanilla).
      */
-    public static final ResourceLocation BOSS_EVENT_PROGRESS = new ResourceLocation("boss_event_progress");
+    public static final GuiOverlay BOSS_EVENT_PROGRESS = new GuiOverlay("boss_event_progress");
     /**
      * The hearts representing the player's current health shown to the left above the hotbar.
      */
-    public static final ResourceLocation PLAYER_HEALTH = new ResourceLocation("player_health");
+    public static final GuiOverlay PLAYER_HEALTH = new GuiOverlay("player_health");
     /**
      * The armor icons representing the player's current protection level shown to the left above the hotbar.
      */
-    public static final ResourceLocation ARMOR_LEVEL = new ResourceLocation("armor_level");
+    public static final GuiOverlay ARMOR_LEVEL = new GuiOverlay("armor_level");
     /**
      * The little meat shanks representing the player's current food level shown to the right above the hotbar.
      */
-    public static final ResourceLocation FOOD_LEVEL = new ResourceLocation("food_level");
+    public static final GuiOverlay FOOD_LEVEL = new GuiOverlay("food_level");
     /**
      * The hearts representing the player's current mount's health shown to the right above the hotbar.
      */
-    public static final ResourceLocation MOUNT_HEALTH = new ResourceLocation("mount_health");
+    public static final GuiOverlay MOUNT_HEALTH = new GuiOverlay("mount_health");
     /**
      * The air bubbles representing the player's left air supply while underwater shown to the right above the hotbar.
      */
-    public static final ResourceLocation AIR_LEVEL = new ResourceLocation("air_level");
+    public static final GuiOverlay AIR_LEVEL = new GuiOverlay("air_level");
     /**
      * The jump bar shown when riding a mount that can jump such as horses, replaces the experience bar while active.
      */
-    public static final ResourceLocation JUMP_BAR = new ResourceLocation("jump_bar");
+    public static final GuiOverlay JUMP_BAR = new GuiOverlay("jump_bar");
     /**
      * A bar representing the player's current experience level progress shown above the hotbar.
      */
-    public static final ResourceLocation EXPERIENCE_BAR = new ResourceLocation("experience_bar");
+    public static final GuiOverlay EXPERIENCE_BAR = new GuiOverlay("experience_bar");
     /**
      * The name of the currently selected hotbar item shown right above the hotbar for a few seconds right after switching to that item.
      */
-    public static final ResourceLocation ITEM_NAME = new ResourceLocation("item_name");
+    public static final GuiOverlay ITEM_NAME = new GuiOverlay("item_name", minecraft -> minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR);
     /**
      * The screen fade effect that increasingly intensifies the longer the player lies in a bed.
      */
-    public static final ResourceLocation SLEEP_FADE = new ResourceLocation("sleep_fade");
+    public static final GuiOverlay SLEEP_FADE = new GuiOverlay("sleep_fade");
     /**
      * The debug screen that is toggled using <code>F3</code>.
      */
-    public static final ResourceLocation DEBUG_TEXT = new ResourceLocation("debug_text");
+    public static final GuiOverlay DEBUG_TEXT = new GuiOverlay("debug_text");
     /**
      * The fps graph which is part of the debug screen, but must be separately toggled by opening the debug screen while also holding <code>Alt</code>.
      */
-    public static final ResourceLocation FPS_GRAPH = new ResourceLocation("fps_graph");
+    public static final GuiOverlay FPS_GRAPH = new GuiOverlay("fps_graph");
     /**
      * The widgets showing the player's active {@link net.minecraft.world.effect.MobEffect}s in the top right corner of the screen.
      */
-    public static final ResourceLocation POTION_ICONS = new ResourceLocation("potion_icons");
+    public static final GuiOverlay POTION_ICONS = new GuiOverlay("potion_icons");
     /**
      * The title of the current record that is playing in a nearby jukebox shown above the hotbar.
      */
-    public static final ResourceLocation RECORD_OVERLAY = new ResourceLocation("record_overlay");
+    public static final GuiOverlay RECORD_OVERLAY = new GuiOverlay("record_overlay");
     /**
      * Subtitles for in-game sound events shown in the bottom right of the screen.
      */
-    public static final ResourceLocation SUBTITLES = new ResourceLocation("subtitles");
+    public static final GuiOverlay SUBTITLES = new GuiOverlay("subtitles");
     /**
      * A huge text shown in the center of the screen, triggered by the <code>/title</code> command.
      */
-    public static final ResourceLocation TITLE_TEXT = new ResourceLocation("title_text");
+    public static final GuiOverlay TITLE_TEXT = new GuiOverlay("title_text");
     /**
      * The scoreboard display shown to the right of the screen.
      */
-    public static final ResourceLocation SCOREBOARD = new ResourceLocation("scoreboard");
+    public static final GuiOverlay SCOREBOARD = new GuiOverlay("scoreboard");
     /**
      * The display for incoming chat messages.
      */
-    public static final ResourceLocation CHAT_PANEL = new ResourceLocation("chat_panel");
+    public static final GuiOverlay CHAT_PANEL = new GuiOverlay("chat_panel");
     /**
      * The list of online players on a server that shows centered at the top of the screen while the tab key is held.
      */
-    public static final ResourceLocation PLAYER_LIST = new ResourceLocation("player_list");
+    public static final GuiOverlay PLAYER_LIST = new GuiOverlay("player_list");
 
     private RenderGuiElementEvents() {
 
     }
 
-    public static EventInvoker<Before> before(ResourceLocation id) {
+    public static EventInvoker<Before> before(GuiOverlay id) {
         Objects.requireNonNull(id, "id is null");
         return EventInvoker.lookup(Before.class, id);
     }
 
-    public static EventInvoker<Before> after(ResourceLocation id) {
+    public static EventInvoker<Before> after(GuiOverlay id) {
         Objects.requireNonNull(id, "id is null");
         return EventInvoker.lookup(Before.class, id);
+    }
+
+    /**
+     * A simple id storage for a gui overlay, additionally can support a predicate for applying more precisely.
+     *
+     * @param id the identifier for this overlay type
+     * @param filter an optional filter to better help match the implementation between different mod loaders
+     */
+    public record GuiOverlay(ResourceLocation id, Predicate<Minecraft> filter) {
+
+        public GuiOverlay(String id) {
+            this(new ResourceLocation(id));
+        }
+
+        public GuiOverlay(ResourceLocation id) {
+            this(id, minecraft -> true);
+        }
+
+        public GuiOverlay(String id, Predicate<Minecraft> filter) {
+            this(new ResourceLocation(id), filter);
+        }
+
+        public GuiOverlay {
+            Objects.requireNonNull(id, "id is null");
+            Objects.requireNonNull(filter, "filter is null");
+        }
     }
 
     @FunctionalInterface
@@ -139,6 +168,7 @@ public final class RenderGuiElementEvents {
         /**
          * Called before a gui element is rendered, allows for cancelling rendering.
          *
+         * @param minecraft    minecraft singleton instance
          * @param poseStack    the pose stack
          * @param tickDelta    partial tick time
          * @param screenWidth  width of the window's screen
@@ -146,7 +176,7 @@ public final class RenderGuiElementEvents {
          * @return {@link EventResult#INTERRUPT} to prevent the element from rendering,
          * {@link EventResult#PASS} to allow the element to render normally
          */
-        EventResult onBeforeRenderGuiElement(PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
+        EventResult onBeforeRenderGuiElement(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
     }
 
     @FunctionalInterface
@@ -155,11 +185,12 @@ public final class RenderGuiElementEvents {
         /**
          * Called after a gui element is rendered.
          *
+         * @param minecraft    minecraft singleton instance
          * @param poseStack    the pose stack
          * @param tickDelta    partial tick time
          * @param screenWidth  width of the window's screen
          * @param screenHeight height of the window's screen
          */
-        void onAfterRenderGuiElement(PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
+        void onAfterRenderGuiElement(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
     }
 }

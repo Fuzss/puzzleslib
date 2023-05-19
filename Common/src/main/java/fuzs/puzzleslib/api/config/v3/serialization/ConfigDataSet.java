@@ -77,22 +77,6 @@ public interface ConfigDataSet<T> extends Collection<T> {
     void clear();
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given registry and a list of values to parse.
-     * If no data types are specified, the config data set will only contain simple values, the underlying data structure will be similar to a set.
-     *
-     * @param registryKey registry for type
-     * @param values      values backing this set
-     * @param <T>         registry type
-     * @return builder backed by <code>registry</code>
-     *
-     * @deprecated migrate to {@link #from(ResourceKey, List, Class[])}
-     */
-    @Deprecated(forRemoval = true)
-    static <T> ConfigDataSet<T> from(final ResourceKey<? extends Registry<T>> registryKey, List<String> values) {
-        return from(registryKey, values, new Class[0]);
-    }
-
-    /**
      * Creates a new {@link ConfigDataSet} instance for a given registry and a list of values to parse, possibly including attached data types.
      * <p>If no data types are specified, the config data set will only contain simple values, the underlying data structure will be similar to a set.
      * <p>Otherwise, the config data set will contain values as keys with associated data values in the form of <code>Object[]</code>, the underlying data structure is similar to a map.
@@ -113,7 +97,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
      *
      * @param registryKey registry for type
      * @param values      values backing this set
-     * @param filter      filter for verifying values and attached data
+     * @param filter      filter for verifying data values, the filter is passed the index of the data type in <code>types</code> and then the read data value to be tested
      * @param types       attached data types
      * @param <T>         registry type
      * @return builder backed by <code>registry</code>

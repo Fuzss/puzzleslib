@@ -12,10 +12,10 @@ public interface RenderGuiCallback {
      * Called at the end of {@link net.minecraft.client.gui.Gui#render(PoseStack, float)} after vanilla has drawn all elements.
      * <p>Allows for rendering additional elements on the screen.
      *
-     * @param minecraft minecraft singleton instance
-     * @param poseStack the current pose stack
-     * @param tickDelta partial tick time
-     * @param screenWidth window width
+     * @param minecraft    minecraft singleton instance
+     * @param poseStack    the current pose stack
+     * @param tickDelta    partial tick time
+     * @param screenWidth  window width
      * @param screenHeight window height
      */
     void onRenderGui(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
