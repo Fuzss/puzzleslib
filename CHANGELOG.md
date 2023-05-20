@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.4-1.19.4] - 2023-05-20
+### Added
+- Added a few new rendering related client events
+
 ## [v6.0.3-1.19.4] - 2023-05-20
 ### Fixed
 - Fixed `ClassCastException` for `RenderGuiElementEvents`

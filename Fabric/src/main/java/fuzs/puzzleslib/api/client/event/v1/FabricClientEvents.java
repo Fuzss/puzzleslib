@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.client.event.v1;
 
 import com.google.common.collect.Maps;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.resources.ResourceLocation;
@@ -52,6 +53,22 @@ public final class FabricClientEvents {
      * Called after a key press, release or repeat action is handled.
      */
     public static final Event<InputEvents.AfterKeyAction> AFTER_KEY_ACTION = FabricEventFactory.create(InputEvents.AfterKeyAction.class);
+    /**
+     * Called before the player model is rendered, allows for applying transformations to the {@link PoseStack}, or for completely taking over rendering as a whole.
+     */
+    public static final Event<RenderPlayerEvents.Before> BEFORE_RENDER_PLAYER = FabricEventFactory.createResult(RenderPlayerEvents.Before.class);
+    /**
+     * Called after the player model is rendered, allows for cleaning up trnasofmrations applied to the {@link PoseStack}.
+     */
+    public static final Event<RenderPlayerEvents.After> AFTER_RENDER_PLAYER = FabricEventFactory.create(RenderPlayerEvents.After.class);
+    /**
+     * Called before one of the player's hands is rendered in first-person mode.
+     */
+    public static final Event<RenderHandCallback> RENDER_HAND = FabricEventFactory.createResult(RenderHandCallback.class);
+    /**
+     * Runs before camera angle setup is done, allows for additional control over roll (which vanilla itself does not support) in addition to pitch and yaw.
+     */
+    public static final Event<ComputeCameraAnglesCallback> COMPUTE_CAMERA_ANGLES = FabricEventFactory.create(ComputeCameraAnglesCallback.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

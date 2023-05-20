@@ -182,6 +182,24 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(InputEvents.AfterKeyAction.class, InputEvent.Key.class, (InputEvents.AfterKeyAction callback, InputEvent.Key evt) -> {
             callback.onAfterKeyAction(evt.getKey(), evt.getScanCode(), evt.getAction(), evt.getModifiers());
         });
+        INSTANCE.register(ComputeCameraAnglesCallback.class, ViewportEvent.ComputeCameraAngles.class, (ComputeCameraAnglesCallback callback, ViewportEvent.ComputeCameraAngles evt) -> {
+            MutableFloat pitch = MutableFloat.fromEvent(evt::setPitch, evt::getPitch);
+            MutableFloat yaw = MutableFloat.fromEvent(evt::setYaw, evt::getYaw);
+            MutableFloat roll = MutableFloat.fromEvent(evt::setRoll, evt::getRoll);
+            callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), evt.getPitch(), pitch, yaw, roll);
+        });
+        INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
+            EventResult result = callback.onBeforeRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderPlayerEvents.After.class, RenderPlayerEvent.Post.class, (RenderPlayerEvents.After callback, RenderPlayerEvent.Post evt) -> {
+            callback.onAfterRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+        });
+        INSTANCE.register(RenderHandCallback.class, RenderHandEvent.class, (RenderHandCallback callback, RenderHandEvent evt) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            EventResult result = callback.onRenderHand(minecraft.player, evt.getHand(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {

@@ -38,15 +38,18 @@
     "client.EntityRendererFabricMixin",
     "client.GameRendererFabricMixin",
     "client.GuiFabricMixin",
+    "client.ItemInHandRendererMixin",
     "client.ItemRendererFabricMixin",
     "client.KeyboardHandlerFabricMixin",
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",
     "client.ModelManagerFabricMixin",
     "client.MouseHandlerFabricMixin",
+    "client.PlayerRendererFabricMixin",
     "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
+    "client.accessor.CameraFabricAccessor",
     "client.accessor.MinecraftFabricAccessor"
   ],
   "injectors": {
