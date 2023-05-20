@@ -29,24 +29,16 @@ public interface ContainerImpl extends Container {
     /**
      * Retrieves the item list backing this inventory.
      */
-    @Deprecated(forRemoval = true)
-    default NonNullList<ItemStack> items() {
-        return this.getItems();
-    }
-
-    /**
-     * Retrieves the item list backing this inventory.
-     */
-    NonNullList<ItemStack> getItems();
+    NonNullList<ItemStack> items();
 
     @Override
     default int getContainerSize() {
-        return this.getItems().size();
+        return this.items().size();
     }
 
     @Override
     default boolean isEmpty() {
-        for (ItemStack stack : this.getItems()) {
+        for (ItemStack stack : this.items()) {
             if (!stack.isEmpty()) {
                 return false;
             }
@@ -56,25 +48,25 @@ public interface ContainerImpl extends Container {
 
     @Override
     default ItemStack getItem(int slot) {
-        return slot >= 0 && slot < this.getContainerSize() ? this.getItems().get(slot) : ItemStack.EMPTY;
+        return slot >= 0 && slot < this.getContainerSize() ? this.items().get(slot) : ItemStack.EMPTY;
     }
 
     @Override
     default ItemStack removeItem(int slot, int count) {
-        ItemStack result = ContainerHelper.removeItem(this.getItems(), slot, count);
+        ItemStack result = ContainerHelper.removeItem(this.items(), slot, count);
         if (!result.isEmpty()) this.setChanged();
         return result;
     }
 
     @Override
     default ItemStack removeItemNoUpdate(int slot) {
-        return ContainerHelper.takeItem(this.getItems(), slot);
+        return ContainerHelper.takeItem(this.items(), slot);
     }
 
     @Override
     default void setItem(int slot, ItemStack stack) {
         if (slot >= 0 && slot < this.getContainerSize()) {
-            this.getItems().set(slot, stack);
+            this.items().set(slot, stack);
             if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
                 stack.setCount(this.getMaxStackSize());
             }
@@ -84,7 +76,7 @@ public interface ContainerImpl extends Container {
 
     @Override
     default void clearContent() {
-        this.getItems().clear();
+        this.items().clear();
         this.setChanged();
     }
 

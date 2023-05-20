@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.27-1.19.3] - 2023-05-20
+### Fixed
+- Fixed `java.lang.AbstractMethodError` caused by an overambitious rename in `ContainerImpl`
+
 ## [v5.0.26-1.19.3] - 2023-05-20
 ### Fixed
 - Fixed `ClassCastException` for after events in `ScreenMouseEvents`
