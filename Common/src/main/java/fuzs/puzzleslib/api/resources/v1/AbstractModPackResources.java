@@ -96,6 +96,11 @@ public abstract class AbstractModPackResources implements PackResources {
     }
 
     @Override
+    public boolean isBuiltin() {
+        return true;
+    }
+
+    @Override
     public void close() {
 
     }

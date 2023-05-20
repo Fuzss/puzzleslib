@@ -24,7 +24,7 @@ public final class FabricClientEvents {
      * Called when computing the field of view modifier on the client, mostly depending on {@link Attributes#MOVEMENT_SPEED},
      * but also changes for certain actions such as when drawing a bow.
      */
-    public static final Event<ComputeFovModifierCallback> COMPUTE_FOV_MODIFIER = FabricEventFactory.createResult(ComputeFovModifierCallback.class);
+    public static final Event<ComputeFovModifierCallback> COMPUTE_FOV_MODIFIER = FabricEventFactory.create(ComputeFovModifierCallback.class);
     /**
      * Called before the chat panel is drawn, allows for changing x- and y-position.
      */

@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog].
 ## [v6.0.4-1.19.4] - 2023-05-20
 ### Added
 - Added a few new rendering related client events
+### Fixed
+- Fixed `NullPointerException` when firing `ComputeFovModifierCallback` on Fabric
 
 ## [v6.0.3-1.19.4] - 2023-05-20
 ### Fixed

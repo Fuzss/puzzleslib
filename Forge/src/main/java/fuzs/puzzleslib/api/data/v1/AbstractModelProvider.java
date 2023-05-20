@@ -23,9 +23,44 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
     @Override
     protected abstract void registerStatesAndModels();
 
-    public void builtInBlock(Block block, Block texture) {
+    /**
+     * Creates a block states definition for a simple block with an already existing model, useful when the model has been created with an external tool like Blockbench.
+     *
+     * @param block the block whose id to use for both the block states file and the existing model reference
+     */
+    public void simpleExistingBlock(Block block) {
+        this.simpleBlock(block, existingBlockModel(block));
+    }
+
+    public void simpleExistingBlockWithItem(Block block) {
+        ModelFile.ExistingModelFile model = this.existingBlockModel(block);
+        this.simpleBlock(block, model);
+        this.simpleBlockItem(block, model);
+    }
+
+    public ModelFile.ExistingModelFile existingBlockModel(Block block) {
+        return new ModelFile.ExistingModelFile(this.blockTexture(block), this.models().existingFileHelper);
+    }
+
+    /**
+     * Creates a simple block states definition for a block entity block that is rendered via a built-in block, only defines a particle texture by providing another block.
+     *
+     * @param block           the block to generate the block states definition for
+     * @param particleTexture the block use for the particle texture
+     */
+    public void builtInBlock(Block block, Block particleTexture) {
+        this.builtInBlock(block, this.blockTexture(particleTexture));
+    }
+
+    /**
+     * Creates a simple block states definition for a block entity block that is rendered via a built-in block, only defines a particle texture.
+     *
+     * @param block           the block to generate the block states definition for
+     * @param particleTexture the particle texture
+     */
+    public void builtInBlock(Block block, ResourceLocation particleTexture) {
         this.simpleBlock(block, this.models().getBuilder(this.name(block))
-                .texture("particle", this.blockTexture(texture)));
+                .texture("particle", particleTexture));
     }
 
     public void cubeBottomTopBlock(Block block) {
@@ -69,10 +104,22 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
         return new ResourceLocation(rl.getNamespace(), rl.getPath() + suffix);
     }
 
+    /**
+     * Creates a flat item texture model with a single layer.
+     *
+     * @param item the item to generate the model for
+     * @return the model builder for adding further data
+     */
     public ItemModelBuilder basicItem(Item item) {
         return this.itemModels().basicItem(item);
     }
 
+    /**
+     * Creates a flat item texture model with a single layer.
+     *
+     * @param item the item to generate the model for
+     * @return the model builder for adding further data
+     */
     public ItemModelBuilder basicItem(ResourceLocation item) {
         return this.itemModels().basicItem(item);
     }
