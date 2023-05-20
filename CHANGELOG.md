@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.28-1.19.3] - 2023-05-20
+### Fixed
+- Fixed `NullPointerException` when firing `ComputeFovModifierCallback` on Fabric
+
 ## [v5.0.27-1.19.3] - 2023-05-20
 ### Fixed
 - Fixed `java.lang.AbstractMethodError` caused by an overambitious rename in `ContainerImpl`
