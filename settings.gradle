@@ -17,10 +17,6 @@ pluginManagement {
             name = 'Quilt (Snapshot)'
             url = 'https://maven.quiltmc.org/repository/snapshot'
         }
-        maven {
-            name = 'QuiltFlower'
-            url = 'https://server.bbkr.space/artifactory/libs-release/'
-        }
     }
 }
 

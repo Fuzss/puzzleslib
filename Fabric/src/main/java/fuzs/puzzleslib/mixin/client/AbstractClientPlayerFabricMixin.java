@@ -24,9 +24,11 @@ abstract class AbstractClientPlayerFabricMixin extends Player {
     @Inject(method = "getFieldOfViewModifier", at = @At("TAIL"), cancellable = true)
     public void getFieldOfViewModifier(CallbackInfoReturnable<Float> callback) {
         final float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
+        // if fov effects don't apply due to the option being set to 0 no need to fire the event
+        if (fovEffectScale == 0.0F) return;
         // reverse fovEffectScale calculations applied by vanilla in return statement,
         // we could capture the original value previous to return, but this approach only needs one mixin
-        DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue(callback.getReturnValueF() + 1.0F - 1.0F / fovEffectScale);
+        DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue((callback.getReturnValueF() - 1.0F) / fovEffectScale + 1.0F);
         FabricClientEvents.COMPUTE_FOV_MODIFIER.invoker().onComputeFovModifier(this, fieldOfViewModifier);
         fieldOfViewModifier.getAsOptionalFloat().map(value -> Mth.lerp(fovEffectScale, 1.0F, value)).ifPresent(callback::setReturnValue);
     }

@@ -19,6 +19,8 @@ import net.minecraftforge.eventbus.api.Event;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import static fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl.INSTANCE;
 
@@ -64,13 +66,13 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ComputeFovModifierCallback.class, ComputeFovModifierEvent.class, (ComputeFovModifierCallback callback, ComputeFovModifierEvent evt) -> {
             final float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
-            // reverse fovEffectScale calculations applied by vanilla in return statement
-            float fieldOfViewModifierValue = evt.getNewFovModifier() + 1.0F - 1.0F / fovEffectScale;
-            MutableFloat fieldOfViewModifier$Internal = MutableFloat.fromValue(fieldOfViewModifierValue);
-            // this approach is chosen so the callback may work with the actual fov modifier, and does not have to deal with the fovEffectScale option
-            DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromEvent(fieldOfViewModifier$Internal::accept, fieldOfViewModifier$Internal::getAsFloat, evt::getFovModifier);
-            callback.onComputeFovModifier(evt.getPlayer(), fieldOfViewModifier);
-            fieldOfViewModifier.getAsOptionalFloat().filter(value -> value != fieldOfViewModifierValue).map(value -> Mth.lerp(fovEffectScale, 1.0F, value)).ifPresent(evt::setNewFovModifier);
+            if (fovEffectScale == 0.0F) return;
+            // reverse fovEffectScale calculations applied by vanilla in return statement / by Forge when setting up the event
+            // this approach is chosen so the callback may work with the actual fov modifier, and does not have to deal with the fovEffectScale option,
+            // which is applied automatically regardless
+            Consumer<Float> consumer = value -> evt.setNewFovModifier(Mth.lerp(fovEffectScale, 1.0F, value));
+            Supplier<Float> supplier = () -> (evt.getNewFovModifier() - 1.0F) / fovEffectScale + 1.0F;
+            callback.onComputeFovModifier(evt.getPlayer(), DefaultedFloat.fromEvent(consumer, supplier, evt::getFovModifier));
         });
         INSTANCE.register(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (ScreenEvents.BeforeInit callback, ScreenEvent.Init.Pre evt) -> {
             List<AbstractWidget> widgets = evt.getListenersList().stream().filter(listener -> listener instanceof AbstractWidget).map(listener -> (AbstractWidget) listener).toList();
