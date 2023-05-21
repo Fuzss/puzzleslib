@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.core.v1;
 
 /**
- * Allows for specifying certain mod contents that need something to be registered to enable the mod loader specific implementation to work (mostly on Forge)
+ * Allows for specifying certain mod contents that need something to be registered to enable the mod loader specific implementation to work (mostly intended for Forge).
  */
 public enum ContentRegistrationFlags {
     /**

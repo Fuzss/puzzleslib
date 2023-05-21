@@ -1,151 +1,122 @@
 package fuzs.puzzleslib.impl.client.core;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
-import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
-import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextForgeImpl;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.loading.FMLLoader;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.Map;
+import java.util.function.Consumer;
 
 public final class ForgeClientModConstructor {
-    private final String modId;
-    private final ClientModConstructor constructor;
-    private final Set<ContentRegistrationFlags> contentRegistrations;
-    private final List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers = Lists.newArrayList();
 
-    private ForgeClientModConstructor(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        this.modId = modId;
-        this.constructor = constructor;
-        this.contentRegistrations = ImmutableSet.copyOf(contentRegistrations);
-        constructor.onConstructMod();
+    private ForgeClientModConstructor() {
+
     }
 
-    @SubscribeEvent
-    public void onClientSetup(final FMLClientSetupEvent evt) {
-        this.constructor.onClientSetup(evt::enqueueWork);
-        this.constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
-        this.constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
-        this.constructor.onRegisterBuiltinModelItemRenderers(this.getBuiltinModelItemRendererContext());
-        this.constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
-        this.constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+
+    public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
+        ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
+            registerModHandlers(constructor, modId, eventBus, Lists.newArrayList(), contentRegistrations);
+            constructor.onConstructMod();
+        });
     }
 
-    private BuiltinModelItemRendererContext getBuiltinModelItemRendererContext() {
-        return new BuiltinModelItemRendererContext() {
-
-            @Override
-            public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
-                // copied from Forge, seems to break data gen otherwise
-                if (FMLLoader.getLaunchHandler().isData()) return;
-                Objects.requireNonNull(renderer, "renderer is null");
-                // store this to enable listening to resource reloads
-                ForgeClientModConstructor.this.dynamicBuiltinModelItemRenderers.add(renderer);
-                // this solution is very dangerous as it relies on internal stuff in Forge
-                // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
-                IClientItemExtensions clientItemExtension = new IClientItemExtensions() {
-
-                    @Override
-                    public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                        Minecraft minecraft = Minecraft.getInstance();
-                        return new BlockEntityWithoutLevelRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels()) {
-
-                            @Override
-                            public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-                                renderer.renderByItem(stack, mode, matrices, vertexConsumers, light, overlay);
-                            }
-                        };
-                    }
-                };
-                Objects.requireNonNull(object, "item is null");
-                setClientItemExtensions(object, clientItemExtension);
-                Objects.requireNonNull(objects, "items is null");
-                for (ItemLike item : objects) {
-                    Objects.requireNonNull(item, "item is null");
-                    setClientItemExtensions(item, clientItemExtension);
-                }
+    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
+        eventBus.addListener((final FMLClientSetupEvent evt) -> {
+            constructor.onClientSetup(evt::enqueueWork);
+            constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
+            constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
+            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers, contentRegistrations));
+            constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
+            constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+        });
+        eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
+            constructor.onRegisterEntityRenderers(new EntityRenderersContextForgeImpl(evt::registerEntityRenderer));
+            constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextForgeImpl(evt::registerBlockEntityRenderer));
+        });
+        eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent evt) -> {
+            constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl(evt::register));
+        });
+        eventBus.addListener((final RegisterParticleProvidersEvent evt) -> {
+            constructor.onRegisterParticleProviders(new ParticleProvidersContextForgeImpl(evt));
+        });
+        eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
+            constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextForgeImpl(evt::registerLayerDefinition));
+        });
+        eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
+            onModifyBakingResult(constructor::onModifyBakingResult, modId, evt.getModels(), evt.getModelBakery());
+        });
+        eventBus.addListener((final ModelEvent.BakingCompleted evt) -> {
+            onBakingCompleted(constructor::onBakingCompleted, modId, evt.getModelManager(), evt.getModels(), evt.getModelBakery());
+        });
+        eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
+            constructor.onRegisterAdditionalModels(new AdditionalModelsContextForgeImpl(evt::register));
+        });
+        eventBus.addListener((final RegisterItemDecorationsEvent evt) -> {
+            constructor.onRegisterItemDecorations(new ItemDecorationContextForgeImpl(evt::register));
+        });
+        eventBus.addListener((final RegisterEntitySpectatorShadersEvent evt) -> {
+            constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextForgeImpl(evt::register));
+        });
+        eventBus.addListener((final EntityRenderersEvent.CreateSkullModels evt) -> {
+            constructor.onRegisterSkullRenderers(new SkullRenderersContextForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
+        });
+        eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
+            constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextForgeImpl(evt::registerReloadListener));
+        });
+        eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
+            registerBuiltInItemModelRenderersReloadListeners(evt::registerReloadListener, modId, dynamicRenderers, contentRegistrations);
+        });
+        eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
+            constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextForgeImpl(evt));
+        });
+        eventBus.addListener((final RegisterKeyMappingsEvent evt) -> {
+            constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl(evt::register));
+        });
+        eventBus.addListener((final RegisterColorHandlersEvent.Block evt) -> {
+            constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextForgeImpl(evt::register, evt.getBlockColors()));
+        });
+        eventBus.addListener((final RegisterColorHandlersEvent.Item evt) -> {
+            constructor.onRegisterItemColorProviders(new ItemColorProvidersContextForgeImpl(evt::register, evt.getItemColors()));
+        });
+        eventBus.addListener((final CreativeModeTabEvent.BuildContents evt) -> {
+            ResourceLocation identifier = CreativeModeTabRegistry.getName(evt.getTab());
+            if (identifier != null) {
+                constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl(identifier, evt.getParameters(), evt));
             }
-        };
-    }
-
-    private static void setClientItemExtensions(ItemLike item, IClientItemExtensions clientItemExtensions) {
-        Object currentClientItemExtension = ((ItemForgeAccessor) item.asItem()).puzzleslib$getRenderProperties();
-        ((ItemForgeAccessor) item.asItem()).puzzleslib$setRenderProperties(currentClientItemExtension != null ? new ForwardingClientItemExtensions((IClientItemExtensions) currentClientItemExtension) {
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return clientItemExtensions.getCustomRenderer();
+        });
+        eventBus.addListener((final AddPackFindersEvent evt) -> {
+            if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
+                constructor.onAddResourcePackFinders(new ResourcePackSourcesContextForgeImpl(evt::addRepositorySource));
             }
-        } : clientItemExtensions);
+        });
     }
 
-    @SubscribeEvent
-    public void onRegisterRenderers(final EntityRenderersEvent.RegisterRenderers evt) {
-        this.constructor.onRegisterEntityRenderers(new EntityRenderersContextForgeImpl(evt::registerEntityRenderer));
-        this.constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextForgeImpl(evt::registerBlockEntityRenderer));
-    }
-
-    @SubscribeEvent
-    public void onRegisterClientTooltipComponentFactories(final RegisterClientTooltipComponentFactoriesEvent evt) {
-        this.constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl(evt::register));
-    }
-
-    @SubscribeEvent
-    public void onRegisterParticleProviders(final RegisterParticleProvidersEvent evt) {
-        this.constructor.onRegisterParticleProviders(new ParticleProvidersContextForgeImpl(evt));
-    }
-
-    @SubscribeEvent
-    public void onRegisterLayerDefinitions(final EntityRenderersEvent.RegisterLayerDefinitions evt) {
-        this.constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextForgeImpl(evt::registerLayerDefinition));
-    }
-
-    @SubscribeEvent
-    public void onModifyBakingResult(final ModelEvent.ModifyBakingResult evt) {
+    private static void onBakingCompleted(Consumer<DynamicBakingCompletedContext> consumer, String modId, ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
         try {
-            this.constructor.onModifyBakingResult(new DynamicModifyBakingResultContext(evt.getModels(), evt.getModelBakery()));
-        } catch (Exception e) {
-            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", this.modId, e);
-        }
-    }
-
-    @SubscribeEvent
-    public void onBakingCompleted(final ModelEvent.BakingCompleted evt) {
-        try {
-            this.constructor.onBakingCompleted(new DynamicBakingCompletedContext(evt.getModelManager(), evt.getModels(), evt.getModelBakery()) {
+            consumer.accept(new DynamicBakingCompletedContext(modelManager, models, modelBakery) {
 
                 @SuppressWarnings("resource")
                 @Override
@@ -154,86 +125,30 @@ public final class ForgeClientModConstructor {
                 }
             });
         } catch (Exception e) {
-            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", this.modId, e);
+            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
         }
     }
 
-    @SubscribeEvent
-    public void onRegisterAdditional(final ModelEvent.RegisterAdditional evt) {
-        this.constructor.onRegisterAdditionalModels(new AdditionalModelsContextForgeImpl(evt::register));
+    private static void onModifyBakingResult(Consumer<DynamicModifyBakingResultContext> consumer, String modId, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
+        try {
+            consumer.accept(new DynamicModifyBakingResultContext(models, modelBakery));
+        } catch (Exception e) {
+            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
+        }
     }
 
-    @SubscribeEvent
-    public void onRegisterItemDecorations(final RegisterItemDecorationsEvent evt) {
-        this.constructor.onRegisterItemDecorations(new ItemDecorationContextForgeImpl(evt::register));
-    }
-
-    @SubscribeEvent
-    public void onRegisterEntitySpectatorShaders(final RegisterEntitySpectatorShadersEvent evt) {
-        this.constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextForgeImpl(evt::register));
-    }
-
-    @SubscribeEvent
-    public void onCreateSkullModels(final EntityRenderersEvent.CreateSkullModels evt) {
-        this.constructor.onRegisterSkullRenderers(new SkullRenderersContextForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
-    }
-
-    @SubscribeEvent
-    public void onRegisterClientReloadListeners(final RegisterClientReloadListenersEvent evt) {
-        this.constructor.onRegisterResourcePackReloadListeners((String id, PreparableReloadListener reloadListener) -> {
-            Objects.requireNonNull(id, "reload listener id is null");
-            Objects.requireNonNull(reloadListener, "reload listener is null");
-            evt.registerReloadListener(reloadListener);
-        });
-        if (this.contentRegistrations.contains(ContentRegistrationFlags.BUILT_IN_ITEM_MODEL_RENDERERS)) {
+    private static void registerBuiltInItemModelRenderersReloadListeners(Consumer<PreparableReloadListener> consumer, String modId, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
+        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BUILT_IN_ITEM_MODEL_RENDERERS)) {
             // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
-            evt.registerReloadListener((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-                for (ResourceManagerReloadListener listener : this.dynamicBuiltinModelItemRenderers) {
-                    listener.onResourceManagerReload(resourceManager);
+            consumer.accept((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+                for (ResourceManagerReloadListener listener : dynamicRenderers) {
+                    try {
+                        listener.onResourceManagerReload(resourceManager);
+                    } catch (Exception e) {
+                        PuzzlesLib.LOGGER.error("Unable to execute dynamic built-in model item renderers reload provided by {}", modId, e);
+                    }
                 }
             });
         }
-    }
-
-    @SubscribeEvent
-    public void onAddLayers(final EntityRenderersEvent.AddLayers evt) {
-        this.constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextForgeImpl(evt));
-    }
-
-    @SubscribeEvent
-    public void onRegisterKeyMappings(final RegisterKeyMappingsEvent evt) {
-        this.constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl(evt::register));
-    }
-
-    @SubscribeEvent
-    public void onRegisterBlockColorHandlers(final RegisterColorHandlersEvent.Block evt) {
-        this.constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextForgeImpl(evt::register, evt.getBlockColors()));
-    }
-
-    @SubscribeEvent
-    public void onRegisterItemColorHandlers(final RegisterColorHandlersEvent.Item evt) {
-        this.constructor.onRegisterItemColorProviders(new ItemColorProvidersContextForgeImpl(evt::register, evt.getItemColors()));
-    }
-
-    @SubscribeEvent
-    public void onCreativeModeTab$BuildContents(final CreativeModeTabEvent.BuildContents evt) {
-        ResourceLocation identifier = CreativeModeTabRegistry.getName(evt.getTab());
-        if (identifier != null) {
-            this.constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl(identifier, evt.getParameters(), evt));
-        }
-    }
-
-    @SubscribeEvent
-    public void onAddPackFinders(final AddPackFindersEvent evt) {
-        if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
-            this.constructor.onAddResourcePackFinders(new ResourcePackSourcesContextForgeImpl(evt::addRepositorySource));
-        }
-    }
-
-    public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        ForgeClientModConstructor forgeModConstructor = new ForgeClientModConstructor(constructor, modId, contentRegistrations);
-        ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
-            eventBus.register(forgeModConstructor);
-        });
     }
 }

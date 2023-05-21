@@ -80,8 +80,7 @@ public final class FabricClientModConstructor {
 
     private static void registerBuiltinModelItemRenderers(Consumer<BuiltinModelItemRendererContext> consumer, String modId) {
         List<ResourceManagerReloadListener> listeners = Lists.newArrayList();
-        BuiltinModelItemRendererContextFabricImpl context = new BuiltinModelItemRendererContextFabricImpl(listeners);
-        consumer.accept(context);
+        consumer.accept(new BuiltinModelItemRendererContextFabricImpl(listeners));
         if (listeners.isEmpty()) return;
         ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricResourceReloadListener(modId, "built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
             for (ResourceManagerReloadListener listener : listeners) {

@@ -21,6 +21,7 @@ public record BuiltinModelItemRendererContextFabricImpl(List<ResourceManagerRelo
             Objects.requireNonNull(item, "item is null");
             BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
         }
+        // store this to enable listening to resource reloads
         this.dynamicBuiltinModelItemRenderers.add(renderer);
     }
 }
