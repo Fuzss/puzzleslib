@@ -32,6 +32,11 @@ public class FabricClientProxy extends FabricServerProxy {
     }
 
     @Override
+    public Object getClientInstance() {
+        return Minecraft.getInstance();
+    }
+
+    @Override
     public Connection getClientConnection() {
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
         Objects.requireNonNull(connection, "Cannot send packets when not in game!");

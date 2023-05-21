@@ -9,6 +9,14 @@ import java.util.function.Function;
 @FunctionalInterface
 public interface CapabilityFactory<C> extends Function<Object, C> {
 
+    /**
+     * @param t object to create capability from, mostly unused
+     * @return the capability component
+     */
+    C createComponent(Object t);
+
     @Override
-    C apply(Object t);
+    default C apply(Object t) {
+        return this.createComponent(t);
+    }
 }

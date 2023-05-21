@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.30-1.19.3] - 2023-05-21
+### Fixed
+- Reverted some more changes introduced in v5.0.25 leading to incompatibilities
+- Fixed `ComputeFovModifierCallback` dividing by zero when fov effects are disabled
+
+## [v5.0.29-1.19.3] - 2023-05-20
+- Bump version
+
 ## [v5.0.28-1.19.3] - 2023-05-20
 ### Fixed
 - Fixed `NullPointerException` when firing `ComputeFovModifierCallback` on Fabric

@@ -31,17 +31,22 @@ public class FabricServerProxy implements FabricProxy {
 
     @Override
     public Player getClientPlayer() {
-        throw new RuntimeException("Client player accessed for wrong side!");
+        return null;
     }
 
     @Override
     public Level getClientLevel() {
-        throw new RuntimeException("Client level accessed for wrong side!");
+        return null;
+    }
+
+    @Override
+    public Object getClientInstance() {
+        return null;
     }
 
     @Override
     public Connection getClientConnection() {
-        throw new RuntimeException("Client connection accessed for wrong side!");
+        return null;
     }
 
     @Override
