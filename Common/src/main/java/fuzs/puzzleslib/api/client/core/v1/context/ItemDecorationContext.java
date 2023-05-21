@@ -13,8 +13,7 @@ public interface ItemDecorationContext {
      * register a {@link DynamicItemDecorator} for an <code>item</code>
      *
      * @param decorator renderer implementation
-     * @param object    the item to draw for
-     * @param objects   more items to draw for
+     * @param items   items to draw for
      */
-    void registerItemDecorator(DynamicItemDecorator decorator, ItemLike object, ItemLike... objects);
+    void registerItemDecorator(DynamicItemDecorator decorator, ItemLike... items);
 }

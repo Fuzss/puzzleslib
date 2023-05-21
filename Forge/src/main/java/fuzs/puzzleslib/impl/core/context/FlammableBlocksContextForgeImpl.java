@@ -2,12 +2,13 @@ package fuzs.puzzleslib.impl.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.FlammableBlocksContext;
-import net.fabricmc.fabric.api.registry.FlammableBlockRegistry;
+import fuzs.puzzleslib.mixin.accessor.FireBlockForgeAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
-public final class FlammableBlocksContextFabricImpl implements FlammableBlocksContext {
+public final class FlammableBlocksContextForgeImpl implements FlammableBlocksContext {
 
     @Override
     public void registerFlammable(int encouragement, int flammability, Block... blocks) {
@@ -17,8 +18,7 @@ public final class FlammableBlocksContextFabricImpl implements FlammableBlocksCo
         Preconditions.checkPositionIndex(0, blocks.length, "blocks is empty");
         for (Block block : blocks) {
             Objects.requireNonNull(block, "block is null");
-            // flammability == burn, encouragement == spread
-            FlammableBlockRegistry.getDefaultInstance().add(block, flammability, encouragement);
+            ((FireBlockForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(block, encouragement, flammability);
         }
     }
 }

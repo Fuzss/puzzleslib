@@ -17,11 +17,10 @@ public interface ColorProvidersContext<T, P> {
      * Register a new <code>provider</code> for a number of <code>objects</code>.
      *
      * @param provider provider type, either {@link BlockColor} or {@link ItemColor}
-     * @param object   object type supported by provider, either {@link Block} or {@link Item}
-     * @param objects  more object types supported by provider, either {@link Block} or {@link Item}
+     * @param objects  object types supported by provider, either {@link Block} or {@link Item}
      */
     @SuppressWarnings("unchecked")
-    void registerColorProvider(P provider, T object, T... objects);
+    void registerColorProvider(P provider, T... objects);
 
     /**
      * Provides access to already registered providers, might be incomplete during registration,

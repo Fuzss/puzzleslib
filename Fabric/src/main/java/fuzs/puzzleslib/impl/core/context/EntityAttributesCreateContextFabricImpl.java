@@ -10,11 +10,11 @@ import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
 public final class EntityAttributesCreateContextFabricImpl implements EntityAttributesCreateContext {
 
     @Override
-    public void registerEntityAttributes(EntityType<? extends LivingEntity> type, AttributeSupplier.Builder builder) {
+    public void registerEntityAttributes(EntityType<? extends LivingEntity> entityType, AttributeSupplier.Builder builder) {
         // this is not allowed on Forge, use the separate method which mirrors the Forge implementation
-        if (DefaultAttributes.hasSupplier(type)) {
-            throw new IllegalStateException("Duplicate DefaultAttributes entry: " + type);
+        if (DefaultAttributes.hasSupplier(entityType)) {
+            throw new IllegalStateException("Duplicate DefaultAttributes entry: " + entityType);
         }
-        FabricDefaultAttributeRegistry.register(type, builder);
+        FabricDefaultAttributeRegistry.register(entityType, builder);
     }
 }

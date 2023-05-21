@@ -9,7 +9,7 @@ import net.minecraft.world.level.ItemLike;
 
 import java.util.Objects;
 
-public final class ItemModelPropertiesContextFabricImpl implements ItemModelPropertiesContext {
+public final class ItemModelPropertiesContextForgeImpl implements ItemModelPropertiesContext {
 
     @Override
     public void registerGlobalProperty(ResourceLocation identifier, ClampedItemPropertyFunction function) {

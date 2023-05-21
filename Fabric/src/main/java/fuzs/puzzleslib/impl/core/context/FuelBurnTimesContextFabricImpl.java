@@ -1,20 +1,23 @@
 package fuzs.puzzleslib.impl.core.context;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.FuelBurnTimesContext;
-import fuzs.puzzleslib.api.core.v1.context.MultiRegistrationContext;
 import net.fabricmc.fabric.api.registry.FuelRegistry;
 import net.minecraft.world.level.ItemLike;
 
-public final class FuelBurnTimesContextFabricImpl implements FuelBurnTimesContext, MultiRegistrationContext<ItemLike, Integer> {
+import java.util.Objects;
+
+public final class FuelBurnTimesContextFabricImpl implements FuelBurnTimesContext {
 
     @Override
-    public void registerFuel(int burnTime, ItemLike item, ItemLike... items) {
-        if (burnTime <= 0) throw new IllegalArgumentException("burn time must be greater than 0");
-        this.register(burnTime, item, items);
-    }
-
-    @Override
-    public void register(ItemLike object, Integer type) {
-        FuelRegistry.INSTANCE.add(object.asItem(), type);
+    public void registerFuel(int burnTime, ItemLike... items) {
+        Preconditions.checkArgument(burnTime >= 0, "burn time is negative");
+        Preconditions.checkArgument(burnTime <= 32767, "burn time is too high");
+        Objects.requireNonNull(items, "items is null");
+        Preconditions.checkPositionIndex(0, items.length, "items is empty");
+        for (ItemLike item : items) {
+            Objects.requireNonNull(item, "item is null");
+            FuelRegistry.INSTANCE.add(item.asItem(), burnTime);
+        }
     }
 }

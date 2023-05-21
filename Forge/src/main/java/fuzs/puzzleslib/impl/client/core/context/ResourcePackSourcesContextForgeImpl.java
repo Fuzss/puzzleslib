@@ -1,13 +1,14 @@
-package fuzs.puzzleslib.impl.core.context;
+package fuzs.puzzleslib.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
-import fuzs.puzzleslib.api.event.v1.DataPackFinderRegistry;
 import net.minecraft.server.packs.repository.RepositorySource;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public final class DataPackSourcesContextFabricImpl implements PackRepositorySourcesContext {
+public record ResourcePackSourcesContextForgeImpl(
+        Consumer<RepositorySource> consumer) implements PackRepositorySourcesContext {
 
     @Override
     public void addRepositorySources(RepositorySource... repositorySources) {
@@ -15,7 +16,7 @@ public final class DataPackSourcesContextFabricImpl implements PackRepositorySou
         Preconditions.checkPositionIndex(0, repositorySources.length, "repository sources is empty");
         for (RepositorySource repositorySource : repositorySources) {
             Objects.requireNonNull(repositorySource, "repository source is null");
-            DataPackFinderRegistry.INSTANCE.register(repositorySource);
+            this.consumer.accept(repositorySource);
         }
     }
 }

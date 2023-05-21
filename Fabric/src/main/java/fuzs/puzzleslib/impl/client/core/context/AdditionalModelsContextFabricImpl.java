@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.AdditionalModelsContext;
 import net.fabricmc.fabric.api.client.model.ModelLoadingRegistry;
 import net.minecraft.resources.ResourceLocation;
@@ -11,10 +12,14 @@ import java.util.function.Consumer;
 public final class AdditionalModelsContextFabricImpl implements AdditionalModelsContext {
 
     @Override
-    public void registerAdditionalModel(ResourceLocation model) {
-        Objects.requireNonNull(model, "model location is null");
+    public void registerAdditionalModel(ResourceLocation... models) {
+        Objects.requireNonNull(models, "models is null");
+        Preconditions.checkPositionIndex(0, models.length, "models is empty");
         ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
-            out.accept(model);
+            for (ResourceLocation model : models) {
+                Objects.requireNonNull(model, "model is null");
+                out.accept(model);
+            }
         });
     }
 }

@@ -14,20 +14,20 @@ public interface EntityAttributesModifyContext {
      * use this method for modifying attributes of existing entity types
      * this overrides/adds attributes individually as this is what is done on Forge
      *
-     * @param type      type of entity
-     * @param attribute attribute to override/add
+     * @param entityType type of entity
+     * @param attribute  attribute to override/add
      */
-    default void registerAttributeModification(EntityType<? extends LivingEntity> type, Attribute attribute) {
-        this.registerAttributeModification(type, attribute, attribute.getDefaultValue());
+    default void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Attribute attribute) {
+        this.registerAttributeModification(entityType, attribute, attribute.getDefaultValue());
     }
 
     /**
      * use this method for modifying attributes of existing entity types
      * this overrides/adds attributes individually as this is what is done on Forge
      *
-     * @param type           type of entity
+     * @param entityType     type of entity
      * @param attribute      attribute to override/add
      * @param attributeValue new value, possibly {@link Attribute#getDefaultValue()}
      */
-    void registerAttributeModification(EntityType<? extends LivingEntity> type, Attribute attribute, double attributeValue);
+    void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Attribute attribute, double attributeValue);
 }

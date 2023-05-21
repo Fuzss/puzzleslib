@@ -2,12 +2,12 @@ package fuzs.puzzleslib.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
+public record KeyMappingsContextForgeImpl(Consumer<KeyMapping> consumer) implements KeyMappingsContext {
 
     @Override
     public void registerKeyMapping(KeyMapping... keyMappings) {
@@ -15,7 +15,7 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
         Preconditions.checkPositionIndex(0, keyMappings.length, "key mappings is empty");
         for (KeyMapping keyMapping : keyMappings) {
             Objects.requireNonNull(keyMapping, "key mapping is null");
-            KeyBindingHelper.registerKeyBinding(keyMapping);
+            this.consumer.accept(keyMapping);
         }
     }
 }

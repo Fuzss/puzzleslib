@@ -13,8 +13,7 @@ public interface BuiltinModelItemRendererContext {
      * register a <code>renderer</code> for an <code>item</code>
      *
      * @param renderer dynamic implementation of {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer}
-     * @param object   the item to register for
-     * @param objects  more items to register for
+     * @param items    items to register for
      */
-    void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike object, ItemLike... objects);
+    void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items);
 }

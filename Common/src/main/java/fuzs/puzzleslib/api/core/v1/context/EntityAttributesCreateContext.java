@@ -13,8 +13,8 @@ public interface EntityAttributesCreateContext {
     /**
      * register attributes for our own entities, modifying attributes for any other entity (vanilla or modded) should be done using {@link EntityAttributesModifyContext}
      *
-     * @param type    type of entity
-     * @param builder the attribute supplier builder
+     * @param entityType type of entity
+     * @param builder    the attribute supplier builder
      */
-    void registerEntityAttributes(EntityType<? extends LivingEntity> type, AttributeSupplier.Builder builder);
+    void registerEntityAttributes(EntityType<? extends LivingEntity> entityType, AttributeSupplier.Builder builder);
 }

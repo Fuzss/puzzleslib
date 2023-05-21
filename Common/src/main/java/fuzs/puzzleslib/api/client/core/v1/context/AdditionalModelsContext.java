@@ -11,7 +11,7 @@ public interface AdditionalModelsContext {
     /**
      * register a model that is referenced nowhere and would normally not be loaded
      *
-     * @param model the models location
+     * @param models model locations
      */
-    void registerAdditionalModel(ResourceLocation model);
+    void registerAdditionalModel(ResourceLocation... models);
 }

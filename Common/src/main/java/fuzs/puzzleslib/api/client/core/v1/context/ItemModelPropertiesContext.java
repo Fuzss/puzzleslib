@@ -22,8 +22,7 @@ public interface ItemModelPropertiesContext {
      *
      * @param identifier predicate name
      * @param function   handler for this predicate
-     * @param object     item to apply the model property to
-     * @param objects    more items to apply the model property to
+     * @param items      items to apply the model property to
      */
-    void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike object, ItemLike... objects);
+    void registerItemProperty(ResourceLocation identifier, ClampedItemPropertyFunction function, ItemLike... items);
 }

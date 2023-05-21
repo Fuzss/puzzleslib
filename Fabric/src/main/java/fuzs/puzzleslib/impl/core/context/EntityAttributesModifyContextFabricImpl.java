@@ -17,15 +17,15 @@ import java.util.stream.Collectors;
 public final class EntityAttributesModifyContextFabricImpl implements EntityAttributesModifyContext {
 
     @Override
-    public void registerAttributeModification(EntityType<? extends LivingEntity> type, Attribute attribute, double attributeValue) {
+    public void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Attribute attribute, double attributeValue) {
         // Forge makes this very simple by patching in a couple of helper methods, but Fabric should work like this
-        AttributeSupplier supplier = DefaultAttributes.getSupplier(type);
+        AttributeSupplier supplier = DefaultAttributes.getSupplier(entityType);
         // there aren't many attributes anyway, so iterating the whole registry isn't costly
         Map<Attribute, Double> attributeToBaseValueMap = BuiltInRegistries.ATTRIBUTE.stream().filter(supplier::hasAttribute).map(attribute1 -> supplier.createInstance(instance -> {
         }, attribute1)).filter(Objects::nonNull).collect(Collectors.toMap(AttributeInstance::getAttribute, AttributeInstance::getBaseValue));
         attributeToBaseValueMap.put(attribute, attributeValue);
         AttributeSupplier.Builder builder = AttributeSupplier.builder();
         attributeToBaseValueMap.forEach(builder::add);
-        FabricDefaultAttributeRegistry.register(type, builder);
+        FabricDefaultAttributeRegistry.register(entityType, builder);
     }
 }

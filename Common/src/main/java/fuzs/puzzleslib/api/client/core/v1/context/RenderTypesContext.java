@@ -16,9 +16,8 @@ public interface RenderTypesContext<T> {
      * Register a <code>renderType</code> for an <code>object</code>
      *
      * @param renderType the {@link RenderType} for <code>object</code>
-     * @param object     object type supporting render type, either {@link Block} or {@link Fluid}
-     * @param objects    more object types supporting render type, either {@link Block} or {@link Fluid}
+     * @param objects    object types supporting render type, either {@link Block} or {@link Fluid}
      */
     @SuppressWarnings("unchecked")
-    void registerRenderType(RenderType renderType, T object, T... objects);
+    void registerRenderType(RenderType renderType, T... objects);
 }

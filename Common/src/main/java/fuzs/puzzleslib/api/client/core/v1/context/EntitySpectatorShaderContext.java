@@ -13,8 +13,7 @@ public interface EntitySpectatorShaderContext {
      * Register the custom shader.
      *
      * @param shaderLocation location to the shader file, usually <code>shaders/post/&lt;file&gt;.json</code>
-     * @param object         the entity type being spectated
-     * @param objects        more entity types being spectated
+     * @param entityTypes        entity types being spectated
      */
-    void registerSpectatorShader(ResourceLocation shaderLocation, EntityType<?> object, EntityType<?>... objects);
+    void registerSpectatorShader(ResourceLocation shaderLocation, EntityType<?>... entityTypes);
 }

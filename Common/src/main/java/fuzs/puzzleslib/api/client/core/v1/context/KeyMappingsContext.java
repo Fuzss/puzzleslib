@@ -9,9 +9,9 @@ import net.minecraft.client.KeyMapping;
 public interface KeyMappingsContext {
 
     /**
-     * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric)
+     * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric).
      *
      * @param keyMappings the key mappings to register
      */
-    void registerKeyMappings(KeyMapping... keyMappings);
+    void registerKeyMapping(KeyMapping... keyMappings);
 }

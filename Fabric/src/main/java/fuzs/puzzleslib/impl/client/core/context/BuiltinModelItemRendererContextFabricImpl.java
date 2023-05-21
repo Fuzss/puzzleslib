@@ -1,24 +1,26 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
-import fuzs.puzzleslib.api.core.v1.context.MultiRegistrationContext;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
+import java.util.Objects;
 
-public record BuiltinModelItemRendererContextFabricImpl(List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers) implements BuiltinModelItemRendererContext, MultiRegistrationContext<ItemLike, DynamicBuiltinItemRenderer> {
+public record BuiltinModelItemRendererContextFabricImpl(List<ResourceManagerReloadListener> dynamicBuiltinModelItemRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
-    public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike object, ItemLike... objects) {
-        this.register(renderer, object, objects);
+    public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
+        Objects.requireNonNull(renderer, "renderer is null");
+        Objects.requireNonNull(items, "items is null");
+        Preconditions.checkPositionIndex(0, items.length, "items is empty");
+        for (ItemLike item : items) {
+            Objects.requireNonNull(item, "item is null");
+            BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
+        }
         this.dynamicBuiltinModelItemRenderers.add(renderer);
-    }
-
-    @Override
-    public void register(ItemLike object, DynamicBuiltinItemRenderer type) {
-        BuiltinItemRendererRegistry.INSTANCE.register(object, type::renderByItem);
     }
 }

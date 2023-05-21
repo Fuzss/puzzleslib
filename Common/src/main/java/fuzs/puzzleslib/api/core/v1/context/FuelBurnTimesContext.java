@@ -11,8 +11,8 @@ public interface FuelBurnTimesContext {
     /**
      * Registers an <code>item</code> as a fuel with the given <code>burnTime</code>.
      *
-     * @param items    items to add
      * @param burnTime burn time in ticks
+     * @param items    items to add <code>burnTime</code> to
      */
-    void registerFuel(int burnTime, ItemLike item, ItemLike... items);
+    void registerFuel(int burnTime, ItemLike... items);
 }
