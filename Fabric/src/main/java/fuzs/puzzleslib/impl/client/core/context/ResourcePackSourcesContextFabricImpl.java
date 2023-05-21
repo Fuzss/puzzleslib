@@ -10,7 +10,7 @@ import java.util.Objects;
 public final class ResourcePackSourcesContextFabricImpl implements PackRepositorySourcesContext {
 
     @Override
-    public void addRepositorySources(RepositorySource... repositorySources) {
+    public void addRepositorySource(RepositorySource... repositorySources) {
         Objects.requireNonNull(repositorySources, "repository sources is null");
         Preconditions.checkPositionIndex(0, repositorySources.length, "repository sources is empty");
         for (RepositorySource repositorySource : repositorySources) {

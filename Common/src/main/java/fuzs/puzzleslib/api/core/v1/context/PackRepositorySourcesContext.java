@@ -11,5 +11,5 @@ public interface PackRepositorySourcesContext {
      *
      * @param repositorySources repository sources to add
      */
-    void addRepositorySources(RepositorySource... repositorySources);
+    void addRepositorySource(RepositorySource... repositorySources);
 }
