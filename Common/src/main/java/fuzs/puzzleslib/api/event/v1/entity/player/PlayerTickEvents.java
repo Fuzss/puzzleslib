@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.event.v1;
+package fuzs.puzzleslib.api.event.v1.entity.player;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.world.entity.player.Player;
@@ -19,7 +19,7 @@ public final class PlayerTickEvents {
          *
          * @param player the ticking player
          */
-        void onStartTick(Player player);
+        void onStartPlayerTick(Player player);
     }
 
     @FunctionalInterface
@@ -30,6 +30,6 @@ public final class PlayerTickEvents {
          *
          * @param player the ticking player
          */
-        void onEndTick(Player player);
+        void onEndPlayerTick(Player player);
     }
 }

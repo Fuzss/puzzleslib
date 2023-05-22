@@ -110,7 +110,7 @@ public class FabricRegistryManager implements RegistryManager {
     }
 
     @Override
-    public RegistryReference<Item> registerSpawnEggItem(RegistryReference<EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
+    public RegistryReference<Item> registerSpawnEggItem(RegistryReference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
         return this.registerItem(entityTypeReference.getResourceLocation().getPath() + "_spawn_egg", () -> new SpawnEggItem(entityTypeReference.get(), backgroundColor, highlightColor, itemProperties));
     }
 

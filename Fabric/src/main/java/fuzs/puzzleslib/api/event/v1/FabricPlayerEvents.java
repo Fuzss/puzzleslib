@@ -6,6 +6,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -38,4 +39,16 @@ public final class FabricPlayerEvents {
      * Called when the player stops using a bow, just before the arrow is fired.
      */
     public static final Event<ArrowLooseCallback> ARROW_LOOSE = FabricEventFactory.createResult(ArrowLooseCallback.class);
+    /**
+     * Fires at the beginning of {@link Player#tick()}.
+     */
+    public static final Event<PlayerTickEvents.Start> PLAYER_TICK_START = FabricEventFactory.create(PlayerTickEvents.Start.class);
+    /**
+     * Fires at the end of {@link Player#tick()}.
+     */
+    public static final Event<PlayerTickEvents.End> PLAYER_TICK_END = FabricEventFactory.create(PlayerTickEvents.End.class);
+    /**
+     * Called before a result item is generated from the two input slots in an anvil in {@link AnvilMenu#createResult()}.
+     */
+    public static final Event<AnvilUpdateCallback> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilUpdateCallback.class);
 }

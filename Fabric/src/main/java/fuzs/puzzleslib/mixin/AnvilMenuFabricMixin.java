@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.mixin;
 
-import fuzs.puzzleslib.api.event.v1.FabricEvents;
 import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
@@ -81,7 +80,7 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
         MutableValue<ItemStack> output = MutableValue.fromValue(ItemStack.EMPTY);
         MutableInt enchantmentCost = MutableInt.fromValue(leftInput.getBaseRepairCost() + rightInput.getBaseRepairCost());
         MutableInt materialCost = MutableInt.fromValue(0);
-        EventResult result = FabricEvents.ANVIL_UPDATE.invoker().onAnvilUpdate(leftInput, rightInput, output, this.itemName, enchantmentCost, materialCost, this.player);
+        EventResult result = FabricPlayerEvents.ANVIL_UPDATE.invoker().onAnvilUpdate(leftInput, rightInput, output, this.itemName, enchantmentCost, materialCost, this.player);
         if (result.isPass()) return;
         callback.cancel();
         if (!result.getAsBoolean()) return;

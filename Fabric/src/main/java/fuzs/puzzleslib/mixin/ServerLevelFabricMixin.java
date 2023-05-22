@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin;
 
-import fuzs.puzzleslib.api.event.v1.FabricEvents;
+import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
@@ -49,7 +49,7 @@ abstract class ServerLevelFabricMixin extends Level {
         this.puzzleslib$source = DefaultedValue.fromValue(source);
         this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
         this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker().onPlaySoundAtPosition(this, new Vec3(x, y, z), this.puzzleslib$sound, this.puzzleslib$source, this.puzzleslib$volume, this.puzzleslib$pitch);
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker().onPlaySoundAtPosition(this, new Vec3(x, y, z), this.puzzleslib$sound, this.puzzleslib$source, this.puzzleslib$volume, this.puzzleslib$pitch);
         if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
     }
 
@@ -59,7 +59,7 @@ abstract class ServerLevelFabricMixin extends Level {
         this.puzzleslib$source = DefaultedValue.fromValue(source);
         this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
         this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this, entity, this.puzzleslib$sound, this.puzzleslib$source, this.puzzleslib$volume, this.puzzleslib$pitch);
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this, entity, this.puzzleslib$sound, this.puzzleslib$source, this.puzzleslib$volume, this.puzzleslib$pitch);
         if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
     }
 

@@ -23,7 +23,7 @@ public final class ServerLevelTickEvents {
          * @param server the current minecraft server instance
          * @param level  the server level that is being ticked
          */
-        void onStartTick(MinecraftServer server, ServerLevel level);
+        void onStartLevelTick(MinecraftServer server, ServerLevel level);
     }
 
     @FunctionalInterface
@@ -35,6 +35,6 @@ public final class ServerLevelTickEvents {
          * @param server the current minecraft server instance
          * @param level  the server level that is being ticked
          */
-        void onEndTick(MinecraftServer server, ServerLevel level);
+        void onEndLevelTick(MinecraftServer server, ServerLevel level);
     }
 }

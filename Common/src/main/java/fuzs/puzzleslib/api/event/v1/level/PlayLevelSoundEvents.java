@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.event.v1;
+package fuzs.puzzleslib.api.event.v1.level;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;

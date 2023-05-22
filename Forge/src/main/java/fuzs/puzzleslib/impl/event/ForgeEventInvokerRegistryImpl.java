@@ -4,15 +4,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
-import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
-import fuzs.puzzleslib.api.event.v1.server.ServerTickEvents;
+import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.minecraft.core.Holder;
@@ -116,11 +114,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(PlayerTickEvents.Start.class, TickEvent.PlayerTickEvent.class, (PlayerTickEvents.Start callback, TickEvent.PlayerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.START) return;
-            callback.onStartTick(evt.player);
+            callback.onStartPlayerTick(evt.player);
         });
         INSTANCE.register(PlayerTickEvents.End.class, TickEvent.PlayerTickEvent.class, (PlayerTickEvents.End callback, TickEvent.PlayerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.END) return;
-            callback.onEndTick(evt.player);
+            callback.onEndPlayerTick(evt.player);
         });
         INSTANCE.register(LivingFallCallback.class, LivingFallEvent.class, (LivingFallCallback callback, LivingFallEvent evt) -> {
             MutableFloat fallDistance = MutableFloat.fromEvent(evt::setDistance, evt::getDistance);
@@ -283,13 +281,13 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            if (callback.onLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            callback.onUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
+            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
@@ -341,35 +339,35 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerTickEvents.Start.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.Start callback, TickEvent.ServerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.START) return;
-            callback.onStartTick(evt.getServer());
+            callback.onStartServerTick(evt.getServer());
         });
         INSTANCE.register(ServerTickEvents.End.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.End callback, TickEvent.ServerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.END) return;
-            callback.onEndTick(evt.getServer());
+            callback.onEndServerTick(evt.getServer());
         });
         INSTANCE.register(ServerLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ServerLevel level)) return;
-            callback.onStartTick(level.getServer(), level);
+            callback.onStartLevelTick(level.getServer(), level);
         });
         INSTANCE.register(ServerLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ServerLevel level)) return;
-            callback.onEndTick(level.getServer(), level);
+            callback.onEndLevelTick(level.getServer(), level);
         });
         INSTANCE.register(ServerLevelEvents.Load.class, LevelEvent.Load.class, (ServerLevelEvents.Load callback, LevelEvent.Load evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onLoad(level.getServer(), level);
+            callback.onLevelLoad(level.getServer(), level);
         });
         INSTANCE.register(ServerLevelEvents.Unload.class, LevelEvent.Unload.class, (ServerLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onUnload(level.getServer(), level);
+            callback.onLevelUnload(level.getServer(), level);
         });
         INSTANCE.register(ServerChunkEvents.Load.class, ChunkEvent.Load.class, (ServerChunkEvents.Load callback, ChunkEvent.Load evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onLoad(level, evt.getChunk());
+            callback.onChunkLoad(level, evt.getChunk());
         });
         INSTANCE.register(ServerChunkEvents.Unload.class, ChunkEvent.Unload.class, (ServerChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onUnload(level, evt.getChunk());
+            callback.onChunkUnload(level, evt.getChunk());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

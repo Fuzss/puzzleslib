@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.mixin;
 
-import fuzs.puzzleslib.api.event.v1.FabricEvents;
+import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -19,11 +19,11 @@ abstract class PlayerFabricMixin extends LivingEntity {
 
     @Inject(method = "tick", at = @At("HEAD"))
     public void tick$0(CallbackInfo callback) {
-        FabricEvents.PLAYER_TICK_START.invoker().onStartTick(Player.class.cast(this));
+        FabricPlayerEvents.PLAYER_TICK_START.invoker().onStartPlayerTick(Player.class.cast(this));
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick$1(CallbackInfo callback) {
-        FabricEvents.PLAYER_TICK_END.invoker().onEndTick(Player.class.cast(this));
+        FabricPlayerEvents.PLAYER_TICK_END.invoker().onEndPlayerTick(Player.class.cast(this));
     }
 }

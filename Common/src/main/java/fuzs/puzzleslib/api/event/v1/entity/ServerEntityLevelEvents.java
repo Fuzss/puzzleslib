@@ -31,7 +31,7 @@ public final class ServerEntityLevelEvents {
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level (on Fabric the entity will instead just immediately be removed again),
          * {@link EventResult#PASS} for the entity to be added normally
          */
-        EventResult onLoad(Entity entity, ServerLevel level, @Nullable MobSpawnType spawnType);
+        EventResult onEntityLoad(Entity entity, ServerLevel level, @Nullable MobSpawnType spawnType);
     }
 
     @FunctionalInterface
@@ -43,6 +43,6 @@ public final class ServerEntityLevelEvents {
          * @param entity    the entity that is being unloaded
          * @param level     the level the entity is unloaded in
          */
-        void onUnload(Entity entity, ServerLevel level);
+        void onEntityUnload(Entity entity, ServerLevel level);
     }
 }

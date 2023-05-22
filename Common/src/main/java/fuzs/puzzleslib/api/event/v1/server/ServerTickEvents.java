@@ -21,7 +21,7 @@ public final class ServerTickEvents {
          *
          * @param server the current minecraft server instance
          */
-        void onStartTick(MinecraftServer server);
+        void onStartServerTick(MinecraftServer server);
     }
 
     @FunctionalInterface
@@ -32,6 +32,6 @@ public final class ServerTickEvents {
          *
          * @param server the current minecraft server instance
          */
-        void onEndTick(MinecraftServer server);
+        void onEndServerTick(MinecraftServer server);
     }
 }

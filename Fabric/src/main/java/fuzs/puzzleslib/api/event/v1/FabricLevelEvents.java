@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.event.v1;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
 import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
+import fuzs.puzzleslib.api.event.v1.level.PlayLevelSoundEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.level.Explosion;
 
@@ -22,4 +23,12 @@ public final class FabricLevelEvents {
      * Called just before entities affected by an ongoing explosion are processed, meaning before they are hurt and knocked back.
      */
     public static final Event<ExplosionEvents.Detonate> EXPLOSION_DETONATE = FabricEventFactory.create(ExplosionEvents.Detonate.class);
+    /**
+     * Called when a sound event is played at a specific position in the world, allows for cancelling the sound.
+     */
+    public static final Event<PlayLevelSoundEvents.AtPosition> PLAY_LEVEL_SOUND_AT_POSITION = FabricEventFactory.createResult(PlayLevelSoundEvents.AtPosition.class);
+    /**
+     * Called when a sound event is played at a specific entity, allows for cancelling the sound.
+     */
+    public static final Event<PlayLevelSoundEvents.AtEntity> PLAY_LEVEL_SOUND_AT_ENTITY = FabricEventFactory.createResult(PlayLevelSoundEvents.AtEntity.class);
 }

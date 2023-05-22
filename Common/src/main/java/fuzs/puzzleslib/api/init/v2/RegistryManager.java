@@ -171,7 +171,7 @@ public interface RegistryManager {
      * @param highlightColor      spots color pf the spawn egg item
      * @return registry reference for the new spawn egg item
      */
-    default RegistryReference<Item> registerSpawnEggItem(RegistryReference<EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor) {
+    default RegistryReference<Item> registerSpawnEggItem(RegistryReference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor) {
         return this.registerSpawnEggItem(entityTypeReference, backgroundColor, highlightColor, new Item.Properties());
     }
 
@@ -184,7 +184,7 @@ public interface RegistryManager {
      * @param itemProperties      properties for the item
      * @return registry reference for the new spawn egg item
      */
-    RegistryReference<Item> registerSpawnEggItem(RegistryReference<EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
+    RegistryReference<Item> registerSpawnEggItem(RegistryReference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
 
     /**
      * register fluid entry with a path

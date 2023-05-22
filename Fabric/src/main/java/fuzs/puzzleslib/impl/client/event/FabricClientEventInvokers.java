@@ -126,13 +126,13 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, ClientEntityEvents.ENTITY_LOAD, callback -> {
             return (Entity entity, ClientLevel world) -> {
-                if (callback.onLoad(entity, world).isInterrupt()) {
+                if (callback.onEntityLoad(entity, world).isInterrupt()) {
                     entity.setRemoved(Entity.RemovalReason.DISCARDED);
                 }
             };
         });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
-            return callback::onUnload;
+            return callback::onEntityUnload;
         });
         INSTANCE.register(InputEvents.BeforeMouseAction.class, FabricClientEvents.BEFORE_MOUSE_ACTION);
         INSTANCE.register(InputEvents.AfterMouseAction.class, FabricClientEvents.AFTER_MOUSE_ACTION);
@@ -146,19 +146,19 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricClientEvents.COMPUTE_CAMERA_ANGLES);
         INSTANCE.register(ClientLevelTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK, callback -> {
             return (ClientLevel world) -> {
-                callback.onStartTick(Minecraft.getInstance(), world);
+                callback.onStartLevelTick(Minecraft.getInstance(), world);
             };
         });
         INSTANCE.register(ClientLevelTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_WORLD_TICK, callback -> {
             return (ClientLevel world) -> {
-                callback.onEndTick(Minecraft.getInstance(), world);
+                callback.onEndLevelTick(Minecraft.getInstance(), world);
             };
         });
         INSTANCE.register(ClientChunkEvents.Load.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_LOAD, callback -> {
-            return callback::onLoad;
+            return callback::onChunkLoad;
         });
         INSTANCE.register(ClientChunkEvents.Unload.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD, callback -> {
-            return callback::onUnload;
+            return callback::onChunkUnload;
         });
     }
 

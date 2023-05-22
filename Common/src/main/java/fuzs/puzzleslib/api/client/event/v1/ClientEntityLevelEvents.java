@@ -24,7 +24,7 @@ public final class ClientEntityLevelEvents {
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level (on Fabric the entity will instead just immediately be removed again),
          * {@link EventResult#PASS} for the entity to be added normally
          */
-        EventResult onLoad(Entity entity, ClientLevel level);
+        EventResult onEntityLoad(Entity entity, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -36,6 +36,6 @@ public final class ClientEntityLevelEvents {
          * @param entity    the entity that is being unloaded
          * @param level     the level the entity is unloaded in
          */
-        void onUnload(Entity entity, ClientLevel level);
+        void onEntityUnload(Entity entity, ClientLevel level);
     }
 }

@@ -21,7 +21,7 @@ public final class ServerChunkEvents {
          * @param level the server level the chunk is in
          * @param chunk the chunk being loaded
          */
-        void onLoad(ServerLevel level, ChunkAccess chunk);
+        void onChunkLoad(ServerLevel level, ChunkAccess chunk);
     }
 
     @FunctionalInterface
@@ -33,6 +33,6 @@ public final class ServerChunkEvents {
          * @param level the server level the chunk is in
          * @param chunk the chunk being unloaded
          */
-        void onUnload(ServerLevel level, ChunkAccess chunk);
+        void onChunkUnload(ServerLevel level, ChunkAccess chunk);
     }
 }

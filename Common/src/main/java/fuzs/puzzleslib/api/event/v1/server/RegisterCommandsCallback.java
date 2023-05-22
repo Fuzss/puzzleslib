@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.event.v1;
+package fuzs.puzzleslib.api.event.v1.server;
 
 import com.mojang.brigadier.CommandDispatcher;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;

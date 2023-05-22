@@ -13,7 +13,7 @@ import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
-import fuzs.puzzleslib.api.event.v1.server.ServerTickEvents;
+import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -92,8 +92,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricLevelEvents.FARMLAND_TRAMPLE);
-        INSTANCE.register(PlayerTickEvents.Start.class, FabricEvents.PLAYER_TICK_START);
-        INSTANCE.register(PlayerTickEvents.End.class, FabricEvents.PLAYER_TICK_END);
+        INSTANCE.register(PlayerTickEvents.Start.class, FabricPlayerEvents.PLAYER_TICK_START);
+        INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
         INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, callback -> {
             return callback::onRegisterCommands;
@@ -131,7 +131,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ItemTouchCallback.class, FabricPlayerEvents.ITEM_TOUCH);
         INSTANCE.register(PlayerEvents.ItemPickup.class, FabricPlayerEvents.ITEM_PICKUP);
         INSTANCE.register(LootingLevelCallback.class, FabricLivingEvents.LOOTING_LEVEL);
-        INSTANCE.register(AnvilUpdateCallback.class, FabricEvents.ANVIL_UPDATE);
+        INSTANCE.register(AnvilUpdateCallback.class, FabricPlayerEvents.ANVIL_UPDATE);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
         INSTANCE.register(LivingEvents.Tick.class, FabricLivingEvents.LIVING_TICK);
         INSTANCE.register(ArrowLooseCallback.class, FabricPlayerEvents.ARROW_LOOSE);
@@ -161,17 +161,17 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped.class, ServerLifecycleEvents.SERVER_STOPPED, callback -> {
             return callback::onServerStopped;
         });
-        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricEvents.PLAY_LEVEL_SOUND_AT_POSITION);
-        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
+        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);
+        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, ServerEntityEvents.ENTITY_LOAD, callback -> {
             return (Entity entity, ServerLevel world) -> {
-                if (callback.onLoad(entity, world, entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
+                if (callback.onEntityLoad(entity, world, entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
                     entity.setRemoved(Entity.RemovalReason.DISCARDED);
                 }
             };
         });
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
-            return callback::onUnload;
+            return callback::onEntityUnload;
         });
         INSTANCE.register(LivingDeathCallback.class, ServerLivingEntityEvents.ALLOW_DEATH, callback -> {
             return (LivingEntity entity, DamageSource damageSource, float damageAmount) -> {
@@ -213,32 +213,32 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             };
         });
         INSTANCE.register(ServerTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_SERVER_TICK, callback -> {
-            return callback::onStartTick;
+            return callback::onStartServerTick;
         });
         INSTANCE.register(ServerTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK, callback -> {
-            return callback::onEndTick;
+            return callback::onEndServerTick;
         });
         INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, callback -> {
             return (ServerLevel world) -> {
-                callback.onStartTick(world.getServer(), world);
+                callback.onStartLevelTick(world.getServer(), world);
             };
         });
         INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, callback -> {
             return (ServerLevel world) -> {
-                callback.onEndTick(world.getServer(), world);
+                callback.onEndLevelTick(world.getServer(), world);
             };
         });
         INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, callback -> {
-            return callback::onLoad;
+            return callback::onLevelLoad;
         });
         INSTANCE.register(ServerLevelEvents.Unload.class, ServerWorldEvents.UNLOAD, callback -> {
-            return callback::onUnload;
+            return callback::onLevelUnload;
         });
         INSTANCE.register(ServerChunkEvents.Load.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD, callback -> {
-            return callback::onLoad;
+            return callback::onChunkLoad;
         });
         INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, callback -> {
-            return callback::onUnload;
+            return callback::onChunkUnload;
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();

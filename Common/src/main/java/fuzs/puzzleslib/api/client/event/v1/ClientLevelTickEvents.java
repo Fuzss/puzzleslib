@@ -21,7 +21,7 @@ public final class ClientLevelTickEvents {
          * @param minecraft minecraft singleton instance
          * @param level     the client level that is being ticked
          */
-        void onStartTick(Minecraft minecraft, ClientLevel level);
+        void onStartLevelTick(Minecraft minecraft, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -33,6 +33,6 @@ public final class ClientLevelTickEvents {
          * @param minecraft minecraft singleton instance
          * @param level     the client level that is being ticked
          */
-        void onEndTick(Minecraft minecraft, ClientLevel level);
+        void onEndLevelTick(Minecraft minecraft, ClientLevel level);
     }
 }

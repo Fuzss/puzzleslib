@@ -152,12 +152,12 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
-            EventResult result = callback.onLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
+            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
-            callback.onUnload(evt.getEntity(), (ClientLevel) evt.getLevel());
+            callback.onEntityUnload(evt.getEntity(), (ClientLevel) evt.getLevel());
         });
         INSTANCE.register(InputEvents.BeforeMouseAction.class, InputEvent.MouseButton.Pre.class, (InputEvents.BeforeMouseAction callback, InputEvent.MouseButton.Pre evt) -> {
             EventResult result = callback.onBeforeMouseAction(evt.getButton(), evt.getAction(), evt.getModifiers());
@@ -201,19 +201,19 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ClientLevel level)) return;
-            callback.onStartTick(Minecraft.getInstance(), level);
+            callback.onStartLevelTick(Minecraft.getInstance(), level);
         });
         INSTANCE.register(ClientLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ClientLevel level)) return;
-            callback.onEndTick(Minecraft.getInstance(), level);
+            callback.onEndLevelTick(Minecraft.getInstance(), level);
         });
         INSTANCE.register(ClientChunkEvents.Load.class, ChunkEvent.Load.class, (ClientChunkEvents.Load callback, ChunkEvent.Load evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onLoad(level, evt.getChunk());
+            callback.onChunkLoad(level, evt.getChunk());
         });
         INSTANCE.register(ClientChunkEvents.Unload.class, ChunkEvent.Unload.class, (ClientChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onUnload(level, evt.getChunk());
+            callback.onChunkUnload(level, evt.getChunk());
         });
     }
 

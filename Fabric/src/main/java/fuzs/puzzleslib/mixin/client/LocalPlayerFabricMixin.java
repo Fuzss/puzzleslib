@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.api.event.v1.FabricEvents;
+import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
@@ -39,7 +39,7 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
         this.puzzleslib$sound = DefaultedValue.fromValue(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent));
         this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
         this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this.level, this, this.puzzleslib$sound, MutableValue.fromValue(this.getSoundSource()), this.puzzleslib$volume, this.puzzleslib$pitch);
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this.level, this, this.puzzleslib$sound, MutableValue.fromValue(this.getSoundSource()), this.puzzleslib$volume, this.puzzleslib$pitch);
         if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
     }
 

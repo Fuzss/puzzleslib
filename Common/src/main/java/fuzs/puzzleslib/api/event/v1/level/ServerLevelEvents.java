@@ -21,7 +21,7 @@ public final class ServerLevelEvents {
          * @param server the current minecraft server instance
          * @param level  the server level that is being loaded
          */
-        void onLoad(MinecraftServer server, ServerLevel level);
+        void onLevelLoad(MinecraftServer server, ServerLevel level);
     }
 
     @FunctionalInterface
@@ -33,6 +33,6 @@ public final class ServerLevelEvents {
          * @param server the current minecraft server instance
          * @param level  the server level that is being unloaded
          */
-        void onUnload(MinecraftServer server, ServerLevel level);
+        void onLevelUnload(MinecraftServer server, ServerLevel level);
     }
 }
