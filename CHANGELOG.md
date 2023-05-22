@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog].
 ### Added
 - Added a few new rendering related client events
 - Added `ScreenElementPositioner` helper class
+- Added a bunch of new `Level` related events
 ### Changed
 - Refactored a lot of mod construction contexts
 ### Fixed

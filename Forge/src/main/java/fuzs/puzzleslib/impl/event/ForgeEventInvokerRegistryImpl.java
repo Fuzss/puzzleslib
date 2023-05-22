@@ -10,9 +10,9 @@ import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
-import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
-import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
+import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
+import fuzs.puzzleslib.api.event.v1.server.ServerTickEvents;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.minecraft.core.Holder;
@@ -35,7 +35,9 @@ import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -135,7 +137,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onReplaceLootTable(evt.getLootTableManager(), evt.getName(), table);
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
-            callback.onModifyLootTable(evt.getLootTableManager(), evt.getName(), evt.getTable()::addPool, index -> {
+            callback.onModifyLootTable(evt.getLootTableManager(), evt.getName(), evt.getTable()::addPool, (int index) -> {
                 if (index == 0 && evt.getTable().removePool("main") != null) {
                     return true;
                 }
@@ -336,6 +338,38 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(PlayerEvents.Respawn.class, PlayerEvent.PlayerRespawnEvent.class, (PlayerEvents.Respawn callback, PlayerEvent.PlayerRespawnEvent evt) -> {
             callback.onRespawn((ServerPlayer) evt.getEntity(), evt.isEndConquered());
+        });
+        INSTANCE.register(ServerTickEvents.Start.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.Start callback, TickEvent.ServerTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.START) return;
+            callback.onStartTick(evt.getServer());
+        });
+        INSTANCE.register(ServerTickEvents.End.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.End callback, TickEvent.ServerTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.END) return;
+            callback.onEndTick(evt.getServer());
+        });
+        INSTANCE.register(ServerLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ServerLevel level)) return;
+            callback.onStartTick(level.getServer(), level);
+        });
+        INSTANCE.register(ServerLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ServerLevel level)) return;
+            callback.onEndTick(level.getServer(), level);
+        });
+        INSTANCE.register(ServerLevelEvents.Load.class, LevelEvent.Load.class, (ServerLevelEvents.Load callback, LevelEvent.Load evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+            callback.onLoad(level.getServer(), level);
+        });
+        INSTANCE.register(ServerLevelEvents.Unload.class, LevelEvent.Unload.class, (ServerLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+            callback.onUnload(level.getServer(), level);
+        });
+        INSTANCE.register(ServerChunkEvents.Load.class, ChunkEvent.Load.class, (ServerChunkEvents.Load callback, ChunkEvent.Load evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+            callback.onLoad(level, evt.getChunk());
+        });
+        INSTANCE.register(ServerChunkEvents.Unload.class, ChunkEvent.Unload.class, (ServerChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+            callback.onUnload(level, evt.getChunk());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

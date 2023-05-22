@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.client.core.ForwardingClientItemExtensions;
 import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import net.minecraft.client.Minecraft;
@@ -16,20 +15,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.fml.loading.FMLLoader;
-import org.apache.commons.lang3.ArrayUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 
 public record BuiltinModelItemRendererContextForgeImpl(
-        List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) implements BuiltinModelItemRendererContext {
+        List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
     public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
         // copied from Forge, seems to break data gen otherwise
         if (FMLLoader.getLaunchHandler().isData()) return;
-        Preconditions.checkArgument(ArrayUtils.contains(this.contentRegistrations, ContentRegistrationFlags.BUILT_IN_ITEM_MODEL_RENDERERS), "built in item model renderers registration flag is missing");
+        // do not check for ContentRegistrationFlags#BUILT_IN_ITEM_MODEL_RENDERERS being properly set as not every built-in item renderer needs to reload
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
         Preconditions.checkPositionIndex(0, items.length, "items is empty");

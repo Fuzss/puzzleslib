@@ -12,8 +12,8 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
-import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
-import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
+import fuzs.puzzleslib.api.event.v1.level.*;
+import fuzs.puzzleslib.api.event.v1.server.ServerTickEvents;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -24,6 +24,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
@@ -210,6 +211,34 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) -> {
                 callback.onRespawn(newPlayer, alive);
             };
+        });
+        INSTANCE.register(ServerTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_SERVER_TICK, callback -> {
+            return callback::onStartTick;
+        });
+        INSTANCE.register(ServerTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK, callback -> {
+            return callback::onEndTick;
+        });
+        INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, callback -> {
+            return (ServerLevel world) -> {
+                callback.onStartTick(world.getServer(), world);
+            };
+        });
+        INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, callback -> {
+            return (ServerLevel world) -> {
+                callback.onEndTick(world.getServer(), world);
+            };
+        });
+        INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, callback -> {
+            return callback::onLoad;
+        });
+        INSTANCE.register(ServerLevelEvents.Unload.class, ServerWorldEvents.UNLOAD, callback -> {
+            return callback::onUnload;
+        });
+        INSTANCE.register(ServerChunkEvents.Load.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD, callback -> {
+            return callback::onLoad;
+        });
+        INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, callback -> {
+            return callback::onUnload;
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();

@@ -13,6 +13,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Objects;
@@ -197,6 +198,22 @@ public final class ForgeClientEventInvokers {
             Minecraft minecraft = Minecraft.getInstance();
             EventResult result = callback.onRenderHand(minecraft.player, evt.getHand(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
             if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(ClientLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ClientLevel level)) return;
+            callback.onStartTick(Minecraft.getInstance(), level);
+        });
+        INSTANCE.register(ClientLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ClientLevel level)) return;
+            callback.onEndTick(Minecraft.getInstance(), level);
+        });
+        INSTANCE.register(ClientChunkEvents.Load.class, ChunkEvent.Load.class, (ClientChunkEvents.Load callback, ChunkEvent.Load evt) -> {
+            if (!(evt.getLevel() instanceof ClientLevel level)) return;
+            callback.onLoad(level, evt.getChunk());
+        });
+        INSTANCE.register(ClientChunkEvents.Unload.class, ChunkEvent.Unload.class, (ClientChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
+            if (!(evt.getLevel() instanceof ClientLevel level)) return;
+            callback.onUnload(level, evt.getChunk());
         });
     }
 

@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.core.context;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.CreativeModeTabContext;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
@@ -33,16 +34,17 @@ public record CreativeModeTabContextForgeImpl(
         if (configuratorImpl.getIcons() != null) {
             builder.withTabFactory(other -> new CreativeModeTab(other) {
                 @Nullable
-                private ItemStack[] itemStacks;
+                private ItemStack[] icons;
 
                 @Override
                 public ItemStack getIconItem() {
                     // stolen from XFactHD, thanks :)
-                    if (this.itemStacks == null) {
-                        this.itemStacks = configuratorImpl.getIcons().get();
+                    if (this.icons == null) {
+                        this.icons = configuratorImpl.getIcons().get();
+                        Preconditions.checkPositionIndex(0, this.icons.length, "icons is empty");
                     }
-                    int index = (int) (System.currentTimeMillis() / 2000) % this.itemStacks.length;
-                    return this.itemStacks[index];
+                    int index = (int) (System.currentTimeMillis() / 2000) % this.icons.length;
+                    return this.icons[index];
                 }
             });
         }

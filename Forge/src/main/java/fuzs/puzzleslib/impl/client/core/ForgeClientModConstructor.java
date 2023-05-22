@@ -48,7 +48,7 @@ public final class ForgeClientModConstructor {
             constructor.onClientSetup(evt::enqueueWork);
             constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
             constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
-            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers, contentRegistrations));
+            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
             constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
             constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
         });

@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
 
 import java.util.Collections;
@@ -97,7 +98,7 @@ public final class FabricClientEventInvokers {
             return callback::onAfterMouseDrag;
         }, ExtraScreenMouseEvents::afterMouseDrag);
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowKeyPress.class, callback -> {
-            return (screen, key, scancode, modifiers) -> {
+            return (Screen screen, int key, int scancode, int modifiers) -> {
                 return callback.onBeforeKeyPress(screen, key, scancode, modifiers).isPass();
             };
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowKeyPress);
@@ -105,7 +106,7 @@ public final class FabricClientEventInvokers {
             return callback::onAfterKeyPress;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyPress);
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowKeyRelease.class, callback -> {
-            return (screen, key, scancode, modifiers) -> {
+            return (Screen screen, int key, int scancode, int modifiers) -> {
                 return callback.onBeforeKeyRelease(screen, key, scancode, modifiers).isPass();
             };
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowKeyRelease);
@@ -124,7 +125,7 @@ public final class FabricClientEventInvokers {
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, ClientEntityEvents.ENTITY_LOAD, callback -> {
-            return (entity, world) -> {
+            return (Entity entity, ClientLevel world) -> {
                 if (callback.onLoad(entity, world).isInterrupt()) {
                     entity.setRemoved(Entity.RemovalReason.DISCARDED);
                 }
@@ -143,6 +144,22 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderPlayerEvents.After.class, FabricClientEvents.AFTER_RENDER_PLAYER);
         INSTANCE.register(RenderHandCallback.class, FabricClientEvents.RENDER_HAND);
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricClientEvents.COMPUTE_CAMERA_ANGLES);
+        INSTANCE.register(ClientLevelTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK, callback -> {
+            return (ClientLevel world) -> {
+                callback.onStartTick(Minecraft.getInstance(), world);
+            };
+        });
+        INSTANCE.register(ClientLevelTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_WORLD_TICK, callback -> {
+            return (ClientLevel world) -> {
+                callback.onEndTick(Minecraft.getInstance(), world);
+            };
+        });
+        INSTANCE.register(ClientChunkEvents.Load.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_LOAD, callback -> {
+            return callback::onLoad;
+        });
+        INSTANCE.register(ClientChunkEvents.Unload.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD, callback -> {
+            return callback::onUnload;
+        });
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

@@ -7,6 +7,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobSpawnType;
 import org.jetbrains.annotations.Nullable;
 
+// TODO rename to ServerEntityLevelEvents to make more similar to the Fabric name because I keep forgetting this doesn't have server in the name
 public final class EntityLevelEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
