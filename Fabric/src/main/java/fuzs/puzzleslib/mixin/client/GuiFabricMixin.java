@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = Gui.class, priority = 500)
-public abstract class GuiFabricMixin extends GuiComponent {
+abstract class GuiFabricMixin extends GuiComponent {
     @Shadow
     @Final
     private Minecraft minecraft;
@@ -32,14 +32,20 @@ public abstract class GuiFabricMixin extends GuiComponent {
         this.puzzleslib$partialTick = partialTick;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;III)V"))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;III)V", shift = At.Shift.BEFORE))
     public void render$1(PoseStack poseStack, float partialTick, CallbackInfo callback) {
+        poseStack.pushPose();
         DefaultedInt posX = DefaultedInt.fromValue(0);
         DefaultedInt posY = DefaultedInt.fromValue(this.screenHeight - 48);
         FabricClientEvents.CUSTOMIZE_CHAT_PANEL.invoker().onRenderChatPanel(this.minecraft.getWindow(), poseStack, partialTick, posX, posY);
         if (posX.getAsOptionalInt().isPresent() || posY.getAsOptionalInt().isPresent()) {
             poseStack.translate(posX.getAsInt(), posY.getAsInt() - (this.screenHeight - 48), 0.0);
         }
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;III)V", shift = At.Shift.AFTER))
+    public void render$2(PoseStack poseStack, float partialTick, CallbackInfo callback) {
+        poseStack.popPose();
     }
 
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
@@ -52,6 +58,18 @@ public abstract class GuiFabricMixin extends GuiComponent {
     @Inject(method = "renderEffects", at = @At("TAIL"))
     protected void renderEffects$1(PoseStack poseStack, CallbackInfo callback) {
         FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.POTION_ICONS.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
+    }
+
+    @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"))
+    public void renderExperienceBar$0(PoseStack poseStack, int xPos, CallbackInfo callback) {
+        if (FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.EXPERIENCE_BAR.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt()) {
+            callback.cancel();
+        }
+    }
+
+    @Inject(method = "renderExperienceBar", at = @At(value = "TAIL"))
+    public void renderExperienceBar$1(PoseStack poseStack, int xPos, CallbackInfo callback) {
+        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.EXPERIENCE_BAR.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)

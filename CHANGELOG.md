@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.5-1.19.4] - 2023-05-23
+### Fixed
+- Fixed `CustomizeChatPanelCallback` from interfering with more than the chat panel
+
 ## [v6.0.4-1.19.4] - 2023-05-22
 ### Added
 - Added a few new rendering related client events

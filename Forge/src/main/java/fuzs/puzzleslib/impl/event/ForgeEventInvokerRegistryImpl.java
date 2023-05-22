@@ -7,7 +7,7 @@ import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
-import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
@@ -281,13 +281,13 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(EntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (EntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
             if (callback.onLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(EntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (EntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
             callback.onUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
         });

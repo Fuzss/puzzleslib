@@ -9,7 +9,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.api.event.v1.entity.EntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
@@ -163,14 +163,14 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricEvents.PLAY_LEVEL_SOUND_AT_POSITION);
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
-        INSTANCE.register(EntityLevelEvents.Load.class, ServerEntityEvents.ENTITY_LOAD, callback -> {
+        INSTANCE.register(ServerEntityLevelEvents.Load.class, ServerEntityEvents.ENTITY_LOAD, callback -> {
             return (Entity entity, ServerLevel world) -> {
                 if (callback.onLoad(entity, world, entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
                     entity.setRemoved(Entity.RemovalReason.DISCARDED);
                 }
             };
         });
-        INSTANCE.register(EntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onUnload;
         });
         INSTANCE.register(LivingDeathCallback.class, ServerLivingEntityEvents.ALLOW_DEATH, callback -> {
