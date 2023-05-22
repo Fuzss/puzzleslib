@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
@@ -16,7 +15,6 @@ import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.Event;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -75,12 +73,10 @@ public final class ForgeClientEventInvokers {
             callback.onComputeFovModifier(evt.getPlayer(), DefaultedFloat.fromEvent(consumer, supplier, evt::getFovModifier));
         });
         INSTANCE.register(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (ScreenEvents.BeforeInit callback, ScreenEvent.Init.Pre evt) -> {
-            List<AbstractWidget> widgets = evt.getListenersList().stream().filter(listener -> listener instanceof AbstractWidget).map(listener -> (AbstractWidget) listener).toList();
-            callback.onBeforeInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, widgets);
+            callback.onBeforeInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables));
         });
         INSTANCE.register(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (ScreenEvents.AfterInit callback, ScreenEvent.Init.Post evt) -> {
-            List<AbstractWidget> widgets = evt.getListenersList().stream().filter(listener -> listener instanceof AbstractWidget).map(listener -> (AbstractWidget) listener).toList();
-            callback.onAfterInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, widgets, evt::addListener, evt::removeListener);
+            callback.onAfterInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), evt::addListener, evt::removeListener);
         });
         registerScreenEvent(ScreenEvents.Remove.class, ScreenEvent.Closing.class, (callback, evt) -> {
             callback.onRemove(evt.getScreen());
@@ -211,4 +207,5 @@ public final class ForgeClientEventInvokers {
             converter.accept(callback, evt);
         });
     }
+
 }

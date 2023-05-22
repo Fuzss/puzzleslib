@@ -6,11 +6,13 @@ The format is based on [Keep a Changelog].
 ## [v6.0.4-1.19.4] - 2023-05-22
 ### Added
 - Added a few new rendering related client events
+- Added `ScreenElementPositioner` helper class
 ### Changed
 - Refactored a lot of mod construction contexts
 ### Fixed
 - Fixed `NullPointerException` when firing `ComputeFovModifierCallback` on Fabric
 - Fixed `ComputeFovModifierCallback` dividing by zero when fov effects are disabled
+- Fixed `Screen::init` events not providing a view of `AbstractWidget`s on Forge
 
 ## [v6.0.3-1.19.4] - 2023-05-20
 ### Fixed
