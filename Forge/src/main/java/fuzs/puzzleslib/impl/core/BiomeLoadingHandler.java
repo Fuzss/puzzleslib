@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.biome;
+package fuzs.puzzleslib.impl.core;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
@@ -6,6 +6,7 @@ import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
+import fuzs.puzzleslib.impl.biome.*;
 import net.minecraft.core.Holder;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.world.BiomeModifier;
@@ -36,7 +37,7 @@ public class BiomeLoadingHandler {
     public static void register(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications) {
         DeferredRegister<Codec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
         deferredRegister.register(modEventBus);
-        deferredRegister.register("biome_modifier", new BiomeModifierImpl(biomeModifications)::codec);
+        deferredRegister.register("biome_modifications", new BiomeModifierImpl(biomeModifications)::codec);
     }
 
     private record BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications,

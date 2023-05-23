@@ -138,7 +138,7 @@ public final class ForgeClientModConstructor {
     }
 
     private static void registerBuiltInItemModelRenderersReloadListeners(Consumer<PreparableReloadListener> consumer, String modId, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
-        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BUILT_IN_ITEM_MODEL_RENDERERS)) {
+        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
             // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
             consumer.accept((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
                 for (ResourceManagerReloadListener listener : dynamicRenderers) {

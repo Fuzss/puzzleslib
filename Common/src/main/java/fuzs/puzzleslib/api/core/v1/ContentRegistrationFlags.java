@@ -5,11 +5,11 @@ package fuzs.puzzleslib.api.core.v1;
  */
 public enum ContentRegistrationFlags {
     /**
-     * Registers a biome modifier, and it's codec on Forge to allow the custom biome modification system to work
+     * Registers a biome modifier, and it's codec on Forge to allow the custom biome modification system to work.
      */
-    BIOMES,
+    BIOME_MODIFICATIONS,
     /**
-     * Register a client-side resource reload listener that reloads built-in item model renderers
+     * Register a client-side resource reload listener that reloads built-in item model renderers.
      */
-    BUILT_IN_ITEM_MODEL_RENDERERS
+    DYNAMIC_RENDERERS
 }

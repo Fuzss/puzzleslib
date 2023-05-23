@@ -6,7 +6,6 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.impl.biome.BiomeLoadingHandler;
 import fuzs.puzzleslib.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.MinecraftForge;
@@ -37,7 +36,7 @@ public final class ForgeModConstructor {
     }
 
     private static void registerContent(String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
-        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOMES)) {
+        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             BiomeLoadingHandler.register(modId, eventBus, biomeModifications);
         }
     }

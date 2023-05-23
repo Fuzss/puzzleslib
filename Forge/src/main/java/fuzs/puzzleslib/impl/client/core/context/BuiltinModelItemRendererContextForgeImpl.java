@@ -27,7 +27,7 @@ public record BuiltinModelItemRendererContextForgeImpl(
     public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
         // copied from Forge, seems to break data gen otherwise
         if (FMLLoader.getLaunchHandler().isData()) return;
-        // do not check for ContentRegistrationFlags#BUILT_IN_ITEM_MODEL_RENDERERS being properly set as not every built-in item renderer needs to reload
+        // do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set as not every built-in item renderer needs to reload
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
         Preconditions.checkPositionIndex(0, items.length, "items is empty");
