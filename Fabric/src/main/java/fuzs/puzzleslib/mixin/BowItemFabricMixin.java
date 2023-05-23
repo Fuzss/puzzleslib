@@ -20,8 +20,9 @@ import java.util.Objects;
 
 @Mixin(BowItem.class)
 abstract class BowItemFabricMixin extends ProjectileWeaponItem {
+    // accessed on both render and server threads, and since we remove it again after charge has been set to local variable this is necessary
     @Unique
-    private DefaultedInt puzzleslib$charge;
+    private final ThreadLocal<DefaultedInt> puzzleslib$charge = new ThreadLocal<>();
 
     public BowItemFabricMixin(Properties properties) {
         super(properties);
@@ -29,17 +30,17 @@ abstract class BowItemFabricMixin extends ProjectileWeaponItem {
 
     @Inject(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfo callback, Player player, boolean hasInfiniteAmmo, ItemStack projectileStack) {
-        this.puzzleslib$charge = DefaultedInt.fromValue(this.getUseDuration(stack) - timeCharged);
-        if (FabricPlayerEvents.ARROW_LOOSE.invoker().onArrowLoose(player, stack, level, this.puzzleslib$charge, !projectileStack.isEmpty() || hasInfiniteAmmo).isInterrupt()) {
+        this.puzzleslib$charge.set(DefaultedInt.fromValue(this.getUseDuration(stack) - timeCharged));
+        if (FabricPlayerEvents.ARROW_LOOSE.invoker().onArrowLoose(player, stack, level, this.puzzleslib$charge.get(), !projectileStack.isEmpty() || hasInfiniteAmmo).isInterrupt()) {
             callback.cancel();
         }
     }
 
     @ModifyVariable(method = "releaseUsing", at = @At("STORE"), ordinal = 1)
     public int releaseUsing(int charge) {
-        Objects.requireNonNull(this.puzzleslib$charge, "charge is null");
-        charge = this.puzzleslib$charge.getAsOptionalInt().orElse(charge);
-        this.puzzleslib$charge = null;
+        Objects.requireNonNull(this.puzzleslib$charge.get(), "charge is null");
+        charge = this.puzzleslib$charge.get().getAsOptionalInt().orElse(charge);
+        this.puzzleslib$charge.remove();
         return charge;
     }
 }
