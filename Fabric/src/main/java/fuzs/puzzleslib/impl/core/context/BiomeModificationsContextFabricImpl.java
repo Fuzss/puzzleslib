@@ -14,6 +14,7 @@ import net.minecraft.world.level.biome.Biome;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -41,6 +42,7 @@ public record BiomeModificationsContextFabricImpl(
 
     private static void registerBiomeModification(BiomeModification biomeModification, BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier) {
         ModificationPhase modificationPhase = BIOME_PHASE_CONVERSIONS.get(phase);
+        Objects.requireNonNull(modificationPhase, "modification phase is null");
         biomeModification.add(modificationPhase, selectionContext -> selector.test(BiomeLoadingContextFabric.create(selectionContext)), (selectionContext, modificationContext) -> {
             modifier.accept(getBiomeModificationContext(modificationContext, selectionContext.getBiome()));
         });

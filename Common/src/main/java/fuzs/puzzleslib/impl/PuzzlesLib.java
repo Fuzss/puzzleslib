@@ -1,11 +1,17 @@
 package fuzs.puzzleslib.impl;
 
+import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
 import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.biome.Biomes;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +26,16 @@ public class PuzzlesLib implements ModConstructor {
             .allAcceptVanillaOrMissing()
             .registerClientbound(ClientboundSyncCapabilityMessage.class)
             .registerClientbound(ClientboundAddEntityDataMessage.class);
+
+    @Override
+    public void onRegisterBiomeModifications(BiomeModificationsContext context) {
+        context.register(BiomeLoadingPhase.ADDITIONS, biomeLoadingContext -> {
+            return biomeLoadingContext.is(Biomes.PLAINS);
+        }, context1 -> {
+            context1.mobSpawnSettings().clearSpawns();
+            context1.mobSpawnSettings().addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 100, 4, 4));
+        });
+    }
 
     public static ResourceLocation id(String path) {
         return new ResourceLocation(MOD_ID, path);

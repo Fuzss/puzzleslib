@@ -28,25 +28,25 @@ public final class ForgeModConstructor {
 
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
-            Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeEntries = HashMultimap.create();
-            registerContent(modId, eventBus, biomeEntries, contentRegistrations);
-            registerModHandlers(constructor, eventBus, biomeEntries, contentRegistrations);
+            Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
+            registerContent(modId, eventBus, biomeModifications, contentRegistrations);
+            registerModHandlers(constructor, eventBus, biomeModifications, contentRegistrations);
             registerHandlers(constructor);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerContent(String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeEntries, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerContent(String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
         if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOMES)) {
-            BiomeLoadingHandler.register(modId, eventBus, biomeEntries);
+            BiomeLoadingHandler.register(modId, eventBus, biomeModifications);
         }
     }
 
-    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeEntries, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
             constructor.onCommonSetup(evt::enqueueWork);
             constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
-            constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeEntries, contentRegistrations));
+            constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeModifications, contentRegistrations));
             constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
         });
         eventBus.addListener((final SpawnPlacementRegisterEvent evt) -> {

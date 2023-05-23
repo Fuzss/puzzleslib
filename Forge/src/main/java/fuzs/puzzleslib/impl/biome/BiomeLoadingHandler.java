@@ -13,6 +13,7 @@ import net.minecraftforge.common.world.ModifiableBiomeInfo;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -32,57 +33,53 @@ public class BiomeLoadingHandler {
         this.put(BiomeModifier.Phase.AFTER_EVERYTHING, BiomeLoadingPhase.POST_PROCESSING);
     }});
 
-    public static void register(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeModificationData> biomeLoadingEntries) {
-        DeferredRegister<BiomeModifier> biomeModifiersRegistry = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIERS, modId);
-        DeferredRegister<Codec<? extends BiomeModifier>> biomeModifierSerializersRegistry = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
-        biomeModifiersRegistry.register(modEventBus);
-        biomeModifierSerializersRegistry.register(modEventBus);
-        BiomeModifierImpl biomeModifier = new BiomeModifierImpl(biomeLoadingEntries);
-        biomeModifierSerializersRegistry.register("biome_modifiers_codec", () -> biomeModifier.codec());
-        biomeModifiersRegistry.register("biome_modifiers", () -> biomeModifier);
+    public static void register(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications) {
+        DeferredRegister<Codec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
+        deferredRegister.register(modEventBus);
+        deferredRegister.register("biome_modifier", new BiomeModifierImpl(biomeModifications)::codec);
     }
 
-    private static BiomeModificationContext getBiomeModificationContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-        ClimateSettingsContextForge climateSettings = new ClimateSettingsContextForge(builder.getClimateSettings());
-        SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(builder.getSpecialEffects());
-        GenerationSettingsContextForge generationSettings = GenerationSettingsContextForge.create(builder.getGenerationSettings());
-        MobSpawnSettingsContextForge mobSpawnSettings = new MobSpawnSettingsContextForge(builder.getMobSpawnSettings());
-        return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
-    }
+    private record BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications,
+                                     Codec<? extends BiomeModifier> codec) implements BiomeModifier {
 
-    private static class BiomeModifierImpl implements BiomeModifier {
-        private final Codec<? extends BiomeModifier> codec = Codec.unit(this);
-        private final Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModificationData> biomeLoadingEntries;
+        private BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications, @Nullable Codec<? extends BiomeModifier> codec) {
+            this.biomeModifications = biomeModifications;
+            this.codec = Codec.unit(this);
+        }
 
-        public BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModificationData> biomeLoadingEntries) {
-            this.biomeLoadingEntries = biomeLoadingEntries;
+        public BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications) {
+            this(biomeModifications, null);
+        }
+
+        private static BiomeModificationContext createBuilderBackedContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+            ClimateSettingsContextForge climateSettings = new ClimateSettingsContextForge(builder.getClimateSettings());
+            SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(builder.getSpecialEffects());
+            GenerationSettingsContextForge generationSettings = GenerationSettingsContextForge.create(builder.getGenerationSettings());
+            MobSpawnSettingsContextForge mobSpawnSettings = new MobSpawnSettingsContextForge(builder.getMobSpawnSettings());
+            return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
         }
 
         @Override
         public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+            // no equivalent for BEFORE_EVERYTHING exists on Fabric, so we don't use it
+            // therefore result from map can be null
             BiomeLoadingPhase loadingPhase = BIOME_MODIFIER_PHASE_CONVERSIONS.get(phase);
-            if (loadingPhase != null) {
-                Collection<BiomeModificationData> modifications = this.biomeLoadingEntries.get(loadingPhase);
-                if (!modifications.isEmpty()) {
-                    BiomeLoadingContext loadingContext = BiomeLoadingContextForge.create(biome);
-                    BiomeModificationContext modificationContext = getBiomeModificationContext(builder);
-                    for (BiomeModificationData modification : modifications) {
-                        if (modification.selector().test(loadingContext)) {
-                            modification.modifier().accept(modificationContext);
-                        }
-                    }
-                }
+            if (loadingPhase == null) return;
+            Collection<BiomeModification> modifications = this.biomeModifications.get(loadingPhase);
+            if (modifications.isEmpty()) return;
+            BiomeLoadingContext filter = BiomeLoadingContextForge.create(biome);
+            BiomeModificationContext context = createBuilderBackedContext(builder);
+            for (BiomeModification modification : modifications) {
+                modification.tryApply(filter, context);
             }
-        }
-
-        @Override
-        public Codec<? extends BiomeModifier> codec() {
-            return this.codec;
         }
     }
 
-    public record BiomeModificationData(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector,
-                                        Consumer<BiomeModificationContext> modifier) {
+    public record BiomeModification(Predicate<BiomeLoadingContext> selector,
+                                    Consumer<BiomeModificationContext> modifier) {
 
+        public void tryApply(BiomeLoadingContext filter, BiomeModificationContext context) {
+            if (this.selector().test(filter)) this.modifier().accept(context);
+        }
     }
 }

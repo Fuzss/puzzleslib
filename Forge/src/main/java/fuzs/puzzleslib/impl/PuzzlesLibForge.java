@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl;
 
+import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -11,6 +12,6 @@ public class PuzzlesLibForge {
 
     @SubscribeEvent
     public static void onConstructMod(final FMLConstructModEvent evt) {
-        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLib::new);
+        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLib::new, ContentRegistrationFlags.BIOMES);
     }
 }
