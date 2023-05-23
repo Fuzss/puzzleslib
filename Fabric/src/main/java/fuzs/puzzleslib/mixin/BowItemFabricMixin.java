@@ -27,7 +27,7 @@ abstract class BowItemFabricMixin extends ProjectileWeaponItem {
         super(properties);
     }
 
-    @Inject(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getProjectile(Lnet/minecraft/world/item/ItemStack;)Lnet/minecraft/world/item/ItemStack;"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "releaseUsing", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", ordinal = 0, shift = At.Shift.BEFORE), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfo callback, Player player, boolean hasInfiniteAmmo, ItemStack projectileStack) {
         this.puzzleslib$charge = DefaultedInt.fromValue(this.getUseDuration(stack) - timeCharged);
         if (FabricPlayerEvents.ARROW_LOOSE.invoker().onArrowLoose(player, stack, level, this.puzzleslib$charge, !projectileStack.isEmpty() || hasInfiniteAmmo).isInterrupt()) {
