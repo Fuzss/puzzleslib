@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.31-1.19.3] - 2023-05-23
+### Fixed
+- Fixed biome modifiers causing an exception on Forge
+- Fixed `ArrowLooseCallback` not running on Fabric
+
 ## [v5.0.30-1.19.3] - 2023-05-21
 ### Fixed
 - Reverted some more changes introduced in v5.0.25 leading to incompatibilities

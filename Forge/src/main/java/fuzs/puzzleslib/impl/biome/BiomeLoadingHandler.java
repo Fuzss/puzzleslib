@@ -33,13 +33,9 @@ public class BiomeLoadingHandler {
     }});
 
     public static void register(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeModificationData> biomeLoadingEntries) {
-        DeferredRegister<BiomeModifier> biomeModifiersRegistry = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIERS, modId);
-        DeferredRegister<Codec<? extends BiomeModifier>> biomeModifierSerializersRegistry = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
-        biomeModifiersRegistry.register(modEventBus);
-        biomeModifierSerializersRegistry.register(modEventBus);
-        BiomeModifierImpl biomeModifier = new BiomeModifierImpl(biomeLoadingEntries);
-        biomeModifierSerializersRegistry.register("biome_modifiers_codec", () -> biomeModifier.codec());
-        biomeModifiersRegistry.register("biome_modifiers", () -> biomeModifier);
+        DeferredRegister<Codec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
+        deferredRegister.register(modEventBus);
+        deferredRegister.register("biome_modifications", new BiomeModifierImpl(biomeLoadingEntries)::codec);
     }
 
     private static BiomeModificationContext getBiomeModificationContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
