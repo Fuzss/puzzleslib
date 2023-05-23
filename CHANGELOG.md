@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v5.0.32-1.19.3] - 2023-05-23
+### Fixed
+- Fixed faulty `BowItem` mixin on Fabric
+
 ## [v5.0.31-1.19.3] - 2023-05-23
 ### Fixed
 - Fixed biome modifiers causing an exception on Forge
