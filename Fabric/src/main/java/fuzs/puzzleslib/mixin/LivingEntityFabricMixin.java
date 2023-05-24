@@ -47,7 +47,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Unique
     private int puzzleslib$lootingLevel;
     @Unique
-    protected ItemStack puzzleslib$originalUseItem;
+    protected ThreadLocal<ItemStack> puzzleslib$originalUseItem = new ThreadLocal<>();
     @Unique
     private DefaultedFloat puzzleslib$damageAmount;
     @Unique
@@ -93,19 +93,19 @@ abstract class LivingEntityFabricMixin extends Entity {
         throw new RuntimeException();
     }
 
-    @Inject(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"))
+    @Inject(method = "completeUsingItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;", shift = At.Shift.BEFORE))
     protected void completeUsingItem(CallbackInfo callback) {
-        this.puzzleslib$originalUseItem = this.useItem.copy();
+        this.puzzleslib$originalUseItem.set(this.useItem.copy());
     }
 
     @ModifyVariable(method = "completeUsingItem", at = @At("STORE"), ordinal = 0)
-    protected ItemStack completeUsingItem(ItemStack stack) {
-        DefaultedValue<ItemStack> useItemResult = DefaultedValue.fromValue(stack);
-        Objects.requireNonNull(this.puzzleslib$originalUseItem, "use item copy is null");
-        FabricLivingEvents.USE_ITEM_FINISH.invoker().onUseItemFinish(LivingEntity.class.cast(this), this.puzzleslib$originalUseItem, this.useItemRemaining, useItemResult);
-        stack = useItemResult.getAsOptional().orElse(stack);
-        this.puzzleslib$originalUseItem = null;
-        return stack;
+    protected ItemStack completeUsingItem(ItemStack useItem) {
+        Objects.requireNonNull(this.puzzleslib$originalUseItem.get(), "use item copy is null");
+        DefaultedValue<ItemStack> stack = DefaultedValue.fromValue(useItem);
+        FabricLivingEvents.USE_ITEM_FINISH.invoker().onUseItemFinish(LivingEntity.class.cast(this), stack, this.useItemRemaining, this.puzzleslib$originalUseItem.get());
+        useItem = stack.getAsOptional().orElse(useItem);
+        this.puzzleslib$originalUseItem.remove();
+        return useItem;
     }
 
     @Shadow

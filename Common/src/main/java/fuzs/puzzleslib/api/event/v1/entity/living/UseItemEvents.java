@@ -25,13 +25,13 @@ public final class UseItemEvents {
          * Fired when an item starts being used in {@link LivingEntity#startUsingItem(InteractionHand)}.
          * <p>Can be called to set a custom use duration for items, this way items that normally cannot be used for a duration support that.
          *
-         * @param entity      the entity using the item
-         * @param useItem     the item stack being used
-         * @param useDuration the duration in ticks the stack needs to be used until {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)} is called retrieved from {@link net.minecraft.world.item.Item#getUseDuration(ItemStack)}
+         * @param entity               the entity using the item
+         * @param stack                the item stack being used
+         * @param remainingUseDuration the duration in ticks the stack needs to be used until {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)} is called retrieved from {@link net.minecraft.world.item.Item#getUseDuration(ItemStack)}
          * @return {@link EventResult#INTERRUPT} to prevent the item from starting to be used,
-         * {@link EventResult#PASS} to allow the item to be used continuously, <code>useDuration</code> will be set as remaining use ticks
+         * {@link EventResult#PASS} to allow the item to be used continuously, <code>remainingUseDuration</code> will be set as remaining use ticks
          */
-        EventResult onUseItemStart(LivingEntity entity, ItemStack useItem, MutableInt useDuration);
+        EventResult onUseItemStart(LivingEntity entity, ItemStack stack, MutableInt remainingUseDuration);
     }
 
     @FunctionalInterface
@@ -39,13 +39,13 @@ public final class UseItemEvents {
         /**
          * Fired every tick an entity is using an item.
          *
-         * @param entity           the entity using the item
-         * @param useItem          the item stack being used
-         * @param useItemRemaining the duration in ticks the stack has already been in use for
+         * @param entity               the entity using the item
+         * @param stack                the item stack being used
+         * @param remainingUseDuration the duration in ticks the stack has already been in use for
          * @return {@link EventResult#INTERRUPT} to immediately stop the item from being used, no methods that usually run on use release / finishing are called,
          * {@link EventResult#PASS} to allow the item to continue ticking
          */
-        EventResult onUseItemTick(LivingEntity entity, ItemStack useItem, MutableInt useItemRemaining);
+        EventResult onUseItemTick(LivingEntity entity, ItemStack stack, MutableInt remainingUseDuration);
     }
 
     @FunctionalInterface
@@ -56,13 +56,13 @@ public final class UseItemEvents {
          * <p>This event is called for items that do not utilise {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)}.
          * <p>Use items that have been stopped due to the held item stack changing do not receive this event.
          *
-         * @param entity           the entity using the item
-         * @param useItem          the item stack being used
-         * @param useItemRemaining the duration in ticks the stack has already been in use for
+         * @param entity               the entity using the item
+         * @param stack                the item stack being used
+         * @param remainingUseDuration the duration in ticks the stack has already been in use for
          * @return {@link EventResult#INTERRUPT} to prevent {@link net.minecraft.world.item.Item#releaseUsing(ItemStack, Level, LivingEntity, int)} from being called, directly proceeding to {@link LivingEntity#stopUsingItem()},
          * {@link EventResult#PASS} to allow the item to release normally by calling the dedicated vanilla method
          */
-        EventResult onUseItemStop(LivingEntity entity, ItemStack useItem, int useItemRemaining);
+        EventResult onUseItemStop(LivingEntity entity, ItemStack stack, int remainingUseDuration);
     }
 
     @FunctionalInterface
@@ -72,13 +72,13 @@ public final class UseItemEvents {
          * <p>In that case {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)} is called for applying effects to the user,
          * such as restoring food points or applying mob effects.
          *
-         * @param entity           the entity using the item
-         * @param originalUseItem  a copy of the item stack being used, made before using finished
-         * @param useItemRemaining the duration in ticks the stack has already been in use for
-         * @param useItemResult    the item that is set to the entity's use hand after <code>useItem</code> has finished, like a bowl from eating stew,
-         *                         but most of the time when an item is fully consumed like when eating normal food,
-         *                         <code>useItem</code> is simply returned and reduced by one item in the process
+         * @param entity               the entity using the item
+         * @param stack                the item that is set to the entity's use hand after <code>useItem</code> has finished, like a bowl from eating stew,
+         *                             but most of the time when an item is fully consumed like when eating normal food,
+         *                             <code>useItem</code> is simply returned and reduced by one item in the process
+         * @param remainingUseDuration the duration in ticks the stack has already been in use for
+         * @param originalUseItem      a copy of the item stack being used, made before using finished
          */
-        void onUseItemFinish(LivingEntity entity, ItemStack originalUseItem, int useItemRemaining, MutableValue<ItemStack> useItemResult);
+        void onUseItemFinish(LivingEntity entity, MutableValue<ItemStack> stack, int remainingUseDuration, ItemStack originalUseItem);
     }
 }

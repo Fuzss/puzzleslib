@@ -30,6 +30,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
+import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
 import net.minecraftforge.event.level.BlockEvent;
@@ -219,8 +220,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(UseItemEvents.Finish.class, LivingEntityUseItemEvent.Finish.class, (UseItemEvents.Finish callback, LivingEntityUseItemEvent.Finish evt) -> {
-            MutableValue<ItemStack> useItemResult = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
-            callback.onUseItemFinish(evt.getEntity(), evt.getItem(), evt.getDuration(), useItemResult);
+            MutableValue<ItemStack> stack = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
+            callback.onUseItemFinish(evt.getEntity(), stack, evt.getDuration(), evt.getItem());
         });
         INSTANCE.register(ShieldBlockCallback.class, ShieldBlockEvent.class, (ShieldBlockCallback callback, ShieldBlockEvent evt) -> {
             DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(evt::setBlockedDamage, evt::getBlockedDamage, evt::getOriginalBlockedDamage);
@@ -368,6 +369,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(ServerChunkEvents.Unload.class, ChunkEvent.Unload.class, (ServerChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
             callback.onChunkUnload(level, evt.getChunk());
+        });
+        INSTANCE.register(ItemTossCallback.class, ItemTossEvent.class, (ItemTossCallback callback, ItemTossEvent evt) -> {
+            if (callback.onItemToss(evt.getEntity(), evt.getPlayer()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

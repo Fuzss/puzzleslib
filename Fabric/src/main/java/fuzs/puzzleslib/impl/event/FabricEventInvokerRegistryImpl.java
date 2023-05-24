@@ -4,7 +4,9 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.event.v1.*;
+import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
+import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
+import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
@@ -240,6 +242,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, callback -> {
             return callback::onChunkUnload;
         });
+        INSTANCE.register(ItemTossCallback.class, FabricPlayerEvents.ITEM_TOSS);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }
