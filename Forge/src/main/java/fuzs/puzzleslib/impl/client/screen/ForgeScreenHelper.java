@@ -23,49 +23,49 @@ public final class ForgeScreenHelper implements ScreenHelper {
 
     @Override
     public Minecraft getMinecraft(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return screen.getMinecraft();
     }
 
     @Override
     public Font getFont(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return this.getMinecraft(screen).font;
     }
 
     @Override
     public ItemRenderer getItemRenderer(Screen screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return this.getMinecraft(screen).getItemRenderer();
     }
 
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return screen.getXSize();
     }
 
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return screen.getYSize();
     }
 
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return screen.getGuiLeft();
     }
 
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return screen.getGuiTop();
     }
 
     @Override
     public @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return screen.getSlotUnderMouse();
     }
 }

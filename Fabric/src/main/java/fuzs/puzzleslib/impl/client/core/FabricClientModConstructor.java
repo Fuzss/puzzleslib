@@ -7,19 +7,21 @@ import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
-import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
-import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 public final class FabricClientModConstructor {
@@ -55,23 +57,17 @@ public final class FabricClientModConstructor {
         constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
     }
 
-    private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> consumer1, Consumer<DynamicBakingCompletedContext> consumer2, String modId) {
-        ModelEvents.MODIFY_BAKING_RESULT.register((models, modelBakery) -> {
+    private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer, String modId) {
+        ModelEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
             try {
-                consumer1.accept(new DynamicModifyBakingResultContext(models, modelBakery));
+                modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
             }
         });
-        ModelEvents.BAKING_COMPLETED.register((modelManager, models, modelBakery) -> {
+        ModelEvents.BAKING_COMPLETED.register((ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
             try {
-                consumer2.accept(new DynamicBakingCompletedContext(modelManager, models, modelBakery) {
-
-                    @Override
-                    public BakedModel getModel(ResourceLocation identifier) {
-                        return BakedModelManagerHelper.getModel(this.modelManager(), identifier);
-                    }
-                });
+                bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager, models, modelBakery));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
             }

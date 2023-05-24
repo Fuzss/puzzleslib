@@ -116,14 +116,7 @@ public final class ForgeClientModConstructor {
 
     private static void onBakingCompleted(Consumer<DynamicBakingCompletedContext> consumer, String modId, ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
         try {
-            consumer.accept(new DynamicBakingCompletedContext(modelManager, models, modelBakery) {
-
-                @SuppressWarnings("resource")
-                @Override
-                public BakedModel getModel(ResourceLocation identifier) {
-                    return this.modelManager().getModel(identifier);
-                }
-            });
+            consumer.accept(new DynamicBakingCompletedContextForgeImpl(modelManager, models, modelBakery));
         } catch (Exception e) {
             PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
         }
@@ -131,7 +124,7 @@ public final class ForgeClientModConstructor {
 
     private static void onModifyBakingResult(Consumer<DynamicModifyBakingResultContext> consumer, String modId, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
         try {
-            consumer.accept(new DynamicModifyBakingResultContext(models, modelBakery));
+            consumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
         } catch (Exception e) {
             PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
         }

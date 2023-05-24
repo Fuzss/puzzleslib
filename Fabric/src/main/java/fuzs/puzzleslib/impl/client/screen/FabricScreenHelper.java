@@ -40,31 +40,31 @@ public final class FabricScreenHelper implements ScreenHelper {
 
     @Override
     public int getImageWidth(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getXSize();
     }
 
     @Override
     public int getImageHeight(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getYSize();
     }
 
     @Override
     public int getLeftPos(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getGuiLeft();
     }
 
     @Override
     public int getTopPos(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getGuiTop();
     }
 
     @Override
     public @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
-        Objects.requireNonNull(screen, "Screen cannot be null");
+        Objects.requireNonNull(screen, "screen is null");
         return ((AbstractContainerScreenFabricAccessor) screen).puzzleslib$getSlotUnderMouse();
     }
 }
