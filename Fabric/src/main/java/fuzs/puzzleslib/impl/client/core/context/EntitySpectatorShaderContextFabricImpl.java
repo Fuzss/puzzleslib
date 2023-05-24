@@ -14,7 +14,7 @@ public final class EntitySpectatorShaderContextFabricImpl implements EntitySpect
     public void registerSpectatorShader(ResourceLocation shaderLocation, EntityType<?>... entityTypes) {
         Objects.requireNonNull(shaderLocation, "shader location is null");
         Objects.requireNonNull(entityTypes, "entity types is null");
-        Preconditions.checkPositionIndex(0, entityTypes.length, "entity types is empty");
+        Preconditions.checkPositionIndex(1, entityTypes.length, "entity types is empty");
         for (EntityType<?> entityType : entityTypes) {
             Objects.requireNonNull(entityType, "entity type is null");
             EntitySpectatorShaderRegistry.INSTANCE.register(entityType, shaderLocation);

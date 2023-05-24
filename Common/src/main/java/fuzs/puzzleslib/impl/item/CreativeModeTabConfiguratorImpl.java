@@ -93,7 +93,7 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
             if (!ModLoaderEnvironment.INSTANCE.isForge()) {
                 builder.icon(() -> {
                     ItemStack[] icons = this.icons.get();
-                    Preconditions.checkPositionIndex(0, icons.length, "icons is empty");
+                    Preconditions.checkPositionIndex(1, icons.length, "icons is empty");
                     return icons[0];
                 });
             }

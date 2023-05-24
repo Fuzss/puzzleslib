@@ -30,7 +30,7 @@ public record BuiltinModelItemRendererContextForgeImpl(
         // do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set as not every built-in item renderer needs to reload
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(0, items.length, "items is empty");
+        Preconditions.checkPositionIndex(1, items.length, "items is empty");
         IClientItemExtensions itemExtensions = new IClientItemExtensions() {
             @Nullable
             private BlockEntityWithoutLevelRenderer blockEntityWithoutLevelRenderer;

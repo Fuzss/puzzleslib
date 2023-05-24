@@ -14,7 +14,7 @@ public final class FluidRenderTypesContextForgeImpl implements RenderTypesContex
     public void registerRenderType(RenderType renderType, Fluid... fluids) {
         Objects.requireNonNull(renderType, "render type is null");
         Objects.requireNonNull(fluids, "fluids is null");
-        Preconditions.checkPositionIndex(0, fluids.length, "fluids is empty");
+        Preconditions.checkPositionIndex(1, fluids.length, "fluids is empty");
         for (Fluid fluid : fluids) {
             Objects.requireNonNull(fluid, "fluid is null");
             ItemBlockRenderTypes.setRenderLayer(fluid, renderType);

@@ -15,7 +15,7 @@ public final class BlockRenderTypesContextForgeImpl implements RenderTypesContex
     public void registerRenderType(RenderType renderType, Block... blocks) {
         Objects.requireNonNull(renderType, "render type is null");
         Objects.requireNonNull(blocks, "blocks is null");
-        Preconditions.checkPositionIndex(0, blocks.length, "blocks is empty");
+        Preconditions.checkPositionIndex(1, blocks.length, "blocks is empty");
         for (Block block : blocks) {
             Objects.requireNonNull(block, "block is null");
             ItemBlockRenderTypes.setRenderLayer(block, renderType);

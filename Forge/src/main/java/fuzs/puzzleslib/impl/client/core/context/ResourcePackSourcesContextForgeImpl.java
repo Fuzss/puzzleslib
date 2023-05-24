@@ -13,7 +13,7 @@ public record ResourcePackSourcesContextForgeImpl(
     @Override
     public void addRepositorySource(RepositorySource... repositorySources) {
         Objects.requireNonNull(repositorySources, "repository sources is null");
-        Preconditions.checkPositionIndex(0, repositorySources.length, "repository sources is empty");
+        Preconditions.checkPositionIndex(1, repositorySources.length, "repository sources is empty");
         for (RepositorySource repositorySource : repositorySources) {
             Objects.requireNonNull(repositorySource, "repository source is null");
             this.consumer.accept(repositorySource);

@@ -14,7 +14,7 @@ public final class AdditionalModelsContextFabricImpl implements AdditionalModels
     @Override
     public void registerAdditionalModel(ResourceLocation... models) {
         Objects.requireNonNull(models, "models is null");
-        Preconditions.checkPositionIndex(0, models.length, "models is empty");
+        Preconditions.checkPositionIndex(1, models.length, "models is empty");
         ModelLoadingRegistry.INSTANCE.registerModelProvider((ResourceManager manager, Consumer<ResourceLocation> out) -> {
             for (ResourceLocation model : models) {
                 Objects.requireNonNull(model, "model is null");

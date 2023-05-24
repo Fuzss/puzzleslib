@@ -19,7 +19,7 @@ public record ItemDecorationContextForgeImpl(
     public void registerItemDecorator(DynamicItemDecorator decorator, ItemLike... items) {
         Objects.requireNonNull(decorator, "decorator is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(0, items.length, "items is empty");
+        Preconditions.checkPositionIndex(1, items.length, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             this.consumer.accept(item, new IItemDecorator() {

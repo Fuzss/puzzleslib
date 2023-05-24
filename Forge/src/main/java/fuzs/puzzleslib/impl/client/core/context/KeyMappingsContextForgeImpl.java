@@ -12,7 +12,7 @@ public record KeyMappingsContextForgeImpl(Consumer<KeyMapping> consumer) impleme
     @Override
     public void registerKeyMapping(KeyMapping... keyMappings) {
         Objects.requireNonNull(keyMappings, "key mappings is null");
-        Preconditions.checkPositionIndex(0, keyMappings.length, "key mappings is empty");
+        Preconditions.checkPositionIndex(1, keyMappings.length, "key mappings is empty");
         for (KeyMapping keyMapping : keyMappings) {
             Objects.requireNonNull(keyMapping, "key mapping is null");
             this.consumer.accept(keyMapping);

@@ -13,6 +13,8 @@
     "accessor.PotionBrewingForgeAccessor"
   ],
   "client": [
+    "client.accessor.BlockColorsAccessor",
+    "client.accessor.ItemColorsAccessor",
     "client.accessor.ItemForgeAccessor"
   ],
   "injectors": {

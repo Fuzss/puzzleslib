@@ -4,6 +4,7 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Register custom item/block color providers, like tint getters for leaves or grass.
@@ -28,5 +29,6 @@ public interface ColorProvidersContext<T, P> {
      *
      * @return access to {@link net.minecraft.client.color.block.BlockColors} or {@link net.minecraft.client.color.item.ItemColors}
      */
-    P getProviders();
+    @Nullable
+    P getProvider(T object);
 }

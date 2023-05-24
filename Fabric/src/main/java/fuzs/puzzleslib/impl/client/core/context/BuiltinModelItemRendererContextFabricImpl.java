@@ -16,7 +16,7 @@ public record BuiltinModelItemRendererContextFabricImpl(List<ResourceManagerRelo
     public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(0, items.length, "items is empty");
+        Preconditions.checkPositionIndex(1, items.length, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);

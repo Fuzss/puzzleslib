@@ -21,7 +21,7 @@ public record FuelBurnTimesContextForgeImpl(Object2IntOpenHashMap<Item> fuelBurn
         Preconditions.checkArgument(burnTime >= 0, "burn time is negative");
         Preconditions.checkArgument(burnTime <= 32767, "burn time is too high");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(0, items.length, "items is empty");
+        Preconditions.checkPositionIndex(1, items.length, "items is empty");
         if (this.fuelBurnTimes.isEmpty()) MinecraftForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
