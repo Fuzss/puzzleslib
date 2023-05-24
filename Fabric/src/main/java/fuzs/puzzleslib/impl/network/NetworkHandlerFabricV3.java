@@ -10,7 +10,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
@@ -52,19 +55,19 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     }
 
     @Override
-    public <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message) {
+    public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     @Override
-    public <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message) {
+    public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Record> Packet<?> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<?>> packetFactory, T message) {
+    private <T extends Record, S extends PacketListener> Packet<S> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<S>> packetFactory, T message) {
         Class<T> clazz = (Class<T>) message.getClass();
         if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         FriendlyByteBuf byteBuf = PacketByteBufs.create();

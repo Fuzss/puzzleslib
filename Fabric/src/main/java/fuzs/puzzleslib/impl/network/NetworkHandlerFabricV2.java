@@ -11,7 +11,10 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.Util;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
@@ -65,13 +68,13 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     @Override
-    public Packet<?> toServerboundPacket(MessageV2<?> message) {
+    public Packet<ServerGamePacketListener> toServerboundPacket(MessageV2<?> message) {
         if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_SERVER) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_SERVER, MessageDirection.TO_CLIENT));
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     @Override
-    public Packet<?> toClientboundPacket(MessageV2<?> message) {
+    public Packet<ClientGamePacketListener> toClientboundPacket(MessageV2<?> message) {
         if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_CLIENT) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_CLIENT, MessageDirection.TO_SERVER));
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
@@ -81,7 +84,7 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
      * @param message           message to create packet from
      * @return                  packet for message
      */
-    private Packet<?> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<?>> packetFactory, MessageV2<?> message) {
+    private <T extends PacketListener> Packet<T> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<T>> packetFactory, MessageV2<?> message) {
         ResourceLocation identifier = this.messages.get(message.getClass()).identifier();
         FriendlyByteBuf byteBuf = PacketByteBufs.create();
         message.write(byteBuf);

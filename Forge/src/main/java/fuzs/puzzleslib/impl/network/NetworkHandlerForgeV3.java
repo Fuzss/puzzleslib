@@ -7,6 +7,8 @@ import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.impl.core.ForgeProxy;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkEvent;
@@ -52,16 +54,18 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
         this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle, Optional.of(networkDirection));
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message) {
+    public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
         Objects.requireNonNull(this.channel, "channel is null");
-        return this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
+        return (Packet<ClientGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message) {
+    public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
         Objects.requireNonNull(this.channel, "channel is null");
-        return this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER);
+        return (Packet<ServerGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER);
     }
 
     @Override

@@ -4,6 +4,8 @@ import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerPlayer;
@@ -58,7 +60,7 @@ public interface NetworkHandlerV2 {
      * @param message message to create packet from
      * @return packet for message
      */
-    Packet<?> toServerboundPacket(MessageV2<?> message);
+    Packet<ServerGamePacketListener> toServerboundPacket(MessageV2<?> message);
 
     /**
      * creates a packet heading to the client side
@@ -66,7 +68,7 @@ public interface NetworkHandlerV2 {
      * @param message message to create packet from
      * @return packet for message
      */
-    Packet<?> toClientboundPacket(MessageV2<?> message);
+    Packet<ClientGamePacketListener> toClientboundPacket(MessageV2<?> message);
 
     /**
      * send message from client to server

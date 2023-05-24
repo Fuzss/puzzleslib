@@ -5,6 +5,8 @@ import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -15,11 +17,11 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @Deprecated
     @Override
-    <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message);
+    <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message);
 
     @Deprecated
     @Override
-    <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message);
+    <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message);
 
     @Deprecated
     @Override

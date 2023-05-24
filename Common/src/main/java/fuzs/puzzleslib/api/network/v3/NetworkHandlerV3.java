@@ -10,6 +10,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
@@ -46,7 +48,7 @@ public interface NetworkHandlerV3 {
      * @param message message to create packet from
      * @return packet for message
      */
-    <T extends Record & ClientboundMessage<T>> Packet<?> toClientboundPacket(T message);
+    <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message);
 
     /**
      * creates a packet heading to the server side
@@ -54,7 +56,7 @@ public interface NetworkHandlerV3 {
      * @param message message to create packet from
      * @return packet for message
      */
-    <T extends Record & ServerboundMessage<T>> Packet<?> toServerboundPacket(T message);
+    <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message);
 
     /**
      * send message from client to server
