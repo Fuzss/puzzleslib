@@ -15,6 +15,7 @@ import java.util.function.BiConsumer;
 
 public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<DamageType> {
     private final Map<ResourceLocation, DamageType> entries;
+    private final ExistingFileHelper.ResourceType resourceType;
 
     public AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
         this(packOutput, modId, fileHelper, Maps.newHashMap());
@@ -23,6 +24,7 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
     private AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper, Map<ResourceLocation, DamageType> entries) {
         super(packOutput, fileHelper, modId, JsonOps.INSTANCE, PackType.SERVER_DATA, "damage_type", DamageType.CODEC, entries);
         this.entries = entries;
+        this.resourceType = new ExistingFileHelper.ResourceType(this.packType, ".json", this.directory);
     }
 
     @Override
@@ -41,9 +43,15 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
         this.add(new ResourceLocation(this.modid, id), damageType);
     }
 
-    protected void add(ResourceLocation id, DamageType damageType) {
+    protected final void add(ResourceLocation id, DamageType damageType) {
+        this.existingFileHelper.trackGenerated(id, this.resourceType);
         if (this.entries.put(id, damageType) != null) {
             throw new IllegalStateException("Damage type for " + id + " already registered");
         }
+    }
+
+    @Override
+    public String getName() {
+        return "Damage Types";
     }
 }
