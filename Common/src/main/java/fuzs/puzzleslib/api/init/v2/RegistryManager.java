@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -377,6 +378,16 @@ public interface RegistryManager {
      */
     default TagKey<GameEvent> createGameEventTag(String path) {
         return this.createTag(Registries.GAME_EVENT, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for damage types.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<DamageType> createDamageTypeTag(String path) {
+        return this.createTag(Registries.DAMAGE_TYPE, path);
     }
 
     /**

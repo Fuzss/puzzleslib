@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.6-1.19.4] - 2023-05-25
+### Added
+- Added `AbstractDamageTypeProvider`
+
 ## [v6.0.5-1.19.4] - 2023-05-24
 ### Added
 - Added `ItemTossCallback`
