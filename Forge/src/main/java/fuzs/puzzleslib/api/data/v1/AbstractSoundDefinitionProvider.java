@@ -7,10 +7,10 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.SoundDefinition;
 import net.minecraftforge.common.data.SoundDefinitionsProvider;
 
-public abstract class AbstractSoundDefinitionsProvider extends SoundDefinitionsProvider {
+public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
     private final String modId;
 
-    public AbstractSoundDefinitionsProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
+    public AbstractSoundDefinitionProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
         super(packOutput, modId, fileHelper);
         this.modId = modId;
     }

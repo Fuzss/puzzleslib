@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.api.data.v1;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.*;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.BlockTagsProvider;
@@ -69,10 +71,10 @@ public final class AbstractTagProvider {
         protected abstract void addTags(HolderLookup.Provider provider);
     }
 
-    public abstract static class DamageTypes extends DamageTypeTagsProvider {
+    public abstract static class DamageTypes extends TagsProvider<DamageType> {
 
-        public DamageTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-            super(packOutput, lookupProvider);
+        public DamageTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, Registries.DAMAGE_TYPE, lookupProvider, modId, fileHelper);
         }
 
         @Override
