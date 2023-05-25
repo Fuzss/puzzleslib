@@ -85,7 +85,9 @@ public interface RegistryManager {
      * @return this manager as a builder
      */
     default RegistryManager whenNotOn(ModLoader... forbiddenModLoaders) {
-        if (forbiddenModLoaders.length == 0) throw new IllegalArgumentException("Must provide at least one mod loader to not register on");
+        if (forbiddenModLoaders.length == 0) {
+            throw new IllegalArgumentException("Must provide at least one mod loader to not register on");
+        }
         ModLoader[] allowedModLoaders = Stream.of(ModLoader.values()).filter(modLoader -> !ArrayUtils.contains(forbiddenModLoaders, modLoader)).toArray(ModLoader[]::new);
         return this.whenOn(allowedModLoaders);
     }
@@ -346,7 +348,7 @@ public interface RegistryManager {
      * @param path path for new tag key
      * @return new tag key
      */
-    default TagKey<Block> createBlockTag(String path) {
+    default TagKey<Block> registerBlockTag(String path) {
         return this.createTag(Registries.BLOCK, path);
     }
 
@@ -356,7 +358,7 @@ public interface RegistryManager {
      * @param path path for new tag key
      * @return new tag key
      */
-    default TagKey<Item> createItemTag(String path) {
+    default TagKey<Item> registerItemTag(String path) {
         return this.createTag(Registries.ITEM, path);
     }
 
@@ -365,8 +367,21 @@ public interface RegistryManager {
      *
      * @param path path for new tag key
      * @return new tag key
+     *
+     * @deprecated renamed to {@link #registerEntityTypeTag(String)}
      */
+    @Deprecated(forRemoval = true)
     default TagKey<EntityType<?>> createEntityTypeTag(String path) {
+        return this.registerEntityTypeTag(path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for entity types.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<EntityType<?>> registerEntityTypeTag(String path) {
         return this.createTag(Registries.ENTITY_TYPE, path);
     }
 
@@ -376,7 +391,7 @@ public interface RegistryManager {
      * @param path path for new tag key
      * @return new tag key
      */
-    default TagKey<GameEvent> createGameEventTag(String path) {
+    default TagKey<GameEvent> registerGameEventTag(String path) {
         return this.createTag(Registries.GAME_EVENT, path);
     }
 
@@ -386,8 +401,31 @@ public interface RegistryManager {
      * @param path path for new tag key
      * @return new tag key
      */
-    default TagKey<DamageType> createDamageTypeTag(String path) {
+    default TagKey<DamageType> registerDamageTypeTag(String path) {
         return this.createTag(Registries.DAMAGE_TYPE, path);
+    }
+
+    /**
+     * Creates a new {@link ResourceKey} for a provided registry from the given <code>path</code>.
+     * <p>Ideally used for content loading in via a dynamic registry.
+     *
+     * @param registryKey key for registry to create {@link ResourceKey} for
+     * @param path        path for new entry
+     * @param <T>         registry type
+     * @return {@link ResourceKey} for <code>entry</code>
+     */
+    default <T> ResourceKey<T> registerResourceKey(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return ResourceKey.create(registryKey, this.makeKey(path));
+    }
+
+    /**
+     * Creates a new {@link ResourceKey} for a {@link DamageType}.
+     *
+     * @param path path for new resource key
+     * @return new {@link ResourceKey}
+     */
+    default ResourceKey<DamageType> registerDamageType(String path) {
+        return this.registerResourceKey(Registries.DAMAGE_TYPE, path);
     }
 
     /**
