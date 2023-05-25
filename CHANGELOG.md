@@ -6,6 +6,7 @@ The format is based on [Keep a Changelog].
 ## [v6.0.6-1.19.4] - 2023-05-25
 ### Added
 - Added `AbstractDamageTypeProvider` and related tag provider
+- Added `DamageSourcesHelper`
 
 ## [v6.0.5-1.19.4] - 2023-05-24
 ### Added

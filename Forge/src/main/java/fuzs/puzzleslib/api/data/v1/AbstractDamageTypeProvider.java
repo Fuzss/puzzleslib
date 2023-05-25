@@ -20,7 +20,7 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
         this(packOutput, modId, fileHelper, Maps.newHashMap());
     }
 
-    public AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper, Map<ResourceLocation, DamageType> entries) {
+    private AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper, Map<ResourceLocation, DamageType> entries) {
         super(packOutput, fileHelper, modId, JsonOps.INSTANCE, PackType.SERVER_DATA, "damage_type", DamageType.CODEC, entries);
         this.entries = entries;
     }
