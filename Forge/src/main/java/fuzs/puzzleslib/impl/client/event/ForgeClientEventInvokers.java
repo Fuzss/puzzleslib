@@ -74,10 +74,10 @@ public final class ForgeClientEventInvokers {
             callback.onComputeFovModifier(evt.getPlayer(), DefaultedFloat.fromEvent(consumer, supplier, evt::getFovModifier));
         });
         INSTANCE.register(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (ScreenEvents.BeforeInit callback, ScreenEvent.Init.Pre evt) -> {
-            callback.onBeforeInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables));
+            callback.onBeforeInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables));
         });
         INSTANCE.register(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (ScreenEvents.AfterInit callback, ScreenEvent.Init.Post evt) -> {
-            callback.onAfterInit(evt.getScreen().getMinecraft(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), evt::addListener, evt::removeListener);
+            callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), evt::addListener, evt::removeListener);
         });
         registerScreenEvent(ScreenEvents.Remove.class, ScreenEvent.Closing.class, (callback, evt) -> {
             callback.onRemove(evt.getScreen());

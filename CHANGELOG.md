@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.7-1.19.4] - 2023-05-27
+### Fixed
+- Fixed a crash caused by screen init events on Forge
+
 ## [v6.0.6-1.19.4] - 2023-05-25
 ### Added
 - Added `AbstractDamageTypeProvider` and related tag provider
