@@ -3,9 +3,11 @@ package fuzs.puzzleslib.api.data.v1;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatType;
+import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -95,7 +97,23 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
         this.add(entityType.getDescriptionId() + "." + key, value);
     }
 
+    /**
+     * @deprecated migrate to {@link #addDamageType(ResourceKey, String)}
+     */
+    @Deprecated(forRemoval = true)
     public void addDamageSource(String damageSource, String value) {
         this.add("death.attack." + damageSource, value);
+    }
+
+    public void addDamageType(ResourceKey<DamageType> damageType, String value) {
+        this.add("death.attack." + damageType.location().getPath(), value);
+    }
+
+    public void addPlayerDamageType(ResourceKey<DamageType> damageType, String value) {
+        this.add("death.attack." + damageType.location().getPath() + ".player", value);
+    }
+
+    public void addItemDamageType(ResourceKey<DamageType> damageType, String value) {
+        this.add("death.attack." + damageType.location().getPath() + ".item", value);
     }
 }

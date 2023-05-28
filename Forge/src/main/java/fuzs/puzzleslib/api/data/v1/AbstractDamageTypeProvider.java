@@ -6,6 +6,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.JsonCodecProvider;
@@ -34,6 +35,14 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
     }
 
     protected abstract void addDamageSources();
+
+    protected void add(ResourceKey<DamageType> id) {
+        this.add(id.location(), new DamageType(id.location().getPath(), 0.1F));
+    }
+
+    protected void add(ResourceKey<DamageType> id, DamageEffects damageEffects) {
+        this.add(id.location(), new DamageType(id.location().getPath(), 0.1F, damageEffects));
+    }
 
     protected void add(ResourceKey<DamageType> id, DamageType damageType) {
         this.add(id.location(), damageType);

@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.8-1.19.4] - 2023-05-28
+### Added
+- Added support for legacy-like smithing recipes that do not require an upgrade template
+- A few more helper methods when dealing with `DamageType`s
+
 ## [v6.0.7-1.19.4] - 2023-05-27
 ### Fixed
 - Fixed a crash caused by screen init events on Forge
