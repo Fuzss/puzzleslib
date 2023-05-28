@@ -6,8 +6,10 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import fuzs.puzzleslib.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
@@ -17,6 +19,8 @@ import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.ArrayUtils;
 
 public final class ForgeModConstructor {
@@ -26,18 +30,23 @@ public final class ForgeModConstructor {
     }
 
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
-        ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
+        ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
             Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
-            registerContent(modId, eventBus, biomeModifications, contentRegistrations);
-            registerModHandlers(constructor, eventBus, biomeModifications, contentRegistrations);
+            registerContent(modId, modEventBus, biomeModifications, contentRegistrations);
+            registerModHandlers(constructor, modEventBus, biomeModifications, contentRegistrations);
             registerHandlers(constructor);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerContent(String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerContent(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
         if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
-            BiomeLoadingHandler.register(modId, eventBus, biomeModifications);
+            BiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
+        }
+        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.LEGACY_SMITHING)) {
+            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.RECIPE_SERIALIZERS, modId);
+            deferredRegister.register(modEventBus);
+            deferredRegister.register(LegacySmithingTransformRecipe.RECIPE_SERIALIZER_ID, LegacySmithingTransformRecipe.Serializer::new);
         }
     }
 

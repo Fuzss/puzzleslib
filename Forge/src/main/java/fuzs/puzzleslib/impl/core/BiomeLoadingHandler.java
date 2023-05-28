@@ -23,7 +23,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
- * Forge implementation based on <a href="https://github.com/teamfusion/rottencreatures/blob/1.19.2/forge/src/main/java/com/github/teamfusion/platform/common/worldgen/forge/BiomeManagerImpl.java">BiomeManager</a> from <a href="https://github.com/teamfusion/rottencreatures">Rotten Creatures mod</a>
+ * Forge implementation based on <a href="https://github.com/teamfusion/rottencreatures/blob/1.19.2/forge/src/main/java/com/github/teamfusion/platform/common/worldgen/forge/BiomeManagerImpl.java">BiomeManager</a>
+ * from <a href="https://github.com/teamfusion/rottencreatures">Rotten Creatures mod</a>.
  */
 public class BiomeLoadingHandler {
     @SuppressWarnings("RedundantTypeArguments")

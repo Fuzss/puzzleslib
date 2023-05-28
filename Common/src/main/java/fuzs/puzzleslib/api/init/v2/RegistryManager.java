@@ -347,6 +347,19 @@ public interface RegistryManager {
      *
      * @param path path for new tag key
      * @return new tag key
+     *
+     * @deprecated renamed to {@link #registerBlockTag(String)}
+     */
+    @Deprecated(forRemoval = true)
+    default TagKey<Block> createBlockTag(String path) {
+        return this.registerBlockTag(path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for blocks.
+     *
+     * @param path path for new tag key
+     * @return new tag key
      */
     default TagKey<Block> registerBlockTag(String path) {
         return this.createTag(Registries.BLOCK, path);
