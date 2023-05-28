@@ -6,6 +6,11 @@ import net.minecraftforge.common.data.SpriteSourceProvider;
 
 public abstract class AbstractSpriteSourceProvider extends SpriteSourceProvider {
 
+    @Deprecated(forRemoval = true)
+    public AbstractSpriteSourceProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
+        this(packOutput, fileHelper);
+    }
+
     public AbstractSpriteSourceProvider(PackOutput packOutput, ExistingFileHelper fileHelper) {
         super(packOutput, fileHelper, "");
     }

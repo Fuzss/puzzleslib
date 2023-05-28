@@ -18,12 +18,17 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
     private final Map<ResourceLocation, DamageType> entries;
     private final ExistingFileHelper.ResourceType resourceType;
 
+    @Deprecated(forRemoval = true)
     public AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
-        this(packOutput, modId, fileHelper, Maps.newHashMap());
+        this(packOutput, fileHelper);
     }
 
-    private AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper, Map<ResourceLocation, DamageType> entries) {
-        super(packOutput, fileHelper, modId, JsonOps.INSTANCE, PackType.SERVER_DATA, "damage_type", DamageType.CODEC, entries);
+    public AbstractDamageTypeProvider(PackOutput packOutput, ExistingFileHelper fileHelper) {
+        this(packOutput, fileHelper, Maps.newHashMap());
+    }
+
+    private AbstractDamageTypeProvider(PackOutput packOutput, ExistingFileHelper fileHelper, Map<ResourceLocation, DamageType> entries) {
+        super(packOutput, fileHelper, "", JsonOps.INSTANCE, PackType.SERVER_DATA, "damage_type", DamageType.CODEC, entries);
         this.entries = entries;
         this.resourceType = new ExistingFileHelper.ResourceType(this.packType, ".json", this.directory);
     }
@@ -48,6 +53,7 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
         this.add(id.location(), damageType);
     }
 
+    @Deprecated(forRemoval = true)
     protected void add(String id, DamageType damageType) {
         this.add(new ResourceLocation(this.modid, id), damageType);
     }
