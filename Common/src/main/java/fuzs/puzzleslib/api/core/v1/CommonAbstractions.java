@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -11,6 +12,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
@@ -73,4 +75,14 @@ public interface CommonAbstractions {
      * @return is equipping this <code>stack</code> to <code>slot</code> allowed for <code>entity</code>
      */
     boolean canEquip(ItemStack stack, EquipmentSlot slot, Entity entity);
+
+    /**
+     * Called before an entity drops loot for determining the level of {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} to apply when generating drops.
+     *
+     * @param entity       the entity that has been killed
+     * @param killerEntity another entity responsible for killing <code>entity</code>
+     * @param damageSource the damage source <code>entity</code> has been killed by
+     * @return the level of looting to apply when generating drops.
+     */
+    int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource);
 }
