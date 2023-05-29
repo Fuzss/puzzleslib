@@ -160,6 +160,9 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientChunkEvents.Unload.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD, callback -> {
             return callback::onChunkUnload;
         });
+        INSTANCE.register(ClientPlayerEvents.LoggedIn.class, FabricClientEvents.PLAYER_LOGGED_IN);
+        INSTANCE.register(ClientPlayerEvents.LoggedOut.class, FabricClientEvents.PLAYER_LOGGED_OUT);
+        INSTANCE.register(ClientPlayerEvents.Copy.class, FabricClientEvents.PLAYER_COPY);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

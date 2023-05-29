@@ -35,6 +35,7 @@
     "client.AbstractClientPlayerFabricMixin",
     "client.AbstractContainerScreenFabricMixin",
     "client.ClientLevelFabricMixin",
+    "client.ClientPacketListenerMixin",
     "client.EffectRenderingInventoryScreenFabricMixin",
     "client.EntityRendererFabricMixin",
     "client.GameRendererFabricMixin",

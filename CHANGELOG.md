@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.9-1.19.4] - 2023-05-29
+### Added
+- Add `ClientPlayerEvents`
+
 ## [v6.0.8-1.19.4] - 2023-05-28
 ### Added
 - Added support for legacy-like smithing recipes that do not require an upgrade template

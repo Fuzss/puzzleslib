@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
+import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.client.event.v1.FabricScreenEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
@@ -8,7 +9,9 @@ import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.Connection;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,6 +32,9 @@ public abstract class MinecraftFabricMixin {
     @Shadow
     @Nullable
     public LocalPlayer player;
+    @Shadow
+    @Nullable
+    public MultiPlayerGameMode gameMode;
     @Shadow
     @Nullable
     public Screen screen;
@@ -68,5 +74,13 @@ public abstract class MinecraftFabricMixin {
         newScreen = this.puzzleslib$newScreen.getAsOptional().orElse(newScreen);
         this.puzzleslib$newScreen = null;
         return newScreen;
+    }
+
+    @Inject(method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V", shift = At.Shift.AFTER))
+    public void clearLevel(Screen screen, CallbackInfo callback) {
+        if (this.player == null || this.gameMode == null) return;
+        Connection connection = this.player.connection.getConnection();
+        Objects.requireNonNull(connection, "connection is null");
+        FabricClientEvents.PLAYER_LOGGED_OUT.invoker().onLoggedOut(this.player, this.gameMode, connection);
     }
 }

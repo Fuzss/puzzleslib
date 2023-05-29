@@ -215,6 +215,17 @@ public final class ForgeClientEventInvokers {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onChunkUnload(level, evt.getChunk());
         });
+        INSTANCE.register(ClientPlayerEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggingIn.class, (ClientPlayerEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggingIn evt) -> {
+            callback.onLoggedIn(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
+        });
+        INSTANCE.register(ClientPlayerEvents.LoggedOut.class, ClientPlayerNetworkEvent.LoggingOut.class, (ClientPlayerEvents.LoggedOut callback, ClientPlayerNetworkEvent.LoggingOut evt) -> {
+            if (evt.getPlayer() == null || evt.getMultiPlayerGameMode() == null) return;
+            Objects.requireNonNull(evt.getConnection(), "connection is null");
+            callback.onLoggedOut(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
+        });
+        INSTANCE.register(ClientPlayerEvents.Copy.class, ClientPlayerNetworkEvent.Clone.class, (ClientPlayerEvents.Copy callback, ClientPlayerNetworkEvent.Clone evt) -> {
+            callback.onCopy(evt.getOldPlayer(), evt.getNewPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {

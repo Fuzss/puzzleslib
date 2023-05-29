@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -69,6 +70,19 @@ public final class FabricClientEvents {
      * Runs before camera angle setup is done, allows for additional control over roll (which vanilla itself does not support) in addition to pitch and yaw.
      */
     public static final Event<ComputeCameraAnglesCallback> COMPUTE_CAMERA_ANGLES = FabricEventFactory.create(ComputeCameraAnglesCallback.class);
+    /**
+     * Called when a player joins a server, the player is already initialized.
+     */
+    public static final Event<ClientPlayerEvents.LoggedIn> PLAYER_LOGGED_IN = FabricEventFactory.create(ClientPlayerEvents.LoggedIn.class);
+    /**
+     * Called whenever {@link Minecraft#clearLevel()} is called, which is the case when a player disconnects from a server,
+     * but also occurs before joining a new single player level or server.
+     */
+    public static final Event<ClientPlayerEvents.LoggedOut> PLAYER_LOGGED_OUT = FabricEventFactory.create(ClientPlayerEvents.LoggedOut.class);
+    /**
+     * Called when the local player is replaced from respawning.
+     */
+    public static final Event<ClientPlayerEvents.Copy> PLAYER_COPY = FabricEventFactory.create(ClientPlayerEvents.Copy.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.
