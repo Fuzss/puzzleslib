@@ -85,4 +85,14 @@ public interface CommonAbstractions {
      * @return the level of looting to apply when generating drops.
      */
     int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource);
+
+    /**
+     * Called when a <code>mobGriefing</code> game rule check is required instead of vanilla's <code>level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)</code>,
+     * allowing for a dedicated Forge event to run.
+     *
+     * @param level  the level mob griefing is happening in
+     * @param entity the entity responsible for triggering the game rule check
+     * @return is mob griefing allows to happen
+     */
+    boolean getMobGriefingRule(Level level, @Nullable Entity entity);
 }

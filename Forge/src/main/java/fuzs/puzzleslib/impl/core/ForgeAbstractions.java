@@ -14,6 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,5 +45,10 @@ public final class ForgeAbstractions implements CommonAbstractions {
     @Override
     public int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource) {
         return ForgeHooks.getLootingLevel(entity, killerEntity, damageSource);
+    }
+
+    @Override
+    public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
+        return ForgeEventFactory.getMobGriefingEvent(level, entity);
     }
 }
