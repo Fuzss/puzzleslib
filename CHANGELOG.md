@@ -3,67 +3,81 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v6.0.9-1.19.4] - 2023-05-29
-### Added
-- Add `ClientPlayerEvents`
+## [v3.4.0-1.18.2] - 2023-06-03
+- Backported v6.0.9 from Minecraft 1.19.4
 
-## [v6.0.8-1.19.4] - 2023-05-28
-### Added
-- Added support for legacy-like smithing recipes that do not require an upgrade template
-- A few more helper methods when dealing with `DamageType`s
-
-## [v6.0.7-1.19.4] - 2023-05-27
+## [v3.3.6-1.18.2] - 2023-02-26
 ### Fixed
-- Fixed a crash caused by screen init events on Forge
+- Fixed a bug where deserializing a list of ids always yields nothing if the ids don't use the `minecraft` namespace
 
-## [v6.0.6-1.19.4] - 2023-05-25
-### Added
-- Added `AbstractDamageTypeProvider` and related tag provider
-- Added `DamageSourcesHelper`
-
-## [v6.0.5-1.19.4] - 2023-05-24
-### Added
-- Added `ItemTossCallback`
-### Changed
-- Allow retrieving an actual `BlockColor` / `ItemColor` from `ColorProviderContext`
-- Some more internal clean-ups
+## [v3.3.5-1.18.2] - 2022-05-25
 ### Fixed
-- Prevent `CustomizeChatPanelCallback` from interfering with more than the chat panel
-- Fixed faulty `BowItem` mixin on Fabric
+- Fixed configs not properly being loaded
 
-## [v6.0.4-1.19.4] - 2023-05-22
+## [v3.3.4-1.18.2] - 2022-05-24
+### Fixed
+- Prevent crash when externally registering additional config types for a mod
+
+## [v3.3.3-1.18.2] - 2022-04-30
+### Fixed
+- Hopefully fixed rare crash on start-up due to some registry objects not having been updated
+
+## [v3.3.2-1.18.2] - 2022-03-08
+### Fixed
+- Fixed a small issue that prevented registering entity based capabilities
+
+## [v3.3.1-1.18.2] - 2022-03-03
+### Fixed
+- Fixed an issue where a wrong config load state would be set
+
+## [v3.3.0-1.18.2] - 2022-03-03
+- Updated to Minecraft 1.18.2
+### Changed
+- Made config system more aware of what parts have been loaded yet to avoid accidentally accessing data too early
+
+## [v3.2.1-1.18.1] - 2022-02-25
 ### Added
-- Added a few new rendering related client events
-- Added `ScreenElementPositioner` helper class
-- Added a bunch of new `Level` related events
-### Changed
-- Refactored a lot of mod construction contexts
-### Fixed
-- Fixed `NullPointerException` when firing `ComputeFovModifierCallback` on Fabric
-- Fixed `ComputeFovModifierCallback` dividing by zero when fov effects are disabled
-- Fixed `Screen::init` events not providing a view of `AbstractWidget`s on Forge
+- Added tooltip utility methods for checking if certain modifier keys are pressed
 
-## [v6.0.3-1.19.4] - 2023-05-20
-### Fixed
-- Fixed `ClassCastException` for `RenderGuiElementEvents`
-
-## [v6.0.2-1.19.4] - 2023-05-20
-### Changed
-- Implemented `RenderGuiElementEvents` for item name
-- Moved `SpawnDataMob` implementation to Fabric, the native `Mob::getSpawnType` method is now used on Forge
-- Allow more context for `RenderGuiElementEvents` to ease implementations on different mod loaders 
-### Fixed
-- Fixed `ClassCastException` for after events in `ScreenMouseEvents`
-
-## [v6.0.1-1.19.4] - 2023-05-19
+## [v3.2.0-1.18.1] - 2022-02-22
 ### Added
-- Added events for when the player is being cloned and for after respawning
-### Changed
-- Some internal clean-up for capabilities and networking
+- Added system for managing Forge's capabilities
 
-## [v6.0.0-1.19.4] - 2023-05-18
-- Ported to Minecraft 1.19.4
-### Changed
-- Internal changes to capability implementation on Fabric to make capabilities other than for entities actually usable and not result in class loading errors
+## [v3.1.5-1.18.1] - 2022-02-10
+### Fixed
+- Made it more clear when category comments in a config are not supported
+
+## [v3.1.4-1.18.1] - 2022-02-09
+### Fixed
+- Hopefully fixed an issue where registry entries rarely wouldn't load properly, also added a bunch more log output for debugging in case something goes wrong registering content in the future
+- Fixed an issue with some category comments being unable to apply
+
+## [v3.1.3-1.18.1] - 2021-12-28
+### Fixed
+- Fixed an ordering issue when loading configs
+
+## [v3.1.2-1.18.1] - 2021-12-24
+### Added
+- Added helper class for accessing hidden fields on screen instances
+
+## [v3.1.1-1.18.1] - 2021-12-15
+### Added
+- Added more helper methods for registering sound events and items
+
+## [v3.1.0-1.18.1] - 2021-12-13
+- Compiled for Minecraft 1.18.1
+
+## [v3.0.2-1.18] - 2021-12-10
+### Added
+- Added a helper method for converting a list of registry entries to string
+
+## [v3.0.1-1.18] - 2021-12-05
+### Added
+- Added utility classes for working with json files
+### Fixed
+- Fixed a rare case where configs wouldn't load properly on start-up
+
+## [v3.0.0-1.18] - 2021-12-01
+- Ported to Minecraft 1.18
 
 [Keep a Changelog]: https://keepachangelog.com/en/1.0.0/

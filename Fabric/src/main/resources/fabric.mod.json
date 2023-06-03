@@ -26,6 +26,9 @@
       "${modGroup}.impl.PuzzlesLibFabric"
     ],
     "client": [
+    ],
+    "cardinal-components": [
+      "fuzs.puzzleslib.capability.CapabilityController"
     ]
   },
 
@@ -40,6 +43,8 @@
     "fabricloader": ">=${minFabricVersion}",
     "fabric-api": ">=${minFabricApiVersion}",
     "forgeconfigapiport": "*",
+    "cardinal-components-base": "*",
+    "cardinal-components-entity": "*",
     "minecraft": "${minecraftVersion}",
     "java": ">=17"
   },
