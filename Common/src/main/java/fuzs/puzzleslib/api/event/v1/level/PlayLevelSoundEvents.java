@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
-import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
@@ -33,7 +32,7 @@ public final class PlayLevelSoundEvents {
          * @param pitch         pitch
          * @return              if present the sound will be cancelled
          */
-        EventResult onPlaySoundAtPosition(Level level, Vec3 position, MutableValue<Holder<SoundEvent>> sound, MutableValue<SoundSource> source, DefaultedFloat volume, DefaultedFloat pitch);
+        EventResult onPlaySoundAtPosition(Level level, Vec3 position, MutableValue<SoundEvent> sound, MutableValue<SoundSource> source, DefaultedFloat volume, DefaultedFloat pitch);
     }
 
     @FunctionalInterface
@@ -50,6 +49,6 @@ public final class PlayLevelSoundEvents {
          * @param pitch         pitch
          * @return              if present the sound will be cancelled
          */
-        EventResult onPlaySoundAtEntity(Level level, Entity entity, MutableValue<Holder<SoundEvent>> sound, MutableValue<SoundSource> source, DefaultedFloat volume, DefaultedFloat pitch);
+        EventResult onPlaySoundAtEntity(Level level, Entity entity, MutableValue<SoundEvent> sound, MutableValue<SoundSource> source, DefaultedFloat volume, DefaultedFloat pitch);
     }
 }

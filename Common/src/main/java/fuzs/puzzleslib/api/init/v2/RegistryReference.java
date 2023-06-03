@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.init.v2;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -90,7 +89,7 @@ public interface RegistryReference<T> {
      */
     @SuppressWarnings("unchecked")
     static <T> RegistryReference<T> placeholder(ResourceKey<? extends Registry<? super T>> registryKey, ResourceLocation resourceLocation) {
-        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
+        Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(registryKey.location());
         if (registry == null) {
             throw new IllegalStateException(String.format("Unable to retrieve registry from key %s", registryKey));
         }

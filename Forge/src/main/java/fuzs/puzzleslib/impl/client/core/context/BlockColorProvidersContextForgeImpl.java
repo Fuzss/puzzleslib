@@ -6,7 +6,6 @@ import fuzs.puzzleslib.mixin.client.accessor.BlockColorsAccessor;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -28,6 +27,6 @@ public record BlockColorProvidersContextForgeImpl(BiConsumer<BlockColor, Block> 
 
     @Override
     public @Nullable BlockColor getProvider(Block block) {
-        return ((BlockColorsAccessor) this.blockColors).puzzleslib$getBlockColors().get(ForgeRegistries.BLOCKS.getDelegateOrThrow(block));
+        return ((BlockColorsAccessor) this.blockColors).puzzleslib$getBlockColors().get(block.delegate);
     }
 }

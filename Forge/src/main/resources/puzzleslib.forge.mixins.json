@@ -13,6 +13,7 @@
     "accessor.PotionBrewingForgeAccessor"
   ],
   "client": [
+    "client.ItemRendererForgeMixin",
     "client.accessor.BlockColorsAccessor",
     "client.accessor.ItemColorsAccessor",
     "client.accessor.ItemForgeAccessor"

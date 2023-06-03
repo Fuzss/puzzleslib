@@ -11,8 +11,6 @@ import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -76,10 +74,10 @@ public class FabricRegistryManager implements RegistryManager {
         if (!this.deferred || this.registryToFactory.isEmpty()) throw new IllegalStateException("No registry entries available for deferred registration");
         // follow the same order as Forge: blocks, items, everything else
         // this will run into issues for spawn eggs, as the eggs will be registered before the entity type is created -> we'll deal with this when it's required by a mod
-        this.registryToFactory.get(Registries.BLOCK).forEach(Runnable::run);
-        this.registryToFactory.get(Registries.ITEM).forEach(Runnable::run);
+        this.registryToFactory.get(Registry.BLOCK_REGISTRY).forEach(Runnable::run);
+        this.registryToFactory.get(Registry.ITEM_REGISTRY).forEach(Runnable::run);
         for (Map.Entry<ResourceKey<? extends Registry<?>>, Collection<Runnable>> entry : this.registryToFactory.asMap().entrySet()) {
-            if (entry.getKey() != Registries.BLOCK && entry.getKey() != Registries.ITEM) entry.getValue().forEach(Runnable::run);
+            if (entry.getKey() != Registry.BLOCK_REGISTRY && entry.getKey() != Registry.ITEM_REGISTRY) entry.getValue().forEach(Runnable::run);
         }
     }
 
@@ -101,7 +99,7 @@ public class FabricRegistryManager implements RegistryManager {
             return this.placeholder(registryKey, path);
         }
         T value = supplier.get();
-        Registry<? super T> registry = (Registry<? super T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
+        Registry<? super T> registry = (Registry<? super T>) Registry.REGISTRY.get(registryKey.location());
         Objects.requireNonNull(value, "Can't register null value");
         Objects.requireNonNull(registry, "Registry %s not found".formatted(registryKey));
         ResourceLocation key = this.makeKey(path);
@@ -117,7 +115,7 @@ public class FabricRegistryManager implements RegistryManager {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new ExtendedScreenHandlerType<>(entry.get()::create));
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registry.MENU_REGISTRY, path, () -> new ExtendedScreenHandlerType<>(entry.get()::create));
     }
 
     @Override
@@ -125,6 +123,6 @@ public class FabricRegistryManager implements RegistryManager {
         PoiTypeBuilder builder = entry.get();
         ResourceLocation key = this.makeKey(path);
         PoiType value = PointOfInterestHelper.register(key, builder.ticketCount(), builder.searchDistance(), builder.blocks());
-        return new FabricRegistryReference<>(value, key, BuiltInRegistries.POINT_OF_INTEREST_TYPE);
+        return new FabricRegistryReference<>(value, key, Registry.POINT_OF_INTEREST_TYPE);
     }
 }

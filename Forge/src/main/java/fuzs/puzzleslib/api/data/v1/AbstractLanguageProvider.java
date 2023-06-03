@@ -1,30 +1,24 @@
 package fuzs.puzzleslib.api.data.v1;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraft.data.PackOutput;
-import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatType;
-import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.data.LanguageProvider;
-
-import java.util.Objects;
 
 public abstract class AbstractLanguageProvider extends LanguageProvider {
     protected final String modId;
 
-    public AbstractLanguageProvider(PackOutput packOutput, String modId) {
+    public AbstractLanguageProvider(DataGenerator packOutput, String modId) {
         super(packOutput, modId, "en_us");
         this.modId = modId;
     }
@@ -37,16 +31,7 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
     }
 
     public void addCreativeModeTab(String tabId, String value) {
-        this.add(CreativeModeTabRegistry.getTab(new ResourceLocation(this.modId, tabId)), value);
-    }
-
-    public void add(CreativeModeTab tab, String value) {
-        Objects.requireNonNull(tab, "tab is null");
-        if (tab.getDisplayName().getContents() instanceof TranslatableContents contents) {
-            this.add(contents.getKey(), value);
-        } else {
-            throw new UnsupportedOperationException("Cannot add language entry for tab %s".formatted(tab.getDisplayName().getString()));
-        }
+        this.add(String.format("itemGroup.%s.%s", this.modId, tabId), value);
     }
 
     public void add(Attribute entityAttribute, String value) {
@@ -74,7 +59,7 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
     }
 
     public void add(ResourceLocation identifier, String value) {
-        this.add(identifier.toLanguageKey(), value);
+        this.add(identifier.getNamespace() + "." + identifier.getPath(), value);
     }
 
     public void addAdditional(Block block, String key, String value) {
@@ -98,22 +83,22 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
     }
 
     /**
-     * @deprecated migrate to {@link #addDamageType(ResourceKey, String)}
+     * @deprecated migrate to {@link #addDamageType(DamageSource, String)}
      */
     @Deprecated(forRemoval = true)
     public void addDamageSource(String damageSource, String value) {
         this.add("death.attack." + damageSource, value);
     }
 
-    public void addDamageType(ResourceKey<DamageType> damageType, String value) {
-        this.add("death.attack." + damageType.location().getPath(), value);
+    public void addDamageType(DamageSource damageSource, String value) {
+        this.add("death.attack." + damageSource.msgId, value);
     }
 
-    public void addPlayerDamageType(ResourceKey<DamageType> damageType, String value) {
-        this.add("death.attack." + damageType.location().getPath() + ".player", value);
+    public void addPlayerDamageType(DamageSource damageSource, String value) {
+        this.add("death.attack." + damageSource.msgId + ".player", value);
     }
 
-    public void addItemDamageType(ResourceKey<DamageType> damageType, String value) {
-        this.add("death.attack." + damageType.location().getPath() + ".item", value);
+    public void addItemDamageType(DamageSource damageSource, String value) {
+        this.add("death.attack." + damageSource.msgId + ".item", value);
     }
 }

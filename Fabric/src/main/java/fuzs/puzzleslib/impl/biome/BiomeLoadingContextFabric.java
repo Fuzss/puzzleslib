@@ -8,8 +8,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.Optional;
 
@@ -50,12 +50,12 @@ public class BiomeLoadingContextFabric implements BiomeLoadingContext {
     }
 
     @Override
-    public boolean validForStructure(ResourceKey<Structure> key) {
+    public boolean validForStructure(ResourceKey<ConfiguredStructureFeature<?, ?>> key) {
         return this.context.validForStructure(key);
     }
 
     @Override
-    public Optional<ResourceKey<Structure>> getStructureKey(Structure structureFeature) {
+    public Optional<ResourceKey<ConfiguredStructureFeature<?, ?>>> getStructureKey(ConfiguredStructureFeature<?, ?> structureFeature) {
         return this.context.getStructureKey(structureFeature);
     }
 

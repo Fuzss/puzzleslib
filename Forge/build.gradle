@@ -27,8 +27,8 @@ version = "v${modVersion}-${minecraftVersion}-Forge"
 group = modMavenGroup
 
 minecraft {
-//    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${minecraftVersion}"
-    mappings channel: 'official', version: "${minecraftVersion}"
+    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${parchmentMinecraftVersion}"
+//    mappings channel: 'official', version: "${minecraftVersion}"
 
     runs {
         client {
@@ -116,9 +116,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:6.0.0")
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4496718")
-    runtimeOnly fg.deobf("curse.maven:configured-457570:4462894")
+    runtimeOnly fg.deobf("curse.maven:better-mods-button-541584:3963200")
+    runtimeOnly fg.deobf("curse.maven:catalogue-459701:3803098")
+    runtimeOnly fg.deobf("curse.maven:configured-457570:4462832")
 
     // Puzzles Lib
 //    api fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")

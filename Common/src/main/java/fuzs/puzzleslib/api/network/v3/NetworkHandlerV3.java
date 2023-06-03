@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -184,7 +185,7 @@ public interface NetworkHandlerV3 {
     interface Builder extends NetworkHandlerRegistry, Buildable {
 
         /**
-         * Register a new {@link MessageSerializer} by providing a {@link net.minecraft.network.FriendlyByteBuf.Writer} and a {@link net.minecraft.network.FriendlyByteBuf.Reader},
+         * Register a new {@link MessageSerializer} by providing a {@link BiConsumer} and a {@link Function},
          * similarly to vanilla's {@link EntityDataSerializer}
          *
          * @param type   type to serialize, inheritance is not supported
@@ -193,7 +194,7 @@ public interface NetworkHandlerV3 {
          * @param <T>    data type
          * @return this builder instance
          */
-        default <T> Builder registerSerializer(Class<T> type, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
+        default <T> Builder registerSerializer(Class<T> type, BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) {
             MessageSerializers.registerSerializer(type, writer, reader);
             return this;
         }

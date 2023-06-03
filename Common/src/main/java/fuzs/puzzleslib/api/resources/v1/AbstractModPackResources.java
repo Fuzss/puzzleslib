@@ -3,20 +3,25 @@ package fuzs.puzzleslib.api.resources.v1;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.BuiltInMetadata;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -41,7 +46,7 @@ public abstract class AbstractModPackResources implements PackResources {
     /**
      * The metadata for the <code>pack.mcmeta</code> section, set internally using {@link #buildPack(PackType, Supplier, String, Component, Component, boolean, boolean)}.
      */
-    private BuiltInMetadata metadata;
+    private PackMetadataSection metadata;
 
     /**
      * Simple constructor with default parameters regarding the pack icon.
@@ -69,35 +74,29 @@ public abstract class AbstractModPackResources implements PackResources {
 
     @Nullable
     @Override
-    public IoSupplier<InputStream> getRootResource(String... elements) {
-        String path = String.join("/", elements);
-        if ("pack.png".equals(path)) {
-            return ModLoaderEnvironment.INSTANCE.findModResource(this.logoModId, this.modLogoPath).<IoSupplier<InputStream>>map(modResource -> {
-                return () -> Files.newInputStream(modResource);
-            }).orElse(null);
+    public InputStream getRootResource(String string) throws IOException {
+        if ("pack.png".equals(string)) {
+            Optional<Path> optional = ModLoaderEnvironment.INSTANCE.findModResource(this.logoModId, this.modLogoPath);
+            if (optional.isPresent()) return Files.newInputStream(optional.get());
         }
         return null;
     }
 
     @Override
-    public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-
+    public Collection<ResourceLocation> getResources(PackType packType, String string, String string2, int i, Predicate<String> predicate) {
+        return Collections.emptyList();
     }
 
+    @SuppressWarnings("unchecked")
     @Nullable
     @Override
     public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) {
-        return this.metadata.get(deserializer);
+        return deserializer == PackMetadataSection.SERIALIZER ? (T) this.metadata : null;
     }
 
     @Override
-    public String packId() {
+    public String getName() {
         return this.id;
-    }
-
-    @Override
-    public boolean isBuiltin() {
-        return true;
     }
 
     @Override
@@ -107,10 +106,8 @@ public abstract class AbstractModPackResources implements PackResources {
 
     @ApiStatus.Internal
     static Pack buildPack(PackType packType, Supplier<AbstractModPackResources> factory, String id, Component title, Component description, boolean required, boolean fixedPosition) {
-        PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType));
-        BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
-        Pack.Info info = new Pack.Info(description, metadataSection.getPackFormat(), FeatureFlagSet.of());
-        return Pack.create(id, title, required, $ -> {
+        PackMetadataSection metadata = new PackMetadataSection(description, packType.getVersion(SharedConstants.getCurrentVersion()));
+        return new Pack(id, required, () -> {
             AbstractModPackResources packResources = factory.get();
             packResources.id = id;
             packResources.metadata = metadata;
@@ -118,6 +115,6 @@ public abstract class AbstractModPackResources implements PackResources {
                 packResources.logoModId = id;
             }
             return packResources;
-        }, info, packType, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
+        }, title, description, PackCompatibility.COMPATIBLE, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
     }
 }

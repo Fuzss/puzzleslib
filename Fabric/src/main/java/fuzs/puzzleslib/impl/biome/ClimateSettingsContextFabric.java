@@ -9,12 +9,12 @@ public record ClimateSettingsContextFabric(Biome biome, BiomeModificationContext
 
     @Override
     public void hasPrecipitation(boolean hasPrecipitation) {
-        this.context.setPrecipitation(hasPrecipitation);
+        this.context.setPrecipitation(Biome.Precipitation.RAIN);
     }
 
     @Override
     public boolean hasPrecipitation() {
-        return this.biome.hasPrecipitation();
+        return this.biome.getPrecipitation() != Biome.Precipitation.NONE;
     }
 
     @Override

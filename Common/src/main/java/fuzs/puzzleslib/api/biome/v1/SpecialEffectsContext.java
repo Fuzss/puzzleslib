@@ -177,7 +177,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
      * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent();
+    Optional<SoundEvent> getAmbientLoopSoundEvent();
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()

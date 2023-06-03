@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.math.Vector3f;
 import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
@@ -47,6 +47,6 @@ abstract class GameRendererFabricMixin {
         MutableFloat yaw = MutableFloat.fromEvent(((CameraFabricAccessor) this.mainCamera)::puzzleslib$setYRot, this.mainCamera::getYRot);
         DefaultedFloat roll = DefaultedFloat.fromValue(0.0F);
         FabricClientEvents.COMPUTE_CAMERA_ANGLES.invoker().onComputeCameraAngles(GameRenderer.class.cast(this), this.mainCamera, partialTicks, pitch, yaw, roll);
-        roll.getAsOptionalFloat().ifPresent(f -> matrixStack.mulPose(Axis.ZP.rotationDegrees(f)));
+        roll.getAsOptionalFloat().ifPresent(f -> matrixStack.mulPose(Vector3f.ZP.rotationDegrees(f)));
     }
 }

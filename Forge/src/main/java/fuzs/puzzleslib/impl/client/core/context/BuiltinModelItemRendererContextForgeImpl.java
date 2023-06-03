@@ -9,11 +9,11 @@ import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.client.IItemRenderProperties;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,12 +31,12 @@ public record BuiltinModelItemRendererContextForgeImpl(
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
         Preconditions.checkPositionIndex(1, items.length, "items is empty");
-        IClientItemExtensions itemExtensions = new IClientItemExtensions() {
+        IItemRenderProperties itemExtensions = new IItemRenderProperties() {
             @Nullable
             private BlockEntityWithoutLevelRenderer blockEntityWithoutLevelRenderer;
 
             @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
                 if (this.blockEntityWithoutLevelRenderer == null) {
                     this.blockEntityWithoutLevelRenderer = new ForwardingBlockEntityWithoutLevelRenderer(Minecraft.getInstance(), renderer);
                 }
@@ -51,15 +51,15 @@ public record BuiltinModelItemRendererContextForgeImpl(
         this.dynamicRenderers.add(renderer);
     }
 
-    private static void setClientItemExtensions(ItemLike item, IClientItemExtensions itemExtensions) {
+    private static void setClientItemExtensions(ItemLike item, IItemRenderProperties itemExtensions) {
         // this solution is very dangerous as it relies on internal stuff in Forge
         // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
         Object renderProperties = ((ItemForgeAccessor) item.asItem()).puzzleslib$getRenderProperties();
-        ((ItemForgeAccessor) item.asItem()).puzzleslib$setRenderProperties(renderProperties != null ? new ForwardingClientItemExtensions((IClientItemExtensions) renderProperties) {
+        ((ItemForgeAccessor) item.asItem()).puzzleslib$setRenderProperties(renderProperties != null ? new ForwardingClientItemExtensions((IItemRenderProperties) renderProperties) {
 
             @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return itemExtensions.getCustomRenderer();
+            public BlockEntityWithoutLevelRenderer getItemStackRenderer() {
+                return itemExtensions.getItemStackRenderer();
             }
         } : itemExtensions);
     }
@@ -73,7 +73,7 @@ public record BuiltinModelItemRendererContextForgeImpl(
         }
 
         @Override
-        public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        public void renderByItem(ItemStack stack, ItemTransforms.TransformType mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
             this.renderer.renderByItem(stack, mode, matrices, vertexConsumers, light, overlay);
         }
     }

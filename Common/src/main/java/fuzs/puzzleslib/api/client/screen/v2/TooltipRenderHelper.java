@@ -3,12 +3,12 @@ package fuzs.puzzleslib.api.client.screen.v2;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Matrix4f;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.Objects;
@@ -197,11 +196,12 @@ public final class TooltipRenderHelper extends GuiComponent {
 
         if (components.isEmpty()) return;
 
+        Font font = Minecraft.getInstance().font;
+        ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
+
         int i = 0;
         int j = components.size() == 1 ? -2 : 0;
 
-        Minecraft minecraft = Minecraft.getInstance();
-        Font font = minecraft.font;
         for (ClientTooltipComponent component : components) {
             int k = component.getWidth(font);
             if (k > i) {
@@ -213,16 +213,30 @@ public final class TooltipRenderHelper extends GuiComponent {
         int l = posX + 12;
         int m = posY - 12;
         poseStack.pushPose();
+        float f = itemRenderer.blitOffset;
+        itemRenderer.blitOffset = 400.0F;
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         Matrix4f matrix4f = poseStack.last().pose();
-        TooltipRenderUtil.renderTooltipBackground(GuiComponent::fillGradient, matrix4f, bufferBuilder, l, m, i, j, 400);
+        fillGradient(matrix4f, bufferBuilder, l - 3, m - 4, l + i + 3, m - 3, 400, -267386864, -267386864);
+        fillGradient(matrix4f, bufferBuilder, l - 3, m + l + 3, l + i + 3, m + l + 4, 400, -267386864, -267386864);
+        fillGradient(matrix4f, bufferBuilder, l - 3, m - 3, l + i + 3, m + l + 3, 400, -267386864, -267386864);
+        fillGradient(matrix4f, bufferBuilder, l - 4, m - 3, l - 3, m + l + 3, 400, -267386864, -267386864);
+        fillGradient(matrix4f, bufferBuilder, l + i + 3, m - 3, l + i + 4, m + l + 3, 400, -267386864, -267386864);
+        fillGradient(matrix4f, bufferBuilder, l - 3, m - 3 + 1, l - 3 + 1, m + l + 3 - 1, 400, 1347420415, 1344798847);
+        fillGradient(matrix4f, bufferBuilder, l + i + 2, m - 3 + 1, l + i + 3, m + l + 3 - 1, 400, 1347420415, 1344798847);
+        fillGradient(matrix4f, bufferBuilder, l - 3, m - 3, l + i + 3, m - 3 + 1, 400, 1347420415, 1347420415);
+        fillGradient(matrix4f, bufferBuilder, l - 3, m + l + 2, l + i + 3, m + l + 3, 400, 1344798847, 1344798847);
         RenderSystem.enableDepthTest();
+        RenderSystem.disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
-        BufferUploader.drawWithShader(bufferBuilder.end());
+        bufferBuilder.end();
+        BufferUploader.end(bufferBuilder);
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         poseStack.translate(0.0F, 0.0F, 400.0F);
         int p = m;
@@ -236,15 +250,15 @@ public final class TooltipRenderHelper extends GuiComponent {
         }
 
         bufferSource.endBatch();
+        poseStack.popPose();
         p = m;
 
-        ItemRenderer itemRenderer = minecraft.getItemRenderer();
         for (q = 0; q < components.size(); ++q) {
-            clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderImage(font, l, p, poseStack, itemRenderer);
+            clientTooltipComponent2 = (ClientTooltipComponent) components.get(q);
+            clientTooltipComponent2.renderImage(font, l, p, poseStack, itemRenderer, 400);
             p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
         }
 
-        poseStack.popPose();
+        itemRenderer.blitOffset = f;
     }
 }

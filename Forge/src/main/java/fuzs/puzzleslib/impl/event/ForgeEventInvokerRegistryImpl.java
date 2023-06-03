@@ -13,7 +13,6 @@ import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
-import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,25 +21,25 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.AgeableMob;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
+import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.ChunkEvent;
-import net.minecraftforge.event.level.ExplosionEvent;
-import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
+import net.minecraftforge.event.world.BlockEvent;
+import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.ExplosionEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -59,40 +58,40 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
 
     static {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getHitVec());
+            EventResultHolder<InteractionResult> result = callback.onUseBlock(evt.getPlayer(), evt.getWorld(), evt.getHand(), evt.getHitVec());
             if (result.isInterrupt()) {
                 evt.setCancellationResult(result.getInterrupt().orElseThrow());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
-            EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
+            EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getPlayer(), evt.getWorld(), evt.getHand());
             if (result.isInterrupt()) {
                 evt.setCancellationResult(result.getInterrupt().orElseThrow().getResult());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, PlayerInteractEvent.EntityInteract.class, (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseEntity(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget());
+            EventResultHolder<InteractionResult> result = callback.onUseEntity(evt.getPlayer(), evt.getWorld(), evt.getHand(), evt.getTarget());
             if (result.isInterrupt()) {
                 evt.setCancellationResult(result.getInterrupt().orElseThrow());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, PlayerInteractEvent.EntityInteractSpecific.class, (PlayerInteractEvents.UseEntityAt callback, PlayerInteractEvent.EntityInteractSpecific evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseEntityAt(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget(), evt.getLocalPos());
+            EventResultHolder<InteractionResult> result = callback.onUseEntityAt(evt.getPlayer(), evt.getWorld(), evt.getHand(), evt.getTarget(), evt.getLocalPos());
             if (result.isInterrupt()) {
                 evt.setCancellationResult(result.getInterrupt().orElseThrow());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerXpEvents.PickupXp.class, PlayerXpEvent.PickupXp.class, (PlayerXpEvents.PickupXp callback, PlayerXpEvent.PickupXp evt) -> {
-            if (callback.onPickupXp(evt.getEntity(), evt.getOrb()).isInterrupt()) {
+            if (callback.onPickupXp(evt.getPlayer(), evt.getOrb()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(BonemealCallback.class, BonemealEvent.class, (BonemealCallback callback, BonemealEvent evt) -> {
-            EventResult result = callback.onBonemeal(evt.getLevel(), evt.getPos(), evt.getBlock(), evt.getStack());
+            EventResult result = callback.onBonemeal(evt.getWorld(), evt.getPos(), evt.getBlock(), evt.getStack());
             // cancelling bone meal event is kinda weird...
             if (result.isInterrupt()) {
                 if (result.getAsBoolean()) {
@@ -104,12 +103,12 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(LivingExperienceDropCallback.class, LivingExperienceDropEvent.class, (LivingExperienceDropCallback callback, LivingExperienceDropEvent evt) -> {
             DefaultedInt droppedExperience = DefaultedInt.fromEvent(evt::setDroppedExperience, evt::getDroppedExperience, evt::getOriginalExperience);
-            if (callback.onLivingExperienceDrop(evt.getEntity(), evt.getAttackingPlayer(), droppedExperience).isInterrupt()) {
+            if (callback.onLivingExperienceDrop(evt.getEntityLiving(), evt.getAttackingPlayer(), droppedExperience).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
-            if (callback.onFarmlandTrample((Level) evt.getLevel(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
+            if (callback.onFarmlandTrample((Level) evt.getWorld(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -124,12 +123,12 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(LivingFallCallback.class, LivingFallEvent.class, (LivingFallCallback callback, LivingFallEvent evt) -> {
             MutableFloat fallDistance = MutableFloat.fromEvent(evt::setDistance, evt::getDistance);
             MutableFloat damageMultiplier = MutableFloat.fromEvent(evt::setDamageMultiplier, evt::getDamageMultiplier);
-            if (callback.onLivingFall(evt.getEntity(), fallDistance, damageMultiplier).isInterrupt()) {
+            if (callback.onLivingFall(evt.getEntityLiving(), fallDistance, damageMultiplier).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(RegisterCommandsCallback.class, RegisterCommandsEvent.class, (RegisterCommandsCallback callback, RegisterCommandsEvent evt) -> {
-            callback.onRegisterCommands(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection());
+            callback.onRegisterCommands(evt.getDispatcher(), evt.getEnvironment());
         });
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableLoadEvent.class, (LootTableLoadEvents.Replace callback, LootTableLoadEvent evt) -> {
             MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
@@ -145,10 +144,10 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
             MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
-            callback.onAnvilRepair(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
+            callback.onAnvilRepair(evt.getPlayer(), evt.getItemInput(), evt.getIngredientInput(), evt.getItemResult(), breakChance);
         });
         INSTANCE.register(ItemTouchCallback.class, EntityItemPickupEvent.class, (ItemTouchCallback callback, EntityItemPickupEvent evt) -> {
-            EventResult result = callback.onItemTouch(evt.getEntity(), evt.getItem());
+            EventResult result = callback.onItemTouch(evt.getPlayer(), evt.getItem());
             if (result.isInterrupt()) {
                 if (result.getAsBoolean()) {
                     evt.setResult(Event.Result.ALLOW);
@@ -158,11 +157,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(PlayerEvents.ItemPickup.class, PlayerEvent.ItemPickupEvent.class, (PlayerEvents.ItemPickup callback, PlayerEvent.ItemPickupEvent evt) -> {
-            callback.onItemPickup(evt.getEntity(), evt.getOriginalEntity(), evt.getStack());
+            callback.onItemPickup(evt.getPlayer(), evt.getOriginalEntity(), evt.getStack());
         });
         INSTANCE.register(LootingLevelCallback.class, LootingLevelEvent.class, (LootingLevelCallback callback, LootingLevelEvent evt) -> {
             MutableInt lootingLevel = MutableInt.fromEvent(evt::setLootingLevel, evt::getLootingLevel);
-            callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), lootingLevel);
+            callback.onLootingLevel(evt.getEntityLiving(), evt.getDamageSource(), lootingLevel);
         });
         INSTANCE.register(AnvilUpdateCallback.class, AnvilUpdateEvent.class, (AnvilUpdateCallback callback, AnvilUpdateEvent evt) -> {
             MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
@@ -180,66 +179,66 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (LivingDropsCallback callback, LivingDropsEvent evt) -> {
-            if (callback.onLivingDrops(evt.getEntity(), evt.getSource(), evt.getDrops(), evt.getLootingLevel(), evt.isRecentlyHit()).isInterrupt()) {
+            if (callback.onLivingDrops(evt.getEntityLiving(), evt.getSource(), evt.getDrops(), evt.getLootingLevel(), evt.isRecentlyHit()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(LivingEvents.Tick.class, LivingEvent.LivingTickEvent.class, (LivingEvents.Tick callback, LivingEvent.LivingTickEvent evt) -> {
-            if (callback.onLivingTick(evt.getEntity()).isInterrupt()) {
+        INSTANCE.register(LivingEvents.Tick.class, LivingEvent.LivingUpdateEvent.class, (LivingEvents.Tick callback, LivingEvent.LivingUpdateEvent evt) -> {
+            if (callback.onLivingTick(evt.getEntityLiving()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(ArrowLooseCallback.class, ArrowLooseEvent.class, (ArrowLooseCallback callback, ArrowLooseEvent evt) -> {
             MutableInt charge = MutableInt.fromEvent(evt::setCharge, evt::getCharge);
-            if (callback.onArrowLoose(evt.getEntity(), evt.getBow(), evt.getLevel(), charge, evt.hasAmmo()).isInterrupt()) {
+            if (callback.onArrowLoose(evt.getPlayer(), evt.getBow(), evt.getWorld(), charge, evt.hasAmmo()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(LivingHurtCallback.class, LivingHurtEvent.class, (LivingHurtCallback callback, LivingHurtEvent evt) -> {
             MutableFloat amount = MutableFloat.fromEvent(evt::setAmount, evt::getAmount);
-            if (callback.onLivingHurt(evt.getEntity(), evt.getSource(), amount).isInterrupt()) {
+            if (callback.onLivingHurt(evt.getEntityLiving(), evt.getSource(), amount).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(UseItemEvents.Start.class, LivingEntityUseItemEvent.Start.class, (UseItemEvents.Start callback, LivingEntityUseItemEvent.Start evt) -> {
             MutableInt useDuration = MutableInt.fromEvent(evt::setDuration, evt::getDuration);
-            if (callback.onUseItemStart(evt.getEntity(), evt.getItem(), useDuration).isInterrupt()) {
+            if (callback.onUseItemStart(evt.getEntityLiving(), evt.getItem(), useDuration).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(UseItemEvents.Tick.class, LivingEntityUseItemEvent.Tick.class, (UseItemEvents.Tick callback, LivingEntityUseItemEvent.Tick evt) -> {
             MutableInt useItemRemaining = MutableInt.fromEvent(evt::setDuration, evt::getDuration);
-            if (callback.onUseItemTick(evt.getEntity(), evt.getItem(), useItemRemaining).isInterrupt()) {
+            if (callback.onUseItemTick(evt.getEntityLiving(), evt.getItem(), useItemRemaining).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(UseItemEvents.Stop.class, LivingEntityUseItemEvent.Stop.class, (UseItemEvents.Stop callback, LivingEntityUseItemEvent.Stop evt) -> {
             // Forge event also supports changing duration, but it remains unused
-            if (callback.onUseItemStop(evt.getEntity(), evt.getItem(), evt.getDuration()).isInterrupt()) {
+            if (callback.onUseItemStop(evt.getEntityLiving(), evt.getItem(), evt.getDuration()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(UseItemEvents.Finish.class, LivingEntityUseItemEvent.Finish.class, (UseItemEvents.Finish callback, LivingEntityUseItemEvent.Finish evt) -> {
             MutableValue<ItemStack> stack = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
-            callback.onUseItemFinish(evt.getEntity(), stack, evt.getDuration(), evt.getItem());
+            callback.onUseItemFinish(evt.getEntityLiving(), stack, evt.getDuration(), evt.getItem());
         });
         INSTANCE.register(ShieldBlockCallback.class, ShieldBlockEvent.class, (ShieldBlockCallback callback, ShieldBlockEvent evt) -> {
             DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(evt::setBlockedDamage, evt::getBlockedDamage, evt::getOriginalBlockedDamage);
             // Forge event can also prevent the shield taking durability damage, but that's hard to implement...
-            if (callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), blockedDamage).isInterrupt()) {
+            if (callback.onShieldBlock(evt.getEntityLiving(), evt.getDamageSource(), blockedDamage).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(TagsUpdatedCallback.class, TagsUpdatedEvent.class, (TagsUpdatedCallback callback, TagsUpdatedEvent evt) -> {
-            callback.onTagsUpdated(evt.getRegistryAccess(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
+            callback.onTagsUpdated(evt.getTagManager(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
         });
         INSTANCE.register(ExplosionEvents.Start.class, ExplosionEvent.Start.class, (ExplosionEvents.Start callback, ExplosionEvent.Start evt) -> {
-            if (callback.onExplosionStart(evt.getLevel(), evt.getExplosion()).isInterrupt()) {
+            if (callback.onExplosionStart(evt.getWorld(), evt.getExplosion()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(ExplosionEvents.Detonate.class, ExplosionEvent.Detonate.class, (ExplosionEvents.Detonate callback, ExplosionEvent.Detonate evt) -> {
-            callback.onExplosionDetonate(evt.getLevel(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
+            callback.onExplosionDetonate(evt.getWorld(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
         });
         INSTANCE.register(SyncDataPackContentsCallback.class, OnDatapackSyncEvent.class, (SyncDataPackContentsCallback callback, OnDatapackSyncEvent evt) -> {
             if (evt.getPlayer() != null) {
@@ -262,36 +261,36 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(ServerLifecycleEvents.ServerStopped.class, ServerStoppedEvent.class, (ServerLifecycleEvents.ServerStopped callback, ServerStoppedEvent evt) -> {
             callback.onServerStopped(evt.getServer());
         });
-        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, PlayLevelSoundEvent.AtPosition.class, (PlayLevelSoundEvents.AtPosition callback, PlayLevelSoundEvent.AtPosition evt) -> {
-            MutableValue<Holder<SoundEvent>> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
-            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setSource, evt::getSource);
-            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setNewVolume, evt::getNewVolume, evt::getOriginalVolume);
-            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setNewPitch, evt::getNewPitch, evt::getOriginalPitch);
-            if (callback.onPlaySoundAtPosition(evt.getLevel(), evt.getPosition(), sound, source, volume, pitch).isInterrupt()) {
+        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, PlaySoundAtEntityEvent.class, (PlayLevelSoundEvents.AtPosition callback, PlaySoundAtEntityEvent evt) -> {
+            MutableValue<SoundEvent> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
+            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setCategory, evt::getCategory);
+            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setVolume, evt::getVolume, evt::getDefaultVolume);
+            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setPitch, evt::getPitch, evt::getDefaultPitch);
+            if (callback.onPlaySoundAtPosition(evt.getEntity().level, evt.getEntity().position(), sound, source, volume, pitch).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, PlayLevelSoundEvent.AtEntity.class, (PlayLevelSoundEvents.AtEntity callback, PlayLevelSoundEvent.AtEntity evt) -> {
-            MutableValue<Holder<SoundEvent>> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
-            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setSource, evt::getSource);
-            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setNewVolume, evt::getNewVolume, evt::getOriginalVolume);
-            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setNewPitch, evt::getNewPitch, evt::getOriginalPitch);
-            if (callback.onPlaySoundAtEntity(evt.getLevel(), evt.getEntity(), sound, source, volume, pitch).isInterrupt()) {
+        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, PlaySoundAtEntityEvent.class, (PlayLevelSoundEvents.AtEntity callback, PlaySoundAtEntityEvent evt) -> {
+            MutableValue<SoundEvent> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
+            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setCategory, evt::getCategory);
+            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setVolume, evt::getVolume, evt::getDefaultVolume);
+            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setPitch, evt::getPitch, evt::getDefaultPitch);
+            if (callback.onPlaySoundAtEntity(evt.getEntity().level, evt.getEntity(), sound, source, volume, pitch).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+        INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinWorldEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinWorldEvent evt) -> {
+            if (evt.getWorld().isClientSide) return;
+            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getWorld(), !evt.loadedFromDisk() && evt.getEntity() instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveWorldEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveWorldEvent evt) -> {
+            if (evt.getWorld().isClientSide) return;
+            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getWorld());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
-            EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
+            EventResult result = callback.onLivingDeath(evt.getEntityLiving(), evt.getSource());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(PlayerEvents.StartTracking.class, PlayerEvent.StartTracking.class, (PlayerEvents.StartTracking callback, PlayerEvent.StartTracking evt) -> {
@@ -326,7 +325,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(LivingAttackCallback.class, LivingAttackEvent.class, (LivingAttackCallback callback, LivingAttackEvent evt) -> {
-            if (callback.onLivingAttack(evt.getEntity(), evt.getSource(), evt.getAmount()).isInterrupt()) {
+            if (callback.onLivingAttack(evt.getEntityLiving(), evt.getSource(), evt.getAmount()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -340,38 +339,38 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerTickEvents.Start.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.Start callback, TickEvent.ServerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.START) return;
-            callback.onStartServerTick(evt.getServer());
+            callback.onStartServerTick(Proxy.INSTANCE.getGameServer());
         });
         INSTANCE.register(ServerTickEvents.End.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.End callback, TickEvent.ServerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.END) return;
-            callback.onEndServerTick(evt.getServer());
+            callback.onEndServerTick(Proxy.INSTANCE.getGameServer());
         });
-        INSTANCE.register(ServerLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ServerLevel level)) return;
+        INSTANCE.register(ServerLevelTickEvents.Start.class, TickEvent.WorldTickEvent.class, (ServerLevelTickEvents.Start callback, TickEvent.WorldTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.START || !(evt.world instanceof ServerLevel level)) return;
             callback.onStartLevelTick(level.getServer(), level);
         });
-        INSTANCE.register(ServerLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ServerLevel level)) return;
+        INSTANCE.register(ServerLevelTickEvents.End.class, TickEvent.WorldTickEvent.class, (ServerLevelTickEvents.End callback, TickEvent.WorldTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.END || !(evt.world instanceof ServerLevel level)) return;
             callback.onEndLevelTick(level.getServer(), level);
         });
-        INSTANCE.register(ServerLevelEvents.Load.class, LevelEvent.Load.class, (ServerLevelEvents.Load callback, LevelEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+        INSTANCE.register(ServerLevelEvents.Load.class, WorldEvent.Load.class, (ServerLevelEvents.Load callback, WorldEvent.Load evt) -> {
+            if (!(evt.getWorld() instanceof ServerLevel level)) return;
             callback.onLevelLoad(level.getServer(), level);
         });
-        INSTANCE.register(ServerLevelEvents.Unload.class, LevelEvent.Unload.class, (ServerLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+        INSTANCE.register(ServerLevelEvents.Unload.class, WorldEvent.Unload.class, (ServerLevelEvents.Unload callback, WorldEvent.Unload evt) -> {
+            if (!(evt.getWorld() instanceof ServerLevel level)) return;
             callback.onLevelUnload(level.getServer(), level);
         });
         INSTANCE.register(ServerChunkEvents.Load.class, ChunkEvent.Load.class, (ServerChunkEvents.Load callback, ChunkEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+            if (!(evt.getWorld() instanceof ServerLevel level)) return;
             callback.onChunkLoad(level, evt.getChunk());
         });
         INSTANCE.register(ServerChunkEvents.Unload.class, ChunkEvent.Unload.class, (ServerChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
+            if (!(evt.getWorld() instanceof ServerLevel level)) return;
             callback.onChunkUnload(level, evt.getChunk());
         });
         INSTANCE.register(ItemTossCallback.class, ItemTossEvent.class, (ItemTossCallback callback, ItemTossEvent evt) -> {
-            if (callback.onItemToss(evt.getEntity(), evt.getPlayer()).isInterrupt()) {
+            if (callback.onItemToss(evt.getEntityItem(), evt.getPlayer()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });

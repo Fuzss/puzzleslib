@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.data.v1;
 
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -10,7 +10,7 @@ import net.minecraftforge.common.data.SoundDefinitionsProvider;
 public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
     private final String modId;
 
-    public AbstractSoundDefinitionProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
+    public AbstractSoundDefinitionProvider(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
         super(packOutput, modId, fileHelper);
         this.modId = modId;
     }

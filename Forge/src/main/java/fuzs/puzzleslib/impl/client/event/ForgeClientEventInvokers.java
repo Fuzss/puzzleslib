@@ -3,17 +3,19 @@ package fuzs.puzzleslib.impl.client.event;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.impl.client.core.event.CreativeModeTabContentsEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.gui.OverlayRegistry;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Objects;
@@ -33,13 +35,14 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ClientTickEvents.End.class, TickEvent.ClientTickEvent.class, (ClientTickEvents.End callback, TickEvent.ClientTickEvent evt) -> {
             if (evt.phase == TickEvent.Phase.END) callback.onEndTick(Minecraft.getInstance());
         });
-        INSTANCE.register(RenderGuiCallback.class, RenderGuiEvent.Post.class, (RenderGuiCallback callback, RenderGuiEvent.Post evt) -> {
-            callback.onRenderGui(Minecraft.getInstance(), evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+        INSTANCE.register(RenderGuiCallback.class, RenderGameOverlayEvent.Post.class, (RenderGuiCallback callback, RenderGameOverlayEvent.Post evt) -> {
+            if (evt.getType() != RenderGameOverlayEvent.ElementType.ALL) return;
+            callback.onRenderGui(Minecraft.getInstance(), evt.getMatrixStack(), evt.getPartialTicks(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
         });
         INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
-            callback.onItemTooltip(evt.getItemStack(), evt.getEntity(), evt.getToolTip(), evt.getFlags());
+            callback.onItemTooltip(evt.getItemStack(), evt.getPlayer(), evt.getToolTip(), evt.getFlags());
         });
-        INSTANCE.register(RenderNameTagCallback.class, RenderNameTagEvent.class, (RenderNameTagCallback callback, RenderNameTagEvent evt) -> {
+        INSTANCE.register(RenderNameTagCallback.class, RenderNameplateEvent.class, (RenderNameTagCallback callback, RenderNameplateEvent evt) -> {
             DefaultedValue<Component> content = DefaultedValue.fromEvent(evt::setContent, evt::getContent, evt::getOriginalContent);
             EventResult result = callback.onRenderNameTag(evt.getEntity(), content, evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick());
             if (result.isInterrupt()) evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
@@ -56,12 +59,13 @@ public final class ForgeClientEventInvokers {
             EventResult result = callback.onInventoryMobEffects(evt.getScreen(), evt.getAvailableSpace(), fullSizeRendering, horizontalOffset);
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
-            DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setNewScreen, evt::getNewScreen, evt::getScreen);
-            EventResult result = callback.onScreenOpening(evt.getCurrentScreen(), newScreen);
+        INSTANCE.register(ScreenOpeningCallback.class, ScreenOpenEvent.class, (ScreenOpeningCallback callback, ScreenOpenEvent evt) -> {
+            DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setScreen, evt::getScreen, evt::getScreen);
+            Screen oldScreen = Minecraft.getInstance().screen;
+            EventResult result = callback.onScreenOpening(oldScreen, newScreen);
             // setting current screen again already prevents Screen#remove from running as implemented by Forge, but Screen#init still runs again,
             // we just manually fully cancel the event to deal in a more 'proper' way with this, the same is implemented on Fabric
-            if (result.isInterrupt() || newScreen.getAsOptional().filter(screen -> screen == evt.getCurrentScreen()).isPresent()) evt.setCanceled(true);
+            if (result.isInterrupt() || newScreen.getAsOptional().filter(screen -> screen == oldScreen).isPresent()) evt.setCanceled(true);
         });
         INSTANCE.register(ComputeFovModifierCallback.class, ComputeFovModifierEvent.class, (ComputeFovModifierCallback callback, ComputeFovModifierEvent evt) -> {
             final float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
@@ -130,34 +134,36 @@ public final class ForgeClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, ScreenEvent.KeyReleased.Post.class, (callback, evt) -> {
             callback.onAfterKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
         });
-        INSTANCE.register(RenderGuiElementEvents.Before.class, RenderGuiOverlayEvent.Pre.class, (RenderGuiElementEvents.Before callback, RenderGuiOverlayEvent.Pre evt, Object context) -> {
+        INSTANCE.register(RenderGuiElementEvents.Before.class, RenderGameOverlayEvent.PreLayer.class, (RenderGuiElementEvents.Before callback, RenderGameOverlayEvent.PreLayer evt, Object context) -> {
             Objects.requireNonNull(context, "context is null");
             RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
+            OverlayRegistry.OverlayEntry entry = OverlayRegistry.getEntry(evt.getOverlay());
             Minecraft minecraft = Minecraft.getInstance();
-            if (!evt.getOverlay().id().equals(overlay.id()) || !overlay.filter().test(minecraft)) return;
-            EventResult result = callback.onBeforeRenderGuiElement(minecraft, evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            if (entry == null || !Objects.equals(overlay.id().toString(), entry.getDisplayName()) || !overlay.filter().test(minecraft)) return;
+            EventResult result = callback.onBeforeRenderGuiElement(minecraft, evt.getMatrixStack(), evt.getPartialTicks(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(RenderGuiElementEvents.After.class, RenderGuiOverlayEvent.Post.class, (RenderGuiElementEvents.After callback, RenderGuiOverlayEvent.Post evt, Object context) -> {
+        INSTANCE.register(RenderGuiElementEvents.After.class, RenderGameOverlayEvent.PostLayer.class, (RenderGuiElementEvents.After callback, RenderGameOverlayEvent.PostLayer evt, Object context) -> {
             Objects.requireNonNull(context, "context is null");
             RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
+            OverlayRegistry.OverlayEntry entry = OverlayRegistry.getEntry(evt.getOverlay());
             Minecraft minecraft = Minecraft.getInstance();
-            if (!evt.getOverlay().id().equals(overlay.id()) || !overlay.filter().test(minecraft)) return;
-            callback.onAfterRenderGuiElement(minecraft, evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            if (entry == null || !Objects.equals(overlay.id().toString(), entry.getDisplayName()) || !overlay.filter().test(minecraft)) return;
+            callback.onAfterRenderGuiElement(minecraft, evt.getMatrixStack(), evt.getPartialTicks(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
         });
-        INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {
+        INSTANCE.register(CustomizeChatPanelCallback.class, RenderGameOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, RenderGameOverlayEvent.Chat evt) -> {
             MutableInt posX = MutableInt.fromEvent(evt::setPosX, evt::getPosX);
             MutableInt posY = MutableInt.fromEvent(evt::setPosY, evt::getPosY);
-            callback.onRenderChatPanel(evt.getWindow(), evt.getPoseStack(), evt.getPartialTick(), posX, posY);
+            callback.onRenderChatPanel(evt.getWindow(), evt.getMatrixStack(), evt.getPartialTicks(), posX, posY);
         });
-        INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
-            if (!evt.getLevel().isClientSide) return;
-            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
+        INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinWorldEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinWorldEvent evt) -> {
+            if (!evt.getWorld().isClientSide) return;
+            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getWorld());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
-            if (!evt.getLevel().isClientSide) return;
-            callback.onEntityUnload(evt.getEntity(), (ClientLevel) evt.getLevel());
+        INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveWorldEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveWorldEvent evt) -> {
+            if (!evt.getWorld().isClientSide) return;
+            callback.onEntityUnload(evt.getEntity(), (ClientLevel) evt.getWorld());
         });
         INSTANCE.register(InputEvents.BeforeMouseAction.class, InputEvent.MouseButton.Pre.class, (InputEvents.BeforeMouseAction callback, InputEvent.MouseButton.Pre evt) -> {
             EventResult result = callback.onBeforeMouseAction(evt.getButton(), evt.getAction(), evt.getModifiers());
@@ -188,43 +194,46 @@ public final class ForgeClientEventInvokers {
             callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), evt.getPitch(), pitch, yaw, roll);
         });
         INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
-            EventResult result = callback.onBeforeRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            EventResult result = callback.onBeforeRenderPlayer(evt.getPlayer(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderPlayerEvents.After.class, RenderPlayerEvent.Post.class, (RenderPlayerEvents.After callback, RenderPlayerEvent.Post evt) -> {
-            callback.onAfterRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            callback.onAfterRenderPlayer(evt.getPlayer(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
         INSTANCE.register(RenderHandCallback.class, RenderHandEvent.class, (RenderHandCallback callback, RenderHandEvent evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            EventResult result = callback.onRenderHand(minecraft.player, evt.getHand(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
+            EventResult result = callback.onRenderHand(minecraft.player, evt.getHand(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTicks(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(ClientLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ClientLevel level)) return;
+        INSTANCE.register(ClientLevelTickEvents.Start.class, TickEvent.WorldTickEvent.class, (ClientLevelTickEvents.Start callback, TickEvent.WorldTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.START || !(evt.world instanceof ClientLevel level)) return;
             callback.onStartLevelTick(Minecraft.getInstance(), level);
         });
-        INSTANCE.register(ClientLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ClientLevel level)) return;
+        INSTANCE.register(ClientLevelTickEvents.End.class, TickEvent.WorldTickEvent.class, (ClientLevelTickEvents.End callback, TickEvent.WorldTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.END || !(evt.world instanceof ClientLevel level)) return;
             callback.onEndLevelTick(Minecraft.getInstance(), level);
         });
         INSTANCE.register(ClientChunkEvents.Load.class, ChunkEvent.Load.class, (ClientChunkEvents.Load callback, ChunkEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
+            if (!(evt.getWorld() instanceof ClientLevel level)) return;
             callback.onChunkLoad(level, evt.getChunk());
         });
         INSTANCE.register(ClientChunkEvents.Unload.class, ChunkEvent.Unload.class, (ClientChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
+            if (!(evt.getWorld() instanceof ClientLevel level)) return;
             callback.onChunkUnload(level, evt.getChunk());
         });
-        INSTANCE.register(ClientPlayerEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggingIn.class, (ClientPlayerEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggingIn evt) -> {
+        INSTANCE.register(ClientPlayerEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggedInEvent.class, (ClientPlayerEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggedInEvent evt) -> {
             callback.onLoggedIn(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
         });
-        INSTANCE.register(ClientPlayerEvents.LoggedOut.class, ClientPlayerNetworkEvent.LoggingOut.class, (ClientPlayerEvents.LoggedOut callback, ClientPlayerNetworkEvent.LoggingOut evt) -> {
+        INSTANCE.register(ClientPlayerEvents.LoggedOut.class, ClientPlayerNetworkEvent.LoggedOutEvent.class, (ClientPlayerEvents.LoggedOut callback, ClientPlayerNetworkEvent.LoggedOutEvent evt) -> {
             if (evt.getPlayer() == null || evt.getMultiPlayerGameMode() == null) return;
             Objects.requireNonNull(evt.getConnection(), "connection is null");
             callback.onLoggedOut(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
         });
-        INSTANCE.register(ClientPlayerEvents.Copy.class, ClientPlayerNetworkEvent.Clone.class, (ClientPlayerEvents.Copy callback, ClientPlayerNetworkEvent.Clone evt) -> {
+        INSTANCE.register(ClientPlayerEvents.Copy.class, ClientPlayerNetworkEvent.RespawnEvent.class, (ClientPlayerEvents.Copy callback, ClientPlayerNetworkEvent.RespawnEvent evt) -> {
             callback.onCopy(evt.getOldPlayer(), evt.getNewPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
+        });
+        INSTANCE.register(BuildCreativeContentsCallback.class, CreativeModeTabContentsEvent.class, (BuildCreativeContentsCallback callback, CreativeModeTabContentsEvent evt) -> {
+            callback.onBuildCreativeContents(evt.getTab(), evt.getOutput());
         });
     }
 

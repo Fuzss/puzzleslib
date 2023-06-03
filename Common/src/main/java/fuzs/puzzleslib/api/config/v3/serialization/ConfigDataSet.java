@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.config.v3.serialization;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.impl.config.serialization.ConfigDataSetImpl;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
@@ -135,7 +134,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
      */
     @SuppressWarnings("unchecked")
     static <T> Registry<T> findRegistry(ResourceKey<? extends Registry<T>> registryKey, boolean dynamicRegistries) {
-        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
+        Registry<T> registry = (Registry<T>) Registry.REGISTRY.get(registryKey.location());
         if (registry != null) return registry;
         if (dynamicRegistries && Proxy.INSTANCE.getGameServer() != null) {
             registry = Proxy.INSTANCE.getGameServer().registryAccess().registry(registryKey).orElse(null);

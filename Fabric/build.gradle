@@ -41,7 +41,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${parchmentMinecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
     // Fabric
@@ -49,17 +49,19 @@ dependencies {
     modApi "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
 
     // Forge Config API Port
-    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:6.0.2"
+    api 'com.electronwill.night-config:core:3.6.5'
+    api 'com.electronwill.night-config:toml:3.6.5'
+    modApi "net.minecraftforge:forgeconfigapiport-fabric:3.2.4"
 
     // Cardinal Components
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:4.2.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:4.2.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-block:4.2.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:4.2.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-world:4.2.0"
 
     // Quality of Life Mods
-    modLocalRuntime "com.terraformersmc:modmenu:6.2.2"
+    modLocalRuntime "com.terraformersmc:modmenu:3.2.5"
 //    modLocalRuntime "curse.maven:configured-fabric-667378:4441611"
 
     // Puzzles Lib

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -78,7 +79,7 @@ public interface CreativeModeTabConfigurator {
      *
      * @return builder instance
      */
-    CreativeModeTabConfigurator displayItems(CreativeModeTab.DisplayItemsGenerator displayItemsGenerator);
+    CreativeModeTabConfigurator displayItems(Consumer<DisplayItemsOutput> displayItemsGenerator);
 
     /**
      * show a search bar in this tab like vanilla's search tab

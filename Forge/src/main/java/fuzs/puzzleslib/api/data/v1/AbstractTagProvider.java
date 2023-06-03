@@ -1,45 +1,45 @@
 package fuzs.puzzleslib.api.data.v1;
 
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.tags.BlockTagsProvider;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.data.tags.GameEventTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
-
-import java.util.concurrent.CompletableFuture;
 
 public final class AbstractTagProvider {
 
     public abstract static class Blocks extends BlockTagsProvider {
 
-        public Blocks(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, lookupProvider, modId, fileHelper);
+        public Blocks(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, modId, fileHelper);
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        protected abstract void addTags();
     }
 
     public abstract static class Items extends ItemTagsProvider {
 
-        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, lookupProvider, CompletableFuture.completedFuture(null), modId, fileHelper);
+        public Items(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, new BlockTagsProvider(packOutput, modId, fileHelper) {
+
+                @Override
+                protected void addTags() {
+
+                }
+            }, modId, fileHelper);
         }
 
-        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagsProvider.TagLookup<Block>> blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, lookupProvider, blockTagsProvider, modId, fileHelper);
+        public Items(DataGenerator packOutput, BlockTagsProvider blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, blockTagsProvider, modId, fileHelper);
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        protected abstract void addTags();
 
         @Deprecated
         @Override
@@ -50,31 +50,21 @@ public final class AbstractTagProvider {
 
     public abstract static class EntityTypes extends EntityTypeTagsProvider {
 
-        public EntityTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, lookupProvider, modId, fileHelper);
+        public EntityTypes(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, modId, fileHelper);
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        protected abstract void addTags();
     }
 
     public abstract static class GameEvents extends GameEventTagsProvider {
 
-        public GameEvents(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, lookupProvider, modId, fileHelper);
+        public GameEvents(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, modId, fileHelper);
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
-    }
-
-    public abstract static class DamageTypes extends TagsProvider<DamageType> {
-
-        public DamageTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, Registries.DAMAGE_TYPE, lookupProvider, modId, fileHelper);
-        }
-
-        @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        protected abstract void addTags();
     }
 }

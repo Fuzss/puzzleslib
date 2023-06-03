@@ -108,7 +108,7 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent() {
+    public Optional<SoundEvent> getAmbientLoopSoundEvent() {
         return this.specialEffects.getAmbientLoopSoundEvent();
     }
 

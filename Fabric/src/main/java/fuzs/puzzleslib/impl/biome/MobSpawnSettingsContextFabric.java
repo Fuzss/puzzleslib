@@ -4,7 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
 import fuzs.puzzleslib.api.core.v1.ReflectionHelper;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -79,7 +79,7 @@ public class MobSpawnSettingsContextFabric implements MobSpawnSettingsContext {
     @Override
     public Set<EntityType<?>> getEntityTypesWithSpawnCost() {
         // be careful: does not provide a view, but a copy, so avoid caching this result
-        return BuiltInRegistries.ENTITY_TYPE.stream().filter(entityType -> this.mobSpawnSettings.getMobSpawnCost(entityType) != null).collect(ImmutableSet.toImmutableSet());
+        return Registry.ENTITY_TYPE.stream().filter(entityType -> this.mobSpawnSettings.getMobSpawnCost(entityType) != null).collect(ImmutableSet.toImmutableSet());
     }
 
     @Override

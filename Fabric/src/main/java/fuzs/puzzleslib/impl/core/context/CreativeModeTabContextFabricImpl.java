@@ -3,15 +3,15 @@ package fuzs.puzzleslib.impl.core.context;
 import fuzs.puzzleslib.api.core.v1.context.CreativeModeTabContext;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
-import net.minecraft.world.item.CreativeModeTab;
+import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder;
 
 public final class CreativeModeTabContextFabricImpl implements CreativeModeTabContext {
 
     @Override
     public void registerCreativeModeTab(CreativeModeTabConfigurator configurator) {
-        CreativeModeTab.Builder builder = FabricItemGroup.builder(((CreativeModeTabConfiguratorImpl) configurator).getIdentifier());
-        ((CreativeModeTabConfiguratorImpl) configurator).configure(builder);
-        builder.build();
+        CreativeModeTabConfiguratorImpl impl = (CreativeModeTabConfiguratorImpl) configurator;
+        FabricItemGroupBuilder.create(impl.getIdentifier()).icon(impl.getIcon()).appendItems((itemStacks, tab) -> {
+            impl.getDisplayItemsGenerator().accept(tab, itemStacks::add);
+        }).build();
     }
 }

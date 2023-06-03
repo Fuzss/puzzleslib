@@ -8,6 +8,7 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
+import fuzs.puzzleslib.impl.client.core.event.RegisterItemDecorationsEvent;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextForgeImpl;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -18,9 +19,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.apache.commons.lang3.ArrayUtils;
@@ -51,35 +50,35 @@ public final class ForgeClientModConstructor {
             constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
             constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
             constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+            constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl());
+            constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl());
+            constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl());
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextForgeImpl(evt::registerEntityRenderer));
             constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextForgeImpl(evt::registerBlockEntityRenderer));
         });
-        eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent evt) -> {
-            constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl(evt::register));
-        });
-        eventBus.addListener((final RegisterParticleProvidersEvent evt) -> {
-            constructor.onRegisterParticleProviders(new ParticleProvidersContextForgeImpl(evt));
+        eventBus.addListener((final ParticleFactoryRegisterEvent evt) -> {
+            constructor.onRegisterParticleProviders(new ParticleProvidersContextForgeImpl());
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
             constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextForgeImpl(evt::registerLayerDefinition));
         });
-        eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
-            onModifyBakingResult(constructor::onModifyBakingResult, modId, evt.getModels(), evt.getModelBakery());
+        eventBus.addListener((final ModelBakeEvent evt) -> {
+            onModifyBakingResult(constructor::onModifyBakingResult, modId, evt.getModelRegistry(), evt.getModelLoader());
         });
-        eventBus.addListener((final ModelEvent.BakingCompleted evt) -> {
-            onBakingCompleted(constructor::onBakingCompleted, modId, evt.getModelManager(), evt.getModels(), evt.getModelBakery());
+        eventBus.addListener((final ModelBakeEvent evt) -> {
+            onBakingCompleted(constructor::onBakingCompleted, modId, evt.getModelManager(), evt.getModelRegistry(), evt.getModelLoader());
         });
-        eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
-            constructor.onRegisterAdditionalModels(new AdditionalModelsContextForgeImpl(evt::register));
+        eventBus.addListener((final ModelRegistryEvent evt) -> {
+            constructor.onRegisterAdditionalModels(new AdditionalModelsContextForgeImpl());
         });
         eventBus.addListener((final RegisterItemDecorationsEvent evt) -> {
             constructor.onRegisterItemDecorations(new ItemDecorationContextForgeImpl(evt::register));
         });
-        eventBus.addListener((final RegisterEntitySpectatorShadersEvent evt) -> {
-            constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextForgeImpl(evt::register));
-        });
+//        eventBus.addListener((final RegisterEntitySpectatorShadersEvent evt) -> {
+//            constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextForgeImpl(evt::register));
+//        });
         eventBus.addListener((final EntityRenderersEvent.CreateSkullModels evt) -> {
             constructor.onRegisterSkullRenderers(new SkullRenderersContextForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
         });
@@ -92,20 +91,11 @@ public final class ForgeClientModConstructor {
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
             constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextForgeImpl(evt));
         });
-        eventBus.addListener((final RegisterKeyMappingsEvent evt) -> {
-            constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl(evt::register));
+        eventBus.addListener((final ColorHandlerEvent.Block evt) -> {
+            constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextForgeImpl(evt.getBlockColors()::register, evt.getBlockColors()));
         });
-        eventBus.addListener((final RegisterColorHandlersEvent.Block evt) -> {
-            constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextForgeImpl(evt::register, evt.getBlockColors()));
-        });
-        eventBus.addListener((final RegisterColorHandlersEvent.Item evt) -> {
-            constructor.onRegisterItemColorProviders(new ItemColorProvidersContextForgeImpl(evt::register, evt.getItemColors()));
-        });
-        eventBus.addListener((final CreativeModeTabEvent.BuildContents evt) -> {
-            ResourceLocation identifier = CreativeModeTabRegistry.getName(evt.getTab());
-            if (identifier != null) {
-                constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl(identifier, evt.getParameters(), evt));
-            }
+        eventBus.addListener((final ColorHandlerEvent.Item evt) -> {
+            constructor.onRegisterItemColorProviders(new ItemColorProvidersContextForgeImpl(evt.getItemColors()::register, evt.getItemColors()));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.CLIENT_RESOURCES) {

@@ -9,8 +9,6 @@ import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -24,7 +22,7 @@ import java.util.Objects;
 @Mixin(LocalPlayer.class)
 abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
     @Unique
-    private DefaultedValue<Holder<SoundEvent>> puzzleslib$sound;
+    private DefaultedValue<SoundEvent> puzzleslib$sound;
     @Unique
     private DefaultedFloat puzzleslib$volume;
     @Unique
@@ -36,7 +34,7 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
 
     @Inject(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At("HEAD"), cancellable = true)
     public void playSound$0(SoundEvent soundEvent, float volume, float pitch, CallbackInfo callback) {
-        this.puzzleslib$sound = DefaultedValue.fromValue(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent));
+        this.puzzleslib$sound = DefaultedValue.fromValue(soundEvent);
         this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
         this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
         EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this.level, this, this.puzzleslib$sound, MutableValue.fromValue(this.getSoundSource()), this.puzzleslib$volume, this.puzzleslib$pitch);
@@ -46,7 +44,7 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
     @ModifyVariable(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At("HEAD"), ordinal = 0)
     public SoundEvent playSound$1(SoundEvent soundEvent) {
         Objects.requireNonNull(this.puzzleslib$sound, "sound is null");
-        soundEvent = this.puzzleslib$sound.getAsOptional().map(Holder::value).orElse(soundEvent);
+        soundEvent = this.puzzleslib$sound.getAsOptional().orElse(soundEvent);
         this.puzzleslib$sound = null;
         return soundEvent;
     }

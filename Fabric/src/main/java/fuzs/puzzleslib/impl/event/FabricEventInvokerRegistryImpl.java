@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.event;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.mojang.brigadier.CommandDispatcher;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
@@ -18,9 +19,8 @@ import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
-import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
@@ -35,6 +35,8 @@ import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -98,7 +100,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
         INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, callback -> {
-            return callback::onRegisterCommands;
+            return (CommandDispatcher<CommandSourceStack> dispatcher, boolean dedicated) -> {
+                callback.onRegisterCommands(dispatcher, dedicated ? Commands.CommandSelection.DEDICATED : Commands.CommandSelection.INTEGRATED);
+            };
         });
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, callback -> {
             return (ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {

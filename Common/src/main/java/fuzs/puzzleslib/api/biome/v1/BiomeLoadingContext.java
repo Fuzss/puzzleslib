@@ -7,8 +7,8 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.List;
 import java.util.Optional;
@@ -91,14 +91,14 @@ public interface BiomeLoadingContext {
      * Returns true if the configured structure with the given key can start in this biome in any chunk generator
      * used by the current world-save.
      */
-    boolean validForStructure(ResourceKey<Structure> key);
+    boolean validForStructure(ResourceKey<ConfiguredStructureFeature<?, ?>> key);
 
     /**
      * Tries to retrieve the registry key for the given configured feature, which should be from this biomes
      * current structure list. May be empty if the configured feature is not registered, or does not come
      * from this biomes feature list.
      */
-    Optional<ResourceKey<Structure>> getStructureKey(Structure structureFeature);
+    Optional<ResourceKey<ConfiguredStructureFeature<?, ?>>> getStructureKey(ConfiguredStructureFeature<?, ?> structureFeature);
 
     /**
      * Tries to determine whether this biome generates in a specific dimension, based on the {@link net.minecraft.world.level.levelgen.WorldGenSettings}

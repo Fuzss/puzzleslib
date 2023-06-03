@@ -2,9 +2,8 @@ package fuzs.puzzleslib.api.client.screen.v2;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.network.chat.ComponentContents;
-import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -33,7 +32,7 @@ public final class ScreenElementPositioner {
      * @param translationKeys the translation keys to use for locating other widgets to place <code>element</code> next to, the key is retrieved from {@link AbstractWidget#getMessage()}; note that for widgets without a displayed {@link net.minecraft.network.chat.Component} (such as {@link net.minecraft.client.gui.components.ImageButton}) the narration key usually works, too
      * @return was positioning <code>element</code> successful; the element position has already been changed, all that's left to the caller is actually adding the element to the current screen; otherwise if positioning has failed <code>element</code> is unchanged
      */
-    public static boolean tryPositionElement(LayoutElement element, List<? extends GuiEventListener> widgets, String... translationKeys) {
+    public static boolean tryPositionElement(AbstractWidget element, List<? extends GuiEventListener> widgets, String... translationKeys) {
         return tryPositionElement(element, widgets, false, translationKeys);
     }
 
@@ -47,7 +46,7 @@ public final class ScreenElementPositioner {
      * @param translationKeys    the translation keys to use for locating other widgets to place <code>element</code> next to, the key is retrieved from {@link AbstractWidget#getMessage()}; note that for widgets without a displayed {@link net.minecraft.network.chat.Component} (such as {@link net.minecraft.client.gui.components.ImageButton}) the narration key usually works, too
      * @return was positioning <code>element</code> successful; the element position has already been changed, all that's left to the caller is actually adding the element to the current screen; otherwise if positioning has failed <code>element</code> is unchanged
      */
-    public static boolean tryPositionElement(LayoutElement element, List<? extends GuiEventListener> widgets, boolean tryPositionRightFirst, String... translationKeys) {
+    public static boolean tryPositionElement(AbstractWidget element, List<? extends GuiEventListener> widgets, boolean tryPositionRightFirst, String... translationKeys) {
         return tryPositionElement(element, widgets, tryPositionRightFirst, 4, translationKeys);
     }
 
@@ -62,11 +61,11 @@ public final class ScreenElementPositioner {
      * @param translationKeys    the translation keys to use for locating other widgets to place <code>element</code> next to, the key is retrieved from {@link AbstractWidget#getMessage()}; note that for widgets without a displayed {@link net.minecraft.network.chat.Component} (such as {@link net.minecraft.client.gui.components.ImageButton}) the narration key usually works, too
      * @return was positioning <code>element</code> successful; the element position has already been changed, all that's left to the caller is actually adding the element to the current screen; otherwise if positioning has failed <code>element</code> is unchanged
      */
-    public static boolean tryPositionElement(LayoutElement element, List<? extends GuiEventListener> widgets, boolean tryPositionRightFirst, int horizontalOffset, String... translationKeys) {
-        final int originalX = element.getX();
-        final int originalY = element.getY();
+    public static boolean tryPositionElement(AbstractWidget element, List<? extends GuiEventListener> widgets, boolean tryPositionRightFirst, int horizontalOffset, String... translationKeys) {
+        final int originalX = element.x;
+        final int originalY = element.y;
         for (String translationKey : translationKeys) {
-            LayoutElement otherElement = findElement(widgets, translationKey);
+            AbstractWidget otherElement = findElement(widgets, translationKey);
             if (otherElement != null) {
                 moveElementToOther(element, otherElement, tryPositionRightFirst, horizontalOffset);
                 if (noOverlapWithExisting(widgets, element)) {
@@ -80,11 +79,11 @@ public final class ScreenElementPositioner {
             }
         }
         // reset if we were not successful in finding a position next to another widget
-        element.setPosition(originalX, originalY);
+        setPosition(element, originalX, originalY);
         return false;
     }
 
-    private static void moveElementToOther(LayoutElement element, LayoutElement otherElement, boolean tryPositionRightFirst, int horizontalOffset) {
+    private static void moveElementToOther(AbstractWidget element, AbstractWidget otherElement, boolean tryPositionRightFirst, int horizontalOffset) {
         if (tryPositionRightFirst) {
             moveToRight(element, otherElement, horizontalOffset);
         } else {
@@ -92,18 +91,23 @@ public final class ScreenElementPositioner {
         }
     }
 
-    private static void moveToLeft(LayoutElement element, LayoutElement otherElement, int horizontalOffset) {
-        element.setPosition(otherElement.getX() - element.getWidth() - horizontalOffset, otherElement.getY());
+    private static void moveToLeft(AbstractWidget element, AbstractWidget otherElement, int horizontalOffset) {
+        setPosition(element, otherElement.x - element.getWidth() - horizontalOffset, otherElement.y);
     }
 
-    private static void moveToRight(LayoutElement element, LayoutElement otherElement, int horizontalOffset) {
-        element.setPosition(otherElement.getX() + otherElement.getWidth() + horizontalOffset, otherElement.getY());
+    private static void moveToRight(AbstractWidget element, AbstractWidget otherElement, int horizontalOffset) {
+        setPosition(element, otherElement.x + otherElement.getWidth() + horizontalOffset, otherElement.y);
     }
 
-    private static boolean noOverlapWithExisting(List<? extends GuiEventListener> widgets, LayoutElement element) {
+    private static void setPosition(AbstractWidget element, int x, int y) {
+        element.x = x;
+        element.y = y;
+    }
+
+    private static boolean noOverlapWithExisting(List<? extends GuiEventListener> widgets, AbstractWidget element) {
         for (GuiEventListener widget : widgets) {
-            if (widget instanceof LayoutElement otherElement) {
-                if (element.getRectangle().intersection(otherElement.getRectangle()) != null) {
+            if (widget instanceof AbstractWidget otherElement) {
+                if (intersection(element, otherElement)) {
                     return false;
                 }
             }
@@ -111,8 +115,16 @@ public final class ScreenElementPositioner {
         return true;
     }
 
+    private static boolean intersection(AbstractWidget element, AbstractWidget otherElement) {
+        int i = Math.max(element.x, otherElement.x);
+        int j = Math.max(element.y, otherElement.y);
+        int k = Math.min(element.x + element.getWidth(), otherElement.x + otherElement.getWidth());
+        int l = Math.min(element.y + element.getHeight(), otherElement.y + otherElement.getHeight());
+        return i < k && j < l;
+    }
+
     @Nullable
-    private static LayoutElement findElement(List<? extends GuiEventListener> widgets, String translationKey) {
+    private static AbstractWidget findElement(List<? extends GuiEventListener> widgets, String translationKey) {
         for (GuiEventListener listener : widgets) {
             if (listener instanceof AbstractWidget widget) {
                 if (matchesTranslationKey(widget, translationKey)) {
@@ -124,7 +136,7 @@ public final class ScreenElementPositioner {
     }
 
     private static boolean matchesTranslationKey(AbstractWidget widget, String translationKey) {
-        final ComponentContents message = widget.getMessage().getContents();
-        return message instanceof TranslatableContents contents && contents.getKey().equals(translationKey);
+        final Component message = widget.getMessage();
+        return message instanceof TranslatableComponent contents && contents.getKey().equals(translationKey);
     }
 }

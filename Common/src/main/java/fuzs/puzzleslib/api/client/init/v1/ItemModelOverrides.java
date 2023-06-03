@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.api.client.init.v1;
 
 import fuzs.puzzleslib.impl.client.init.ItemModelOverridesImpl;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemDisplayContext;
 
 /**
- * Allows for registering model overrides for items that have a different model in {@link net.minecraft.client.renderer.entity.ItemRenderer} depending on {@link ItemDisplayContext}like {@link net.minecraft.world.item.Items#TRIDENT} and {@link net.minecraft.world.item.Items#SPYGLASS} in vanilla
+ * Allows for registering model overrides for items that have a different model in {@link net.minecraft.client.renderer.entity.ItemRenderer} depending on {@link ItemTransforms.TransformType}like {@link net.minecraft.world.item.Items#TRIDENT} and {@link net.minecraft.world.item.Items#SPYGLASS} in vanilla
  */
 public interface ItemModelOverrides {
     /**
@@ -23,5 +23,5 @@ public interface ItemModelOverrides {
      * @param customModel         the custom model, usually used for in-hand rendering
      * @param itemModelTransforms   transform types to keep the default <code>itemModel</code> for
      */
-    void register(Item item, ModelResourceLocation itemModel, ModelResourceLocation customModel, ItemDisplayContext... itemModelTransforms);
+    void register(Item item, ModelResourceLocation itemModel, ModelResourceLocation customModel, ItemTransforms.TransformType... itemModelTransforms);
 }

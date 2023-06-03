@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.core.context;
 
 import fuzs.puzzleslib.api.core.v1.context.EntityAttributesModifyContext;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.Registry;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -21,7 +21,7 @@ public final class EntityAttributesModifyContextFabricImpl implements EntityAttr
         // Forge makes this very simple by patching in a couple of helper methods, but Fabric should work like this
         AttributeSupplier supplier = DefaultAttributes.getSupplier(entityType);
         // there aren't many attributes anyway, so iterating the whole registry isn't costly
-        Map<Attribute, Double> attributeToBaseValueMap = BuiltInRegistries.ATTRIBUTE.stream().filter(supplier::hasAttribute).map(attribute1 -> supplier.createInstance(instance -> {
+        Map<Attribute, Double> attributeToBaseValueMap = Registry.ATTRIBUTE.stream().filter(supplier::hasAttribute).map(attribute1 -> supplier.createInstance(instance -> {
         }, attribute1)).filter(Objects::nonNull).collect(Collectors.toMap(AttributeInstance::getAttribute, AttributeInstance::getBaseValue));
         attributeToBaseValueMap.put(attribute, attributeValue);
         AttributeSupplier.Builder builder = AttributeSupplier.builder();

@@ -1,49 +1,59 @@
 package fuzs.puzzleslib.api.data.v1;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import net.minecraft.data.CachedOutput;
+import com.mojang.datafixers.util.Pair;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.PackOutput;
-import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.data.loot.EntityLootSubProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.data.loot.BlockLoot;
+import net.minecraft.data.loot.EntityLoot;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public final class AbstractLootProvider {
 
-    public static LootTableProvider createProvider(PackOutput packOutput, LootTableSubProvider provider, LootContextParamSet paramSet) {
-        return new LootTableProvider(packOutput, Set.of(), List.of(new LootTableProvider.SubProviderEntry(() -> provider, paramSet)));
+    public static LootTableProvider createProvider(DataGenerator packOutput, Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> provider, LootContextParamSet paramSet) {
+        return new LootTableProvider(packOutput) {
+
+            @Override
+            protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
+                return ImmutableList.of(Pair.of(() -> provider, paramSet));
+            }
+
+            @Override
+            protected void validate(Map<ResourceLocation, LootTable> map, ValidationContext validationtracker) {
+
+            }
+        };
     }
 
-    public static abstract class Blocks extends BlockLootSubProvider implements DataProvider {
+    public static abstract class Blocks extends BlockLoot implements DataProvider {
         private final LootTableProvider provider;
         private final String modId;
 
-        public Blocks(PackOutput packOutput, String modId) {
-            super(Set.of(), FeatureFlags.REGISTRY.allFlags());
+        public Blocks(DataGenerator packOutput, String modId) {
             this.provider = createProvider(packOutput, this, LootContextParamSets.BLOCK);
             this.modId = modId;
         }
 
         @Override
-        public final CompletableFuture<?> run(CachedOutput output) {
-            return this.provider.run(output);
+        public final void run(HashCache output) {
+            this.provider.run(output);
         }
 
         @Override
@@ -52,7 +62,7 @@ public final class AbstractLootProvider {
         }
 
         @Override
-        public abstract void generate();
+        public abstract void addTables();
 
         @Override
         protected Iterable<Block> getKnownBlocks() {
@@ -63,18 +73,17 @@ public final class AbstractLootProvider {
         }
     }
 
-    public static abstract class EntityTypes extends EntityLootSubProvider implements DataProvider {
+    public static abstract class EntityTypes extends EntityLoot implements DataProvider {
         private final LootTableProvider provider;
         private final String modId;
 
-        public EntityTypes(PackOutput packOutput, String modId) {
-            super(FeatureFlags.REGISTRY.allFlags());
+        public EntityTypes(DataGenerator packOutput, String modId) {
             this.provider = createProvider(packOutput, this, LootContextParamSets.ENTITY);
             this.modId = modId;
         }
         @Override
-        public final CompletableFuture<?> run(CachedOutput output) {
-            return this.provider.run(output);
+        public final void run(HashCache output) {
+            this.provider.run(output);
         }
 
         @Override
@@ -83,42 +92,49 @@ public final class AbstractLootProvider {
         }
 
         @Override
-        public abstract void generate();
+        public abstract void addTables();
 
         @Override
-        protected Stream<EntityType<?>> getKnownEntityTypes() {
-            return ForgeRegistries.ENTITY_TYPES.getEntries().stream()
+        protected Iterable<EntityType<?>> getKnownEntities() {
+            return ForgeRegistries.ENTITIES.getEntries().stream()
                     .filter(entry -> entry.getKey().location().getNamespace().equals(this.modId))
-                    .map(Map.Entry::getValue);
+                    .map(Map.Entry::getValue).collect(Collectors.toSet());
         }
 
         @Override
-        protected boolean canHaveLootTable(EntityType<?> pEntityType) {
-            return true;
+        protected boolean isNonLiving(EntityType<?> entityType) {
+            return false;
         }
     }
 
-    public static abstract class Simple implements LootTableSubProvider, DataProvider {
-        private final LootTableProvider provider;
+    public static abstract class Simple extends LootTableProvider implements DataProvider, Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> {
         private final Map<ResourceLocation, LootTable.Builder> values = Maps.newHashMap();
+        private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> provider;
 
-        public Simple(PackOutput packOutput, LootContextParamSet paramSet) {
-            this.provider = createProvider(packOutput, this, paramSet);
-        }
-        @Override
-        public final CompletableFuture<?> run(CachedOutput output) {
-            return this.provider.run(output);
+        public Simple(DataGenerator packOutput, String name, LootContextParamSet paramSet) {
+            super(packOutput);
+            this.provider = ImmutableList.of(Pair.of(() -> this, paramSet));
         }
 
         @Override
         public String getName() {
-            return this.provider.getName();
+            return "Loot Tables";
         }
 
         @Override
-        public void generate(BiConsumer<ResourceLocation, LootTable.Builder> exporter) {
+        protected void validate(Map<ResourceLocation, LootTable> tables, ValidationContext context) {
+
+        }
+
+        @Override
+        protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
+            return this.provider;
+        }
+
+        @Override
+        public void accept(BiConsumer<ResourceLocation, LootTable.Builder> consumer) {
             this.generate();
-            this.values.forEach(exporter);
+            this.values.forEach(consumer);
         }
 
         protected void add(ResourceLocation table, LootTable.Builder builder) {

@@ -9,7 +9,6 @@ import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraftforge.common.world.BiomeSpecialEffectsBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -20,15 +19,24 @@ import java.util.Optional;
  * Resetting a value to an empty optional would otherwise not be possible.
  */
 public class SpecialEffectsContextForge implements SpecialEffectsContext {
-    private final BiomeSpecialEffectsBuilder context;
+    public BiomeSpecialEffects context;
 
-    public SpecialEffectsContextForge(BiomeSpecialEffectsBuilder context) {
+    public SpecialEffectsContextForge(BiomeSpecialEffects context) {
         this.context = context;
     }
 
     @Override
     public void setFogColor(int color) {
-        this.context.fogColor(color);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(color).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
@@ -38,17 +46,35 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
 
     @Override
     public void setWaterColor(int color) {
-        this.context.waterColor(color);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(color).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
     public int getWaterColor() {
-        return this.context.waterColor();
+        return this.context.getWaterColor();
     }
 
     @Override
     public void setWaterFogColor(int color) {
-        this.context.waterFogColor(color);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(color).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
@@ -58,7 +84,16 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
 
     @Override
     public void setSkyColor(int color) {
-        this.context.skyColor(color);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(color);
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
@@ -68,7 +103,16 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
 
     @Override
     public void setFoliageColorOverride(Optional<Integer> color) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(color);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        ((BiomeSpecialEffectsBuilderForgeAccessor) builder).puzzleslib$setFoliageColorOverride(color);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
@@ -90,6 +134,17 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier colorModifier) {
         Objects.requireNonNull(colorModifier);
         this.context.grassColorModifier(colorModifier);
+
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
@@ -99,47 +154,92 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
 
     @Override
     public void setAmbientParticleSettings(Optional<AmbientParticleSettings> particleConfig) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientParticle(particleConfig);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        ((BiomeSpecialEffectsBuilderForgeAccessor) builder).puzzleslib$setAmbientParticle(particleConfig);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
     public Optional<AmbientParticleSettings> getAmbientParticleSettings() {
-        return this.context.getAmbientParticle();
+        return this.context.getAmbientParticleSettings();
     }
 
     @Override
     public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(sound);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        ((BiomeSpecialEffectsBuilderForgeAccessor) builder).puzzleslib$setAmbientLoopSoundEvent(sound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
-    public Optional<Holder<SoundEvent>> getAmbientLoopSoundEvent() {
-        return this.context.getAmbientLoopSound();
+    public Optional<SoundEvent> getAmbientLoopSoundEvent() {
+        return this.context.getAmbientLoopSoundEvent();
     }
 
     @Override
     public void setAmbientMoodSettings(Optional<AmbientMoodSettings> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(sound);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        ((BiomeSpecialEffectsBuilderForgeAccessor) builder).puzzleslib$setAmbientMoodSettings(sound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
     public Optional<AmbientMoodSettings> getAmbientMoodSettings() {
-        return this.context.getAmbientMoodSound();
+        return this.context.getAmbientMoodSettings();
     }
 
     @Override
     public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(sound);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        ((BiomeSpecialEffectsBuilderForgeAccessor) builder).puzzleslib$setAmbientAdditionsSettings(sound);
+        this.context.getBackgroundMusic().ifPresent(builder::backgroundMusic);
+        this.context = builder.build();
     }
 
     @Override
     public Optional<AmbientAdditionsSettings> getAmbientAdditionsSettings() {
-        return this.context.getAmbientAdditionsSound();
+        return this.context.getAmbientAdditionsSettings();
     }
 
     @Override
     public void setBackgroundMusic(Optional<Music> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setBackgroundMusic(sound);
+        BiomeSpecialEffects.Builder builder = new BiomeSpecialEffects.Builder().fogColor(this.context.getFogColor()).waterColor(this.context.getWaterColor()).waterFogColor(this.context.getWaterFogColor()).skyColor(this.context.getSkyColor());
+        this.context.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
+        this.context.getGrassColorOverride().ifPresent(builder::grassColorOverride);
+        builder.grassColorModifier(this.context.getGrassColorModifier());
+        this.context.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
+        this.context.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
+        this.context.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
+        this.context.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
+        ((BiomeSpecialEffectsBuilderForgeAccessor) builder).puzzleslib$setBackgroundMusic(sound);
+        this.context = builder.build();
     }
 
     @Override

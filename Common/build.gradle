@@ -12,7 +12,7 @@ dependencies {
     minecraft "com.mojang:minecraft:${minecraftVersion}"
     mappings loom.layered() {
         officialMojangMappings()
-//        parchment("org.parchmentmc.data:parchment-${minecraftVersion}:${parchmentMappingsVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${parchmentMinecraftVersion}:${parchmentMappingsVersion}@zip")
     }
 
     // Fabric
@@ -21,7 +21,9 @@ dependencies {
     modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${fabricApiVersion}")
 
     // Forge Config API Port
-    api "fuzs.forgeconfigapiport:forgeconfigapiport-common:6.0.2"
+    api 'com.electronwill.night-config:core:3.6.5'
+    api 'com.electronwill.night-config:toml:3.6.5'
+    modApi "net.minecraftforge:forgeconfigapiport-fabric:3.2.4"
 
     // Puzzles Lib
 //    modApi "fuzs.puzzleslib:puzzleslib-common:${puzzlesVersion}"

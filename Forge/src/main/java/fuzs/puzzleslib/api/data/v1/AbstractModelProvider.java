@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.data.v1;
 
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public abstract class AbstractModelProvider extends BlockStateProvider {
 
-    public AbstractModelProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
+    public AbstractModelProvider(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
         super(packOutput, modId, fileHelper);
     }
 

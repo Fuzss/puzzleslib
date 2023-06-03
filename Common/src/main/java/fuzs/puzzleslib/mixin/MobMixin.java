@@ -14,12 +14,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Mob.class)
-abstract class MobFabricMixin extends LivingEntity implements SpawnDataMob {
+abstract class MobMixin extends LivingEntity implements SpawnDataMob {
     @Unique
     @Nullable
     private MobSpawnType puzzleslib$spawnType;
 
-    protected MobFabricMixin(EntityType<? extends LivingEntity> entityType, Level level) {
+    protected MobMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
 

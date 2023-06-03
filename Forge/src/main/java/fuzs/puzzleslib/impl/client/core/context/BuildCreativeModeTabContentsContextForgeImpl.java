@@ -1,29 +1,24 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.BuildCreativeModeTabContentsContext;
+import fuzs.puzzleslib.api.item.v2.DisplayItemsOutput;
+import fuzs.puzzleslib.impl.client.core.event.CreativeModeTabContentsEvent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraftforge.common.CreativeModeTabRegistry;
+import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Objects;
+import java.util.function.Consumer;
 
-public record BuildCreativeModeTabContentsContextForgeImpl(ResourceLocation identifier,
-                                                           CreativeModeTab.ItemDisplayParameters parameters,
-                                                           CreativeModeTab.Output output) implements BuildCreativeModeTabContentsContext {
+public record BuildCreativeModeTabContentsContextForgeImpl() implements BuildCreativeModeTabContentsContext {
 
     @Override
-    public void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
+    public void registerBuildListener(ResourceLocation identifier, Consumer<DisplayItemsOutput> itemsGenerator) {
         Objects.requireNonNull(identifier, "identifier is null");
         Objects.requireNonNull(itemsGenerator, "display items generator is null");
-        if (Objects.equals(identifier, this.identifier)) {
-            itemsGenerator.accept(this.parameters, this.output);
-        }
-    }
-
-    @Override
-    public void registerBuildListener(CreativeModeTab tab, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
-        Objects.requireNonNull(tab, "creative mode tab is null");
-        ResourceLocation identifier = CreativeModeTabRegistry.getName(tab);
-        this.registerBuildListener(identifier, itemsGenerator);
+        MinecraftForge.EVENT_BUS.addListener((final CreativeModeTabContentsEvent evt) -> {
+            if (Objects.equals(identifier, BuildCreativeModeTabContentsContext.tryCreateIdentifier(evt.getTab()))) {
+                itemsGenerator.accept(evt.getOutput());
+            }
+        });
     }
 }

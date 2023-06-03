@@ -9,12 +9,10 @@ import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
@@ -97,14 +95,14 @@ public class ForgeRegistryManager implements RegistryManager {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>((IContainerFactory<T>) (containerId, inventory, data) -> entry.get().create(containerId, inventory, data), FeatureFlags.VANILLA_SET));
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registry.MENU_REGISTRY, path, () -> new MenuType<>((IContainerFactory<T>) (containerId, inventory, data) -> entry.get().create(containerId, inventory, data)));
     }
 
     @Override
     public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry) {
-        return this.register(Registries.POINT_OF_INTEREST_TYPE, path, () -> {
+        return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, () -> {
             PoiTypeBuilder builder = entry.get();
-            return new PoiType(ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
+            return new PoiType(path, ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
         });
     }
 }

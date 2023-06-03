@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.config;
 
-import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
-import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
+import net.minecraftforge.api.ModLoadingContext;
+import net.minecraftforge.api.fml.event.config.ModConfigEvent;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -15,14 +15,16 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     void bake(ConfigDataHolderImpl<?> holder, String modId) {
-        ModConfigEvents.loading(modId).register((ModConfig config) -> {
+        ModConfigEvent.LOADING.register((ModConfig config) -> {
+            if (!config.getModId().equals(modId)) return;
             holder.onModConfig(config, false);
         });
-        ModConfigEvents.reloading(modId).register((ModConfig config) -> {
+        ModConfigEvent.RELOADING.register((ModConfig config) -> {
+            if (!config.getModId().equals(modId)) return;
             holder.onModConfig(config, true);
         });
         holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-            return ForgeConfigRegistry.INSTANCE.register(modId, type, spec, fileName.apply(modId));
+            return ModLoadingContext.registerConfig(modId, type, spec, fileName.apply(modId));
         });
     }
 }

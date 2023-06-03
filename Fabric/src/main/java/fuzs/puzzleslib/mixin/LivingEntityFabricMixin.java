@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
+import fuzs.puzzleslib.impl.event.ServerLivingEntityEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -27,6 +28,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -152,7 +154,7 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "dropExperience", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"), cancellable = true)
     protected void dropExperience(CallbackInfo callback) {
-        DefaultedInt experienceReward = DefaultedInt.fromValue(this.getExperienceReward());
+        DefaultedInt experienceReward = DefaultedInt.fromValue(this.getExperienceReward(this.lastHurtByPlayer));
         EventResult result = FabricLivingEvents.EXPERIENCE_DROP.invoker().onLivingExperienceDrop(LivingEntity.class.cast(this), this.lastHurtByPlayer, experienceReward);
         if (result.isInterrupt()) {
             callback.cancel();
@@ -165,7 +167,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     }
 
     @Shadow
-    protected abstract int getExperienceReward();
+    protected abstract int getExperienceReward(Player player);
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback) {
@@ -242,5 +244,25 @@ abstract class LivingEntityFabricMixin extends Entity {
         damageMultiplier = this.puzzleslib$damageMultiplier.getAsOptionalFloat().orElse(damageMultiplier);
         this.puzzleslib$damageMultiplier = null;
         return damageMultiplier;
+    }
+
+    @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;broadcastEntityEvent(Lnet/minecraft/world/entity/Entity;B)V"))
+    public void die(DamageSource damageSource, CallbackInfo callback) {
+        ServerLivingEntityEvents.AFTER_DEATH.invoker().afterDeath(LivingEntity.class.cast(this), damageSource);
+    }
+
+    @Redirect(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDeadOrDying()Z", ordinal = 1))
+    public boolean hurt$0(LivingEntity entity, DamageSource damageSource, float amount) {
+        return this.isDeadOrDying() && ServerLivingEntityEvents.ALLOW_DEATH.invoker().allowDeath(entity, damageSource, amount);
+    }
+
+    @Shadow
+    public abstract boolean isDeadOrDying();
+
+    @Inject(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSleeping()Z"), cancellable = true)
+    public void hurt$1(DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> callback) {
+        if (!ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(LivingEntity.class.cast(this), damageSource, amount)) {
+            callback.setReturnValue(false);
+        }
     }
 }

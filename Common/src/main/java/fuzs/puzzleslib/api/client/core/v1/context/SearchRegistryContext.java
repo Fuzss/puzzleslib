@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
+import net.minecraft.client.searchtree.MutableSearchTree;
 import net.minecraft.client.searchtree.SearchRegistry;
 
 /**
@@ -15,5 +16,5 @@ public interface SearchRegistryContext {
      * @param treeBuilder       builder supplier for search tree
      * @param <T>               type to be searched for
      */
-    <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, SearchRegistry.TreeBuilderSupplier<T> treeBuilder);
+    <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, MutableSearchTree<T> treeBuilder);
 }
