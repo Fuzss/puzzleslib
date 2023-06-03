@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog].
 
 ## [v3.4.0-1.18.2] - 2023-06-03
-- Backported v6.0.9 from Minecraft 1.19.4
+- Backported to Minecraft 1.18.2
 
 ## [v3.3.6-1.18.2] - 2023-02-26
 ### Fixed
