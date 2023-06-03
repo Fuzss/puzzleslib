@@ -54,16 +54,18 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
         return new ResourceLocation(this.modId, "play/" + this.discriminator.getAndIncrement());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
-        return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
+        return (Packet<ClientGamePacketListener>) this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
-        return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
+        return (Packet<ServerGamePacketListener>) this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     @SuppressWarnings("unchecked")

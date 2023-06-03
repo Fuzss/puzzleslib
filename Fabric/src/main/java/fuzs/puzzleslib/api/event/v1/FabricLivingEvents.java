@@ -60,6 +60,10 @@ public final class FabricLivingEvents {
      */
     public static final Event<ShieldBlockCallback> SHIELD_BLOCK = FabricEventFactory.createResult(ShieldBlockCallback.class);
     /**
+     * Fires whenever a living entity dies, allows for preventing the death.
+     */
+    public static final Event<LivingDeathCallback> LIVING_DEATH = FabricEventFactory.createResult(LivingDeathCallback.class);
+    /**
      * Called when a child is created from breeding two parents, allows for replacing the child or for preventing any offspring from being spawned.
      */
     public static final Event<BabyEntitySpawnCallback> BABY_ENTITY_SPAWN = FabricEventFactory.createResult(BabyEntitySpawnCallback.class);
@@ -67,4 +71,8 @@ public final class FabricLivingEvents {
      * Called when a player is about to tame an animal, allows for preventing taming.
      */
     public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(AnimalTameCallback.class);
+    /**
+     * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
+     */
+    public static final Event<LivingAttackCallback> LIVING_ATTACK = FabricEventFactory.createResult(LivingAttackCallback.class);
 }

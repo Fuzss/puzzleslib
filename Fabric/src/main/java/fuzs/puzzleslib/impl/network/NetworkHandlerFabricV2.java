@@ -67,16 +67,18 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
         return new ResourceLocation(this.modId, "play/" + this.discriminator.getAndIncrement());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Packet<ServerGamePacketListener> toServerboundPacket(MessageV2<?> message) {
         if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_SERVER) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_SERVER, MessageDirection.TO_CLIENT));
-        return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
+        return (Packet<ServerGamePacketListener>) this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Packet<ClientGamePacketListener> toClientboundPacket(MessageV2<?> message) {
         if (this.messages.get(message.getClass()).direction() != MessageDirection.TO_CLIENT) throw new IllegalStateException("Attempted sending message to wrong side, expected %s, was %s".formatted(MessageDirection.TO_CLIENT, MessageDirection.TO_SERVER));
-        return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
+        return (Packet<ClientGamePacketListener>) this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     /**

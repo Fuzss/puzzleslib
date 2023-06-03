@@ -37,6 +37,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextFabricImpl());
         constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());
         constructor.onRegisterParticleProviders(new ParticleProvidersContextFabricImpl());
+        constructor.onRegisterAtlasSprites(new AtlasSpritesContextFabricImpl());
         constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         constructor.onRegisterSearchTrees(new SearchRegistryContextFabricImpl());
         registerModelBakingListeners(constructor::onModifyBakingResult, constructor::onBakingCompleted, modId);
@@ -53,20 +54,13 @@ public final class FabricClientModConstructor {
         constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextFabricImpl());
         constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
         constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
-        constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
         constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
     }
 
     private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer, String modId) {
-        ModelEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
-            try {
-                modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
-            }
-        });
         ModelEvents.BAKING_COMPLETED.register((ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
             try {
+                modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
                 bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager, models, modelBakery));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);

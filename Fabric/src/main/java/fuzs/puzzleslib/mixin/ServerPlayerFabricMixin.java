@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.impl.event.ServerLivingEntityEvents;
+import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -19,8 +19,10 @@ abstract class ServerPlayerFabricMixin extends Player {
         super(level, blockPos, f, gameProfile);
     }
 
-    @Inject(method = "die", at = @At("TAIL"))
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
-        ServerLivingEntityEvents.AFTER_DEATH.invoker().afterDeath(ServerPlayer.class.cast(this), damageSource);
+        if (FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource).isInterrupt()) {
+            callback.cancel();
+        }
     }
 }

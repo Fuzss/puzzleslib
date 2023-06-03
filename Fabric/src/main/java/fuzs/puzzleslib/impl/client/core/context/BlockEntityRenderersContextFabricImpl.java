@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.BlockEntityRenderersContext;
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
@@ -14,6 +14,6 @@ public final class BlockEntityRenderersContextFabricImpl implements BlockEntityR
     public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider) {
         Objects.requireNonNull(blockEntityType, "block entity type is null");
         Objects.requireNonNull(blockEntityRendererProvider, "block entity renderer provider is null");
-        BlockEntityRenderers.register(blockEntityType, blockEntityRendererProvider);
+        BlockEntityRendererRegistry.register(blockEntityType, blockEntityRendererProvider);
     }
 }

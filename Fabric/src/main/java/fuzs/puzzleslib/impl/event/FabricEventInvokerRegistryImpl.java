@@ -46,9 +46,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -179,11 +177,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onEntityUnload;
         });
-        INSTANCE.register(LivingDeathCallback.class, ServerLivingEntityEvents.ALLOW_DEATH, callback -> {
-            return (LivingEntity entity, DamageSource damageSource, float damageAmount) -> {
-                return callback.onLivingDeath(entity, damageSource).isPass();
-            };
-        });
+        INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
         INSTANCE.register(PlayerEvents.StartTracking.class, EntityTrackingEvents.START_TRACKING, callback -> {
             return callback::onStartTracking;
         });
@@ -205,11 +199,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(BabyEntitySpawnCallback.class, FabricLivingEvents.BABY_ENTITY_SPAWN);
         INSTANCE.register(AnimalTameCallback.class, FabricLivingEvents.ANIMAL_TAME);
-        INSTANCE.register(LivingAttackCallback.class, ServerLivingEntityEvents.ALLOW_DAMAGE, callback -> {
-            return (LivingEntity entity, DamageSource source, float amount) -> {
-                return callback.onLivingAttack(entity, source, amount).isPass();
-            };
-        });
+        INSTANCE.register(LivingAttackCallback.class, FabricLivingEvents.LIVING_ATTACK);
         INSTANCE.register(PlayerEvents.Copy.class, ServerPlayerEvents.COPY_FROM, callback -> {
             return callback::onCopy;
         });

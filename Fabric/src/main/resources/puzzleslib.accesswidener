@@ -28,3 +28,10 @@ transitive-accessible	class	net/minecraft/world/item/CreativeModeTab$Output
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    OUTER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    INNER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
+accessible	method	net/minecraft/world/item/alchemy/PotionBrewing	addContainerRecipe	(Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/Item;)V
+accessible	method	net/minecraft/world/item/alchemy/PotionBrewing	addContainer	(Lnet/minecraft/world/item/Item;)V
+accessible	method	net/minecraft/world/item/alchemy/PotionBrewing	addMix	(Lnet/minecraft/world/item/alchemy/Potion;Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/alchemy/Potion;)V
+transitive-accessible	class	net/minecraft/world/item/alchemy/PotionBrewing$Mix
+accessible	field	net/minecraft/world/item/alchemy/PotionBrewing	POTION_MIXES	Ljava/util/List;
+accessible	field	net/minecraft/world/item/alchemy/PotionBrewing	CONTAINER_MIXES	Ljava/util/List;
+transitive-accessible	method	net/minecraft/world/entity/SpawnPlacements	register	(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/SpawnPlacements$Type;Lnet/minecraft/world/level/levelgen/Heightmap$Types;Lnet/minecraft/world/entity/SpawnPlacements$SpawnPredicate;)V

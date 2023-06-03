@@ -32,7 +32,7 @@ abstract class GuiFabricMixin extends GuiComponent {
         this.puzzleslib$partialTick = partialTick;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;III)V", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;I)V", shift = At.Shift.BEFORE))
     public void render$1(PoseStack poseStack, float partialTick, CallbackInfo callback) {
         poseStack.pushPose();
         DefaultedInt posX = DefaultedInt.fromValue(0);
@@ -43,7 +43,7 @@ abstract class GuiFabricMixin extends GuiComponent {
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;III)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;I)V", shift = At.Shift.AFTER))
     public void render$2(PoseStack poseStack, float partialTick, CallbackInfo callback) {
         poseStack.popPose();
     }

@@ -171,7 +171,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
      * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound);
+    void setAmbientLoopSoundEvent(Optional<SoundEvent> sound);
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
@@ -183,7 +183,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
      * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    default void setAmbientLoopSoundEvent(@NotNull Holder<SoundEvent> sound) {
+    default void setAmbientLoopSoundEvent(@NotNull SoundEvent sound) {
         this.setAmbientLoopSoundEvent(Optional.of(sound));
     }
 

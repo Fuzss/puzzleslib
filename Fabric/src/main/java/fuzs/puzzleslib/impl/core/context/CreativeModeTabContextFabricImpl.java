@@ -11,7 +11,7 @@ public final class CreativeModeTabContextFabricImpl implements CreativeModeTabCo
     public void registerCreativeModeTab(CreativeModeTabConfigurator configurator) {
         CreativeModeTabConfiguratorImpl impl = (CreativeModeTabConfiguratorImpl) configurator;
         FabricItemGroupBuilder.create(impl.getIdentifier()).icon(impl.getIcon()).appendItems((itemStacks, tab) -> {
-            impl.getDisplayItemsGenerator().accept(tab, itemStacks::add);
+            impl.getDisplayItemsGenerator().accept(itemStacks::add);
         }).build();
     }
 }

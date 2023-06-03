@@ -66,7 +66,7 @@ public class FabricServerProxy implements FabricProxy {
 
     @Override
     public Component getKeyMappingComponent(String identifier) {
-        return Component.empty();
+        throw new RuntimeException("Key mapping component accessed for wrong side!");
     }
 
     @Override

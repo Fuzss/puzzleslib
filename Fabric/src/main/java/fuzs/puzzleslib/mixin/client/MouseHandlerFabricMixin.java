@@ -51,9 +51,9 @@ abstract class MouseHandlerFabricMixin {
     @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z", shift = At.Shift.BEFORE), cancellable = true)
     private void onScroll$0(long windowPointer, double xOffset, double yOffset, CallbackInfo callback) {
         // just recalculate this instead of capturing local, shouldn't be able to change in the meantime
-        this.puzzleslib$verticalScrollAmount = this.minecraft.options.discreteMouseScroll().get() ? Math.signum(yOffset) : yOffset * this.minecraft.options.mouseWheelSensitivity().get();
+        this.puzzleslib$verticalScrollAmount = this.minecraft.options.discreteMouseScroll ? Math.signum(yOffset) : yOffset * this.minecraft.options.mouseWheelSensitivity;
         // apply same calculations to horizontal scroll as vertical scroll amount has
-        this.puzzleslib$horizontalScrollAmount = this.minecraft.options.discreteMouseScroll().get() ? Math.signum(xOffset) : xOffset * this.minecraft.options.mouseWheelSensitivity().get();
+        this.puzzleslib$horizontalScrollAmount = this.minecraft.options.discreteMouseScroll ? Math.signum(xOffset) : xOffset * this.minecraft.options.mouseWheelSensitivity;
         if (FabricClientEvents.BEFORE_MOUSE_SCROLL.invoker().onBeforeMouseScroll(this.isLeftPressed(), this.isMiddlePressed(), this.isRightPressed(), this.puzzleslib$horizontalScrollAmount, this.puzzleslib$verticalScrollAmount).isInterrupt()) {
             this.puzzleslib$verticalScrollAmount = null;
             this.puzzleslib$horizontalScrollAmount = null;

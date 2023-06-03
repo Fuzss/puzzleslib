@@ -9,7 +9,6 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
-import fuzs.puzzleslib.impl.event.ServerLivingEntityEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -28,7 +27,6 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -210,7 +208,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         return amount;
     }
 
-    @ModifyVariable(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;walkAnimation:Lnet/minecraft/world/entity/WalkAnimationState;", shift = At.Shift.BEFORE), ordinal = 0)
+    @ModifyVariable(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;animationSpeed:F", shift = At.Shift.BEFORE), ordinal = 0)
     public float hurt$1(float amount, DamageSource source) {
         // this is only present if the damage source could be blocked
         if (this.puzzleslib$hurtAmount != 0.0F) {
@@ -246,22 +244,16 @@ abstract class LivingEntityFabricMixin extends Entity {
         return damageMultiplier;
     }
 
-    @Inject(method = "die", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;broadcastEntityEvent(Lnet/minecraft/world/entity/Entity;B)V"))
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
-        ServerLivingEntityEvents.AFTER_DEATH.invoker().afterDeath(LivingEntity.class.cast(this), damageSource);
+        if (FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource).isInterrupt()) {
+            callback.cancel();
+        }
     }
-
-    @Redirect(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isDeadOrDying()Z", ordinal = 1))
-    public boolean hurt$0(LivingEntity entity, DamageSource damageSource, float amount) {
-        return this.isDeadOrDying() && ServerLivingEntityEvents.ALLOW_DEATH.invoker().allowDeath(entity, damageSource, amount);
-    }
-
-    @Shadow
-    public abstract boolean isDeadOrDying();
 
     @Inject(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSleeping()Z"), cancellable = true)
     public void hurt$1(DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> callback) {
-        if (!ServerLivingEntityEvents.ALLOW_DAMAGE.invoker().allowDamage(LivingEntity.class.cast(this), damageSource, amount)) {
+        if (FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(LivingEntity.class.cast(this), damageSource, amount).isInterrupt()) {
             callback.setReturnValue(false);
         }
     }

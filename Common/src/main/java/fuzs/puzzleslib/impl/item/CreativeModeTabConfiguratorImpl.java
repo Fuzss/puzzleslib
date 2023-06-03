@@ -73,8 +73,8 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
         if (this.appendEnchantmentsAndPotions) {
             return (DisplayItemsOutput output) -> {
                 this.displayItemsGenerator.accept(output);
-                appendAllEnchantments(this.identifier.getNamespace(), output);
-                appendAllPotions(this.identifier.getNamespace(), output);
+                appendAllEnchantments(this.identifier.getNamespace(), output::accept);
+                appendAllPotions(this.identifier.getNamespace(), output::accept);
             };
         } else {
             return this.displayItemsGenerator;

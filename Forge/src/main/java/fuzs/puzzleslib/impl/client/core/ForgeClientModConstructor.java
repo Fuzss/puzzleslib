@@ -52,7 +52,6 @@ public final class ForgeClientModConstructor {
             constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
             constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl());
             constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl());
-            constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl());
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextForgeImpl(evt::registerEntityRenderer));
@@ -60,6 +59,9 @@ public final class ForgeClientModConstructor {
         });
         eventBus.addListener((final ParticleFactoryRegisterEvent evt) -> {
             constructor.onRegisterParticleProviders(new ParticleProvidersContextForgeImpl());
+        });
+        eventBus.addListener((final TextureStitchEvent.Pre evt) -> {
+            constructor.onRegisterAtlasSprites(new AtlasSpritesContextForgeImpl(evt.getAtlas(), evt::addSprite));
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
             constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextForgeImpl(evt::registerLayerDefinition));

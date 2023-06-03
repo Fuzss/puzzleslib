@@ -88,6 +88,13 @@ public interface ClientModConstructor {
     }
 
     /**
+     * @param context add a sprite to a texture atlas
+     */
+    default void onRegisterAtlasSprites(AtlasSpritesContext context) {
+
+    }
+
+    /**
      * @param context add a layer definition for a {@link ModelLayerLocation}
      */
     default void onRegisterLayerDefinitions(final LayerDefinitionsContext context) {
@@ -203,13 +210,6 @@ public interface ClientModConstructor {
      * @param context register custom item color providers
      */
     default void onRegisterItemColorProviders(final ColorProvidersContext<Item, ItemColor> context) {
-
-    }
-
-    /**
-     * @param context add items to a creative tab
-     */
-    default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
 
     }
 
