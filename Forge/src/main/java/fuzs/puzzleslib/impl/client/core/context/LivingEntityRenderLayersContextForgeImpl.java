@@ -29,7 +29,7 @@ public record LivingEntityRenderLayersContextForgeImpl(
             });
         } else {
             LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) this.evt.getRenderer(entityType);
-            Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(ForgeRegistries.ENTITY_TYPES.getKey(entityType).toString()));
+            Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(ForgeRegistries.ENTITIES.getKey(entityType).toString()));
             this.actuallyRegisterRenderLayer(entityRenderer, factory);
         }
     }
@@ -37,7 +37,7 @@ public record LivingEntityRenderLayersContextForgeImpl(
     private <T extends LivingEntity, M extends EntityModel<T>> void actuallyRegisterRenderLayer(LivingEntityRenderer<T, M> entityRenderer, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
         Minecraft minecraft = Minecraft.getInstance();
         // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
-        EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, this.evt.getEntityModels(), minecraft.font);
+        EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), null, this.evt.getEntityModels(), minecraft.font);
         entityRenderer.addLayer(factory.apply(entityRenderer, context));
     }
 }

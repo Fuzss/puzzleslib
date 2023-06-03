@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.mixin.accessor;
 
-import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
@@ -26,7 +25,7 @@ public interface BiomeSpecialEffectsBuilderForgeAccessor {
     void puzzleslib$setAmbientParticle(Optional<AmbientParticleSettings> ambientParticle);
 
     @Accessor("ambientLoopSoundEvent")
-    void puzzleslib$setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent);
+    void puzzleslib$setAmbientLoopSoundEvent(Optional<SoundEvent> ambientLoopSoundEvent);
 
     @Accessor("ambientMoodSettings")
     void puzzleslib$setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings);

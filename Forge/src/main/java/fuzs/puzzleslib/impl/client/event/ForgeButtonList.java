@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.client.event;
 
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.Widget;
 
 import java.util.AbstractList;
 import java.util.List;
@@ -13,9 +13,9 @@ import java.util.List;
  * just much simpler as it does not need to handle additions and removals (Forge has dedicated methods in the init events for that).
  */
 final class ForgeButtonList extends AbstractList<AbstractWidget> {
-    private final List<Renderable> renderables;
+    private final List<Widget> renderables;
 
-    ForgeButtonList(List<Renderable> renderables) {
+    ForgeButtonList(List<Widget> renderables) {
         this.renderables = renderables;
     }
 

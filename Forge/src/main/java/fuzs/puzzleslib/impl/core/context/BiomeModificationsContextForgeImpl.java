@@ -70,7 +70,7 @@ public record BiomeModificationsContextForgeImpl(
 
     private static BiomeModificationContext createBuilderBackedContext(BiomeLoadingEvent evt) {
         ClimateSettingsContextForge climateSettings = new ClimateSettingsContextForge(evt::getClimate, evt::setClimate);
-        SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(evt.getEffects());
+        SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(evt::getEffects, evt::setEffects);
         GenerationSettingsContextForge generationSettings = GenerationSettingsContextForge.create(evt.getGeneration());
         MobSpawnSettingsContextForge mobSpawnSettings = new MobSpawnSettingsContextForge(evt.getSpawns());
         return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);

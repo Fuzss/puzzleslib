@@ -27,7 +27,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getFogColor()
      * @see BiomeSpecialEffects.Builder#fogColor(int)
      */
-    void setFogColor(int color);
+    void setFogColor(int fogColor);
 
     /**
      * @see BiomeSpecialEffects#getFogColor()
@@ -39,7 +39,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getWaterColor()
      * @see BiomeSpecialEffects.Builder#waterColor(int)
      */
-    void setWaterColor(int color);
+    void setWaterColor(int waterColor);
 
     /**
      * @see BiomeSpecialEffects#getWaterColor()
@@ -51,7 +51,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getWaterFogColor()
      * @see BiomeSpecialEffects.Builder#waterFogColor(int)
      */
-    void setWaterFogColor(int color);
+    void setWaterFogColor(int waterFogColor);
 
     /**
      * @see BiomeSpecialEffects#getWaterFogColor()
@@ -63,7 +63,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getSkyColor()
      * @see BiomeSpecialEffects.Builder#skyColor(int)
      */
-    void setSkyColor(int color);
+    void setSkyColor(int skyColor);
 
     /**
      * @see BiomeSpecialEffects#getSkyColor()
@@ -75,7 +75,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getFoliageColorOverride()
      * @see BiomeSpecialEffects.Builder#foliageColorOverride(int)
      */
-    void setFoliageColorOverride(Optional<Integer> color);
+    void setFoliageColorOverride(Optional<Integer> foliageColorOverride);
 
     /**
      * @see BiomeSpecialEffects#getFoliageColorOverride()
@@ -87,8 +87,8 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getFoliageColorOverride()
      * @see BiomeSpecialEffects.Builder#foliageColorOverride(int)
      */
-    default void setFoliageColorOverride(int color) {
-        this.setFoliageColorOverride(Optional.of(color));
+    default void setFoliageColorOverride(int foliageColorOverride) {
+        this.setFoliageColorOverride(Optional.of(foliageColorOverride));
     }
 
     /**
@@ -103,7 +103,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getGrassColorOverride()
      * @see BiomeSpecialEffects.Builder#grassColorOverride(int)
      */
-    void setGrassColorOverride(Optional<Integer> color);
+    void setGrassColorOverride(Optional<Integer> grassColorOverride);
 
     /**
      * @see BiomeSpecialEffects#getGrassColorOverride()
@@ -115,8 +115,8 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getGrassColorOverride()
      * @see BiomeSpecialEffects.Builder#grassColorOverride(int)
      */
-    default void setGrassColorOverride(int color) {
-        this.setGrassColorOverride(Optional.of(color));
+    default void setGrassColorOverride(int grassColorOverride) {
+        this.setGrassColorOverride(Optional.of(grassColorOverride));
     }
 
     /**
@@ -131,7 +131,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getGrassColorModifier()
      * @see BiomeSpecialEffects.Builder#grassColorModifier(BiomeSpecialEffects.GrassColorModifier)
      */
-    void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier colorModifier);
+    void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier grassColorModifier);
 
     /**
      * @see BiomeSpecialEffects#getGrassColorModifier()
@@ -143,7 +143,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientParticleSettings()
      * @see BiomeSpecialEffects.Builder#ambientParticle(AmbientParticleSettings)
      */
-    void setAmbientParticleSettings(Optional<AmbientParticleSettings> particleConfig);
+    void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings);
 
     /**
      * @see BiomeSpecialEffects#getAmbientParticleSettings()
@@ -155,8 +155,8 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientParticleSettings()
      * @see BiomeSpecialEffects.Builder#ambientParticle(AmbientParticleSettings)
      */
-    default void setAmbientParticleSettings(@NotNull AmbientParticleSettings particleConfig) {
-        this.setAmbientParticleSettings(Optional.of(particleConfig));
+    default void setAmbientParticleSettings(@NotNull AmbientParticleSettings ambientParticleSettings) {
+        this.setAmbientParticleSettings(Optional.of(ambientParticleSettings));
     }
 
     /**
@@ -169,27 +169,27 @@ public interface SpecialEffectsContext {
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
      */
-    void setAmbientLoopSoundEvent(Optional<SoundEvent> sound);
+    void setAmbientLoopSoundEvent(Optional<SoundEvent> ambientLoopSoundEvent);
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
      */
     Optional<SoundEvent> getAmbientLoopSoundEvent();
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
      */
-    default void setAmbientLoopSoundEvent(@NotNull SoundEvent sound) {
-        this.setAmbientLoopSoundEvent(Optional.of(sound));
+    default void setAmbientLoopSoundEvent(@NotNull SoundEvent ambientLoopSoundEvent) {
+        this.setAmbientLoopSoundEvent(Optional.of(ambientLoopSoundEvent));
     }
 
     /**
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
-     * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
+     * @see BiomeSpecialEffects.Builder#ambientLoopSound(SoundEvent)
      */
     default void clearAmbientLoopSoundEvent() {
         this.setAmbientLoopSoundEvent(Optional.empty());
@@ -199,7 +199,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientMoodSettings()
      * @see BiomeSpecialEffects.Builder#ambientMoodSound(AmbientMoodSettings)
      */
-    void setAmbientMoodSettings(Optional<AmbientMoodSettings> sound);
+    void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings);
 
     /**
      * @see BiomeSpecialEffects#getAmbientMoodSettings()
@@ -211,8 +211,8 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientMoodSettings()
      * @see BiomeSpecialEffects.Builder#ambientMoodSound(AmbientMoodSettings)
      */
-    default void setAmbientMoodSettings(@NotNull AmbientMoodSettings sound) {
-        this.setAmbientMoodSettings(Optional.of(sound));
+    default void setAmbientMoodSettings(@NotNull AmbientMoodSettings ambientMoodSettings) {
+        this.setAmbientMoodSettings(Optional.of(ambientMoodSettings));
     }
 
     /**
@@ -227,7 +227,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientAdditionsSettings()
      * @see BiomeSpecialEffects.Builder#ambientAdditionsSound(AmbientAdditionsSettings)
      */
-    void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> sound);
+    void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings);
 
     /**
      * @see BiomeSpecialEffects#getAmbientAdditionsSettings()
@@ -239,8 +239,8 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientAdditionsSettings()
      * @see BiomeSpecialEffects.Builder#ambientAdditionsSound(AmbientAdditionsSettings)
      */
-    default void setAmbientAdditionsSettings(@NotNull AmbientAdditionsSettings sound) {
-        this.setAmbientAdditionsSettings(Optional.of(sound));
+    default void setAmbientAdditionsSettings(@NotNull AmbientAdditionsSettings ambientAdditionsSettings) {
+        this.setAmbientAdditionsSettings(Optional.of(ambientAdditionsSettings));
     }
 
     /**
@@ -255,7 +255,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    void setBackgroundMusic(Optional<Music> sound);
+    void setBackgroundMusic(Optional<Music> backgroundMusic);
 
     /**
      * @see BiomeSpecialEffects#getBackgroundMusic()
@@ -267,8 +267,8 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    default void setBackgroundMusic(@NotNull Music sound) {
-        this.setBackgroundMusic(Optional.of(sound));
+    default void setBackgroundMusic(@NotNull Music backgroundMusic) {
+        this.setBackgroundMusic(Optional.of(backgroundMusic));
     }
 
     /**

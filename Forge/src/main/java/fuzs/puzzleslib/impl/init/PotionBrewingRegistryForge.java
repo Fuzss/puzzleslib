@@ -11,8 +11,7 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
 import net.minecraftforge.common.brewing.VanillaBrewingRecipe;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ForgeRegistryEntry;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +23,7 @@ public final class PotionBrewingRegistryForge implements PotionBrewingRegistry {
         Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(from, "from item is null");
         Objects.requireNonNull(to, "to item is null");
-        BrewingRecipeRegistry.addRecipe(new MixBrewingRecipe<>(ForgeRegistries.ITEMS, from, ingredient, to) {
+        BrewingRecipeRegistry.addRecipe(new MixBrewingRecipe<>(from, ingredient, to) {
 
             @Override
             Optional<ItemStack> mix(PotionBrewing.Mix<Item> mix, ItemStack ingredient, Potion potion, Item item) {
@@ -47,7 +46,7 @@ public final class PotionBrewingRegistryForge implements PotionBrewingRegistry {
         Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(from, "from potion is null");
         Objects.requireNonNull(to, "to potion is null");
-        BrewingRecipeRegistry.addRecipe(new MixBrewingRecipe<>(ForgeRegistries.POTIONS, from, ingredient, to) {
+        BrewingRecipeRegistry.addRecipe(new MixBrewingRecipe<>(from, ingredient, to) {
 
             @Override
             Optional<ItemStack> mix(PotionBrewing.Mix<Potion> mix, ItemStack ingredient, Potion potion, Item item) {
@@ -59,11 +58,11 @@ public final class PotionBrewingRegistryForge implements PotionBrewingRegistry {
         });
     }
 
-    private static abstract class MixBrewingRecipe<T> extends VanillaBrewingRecipe {
+    private static abstract class MixBrewingRecipe<T extends ForgeRegistryEntry<T>> extends VanillaBrewingRecipe {
         private final PotionBrewing.Mix<T> mix;
 
-        public MixBrewingRecipe(IForgeRegistry<T> registry, T from, Ingredient ingredient, T to) {
-            this.mix = new PotionBrewing.Mix<>(registry, from, ingredient, to);
+        public MixBrewingRecipe(T from, Ingredient ingredient, T to) {
+            this.mix = new PotionBrewing.Mix<>(from, ingredient, to);
         }
 
         @Override

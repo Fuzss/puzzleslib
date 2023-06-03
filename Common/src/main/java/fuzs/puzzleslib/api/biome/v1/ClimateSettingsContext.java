@@ -15,14 +15,14 @@ import org.jetbrains.annotations.NotNull;
 public interface ClimateSettingsContext {
 
     /**
-     * @see Biome#hasPrecipitation()
-     * @see Biome.BiomeBuilder#hasPrecipitation(boolean)
+     * @see Biome#getPrecipitation()
+     * @see Biome.BiomeBuilder#precipitation(Biome.Precipitation)
      */
     void hasPrecipitation(boolean hasPrecipitation);
 
     /**
-     * @see Biome#hasPrecipitation()
-     * @see Biome.BiomeBuilder#hasPrecipitation(boolean)
+     * @see Biome#getPrecipitation()
+     * @see Biome.BiomeBuilder#precipitation(Biome.Precipitation)
      */
     boolean hasPrecipitation();
 

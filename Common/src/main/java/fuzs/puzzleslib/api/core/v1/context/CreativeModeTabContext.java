@@ -9,7 +9,7 @@ import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 public interface CreativeModeTabContext {
 
     /**
-     * Register a {@link CreativeModeTabConfigurator} which is used to configure a {@link net.minecraft.world.item.CreativeModeTab.Builder}
+     * Register a {@link CreativeModeTabConfigurator} which is used to configure a {@link net.minecraft.world.item.CreativeModeTab}
      *
      * @param configurator the configurator instance
      */

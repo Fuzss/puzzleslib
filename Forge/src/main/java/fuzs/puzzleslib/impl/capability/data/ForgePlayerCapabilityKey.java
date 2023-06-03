@@ -87,14 +87,14 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     }
 
     private void onPlayerLoggedIn(final PlayerEvent.PlayerLoggedInEvent evt) {
-        Player player = evt.getEntity();
+        Player player = evt.getPlayer();
         this.maybeGet(player).ifPresent(capability -> {
             PlayerCapabilityKey.syncCapabilityToRemote(player, (ServerPlayer) player, this.syncStrategy, capability, this.getId(), true);
         });
     }
 
     private void onPlayerChangedDimension(final PlayerEvent.PlayerChangedDimensionEvent evt) {
-        Player player = evt.getEntity();
+        Player player = evt.getPlayer();
         this.maybeGet(player).ifPresent(capability -> {
             PlayerCapabilityKey.syncCapabilityToRemote(player, (ServerPlayer) player, this.syncStrategy, capability, this.getId(), true);
         });
