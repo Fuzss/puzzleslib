@@ -5,10 +5,8 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.*;
@@ -19,22 +17,21 @@ import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabConfigurator {
     private static final Item[] POTION_ITEMS = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION, Items.TIPPED_ARROW};
-    private static final CreativeModeTab.DisplayItemsGenerator EMPTY_GENERATOR = (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {};
 
     private final ResourceLocation identifier;
     @Nullable
     private Supplier<ItemStack> icon;
     @Nullable
     private Supplier<ItemStack[]> icons;
-    private CreativeModeTab.DisplayItemsGenerator displayItemsGenerator = EMPTY_GENERATOR;
+    private CreativeModeTab.DisplayItemsGenerator displayItemsGenerator = (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
+
+    };
     private boolean hasSearchBar;
     private boolean appendEnchantmentsAndPotions;
 
@@ -142,9 +139,5 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
                 itemStacks.accept(PotionUtils.setPotion(new ItemStack(item), potion));
             }
         }
-    }
-
-    private static <T> Stream<Map.Entry<ResourceKey<T>, T>> getNamespacedEntries(Registry<T> registry, String namespace) {
-        return registry.entrySet().stream().filter(entry -> entry.getKey().location().getNamespace().equals(namespace));
     }
 }

@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
+@FunctionalInterface
 public interface ScreenOpeningCallback {
     EventInvoker<ScreenOpeningCallback> EVENT = EventInvoker.lookup(ScreenOpeningCallback.class);
 

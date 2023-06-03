@@ -31,7 +31,7 @@ public record ClimateSettingsContextForge(ClimateSettingsBuilder context) implem
 
     @Override
     public void setTemperatureModifier(@NotNull Biome.TemperatureModifier temperatureModifier) {
-        Objects.requireNonNull(temperatureModifier);
+        Objects.requireNonNull(temperatureModifier, "temperature modifier is null");
         this.context.setTemperatureModifier(temperatureModifier);
     }
 

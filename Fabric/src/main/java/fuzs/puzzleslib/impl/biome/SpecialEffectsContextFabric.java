@@ -23,8 +23,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setFogColor(int color) {
-        this.context.setFogColor(color);
+    public void setFogColor(int fogColor) {
+        this.context.setFogColor(fogColor);
     }
 
     @Override
@@ -33,8 +33,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setWaterColor(int color) {
-        this.context.setWaterColor(color);
+    public void setWaterColor(int waterColor) {
+        this.context.setWaterColor(waterColor);
     }
 
     @Override
@@ -43,8 +43,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setWaterFogColor(int color) {
-        this.context.setWaterFogColor(color);
+    public void setWaterFogColor(int waterFogColor) {
+        this.context.setWaterFogColor(waterFogColor);
     }
 
     @Override
@@ -53,8 +53,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setSkyColor(int color) {
-        this.context.setSkyColor(color);
+    public void setSkyColor(int skyColor) {
+        this.context.setSkyColor(skyColor);
     }
 
     @Override
@@ -63,8 +63,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setFoliageColorOverride(Optional<Integer> color) {
-        this.context.setFoliageColor(color);
+    public void setFoliageColorOverride(Optional<Integer> foliageColorOverride) {
+        this.context.setFoliageColor(foliageColorOverride);
     }
 
     @Override
@@ -73,8 +73,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setGrassColorOverride(Optional<Integer> color) {
-        this.context.setGrassColor(color);
+    public void setGrassColorOverride(Optional<Integer> grassColorOverride) {
+        this.context.setGrassColor(grassColorOverride);
     }
 
     @Override
@@ -83,8 +83,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier colorModifier) {
-        this.context.setGrassColorModifier(colorModifier);
+    public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
+        this.context.setGrassColorModifier(grassColorModifier);
     }
 
     @Override
@@ -93,8 +93,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientParticleSettings(Optional<AmbientParticleSettings> particleConfig) {
-        this.context.setParticleConfig(particleConfig);
+    public void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings) {
+        this.context.setParticleConfig(ambientParticleSettings);
     }
 
     @Override
@@ -103,8 +103,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound) {
-        this.context.setAmbientSound(sound);
+    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent) {
+        this.context.setAmbientSound(ambientLoopSoundEvent);
     }
 
     @Override
@@ -113,8 +113,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientMoodSettings(Optional<AmbientMoodSettings> sound) {
-        this.context.setMoodSound(sound);
+    public void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings) {
+        this.context.setMoodSound(ambientMoodSettings);
     }
 
     @Override
@@ -123,8 +123,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> sound) {
-        this.context.setAdditionsSound(sound);
+    public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings) {
+        this.context.setAdditionsSound(ambientAdditionsSettings);
     }
 
     @Override
@@ -133,8 +133,8 @@ public class SpecialEffectsContextFabric implements SpecialEffectsContext {
     }
 
     @Override
-    public void setBackgroundMusic(Optional<Music> sound) {
-        this.context.setMusic(sound);
+    public void setBackgroundMusic(Optional<Music> backgroundMusic) {
+        this.context.setMusic(backgroundMusic);
     }
 
     @Override

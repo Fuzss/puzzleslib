@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.Map;
 
 @Mixin(ItemColors.class)
-public interface ItemColorsAccessor {
+public interface ItemColorsForgeAccessor {
 
     @Accessor("itemColors")
     Map<Holder.Reference<Item>, ItemColor> puzzleslib$getItemColors();

@@ -28,7 +28,6 @@
     "RunAroundLikeCrazyGoalFabricMixin",
     "ServerLevelFabricMixin",
     "WolfFabricMixin",
-    "accessor.BuiltInPackSourceFabricAccessor",
     "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [

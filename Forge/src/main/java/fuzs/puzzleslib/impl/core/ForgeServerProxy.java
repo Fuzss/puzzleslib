@@ -53,7 +53,7 @@ public class ForgeServerProxy implements ForgeProxy {
 
     @Override
     public Component getKeyMappingComponent(String identifier) {
-        return Component.empty();
+        throw new RuntimeException("Key mapping component accessed for wrong side!");
     }
 
     @Override

@@ -27,8 +27,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setFogColor(int color) {
-        this.context.fogColor(color);
+    public void setFogColor(int fogColor) {
+        this.context.fogColor(fogColor);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setWaterColor(int color) {
-        this.context.waterColor(color);
+    public void setWaterColor(int waterColor) {
+        this.context.waterColor(waterColor);
     }
 
     @Override
@@ -47,8 +47,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setWaterFogColor(int color) {
-        this.context.waterFogColor(color);
+    public void setWaterFogColor(int waterFogColor) {
+        this.context.waterFogColor(waterFogColor);
     }
 
     @Override
@@ -57,8 +57,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setSkyColor(int color) {
-        this.context.skyColor(color);
+    public void setSkyColor(int skyColor) {
+        this.context.skyColor(skyColor);
     }
 
     @Override
@@ -67,8 +67,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setFoliageColorOverride(Optional<Integer> color) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(color);
+    public void setFoliageColorOverride(Optional<Integer> foliageColorOverride) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(foliageColorOverride);
     }
 
     @Override
@@ -77,8 +77,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setGrassColorOverride(Optional<Integer> color) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setGrassColorOverride(color);
+    public void setGrassColorOverride(Optional<Integer> grassColorOverride) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setGrassColorOverride(grassColorOverride);
     }
 
     @Override
@@ -87,9 +87,9 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier colorModifier) {
-        Objects.requireNonNull(colorModifier);
-        this.context.grassColorModifier(colorModifier);
+    public void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier grassColorModifier) {
+        Objects.requireNonNull(grassColorModifier, "grass color modifier is null");
+        this.context.grassColorModifier(grassColorModifier);
     }
 
     @Override
@@ -98,8 +98,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientParticleSettings(Optional<AmbientParticleSettings> particleConfig) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientParticle(particleConfig);
+    public void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientParticle(ambientParticleSettings);
     }
 
     @Override
@@ -108,8 +108,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(sound);
+    public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(ambientLoopSoundEvent);
     }
 
     @Override
@@ -118,8 +118,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientMoodSettings(Optional<AmbientMoodSettings> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(sound);
+    public void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(ambientMoodSettings);
     }
 
     @Override
@@ -128,8 +128,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(sound);
+    public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(ambientAdditionsSettings);
     }
 
     @Override
@@ -138,8 +138,8 @@ public class SpecialEffectsContextForge implements SpecialEffectsContext {
     }
 
     @Override
-    public void setBackgroundMusic(Optional<Music> sound) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setBackgroundMusic(sound);
+    public void setBackgroundMusic(Optional<Music> backgroundMusic) {
+        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setBackgroundMusic(backgroundMusic);
     }
 
     @Override

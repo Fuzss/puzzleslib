@@ -25,10 +25,9 @@ public interface ColorProvidersContext<T, P> {
 
     /**
      * Provides access to already registered providers, might be incomplete during registration,
-     * but is good to use in either {@link BlockColor} or {@link ItemColor}.
+     * but is good to use in either {@link BlockColor} or {@link ItemColor} as long as it doesn't try to retrieve itself.
      *
      * @return access to {@link net.minecraft.client.color.block.BlockColors} or {@link net.minecraft.client.color.item.ItemColors}
      */
-    @Nullable
-    P getProvider(T object);
+    @Nullable P getProvider(T object);
 }

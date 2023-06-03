@@ -27,7 +27,7 @@ version = "v${modVersion}-${minecraftVersion}-Forge"
 group = modMavenGroup
 
 minecraft {
-//    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${minecraftVersion}"
+//    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${parchmentMinecraftVersion}"
     mappings channel: 'official', version: "${minecraftVersion}"
 
     runs {
