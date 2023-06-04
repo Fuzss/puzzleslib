@@ -10,6 +10,7 @@
     "BoneMealItemFabricMixin",
     "BowItemFabricMixin",
     "CatFabricMixin",
+    "CrossbowItemFabricMixin",
     "EntityFabricMixin",
     "ExperienceOrbFabricMixin",
     "ExplosionFabricMixin",
