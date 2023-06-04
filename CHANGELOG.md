@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.4.1-1.18.2] - 2023-06-04
+### Added
+- Added more transitive access wideners
+
 ## [v3.4.0-1.18.2] - 2023-06-03
 - Backported to Minecraft 1.18.2
 
