@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
+import fuzs.puzzleslib.api.client.event.v1.BuildCreativeContentsCallback;
 import fuzs.puzzleslib.impl.client.core.event.CreativeModeTabContentsEvent;
 import fuzs.puzzleslib.impl.client.event.ScreenCloseEvent;
 import net.minecraft.client.Minecraft;
@@ -9,6 +10,7 @@ import net.minecraft.util.thread.ReentrantBlockableEventLoop;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.ModLoader;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +36,7 @@ abstract class MinecraftForgeMixin extends ReentrantBlockableEventLoop<Runnable>
     @ModifyVariable(method = "createSearchTrees", at = @At(value = "INVOKE", target = "Lnet/minecraft/core/NonNullList;forEach(Ljava/util/function/Consumer;)V", shift = At.Shift.BEFORE))
     public NonNullList<ItemStack> createSearchTrees(NonNullList<ItemStack> items) {
         for (CreativeModeTab tab : CreativeModeTab.TABS) {
-            MinecraftForge.EVENT_BUS.post(new CreativeModeTabContentsEvent(tab, items::add));
+            ModLoader.get().postEvent(new CreativeModeTabContentsEvent(tab, BuildCreativeContentsCallback.checkedOutput(items)));
         }
         return items;
     }

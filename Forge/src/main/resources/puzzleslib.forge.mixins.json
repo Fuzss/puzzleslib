@@ -13,10 +13,11 @@
     "accessor.PotionBrewingForgeAccessor"
   ],
   "client": [
+    "client.CreativeModeInventoryScreenForgeMixin",
     "client.ItemRendererForgeMixin",
     "client.MinecraftForgeMixin",
-    "client.accessor.BlockColorsAccessor",
-    "client.accessor.ItemColorsAccessor",
+    "client.accessor.BlockColorsForgeAccessor",
+    "client.accessor.ItemColorsForgeAccessor",
     "client.accessor.ItemForgeAccessor"
   ],
   "injectors": {

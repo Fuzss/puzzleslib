@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.ColorProvidersContext;
-import fuzs.puzzleslib.mixin.client.accessor.ItemColorsAccessor;
+import fuzs.puzzleslib.mixin.client.accessor.ItemColorsForgeAccessor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.world.item.Item;
@@ -28,6 +28,6 @@ public record ItemColorProvidersContextForgeImpl(BiConsumer<ItemColor, ItemLike>
 
     @Override
     public @Nullable ItemColor getProvider(Item item) {
-        return ((ItemColorsAccessor) this.itemColors).puzzleslib$getItemColors().get(item.delegate);
+        return ((ItemColorsForgeAccessor) this.itemColors).puzzleslib$getItemColors().get(item.delegate);
     }
 }

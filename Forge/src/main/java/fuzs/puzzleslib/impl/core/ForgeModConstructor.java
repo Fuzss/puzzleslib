@@ -24,6 +24,9 @@ public final class ForgeModConstructor {
             registerModHandlers(constructor, modEventBus, contentRegistrations);
             registerHandlers(constructor);
             constructor.onConstructMod();
+            // needs to happen early, will otherwise miss out on search trees
+            // also corresponding event needs to run on mod event bus since normal event bus is still shutdown at this point
+            constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl());
         });
     }
 
@@ -34,7 +37,6 @@ public final class ForgeModConstructor {
             constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(contentRegistrations));
             constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
             constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextForgeImpl());
-            constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl());
         });
         eventBus.addListener((final EntityAttributeCreationEvent evt) -> {
             constructor.onEntityAttributeCreation(new EntityAttributesCreateContextForgeImpl(evt::put));

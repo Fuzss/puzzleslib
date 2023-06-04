@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.4.4-1.18.2] - 2023-06-04
+### Fixed
+- Fixed mod items missing from creative mode search again
+
+## [v3.4.3-1.18.2] - 2023-06-04
+### Fixed
+- Fixed `OutOfMemoryError` due to infinite recursion during biome loading
+
 ## [v3.4.2-1.18.2] - 2023-06-04
 ### Fixed
 - Fixed mod items missing from creative mode search

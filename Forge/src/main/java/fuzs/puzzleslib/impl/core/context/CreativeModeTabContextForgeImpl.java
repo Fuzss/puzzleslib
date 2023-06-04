@@ -1,8 +1,10 @@
 package fuzs.puzzleslib.impl.core.context;
 
 import com.google.common.base.Preconditions;
+import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.context.CreativeModeTabContext;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
+import fuzs.puzzleslib.impl.client.core.event.CreativeModeTabContentsEvent;
 import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
 import net.minecraft.core.NonNullList;
 import net.minecraft.resources.ResourceLocation;
@@ -41,7 +43,8 @@ public record CreativeModeTabContextForgeImpl() implements CreativeModeTabContex
 
             @Override
             public void fillItemList(NonNullList<ItemStack> itemStacks) {
-                impl.getDisplayItemsGenerator().accept(itemStacks::add);
+                // this is handled by the event below to properly support the way the search tab is implemented (it fires for every possible tab instead of the search tab itself)
+                // since there is no way to differentiate between the search tab and this tab being populated fillItemList on the tab itself is skipped
             }
 
             @Override
@@ -52,5 +55,10 @@ public record CreativeModeTabContextForgeImpl() implements CreativeModeTabContex
         if (impl.isHasSearchBar()) {
             tab.setBackgroundImage(new ResourceLocation("textures/gui/container/creative_inventory/tab_item_search.png"));
         }
+        ModContainerHelper.findModEventBus(impl.getIdentifier().getNamespace()).ifPresent(modEventBus -> {
+            modEventBus.addListener((final CreativeModeTabContentsEvent evt) -> {
+                if (evt.getTab() == tab) impl.getDisplayItemsGenerator().accept(evt.getOutput());
+            });
+        });
     }
 }

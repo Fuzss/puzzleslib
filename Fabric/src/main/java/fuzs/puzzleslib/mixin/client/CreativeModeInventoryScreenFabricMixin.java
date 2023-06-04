@@ -31,13 +31,13 @@ abstract class CreativeModeInventoryScreenFabricMixin extends EffectRenderingInv
         if (!this.searchBox.getValue().isEmpty()) return;
         for (CreativeModeTab tab : CreativeModeTab.TABS) {
             ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(tab);
-            FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, this.menu.items::add);
+            FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, BuildCreativeContentsCallback.checkedOutput(this.menu.items));
         }
     }
 
     @Inject(method = "selectTab", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;fillItemList(Lnet/minecraft/core/NonNullList;)V", shift = At.Shift.AFTER))
     private void selectTab(CreativeModeTab tab, CallbackInfo callback) {
         ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(tab);
-        FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, this.menu.items::add);
+        FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, BuildCreativeContentsCallback.checkedOutput(this.menu.items));
     }
 }

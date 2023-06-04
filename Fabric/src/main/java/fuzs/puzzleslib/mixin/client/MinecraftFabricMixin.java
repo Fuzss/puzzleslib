@@ -93,7 +93,7 @@ public abstract class MinecraftFabricMixin {
     public NonNullList<ItemStack> createSearchTrees(NonNullList<ItemStack> items) {
         for (CreativeModeTab tab : CreativeModeTab.TABS) {
             ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(tab);
-            FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, items::add);
+            FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, BuildCreativeContentsCallback.checkedOutput(items));
         }
         return items;
     }
