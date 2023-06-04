@@ -5,7 +5,6 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -13,7 +12,6 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.storage.PrimaryLevelData;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -32,16 +30,10 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
         this.holder = holder;
     }
 
-    @Nullable
-    public static BiomeLoadingContext create(ResourceLocation resourceLocation) {
-        // Forge runs this very early and the minecraft server isn't even available at this point, so use built-in registries to allow the 1.19 implementation to still work
-        RegistryAccess.Frozen registryAccess = RegistryAccess.BUILTIN.get();
-        ResourceKey<Biome> resourceKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
-        Holder<Biome> holder = registryAccess.registry(Registry.BIOME_REGISTRY).flatMap(t -> t.getHolder(resourceKey)).orElse(null);
-        if (holder != null) {
-            return new BiomeLoadingContextForge(registryAccess, null, resourceKey, holder.value(), holder);
-        }
-        return null;
+    public static BiomeLoadingContext create(RegistryAccess.Frozen registryAccess, ResourceKey<Biome> resourceKey) {
+        // Forge runs this very early and the minecraft server isn't even available at this point, so use custom built-in registries without biomes
+        // (as we are constructing the built-in values for those at this very moment) to allow the 1.19 implementation to still work
+        return new BiomeLoadingContextForge(registryAccess, null, resourceKey, null, null);
     }
 
     @Override
@@ -51,12 +43,12 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
 
     @Override
     public Biome getBiome() {
-        return this.biome;
+        throw new UnsupportedOperationException("biome is null");
     }
 
     @Override
     public Holder<Biome> holder() {
-        return this.holder;
+        throw new UnsupportedOperationException("biome holder is null");
     }
 
     @Override
@@ -96,7 +88,7 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
             return false;
         }
 
-        return dimension.generator().getBiomeSource().possibleBiomes().stream().anyMatch(entry -> entry.value() == this.biome);
+        return dimension.generator().getBiomeSource().possibleBiomes().stream().anyMatch(entry -> entry.value() == this.getBiome());
     }
 
     @Override

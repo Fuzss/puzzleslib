@@ -1,12 +1,10 @@
 package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.GenerationSettingsContext;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -19,15 +17,10 @@ public class GenerationSettingsContextForge implements GenerationSettingsContext
     private final Registry<PlacedFeature> features;
     private final BiomeGenerationSettingsBuilder context;
 
-    private GenerationSettingsContextForge(RegistryAccess registryAccess, BiomeGenerationSettingsBuilder context) {
+    public GenerationSettingsContextForge(RegistryAccess registryAccess, BiomeGenerationSettingsBuilder context) {
         this.carvers = registryAccess.registryOrThrow(Registry.CONFIGURED_CARVER_REGISTRY);
         this.features = registryAccess.registryOrThrow(Registry.PLACED_FEATURE_REGISTRY);
         this.context = context;
-    }
-
-    public static GenerationSettingsContextForge create(BiomeGenerationSettingsBuilder context) {
-        MinecraftServer server = Proxy.INSTANCE.getGameServer();
-        return new GenerationSettingsContextForge(server.registryAccess(), context);
     }
 
     @Override

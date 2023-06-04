@@ -2,6 +2,7 @@ package fuzs.puzzleslib.mixin.client;
 
 import fuzs.puzzleslib.api.client.event.v1.BuildCreativeContentsCallback;
 import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -18,13 +19,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class CreativeModeInventoryScreenFabricMixin extends EffectRenderingInventoryScreen<CreativeModeInventoryScreen.ItemPickerMenu> {
     @Shadow
     private static int selectedTab;
+    @Shadow
+    private EditBox searchBox;
 
     public CreativeModeInventoryScreenFabricMixin(CreativeModeInventoryScreen.ItemPickerMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
     }
 
-    @Inject(method = "refreshSearchResults", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;scrollOffs:F", shift = At.Shift.BEFORE, ordinal = 1))
+    @Inject(method = "refreshSearchResults", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;scrollOffs:F", shift = At.Shift.BEFORE))
     private void refreshSearchResults(CallbackInfo callback) {
+        if (!this.searchBox.getValue().isEmpty()) return;
         for (CreativeModeTab tab : CreativeModeTab.TABS) {
             ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(tab);
             FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, this.menu.items::add);

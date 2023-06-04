@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import fuzs.puzzleslib.impl.client.core.event.CreativeModeTabContentsEvent;
+import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -17,6 +18,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class CreativeModeInventoryScreenForgeMixin extends EffectRenderingInventoryScreen<CreativeModeInventoryScreen.ItemPickerMenu> {
     @Shadow
     private static int selectedTab;
+    @Shadow
+    private EditBox searchBox;
 
     public CreativeModeInventoryScreenForgeMixin(CreativeModeInventoryScreen.ItemPickerMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
@@ -30,6 +33,7 @@ abstract class CreativeModeInventoryScreenForgeMixin extends EffectRenderingInve
 
     @Inject(method = "refreshSearchResults", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;scrollOffs:F", shift = At.Shift.BEFORE, ordinal = 1))
     private void refreshSearchResults$1(CallbackInfo callback) {
+        if (!this.searchBox.getValue().isEmpty()) return;
         for (CreativeModeTab tab : CreativeModeTab.TABS) {
             MinecraftForge.EVENT_BUS.post(new CreativeModeTabContentsEvent(tab, this.menu.items::add));
         }
