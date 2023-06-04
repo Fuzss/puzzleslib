@@ -23,6 +23,14 @@ abstract class CreativeModeInventoryScreenFabricMixin extends EffectRenderingInv
         super(pMenu, pPlayerInventory, pTitle);
     }
 
+    @Inject(method = "refreshSearchResults", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;scrollOffs:F", shift = At.Shift.BEFORE, ordinal = 1))
+    private void refreshSearchResults(CallbackInfo callback) {
+        for (CreativeModeTab tab : CreativeModeTab.TABS) {
+            ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(tab);
+            FabricClientEvents.BUILD_CREATIVE_CONTENTS.invoker().onBuildCreativeContents(identifier, tab, this.menu.items::add);
+        }
+    }
+
     @Inject(method = "selectTab", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;fillItemList(Lnet/minecraft/core/NonNullList;)V", shift = At.Shift.AFTER))
     private void selectTab(CreativeModeTab tab, CallbackInfo callback) {
         ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(tab);

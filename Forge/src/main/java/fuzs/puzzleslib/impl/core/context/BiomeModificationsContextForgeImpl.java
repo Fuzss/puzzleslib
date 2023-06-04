@@ -8,10 +8,8 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
 import fuzs.puzzleslib.impl.biome.*;
-import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
@@ -55,12 +53,12 @@ public record BiomeModificationsContextForgeImpl(
                 Objects.requireNonNull(priority, "priority is null");
                 MinecraftForge.EVENT_BUS.addListener(priority, (final BiomeLoadingEvent evt) -> {
                     if (evt.getName() != null) {
-                        ResourceKey<Biome> resourceKey = ResourceKey.create(Registry.BIOME_REGISTRY, evt.getName());
-                        Holder<Biome> holder = Proxy.INSTANCE.getGameServer().registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getHolderOrThrow(resourceKey);
-                        BiomeLoadingContext filter = BiomeLoadingContextForge.create(holder);
-                        BiomeModificationContext context = createBuilderBackedContext(evt);
-                        for (BiomeModification modification : entry.getValue()) {
-                            modification.tryApply(filter, context);
+                        BiomeLoadingContext filter = BiomeLoadingContextForge.create(evt.getName());
+                        if (filter != null) {
+                            BiomeModificationContext context = createBuilderBackedContext(evt);
+                            for (BiomeModification modification : entry.getValue()) {
+                                modification.tryApply(filter, context);
+                            }
                         }
                     }
                 });

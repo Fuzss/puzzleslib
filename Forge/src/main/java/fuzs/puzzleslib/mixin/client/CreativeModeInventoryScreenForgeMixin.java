@@ -23,9 +23,16 @@ abstract class CreativeModeInventoryScreenForgeMixin extends EffectRenderingInve
     }
 
     @Inject(method = "refreshSearchResults", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;fillItemList(Lnet/minecraft/core/NonNullList;)V", shift = At.Shift.AFTER))
-    private void refreshSearchResults(CallbackInfo callback) {
+    private void refreshSearchResults$0(CallbackInfo callback) {
         CreativeModeTab tab = CreativeModeTab.TABS[selectedTab];
         MinecraftForge.EVENT_BUS.post(new CreativeModeTabContentsEvent(tab, this.menu.items::add));
+    }
+
+    @Inject(method = "refreshSearchResults", at = @At(value = "FIELD", target = "Lnet/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen;scrollOffs:F", shift = At.Shift.BEFORE, ordinal = 1))
+    private void refreshSearchResults$1(CallbackInfo callback) {
+        for (CreativeModeTab tab : CreativeModeTab.TABS) {
+            MinecraftForge.EVENT_BUS.post(new CreativeModeTabContentsEvent(tab, this.menu.items::add));
+        }
     }
 
     @Inject(method = "selectTab", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/CreativeModeTab;fillItemList(Lnet/minecraft/core/NonNullList;)V", shift = At.Shift.AFTER))

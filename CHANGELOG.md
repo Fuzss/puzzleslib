@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.4.2-1.18.2] - 2023-06-04
+### Fixed
+- Fixed mod items missing from creative mode search
+- Fixed biome modifications crashing on Forge
+
 ## [v3.4.1-1.18.2] - 2023-06-04
 ### Added
 - Added more transitive access wideners

@@ -1,12 +1,11 @@
 package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
@@ -14,7 +13,7 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.storage.PrimaryLevelData;
-import net.minecraft.world.level.storage.WorldData;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -33,14 +32,16 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
         this.holder = holder;
     }
 
-    public static BiomeLoadingContext create(Holder<Biome> holder) {
-        MinecraftServer server = Proxy.INSTANCE.getGameServer();
-        WorldData worldData = server.getWorldData();
-        if (!(worldData instanceof PrimaryLevelData primaryLevelData)) {
-            throw new RuntimeException("Incompatible SaveProperties passed to MinecraftServer: " + worldData);
+    @Nullable
+    public static BiomeLoadingContext create(ResourceLocation resourceLocation) {
+        // Forge runs this very early and the minecraft server isn't even available at this point, so use built-in registries to allow the 1.19 implementation to still work
+        RegistryAccess.Frozen registryAccess = RegistryAccess.BUILTIN.get();
+        ResourceKey<Biome> resourceKey = ResourceKey.create(Registry.BIOME_REGISTRY, resourceLocation);
+        Holder<Biome> holder = registryAccess.registry(Registry.BIOME_REGISTRY).flatMap(t -> t.getHolder(resourceKey)).orElse(null);
+        if (holder != null) {
+            return new BiomeLoadingContextForge(registryAccess, null, resourceKey, holder.value(), holder);
         }
-        ResourceKey<Biome> resourceKey = holder.unwrapKey().orElseThrow();
-        return new BiomeLoadingContextForge(server.registryAccess(), primaryLevelData, resourceKey, holder.value(), holder);
+        return null;
     }
 
     @Override
