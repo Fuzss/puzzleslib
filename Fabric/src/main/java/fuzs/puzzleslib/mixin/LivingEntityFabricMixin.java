@@ -3,10 +3,7 @@ package fuzs.puzzleslib.mixin;
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -56,6 +53,12 @@ abstract class LivingEntityFabricMixin extends Entity {
     private DefaultedFloat puzzleslib$fallDistance;
     @Unique
     private DefaultedFloat puzzleslib$damageMultiplier;
+    @Unique
+    private DefaultedDouble puzzleslib$strength;
+    @Unique
+    private DefaultedDouble puzzleslib$ratioX;
+    @Unique
+    private DefaultedDouble puzzleslib$ratioZ;
 
     public LivingEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -177,7 +180,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0)
+    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     protected float actuallyHurt(float damageAmount, DamageSource damageSource) {
         if (!this.isInvulnerableTo(damageSource)) {
             Objects.requireNonNull(this.puzzleslib$damageAmount, "damage amount is null");
@@ -228,7 +231,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 0)
+    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)
     public float causeFallDamage$1(float fallDistance) {
         Objects.requireNonNull(this.puzzleslib$fallDistance, "fall distance is null");
         fallDistance = this.puzzleslib$fallDistance.getAsOptionalFloat().orElse(fallDistance);
@@ -236,11 +239,45 @@ abstract class LivingEntityFabricMixin extends Entity {
         return fallDistance;
     }
 
-    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 1)
+    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 1, argsOnly = true)
     public float causeFallDamage$2(float damageMultiplier) {
         Objects.requireNonNull(this.puzzleslib$damageMultiplier, "damage multiplier is null");
         damageMultiplier = this.puzzleslib$damageMultiplier.getAsOptionalFloat().orElse(damageMultiplier);
         this.puzzleslib$damageMultiplier = null;
         return damageMultiplier;
+    }
+
+    @Inject(method = "knockback", at = @At("HEAD"), cancellable = true)
+    public void knockback$0(double strength, double ratioX, double ratioZ, CallbackInfo callback) {
+        this.puzzleslib$strength = DefaultedDouble.fromValue(strength);
+        this.puzzleslib$ratioX = DefaultedDouble.fromValue(ratioX);
+        this.puzzleslib$ratioZ = DefaultedDouble.fromValue(ratioZ);
+        if (FabricLivingEvents.LIVING_KNOCK_BACK.invoker().onLivingKnockBack(LivingEntity.class.cast(this), this.puzzleslib$strength, this.puzzleslib$ratioX, this.puzzleslib$ratioZ).isInterrupt()) {
+            callback.cancel();
+        }
+    }
+
+    @ModifyVariable(method = "knockback", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)
+    public double knockback$1(double strength) {
+        Objects.requireNonNull(this.puzzleslib$strength, "strength is null");
+        strength = this.puzzleslib$strength.getAsOptionalDouble().orElse(strength);
+        this.puzzleslib$strength = null;
+        return strength;
+    }
+
+    @ModifyVariable(method = "knockback", at = @At(value = "HEAD"), ordinal = 1, argsOnly = true)
+    public double knockback$2(double ratioX) {
+        Objects.requireNonNull(this.puzzleslib$ratioX, "ratio x is null");
+        ratioX = this.puzzleslib$ratioX.getAsOptionalDouble().orElse(ratioX);
+        this.puzzleslib$ratioX = null;
+        return ratioX;
+    }
+
+    @ModifyVariable(method = "knockback", at = @At(value = "HEAD"), ordinal = 2, argsOnly = true)
+    public double knockback$3(double ratioZ) {
+        Objects.requireNonNull(this.puzzleslib$ratioZ, "ratio z is null");
+        ratioZ = this.puzzleslib$ratioZ.getAsOptionalDouble().orElse(ratioZ);
+        this.puzzleslib$ratioZ = null;
+        return ratioZ;
     }
 }

@@ -17,6 +17,7 @@
     "FarmBlockFabricMixin",
     "FoxBreedGoalFabricMixin",
     "ItemEntityFabricMixin",
+    "ItemStackMixin",
     "LevelFabricMixin",
     "LivingEntityFabricMixin",
     "LootingEnchantFunctionFabricMixin",
