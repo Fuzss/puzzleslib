@@ -124,7 +124,7 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
     private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         AnnotatedConfigBuilder.serialize(builder,this, this.config);
-        // add config reload callback last to make sure it runs together with value callback relods before the config is set to available in #onModConfig
+        // add config reload callback last to make sure it runs together with value callback reloads before the config is set to available in #onModConfig
         this.configValueCallbacks.add(this.config::afterConfigReload);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
