@@ -30,7 +30,7 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
         this.holder = holder;
     }
 
-    public static BiomeLoadingContext create(RegistryAccess.Frozen registryAccess, ResourceKey<Biome> resourceKey) {
+    public static BiomeLoadingContext create(RegistryAccess registryAccess, ResourceKey<Biome> resourceKey) {
         // Forge runs this very early and the minecraft server isn't even available at this point, so use custom built-in registries without biomes
         // (as we are constructing the built-in values for those at this very moment) to allow the 1.19 implementation to still work
         return new BiomeLoadingContextForge(registryAccess, null, resourceKey, null, null);
@@ -93,7 +93,8 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
 
     @Override
     public boolean is(TagKey<Biome> tag) {
-        Registry<Biome> biomeRegistry = this.registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
-        return biomeRegistry.getHolderOrThrow(this.getResourceKey()).is(tag);
+        throw new UnsupportedOperationException("biome registry is null");
+//        Registry<Biome> biomeRegistry = this.registryAccess.registryOrThrow(Registry.BIOME_REGISTRY);
+//        return biomeRegistry.getHolderOrThrow(this.getResourceKey()).is(tag);
     }
 }

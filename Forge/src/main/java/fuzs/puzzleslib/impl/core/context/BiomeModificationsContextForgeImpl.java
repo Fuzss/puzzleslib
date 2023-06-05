@@ -44,9 +44,9 @@ public record BiomeModificationsContextForgeImpl(
         this.put(BiomeLoadingPhase.MODIFICATIONS, EventPriority.LOW);
         this.put(BiomeLoadingPhase.POST_PROCESSING, EventPriority.LOW);
     }});
-    private static final Supplier<RegistryAccess.Frozen> BUILT_IN_REGISTRY_ACCESS = Suppliers.memoize(() -> {
-        return builtinCopy().freeze();
-    });
+    // this is not frozen, as Tropicraft mixes into the registry codec, expecting a biome registry to be present which it cannot be
+    // this keeps turning into a bigger and bigger hack, all to just get the 1.19 biome modifiers system working on Forge somehow
+    private static final Supplier<RegistryAccess> BUILT_IN_REGISTRY_ACCESS = Suppliers.memoize(BiomeModificationsContextForgeImpl::builtinCopy);
 
     @Override
     public void register(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier) {
