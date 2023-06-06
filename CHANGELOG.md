@@ -5,12 +5,13 @@ The format is based on [Keep a Changelog].
 
 ## [v6.0.10-1.19.4] - 2023-06-06
 ### Added
+- Added many new events, including `ProjectileImpactCallback`, `LivingKnockBackCallback` and `ItemAttributeModifiersCallback`
 - Added `GsonEnumHelper`
-- Added many new events
 ### Changed
-- `ArrowLooseCallback` now also runs for crossbows on Fabric, just like Forge
+- Implemented a few more `RenderGuiElementEvents`
 ### Fixed
-- Fixed configs reporting is available too early
+- `ArrowLooseCallback` now also runs for crossbows on Fabric, just like Forge
+- Fixed configs reporting as available too early
 - Fixed an issue with service loaders when they were loaded by the wrong class loader
 
 ## [v6.0.9-1.19.4] - 2023-05-29

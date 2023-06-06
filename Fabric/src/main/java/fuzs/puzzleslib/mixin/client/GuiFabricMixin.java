@@ -36,9 +36,9 @@ abstract class GuiFabricMixin extends GuiComponent {
     @Unique
     private float puzzleslib$partialTick;
     @Unique
-    private boolean puzzleslib$passSpyglassOverlay;
+    private boolean puzzleslib$interruptSpyglassOverlay;
     @Unique
-    private boolean puzzleslib$passTextureOverlay;
+    private boolean puzzleslib$interruptTextureOverlay;
 
     @Inject(method = "render", at = @At("HEAD"))
     public void render$0(PoseStack poseStack, float partialTick, CallbackInfo callback) {
@@ -47,14 +47,14 @@ abstract class GuiFabricMixin extends GuiComponent {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;getDeltaFrameTime()F", shift = At.Shift.AFTER))
     public void render$1(PoseStack poseStack, float partialTick, CallbackInfo callback) {
-        this.puzzleslib$passSpyglassOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.SPYGLASS.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
-        this.puzzleslib$passTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.HELMET.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
+        this.puzzleslib$interruptSpyglassOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.SPYGLASS.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
+        this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.HELMET.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
     private void renderSpyglassOverlay$0(PoseStack poseStack, float f, CallbackInfo callback) {
-        if (this.puzzleslib$passSpyglassOverlay) callback.cancel();
-        this.puzzleslib$passSpyglassOverlay = false;
+        if (this.puzzleslib$interruptSpyglassOverlay) callback.cancel();
+        this.puzzleslib$interruptSpyglassOverlay = false;
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("TAIL"))
@@ -64,8 +64,8 @@ abstract class GuiFabricMixin extends GuiComponent {
 
     @Inject(method = "renderTextureOverlay", at = @At("HEAD"), cancellable = true)
     private void renderTextureOverlay$0(PoseStack poseStack, ResourceLocation resourceLocation, float f, CallbackInfo callback) {
-        if (this.puzzleslib$passTextureOverlay) callback.cancel();
-        this.puzzleslib$passTextureOverlay = false;
+        if (this.puzzleslib$interruptTextureOverlay) callback.cancel();
+        this.puzzleslib$interruptTextureOverlay = false;
     }
 
     @Inject(method = "renderTextureOverlay", at = @At("TAIL"))
@@ -79,18 +79,18 @@ abstract class GuiFabricMixin extends GuiComponent {
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I", shift = At.Shift.BEFORE))
     public void render$2(PoseStack poseStack, float partialTick, CallbackInfo callback) {
-        this.puzzleslib$passTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
+        this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;oPortalTime:F", shift = At.Shift.BEFORE))
     public void render$3(PoseStack poseStack, float partialTick, CallbackInfo callback) {
-        this.puzzleslib$passTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
+        this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
     }
 
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
     private void renderPortalOverlay$0(PoseStack poseStack, float f, CallbackInfo callback) {
-        if (this.puzzleslib$passTextureOverlay) callback.cancel();
-        this.puzzleslib$passTextureOverlay = false;
+        if (this.puzzleslib$interruptTextureOverlay) callback.cancel();
+        this.puzzleslib$interruptTextureOverlay = false;
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("TAIL"))
@@ -115,14 +115,14 @@ abstract class GuiFabricMixin extends GuiComponent {
     }
 
     @Inject(method = "renderHotbar", at = @At("HEAD"), cancellable = true)
-    private void renderHotbar$0(PoseStack poseStack, CallbackInfo callback) {
+    private void renderHotbar$0(float partialTick, PoseStack poseStack, CallbackInfo callback) {
         if (FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.HOTBAR.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt()) {
             callback.cancel();
         }
     }
 
     @Inject(method = "renderHotbar", at = @At("TAIL"))
-    private void renderHotbar$1(PoseStack poseStack, CallbackInfo callback) {
+    private void renderHotbar$1(float partialTick, PoseStack poseStack, CallbackInfo callback) {
         FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.HOTBAR.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 

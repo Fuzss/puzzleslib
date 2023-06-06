@@ -76,4 +76,8 @@ public final class FabricLivingEvents {
      * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
      */
     public static final Event<ItemAttributeModifiersCallback> ITEM_ATTRIBUTE_MODIFIERS = FabricEventFactory.create(ItemAttributeModifiersCallback.class);
+
+    private FabricLivingEvents() {
+
+    }
 }

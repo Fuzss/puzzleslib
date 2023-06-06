@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ItemStack.class)
-abstract class ItemStackMixin {
+abstract class ItemStackFabricMixin {
 
     @Inject(method = "getAttributeModifiers", at = @At("RETURN"), cancellable = true)
     public void getAttributeModifiers(EquipmentSlot slot, CallbackInfoReturnable<Multimap<Attribute, AttributeModifier>> callback) {
