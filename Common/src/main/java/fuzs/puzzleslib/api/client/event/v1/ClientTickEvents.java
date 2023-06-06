@@ -16,6 +16,7 @@ public final class ClientTickEvents {
 
         /**
          * Fires at the beginning of {@link Minecraft#tick()}.
+         * <p>TODO rename to onStartClientTick
          *
          * @param minecraft minecraft singleton instance
          */
@@ -27,6 +28,7 @@ public final class ClientTickEvents {
 
         /**
          * Fires at the end of {@link Minecraft#tick()}.
+         * <p>TODO rename to onEndClientTick
          *
          * @param minecraft minecraft singleton instance
          */

@@ -6,11 +6,17 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 
 import java.util.Collections;
 import java.util.List;
@@ -163,6 +169,27 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientPlayerEvents.LoggedIn.class, FabricClientEvents.PLAYER_LOGGED_IN);
         INSTANCE.register(ClientPlayerEvents.LoggedOut.class, FabricClientEvents.PLAYER_LOGGED_OUT);
         INSTANCE.register(ClientPlayerEvents.Copy.class, FabricClientEvents.PLAYER_COPY);
+        INSTANCE.register(InteractionInputEvents.Attack.class, ClientPreAttackCallback.EVENT, callback -> {
+            return (Minecraft client, LocalPlayer player, int clickCount) -> {
+                if (client.missTime <= 0 && client.hitResult != null) {
+                    if (clickCount != 0) {
+                        if (!player.isHandsBusy()) {
+                            ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+                            if (itemInHand.isItemEnabled(client.level.enabledFeatures())) {
+                                return callback.onAttackInteraction(client, player).isInterrupt();
+                            }
+                        }
+                    } else {
+                        if (!player.isUsingItem() && client.hitResult.getType() != HitResult.Type.BLOCK) {
+                            if (!client.level.isEmptyBlock(((BlockHitResult) client.hitResult).getBlockPos())) {
+                                return callback.onAttackInteraction(client, player).isInterrupt();
+                            }
+                        }
+                    }
+                }
+                return false;
+            };
+        });
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

@@ -3,9 +3,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.10-1.19.4] - 2023-06-06
+### Added
+- Added `GsonEnumHelper`
+- Added many new events
+### Changed
+- `ArrowLooseCallback` now also runs for crossbows on Fabric, just like Forge
+### Fixed
+- Fixed configs reporting is available too early
+- Fixed an issue with service loaders when they were loaded by the wrong class loader
+
 ## [v6.0.9-1.19.4] - 2023-05-29
 ### Added
-- Add `ClientPlayerEvents`
+- Added `ClientPlayerEvents`
 
 ## [v6.0.8-1.19.4] - 2023-05-28
 ### Added

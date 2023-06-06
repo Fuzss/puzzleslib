@@ -226,6 +226,16 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ClientPlayerEvents.Copy.class, ClientPlayerNetworkEvent.Clone.class, (ClientPlayerEvents.Copy callback, ClientPlayerNetworkEvent.Clone evt) -> {
             callback.onCopy(evt.getOldPlayer(), evt.getNewPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
         });
+        INSTANCE.register(InteractionInputEvents.Attack.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Attack callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
+            if (!evt.isAttack()) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            if (callback.onAttackInteraction(minecraft, minecraft.player).isInterrupt()) {
+                // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
+                // just manually send swing hand packet if necessary
+                evt.setSwingHand(false);
+                evt.setCanceled(true);
+            }
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
