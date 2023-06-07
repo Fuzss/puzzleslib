@@ -43,7 +43,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 import org.joml.Vector3f;
 
 import java.lang.reflect.Array;
@@ -60,7 +59,7 @@ import java.util.function.IntFunction;
  * <p>This implementation is heavily inspired by and largely based upon <a href="https://github.com/wisp-forest/owo-lib">Owo Lib</a> by <a href="https://github.com/gliscowo">Glisco</a>.
  */
 public final class MessageSerializers {
-    private static final Map<Class<?>, MessageSerializer<?>> SERIALIZERS = Collections.synchronizedMap(Maps.newHashMap());
+    private static final Map<Class<?>, MessageSerializer<?>> SERIALIZERS = Collections.synchronizedMap(Maps.newIdentityHashMap());
     private static final Map<Class<?>, Function<Type[], MessageSerializer<?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(Maps.newLinkedHashMap());
 
     private MessageSerializers() {
@@ -135,11 +134,17 @@ public final class MessageSerializers {
      */
     @SuppressWarnings("unchecked")
     public static <T> MessageSerializer<T> findByType(Class<T> type) {
-        return (MessageSerializer<T>) SERIALIZERS.computeIfAbsent(type, MessageSerializers::computeIfAbsent);
+        // don't use Map::computeIfAbsent on map, it will throw java.lang.ConcurrentModificationException as during the Map::computeIfAbsent for the main record type
+        // more calls to MessageSerializers::getByType can happen when the record contains other records / enums / arrays as fields
+        MessageSerializer<T> serializer = (MessageSerializer<T>) SERIALIZERS.get(type);
+        if (serializer == null) {
+            serializer = computeIfAbsent(type);
+            SERIALIZERS.put(type, serializer);
+        }
+        return serializer;
     }
 
     @SuppressWarnings("unchecked")
-    @NotNull
     private static <T, E extends Enum<E>> MessageSerializer<T> computeIfAbsent(Class<T> clazz) {
         if (Record.class.isAssignableFrom(clazz)) {
             return (MessageSerializer<T>) RecordSerializer.createRecordSerializer((Class<? extends Record>) clazz);

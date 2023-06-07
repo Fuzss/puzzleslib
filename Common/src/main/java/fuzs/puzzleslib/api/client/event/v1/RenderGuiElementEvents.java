@@ -131,9 +131,9 @@ public final class RenderGuiElementEvents {
         return EventInvoker.lookup(Before.class, id);
     }
 
-    public static EventInvoker<Before> after(GuiOverlay id) {
+    public static EventInvoker<After> after(GuiOverlay id) {
         Objects.requireNonNull(id, "id is null");
-        return EventInvoker.lookup(Before.class, id);
+        return EventInvoker.lookup(After.class, id);
     }
 
     /**
