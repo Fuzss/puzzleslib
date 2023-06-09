@@ -29,6 +29,7 @@ public final class FabricModConstructor {
 
     private static void registerHandlers(ModConstructor constructor, String modId) {
         constructor.onConstructMod();
+        constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
         constructor.onCommonSetup(Runnable::run);
         constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
         constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
@@ -36,7 +37,6 @@ public final class FabricModConstructor {
         constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
         constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
         constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
-        constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
         constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
         constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.SERVER_DATA, modId));
     }

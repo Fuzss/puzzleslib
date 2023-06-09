@@ -126,8 +126,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, callback -> {
             return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
-                // keep this the same as Forge where editing data pack specified loot tables is not supported
-                if (source == LootTableSource.DATA_PACK) return;
+                // don't filter on source, with our custom event on Forge we can also support non-built-in loot tables
                 callback.onModifyLootTable(lootManager, id, tableBuilder::pool, index -> {
                     MutableInt currentIndex = new MutableInt();
                     MutableBoolean result = new MutableBoolean();
