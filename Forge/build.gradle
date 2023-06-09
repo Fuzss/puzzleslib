@@ -102,8 +102,7 @@ dependencies {
 
     // Quality of Life Mods
     runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:${libs.versions.bettermodsbutton.get()}")
-//    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4496718")
-//    runtimeOnly fg.deobf("curse.maven:configured-457570:4462894")
+    runtimeOnly fg.deobf("fuzs.forgeconfigscreens:forgeconfigscreens-forge:${libs.versions.forgeconfigscreens.get()}")
 
     // Puzzles Lib
 //    api fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${libs.versions.puzzles.get()}")

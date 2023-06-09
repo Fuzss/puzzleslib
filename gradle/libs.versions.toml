@@ -20,5 +20,6 @@ minFabricApi = "0.83.0"
 # Mods
 modmenu = "7.0.1"
 bettermodsbutton = "7.0.0"
+forgeconfigscreens = "7.0.0"
 cardinalcomponents = "5.2.0"
 forgeconfigapiport = "7.0.0"

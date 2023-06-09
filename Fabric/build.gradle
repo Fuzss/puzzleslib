@@ -51,7 +51,7 @@ dependencies {
 
     // Quality of Life Mods
     modLocalRuntime "com.terraformersmc:modmenu:${libs.versions.modmenu.get()}"
-//    modLocalRuntime "curse.maven:configured-fabric-667378:4441611"
+    modLocalRuntime "fuzs.forgeconfigscreens:forgeconfigscreens-fabric:${libs.versions.forgeconfigscreens.get()}"
 
     // Puzzles Lib
 //    modApi ("fuzs.puzzleslib:puzzleslib-fabric:${libs.versions.puzzles.get()}")
