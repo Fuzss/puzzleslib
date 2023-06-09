@@ -36,7 +36,7 @@ abstract class ItemEntityFabricMixin extends Entity {
 
     @Inject(method = "playerTouch", at = @At("HEAD"), cancellable = true)
     public void playerTouch$0(Player player, CallbackInfo callback) {
-        if (!this.level.isClientSide) {
+        if (!this.level().isClientSide) {
             if (this.pickupDelay > 0) {
                 this.puzzleslib$originalItem = this.getItem().copy();
                 return;

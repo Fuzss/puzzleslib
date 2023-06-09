@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.context.ItemDecorationContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.IItemDecorator;
@@ -25,8 +25,8 @@ public record ItemDecorationContextForgeImpl(
             this.consumer.accept(item, new IItemDecorator() {
 
                 @Override
-                public boolean render(PoseStack poseStack, Font font, ItemStack stack, int xOffset, int yOffset) {
-                    return decorator.renderItemDecorations(poseStack, font, stack, xOffset, yOffset);
+                public boolean render(GuiGraphics guiGraphics, Font font, ItemStack stack, int xOffset, int yOffset) {
+                    return decorator.renderItemDecorations(guiGraphics, font, stack, xOffset, yOffset);
                 }
             });
         }

@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.api.client.event.v1;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.GameType;
 
@@ -169,14 +169,14 @@ public final class RenderGuiElementEvents {
          * Called before a gui element is rendered, allows for cancelling rendering.
          *
          * @param minecraft    minecraft singleton instance
-         * @param poseStack    the pose stack
+         * @param guiGraphics the gui graphics component
          * @param tickDelta    partial tick time
          * @param screenWidth  width of the window's screen
          * @param screenHeight height of the window's screen
          * @return {@link EventResult#INTERRUPT} to prevent the element from rendering,
          * {@link EventResult#PASS} to allow the element to render normally
          */
-        EventResult onBeforeRenderGuiElement(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
+        EventResult onBeforeRenderGuiElement(Minecraft minecraft, GuiGraphics guiGraphics, float tickDelta, int screenWidth, int screenHeight);
     }
 
     @FunctionalInterface
@@ -186,11 +186,11 @@ public final class RenderGuiElementEvents {
          * Called after a gui element is rendered.
          *
          * @param minecraft    minecraft singleton instance
-         * @param poseStack    the pose stack
+         * @param guiGraphics the gui graphics component
          * @param tickDelta    partial tick time
          * @param screenWidth  width of the window's screen
          * @param screenHeight height of the window's screen
          */
-        void onAfterRenderGuiElement(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
+        void onAfterRenderGuiElement(Minecraft minecraft, GuiGraphics guiGraphics, float tickDelta, int screenWidth, int screenHeight);
     }
 }

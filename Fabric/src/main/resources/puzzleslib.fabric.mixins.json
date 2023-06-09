@@ -49,7 +49,7 @@
     "client.GameRendererFabricMixin",
     "client.GuiFabricMixin",
     "client.ItemInHandRendererMixin",
-    "client.ItemRendererFabricMixin",
+    "client.GuiGraphicsFabricMixin",
     "client.KeyboardHandlerFabricMixin",
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",

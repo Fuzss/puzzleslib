@@ -2,7 +2,10 @@ package fuzs.puzzleslib.api.data.v1;
 
 import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.*;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -44,11 +47,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
      * @param category the {@link RecipeCategory} for the recipe book
      * @param result   the result item from the smithing upgrade, like netherite armor and tools in vanilla
      */
-    @SuppressWarnings("removal")
     protected static void legacyNetheriteSmithing(String modId, Consumer<FinishedRecipe> exporter, Item base, Item addition, RecipeCategory category, Item result) {
-        LegacyUpgradeRecipeBuilder.smithing(Ingredient.of(base), Ingredient.of(addition), category, result)
-                .unlocks(getHasName(addition), has(addition))
-                .save(exporter, new ResourceLocation(modId, getItemName(result) + "_smithing"));
         new SmithingTransformRecipeBuilder(LegacySmithingTransformRecipe.getModSerializer(modId), Ingredient.of(), Ingredient.of(base), Ingredient.of(addition), category, result)
                 .unlocks(getHasName(addition), has(addition))
                 .save(exporter, new ResourceLocation(modId, getItemName(result) + "_smithing_transform"));

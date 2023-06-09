@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.client.event.v1;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 
@@ -87,29 +87,29 @@ public final class ScreenEvents {
     public interface BeforeRender<T extends Screen> {
 
         /**
-         * Runs before a screen is rendered in {@link Screen#render(PoseStack, int, int, float)}.
+         * Runs before a screen is rendered in {@link Screen#render(GuiGraphics, int, int, float)}.
          *
          * @param screen    the currently displayed screen
-         * @param poseStack the current pose stack
+         * @param guiGraphics the gui graphics component
          * @param mouseX    the x-position of the mouse
          * @param mouseY    the y-position of the mouse
          * @param tickDelta the partial tick time
          */
-        void onBeforeRender(T screen, PoseStack poseStack, int mouseX, int mouseY, float tickDelta);
+        void onBeforeRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float tickDelta);
     }
 
     @FunctionalInterface
     public interface AfterRender<T extends Screen> {
 
         /**
-         * Runs after a screen is rendered in {@link Screen#render(PoseStack, int, int, float)}.
+         * Runs after a screen is rendered in {@link Screen#render(GuiGraphics, int, int, float)}.
          *
          * @param screen    the currently displayed screen
-         * @param poseStack the current pose stack
+         * @param guiGraphics the gui graphics component
          * @param mouseX    the x-position of the mouse
          * @param mouseY    the y-position of the mouse
          * @param tickDelta the partial tick time
          */
-        void onAfterRender(T screen, PoseStack poseStack, int mouseX, int mouseY, float tickDelta);
+        void onAfterRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float tickDelta);
     }
 }

@@ -34,7 +34,7 @@ public final class ForgeClientEventInvokers {
             if (evt.phase == TickEvent.Phase.END) callback.onEndTick(Minecraft.getInstance());
         });
         INSTANCE.register(RenderGuiCallback.class, RenderGuiEvent.Post.class, (RenderGuiCallback callback, RenderGuiEvent.Post evt) -> {
-            callback.onRenderGui(Minecraft.getInstance(), evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            callback.onRenderGui(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
         });
         INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
             callback.onItemTooltip(evt.getItemStack(), evt.getEntity(), evt.getToolTip(), evt.getFlags());
@@ -45,10 +45,10 @@ public final class ForgeClientEventInvokers {
             if (result.isInterrupt()) evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
         });
         INSTANCE.register(ContainerScreenEvents.Background.class, ContainerScreenEvent.Render.Background.class, (ContainerScreenEvents.Background callback, ContainerScreenEvent.Render.Background evt) -> {
-            callback.onDrawBackground(evt.getContainerScreen(), evt.getPoseStack(), evt.getMouseX(), evt.getMouseY());
+            callback.onDrawBackground(evt.getContainerScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
         });
         INSTANCE.register(ContainerScreenEvents.Foreground.class, ContainerScreenEvent.Render.Foreground.class, (ContainerScreenEvents.Foreground callback, ContainerScreenEvent.Render.Foreground evt) -> {
-            callback.onDrawForeground(evt.getContainerScreen(), evt.getPoseStack(), evt.getMouseX(), evt.getMouseY());
+            callback.onDrawForeground(evt.getContainerScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
         });
         INSTANCE.register(InventoryMobEffectsCallback.class, ScreenEvent.RenderInventoryMobEffects.class, (InventoryMobEffectsCallback callback, ScreenEvent.RenderInventoryMobEffects evt) -> {
             MutableBoolean fullSizeRendering = MutableBoolean.fromEvent(evt::setCompact, evt::isCompact);
@@ -83,10 +83,10 @@ public final class ForgeClientEventInvokers {
             callback.onRemove(evt.getScreen());
         });
         registerScreenEvent(ScreenEvents.BeforeRender.class, ScreenEvent.Render.Pre.class, (callback, evt) -> {
-            callback.onBeforeRender(evt.getScreen(), evt.getPoseStack(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
+            callback.onBeforeRender(evt.getScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
         });
         registerScreenEvent(ScreenEvents.AfterRender.class, ScreenEvent.Render.Post.class, (callback, evt) -> {
-            callback.onAfterRender(evt.getScreen(), evt.getPoseStack(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
+            callback.onAfterRender(evt.getScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class, ScreenEvent.MouseButtonPressed.Pre.class, (callback, evt) -> {
             EventResult result = callback.onBeforeMouseClick(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
@@ -135,7 +135,7 @@ public final class ForgeClientEventInvokers {
             RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
             Minecraft minecraft = Minecraft.getInstance();
             if (!evt.getOverlay().id().equals(overlay.id()) || !overlay.filter().test(minecraft)) return;
-            EventResult result = callback.onBeforeRenderGuiElement(minecraft, evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            EventResult result = callback.onBeforeRenderGuiElement(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderGuiElementEvents.After.class, RenderGuiOverlayEvent.Post.class, (RenderGuiElementEvents.After callback, RenderGuiOverlayEvent.Post evt, Object context) -> {
@@ -143,12 +143,12 @@ public final class ForgeClientEventInvokers {
             RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
             Minecraft minecraft = Minecraft.getInstance();
             if (!evt.getOverlay().id().equals(overlay.id()) || !overlay.filter().test(minecraft)) return;
-            callback.onAfterRenderGuiElement(minecraft, evt.getPoseStack(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            callback.onAfterRenderGuiElement(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {
             MutableInt posX = MutableInt.fromEvent(evt::setPosX, evt::getPosX);
             MutableInt posY = MutableInt.fromEvent(evt::setPosY, evt::getPosY);
-            callback.onRenderChatPanel(evt.getWindow(), evt.getPoseStack(), evt.getPartialTick(), posX, posY);
+            callback.onRenderChatPanel(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), posX, posY);
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;

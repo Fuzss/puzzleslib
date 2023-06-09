@@ -5,7 +5,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,12 +26,6 @@ public interface ScreenHelper {
      * @return font renderer
      */
     Font getFont(Screen screen);
-
-    /**
-     * @param screen screen instance
-     * @return item renderer
-     */
-    ItemRenderer getItemRenderer(Screen screen);
 
     /**
      * @param screen container screen instance

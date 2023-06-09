@@ -1,25 +1,16 @@
-plugins {
-    id 'fabric-loom' version '1.0.+'
-    id 'io.github.juuxel.loom-quiltflower' version '1.+'
-    // this depends on an older version of guava, which loom is incompatible with, so make sure to apply this plugin after loom
-    // haven't found a proper way to manage plugin dependencies otherwise
-    id 'me.hypherionmc.cursegradle' version '2.+'
-    // cannot apply this in the base build.gradle as it'll be the same for all subprojects, only one configuration will work
-    id 'com.modrinth.minotaur' version '2.+'
-}
+apply plugin: 'fabric-loom'
+apply plugin: 'io.github.juuxel.loom-quiltflower'
+apply plugin: 'me.hypherionmc.cursegradle'
+apply plugin: 'com.modrinth.minotaur'
 
 archivesBaseName = rootProject.name
-version = "v${modVersion}-${minecraftVersion}-Fabric"
+version = "v${modVersion}-${libs.versions.minecraft.get()}-Fabric"
 group = modMavenGroup
 
 repositories {
     maven {
         name = "Modmuss"
         url = "https://maven.modmuss50.me/"
-    }
-    maven {
-        name = 'Terraformers'
-        url = "https://maven.terraformersmc.com/"
     }
     maven {
         name = "ladysnake"
@@ -38,32 +29,32 @@ dependencies {
     }
 
     // Minecraft
-    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    minecraft "com.mojang:minecraft:${libs.versions.minecraft.get()}"
     mappings loom.layered() {
         officialMojangMappings()
-        parchment("org.parchmentmc.data:parchment-${parchmentMinecraftVersion}:${parchmentMappingsVersion}@zip")
+        parchment("org.parchmentmc.data:parchment-${libs.versions.parchmentMinecraft.get()}:${libs.versions.parchment.get()}@zip")
     }
 
     // Fabric
-    modApi "net.fabricmc:fabric-loader:${fabricVersion}"
-    modApi "net.fabricmc.fabric-api:fabric-api:${fabricApiVersion}"
+    modApi "net.fabricmc:fabric-loader:${libs.versions.fabric.get()}"
+    modApi "net.fabricmc.fabric-api:fabric-api:${libs.versions.fabricApi.get()}"
 
     // Forge Config API Port
-    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:6.0.2"
+    modApi "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:${libs.versions.forgeconfigapiport.get()}"
 
     // Cardinal Components
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-block:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:5.1.0"
-    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-world:5.1.0"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${libs.versions.cardinalcomponents.get()}"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-entity:${libs.versions.cardinalcomponents.get()}"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-block:${libs.versions.cardinalcomponents.get()}"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-chunk:${libs.versions.cardinalcomponents.get()}"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-world:${libs.versions.cardinalcomponents.get()}"
 
     // Quality of Life Mods
-    modLocalRuntime "com.terraformersmc:modmenu:6.2.2"
+    modLocalRuntime "com.terraformersmc:modmenu:${libs.versions.modmenu.get()}"
 //    modLocalRuntime "curse.maven:configured-fabric-667378:4441611"
 
     // Puzzles Lib
-//    modApi "fuzs.puzzleslib:puzzleslib-fabric:${puzzlesVersion}"
+//    modApi ("fuzs.puzzleslib:puzzleslib-fabric:${libs.versions.puzzles.get()}")
 }
 
 loom {
@@ -102,51 +93,53 @@ processResources {
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
-    inputs.property "modId", 					"${modId}"
-    inputs.property "modName", 					"${modName}"
-    inputs.property "modVersion", 				"${modVersion}"
-    inputs.property "modDescription", 			"${modDescription}"
-    inputs.property "modGroup", 				project.group
-    inputs.property "modPageUrl", 				"${modSourceUrl}"
-    inputs.property "modIssueUrl", 				"${modIssueUrl}"
-    inputs.property "modAuthor", 				"${modAuthor}"
-    inputs.property "minFabricVersion", 		"${minFabricVersion}"
-    inputs.property "minFabricApiVersion", 		"${minFabricApiVersion}"
-    inputs.property "minecraftVersion", 		"${minecraftVersion}"
-	inputs.property "minPuzzlesVersion", 		"${minPuzzlesVersion}"
-    inputs.property "resourcePackFormat",       "${resourcePackFormat}"
-    inputs.property "dataPackFormat", 			"${dataPackFormat}"
-	inputs.property "mainEntryPoint", 			"${project.group}.${rootProject.name}Fabric"
-	inputs.property "clientEntryPoint", 		"${project.group}.client.${rootProject.name}FabricClient"
-    inputs.property "modFabricEnvironment", 	"${modFabricEnvironment}"
+    inputs.property "modId", modId
+    inputs.property "modName", modName
+    inputs.property "modVersion", modVersion
+    inputs.property "modDescription", modDescription
+    inputs.property "modGroup", project.group
+    inputs.property "modPageUrl", modSourceUrl
+    inputs.property "modIssueUrl", modIssueUrl
+    inputs.property "modAuthor", modAuthor
+    inputs.property "modLicense", modLicense
+    inputs.property "minFabricVersion", libs.versions.minFabric.get()
+    inputs.property "minFabricApiVersion", libs.versions.minFabricApi.get()
+    inputs.property "minecraftVersion", libs.versions.minecraft.get()
+    inputs.property "minPuzzlesVersion", libs.versions.minPuzzles.get()
+    inputs.property "resourcePackFormat", libs.versions.resources.get()
+    inputs.property "dataPackFormat", libs.versions.data.get()
+    inputs.property "mainEntryPoint", "${project.group}.${rootProject.name}Fabric"
+    inputs.property "clientEntryPoint", "${project.group}.client.${rootProject.name}FabricClient"
+    inputs.property "modFabricEnvironment", modFabricEnvironment
 
     // replace stuff in fabric.mod.json
-    filesMatching ('fabric.mod.json') {
-        expand (
-                'modId':                	"${modId}",
-                'modName':              	"${modName}",
-                'modVersion':           	"${modVersion}",
-                'modDescription':       	"${modDescription}",
-                'modGroup':             	project.group,
-                'modPageUrl':           	"${modSourceUrl}",
-                'modIssueUrl':          	"${modIssueUrl}",
-                'modAuthor':            	"${modAuthor}",
-                'minFabricVersion':     	"${minFabricVersion}",
-                'minFabricApiVersion':  	"${minFabricApiVersion}",
-                'minecraftVersion':  	    "${minecraftVersion}",
-				"minPuzzlesVersion":    	"${minPuzzlesVersion}",
-				"mainEntryPoint": 			"${project.group}.${rootProject.name}Fabric",
-				"clientEntryPoint": 		"${project.group}.client.${rootProject.name}FabricClient",
-                "modFabricEnvironment":		"${modFabricEnvironment}"
+    filesMatching('fabric.mod.json') {
+        expand(
+                'modId': modId,
+                'modName': modName,
+                'modVersion': modVersion,
+                'modDescription': modDescription,
+                'modGroup': project.group,
+                'modPageUrl': modSourceUrl,
+                'modIssueUrl': modIssueUrl,
+                'modAuthor': modAuthor,
+                'modLicense': modLicense,
+                'minFabricVersion': libs.versions.minFabric.get(),
+                'minFabricApiVersion': libs.versions.minFabricApi.get(),
+                'minecraftVersion': libs.versions.minecraft.get(),
+                "minPuzzlesVersion": libs.versions.minPuzzles.get(),
+                "mainEntryPoint": "${project.group}.${rootProject.name}Fabric",
+                "clientEntryPoint": "${project.group}.client.${rootProject.name}FabricClient",
+                "modFabricEnvironment": modFabricEnvironment
         )
     }
 
     // replace stuff in pack.mcmeta
-    filesMatching ('pack.mcmeta') {
-        expand (
-                'modDescription':       "${modDescription}",
-                "resourcePackFormat":   "${resourcePackFormat}",
-                "dataPackFormat":       "${dataPackFormat}"
+    filesMatching('pack.mcmeta') {
+        expand(
+                'modDescription': modDescription,
+                "resourcePackFormat": libs.versions.resources.get(),
+                "dataPackFormat": libs.versions.data.get()
         )
     }
 }
@@ -165,7 +158,7 @@ javadoc {
 
 publishing {
     publications {
-        mavenJava (MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId = "${modId}-fabric"
             version = modVersion
             from components.java
@@ -184,8 +177,8 @@ publishing {
                 }
                 licenses {
                     license {
-                        name = 'MPL-2'
-                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                        name = "${modLicense}"
+                        url = "https://spdx.org/licenses/${modLicense}.html"
                     }
                 }
                 developers {
@@ -210,7 +203,9 @@ signing {
 }
 
 curseforge {
-    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
+    }
     apiKey = project.hasProperty('curseApiToken') ? project.findProperty('curseApiToken') : ''
     project {
         id = projectCurseId
@@ -222,11 +217,12 @@ curseforge {
             addGameVersion it.trim()
         }
         mainArtifact(remapJar) {
-            displayName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+            displayName = "[FABRIC] [${libs.versions.minecraft.get()}] ${rootProject.name}-v${modVersion}"
             relations {
                 requiredDependency 'fabric-api'
                 requiredDependency 'forge-config-api-port-fabric'
 //                requiredDependency 'puzzles-lib'
+//                embeddedLibrary 'cardinal-components'
             }
         }
 //        addArtifact sourcesJar
@@ -239,11 +235,13 @@ curseforge {
 }
 
 modrinth {
-    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
+    }
     token = project.hasProperty('modrinthApiToken') ? project.findProperty('modrinthApiToken') : ''
     projectId = projectModrinthId
     versionNumber = project.version
-    versionName = "[FABRIC] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+    versionName = "[FABRIC] [${libs.versions.minecraft.get()}] ${rootProject.name}-v${modVersion}"
     changelog = file('../CHANGELOG.md').text
     versionType = projectReleaseType
     uploadFile = remapJar // This is the java jar task
@@ -256,6 +254,7 @@ modrinth {
         required.project 'fabric-api'
         required.project 'forge-config-api-port'
 //        required.project 'puzzles-lib'
+//        embedded.project 'cardinal-components-api'
     }
 //	debugMode = true
 }

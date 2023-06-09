@@ -26,7 +26,7 @@ abstract class OcelotFabricMixin extends Animal {
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> callback) {
         if (FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(this, player).isInterrupt()) {
             this.spawnTrustingParticles(false);
-            this.level.broadcastEntityEvent(this, EntityEvent.TRUSTING_FAILED);
+            this.level().broadcastEntityEvent(this, EntityEvent.TRUSTING_FAILED);
             callback.setReturnValue(InteractionResult.CONSUME);
         }
     }

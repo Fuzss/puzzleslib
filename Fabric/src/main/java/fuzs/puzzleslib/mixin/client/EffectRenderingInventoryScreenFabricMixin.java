@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.mixin.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.event.v1.FabricScreenEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedBoolean;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -33,7 +33,7 @@ abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractConta
     }
 
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    private void renderEffects$0(PoseStack poseStack, int mouseX, int mouseY, CallbackInfo callback) {
+    private void renderEffects$0(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo callback) {
         int i = this.leftPos + this.imageWidth + 2;
         int j = this.width - i;
         Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();

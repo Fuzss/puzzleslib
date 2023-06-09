@@ -4,30 +4,28 @@ import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.CreativeModeTabContext;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-
 public record CreativeModeTabContextForgeImpl(
-        BiConsumer<ResourceLocation, Consumer<CreativeModeTab.Builder>> consumer) implements CreativeModeTabContext {
+        IEventBus modEventBus) implements CreativeModeTabContext {
 
     @Override
     public void registerCreativeModeTab(CreativeModeTabConfigurator configurator) {
         CreativeModeTabConfiguratorImpl configuratorImpl = (CreativeModeTabConfiguratorImpl) configurator;
-        this.consumer.accept(configuratorImpl.getIdentifier(), (CreativeModeTab.Builder builder) -> {
-            this.finalizeCreativeModeTabBuilder(builder, configuratorImpl);
-        });
+        DeferredRegister<CreativeModeTab> deferredRegister = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, configuratorImpl.getIdentifier().getNamespace());
+        deferredRegister.register(this.modEventBus);
+        CreativeModeTab.Builder builder = CreativeModeTab.builder();
+        this.finalizeCreativeModeTabBuilder(builder, configuratorImpl);
+        deferredRegister.register(configuratorImpl.getIdentifier().getPath(), builder::build);
     }
 
     private void finalizeCreativeModeTabBuilder(CreativeModeTab.Builder builder, CreativeModeTabConfiguratorImpl configuratorImpl) {
         configuratorImpl.configure(builder);
-        String translationKey = "itemGroup.%s.%s".formatted(configuratorImpl.getIdentifier().getNamespace(), configuratorImpl.getIdentifier().getPath());
-        builder.title(Component.translatable(translationKey));
         if (configuratorImpl.isHasSearchBar()) {
             builder.withSearchBar();
         }

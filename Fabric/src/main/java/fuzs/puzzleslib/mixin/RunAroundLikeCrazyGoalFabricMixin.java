@@ -26,7 +26,7 @@ public abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
             this.horse.modifyTemper(5);
             this.horse.ejectPassengers();
             this.horse.makeMad();
-            this.horse.level.broadcastEntityEvent(this.horse, EntityEvent.TAMING_FAILED);
+            this.horse.level().broadcastEntityEvent(this.horse, EntityEvent.TAMING_FAILED);
             callback.cancel();
         }
     }

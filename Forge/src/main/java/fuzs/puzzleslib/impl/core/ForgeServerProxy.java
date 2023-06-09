@@ -67,7 +67,7 @@ public class ForgeServerProxy implements ForgeProxy {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             Objects.requireNonNull(player, "player is null");
-            message.getHandler().handle(message, this.getGameServer(), player.connection, player, player.getLevel());
+            message.getHandler().handle(message, this.getGameServer(), player.connection, player, player.serverLevel());
         });
         context.setPacketHandled(true);
     }

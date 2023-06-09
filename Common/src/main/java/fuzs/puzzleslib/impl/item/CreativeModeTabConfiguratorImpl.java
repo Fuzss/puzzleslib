@@ -7,6 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.*;
@@ -82,6 +83,8 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     }
 
     public void configure(CreativeModeTab.Builder builder) {
+        String translationKey = "itemGroup.%s.%s".formatted(this.identifier.getNamespace(), this.identifier.getPath());
+        builder.title(Component.translatable(translationKey));
         if (this.icon != null) {
             builder.icon(this.icon);
         } else {

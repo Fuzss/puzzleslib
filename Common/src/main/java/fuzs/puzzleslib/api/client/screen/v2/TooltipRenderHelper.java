@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.*;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.GameRenderer;
@@ -16,7 +16,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import org.joml.Matrix4f;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
  * <p>Note that the implementation is directly copied from vanilla, all caveats apply. This is done to circumvent other mods that interfere with tooltip rendering (such as Adaptive Tooltips and ToolTipFix),
  * since they otherwise cause an implementation such as this one without a proper valid screen to fail or even crash.
  */
-public final class TooltipRenderHelper extends GuiComponent {
+public final class TooltipRenderHelper {
 
     private TooltipRenderHelper() {
 
@@ -88,68 +87,68 @@ public final class TooltipRenderHelper extends GuiComponent {
     /**
      * Renders a tooltip, accepts an item stack.
      *
-     * @param poseStack the pose stack
-     * @param posX      position on x-axis, would be mouse cursor x for vanilla
-     * @param posY      position on y-axis, would be mouse cursor y for vanilla
-     * @param itemStack the item stack to retrieve the tooltip from
+     * @param guiGraphics the gui graphics component
+     * @param posX        position on x-axis, would be mouse cursor x for vanilla
+     * @param posY        position on y-axis, would be mouse cursor y for vanilla
+     * @param itemStack   the item stack to retrieve the tooltip from
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, ItemStack itemStack) {
+    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, ItemStack itemStack) {
         Objects.requireNonNull(itemStack, "item stack is null");
-        renderTooltipInternal(poseStack, posX, posY, getTooltip(itemStack));
+        renderTooltipInternal(guiGraphics, posX, posY, getTooltip(itemStack));
     }
 
     /**
      * Renders a tooltip, accepts a single text component and a single image component.
      *
-     * @param poseStack      the pose stack
+     * @param guiGraphics    the gui graphics component
      * @param posX           position on x-axis, would be mouse cursor x for vanilla
      * @param posY           position on y-axis, would be mouse cursor y for vanilla
      * @param component      component to render in the tooltip
      * @param imageComponent image component to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, Component component, TooltipComponent imageComponent) {
+    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, Component component, TooltipComponent imageComponent) {
         Objects.requireNonNull(component, "component is null");
         Objects.requireNonNull(imageComponent, "image component is null");
-        renderTooltip(poseStack, posX, posY, List.of(component), imageComponent);
+        renderTooltip(guiGraphics, posX, posY, List.of(component), imageComponent);
     }
 
     /**
      * Renders a tooltip, accepts text components and a single image component, just like vanilla.
      *
-     * @param poseStack      the pose stack
+     * @param guiGraphics    the gui graphics component
      * @param posX           position on x-axis, would be mouse cursor x for vanilla
      * @param posY           position on y-axis, would be mouse cursor y for vanilla
      * @param components     components to render in the tooltip
      * @param imageComponent image component to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components, TooltipComponent imageComponent) {
+    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components, TooltipComponent imageComponent) {
         Objects.requireNonNull(imageComponent, "image component is null");
-        renderTooltip(poseStack, posX, posY, components, List.of(imageComponent));
+        renderTooltip(guiGraphics, posX, posY, components, List.of(imageComponent));
     }
 
     /**
      * Renders a tooltip, accepts text components and does not include any image components.
      *
-     * @param poseStack  the pose stack
-     * @param posX       position on x-axis, would be mouse cursor x for vanilla
-     * @param posY       position on y-axis, would be mouse cursor y for vanilla
-     * @param components components to render in the tooltip
+     * @param guiGraphics the gui graphics component
+     * @param posX        position on x-axis, would be mouse cursor x for vanilla
+     * @param posY        position on y-axis, would be mouse cursor y for vanilla
+     * @param components  components to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components) {
-        renderTooltip(poseStack, posX, posY, components, List.of());
+    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components) {
+        renderTooltip(guiGraphics, posX, posY, components, List.of());
     }
 
     /**
      * Renders a tooltip, accepts text components and multiple image components.
      *
-     * @param poseStack       the pose stack
+     * @param guiGraphics     the gui graphics component
      * @param posX            position on x-axis, would be mouse cursor x for vanilla
      * @param posY            position on y-axis, would be mouse cursor y for vanilla
      * @param components      components to render in the tooltip
      * @param imageComponents image components to render in the tooltip
      */
-    public static void renderTooltip(PoseStack poseStack, int posX, int posY, List<Component> components, List<TooltipComponent> imageComponents) {
-        renderTooltipInternal(poseStack, posX, posY, createClientComponents(components, imageComponents));
+    public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components, List<TooltipComponent> imageComponents) {
+        renderTooltipInternal(guiGraphics, posX, posY, createClientComponents(components, imageComponents));
     }
 
     /**
@@ -188,12 +187,12 @@ public final class TooltipRenderHelper extends GuiComponent {
      * <p>Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
      * <p>Also the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning to avoid running offscreen are made.
      *
-     * @param poseStack  the pose stack
-     * @param posX       position on x-axis, would be mouse cursor x for vanilla
-     * @param posY       position on y-axis, would be mouse cursor y for vanilla
-     * @param components components to render in the tooltip
+     * @param guiGraphics the gui graphics component
+     * @param posX        position on x-axis, would be mouse cursor x for vanilla
+     * @param posY        position on y-axis, would be mouse cursor y for vanilla
+     * @param components  components to render in the tooltip
      */
-    public static void renderTooltipInternal(PoseStack poseStack, int posX, int posY, List<ClientTooltipComponent> components) {
+    public static void renderTooltipInternal(GuiGraphics guiGraphics, int posX, int posY, List<ClientTooltipComponent> components) {
 
         if (components.isEmpty()) return;
 
@@ -212,26 +211,25 @@ public final class TooltipRenderHelper extends GuiComponent {
 
         int l = posX + 12;
         int m = posY - 12;
-        poseStack.pushPose();
+        guiGraphics.pose().pushPose();
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferBuilder = tesselator.getBuilder();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        Matrix4f matrix4f = poseStack.last().pose();
-        TooltipRenderUtil.renderTooltipBackground(GuiComponent::fillGradient, matrix4f, bufferBuilder, l, m, i, j, 400);
+        TooltipRenderUtil.renderTooltipBackground(guiGraphics, l, m, i, j, 400);
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         BufferUploader.drawWithShader(bufferBuilder.end());
         MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-        poseStack.translate(0.0F, 0.0F, 400.0F);
+        guiGraphics.pose().translate(0.0F, 0.0F, 400.0F);
         int p = m;
 
         int q;
         ClientTooltipComponent clientTooltipComponent2;
         for (q = 0; q < components.size(); ++q) {
             clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderText(font, l, p, matrix4f, bufferSource);
+            clientTooltipComponent2.renderText(font, l, p, guiGraphics.pose().last().pose(), bufferSource);
             p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
         }
 
@@ -241,10 +239,10 @@ public final class TooltipRenderHelper extends GuiComponent {
         ItemRenderer itemRenderer = minecraft.getItemRenderer();
         for (q = 0; q < components.size(); ++q) {
             clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderImage(font, l, p, poseStack, itemRenderer);
+            clientTooltipComponent2.renderImage(font, l, p, guiGraphics);
             p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
         }
 
-        poseStack.popPose();
+        guiGraphics.pose().popPose();
     }
 }

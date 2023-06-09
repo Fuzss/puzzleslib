@@ -7,7 +7,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
@@ -31,11 +30,6 @@ public final class FabricScreenHelper implements ScreenHelper {
     @Override
     public Font getFont(Screen screen) {
         return Screens.getTextRenderer(screen);
-    }
-
-    @Override
-    public ItemRenderer getItemRenderer(Screen screen) {
-        return Screens.getItemRenderer(screen);
     }
 
     @Override

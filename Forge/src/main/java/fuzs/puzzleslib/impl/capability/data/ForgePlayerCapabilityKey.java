@@ -80,7 +80,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
         evt.getOriginal().reviveCaps();
         this.maybeGet(evt.getOriginal()).ifPresent(oldCapability -> {
             this.maybeGet(evt.getEntity()).ifPresent(newCapability -> {
-                respawnStrategy.copy(oldCapability, newCapability, !evt.isWasDeath(), evt.getEntity().level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY));
+                respawnStrategy.copy(oldCapability, newCapability, !evt.isWasDeath(), evt.getEntity().level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY));
             });
         });
         evt.getOriginal().invalidateCaps();

@@ -53,8 +53,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -115,17 +115,17 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return callback::onRegisterCommands;
         });
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, callback -> {
-            return (ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
+            return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
                 // keep this the same as Forge where editing data pack specified loot tables is not supported
                 if (source == LootTableSource.DATA_PACK) return null;
                 DefaultedValue<LootTable> lootTable = DefaultedValue.fromValue(original);
-                callback.onReplaceLootTable(lootManager, id, lootTable);
+                callback.onReplaceLootTable(id, lootTable);
                 // returning null will prompt no change
                 return lootTable.getAsOptional().orElse(null);
             };
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, callback -> {
-            return (ResourceManager resourceManager, LootTables lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
+            return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
                 // keep this the same as Forge where editing data pack specified loot tables is not supported
                 if (source == LootTableSource.DATA_PACK) return;
                 callback.onModifyLootTable(lootManager, id, tableBuilder::pool, index -> {

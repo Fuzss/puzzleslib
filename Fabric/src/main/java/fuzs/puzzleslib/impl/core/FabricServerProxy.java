@@ -91,7 +91,7 @@ public class FabricServerProxy implements FabricProxy {
     public <T extends Record & ServerboundMessage<T>> void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
         ServerPlayNetworking.registerGlobalReceiver(channelName, (MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) -> {
             T message = factory.apply(buf);
-            server.execute(() -> message.getHandler().handle(message, server, handler, player, player.getLevel()));
+            server.execute(() -> message.getHandler().handle(message, server, handler, player, player.serverLevel()));
         });
     }
 }

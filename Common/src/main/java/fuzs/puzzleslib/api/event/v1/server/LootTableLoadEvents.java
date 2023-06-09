@@ -3,9 +3,9 @@ package fuzs.puzzleslib.api.event.v1.server;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
 
 import java.util.function.Consumer;
 import java.util.function.IntPredicate;
@@ -26,11 +26,10 @@ public final class LootTableLoadEvents {
          * <p>To remove a loot table completely pass {@link LootTable#EMPTY} to <code>lootTable</code>.
          * <p>The event does <b>NOT</b> fire for data pack-provided loot tables.
          *
-         * @param lootManager access to all loot tables
          * @param identifier  the loot table id
          * @param table       the loot table that can be replaced
          */
-        void onReplaceLootTable(LootTables lootManager, ResourceLocation identifier, MutableValue<LootTable> table);
+        void onReplaceLootTable(ResourceLocation identifier, MutableValue<LootTable> table);
     }
 
     @FunctionalInterface
@@ -46,6 +45,6 @@ public final class LootTableLoadEvents {
          * @param removePool  removes a pool at a given index, pools are indexed starting from 0;
          *                    returns if removing the pool was successful, which is the case when a pool at <code>index</code> has been found
          */
-        void onModifyLootTable(LootTables lootManager, ResourceLocation identifier, Consumer<LootPool> addPool, IntPredicate removePool);
+        void onModifyLootTable(LootDataManager lootManager, ResourceLocation identifier, Consumer<LootPool> addPool, IntPredicate removePool);
     }
 }

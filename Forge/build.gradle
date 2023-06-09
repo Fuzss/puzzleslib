@@ -1,34 +1,19 @@
-buildscript {
-    repositories {
-        mavenCentral()
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
-        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
-    }
-}
-
 plugins {
-    id 'me.hypherionmc.cursegradle' version '2.+'
-    // cannot apply this in the base build.gradle as it'll be the same for all subprojects, only one configuration will work
-    id 'com.modrinth.minotaur' version '2.+'
+    id 'net.minecraftforge.gradle' version '6.0.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
 }
 
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'eclipse'
-apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'me.hypherionmc.cursegradle'
+apply plugin: 'com.modrinth.minotaur'
 
 archivesBaseName = rootProject.name
-version = "v${modVersion}-${minecraftVersion}-Forge"
+version = "v${modVersion}-${libs.versions.minecraft.get()}-Forge"
 group = modMavenGroup
 
 minecraft {
 //    mappings channel: 'parchment', version: "${parchmentMappingsVersion}-${parchmentMinecraftVersion}"
-    mappings channel: 'official', version: "${minecraftVersion}"
+    mappings channel: 'official', version: "${libs.versions.minecraft.get()}"
 
     runs {
         client {
@@ -112,16 +97,16 @@ dependencies {
     }
 
     // Minecraft
-    minecraft "net.minecraftforge:forge:${forgeVersion}"
+    minecraft "net.minecraftforge:forge:${libs.versions.forge.get()}"
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Quality of Life Mods
-    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:6.0.0")
-    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4496718")
-    runtimeOnly fg.deobf("curse.maven:configured-457570:4462894")
+    runtimeOnly fg.deobf("fuzs.bettermodsbutton:bettermodsbutton-forge:${libs.versions.bettermodsbutton.get()}")
+//    runtimeOnly fg.deobf("curse.maven:catalogue-459701:4496718")
+//    runtimeOnly fg.deobf("curse.maven:configured-457570:4462894")
 
     // Puzzles Lib
-//    api fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${puzzlesVersion}")
+//    api fg.deobf("fuzs.puzzleslib:puzzleslib-forge:${libs.versions.puzzles.get()}")
 }
 
 mixin {
@@ -145,49 +130,51 @@ processResources {
     duplicatesStrategy DuplicatesStrategy.INCLUDE
 
     // this will ensure that this task is redone when a value changes
-    inputs.property "modId",                    "${modId}"
-    inputs.property "modName",                  "${modName}"
-    inputs.property "modVersion",               "${modVersion}"
-    inputs.property "modDescription",           "${modDescription}"
-    inputs.property "modGroup",                 project.group
-    inputs.property "modPageUrl",               "${modSourceUrl}"
-    inputs.property "modUpdateUrl",             "${modUpdateUrl}"
-    inputs.property "modIssueUrl",              "${modIssueUrl}"
-    inputs.property "modAuthor",                "${modAuthor}"
-    inputs.property "minFMLVersion",            "${minForgeVersion}".replaceAll("\\..*", "")
-    inputs.property "minForgeVersion",          "${minForgeVersion}"
-    inputs.property "minecraftVersion",         "${minecraftVersion}"
-    inputs.property "minPuzzlesVersion",        "${minPuzzlesVersion}"
-    inputs.property "resourcePackFormat",       "${resourcePackFormat}"
-    inputs.property "dataPackFormat", 			"${dataPackFormat}"
-    inputs.property "modForgeDisplayTest",      "${modForgeDisplayTest}"
+    inputs.property "modId", modId
+    inputs.property "modName", modName
+    inputs.property "modVersion", modVersion
+    inputs.property "modDescription", modDescription
+    inputs.property "modGroup", project.group
+    inputs.property "modPageUrl", modSourceUrl
+    inputs.property "modUpdateUrl", modUpdateUrl
+    inputs.property "modIssueUrl", modIssueUrl
+    inputs.property "modAuthor", modAuthor
+    inputs.property "modLicense", modLicense
+    inputs.property "minFMLVersion", libs.versions.minForge.get().replaceAll("\\..*", "")
+    inputs.property "minForgeVersion", libs.versions.minForge.get()
+    inputs.property "minecraftVersion", libs.versions.minecraft.get()
+    inputs.property "minPuzzlesVersion", libs.versions.minPuzzles.get()
+    inputs.property "resourcePackFormat", libs.versions.resources.get()
+    inputs.property "dataPackFormat", libs.versions.data.get()
+    inputs.property "modForgeDisplayTest", modForgeDisplayTest
 
     // replace stuff in mods.toml
-    filesMatching ('META-INF/mods.toml') {
-        expand (
-                'modId':                "${modId}",
-                'modName':              "${modName}",
-                'modVersion':           "${modVersion}",
-                'modDescription':       "${modDescription}",
-                'modGroup':             project.group,
-                'modPageUrl':           "${modSourceUrl}",
-                'modUpdateUrl':         "${modUpdateUrl}",
-                'modIssueUrl':          "${modIssueUrl}",
-                'modAuthor':            "${modAuthor}",
-                'minFMLVersion':        "${minForgeVersion}".replaceAll("\\..*", ""),
-                'minForgeVersion':      "${minForgeVersion}",
-                'minecraftVersion':     "${minecraftVersion}",
-                'minPuzzlesVersion':    "${minPuzzlesVersion}",
-                'modForgeDisplayTest':  "${modForgeDisplayTest}"
+    filesMatching('META-INF/mods.toml') {
+        expand(
+                'modId': modId,
+                'modName': modName,
+                'modVersion': modVersion,
+                'modDescription': modDescription,
+                'modGroup': project.group,
+                'modPageUrl': modSourceUrl,
+                'modUpdateUrl': modUpdateUrl,
+                'modIssueUrl': modIssueUrl,
+                'modAuthor': modAuthor,
+                'modLicense': modLicense,
+                'minFMLVersion': libs.versions.minForge.get().replaceAll("\\..*", ""),
+                'minForgeVersion': libs.versions.minForge.get(),
+                'minecraftVersion': libs.versions.minecraft.get(),
+                'minPuzzlesVersion': libs.versions.minPuzzles.get(),
+                'modForgeDisplayTest': modForgeDisplayTest
         )
     }
 
     // replace stuff in pack.mcmeta
-    filesMatching ('pack.mcmeta') {
-        expand (
-                'modDescription':       "${modDescription}",
-                "resourcePackFormat":   "${resourcePackFormat}",
-                "dataPackFormat":       "${dataPackFormat}"
+    filesMatching('pack.mcmeta') {
+        expand(
+                'modDescription': modDescription,
+                "resourcePackFormat": libs.versions.resources.get(),
+                "dataPackFormat": libs.versions.data.get()
         )
     }
 }
@@ -210,7 +197,7 @@ jar.finalizedBy('reobfJar')
 
 publishing {
     publications {
-        mavenJava (MavenPublication) {
+        mavenJava(MavenPublication) {
             artifactId = "${modId}-forge"
             version = modVersion
             from components.java
@@ -231,8 +218,8 @@ publishing {
                 }
                 licenses {
                     license {
-                        name = 'MPL-2'
-                        url = 'https://www.mozilla.org/en-US/MPL/2.0/'
+                        name = "${modLicense}"
+                        url = "https://spdx.org/licenses/${modLicense}.html"
                     }
                 }
                 developers {
@@ -281,7 +268,9 @@ jar.finalizedBy 'signJar'
 signJar.mustRunAfter 'reobfJar'
 
 curseforge {
-    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
+    }
     apiKey = project.hasProperty('curseApiToken') ? project.findProperty('curseApiToken') : ''
     project {
         id = projectCurseId
@@ -293,10 +282,10 @@ curseforge {
             addGameVersion it.trim()
         }
         mainArtifact(jar) {
-            displayName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
-//            relations {
+            displayName = "[FORGE] [${libs.versions.minecraft.get()}] ${rootProject.name}-v${modVersion}"
+            relations {
 //                requiredDependency 'puzzles-lib'
-//            }
+            }
         }
 //        addArtifact sourcesJar
     }
@@ -308,11 +297,13 @@ curseforge {
 }
 
 modrinth {
-    if (!file('../CHANGELOG.md').canRead()) { throw new FileNotFoundException("Could not read changelog file") }
+    if (!file('../CHANGELOG.md').canRead()) {
+        throw new FileNotFoundException("Could not read changelog file")
+    }
     token = project.hasProperty('modrinthApiToken') ? project.findProperty('modrinthApiToken') : ''
     projectId = projectModrinthId
     versionNumber = project.version
-    versionName = "[FORGE] [${minecraftVersion}] ${rootProject.name}-v${modVersion}"
+    versionName = "[FORGE] [${libs.versions.minecraft.get()}] ${rootProject.name}-v${modVersion}"
     changelog = file('../CHANGELOG.md').text
     versionType = projectReleaseType
     uploadFile = jar // This is the java jar task
@@ -321,13 +312,16 @@ modrinth {
     }
     loaders.add 'forge'
 //    additionalFiles.add file("${project.buildDir}/libs/${project.archivesBaseName}-${project.version}-sources.jar")
-//    dependencies {
+    dependencies {
 //        required.project 'puzzles-lib'
-//    }
+    }
 //	debugMode = true
 }
 
-import groovy.json.*
+
+import groovy.json.JsonBuilder
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
 
 task copyJarToDir(type: Copy) {
     onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
@@ -359,13 +353,15 @@ task refreshUpdateJson {
             def builder = new JsonBuilder()
             updateJson = builder {
                 homepage "${modSourceUrl}"
-                promos { "${projectGameVersions}".replaceAll(" ", "").split(",").each { version ->
-                    "${version}-latest" "${modVersion}"
-                    // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
-                    if ("${modVersion}".matches("[^a-zA-Z]+")) {
-                        "${version}-recommended" "${modVersion}"
+                promos {
+                    "${projectGameVersions}".replaceAll(" ", "").split(",").each { version ->
+                        "${version}-latest" "${modVersion}"
+                        // alpha and beta releases will contain 'a' or 'b' char respectively, don't update recommended for those
+                        if ("${modVersion}".matches("[^a-zA-Z]+")) {
+                            "${version}-recommended" "${modVersion}"
+                        }
                     }
-                } }
+                }
             }
         }
         def output = new JsonOutput()
@@ -374,4 +370,4 @@ task refreshUpdateJson {
 }
 
 build.finalizedBy project.tasks.copyJarToDir, rootProject.tasks.incrementBuildNumber
-[tasks.modrinth, tasks.curseforge].each {it.finalizedBy project.tasks.refreshUpdateJson}
+[tasks.modrinth, tasks.curseforge].each { it.finalizedBy project.tasks.refreshUpdateJson }

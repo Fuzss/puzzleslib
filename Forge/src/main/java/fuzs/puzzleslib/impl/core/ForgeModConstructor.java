@@ -13,7 +13,6 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
@@ -32,14 +31,15 @@ public final class ForgeModConstructor {
     public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
             Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
-            registerContent(modId, modEventBus, biomeModifications, contentRegistrations);
+            registerContent(constructor, modId, modEventBus, biomeModifications, contentRegistrations);
             registerModHandlers(constructor, modEventBus, biomeModifications, contentRegistrations);
             registerHandlers(constructor);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerContent(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
+        constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl(modEventBus));
         if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             BiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
@@ -65,9 +65,6 @@ public final class ForgeModConstructor {
         });
         eventBus.addListener((final EntityAttributeModificationEvent evt) -> {
             constructor.onEntityAttributeModification(new EntityAttributesModifyContextForgeImpl(evt::add));
-        });
-        eventBus.addListener((final CreativeModeTabEvent.Register evt) -> {
-            constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl(evt::registerCreativeModeTab));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.SERVER_DATA) {

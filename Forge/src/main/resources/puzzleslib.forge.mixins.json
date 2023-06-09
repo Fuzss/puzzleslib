@@ -5,10 +5,12 @@
   "package": "fuzs.puzzleslib.mixin",
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
+    "LootDataManagerMixin",
     "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
     "accessor.BooleanValueForgeAccessor",
     "accessor.FireBlockForgeAccessor",
     "accessor.IntegerValueForgeAccessor",
+    "accessor.LootTableAccessor",
     "accessor.MobSpawnSettingsBuilderForgeAccessor",
     "accessor.PotionBrewingForgeAccessor"
   ],

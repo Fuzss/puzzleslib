@@ -147,7 +147,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         Collection<ItemEntity> capturedDrops = ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(null);
         if (capturedDrops != null) {
             EventResult result = FabricLivingEvents.LIVING_DROPS.invoker().onLivingDrops(LivingEntity.class.cast(this), damageSource, capturedDrops, this.puzzleslib$lootingLevel, this.lastHurtByPlayerTime > 0);
-            if (result.isPass()) capturedDrops.forEach(itemEntity -> this.level.addFreshEntity(itemEntity));
+            if (result.isPass()) capturedDrops.forEach(itemEntity -> this.level().addFreshEntity(itemEntity));
         } else {
             PuzzlesLib.LOGGER.warn("Unable to invoke LivingDropsCallback for entity {}: Drops is null", this.getName().getString());
         }
@@ -161,7 +161,7 @@ abstract class LivingEntityFabricMixin extends Entity {
             callback.cancel();
         } else {
             experienceReward.getAsOptionalInt().ifPresent(value -> {
-                ExperienceOrb.award((ServerLevel) this.level, this.position(), value);
+                ExperienceOrb.award((ServerLevel) this.level(), this.position(), value);
                 callback.cancel();
             });
         }

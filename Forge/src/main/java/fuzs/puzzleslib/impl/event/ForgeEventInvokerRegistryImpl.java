@@ -100,7 +100,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityEvent.class, (PlayerInteractEvents.AttackEntity callback, AttackEntityEvent evt) -> {
-            if (callback.onAttackEntity(evt.getEntity(), evt.getEntity().level, InteractionHand.MAIN_HAND, evt.getTarget()).isInterrupt()) {
+            if (callback.onAttackEntity(evt.getEntity(), evt.getEntity().level(), InteractionHand.MAIN_HAND, evt.getTarget()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -151,15 +151,10 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableLoadEvent.class, (LootTableLoadEvents.Replace callback, LootTableLoadEvent evt) -> {
             MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
-            callback.onReplaceLootTable(evt.getLootTableManager(), evt.getName(), table);
+            callback.onReplaceLootTable(evt.getName(), table);
         });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
-            callback.onModifyLootTable(evt.getLootTableManager(), evt.getName(), evt.getTable()::addPool, (int index) -> {
-                if (index == 0 && evt.getTable().removePool("main") != null) {
-                    return true;
-                }
-                return evt.getTable().removePool("pool" + index) != null;
-            });
+        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableModifyEvent.class, (LootTableLoadEvents.Modify callback, LootTableModifyEvent evt) -> {
+            callback.onModifyLootTable(evt.getLootDataManager(), evt.getIdentifier(), evt::addPool, evt::removePool);
         });
         INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
             MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);

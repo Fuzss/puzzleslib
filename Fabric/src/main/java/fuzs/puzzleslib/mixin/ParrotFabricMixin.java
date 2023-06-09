@@ -24,7 +24,7 @@ abstract class ParrotFabricMixin extends ShoulderRidingEntity {
     @Inject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Parrot;tame(Lnet/minecraft/world/entity/player/Player;)V", shift = At.Shift.BEFORE), cancellable = true)
     public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> callback) {
         if (FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(this, player).isInterrupt()) {
-            this.level.broadcastEntityEvent(this, EntityEvent.TAMING_FAILED);
+            this.level().broadcastEntityEvent(this, EntityEvent.TAMING_FAILED);
             callback.setReturnValue(InteractionResult.CONSUME);
         }
     }
