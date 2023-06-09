@@ -180,7 +180,7 @@ public final class FabricClientEventInvokers {
                             }
                         }
                     } else {
-                        if (!player.isUsingItem() && client.hitResult.getType() != HitResult.Type.BLOCK) {
+                        if (!player.isUsingItem() && client.hitResult.getType() == HitResult.Type.BLOCK) {
                             if (!client.level.isEmptyBlock(((BlockHitResult) client.hitResult).getBlockPos())) {
                                 return callback.onAttackInteraction(client, player).isInterrupt();
                             }
