@@ -18,7 +18,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.event.*;
-import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -102,10 +101,7 @@ public final class ForgeClientModConstructor {
             constructor.onRegisterItemColorProviders(new ItemColorProvidersContextForgeImpl(evt::register, evt.getItemColors()));
         });
         eventBus.addListener((final BuildCreativeModeTabContentsEvent evt) -> {
-            ResourceLocation identifier = CreativeModeTabRegistry.getName(evt.getTab());
-            if (identifier != null) {
-                constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl(identifier, evt.getParameters(), evt));
-            }
+            constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl(evt.getTabKey(), evt.getParameters(), evt));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.CLIENT_RESOURCES) {

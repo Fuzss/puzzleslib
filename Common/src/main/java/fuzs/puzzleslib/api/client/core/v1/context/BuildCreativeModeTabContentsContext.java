@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 
@@ -15,7 +17,8 @@ public interface BuildCreativeModeTabContentsContext {
      * @param itemsGenerator context for adding items to the creative mode tab
      */
     default void registerBuildListener(String modId, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
-        this.registerBuildListener(new ResourceLocation(modId, "main"), itemsGenerator);
+        ResourceLocation identifier = new ResourceLocation(modId, "main");
+        this.registerBuildListener(identifier, itemsGenerator);
     }
 
     /**
@@ -24,13 +27,16 @@ public interface BuildCreativeModeTabContentsContext {
      * @param identifier     the creative mode tab to add items to
      * @param itemsGenerator context for adding items to the creative mode tab
      */
-    void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator itemsGenerator);
+    default void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
+        ResourceKey<CreativeModeTab> resourceKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, identifier);
+        this.registerBuildListener(resourceKey, itemsGenerator);
+    }
 
     /**
      * Add items to a creative tab referenced by instance.
      *
-     * @param tab            the creative mode tab to add items to
+     * @param resourceKey    the creative mode tab to add items to
      * @param itemsGenerator context for adding items to the creative mode tab
      */
-    void registerBuildListener(CreativeModeTab tab, CreativeModeTab.DisplayItemsGenerator itemsGenerator);
+    void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator itemsGenerator);
 }

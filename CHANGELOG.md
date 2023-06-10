@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.2-1.20] - 2023-06-10
+- Bump version
+
+## [v7.0.1-1.20] - 2023-06-10
+### Changed
+- Minor improvements to helper methods for adding contents to creative tabs
+- Made `ResourceKey`s in `CreativeModeTabs` accessible in common once again
+
 ## [v7.0.0-1.20] - 2023-06-09
 - Ported to Minecraft 1.20
 
