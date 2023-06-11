@@ -2,12 +2,12 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -54,7 +54,7 @@ public final class FabricAbstractions implements CommonAbstractions {
 
     @Override
     public float getEnchantPowerBonus(BlockState state, Level level, BlockPos pos) {
-        return state.is(ConventionalBlockTags.BOOKSHELVES) ? 1.0F : 0.0F;
+        return state.is(BlockTags.ENCHANTMENT_POWER_PROVIDER) ? 1.0F : 0.0F;
     }
 
     @Override
