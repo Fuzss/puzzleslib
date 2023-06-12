@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.3-1.20] - 2023-06-12
+### Fixed
+- Fixed arrow entity related crash on Fabric
+- Fixed wrong parameter being passed for camera event on Forge
+
 ## [v7.0.2-1.20] - 2023-06-10
 - Bump version
 
