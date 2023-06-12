@@ -130,7 +130,7 @@ public class PuzzlesUtil {
      * @return loaded service
      */
     public static <T> T loadServiceProvider(Class<T> clazz) {
-        return ServiceLoader.load(clazz)
+        return ServiceLoader.load(clazz, PuzzlesUtil.class.getClassLoader())
                 .findFirst()
                 .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
     }

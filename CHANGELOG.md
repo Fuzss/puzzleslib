@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.4.1-1.19.2] - 2023-06-12
+### Fixed
+- Fixed a class loading issue related to loading service provider interfaces
+
 ## [v4.4.0-1.19.2] - 2023-04-20
 - Public release for all new features added since v4.3.12
 
