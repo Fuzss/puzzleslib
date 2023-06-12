@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v6.0.11-1.19.4] - 2023-06-12
+### Fixed
+- Fixed arrow entity related crash on Fabric
+- Fixed wrong parameter being passed for camera event on Forge
+
 ## [v6.0.10-1.19.4] - 2023-06-06
 ### Added
 - Added many new events, including `ProjectileImpactCallback`, `LivingKnockBackCallback` and `ItemAttributeModifiersCallback`

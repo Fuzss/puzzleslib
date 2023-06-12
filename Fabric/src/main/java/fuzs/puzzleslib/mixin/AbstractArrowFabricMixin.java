@@ -7,7 +7,9 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -23,8 +25,8 @@ abstract class AbstractArrowFabricMixin extends Projectile {
     }
 
     @ModifyVariable(method = "tick", at = @At(value = "LOAD", ordinal = 0), ordinal = 0, slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;canHarmPlayer(Lnet/minecraft/world/entity/player/Player;)Z")))
-    public HitResult tick$0(HitResult hitResult) {
-        if (hitResult.getType() == HitResult.Type.MISS) return hitResult;
+    public HitResult tick$0(@Nullable HitResult hitResult) {
+        if (this.isNoPhysics() || hitResult == null || hitResult.getType() == HitResult.Type.MISS) return hitResult;
         if (FabricEntityEvents.PROJECTILE_IMPACT.invoker().onProjectileImpact(this, hitResult).isInterrupt()) {
             this.puzzleslib$interruptHitEntity = true;
             // null is desired here as the implementation doesn't check for HitResult$Type#MISS as most others
@@ -35,6 +37,9 @@ abstract class AbstractArrowFabricMixin extends Projectile {
             return hitResult;
         }
     }
+
+    @Shadow
+    public abstract boolean isNoPhysics();
 
     @ModifyVariable(method = "tick", at = @At(value = "LOAD", ordinal = 0), ordinal = 0, slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;canHarmPlayer(Lnet/minecraft/world/entity/player/Player;)Z")))
     public EntityHitResult tick$1(EntityHitResult hitResult) {
