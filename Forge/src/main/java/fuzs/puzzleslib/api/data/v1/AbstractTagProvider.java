@@ -3,10 +3,7 @@ package fuzs.puzzleslib.api.data.v1;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.EntityTypeTagsProvider;
-import net.minecraft.data.tags.GameEventTagsProvider;
-import net.minecraft.data.tags.ItemTagsProvider;
-import net.minecraft.data.tags.TagsProvider;
+import net.minecraft.data.tags.*;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
@@ -14,6 +11,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -79,10 +77,20 @@ public final class AbstractTagProvider {
         protected abstract void addTags(HolderLookup.Provider provider);
     }
 
-    public abstract static class Enchantments extends TagsProvider<Enchantment> {
+    public abstract static class Enchantments extends IntrinsicHolderTagsProvider<Enchantment> {
 
         public Enchantments(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            super(packOutput, Registries.ENCHANTMENT, lookupProvider, modId, fileHelper);
+            super(packOutput, Registries.ENCHANTMENT, lookupProvider, enchantment -> ForgeRegistries.ENCHANTMENTS.getResourceKey(enchantment).orElseThrow(), modId, fileHelper);
+        }
+
+        @Override
+        protected abstract void addTags(HolderLookup.Provider provider);
+    }
+
+    public abstract static class Fluids extends FluidTagsProvider {
+
+        public Fluids(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, lookupProvider, modId, fileHelper);
         }
 
         @Override

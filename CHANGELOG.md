@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.4-1.20] - 2023-06-14
+### Added
+- Added `ClientLevelEvents`
+- Added `ToolTypeHelper`
+- Added helper methods for dealing with enchantment tags
+
 ## [v7.0.3-1.20] - 2023-06-12
 ### Fixed
 - Fixed arrow entity related crash on Fabric
