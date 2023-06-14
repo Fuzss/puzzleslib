@@ -337,8 +337,23 @@ public interface RegistryManager {
      * @param path        path for new tag key
      * @param <T>         registry type
      * @return new tag key
+     *
+     * @deprecated renamed to {@link #registerTag(ResourceKey, String)}
      */
+    @Deprecated(forRemoval = true)
     default <T> TagKey<T> createTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return this.registerTag(registryKey, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for any type of registry from a given path.
+     *
+     * @param registryKey key for registry to create key from
+     * @param path        path for new tag key
+     * @param <T>         registry type
+     * @return new tag key
+     */
+    default <T> TagKey<T> registerTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
         return TagKey.create(registryKey, this.makeKey(path));
     }
 
@@ -362,7 +377,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Block> registerBlockTag(String path) {
-        return this.createTag(Registries.BLOCK, path);
+        return this.registerTag(Registries.BLOCK, path);
     }
 
     /**
@@ -372,7 +387,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Item> registerItemTag(String path) {
-        return this.createTag(Registries.ITEM, path);
+        return this.registerTag(Registries.ITEM, path);
     }
 
     /**
@@ -395,7 +410,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<EntityType<?>> registerEntityTypeTag(String path) {
-        return this.createTag(Registries.ENTITY_TYPE, path);
+        return this.registerTag(Registries.ENTITY_TYPE, path);
     }
 
     /**
@@ -405,7 +420,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<GameEvent> registerGameEventTag(String path) {
-        return this.createTag(Registries.GAME_EVENT, path);
+        return this.registerTag(Registries.GAME_EVENT, path);
     }
 
     /**
@@ -415,7 +430,17 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<DamageType> registerDamageTypeTag(String path) {
-        return this.createTag(Registries.DAMAGE_TYPE, path);
+        return this.registerTag(Registries.DAMAGE_TYPE, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for enchantments.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<Enchantment> registerEnchantmentTag(String path) {
+        return this.registerTag(Registries.ENCHANTMENT, path);
     }
 
     /**

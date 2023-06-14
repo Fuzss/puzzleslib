@@ -10,6 +10,7 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -72,6 +73,16 @@ public final class AbstractTagProvider {
 
         public DamageTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
             super(packOutput, Registries.DAMAGE_TYPE, lookupProvider, modId, fileHelper);
+        }
+
+        @Override
+        protected abstract void addTags(HolderLookup.Provider provider);
+    }
+
+    public abstract static class Enchantments extends TagsProvider<Enchantment> {
+
+        public Enchantments(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            super(packOutput, Registries.ENCHANTMENT, lookupProvider, modId, fileHelper);
         }
 
         @Override
