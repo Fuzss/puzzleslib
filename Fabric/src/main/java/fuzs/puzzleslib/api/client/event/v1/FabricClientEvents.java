@@ -83,6 +83,14 @@ public final class FabricClientEvents {
      * Called when the local player is replaced from respawning.
      */
     public static final Event<ClientPlayerEvents.Copy> PLAYER_COPY = FabricEventFactory.create(ClientPlayerEvents.Copy.class);
+    /**
+     * Fires before a client level is loaded.
+     */
+    public static final Event<ClientLevelEvents.Load> LOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Load.class);
+    /**
+     * Fires before a client level is unloaded.
+     */
+    public static final Event<ClientLevelEvents.Unload> UNLOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Unload.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

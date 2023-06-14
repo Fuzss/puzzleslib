@@ -14,6 +14,7 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Objects;
@@ -235,6 +236,14 @@ public final class ForgeClientEventInvokers {
                 evt.setSwingHand(false);
                 evt.setCanceled(true);
             }
+        });
+        INSTANCE.register(ClientLevelEvents.Load.class, LevelEvent.Load.class, (ClientLevelEvents.Load callback, LevelEvent.Load evt) -> {
+            if (!(evt.getLevel() instanceof ClientLevel level)) return;
+            callback.onLevelLoad(Minecraft.getInstance(), level);
+        });
+        INSTANCE.register(ClientLevelEvents.Unload.class, LevelEvent.Unload.class, (ClientLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
+            if (!(evt.getLevel() instanceof ClientLevel level)) return;
+            callback.onLevelUnload(Minecraft.getInstance(), level);
         });
     }
 
