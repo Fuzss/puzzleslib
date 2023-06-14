@@ -36,15 +36,16 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
     private List<Runnable> configValueCallbacks = Lists.newArrayList();
     private boolean available;
 
-    protected ConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> config) {
+    protected ConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> supplier) {
         this.configType = configType;
-        this.config = config.get();
-        this.defaultConfigSupplier = config;
+        this.config = supplier.get();
+        this.defaultConfigSupplier = supplier;
         this.fileName = modId -> ConfigHolder.defaultName(modId, configType.extension());
     }
 
     @Override
     public T getConfig() {
+        Objects.requireNonNull(this.config, "config is null");
         return this.isAvailable() ? this.config : this.getOrCreateDefaultConfig();
     }
 
@@ -52,6 +53,7 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
         if (this.defaultConfig == null) {
             this.testAvailable();
             this.defaultConfig = this.defaultConfigSupplier.get();
+            Objects.requireNonNull(this.defaultConfig, "default config is null");
             this.defaultConfig.afterConfigReload();
             for (Consumer<T> callback : this.additionalCallbacks) {
                 callback.accept(this.defaultConfig);

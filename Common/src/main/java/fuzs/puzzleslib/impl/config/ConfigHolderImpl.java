@@ -41,7 +41,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     @Override
     public <T extends ConfigCore> ConfigDataHolder<T> getHolder(Class<T> clazz) {
         ConfigDataHolderImpl<?> holder = this.configsByClass.get(clazz);
-        Objects.requireNonNull(holder, String.format("No config holder available for type %s", clazz));
+        Objects.requireNonNull(holder, "No config holder available for type " + clazz);
         return (ConfigDataHolder<T>) holder;
     }
 
@@ -50,7 +50,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
         Supplier<T> config = () -> DistTypeExecutor.getWhenOn(DistType.CLIENT, () -> construct(clazz));
         if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.CLIENT, config)) != null) {
-            throw new IllegalStateException(String.format("Duplicate registration for client config of type %s", clazz));
+            throw new IllegalStateException("Duplicate registration for client config of type " + clazz);
         }
         return this;
     }
@@ -58,7 +58,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     @Override
     public <T extends ConfigCore> Builder common(Class<T> clazz) {
         if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.COMMON, construct(clazz))) != null) {
-            throw new IllegalStateException(String.format("Duplicate registration for common config of type %s", clazz));
+            throw new IllegalStateException("Duplicate registration for common config of type " + clazz);
         }
         return this;
     }
@@ -66,7 +66,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     @Override
     public <T extends ConfigCore> Builder server(Class<T> clazz) {
         if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.SERVER, construct(clazz))) != null) {
-            throw new IllegalStateException(String.format("Duplicate registration for server config of type %s", clazz));
+            throw new IllegalStateException("Duplicate registration for server config of type " + clazz);
         }
         return this;
     }
