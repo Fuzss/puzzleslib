@@ -121,4 +121,54 @@ public interface ToolTypeHelper {
     default boolean isTrident(ItemStack stack) {
         return stack.getItem() instanceof TridentItem;
     }
+
+    /**
+     * Tests if an {@link ItemStack} is a weapon used for melee combat.
+     *
+     * @param stack the stack to test
+     * @return is this stack a melee weapon
+     */
+    default boolean isMeleeWeapon(ItemStack stack) {
+        return this.isSword(stack) || this.isAxe(stack) || this.isTrident(stack);
+    }
+
+    /**
+     * Tests if an {@link ItemStack} is a weapon used for ranged combat.
+     *
+     * @param stack the stack to test
+     * @return is this stack a ranged weapon
+     */
+    default boolean isRangedWeapon(ItemStack stack) {
+        return this.isBow(stack) || this.isCrossbow(stack) || this.isTrident(stack);
+    }
+
+    /**
+     * Tests if an {@link ItemStack} is a weapon.
+     *
+     * @param stack the stack to test
+     * @return is this stack a weapon
+     */
+    default boolean isWeapon(ItemStack stack) {
+        return this.isMeleeWeapon(stack) || this.isRangedWeapon(stack);
+    }
+
+    /**
+     * Tests if an {@link ItemStack} is a tool used for mining blocks.
+     *
+     * @param stack the stack to test
+     * @return is this stack a mining tool
+     */
+    default boolean isMiningTool(ItemStack stack) {
+        return this.isAxe(stack) || this.isHoe(stack) || this.isPickaxe(stack) || this.isShovel(stack);
+    }
+
+    /**
+     * Tests if an {@link ItemStack} is any sort of tool, mainly in the sense of {@link ItemTags#TOOLS}.
+     *
+     * @param stack the stack to test
+     * @return is this stack a tool
+     */
+    default boolean isTool(ItemStack stack) {
+        return this.isMiningTool(stack) || this.isMeleeWeapon(stack) || stack.is(ItemTags.TOOLS);
+    }
 }
