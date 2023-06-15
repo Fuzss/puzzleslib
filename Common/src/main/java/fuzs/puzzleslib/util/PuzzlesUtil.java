@@ -5,7 +5,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
-import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -130,8 +129,7 @@ public class PuzzlesUtil {
      * @return loaded service
      */
     public static <T> T loadServiceProvider(Class<T> clazz) {
-        return ServiceLoader.load(clazz, PuzzlesUtil.class.getClassLoader())
-                .findFirst()
-                .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
+        // moved to separate class to be able to load that class very early separately from all else
+        return ServiceProviderHelper.load(clazz);
     }
 }

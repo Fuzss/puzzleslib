@@ -14,7 +14,7 @@ public class ModMixinConfigPlugin implements IMixinConfigPlugin {
         // make sure service providers are loaded using the Knot / FML class loader
         // see here for more information: https://github.com/Fuzss/puzzleslib/issues/41
         try {
-            Class.forName("fuzs.puzzleslib.util.PuzzlesUtil");
+            Class.forName("fuzs.puzzleslib.util.ServiceProviderHelper");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
