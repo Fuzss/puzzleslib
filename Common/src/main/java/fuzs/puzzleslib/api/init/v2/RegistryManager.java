@@ -25,6 +25,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -441,6 +442,16 @@ public interface RegistryManager {
      */
     default TagKey<Enchantment> registerEnchantmentTag(String path) {
         return this.registerTag(Registries.ENCHANTMENT, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for biomes.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<Biome> registerBiomeTag(String path) {
+        return this.registerTag(Registries.BIOME, path);
     }
 
     /**
