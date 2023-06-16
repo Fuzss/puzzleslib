@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -329,6 +330,16 @@ public interface RegistryManager {
      */
     default RegistryReference<GameEvent> registerGameEvent(String path, int notificationRadius) {
         return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(path, notificationRadius));
+    }
+
+    /**
+     * Register a new simple particle type.
+     *
+     * @param path path for new entry
+     * @return registry object for <code>entry</code>
+     */
+    default RegistryReference<SimpleParticleType> registerParticleType(String path) {
+        return this.register(Registries.PARTICLE_TYPE, path, () -> new SimpleParticleType(false));
     }
 
     /**
