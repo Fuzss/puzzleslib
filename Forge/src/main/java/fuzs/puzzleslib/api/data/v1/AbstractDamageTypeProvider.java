@@ -10,6 +10,7 @@ import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.JsonCodecProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -20,15 +21,24 @@ public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<Damag
 
     @Deprecated(forRemoval = true)
     public AbstractDamageTypeProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
-        this(packOutput, fileHelper);
+        this(packOutput, fileHelper, modId);
     }
 
+    @Deprecated(forRemoval = true)
     public AbstractDamageTypeProvider(PackOutput packOutput, ExistingFileHelper fileHelper) {
-        this(packOutput, fileHelper, Maps.newHashMap());
+        this(packOutput, fileHelper, "");
     }
 
-    private AbstractDamageTypeProvider(PackOutput packOutput, ExistingFileHelper fileHelper, Map<ResourceLocation, DamageType> entries) {
-        super(packOutput, fileHelper, "", JsonOps.INSTANCE, PackType.SERVER_DATA, "damage_type", DamageType.CODEC, entries);
+    public AbstractDamageTypeProvider(GatherDataEvent evt, String modId) {
+        this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId);
+    }
+
+    public AbstractDamageTypeProvider(PackOutput packOutput, ExistingFileHelper fileHelper, String modId) {
+        this(packOutput, fileHelper, modId, Maps.newHashMap());
+    }
+
+    private AbstractDamageTypeProvider(PackOutput packOutput, ExistingFileHelper fileHelper, String modId, Map<ResourceLocation, DamageType> entries) {
+        super(packOutput, fileHelper, modId, JsonOps.INSTANCE, PackType.SERVER_DATA, "damage_type", DamageType.CODEC, entries);
         this.entries = entries;
         this.resourceType = new ExistingFileHelper.ResourceType(this.packType, ".json", this.directory);
     }

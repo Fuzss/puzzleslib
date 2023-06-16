@@ -6,11 +6,21 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.common.data.SoundDefinition;
 import net.minecraftforge.common.data.SoundDefinitionsProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
 
 public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
-    private final String modId;
+    protected final String modId;
 
+    @Deprecated(forRemoval = true)
     public AbstractSoundDefinitionProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
+        this(packOutput, fileHelper, modId);
+    }
+
+    public AbstractSoundDefinitionProvider(GatherDataEvent evt, String modId) {
+        this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId);
+    }
+
+    public AbstractSoundDefinitionProvider(PackOutput packOutput, ExistingFileHelper fileHelper, String modId) {
         super(packOutput, modId, fileHelper);
         this.modId = modId;
     }

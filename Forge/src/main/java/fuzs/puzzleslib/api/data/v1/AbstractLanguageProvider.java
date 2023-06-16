@@ -18,11 +18,16 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.Objects;
 
 public abstract class AbstractLanguageProvider extends LanguageProvider {
     protected final String modId;
+
+    public AbstractLanguageProvider(GatherDataEvent evt, String modId) {
+        this(evt.getGenerator().getPackOutput(), modId);
+    }
 
     public AbstractLanguageProvider(PackOutput packOutput, String modId) {
         super(packOutput, modId, "en_us");

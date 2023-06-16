@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
@@ -34,6 +35,10 @@ public final class AbstractLootProvider {
     public static abstract class Blocks extends BlockLootSubProvider implements DataProvider {
         private final LootTableProvider provider;
         private final String modId;
+
+        public Blocks(GatherDataEvent evt, String modId) {
+            this(evt.getGenerator().getPackOutput(), modId);
+        }
 
         public Blocks(PackOutput packOutput, String modId) {
             super(Set.of(), FeatureFlags.REGISTRY.allFlags());
@@ -66,6 +71,10 @@ public final class AbstractLootProvider {
     public static abstract class EntityTypes extends EntityLootSubProvider implements DataProvider {
         private final LootTableProvider provider;
         private final String modId;
+
+        public EntityTypes(GatherDataEvent evt, String modId) {
+            this(evt.getGenerator().getPackOutput(), modId);
+        }
 
         public EntityTypes(PackOutput packOutput, String modId) {
             super(FeatureFlags.REGISTRY.allFlags());
@@ -102,7 +111,16 @@ public final class AbstractLootProvider {
         private final LootTableProvider provider;
         private final Map<ResourceLocation, LootTable.Builder> values = Maps.newHashMap();
 
+        @Deprecated(forRemoval = true)
         public Simple(PackOutput packOutput, LootContextParamSet paramSet) {
+            this(paramSet, packOutput);
+        }
+
+        public Simple(LootContextParamSet paramSet, GatherDataEvent evt, String modId) {
+            this(evt.getGenerator().getPackOutput(), paramSet);
+        }
+
+        public Simple(LootContextParamSet paramSet, PackOutput packOutput) {
             this.provider = createProvider(packOutput, this, paramSet);
         }
         @Override

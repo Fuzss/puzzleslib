@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.6-1.20] - 2023-06-16
+### Added
+- Added data generator for particle descriptions
+### Changed
+- Streamlined existing data generators
+- New helper methods in `RegistryManager` for biomes and particles
+
 ## [v7.0.5-1.20] - 2023-06-15
 ### Added
 - Added `ItemEquipmentFactories` helper class
