@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.7-1.20] - 2023-06-16
+### Fixed
+- Multiple simple loot data providers should be allowed 
+
 ## [v7.0.6-1.20] - 2023-06-16
 ### Added
 - Added data generator for particle descriptions

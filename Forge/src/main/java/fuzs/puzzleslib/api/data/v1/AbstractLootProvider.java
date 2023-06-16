@@ -59,6 +59,10 @@ public final class AbstractLootProvider {
         @Override
         public abstract void generate();
 
+        protected void dropNothing(Block block) {
+            this.add(block, noDrop());
+        }
+
         @Override
         protected Iterable<Block> getKnownBlocks() {
             return ForgeRegistries.BLOCKS.getEntries().stream()
@@ -113,14 +117,14 @@ public final class AbstractLootProvider {
 
         @Deprecated(forRemoval = true)
         public Simple(PackOutput packOutput, LootContextParamSet paramSet) {
-            this(paramSet, packOutput);
+            this(paramSet, packOutput, "");
         }
 
         public Simple(LootContextParamSet paramSet, GatherDataEvent evt, String modId) {
-            this(evt.getGenerator().getPackOutput(), paramSet);
+            this(paramSet, evt.getGenerator().getPackOutput(), modId);
         }
 
-        public Simple(LootContextParamSet paramSet, PackOutput packOutput) {
+        public Simple(LootContextParamSet paramSet, PackOutput packOutput, String modId) {
             this.provider = createProvider(packOutput, this, paramSet);
         }
         @Override
@@ -130,7 +134,8 @@ public final class AbstractLootProvider {
 
         @Override
         public String getName() {
-            return this.provider.getName();
+            // multiple data providers cannot have the same name, so just add this to be safe while staying recognizable
+            return this.provider.getName() + "@" + Integer.toHexString(this.hashCode());
         }
 
         @Override
