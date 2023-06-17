@@ -17,6 +17,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -134,8 +135,8 @@ public final class AbstractLootProvider {
 
         @Override
         public String getName() {
-            // multiple data providers cannot have the same name, so just add this to be safe while staying recognizable
-            return this.provider.getName() + "@" + Integer.toHexString(this.hashCode());
+            // multiple data providers cannot have the same name, so handle it like this
+            return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this.getClass().getSimpleName()), ' ');
         }
 
         @Override

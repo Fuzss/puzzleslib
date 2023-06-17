@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.data.v1;
 
+import fuzs.puzzleslib.api.init.v2.RegistryReference;
+import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -120,5 +122,17 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
 
     public void addItemDamageType(ResourceKey<DamageType> damageType, String value) {
         this.add("death.attack." + damageType.location().getPath() + ".item", value);
+    }
+
+    public void add(String registry, RegistryReference<?> registryReference, String value) {
+        this.add(registry, registryReference.getResourceLocation(), value);
+    }
+
+    public void add(String registry, ResourceKey<?> resourceKey, String value) {
+        this.add(registry, resourceKey.location(), value);
+    }
+
+    public void add(String registry, ResourceLocation resourceLocation, String value) {
+        this.add(Util.makeDescriptionId(registry, resourceLocation), value);
     }
 }
