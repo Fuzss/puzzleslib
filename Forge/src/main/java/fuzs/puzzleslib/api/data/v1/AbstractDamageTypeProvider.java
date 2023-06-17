@@ -15,6 +15,10 @@ import net.minecraftforge.data.event.GatherDataEvent;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+/**
+ * @deprecated replaced with {@link fuzs.puzzleslib.api.data.v1.AbstractBuiltInDataProvider.DamageTypes}
+ */
+@Deprecated(forRemoval = true)
 public abstract class AbstractDamageTypeProvider extends JsonCodecProvider<DamageType> {
     private final Map<ResourceLocation, DamageType> entries;
     private final ExistingFileHelper.ResourceType resourceType;

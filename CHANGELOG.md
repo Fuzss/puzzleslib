@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.8-1.20] - 2023-06-17
+### Added
+- Added `PlayerEvents$BreakSpeed`
+- Added `AbstractBuiltInDataProvider`
+
 ## [v7.0.7-1.20] - 2023-06-16
 ### Fixed
 - Multiple simple loot data providers should be allowed 

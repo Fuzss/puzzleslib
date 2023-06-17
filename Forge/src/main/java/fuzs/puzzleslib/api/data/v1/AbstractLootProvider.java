@@ -10,6 +10,7 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -107,8 +108,8 @@ public final class AbstractLootProvider {
         }
 
         @Override
-        protected boolean canHaveLootTable(EntityType<?> pEntityType) {
-            return true;
+        protected boolean canHaveLootTable(EntityType<?> entityType) {
+            return entityType.getCategory() != MobCategory.MISC;
         }
     }
 
