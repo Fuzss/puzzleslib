@@ -16,8 +16,7 @@ public final class ServiceProviderHelper {
      * @return loaded service
      */
     public static <T> T load(Class<T> clazz) {
-        return ServiceLoader.load(clazz)
-                .findFirst()
+        return ServiceLoader.load(clazz, ServiceProviderHelper.class.getClassLoader()).findFirst()
                 .orElseThrow(() -> new NullPointerException("Failed to load service for " + clazz.getName()));
     }
 }

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.4.6-1.18.2] - 2023-06-20
+### Fixed
+- Fixed a class loading issue related to loading service provider interfaces
+
 ## [v3.4.5-1.18.2] - 2023-06-05
 ### Fixed
 - Fixed crash with [Tropicraft](https://legacy.curseforge.com/minecraft/mc-mods/tropicraft) mod when creating or joining a world
