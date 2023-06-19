@@ -3,10 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.9-1.20] - 2023-06-19
+### Added
+- Added `MobEffectEvents`
+
 ## [v7.0.8-1.20] - 2023-06-17
 ### Added
 - Added `PlayerEvents$BreakSpeed`
 - Added `AbstractBuiltInDataProvider`
+### Changed
+- `AbstractDamageTypeProvider` is now deprecated for removal, use `AbstractBuiltInDataProvider` instead
 
 ## [v7.0.7-1.20] - 2023-06-16
 ### Fixed

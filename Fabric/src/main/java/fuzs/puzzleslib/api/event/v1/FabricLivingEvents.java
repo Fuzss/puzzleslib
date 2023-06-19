@@ -5,6 +5,9 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -76,6 +79,22 @@ public final class FabricLivingEvents {
      * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
      */
     public static final Event<ItemAttributeModifiersCallback> ITEM_ATTRIBUTE_MODIFIERS = FabricEventFactory.create(ItemAttributeModifiersCallback.class);
+    /**
+     * Called when the game checks whether a new {@link MobEffectInstance} can be applied to a {@link LivingEntity} in {@link LivingEntity#canBeAffected(MobEffectInstance)}.
+     */
+    public static final Event<MobEffectEvents.Affects> MOB_EFFECT_AFFECTS = FabricEventFactory.createResult(MobEffectEvents.Affects.class);
+    /**
+     * Called when a new {@link MobEffectInstance} is added to a {@link LivingEntity} in {@link LivingEntity#addEffect(MobEffectInstance, Entity)}.
+     */
+    public static final Event<MobEffectEvents.Apply> MOB_EFFECT_APPLY = FabricEventFactory.create(MobEffectEvents.Apply.class);
+    /**
+     * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in {@link LivingEntity#removeEffect(MobEffect)}.
+     */
+    public static final Event<MobEffectEvents.Remove> MOB_EFFECT_REMOVE = FabricEventFactory.createResult(MobEffectEvents.Remove.class);
+    /**
+     * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in <code>net.minecraft.world.entity.LivingEntity#tickEffects</code> due to the instance duration having run out.
+     */
+    public static final Event<MobEffectEvents.Expire> MOB_EFFECT_EXPIRE = FabricEventFactory.create(MobEffectEvents.Expire.class);
 
     private FabricLivingEvents() {
 
