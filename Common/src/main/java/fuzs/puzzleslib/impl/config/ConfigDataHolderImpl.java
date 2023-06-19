@@ -72,7 +72,6 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
 
     @Override
     public <S, V extends ForgeConfigSpec.ConfigValue<S>> V accept(V entry, Consumer<S> save) {
-        Objects.requireNonNull(entry, "entry is null");
         this.configValueCallbacks.add(() -> save.accept(entry.get()));
         return entry;
     }
@@ -100,16 +99,15 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
         if (config.getType() == this.configType && (this.modConfig == null || config == this.modConfig)) {
             String loading;
             if (config.getConfigData() != null) {
+                this.available = true;
                 loading = reloading ? "Reloading" : "Loading";
                 this.configValueCallbacks.forEach(Runnable::run);
-                // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
-                this.available = true;
                 for (Consumer<T> callback : this.additionalCallbacks) {
                     callback.accept(this.config);
                 }
             } else {
-                loading = "Unloading";
                 this.available = false;
+                loading = "Unloading";
             }
             PuzzlesLib.LOGGER.info("{} {} config for {}", loading, config.getType().extension(), config.getModId());
         }
@@ -124,8 +122,6 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
     private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         AnnotatedConfigBuilder.serialize(builder,this, this.config);
-        // add config reload callback last to make sure it runs together with value callback reloads before the config is set to available in #onModConfig
-        this.configValueCallbacks.add(this.config::afterConfigReload);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }
