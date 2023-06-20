@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v4.4.3-1.19.2] - 2023-06-21
+### Fixed
+- Fixed an issue related to serializing enum types for sending in network messages
+
 ## [v4.4.2-1.19.2] - 2023-06-15
 ### Fixed
 - Fixed yet another class loading issue given Fabric Loader trouble recognizing Puzzles Lib as a mod
