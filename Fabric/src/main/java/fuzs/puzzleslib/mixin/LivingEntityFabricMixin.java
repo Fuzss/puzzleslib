@@ -345,4 +345,11 @@ abstract class LivingEntityFabricMixin extends Entity {
     protected void jumpFromGround(CallbackInfo callback) {
         LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
     }
+
+    @ModifyVariable(method = "getVisibilityPercent", at = @At(value = "TAIL", shift = At.Shift.BEFORE), ordinal = 0)
+    public double getVisibilityPercent(double value, @Nullable Entity lookingEntity) {
+        DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
+        FabricLivingEvents.LIVING_VISIBILITY.invoker().onLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
+        return visibilityPercentage.getAsOptionalDouble().stream().map(t -> Math.max(t, 0.0)).findAny().orElse(value);
+    }
 }

@@ -99,6 +99,10 @@ public final class FabricLivingEvents {
      * Called when an entity is jumping, allows for modifying the jump height as well as preventing the jump.
      */
     public static final Event<LivingEvents.Jump> LIVING_JUMP = FabricEventFactory.createResult(LivingEvents.Jump.class);
+    /**
+     * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another entity for applying a given percentage to the looking entity's original visibility range.
+     */
+    public static final Event<LivingEvents.Visibility> LIVING_VISIBILITY = FabricEventFactory.create(LivingEvents.Visibility.class);
 
     private FabricLivingEvents() {
 
