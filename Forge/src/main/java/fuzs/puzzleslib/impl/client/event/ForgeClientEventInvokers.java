@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.event.v1.data.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.*;
@@ -244,6 +245,9 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ClientLevelEvents.Unload.class, LevelEvent.Unload.class, (ClientLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onLevelUnload(Minecraft.getInstance(), level);
+        });
+        INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (callback, evt) -> {
+            callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
         });
     }
 

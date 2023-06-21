@@ -6,6 +6,7 @@
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
     "AbstractArrowFabricMixin",
+    "AbstractHorseFabricMixin",
     "AbstractHurtingProjectileFabricMixin",
     "AnimalFabricMixin",
     "AnvilMenuFabricMixin",
@@ -27,6 +28,7 @@
     "LlamaSpitFabricMixin",
     "LootingEnchantFunctionFabricMixin",
     "LootItemRandomChanceWithLootingConditionFabricMixin",
+    "MagmaCubeFabricMixin",
     "MobFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",

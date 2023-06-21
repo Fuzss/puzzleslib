@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v7.0.10-1.20] - 2023-06-21
+### Added
+- Added `MovementInputUpdateCallback`
+- Added `LivingEvents$Jump`
+
 ## [v7.0.9-1.20] - 2023-06-19
 ### Added
 - Added `MobEffectEvents`

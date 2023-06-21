@@ -428,6 +428,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(MobEffectEvents.Expire.class, MobEffectEvent.Expired.class, (MobEffectEvents.Expire callback, MobEffectEvent.Expired evt) -> {
             callback.onMobEffectExpire(evt.getEntity(), evt.getEffectInstance());
         });
+        INSTANCE.register(LivingEvents.Jump.class, LivingEvent.LivingJumpEvent.class, (LivingEvents.Jump callback, LivingEvent.LivingJumpEvent evt) -> {
+            LivingJumpHelper.onLivingJump(callback, evt.getEntity());
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
         }

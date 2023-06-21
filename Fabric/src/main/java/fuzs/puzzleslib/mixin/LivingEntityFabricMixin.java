@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
+import fuzs.puzzleslib.impl.event.LivingJumpHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -338,5 +339,10 @@ abstract class LivingEntityFabricMixin extends Entity {
     protected MobEffectInstance tickEffects(MobEffectInstance mobEffectInstance) {
         FabricLivingEvents.MOB_EFFECT_EXPIRE.invoker().onMobEffectExpire(LivingEntity.class.cast(this), mobEffectInstance);
         return mobEffectInstance;
+    }
+
+    @Inject(method = "jumpFromGround", at = @At("TAIL"))
+    protected void jumpFromGround(CallbackInfo callback) {
+        LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
     }
 }

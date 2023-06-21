@@ -95,6 +95,10 @@ public final class FabricLivingEvents {
      * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in <code>net.minecraft.world.entity.LivingEntity#tickEffects</code> due to the instance duration having run out.
      */
     public static final Event<MobEffectEvents.Expire> MOB_EFFECT_EXPIRE = FabricEventFactory.create(MobEffectEvents.Expire.class);
+    /**
+     * Called when an entity is jumping, allows for modifying the jump height as well as preventing the jump.
+     */
+    public static final Event<LivingEvents.Jump> LIVING_JUMP = FabricEventFactory.createResult(LivingEvents.Jump.class);
 
     private FabricLivingEvents() {
 

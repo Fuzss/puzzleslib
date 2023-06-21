@@ -5,6 +5,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.Input;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -91,6 +93,10 @@ public final class FabricClientEvents {
      * Fires before a client level is unloaded.
      */
     public static final Event<ClientLevelEvents.Unload> UNLOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Unload.class);
+    /**
+     * Called after {@link Input#tick(boolean, float)} has run for the {@link LocalPlayer}.
+     */
+    public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(MovementInputUpdateCallback.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

@@ -51,13 +51,4 @@ abstract class PlayerFabricMixin extends LivingEntity {
         }
         return breakSpeed.getAsOptionalFloat().orElse(destroySpeed);
     }
-
-//    @Inject(method = "getDestroySpeed", at = @At("TAIL"))
-//    public void getDestroySpeed(BlockState state, CallbackInfoReturnable<Float> callback) {
-//        DefaultedFloat breakSpeed = DefaultedFloat.fromValue(callback.getReturnValueF());
-//        if (FabricPlayerEvents.BREAK_SPEED.invoker().onBreakSpeed(Player.class.cast(this), state, breakSpeed).isInterrupt()) {
-//            breakSpeed.accept(-1.0F);
-//        }
-//        breakSpeed.getAsOptionalFloat().ifPresent(callback::setReturnValue);
-//    }
 }
