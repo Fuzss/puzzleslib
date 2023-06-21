@@ -37,6 +37,7 @@
     "RunAroundLikeCrazyGoalFabricMixin",
     "ServerLevelFabricMixin",
     "ShulkerBulletFabricMixin",
+    "StartAttackingFabricMixin",
     "ThrowableProjectileFabricMixin",
     "WolfFabricMixin",
     "accessor.PackRepositoryFabricAccessor"

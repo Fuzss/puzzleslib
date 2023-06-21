@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog].
 - Added `MovementInputUpdateCallback`
 - Added `LivingEvents$Jump`
 - Added `LivingEvents$Visibility`
+- Added `LivingChangeTargetCallback`
 
 ## [v7.0.9-1.20] - 2023-06-19
 ### Added

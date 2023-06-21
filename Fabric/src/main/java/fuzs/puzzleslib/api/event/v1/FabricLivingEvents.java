@@ -103,6 +103,10 @@ public final class FabricLivingEvents {
      * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another entity for applying a given percentage to the looking entity's original visibility range.
      */
     public static final Event<LivingEvents.Visibility> LIVING_VISIBILITY = FabricEventFactory.create(LivingEvents.Visibility.class);
+    /**
+     * Called when a {@link net.minecraft.world.entity.Mob} sets a new target.
+     */
+    public static final Event<LivingChangeTargetCallback> LIVING_CHANGE_TARGET = FabricEventFactory.createResult(LivingChangeTargetCallback.class);
 
     private FabricLivingEvents() {
 
