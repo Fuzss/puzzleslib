@@ -1,6 +1,6 @@
 name: Bug Report
 description: >-
-  Please use this template when you have encountered a bug in this mod. Supported versions are for Minecraft 1.18+.
+  Please use this template when you have encountered a bug in this mod. Please note that only the latest mod version for Minecraft 1.18.2, 1.19.2 and 1.20.1 is supported.
 title: '[Bug]: '
 labels: ["bug"]
 assignees:
@@ -27,7 +27,7 @@ body:
     attributes:
       label: Minecraft Version (Required)
       description: What is the Minecraft version you are playing with?
-      placeholder: ex. 1.19
+      placeholder: ex. 1.20.1
     validations:
       required: true
   - type: input
@@ -35,7 +35,7 @@ body:
     attributes:
       label: Mod Version (Required)
       description: What version of the mod are you playing with?
-      placeholder: ex. v4.0.0
+      placeholder: ex. v8.0.0
     validations:
       required: true
   - type: textarea
