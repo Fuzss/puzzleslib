@@ -1,6 +1,6 @@
 name: Bug Report
 description: >-
-  Please use this template when you have encountered a bug in this mod.\nPlease note that only the latest mod version for Minecraft 1.18.2, 1.19.2 and 1.20.1 is supported.
+  Please use this template when you have encountered a bug in this mod. Please note that only the latest mod version for Minecraft 1.18.2, 1.19.2 and 1.20.1 is supported.
 title: '[Bug]: '
 labels: ["bug"]
 assignees:
