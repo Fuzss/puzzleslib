@@ -10,7 +10,7 @@ import java.util.Objects;
 
 public final class BlockRenderTypesContextForgeImpl implements RenderTypesContext<Block> {
 
-    @SuppressWarnings("removal")
+    @SuppressWarnings("deprecation")
     @Override
     public void registerRenderType(RenderType renderType, Block... blocks) {
         Objects.requireNonNull(renderType, "render type is null");

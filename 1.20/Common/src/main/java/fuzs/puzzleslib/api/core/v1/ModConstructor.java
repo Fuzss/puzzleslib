@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
+import net.minecraft.core.dispenser.DispenseItemBehavior;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.function.Supplier;
@@ -43,9 +44,19 @@ public interface ModConstructor {
      * used to set various values and settings for already registered content
      *
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
+     *
+     * @deprecated now always runs deferred, use {@link #onCommonSetup()}
      */
     default void onCommonSetup(final ModLifecycleContext context) {
 
+    }
+
+    /**
+     * runs after content has been registered, so it's safe to use here
+     * used to set various values and settings for already registered content
+     */
+    default void onCommonSetup() {
+        this.onCommonSetup(Runnable::run);
     }
 
     /**
@@ -124,6 +135,13 @@ public interface ModConstructor {
      * @param context adds a listener to the server resource manager to reload at the end of all resources
      */
     default void onRegisterDataPackReloadListeners(final AddReloadListenersContext context) {
+
+    }
+
+    /**
+     * @param context allows for registering a new {@link DispenseItemBehavior} for multiple items at once
+     */
+    default void onRegisterDispenseBehaviors(final DispenseBehaviorsContext context) {
 
     }
 }
