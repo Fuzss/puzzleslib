@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.2-1.20.1] - 2023-06-29
+### Fixed
+- Re-upload to fix failed reobfuscation on Forge
+
 ## [v8.0.1-1.20.1] - 2023-06-29
 ### Added
 - Added `DispenseBehaviorsContext`
