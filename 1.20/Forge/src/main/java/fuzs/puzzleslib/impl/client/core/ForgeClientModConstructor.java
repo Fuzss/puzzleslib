@@ -9,7 +9,6 @@ import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextForgeImpl;
-import fuzs.puzzleslib.impl.core.context.BuildCreativeModeTabContentsContextForgeImpl;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
@@ -20,7 +19,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,12 +43,15 @@ public final class ForgeClientModConstructor {
 
     private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
         eventBus.addListener((final FMLClientSetupEvent evt) -> {
-            constructor.onClientSetup(evt::enqueueWork);
-            constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
-            constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
-            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
-            constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
-            constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+            // need to run this deferred as most registries here do not use concurrent maps
+            evt.enqueueWork(() -> {
+                constructor.onClientSetup();
+                constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
+                constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
+                constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
+                constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
+                constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+            });
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextForgeImpl(evt::registerEntityRenderer));

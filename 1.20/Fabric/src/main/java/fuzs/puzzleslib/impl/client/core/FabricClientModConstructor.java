@@ -11,7 +11,6 @@ import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
-import fuzs.puzzleslib.impl.core.context.BuildCreativeModeTabContentsContextFabricImpl;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -33,7 +32,7 @@ public final class FabricClientModConstructor {
 
     public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         constructor.onConstructMod();
-        constructor.onClientSetup(Runnable::run);
+        constructor.onClientSetup();
         constructor.onRegisterEntityRenderers(new EntityRenderersContextFabricImpl());
         constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextFabricImpl());
         constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());

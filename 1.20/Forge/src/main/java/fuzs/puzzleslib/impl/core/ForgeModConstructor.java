@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.api.core.v1.context.DispenseBehaviorsContext;
 import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import fuzs.puzzleslib.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
@@ -53,10 +54,13 @@ public final class ForgeModConstructor {
 
     private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
-            constructor.onCommonSetup(evt::enqueueWork);
-            constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
-            constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeModifications, contentRegistrations));
-            constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
+            evt.enqueueWork(() -> {
+                constructor.onCommonSetup();
+                constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
+                constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeModifications, contentRegistrations));
+                constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
+                constructor.onRegisterDispenseBehaviors(new DispenseBehaviorsContext());
+            });
         });
         eventBus.addListener((final SpawnPlacementRegisterEvent evt) -> {
             constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextForgeImpl(evt));
