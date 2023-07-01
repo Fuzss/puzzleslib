@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.init.v1.ItemModelOverrides;
+import fuzs.puzzleslib.api.client.init.v1.ItemModelDisplayOverrides;
 import fuzs.puzzleslib.api.client.screen.v2.ScreenHelper;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.client.init.ForgeItemDisplayOverrides;
@@ -22,7 +22,7 @@ public final class ForgeClientFactories implements ClientFactories {
     }
 
     @Override
-    public ItemModelOverrides getItemModelDisplayOverrides() {
+    public ItemModelDisplayOverrides getItemModelDisplayOverrides() {
         return new ForgeItemDisplayOverrides();
     }
 }
