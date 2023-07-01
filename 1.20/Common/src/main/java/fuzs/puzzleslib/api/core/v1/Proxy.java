@@ -15,8 +15,7 @@ public interface Proxy {
     /**
      * sided proxy depending on physical side
      */
-    @SuppressWarnings("Convert2MethodRef")
-    Proxy INSTANCE = DistTypeExecutor.getForDistType(() -> CommonFactories.INSTANCE.getClientProxy(), () -> CommonFactories.INSTANCE.getServerProxy());
+    Proxy INSTANCE = ModLoaderEnvironment.INSTANCE.isClient() ? CommonFactories.INSTANCE.getClientProxy() : CommonFactories.INSTANCE.getServerProxy();
 
     /**
      * @return client player from Minecraft singleton when on physical client, otherwise null

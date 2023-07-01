@@ -20,25 +20,29 @@ public final class ForgeModContext extends ModContext {
     @Override
     public NetworkHandlerV2 getNetworkHandlerV2(boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         if (this.networkHandlerV2 == null) {
-            return this.networkHandlerV2 = new NetworkHandlerForgeV2(this.modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+            this.networkHandlerV2 = new NetworkHandlerForgeV2(this.modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+        } else if (clientAcceptsVanillaOrMissing != ((NetworkHandlerForgeV2) this.networkHandlerV2).clientAcceptsVanillaOrMissing) {
+            throw new IllegalArgumentException("client accepts vanilla or missing setting does not match existing value");
+        } else if (serverAcceptsVanillaOrMissing != ((NetworkHandlerForgeV2) this.networkHandlerV2).serverAcceptsVanillaOrMissing) {
+            throw new IllegalArgumentException("server accepts vanilla or missing setting does not match existing value");
         }
-        throw new IllegalStateException("only a single network handler allowed per mod");
+        return this.networkHandlerV2;
     }
 
     @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder() {
         if (this.networkHandlerV3 == null) {
-            return this.networkHandlerV3 = this.addBuildable(new NetworkHandlerForgeV3(this.modId));
+            this.networkHandlerV3 = this.addBuildable(new NetworkHandlerForgeV3(this.modId));
         }
-        throw new IllegalStateException("only a single network handler allowed per mod");
+        return this.networkHandlerV3;
     }
 
     @Override
     public ConfigHolder.Builder getConfigHolder$Builder() {
         if (this.configHolder == null) {
-            return this.configHolder = this.addBuildable(new ForgeConfigHolderImpl(this.modId));
+            this.configHolder = this.addBuildable(new ForgeConfigHolderImpl(this.modId));
         }
-        throw new IllegalStateException("only a single config holder allowed per mod");
+        return this.configHolder;
     }
 
     @Override

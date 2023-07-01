@@ -22,6 +22,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class FabricClientModConstructor {
@@ -30,7 +31,7 @@ public final class FabricClientModConstructor {
 
     }
 
-    public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
+    public static void construct(ClientModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         constructor.onConstructMod();
         constructor.onClientSetup();
         constructor.onRegisterEntityRenderers(new EntityRenderersContextFabricImpl());

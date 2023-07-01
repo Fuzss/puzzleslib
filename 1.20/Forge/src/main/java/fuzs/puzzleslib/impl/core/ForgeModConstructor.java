@@ -6,7 +6,6 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.core.v1.context.DispenseBehaviorsContext;
 import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import fuzs.puzzleslib.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
@@ -22,7 +21,8 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Set;
 
 public final class ForgeModConstructor {
 
@@ -30,36 +30,35 @@ public final class ForgeModConstructor {
 
     }
 
-    public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
+    public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
             Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
-            registerContent(constructor, modId, modEventBus, biomeModifications, contentRegistrations);
-            registerModHandlers(constructor, modEventBus, biomeModifications, contentRegistrations);
+            registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
+            registerModHandlers(constructor, modEventBus, biomeModifications, availableFlags);
             registerHandlers(constructor);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> flagsToHandle) {
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl(modEventBus));
-        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             BiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
-        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.LEGACY_SMITHING)) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.LEGACY_SMITHING)) {
             DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.RECIPE_SERIALIZERS, modId);
             deferredRegister.register(modEventBus);
             deferredRegister.register(LegacySmithingTransformRecipe.RECIPE_SERIALIZER_ID, LegacySmithingTransformRecipe.Serializer::new);
         }
     }
 
-    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> availableFlags) {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
                 constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
-                constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeModifications, contentRegistrations));
+                constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeModifications, availableFlags));
                 constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
-                constructor.onRegisterDispenseBehaviors(new DispenseBehaviorsContext());
             });
         });
         eventBus.addListener((final SpawnPlacementRegisterEvent evt) -> {

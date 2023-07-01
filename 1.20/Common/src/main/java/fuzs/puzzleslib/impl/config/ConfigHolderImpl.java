@@ -5,8 +5,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.core.v1.DistType;
-import fuzs.puzzleslib.api.core.v1.DistTypeExecutor;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.invoke.MethodHandles;
@@ -48,8 +47,8 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     @Override
     public <T extends ConfigCore> Builder client(Class<T> clazz) {
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
-        Supplier<T> config = () -> DistTypeExecutor.getWhenOn(DistType.CLIENT, () -> construct(clazz));
-        if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.CLIENT, config)) != null) {
+        Supplier<T> supplier = ModLoaderEnvironment.INSTANCE.isClient() ? construct(clazz) : () -> null;
+        if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.CLIENT, supplier)) != null) {
             throw new IllegalStateException("Duplicate registration for client config of type " + clazz);
         }
         return this;

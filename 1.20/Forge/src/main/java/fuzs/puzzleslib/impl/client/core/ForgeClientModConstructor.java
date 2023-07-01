@@ -21,10 +21,10 @@ import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class ForgeClientModConstructor {
@@ -34,14 +34,14 @@ public final class ForgeClientModConstructor {
     }
 
 
-    public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
+    public static void construct(ClientModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
-            registerModHandlers(constructor, modId, eventBus, Lists.newArrayList(), contentRegistrations);
+            registerModHandlers(constructor, modId, eventBus, Lists.newArrayList(), availableFlags);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<ResourceManagerReloadListener> dynamicRenderers, Set<ContentRegistrationFlags> availableFlags) {
         eventBus.addListener((final FMLClientSetupEvent evt) -> {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
@@ -88,7 +88,7 @@ public final class ForgeClientModConstructor {
             constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextForgeImpl(evt::registerReloadListener));
         });
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
-            registerBuiltInItemModelRenderersReloadListeners(evt::registerReloadListener, modId, dynamicRenderers, contentRegistrations);
+            registerBuiltInItemModelRenderersReloadListeners(evt::registerReloadListener, modId, dynamicRenderers, availableFlags);
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
             constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextForgeImpl(evt));
@@ -125,8 +125,8 @@ public final class ForgeClientModConstructor {
         }
     }
 
-    private static void registerBuiltInItemModelRenderersReloadListeners(Consumer<PreparableReloadListener> consumer, String modId, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
-        if (ArrayUtils.contains(contentRegistrations, ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
+    private static void registerBuiltInItemModelRenderersReloadListeners(Consumer<PreparableReloadListener> consumer, String modId, List<ResourceManagerReloadListener> dynamicRenderers, Set<ContentRegistrationFlags> availableFlags) {
+        if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
             // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
             consumer.accept((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
                 for (ResourceManagerReloadListener listener : dynamicRenderers) {
