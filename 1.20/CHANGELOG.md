@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.3-1.20.1] - 2023-07-01
+### Added
+- Added `LoadCompleteCallback`
+### Changed
+- Internal changes to allow for more versatile mod loading
+- Separate item model perspective now use built-in features on Forge and longer require a core mod there
+
 ## [v8.0.2-1.20.1] - 2023-06-29
 ### Fixed
 - Re-upload to fix failed reobfuscation on Forge

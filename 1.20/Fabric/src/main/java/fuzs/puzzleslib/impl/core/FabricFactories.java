@@ -13,13 +13,14 @@ import fuzs.puzzleslib.impl.init.PotionBrewingRegistryFabric;
 import fuzs.puzzleslib.impl.item.FabricToolTypeHelper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 public final class FabricFactories implements CommonFactories {
 
     @Override
-    public void constructMod(String modId, ModConstructor modConstructor, ContentRegistrationFlags... contentRegistrations) {
-        FabricModConstructor.construct(modConstructor, modId, contentRegistrations);
+    public void constructMod(String modId, ModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
+        FabricModConstructor.construct(modConstructor, modId, availableFlags, flagsToHandle);
     }
 
     @Override
@@ -27,16 +28,14 @@ public final class FabricFactories implements CommonFactories {
         return new FabricModContext(modId);
     }
 
-    @SuppressWarnings("Convert2MethodRef")
     @Override
-    public Supplier<Proxy> getClientProxy() {
-        return () -> new FabricClientProxy();
+    public Proxy getClientProxy() {
+        return new FabricClientProxy();
     }
 
-    @SuppressWarnings("Convert2MethodRef")
     @Override
-    public Supplier<Proxy> getServerProxy() {
-        return () -> new FabricServerProxy();
+    public Proxy getServerProxy() {
+        return new FabricServerProxy();
     }
 
     @Override

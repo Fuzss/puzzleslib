@@ -23,26 +23,18 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/**
- * handler for network communications of all puzzles lib mods
- */
 public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
-    /**
-     * protocol version for testing client-server compatibility of this mod
-     */
     private static final String PROTOCOL_VERSION = Integer.toString(1);
 
-    /**
-     * channel for sending messages
-     */
-    private final SimpleChannel channel;
-    /**
-     * message index
-     */
     private final AtomicInteger discriminator = new AtomicInteger();
+    private final SimpleChannel channel;
+    public final boolean clientAcceptsVanillaOrMissing;
+    public final boolean serverAcceptsVanillaOrMissing;
 
     public NetworkHandlerForgeV2(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         this.channel = buildSimpleChannel(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+        this.clientAcceptsVanillaOrMissing = clientAcceptsVanillaOrMissing;
+        this.serverAcceptsVanillaOrMissing = serverAcceptsVanillaOrMissing;
     }
 
     @SuppressWarnings("unchecked")
