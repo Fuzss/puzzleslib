@@ -24,9 +24,9 @@ public abstract class ModContext {
     private static final Map<String, ModContext> MOD_CONTEXTS = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
     final String modId;
-    private final Queue<Buildable> buildables = Queues.newArrayDeque();
-    private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newHashMap();
-    private final Set<ResourceLocation> constructedPairings = Sets.newHashSet();
+    private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
+    private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
+    private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
     private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
     protected final AtomicInteger networkHandlers = new AtomicInteger();
     @Nullable RegistryManager registryManager;
