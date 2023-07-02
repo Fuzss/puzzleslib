@@ -31,13 +31,13 @@ import java.util.function.Supplier;
 @Mixin(ServerLevel.class)
 abstract class ServerLevelFabricMixin extends Level {
     @Unique
-    private DefaultedValue<Holder<SoundEvent>> puzzleslib$sound;
+    private final ThreadLocal<DefaultedValue<Holder<SoundEvent>>> puzzleslib$sound = new ThreadLocal<>();
     @Unique
-    private DefaultedValue<SoundSource> puzzleslib$source;
+    private final ThreadLocal<DefaultedValue<SoundSource>> puzzleslib$source = new ThreadLocal<>();
     @Unique
-    private DefaultedFloat puzzleslib$volume;
+    private final ThreadLocal<DefaultedFloat> puzzleslib$volume = new ThreadLocal<>();
     @Unique
-    private DefaultedFloat puzzleslib$pitch;
+    private final ThreadLocal<DefaultedFloat> puzzleslib$pitch = new ThreadLocal<>();
 
     protected ServerLevelFabricMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
         super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
@@ -45,53 +45,53 @@ abstract class ServerLevelFabricMixin extends Level {
 
     @Inject(method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", at = @At("HEAD"), cancellable = true)
     public void playSeededSound$0(@Nullable Player player, double x, double y, double z, Holder<SoundEvent> soundEvent, SoundSource source, float volume, float pitch, long seed, CallbackInfo callback) {
-        this.puzzleslib$sound = DefaultedValue.fromValue(soundEvent);
-        this.puzzleslib$source = DefaultedValue.fromValue(source);
-        this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
-        this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker().onPlaySoundAtPosition(this, new Vec3(x, y, z), this.puzzleslib$sound, this.puzzleslib$source, this.puzzleslib$volume, this.puzzleslib$pitch);
-        if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
+        this.puzzleslib$sound.set(DefaultedValue.fromValue(soundEvent));
+        this.puzzleslib$source.set(DefaultedValue.fromValue(source));
+        this.puzzleslib$volume.set(DefaultedFloat.fromValue(volume));
+        this.puzzleslib$pitch.set(DefaultedFloat.fromValue(pitch));
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker().onPlaySoundAtPosition(this, new Vec3(x, y, z), this.puzzleslib$sound.get(), this.puzzleslib$source.get(), this.puzzleslib$volume.get(), this.puzzleslib$pitch.get());
+        if (result.isInterrupt() || this.puzzleslib$sound.get().get() == null) callback.cancel();
     }
 
     @Inject(method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", at = @At("HEAD"), cancellable = true)
     public void playSeededSound$0(@Nullable Player player, Entity entity, Holder<SoundEvent> soundEvent, SoundSource source, float volume, float pitch, long seed, CallbackInfo callback) {
-        this.puzzleslib$sound = DefaultedValue.fromValue(soundEvent);
-        this.puzzleslib$source = DefaultedValue.fromValue(source);
-        this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
-        this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this, entity, this.puzzleslib$sound, this.puzzleslib$source, this.puzzleslib$volume, this.puzzleslib$pitch);
-        if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
+        this.puzzleslib$sound.set(DefaultedValue.fromValue(soundEvent));
+        this.puzzleslib$source.set(DefaultedValue.fromValue(source));
+        this.puzzleslib$volume.set(DefaultedFloat.fromValue(volume));
+        this.puzzleslib$pitch.set(DefaultedFloat.fromValue(pitch));
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this, entity, this.puzzleslib$sound.get(), this.puzzleslib$source.get(), this.puzzleslib$volume.get(), this.puzzleslib$pitch.get());
+        if (result.isInterrupt() || this.puzzleslib$sound.get().get() == null) callback.cancel();
     }
 
     @ModifyVariable(method = {"playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"}, at = @At("HEAD"), ordinal = 0)
     public Holder<SoundEvent> playSeededSound$1(Holder<SoundEvent> soundEvent) {
-        Objects.requireNonNull(this.puzzleslib$sound, "sound is null");
-        soundEvent = this.puzzleslib$sound.getAsOptional().orElse(soundEvent);
-        this.puzzleslib$sound = null;
+        Objects.requireNonNull(this.puzzleslib$sound.get(), "sound is null");
+        soundEvent = this.puzzleslib$sound.get().getAsOptional().orElse(soundEvent);
+        this.puzzleslib$sound.remove();
         return soundEvent;
     }
 
     @ModifyVariable(method = {"playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"}, at = @At("HEAD"), ordinal = 0)
-    public SoundSource playSeededSound$2(SoundSource source) {
-        Objects.requireNonNull(this.puzzleslib$source, "source is null");
-        source = this.puzzleslib$source.getAsOptional().orElse(source);
-        this.puzzleslib$source = null;
-        return source;
+    public SoundSource playSeededSound$2(SoundSource soundSource) {
+        Objects.requireNonNull(this.puzzleslib$source.get(), "source is null");
+        soundSource = this.puzzleslib$source.get().getAsOptional().orElse(soundSource);
+        this.puzzleslib$source.remove();
+        return soundSource;
     }
 
     @ModifyVariable(method = {"playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"}, at = @At("HEAD"), ordinal = 0)
     public float playSeededSound$3(float volume) {
-        Objects.requireNonNull(this.puzzleslib$volume, "sound is null");
-        volume = this.puzzleslib$volume.getAsOptionalFloat().orElse(volume);
-        this.puzzleslib$volume = null;
+        Objects.requireNonNull(this.puzzleslib$volume.get(), "sound is null");
+        volume = this.puzzleslib$volume.get().getAsOptionalFloat().orElse(volume);
+        this.puzzleslib$volume.remove();
         return volume;
     }
 
     @ModifyVariable(method = {"playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"}, at = @At("HEAD"), ordinal = 1)
     public float playSeededSound$4(float pitch) {
-        Objects.requireNonNull(this.puzzleslib$pitch, "pitch is null");
-        pitch = this.puzzleslib$pitch.getAsOptionalFloat().orElse(pitch);
-        this.puzzleslib$pitch = null;
+        Objects.requireNonNull(this.puzzleslib$pitch.get(), "pitch is null");
+        pitch = this.puzzleslib$pitch.get().getAsOptionalFloat().orElse(pitch);
+        this.puzzleslib$pitch.remove();
         return pitch;
     }
 }
