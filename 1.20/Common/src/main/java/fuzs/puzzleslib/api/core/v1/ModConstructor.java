@@ -24,10 +24,10 @@ public interface ModConstructor extends PairedModConstructor {
      */
     static void construct(String modId, Supplier<ModConstructor> supplier, ContentRegistrationFlags... flags) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
-        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         // build first to force class being loaded for executing buildables
         ModConstructor modConstructor = supplier.get();
         ResourceLocation identifier = ModContext.getPairingIdentifier(modId, modConstructor);
+        PuzzlesLib.LOGGER.info("Constructing common components for {}", identifier);
         ModContext modContext = ModContext.get(modId);
         Set<ContentRegistrationFlags> availableFlags = Set.of(flags);
         Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);

@@ -43,7 +43,7 @@ public interface ClientModConstructor extends PairedModConstructor {
         ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
         // not an issue on Fabric, but Forge might call client construction before common
         modContext.scheduleClientModConstruction(identifier, () -> {
-            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
+            PuzzlesLib.LOGGER.info("Constructing client components for {}", identifier);
             Set<ContentRegistrationFlags> availableFlags = Set.of(flags);
             Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
             ClientFactories.INSTANCE.constructClientMod(modId, instance, availableFlags, flagsToHandle);
