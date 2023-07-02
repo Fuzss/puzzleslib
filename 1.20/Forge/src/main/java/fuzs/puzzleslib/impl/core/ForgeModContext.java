@@ -19,30 +19,17 @@ public final class ForgeModContext extends ModContext {
 
     @Override
     public NetworkHandlerV2 getNetworkHandlerV2(boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        if (this.networkHandlerV2 == null) {
-            this.networkHandlerV2 = new NetworkHandlerForgeV2(this.modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
-        } else if (clientAcceptsVanillaOrMissing != ((NetworkHandlerForgeV2) this.networkHandlerV2).clientAcceptsVanillaOrMissing) {
-            throw new IllegalArgumentException("client accepts vanilla or missing setting does not match existing value");
-        } else if (serverAcceptsVanillaOrMissing != ((NetworkHandlerForgeV2) this.networkHandlerV2).serverAcceptsVanillaOrMissing) {
-            throw new IllegalArgumentException("server accepts vanilla or missing setting does not match existing value");
-        }
-        return this.networkHandlerV2;
+        return new NetworkHandlerForgeV2(this.modId + "-" + this.networkHandlers.incrementAndGet(), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder() {
-        if (this.networkHandlerV3 == null) {
-            this.networkHandlerV3 = this.addBuildable(new NetworkHandlerForgeV3(this.modId));
-        }
-        return this.networkHandlerV3;
+        return this.addBuildable(new NetworkHandlerForgeV3(this.modId + "-" + this.networkHandlers.incrementAndGet()));
     }
 
     @Override
     public ConfigHolder.Builder getConfigHolder$Builder() {
-        if (this.configHolder == null) {
-            this.configHolder = this.addBuildable(new ForgeConfigHolderImpl(this.modId));
-        }
-        return this.configHolder;
+        return this.addBuildable(new ForgeConfigHolderImpl(this.modId));
     }
 
     @Override

@@ -16,6 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -27,9 +28,7 @@ public abstract class ModContext {
     private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newHashMap();
     private final Set<ResourceLocation> constructedPairings = Sets.newHashSet();
     private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
-    @Nullable NetworkHandlerV2 networkHandlerV2;
-    @Nullable NetworkHandlerV3.Builder networkHandlerV3;
-    @Nullable ConfigHolder.Builder configHolder;
+    protected final AtomicInteger networkHandlers = new AtomicInteger();
     @Nullable RegistryManager registryManager;
     @Nullable CapabilityController capabilityController;
 
