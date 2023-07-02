@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.5-1.20.1] - 2023-07-02
+### Fixed
+- Fixed a crash when rendering items on Fabric
+
 ## [v8.0.4-1.20.1] - 2023-07-01
 ### Changed
 - Once again invert `ItemDisplayContext`s when registering item model perspective overrides

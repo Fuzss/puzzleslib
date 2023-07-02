@@ -7,11 +7,13 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
 
 public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
+    @Nullable
     private Map<BakedModel, Map<ItemDisplayContext, BakedModel>> overrideModels;
 
     {
@@ -30,7 +32,8 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
     }
 
     public BakedModel getItemModelDisplayOverride(BakedModel itemModel, ItemDisplayContext itemDisplayContext) {
-        Objects.requireNonNull(this.overrideModels, "overrides is null");
+        // if this class was only loaded by the item renderer mixin because no overrides have been registered by any mod this will still be null
+        if (this.overrideModels == null) return itemModel;
         Map<ItemDisplayContext, BakedModel> overrides = this.overrideModels.get(itemModel);
         return overrides != null ? overrides.getOrDefault(itemDisplayContext, itemModel) : itemModel;
     }
