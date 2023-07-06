@@ -122,14 +122,20 @@ public interface ClientModConstructor extends PairedModConstructor {
 
     /**
      * @param context Context for modifying baked models right after they've been reloaded.
+     *
+     * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.ModifyBakingResult}
      */
+    @Deprecated(forRemoval = true)
     default void onModifyBakingResult(final DynamicModifyBakingResultContext context) {
 
     }
 
     /**
      * @param context Context for retrieving baked models from the model manager after they've been reloaded.
+     *
+     * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.BakingCompleted}
      */
+    @Deprecated(forRemoval = true)
     default void onBakingCompleted(final DynamicBakingCompletedContext context) {
 
     }

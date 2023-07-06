@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.event;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
@@ -52,7 +53,6 @@ import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -469,10 +469,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         Objects.requireNonNull(converter, "converter is null");
         IEventBus eventBus;
         if (IModBusEvent.class.isAssignableFrom(event)) {
-            if (ModLoadingContext.get().getActiveNamespace().equals("minecraft")) {
-                throw new IllegalStateException("invalid active mod container");
-            }
-            eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+            // this will be null when an event is registered after the initial mod loading
+            FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
+            eventBus = context != null ? context.getModEventBus() : null;
         } else {
             eventBus = MinecraftForge.EVENT_BUS;
         }
@@ -485,7 +484,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         }
     }
 
-    private record ForgeEventInvoker<T, E extends Event>(IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvokerLike<T> {
+    private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvokerLike<T> {
         private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = ImmutableMap.<EventPhase, EventPriority>builder().put(EventPhase.FIRST, EventPriority.HIGHEST).put(EventPhase.BEFORE, EventPriority.HIGH).put(EventPhase.DEFAULT, EventPriority.NORMAL).put(EventPhase.AFTER, EventPriority.LOW).put(EventPhase.LAST, EventPriority.LOWEST).build();
 
         @Override
@@ -499,8 +498,17 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             Objects.requireNonNull(phase, "phase is null");
             Objects.requireNonNull(callback, "callback is null");
             EventPriority eventPriority = PHASE_TO_PRIORITY.getOrDefault(phase, EventPriority.NORMAL);
-            // we don't support receiving cancelled events since the event api on Fabric is not designed for it
-            this.eventBus.addListener(eventPriority, false, this.event, (E evt) -> this.converter.accept(callback, evt, context));
+            IEventBus eventBus = this.eventBus;
+            if (eventBus == null) {
+                Objects.requireNonNull(context, "mod id context is null");
+                eventBus = ModContainerHelper.findModEventBus((String) context).orElseThrow();
+            }
+            if (eventBus == MinecraftForge.EVENT_BUS || eventPriority == EventPriority.NORMAL) {
+                // we don't support receiving cancelled events since the event api on Fabric is not designed for it
+                eventBus.addListener(eventPriority, false, this.event, (E evt) -> this.converter.accept(callback, evt, context));
+            } else {
+                throw new IllegalStateException("mod event bus does not support event phases");
+            }
         }
     }
 }

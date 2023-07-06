@@ -29,12 +29,5 @@ versionRange = "[${minecraftVersion}]"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.${ modId }]]
-modId = "puzzleslib"
-mandatory = true
-versionRange = "[${minPuzzlesVersion},)"
-ordering = "NONE"
-side = "BOTH"
-
 [modproperties.${ modId }]
 catalogueImageIcon = "mod_logo.png"
