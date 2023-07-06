@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.client.init;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -17,7 +18,7 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
     private Map<BakedModel, Map<ItemDisplayContext, BakedModel>> overrideModels;
 
     {
-        ModelEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.modifyBakingResult(PuzzlesLib.MOD_ID).register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
             this.overrideModels = Maps.newIdentityHashMap();
             for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : super.overrideLocations.entrySet()) {
                 BakedModel itemModel = models.get(entry.getKey());

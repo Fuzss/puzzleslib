@@ -97,6 +97,14 @@ public final class FabricClientEvents {
      * Called after {@link Input#tick(boolean, float)} has run for the {@link LocalPlayer}.
      */
     public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(MovementInputUpdateCallback.class);
+    /**
+     * Fired when the resource manager is reloading models and models have been baked, but before they are passed on for caching.
+     */
+    public static final Event<ModelEvents.ModifyBakingResult> MODIFY_BAKING_RESULT = FabricEventFactory.create(ModelEvents.ModifyBakingResult.class);
+    /**
+     * Fired after the resource manager has reloaded models. Does not allow for modifying the models map, for that use {@link ModelEvents.ModifyBakingResult}.
+     */
+    public static final Event<ModelEvents.BakingCompleted> BAKING_COMPLETED = FabricEventFactory.create(ModelEvents.BakingCompleted.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

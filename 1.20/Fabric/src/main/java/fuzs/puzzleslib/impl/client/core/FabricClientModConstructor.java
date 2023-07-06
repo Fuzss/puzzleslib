@@ -58,14 +58,14 @@ public final class FabricClientModConstructor {
     }
 
     private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer, String modId) {
-        ModelEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.modifyBakingResult(null).register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
             try {
                 modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
             }
         });
-        ModelEvents.BAKING_COMPLETED.register((ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.bakingCompleted(null).register((ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
             try {
                 bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager, models, modelBakery));
             } catch (Exception e) {
