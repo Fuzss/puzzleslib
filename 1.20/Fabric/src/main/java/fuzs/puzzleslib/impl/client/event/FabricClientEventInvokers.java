@@ -193,11 +193,15 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientLevelEvents.Load.class, FabricClientEvents.LOAD_LEVEL);
         INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientEvents.UNLOAD_LEVEL);
         INSTANCE.register(MovementInputUpdateCallback.class, FabricClientEvents.MOVEMENT_INPUT_UPDATE);
+        INSTANCE.register(ModelEvents.ModifyBakingResult.class, FabricClientEvents.MODIFY_BAKING_RESULT);
+        INSTANCE.register(ModelEvents.BakingCompleted.class, FabricClientEvents.BAKING_COMPLETED);
+        INSTANCE.register(RenderBlockOverlayCallback.class, FabricClientEvents.RENDER_BLOCK_OVERLAY);
+        INSTANCE.register(FogEvents.Render.class, FabricClientEvents.RENDER_FOG);
+        INSTANCE.register(FogEvents.ComputeColor.class, FabricClientEvents.COMPUTE_FOG_COLOR);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
         INSTANCE.register(clazz, eventType, converter, (context, applyToInvoker, removeInvoker) -> {
-            Objects.requireNonNull(context, "context is null");
             // we need to keep our own event invokers during the whole pre-init phase to guarantee phase ordering is applied correctly,
             // since this is managed in the event invokers and there seems to be no way to handle it with just the Fabric event
             // (since the Fabric event doesn't allow for retrieving already applied event phase orders),

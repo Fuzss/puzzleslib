@@ -105,6 +105,18 @@ public final class FabricClientEvents {
      * Fired after the resource manager has reloaded models. Does not allow for modifying the models map, for that use {@link ModelEvents.ModifyBakingResult}.
      */
     public static final Event<ModelEvents.BakingCompleted> BAKING_COMPLETED = FabricEventFactory.create(ModelEvents.BakingCompleted.class);
+    /**
+     * Called before a block overlay is rendered on the screen.
+     */
+    public static final Event<RenderBlockOverlayCallback> RENDER_BLOCK_OVERLAY = FabricEventFactory.createResult(RenderBlockOverlayCallback.class);
+    /**
+     * Called before fog is rendered, allows for controlling fog start and end distance.
+     */
+    public static final Event<FogEvents.Render> RENDER_FOG = FabricEventFactory.create(FogEvents.Render.class);
+    /**
+     * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the color.
+     */
+    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.createResult(FogEvents.ComputeColor.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

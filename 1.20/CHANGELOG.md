@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.9-1.20.1] - 2023-07-12
+### Added
+- Added `RenderBlockOverlayCallback`
+- Added `FogEvents$Render` and `FogEvents$ComputeColor`
+### Fixed
+- Fixed `ModelEvents` crashing on Fabric
+
 ## [v8.0.8-1.20.1] - 2023-07-06
 ### Changed
 - Migrate `ModelEvents` to common event system

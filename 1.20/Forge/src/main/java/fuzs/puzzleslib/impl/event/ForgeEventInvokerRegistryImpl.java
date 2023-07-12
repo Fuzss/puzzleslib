@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.event;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
@@ -485,7 +484,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
     }
 
     private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvokerLike<T> {
-        private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = ImmutableMap.<EventPhase, EventPriority>builder().put(EventPhase.FIRST, EventPriority.HIGHEST).put(EventPhase.BEFORE, EventPriority.HIGH).put(EventPhase.DEFAULT, EventPriority.NORMAL).put(EventPhase.AFTER, EventPriority.LOW).put(EventPhase.LAST, EventPriority.LOWEST).build();
+        private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = Map.of(EventPhase.FIRST, EventPriority.HIGHEST, EventPhase.BEFORE, EventPriority.HIGH, EventPhase.DEFAULT, EventPriority.NORMAL, EventPhase.AFTER, EventPriority.LOW, EventPhase.LAST, EventPriority.LOWEST);
 
         @Override
         public EventInvoker<T> asEventInvoker(@Nullable Object context) {

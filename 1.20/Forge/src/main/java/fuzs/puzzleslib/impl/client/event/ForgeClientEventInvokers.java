@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.client.event;
 
+import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -246,8 +247,33 @@ public final class ForgeClientEventInvokers {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onLevelUnload(Minecraft.getInstance(), level);
         });
-        INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (callback, evt) -> {
+        INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (MovementInputUpdateCallback callback, MovementInputUpdateEvent evt) -> {
             callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
+        });
+        INSTANCE.register(RenderBlockOverlayCallback.class, RenderBlockScreenEffectEvent.class, (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent evt) -> {
+            EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), evt.getBlockState());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(FogEvents.Render.class, ViewportEvent.RenderFog.class, (FogEvents.Render callback, ViewportEvent.RenderFog evt) -> {
+            MutableFloat nearPlaneDistance = MutableFloat.fromEvent(t -> {
+                evt.setNearPlaneDistance(t);
+                evt.setCanceled(true);
+            }, evt::getNearPlaneDistance);
+            MutableFloat farPlaneDistance = MutableFloat.fromEvent(t -> {
+                evt.setFarPlaneDistance(t);
+                evt.setCanceled(true);
+            }, evt::getFarPlaneDistance);
+            MutableValue<FogShape> fogShape = MutableValue.fromEvent(t -> {
+                evt.setFogShape(t);
+                evt.setCanceled(true);
+            }, evt::getFogShape);
+            callback.onRenderFog(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), evt.getMode(), evt.getType(), nearPlaneDistance, farPlaneDistance, fogShape);
+        });
+        INSTANCE.register(FogEvents.ComputeColor.class, ViewportEvent.ComputeFogColor.class, (FogEvents.ComputeColor callback, ViewportEvent.ComputeFogColor evt) -> {
+            MutableFloat red = MutableFloat.fromEvent(evt::setRed, evt::getRed);
+            MutableFloat green = MutableFloat.fromEvent(evt::setGreen, evt::getGreen);
+            MutableFloat blue = MutableFloat.fromEvent(evt::setBlue, evt::getBlue);
+            callback.onComputeFogColor(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), red, green, blue);
         });
     }
 
