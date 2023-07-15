@@ -8,6 +8,8 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.inventory.Slot;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * A helper class for accessing encapsulated fields on a screen.
  * On Forge those are all exposed via added getter methods, but Fabric requires mixin accessors.
@@ -62,6 +64,7 @@ public interface ScreenHelper {
      * @return current mouse x position
      */
     default int getMouseX(Screen screen) {
+        Objects.requireNonNull(screen, "screen is null");
         return this.getMouseX(this.getMinecraft(screen));
     }
 
@@ -70,6 +73,7 @@ public interface ScreenHelper {
      * @return current mouse x position
      */
     default int getMouseX(Minecraft minecraft) {
+        Objects.requireNonNull(minecraft, "minecraft is null");
         return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow().getScreenWidth());
     }
 
@@ -78,6 +82,7 @@ public interface ScreenHelper {
      * @return current mouse y position
      */
     default int getMouseY(Screen screen) {
+        Objects.requireNonNull(screen, "screen is null");
         return this.getMouseY(this.getMinecraft(screen));
     }
 
@@ -86,6 +91,7 @@ public interface ScreenHelper {
      * @return current mouse y position
      */
     default int getMouseY(Minecraft minecraft) {
+        Objects.requireNonNull(minecraft, "minecraft is null");
         return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow().getScreenHeight());
     }
 }
