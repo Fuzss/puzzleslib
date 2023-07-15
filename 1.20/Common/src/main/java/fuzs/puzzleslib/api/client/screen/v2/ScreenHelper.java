@@ -56,4 +56,36 @@ public interface ScreenHelper {
      * @return the slot the mouse is currently hovering (which an item tooltip is shown for and where the hovered slot overlay is drawn)
      */
     @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen);
+
+    /**
+     * @param screen screen instance
+     * @return current mouse x position
+     */
+    default int getMouseX(Screen screen) {
+        return this.getMouseX(this.getMinecraft(screen));
+    }
+
+    /**
+     * @param minecraft minecraft singleton
+     * @return current mouse x position
+     */
+    default int getMouseX(Minecraft minecraft) {
+        return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow().getScreenWidth());
+    }
+
+    /**
+     * @param screen screen instance
+     * @return current mouse y position
+     */
+    default int getMouseY(Screen screen) {
+        return this.getMouseY(this.getMinecraft(screen));
+    }
+
+    /**
+     * @param minecraft minecraft singleton
+     * @return current mouse y position
+     */
+    default int getMouseY(Minecraft minecraft) {
+        return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow().getScreenHeight());
+    }
 }
