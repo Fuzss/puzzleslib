@@ -198,6 +198,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderBlockOverlayCallback.class, FabricClientEvents.RENDER_BLOCK_OVERLAY);
         INSTANCE.register(FogEvents.Render.class, FabricClientEvents.RENDER_FOG);
         INSTANCE.register(FogEvents.ComputeColor.class, FabricClientEvents.COMPUTE_FOG_COLOR);
+        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricScreenEvents.RENDER_TOOLTIP);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

@@ -24,4 +24,8 @@ public final class FabricScreenEvents {
      * allows for exchanging the new screen with a different one, or can prevent a new screen from opening, effectively forcing the old screen to remain.
      */
     public static final Event<ScreenOpeningCallback> SCREEN_OPENING = FabricEventFactory.createResult(ScreenOpeningCallback.class);
+    /**
+     * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
+     */
+    public static final Event<ScreenTooltipEvents.Render> RENDER_TOOLTIP = FabricEventFactory.createResult(ScreenTooltipEvents.Render.class);
 }

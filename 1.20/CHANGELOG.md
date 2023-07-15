@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.10-1.20.1] - 2023-07-15
+### Added
+- Added `ScreenTooltipEvents.Render`
+- Added two helper methods for getting `mouseX` and `mouseY` to `ScreenHelper`
+
 ## [v8.0.9-1.20.1] - 2023-07-12
 ### Added
 - Added `RenderBlockOverlayCallback`

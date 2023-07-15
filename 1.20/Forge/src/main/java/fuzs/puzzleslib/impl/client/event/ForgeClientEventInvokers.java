@@ -275,6 +275,10 @@ public final class ForgeClientEventInvokers {
             MutableFloat blue = MutableFloat.fromEvent(evt::setBlue, evt::getBlue);
             callback.onComputeFogColor(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), red, green, blue);
         });
+        INSTANCE.register(ScreenTooltipEvents.Render.class, RenderTooltipEvent.Pre.class, (ScreenTooltipEvents.Render callback, RenderTooltipEvent.Pre evt) -> {
+            EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getX(), evt.getY(), evt.getScreenWidth(), evt.getScreenHeight(), evt.getFont(), evt.getComponents(), evt.getTooltipPositioner());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
