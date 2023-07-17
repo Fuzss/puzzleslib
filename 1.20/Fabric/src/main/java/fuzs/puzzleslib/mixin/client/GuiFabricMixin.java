@@ -76,12 +76,12 @@ abstract class GuiFabricMixin {
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))
     public void render$2(GuiGraphics guiGraphics, float partialTick, CallbackInfo callback) {
         this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onBeforeRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
     }
 
-    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;oSpinningEffectIntensity:F", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;oSpinningEffectIntensity:F"))
     public void render$3(GuiGraphics guiGraphics, float partialTick, CallbackInfo callback) {
         this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onBeforeRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
     }
@@ -97,7 +97,7 @@ abstract class GuiFabricMixin {
         FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onAfterRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;III)V", shift = At.Shift.BEFORE))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;III)V"))
     public void render$4(GuiGraphics guiGraphics, float partialTick, CallbackInfo callback) {
         guiGraphics.pose().pushPose();
         DefaultedInt posX = DefaultedInt.fromValue(0);
