@@ -19,7 +19,7 @@ public abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
     @Final
     private AbstractHorse horse;
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tameWithName(Lnet/minecraft/world/entity/player/Player;)Z", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tameWithName(Lnet/minecraft/world/entity/player/Player;)Z"), cancellable = true)
     public void tick(CallbackInfo callback) {
         Player player = (Player) this.horse.getPassengers().get(0);
         if (FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(this.horse, player).isInterrupt()) {
