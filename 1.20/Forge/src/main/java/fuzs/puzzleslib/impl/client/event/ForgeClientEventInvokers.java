@@ -10,6 +10,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -278,6 +279,34 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ScreenTooltipEvents.Render.class, RenderTooltipEvent.Pre.class, (ScreenTooltipEvents.Render callback, RenderTooltipEvent.Pre evt) -> {
             EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getX(), evt.getY(), evt.getScreenWidth(), evt.getScreenHeight(), evt.getFont(), evt.getComponents(), evt.getTooltipPositioner());
             if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.class, (RenderHighlightCallback callback, RenderHighlightEvent evt) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
+            EventResult result = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterTerrain.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterTerrain callback, RenderLevelStageEvent evt) -> {
+            // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterTerrain(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterEntities.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterEntities callback, RenderLevelStageEvent evt) -> {
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterEntities(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterTranslucent.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterTranslucent callback, RenderLevelStageEvent evt) -> {
+            // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterTranslucent(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterLevel.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterLevel callback, RenderLevelStageEvent evt) -> {
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterLevel(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
         });
     }
 
