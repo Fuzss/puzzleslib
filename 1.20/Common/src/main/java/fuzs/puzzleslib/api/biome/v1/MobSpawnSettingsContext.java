@@ -73,7 +73,7 @@ public interface MobSpawnSettingsContext {
      * @param charge       the strength of a spawn aura, defines how far away other spawn attempts are affected, usually <code>0.7</code> in vanilla
      * @see MobSpawnSettings#getMobSpawnCost(EntityType)
      * @see MobSpawnSettings.Builder#addMobCharge(EntityType, double, double)
-     * @see <a href=”https://www.reddit.com/r/minecraft_configs/comments/idmyyr/so_how_does_spawn_costs_actuallywork/”>Reddit: So how does spawn_costs actually...work?</a>
+     * @see <a href="https://www.reddit.com/r/minecraft_configs/comments/idmyyr/so_how_does_spawn_costs_actuallywork/">Reddit: So how does spawn_costs actually...work?</a>
      */
     void setSpawnCost(EntityType<?> entityType, double energyBudget, double charge);
 
