@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.client.event.v1.FabricScreenEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedBoolean;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
@@ -32,20 +33,34 @@ abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractConta
         super(abstractContainerMenu, inventory, component);
     }
 
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    private void renderEffects$0(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo callback) {
+    @ModifyVariable(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), ordinal = 0)
+    private boolean renderEffects$0(boolean fullSize) {
+        this.puzzleslib$smallWidgets = DefaultedBoolean.fromValue(!fullSize);
+        return fullSize;
+    }
+
+    @ModifyVariable(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), ordinal = 2)
+    private int renderEffects$1(int horizontalOffset) {
+        this.puzzleslib$horizontalOffset = DefaultedInt.fromValue(horizontalOffset);
+        return horizontalOffset;
+    }
+
+    @Inject(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), cancellable = true)
+    private void renderEffects$2(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo callback) {
         int i = this.leftPos + this.imageWidth + 2;
         int j = this.width - i;
-        Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
-        if (collection.isEmpty() || j < 32) return;
-        this.puzzleslib$smallWidgets = DefaultedBoolean.fromValue(j < 120);
-        this.puzzleslib$horizontalOffset = DefaultedInt.fromValue(i);
+        Objects.requireNonNull(this.puzzleslib$smallWidgets, "full size rendering is null");
+        Objects.requireNonNull(this.puzzleslib$horizontalOffset, "horizontal offset is null");
         EventResult result = FabricScreenEvents.INVENTORY_MOB_EFFECTS.invoker().onInventoryMobEffects(this, j, this.puzzleslib$smallWidgets, this.puzzleslib$horizontalOffset);
-        if (result.isInterrupt()) callback.cancel();
+        if (result.isInterrupt()) {
+            this.puzzleslib$smallWidgets = null;
+            this.puzzleslib$horizontalOffset = null;
+            callback.cancel();
+        }
     }
 
     @ModifyVariable(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), ordinal = 0)
-    private boolean renderEffects$1(boolean fullSize) {
+    private boolean renderEffects$3(boolean fullSize) {
         Objects.requireNonNull(this.puzzleslib$smallWidgets, "full size rendering is null");
         fullSize = this.puzzleslib$smallWidgets.getAsOptionalBoolean().map(t -> !t).orElse(fullSize);
         this.puzzleslib$smallWidgets = null;
@@ -53,7 +68,7 @@ abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractConta
     }
 
     @ModifyVariable(method = "renderEffects", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I", ordinal = 0), ordinal = 2)
-    private int renderEffects$2(int horizontalOffset) {
+    private int renderEffects$4(int horizontalOffset) {
         Objects.requireNonNull(this.puzzleslib$horizontalOffset, "horizontal offset is null");
         horizontalOffset = this.puzzleslib$horizontalOffset.getAsOptionalInt().orElse(horizontalOffset);
         this.puzzleslib$horizontalOffset = null;
