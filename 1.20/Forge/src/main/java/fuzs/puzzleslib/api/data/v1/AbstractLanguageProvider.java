@@ -56,8 +56,8 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
         }
     }
 
-    public void add(Attribute entityAttribute, String value) {
-        this.add(entityAttribute.getDescriptionId(), value);
+    public void add(Attribute attribute, String value) {
+        this.add(attribute.getDescriptionId(), value);
     }
 
     public void add(StatType<?> statType, String value) {
@@ -84,35 +84,78 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
         this.add(identifier.toLanguageKey(), value);
     }
 
+    @Deprecated(forRemoval = true)
     public void addAdditional(Block block, String key, String value) {
         this.add(block.getDescriptionId() + "." + key, value);
     }
 
+    public void add(Block block, String additionalKey, String value) {
+        this.add(block.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(Item item, String key, String value) {
         this.add(item.getDescriptionId() + "." + key, value);
     }
 
+    public void add(Item item, String additionalKey, String value) {
+        this.add(item.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(Enchantment enchantment, String key, String value) {
         this.add(enchantment.getDescriptionId() + "." + key, value);
     }
 
+    public void add(Enchantment enchantment, String additionalKey, String value) {
+        this.add(enchantment.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(MobEffect mobEffect, String key, String value) {
         this.add(mobEffect.getDescriptionId() + "." + key, value);
     }
 
+    public void add(MobEffect mobEffect, String additionalKey, String value) {
+        this.add(mobEffect.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(EntityType<?> entityType, String key, String value) {
         this.add(entityType.getDescriptionId() + "." + key, value);
     }
 
-    /**
-     * @deprecated migrate to {@link #addDamageType(ResourceKey, String)}
-     */
+    public void add(EntityType<?> entityType, String additionalKey, String value) {
+        this.add(entityType.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    public void add(Attribute attribute, String additionalKey, String value) {
+        this.add(attribute.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    public void add(StatType<?> statType, String additionalKey, String value) {
+        this.add(statType.getTranslationKey() + "." + additionalKey, value);
+    }
+
+    public void add(String key, String additionalKey, String value) {
+        this.add(key + "." + additionalKey, value);
+    }
+
+    public void add(ResourceLocation identifier, String additionalKey, String value) {
+        this.add(identifier.toLanguageKey() + "." + additionalKey, value);
+    }
+
     @Deprecated(forRemoval = true)
     public void addDamageSource(String damageSource, String value) {
         this.add("death.attack." + damageSource, value);
     }
 
+    @Deprecated(forRemoval = true)
     public void addDamageType(ResourceKey<DamageType> damageType, String value) {
+        this.addGenericDamageType(damageType, value);
+    }
+
+    public void addGenericDamageType(ResourceKey<DamageType> damageType, String value) {
         this.add("death.attack." + damageType.location().getPath(), value);
     }
 
