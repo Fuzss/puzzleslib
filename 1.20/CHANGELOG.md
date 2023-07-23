@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.12-1.20.1] - 2023-07-23
+### Fixed
+- Fixed a crash when calling `ModelEvents` on Forge
+
 ## [v8.0.11-1.20.1] - 2023-07-23
 ### Added
 - Added `RenderHighlightCallback`
