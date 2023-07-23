@@ -3,10 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.0.11-1.20.1] - 2023-07-17
+## [v8.0.11-1.20.1] - 2023-07-23
 ### Added
 - Added `RenderHighlightCallback`
 - Added `RenderLevelEvents`
+### Changed
+- Shifted injection points for `InventoryMobEffectsCallback` to be compatible with the [Just Enough Items](https://www.curseforge.com/minecraft/mc-mods/jei) mod on Fabric
+- Slightly changed some injection point shifts related to `AnimalTameCallback`
 
 ## [v8.0.10-1.20.1] - 2023-07-15
 ### Added
