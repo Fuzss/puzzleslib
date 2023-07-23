@@ -251,6 +251,12 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (MovementInputUpdateCallback callback, MovementInputUpdateEvent evt) -> {
             callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
         });
+        INSTANCE.register(ModelEvents.ModifyBakingResult.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakingResult callback, ModelEvent.ModifyBakingResult evt) -> {
+            callback.onModifyBakingResult(evt.getModels(), evt.getModelBakery());
+        });
+        INSTANCE.register(ModelEvents.BakingCompleted.class, ModelEvent.BakingCompleted.class, (ModelEvents.BakingCompleted callback, ModelEvent.BakingCompleted evt) -> {
+            callback.onBakingCompleted(evt.getModelManager(), evt.getModels(), evt.getModelBakery());
+        });
         INSTANCE.register(RenderBlockOverlayCallback.class, RenderBlockScreenEffectEvent.class, (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent evt) -> {
             EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), evt.getBlockState());
             if (result.isInterrupt()) evt.setCanceled(true);
