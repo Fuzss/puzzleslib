@@ -16,7 +16,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
@@ -135,13 +134,7 @@ public final class FabricClientEventInvokers {
             applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement(overlay.id()));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
-        INSTANCE.register(ClientEntityLevelEvents.Load.class, ClientEntityEvents.ENTITY_LOAD, callback -> {
-            return (Entity entity, ClientLevel world) -> {
-                if (callback.onEntityLoad(entity, world).isInterrupt()) {
-                    entity.setRemoved(Entity.RemovalReason.DISCARDED);
-                }
-            };
-        });
+        INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEvents.ENTITY_LOAD);
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onEntityUnload;
         });

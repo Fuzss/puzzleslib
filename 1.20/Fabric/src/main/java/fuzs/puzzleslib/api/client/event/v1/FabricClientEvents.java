@@ -33,6 +33,11 @@ public final class FabricClientEvents {
      */
     public static final Event<CustomizeChatPanelCallback> CUSTOMIZE_CHAT_PANEL = FabricEventFactory.create(CustomizeChatPanelCallback.class);
     /**
+     * Fired when an entity is added to the level on the client.
+     * <p>We do not use {@link net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents#ENTITY_LOAD} as it does not allow for preventing the entity from being added.
+     */
+    public static final Event<ClientEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(ClientEntityLevelEvents.Load.class);
+    /**
      * Called before a mouse button is clicked or released without a screen being open.
      */
     public static final Event<InputEvents.BeforeMouseAction> BEFORE_MOUSE_ACTION = FabricEventFactory.createResult(InputEvents.BeforeMouseAction.class);

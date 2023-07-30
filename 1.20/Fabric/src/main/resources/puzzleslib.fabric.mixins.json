@@ -33,6 +33,7 @@
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",
     "ParrotFabricMixin",
+    "PersistentEntitySectionManagerFabricMixin",
     "PlayerFabricMixin",
     "RunAroundLikeCrazyGoalFabricMixin",
     "ServerLevelFabricMixin",

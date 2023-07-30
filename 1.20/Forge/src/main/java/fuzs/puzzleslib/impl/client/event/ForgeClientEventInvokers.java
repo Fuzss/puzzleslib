@@ -156,8 +156,14 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
-            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            if (callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel()).isInterrupt()) {
+                if (evt.getEntity() instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
         });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
