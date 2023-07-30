@@ -12,13 +12,14 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
     @Nullable
     private Map<BakedModel, Map<ItemDisplayContext, BakedModel>> overrideModels;
 
     {
-        ModelEvents.modifyBakingResult(PuzzlesLib.MOD_ID).register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.modifyBakingResult(PuzzlesLib.MOD_ID).register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             this.overrideModels = Maps.newIdentityHashMap();
             for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : super.overrideLocations.entrySet()) {
                 BakedModel itemModel = models.get(entry.getKey());

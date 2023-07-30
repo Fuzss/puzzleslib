@@ -14,12 +14,13 @@ import net.minecraftforge.client.model.BakedModelWrapper;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public final class ForgeItemDisplayOverrides extends ItemDisplayOverridesImpl {
 
     {
-        ModelEvents.modifyBakingResult(PuzzlesLib.MOD_ID).register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.modifyBakingResult(PuzzlesLib.MOD_ID).register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : this.overrideLocations.entrySet()) {
                 BakedModel itemModel = models.get(entry.getKey());
                 Objects.requireNonNull(itemModel, "item model is null");

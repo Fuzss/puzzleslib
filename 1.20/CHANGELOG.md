@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.14-1.20.1] - 2023-07-30
+### Fixed
+- Fixed an issue with the `Sheets` class accidentally being accessed too early, preventing modded materials such as wood types from registering correctly, which would lead to crashes when e.g. rendering signs
+
 ## [v8.0.13-1.20.1] - 2023-07-26
 ### Added
 - Added `ScreenTooltipFactory`

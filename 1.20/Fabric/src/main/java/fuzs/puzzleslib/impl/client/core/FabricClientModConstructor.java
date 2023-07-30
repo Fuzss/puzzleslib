@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class FabricClientModConstructor {
 
@@ -58,16 +59,16 @@ public final class FabricClientModConstructor {
     }
 
     private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer, String modId) {
-        ModelEvents.modifyBakingResult(null).register((Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.modifyBakingResult(null).register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             try {
-                modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
+                modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery.get()));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
             }
         });
-        ModelEvents.bakingCompleted(null).register((ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) -> {
+        ModelEvents.bakingCompleted(null).register((Supplier<ModelManager> modelManager, Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             try {
-                bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager, models, modelBakery));
+                bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager.get(), models, modelBakery.get()));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
             }
