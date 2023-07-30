@@ -52,6 +52,18 @@ abstract class ClientLevelFabricMixin extends Level {
         FabricClientEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
     }
 
+    @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
+    private void addEntity(int entityId, Entity entityToSpawn, CallbackInfo callback) {
+        if (FabricClientEvents.ENTITY_LOAD.invoker().onEntityLoad(entityToSpawn, ClientLevel.class.cast(this)).isInterrupt()) {
+            if (entityToSpawn instanceof Player) {
+                // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+            } else {
+                callback.cancel();
+            }
+        }
+    }
+
     @Inject(method = "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V", at = @At("HEAD"), cancellable = true)
     public void playSeededSound$0(@Nullable Player player, double x, double y, double z, Holder<SoundEvent> soundEvent, SoundSource source, float volume, float pitch, long seed, CallbackInfo callback) {
         this.puzzleslib$sound.set(DefaultedValue.fromValue(soundEvent));

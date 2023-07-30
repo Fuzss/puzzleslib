@@ -178,13 +178,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
-        INSTANCE.register(ServerEntityLevelEvents.Load.class, ServerEntityEvents.ENTITY_LOAD, callback -> {
-            return (Entity entity, ServerLevel world) -> {
-                if (callback.onEntityLoad(entity, world, entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
-                    entity.setRemoved(Entity.RemovalReason.DISCARDED);
-                }
-            };
-        });
+        INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onEntityUnload;
         });
