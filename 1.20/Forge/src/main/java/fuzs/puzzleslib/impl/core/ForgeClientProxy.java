@@ -6,7 +6,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -28,7 +27,7 @@ public class ForgeClientProxy extends ForgeServerProxy {
     }
 
     @Override
-    public Connection getClientConnection() {
+    public ClientPacketListener getClientPacketListener() {
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
         Objects.requireNonNull(connection, "Cannot send packets when not in game!");
         return connection.getConnection();

@@ -92,7 +92,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(method = "updateUsingItem", at = @At("HEAD"))
     protected void updateUsingItem(ItemStack useItem, CallbackInfo callback) {
         // moved here from LivingEntity#updatingUsingItem on Forge, just a little more simple to implement
-        DefaultedInt useItemRemaining = DefaultedInt.fromValue(this.useItemRemaining);
+        DefaultedInt useItemRemaining = DefaultedInt.fromValue(useItem.getUseDuration());
         EventResult result = FabricLivingEvents.USE_ITEM_TICK.invoker().onUseItemTick(LivingEntity.class.cast(this), useItem, useItemRemaining);
         this.useItemRemaining = result.isInterrupt() ? 0 : useItemRemaining.getAsOptionalInt().orElse(this.useItemRemaining);
         // --this.useItemRemaining == 0 runs at the end of this method, since we will be below that LivingEntity#completeUsingItem does not run (intentionally)

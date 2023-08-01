@@ -64,7 +64,7 @@ public interface NetworkHandlerV3 {
      * @param message message to send
      */
     default <T extends Record & ServerboundMessage<T>> void sendToServer(T message) {
-        Proxy.INSTANCE.getClientConnection().send(this.toServerboundPacket(message));
+        Proxy.INSTANCE.getClientPacketListener().send(this.toServerboundPacket(message));
     }
 
     /**

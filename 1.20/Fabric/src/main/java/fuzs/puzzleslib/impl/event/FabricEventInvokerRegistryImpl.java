@@ -4,6 +4,7 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -17,6 +18,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
+import fuzs.puzzleslib.impl.core.FabricProxy;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -38,6 +40,9 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -72,36 +77,55 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
     static {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
-            return (Player player, Level world, InteractionHand hand, BlockHitResult hitResult) -> {
-                return callback.onUseBlock(player, world, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
+            return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
+                InteractionResult interactionResult = callback.onUseBlock(player, level, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
+                // this fixes an issue with Fabric Api where InteractionResult#CONSUME and InteractionResult#PARTIAL_SUCCESS when returned client-side do not trigger the server packet
+                // although InteractionResult#SUCCESS is generally desired for the client, there are cases where it is not, but the interaction should still consume
+                if (level.isClientSide && interactionResult != InteractionResult.SUCCESS && interactionResult.consumesAction()) {
+                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemOnPacket(hand, hitResult, id));
+                }
+                return interactionResult;
             };
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, callback -> {
-            return (Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) -> {
-                return callback.onAttackBlock(player, world, hand, pos, direction).getInterrupt().orElse(InteractionResult.PASS);
+            return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
+                return callback.onAttackBlock(player, level, hand, pos, direction).getInterrupt().orElse(InteractionResult.PASS);
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
-                return callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
+                InteractionResultHolder<ItemStack> result = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
+                // this fixes an issue with Fabric Api where InteractionResult#CONSUME and InteractionResult#PARTIAL_SUCCESS when returned client-side do not trigger the server packet
+                // although InteractionResult#SUCCESS is generally desired for the client, there are cases where it is not, but the interaction should still consume
+                if (level.isClientSide && result.getResult() != InteractionResult.SUCCESS && result.getResult().consumesAction()) {
+                    // send the move packet like vanilla to ensure the position+view vectors are accurate
+                    Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
+                    // send interaction packet to the server with a new sequentially assigned id
+                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemPacket(hand, id));
+                }
+                return result;
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, callback -> {
-            return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult != null) return InteractionResult.PASS;
-                return callback.onUseEntity(player, world, hand, entity).getInterrupt().orElse(InteractionResult.PASS);
+                return callback.onUseEntity(player, level, hand, entity).getInterrupt().orElse(InteractionResult.PASS);
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, callback -> {
-            return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult == null) return InteractionResult.PASS;
-                return callback.onUseEntityAt(player, world, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
+                return callback.onUseEntityAt(player, level, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
             };
         });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, callback -> {
-            return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                EventResult result = callback.onAttackEntity(player, world, hand, entity);
-                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
+            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                EventResult result = callback.onAttackEntity(player, level, hand, entity);
+                // this isn't a proper item use callback (seen with the server-side and Forge implementations), so the return looks a little odd
+                // we return InteractionResult#SUCCESS so the packet is sent to the server either way so the server may handle this on its own as Forge does
+                return result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
             };
         });
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
@@ -228,13 +252,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return callback::onEndServerTick;
         });
         INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, callback -> {
-            return (ServerLevel world) -> {
-                callback.onStartLevelTick(world.getServer(), world);
+            return (ServerLevel level) -> {
+                callback.onStartLevelTick(level.getServer(), level);
             };
         });
         INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, callback -> {
-            return (ServerLevel world) -> {
-                callback.onEndLevelTick(world.getServer(), world);
+            return (ServerLevel level) -> {
+                callback.onEndLevelTick(level.getServer(), level);
             };
         });
         INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, callback -> {
