@@ -76,7 +76,7 @@ public interface NetworkHandlerV2 {
      * @param message message to send
      */
     default void sendToServer(MessageV2<?> message) {
-        Proxy.INSTANCE.getClientConnection().send(this.toServerboundPacket(message));
+        Proxy.INSTANCE.getClientPacketListener().send(this.toServerboundPacket(message));
     }
 
     /**

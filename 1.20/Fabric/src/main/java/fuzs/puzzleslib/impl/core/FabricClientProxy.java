@@ -2,22 +2,26 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import java.util.Objects;
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class FabricClientProxy extends FabricServerProxy {
 
@@ -32,10 +36,10 @@ public class FabricClientProxy extends FabricServerProxy {
     }
 
     @Override
-    public Connection getClientConnection() {
+    public ClientPacketListener getClientPacketListener() {
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
-        Objects.requireNonNull(connection, "Cannot send packets when not in game!");
-        return connection.getConnection();
+        Objects.requireNonNull(connection, "client packet listener is null");
+        return connection;
     }
 
     @Override
@@ -76,5 +80,10 @@ public class FabricClientProxy extends FabricServerProxy {
                 message.getHandler().handle(message, client, handler, player, client.level);
             });
         });
+    }
+
+    @Override
+    public void startClientPrediction(Level level, IntFunction<Packet<ServerGamePacketListener>> predictiveAction) {
+        ((MultiPlayerGameModeFabricAccessor) Minecraft.getInstance().gameMode).puzzleslib$callStartPrediction((ClientLevel) level, predictiveAction::apply);
     }
 }

@@ -67,7 +67,8 @@
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
-    "client.accessor.MinecraftFabricAccessor"
+    "client.accessor.MinecraftFabricAccessor",
+    "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

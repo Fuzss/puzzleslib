@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.16-1.20.1] - 2023-08-01
+### Fixed
+- Fixed `LivingHurtCallback` not firing for players on Fabric
+- Fixed `UseItemEvents$Tick` always having a wrong `useDuration` value
+- Fixed `PlayerInteractEvents$UseBlock` and `PlayerInteractEvents$UseItem` not sending packets to the server for successful interactions if a result other than `InteractionResult#SUCCESS` is returned from the callback
+
 ## [v8.0.15-1.20.1] - 2023-07-30
 ### Fixed
 - Reworked `ServerEntityLevelEvents$Load` and `ClientEntityLevelEvents$Load` on Fabric to prevent a potential memory leak when trying to prevent an entity from loading in

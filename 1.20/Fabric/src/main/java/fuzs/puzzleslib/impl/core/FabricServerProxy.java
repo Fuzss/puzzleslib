@@ -7,9 +7,11 @@ import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.Connection;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -18,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class FabricServerProxy implements FabricProxy {
     private MinecraftServer gameServer;
@@ -40,7 +43,7 @@ public class FabricServerProxy implements FabricProxy {
     }
 
     @Override
-    public Connection getClientConnection() {
+    public ClientPacketListener getClientPacketListener() {
         throw new RuntimeException("Client connection accessed for wrong side!");
     }
 
@@ -93,5 +96,10 @@ public class FabricServerProxy implements FabricProxy {
             T message = factory.apply(buf);
             server.execute(() -> message.getHandler().handle(message, server, handler, player, player.serverLevel()));
         });
+    }
+
+    @Override
+    public void startClientPrediction(Level level, IntFunction<Packet<ServerGamePacketListener>> predictiveAction) {
+        throw new RuntimeException("Start client prediction accessed for wrong side!");
     }
 }
