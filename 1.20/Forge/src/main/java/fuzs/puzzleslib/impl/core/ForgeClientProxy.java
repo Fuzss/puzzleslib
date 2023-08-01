@@ -29,8 +29,8 @@ public class ForgeClientProxy extends ForgeServerProxy {
     @Override
     public ClientPacketListener getClientPacketListener() {
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
-        Objects.requireNonNull(connection, "Cannot send packets when not in game!");
-        return connection.getConnection();
+        Objects.requireNonNull(connection, "client packet listener is null");
+        return connection;
     }
 
     @Override
