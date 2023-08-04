@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.data.v1;
 
 import com.google.common.base.Preconditions;
+import fuzs.puzzleslib.api.data.v1.recipes.ForwardingFinishedRecipe;
 import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
@@ -42,7 +43,10 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
      * @param base     the base item for the smithing upgrade, like diamond armor and tools in vanilla
      * @param category the {@link RecipeCategory} for the recipe book
      * @param result   the result item from the smithing upgrade, like netherite armor and tools in vanilla
+     *
+     * @deprecated replaced by {@link fuzs.puzzleslib.impl.item.CopyTagShapelessRecipe}
      */
+    @Deprecated(forRemoval = true)
     protected static void legacyNetheriteSmithing(String modId, Consumer<FinishedRecipe> exporter, Item base, RecipeCategory category, Item result) {
         legacyNetheriteSmithing(modId, exporter, base, Items.NETHERITE_INGOT, category, result);
     }
@@ -55,13 +59,20 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
      * @param exporter the recipe saver
      * @param base     the base item for the smithing upgrade, like diamond armor and tools in vanilla
      * @param addition the upgrade item, usually a netherite ingot in vanilla
-     * @param category the {@link RecipeCategory} for the recipe book
+     * @param recipeCategory the {@link RecipeCategory} for the recipe book
      * @param result   the result item from the smithing upgrade, like netherite armor and tools in vanilla
+     *
+     * @deprecated replaced by {@link fuzs.puzzleslib.impl.item.CopyTagShapelessRecipe}
      */
+    @Deprecated(forRemoval = true)
     protected static void legacyNetheriteSmithing(String modId, Consumer<FinishedRecipe> exporter, Item base, Item addition, RecipeCategory category, Item result) {
         new SmithingTransformRecipeBuilder(LegacySmithingTransformRecipe.getModSerializer(modId), Ingredient.of(), Ingredient.of(base), Ingredient.of(addition), category, result)
                 .unlocks(getHasName(addition), has(addition))
-                .save(exporter, new ResourceLocation(modId, getItemName(result) + "_smithing_transform"));
+                .save(finishedRecipe -> {
+                    exporter.accept(new ForwardingFinishedRecipe(finishedRecipe, json -> {
+                        json.remove("template");
+                    }));
+                }, new ResourceLocation(modId, getItemName(result) + "_crafting_transform"));
     }
 
     protected static String getHasName(ItemLike... items) {

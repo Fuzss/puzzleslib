@@ -24,11 +24,6 @@ public final class AbstractTagProvider {
 
     public abstract static class Blocks extends BlockTagsProvider {
 
-        @Deprecated(forRemoval = true)
-        public Blocks(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(packOutput, fileHelper, modId, lookupProvider);
-        }
-
         public Blocks(GatherDataEvent evt, String modId) {
             this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
         }
@@ -37,16 +32,16 @@ public final class AbstractTagProvider {
             super(packOutput, lookupProvider, modId, fileHelper);
         }
 
+        @Deprecated(forRemoval = true)
+        public Blocks(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(packOutput, fileHelper, modId, lookupProvider);
+        }
+
         @Override
         protected abstract void addTags(HolderLookup.Provider provider);
     }
 
     public abstract static class Fluids extends FluidTagsProvider {
-
-        @Deprecated(forRemoval = true)
-        public Fluids(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(packOutput, fileHelper, modId, lookupProvider);
-        }
 
         public Fluids(GatherDataEvent evt, String modId) {
             this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
@@ -56,21 +51,16 @@ public final class AbstractTagProvider {
             super(packOutput, lookupProvider, modId, fileHelper);
         }
 
+        @Deprecated(forRemoval = true)
+        public Fluids(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(packOutput, fileHelper, modId, lookupProvider);
+        }
+
         @Override
         protected abstract void addTags(HolderLookup.Provider provider);
     }
 
     public abstract static class Items extends ItemTagsProvider {
-
-        @Deprecated(forRemoval = true)
-        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(packOutput, fileHelper, modId, lookupProvider);
-        }
-
-        @Deprecated(forRemoval = true)
-        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagsProvider.TagLookup<Block>> blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
-            this(packOutput, fileHelper, modId, lookupProvider, blockTagsProvider);
-        }
 
         public Items(GatherDataEvent evt, String modId) {
             this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
@@ -88,6 +78,16 @@ public final class AbstractTagProvider {
             super(packOutput, lookupProvider, blockTagsProvider, modId, fileHelper);
         }
 
+        @Deprecated(forRemoval = true)
+        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(packOutput, fileHelper, modId, lookupProvider);
+        }
+
+        @Deprecated(forRemoval = true)
+        public Items(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagsProvider.TagLookup<Block>> blockTagsProvider, String modId, ExistingFileHelper fileHelper) {
+            this(packOutput, fileHelper, modId, lookupProvider, blockTagsProvider);
+        }
+
         @Override
         protected abstract void addTags(HolderLookup.Provider provider);
 
@@ -100,11 +100,6 @@ public final class AbstractTagProvider {
 
     public abstract static class EntityTypes extends EntityTypeTagsProvider {
 
-        @Deprecated(forRemoval = true)
-        public EntityTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(packOutput, fileHelper, modId, lookupProvider);
-        }
-
         public EntityTypes(GatherDataEvent evt, String modId) {
             this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
         }
@@ -113,16 +108,16 @@ public final class AbstractTagProvider {
             super(packOutput, lookupProvider, modId, fileHelper);
         }
 
+        @Deprecated(forRemoval = true)
+        public EntityTypes(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(packOutput, fileHelper, modId, lookupProvider);
+        }
+
         @Override
         protected abstract void addTags(HolderLookup.Provider provider);
     }
 
     public abstract static class GameEvents extends GameEventTagsProvider {
-
-        @Deprecated(forRemoval = true)
-        public GameEvents(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(packOutput, fileHelper, modId, lookupProvider);
-        }
 
         public GameEvents(GatherDataEvent evt, String modId) {
             this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
@@ -130,6 +125,11 @@ public final class AbstractTagProvider {
 
         public GameEvents(PackOutput packOutput, ExistingFileHelper fileHelper, String modId, CompletableFuture<HolderLookup.Provider> lookupProvider) {
             super(packOutput, lookupProvider, modId, fileHelper);
+        }
+
+        @Deprecated(forRemoval = true)
+        public GameEvents(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(packOutput, fileHelper, modId, lookupProvider);
         }
 
         @Override
@@ -154,11 +154,6 @@ public final class AbstractTagProvider {
 
     public abstract static class Simple<T> extends TagsProvider<T> {
 
-        @Deprecated(forRemoval = true)
-        public Simple(PackOutput packOutput, ResourceKey<? extends Registry<T>> registryKey, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(registryKey, packOutput, fileHelper, modId, lookupProvider);
-        }
-
         public Simple(ResourceKey<? extends Registry<T>> registryKey, GatherDataEvent evt, String modId) {
             this(registryKey, evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
         }
@@ -167,16 +162,16 @@ public final class AbstractTagProvider {
             super(packOutput, registryKey, lookupProvider, modId, fileHelper);
         }
 
+        @Deprecated(forRemoval = true)
+        public Simple(PackOutput packOutput, ResourceKey<? extends Registry<T>> registryKey, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(registryKey, packOutput, fileHelper, modId, lookupProvider);
+        }
+
         @Override
         protected abstract void addTags(HolderLookup.Provider provider);
     }
 
     public abstract static class Intrinsic<T> extends IntrinsicHolderTagsProvider<T> {
-
-        @Deprecated(forRemoval = true)
-        public Intrinsic(ResourceKey<? extends Registry<T>> registryKey, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
-            this(registryKey, packOutput, fileHelper, modId, lookupProvider);
-        }
 
         public Intrinsic(ResourceKey<? extends Registry<T>> registryKey, GatherDataEvent evt, String modId) {
             this(registryKey, evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId, evt.getLookupProvider());
@@ -192,6 +187,11 @@ public final class AbstractTagProvider {
                 // alternatively use this, if the other one breaks
 //                return extractKey(entity, registryKey);
             }, modId, fileHelper);
+        }
+
+        @Deprecated(forRemoval = true)
+        public Intrinsic(ResourceKey<? extends Registry<T>> registryKey, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, ExistingFileHelper fileHelper) {
+            this(registryKey, packOutput, fileHelper, modId, lookupProvider);
         }
 
         @SuppressWarnings("unchecked")
