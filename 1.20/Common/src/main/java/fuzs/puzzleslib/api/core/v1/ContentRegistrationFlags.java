@@ -15,6 +15,14 @@ public enum ContentRegistrationFlags {
     /**
      * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for a recipe of type {@link fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe}
      * for upgrading gear without the need for a smithing template, just like the old smithing used to work.
+     *
+     * @deprecated replaced by {@link #COPY_TAG_RECIPES}
      */
-    LEGACY_SMITHING
+    @Deprecated(forRemoval = true)
+    LEGACY_SMITHING,
+    /**
+     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for custom crafting recipes that support copying the full item nbt tag of a single ingredient item to the result item.
+     * <p>Intended to be used for upgrading items to a higher tier, similar to the smithing table.
+     */
+    COPY_TAG_RECIPES
 }

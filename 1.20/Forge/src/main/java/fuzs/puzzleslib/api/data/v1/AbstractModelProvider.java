@@ -17,17 +17,17 @@ import java.util.Objects;
 
 public abstract class AbstractModelProvider extends BlockStateProvider {
 
-    @Deprecated(forRemoval = true)
-    public AbstractModelProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
-        this(packOutput, fileHelper, modId);
-    }
-
     public AbstractModelProvider(GatherDataEvent evt, String modId) {
         this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId);
     }
 
     public AbstractModelProvider(PackOutput packOutput, ExistingFileHelper fileHelper, String modId) {
         super(packOutput, modId, fileHelper);
+    }
+
+    @Deprecated(forRemoval = true)
+    public AbstractModelProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
+        this(packOutput, fileHelper, modId);
     }
 
     @Override
