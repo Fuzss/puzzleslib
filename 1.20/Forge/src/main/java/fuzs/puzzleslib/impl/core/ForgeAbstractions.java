@@ -4,11 +4,13 @@ import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -50,5 +52,10 @@ public final class ForgeAbstractions implements CommonAbstractions {
     @Override
     public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
         return ForgeEventFactory.getMobGriefingEvent(level, entity);
+    }
+
+    @Override
+    public void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand) {
+        ForgeEventFactory.onPlayerDestroyItem(player, itemStack, interactionHand);
     }
 }
