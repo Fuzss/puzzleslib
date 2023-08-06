@@ -8,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
@@ -70,5 +71,10 @@ public final class FabricAbstractions implements CommonAbstractions {
     @Override
     public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
         return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+    }
+
+    @Override
+    public void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand) {
+
     }
 }
