@@ -4,7 +4,6 @@ transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypas
 transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	damageHelmet	()Lnet/minecraft/world/damagesource/DamageSource;
 transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassInvul	()Lnet/minecraft/world/damagesource/DamageSource;
 transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassMagic	()Lnet/minecraft/world/damagesource/DamageSource;
-transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	bypassEnchantments	()Lnet/minecraft/world/damagesource/DamageSource;
 transitive-accessible	method	net/minecraft/world/damagesource/DamageSource	setIsFire	()Lnet/minecraft/world/damagesource/DamageSource;
 transitive-accessible   method  net/minecraft/client/renderer/RenderType    create  (Ljava/lang/String;Lcom/mojang/blaze3d/vertex/VertexFormat;Lcom/mojang/blaze3d/vertex/VertexFormat$Mode;IZZLnet/minecraft/client/renderer/RenderType$CompositeState;)Lnet/minecraft/client/renderer/RenderType$CompositeRenderType;
 transitive-accessible   class   net/minecraft/client/renderer/RenderType$CompositeState

@@ -7,6 +7,8 @@ dependencies {
     modApi libs.fabricapi.fabric
 
     // Forge Config Api Port
+    api libs.nightconfigcore
+    api libs.nightconfigtoml
     modApi libs.forgeconfigapiport.fabric
 
     // Cardinal Components

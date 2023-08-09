@@ -9,6 +9,8 @@ dependencies {
     modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${libs.versions.fabricapi.version.get()}")
 
     // Forge Config Api Port
+    api libs.nightconfigcore
+    api libs.nightconfigtoml
     api libs.forgeconfigapiport.common
 }
 

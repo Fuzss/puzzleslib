@@ -9,11 +9,11 @@
     "accessor.BooleanValueForgeAccessor",
     "accessor.FireBlockForgeAccessor",
     "accessor.IntegerValueForgeAccessor",
+    "accessor.ItemAccessor",
     "accessor.MobSpawnSettingsBuilderForgeAccessor",
     "accessor.PotionBrewingForgeAccessor"
   ],
   "client": [
-    "client.CreativeModeInventoryScreenForgeMixin",
     "client.ItemRendererForgeMixin",
     "client.MinecraftForgeMixin",
     "client.accessor.BlockColorsForgeAccessor",

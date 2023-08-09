@@ -17,14 +17,15 @@ public final class FabricModConstructor {
 
     private static void registerHandlers(ModConstructor constructor, String modId) {
         constructor.onConstructMod();
+        constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
+        constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
         constructor.onCommonSetup(Runnable::run);
-        constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
-        constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
-        constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
         constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
         constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
         constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
-        constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
+        constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
+        constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
+        constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
         constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
         constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.SERVER_DATA, modId));
     }
