@@ -21,14 +21,6 @@ import java.util.function.BiPredicate;
 public interface MobSpawnSettingsContext {
 
     /**
-     * Associated JSON property: <code>creature_spawn_probability</code>.
-     *
-     * @see MobSpawnSettings#getCreatureProbability()
-     * @see MobSpawnSettings.Builder#creatureGenerationProbability(float)
-     */
-    void setCreatureGenerationProbability(float probability);
-
-    /**
      * Associated JSON property: <code>spawners</code>.
      *
      * @see MobSpawnSettings#getMobs(MobCategory)
@@ -75,10 +67,15 @@ public interface MobSpawnSettingsContext {
     /**
      * Associated JSON property: <code>spawn_costs</code>.
      *
+     * @param entityType   the entity type
+     * @param energyBudget a tolerance level for how close other spawns can happen nearby, like an aura;
+     *                     the higher this value is the closer mobs can spawn together, usually <code>0.15</code> in vanilla
+     * @param charge       the strength of a spawn aura, defines how far away other spawn attempts are affected, usually <code>0.7</code> in vanilla
      * @see MobSpawnSettings#getMobSpawnCost(EntityType)
      * @see MobSpawnSettings.Builder#addMobCharge(EntityType, double, double)
+     * @see <a href="https://www.reddit.com/r/minecraft_configs/comments/idmyyr/so_how_does_spawn_costs_actuallywork/">Reddit: So how does spawn_costs actually...work?</a>
      */
-    void setSpawnCost(EntityType<?> entityType, double mass, double gravityLimit);
+    void setSpawnCost(EntityType<?> entityType, double energyBudget, double charge);
 
     /**
      * Removes a spawn cost entry for a given entity type.
@@ -94,7 +91,7 @@ public interface MobSpawnSettingsContext {
 
     /**
      * @param type mob category
-     * @return all {@link net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData} registered for the given <code>type</code>
+     * @return all {@link MobSpawnSettings.SpawnerData} registered for the given <code>type</code>
      */
     List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory type);
 
@@ -105,7 +102,7 @@ public interface MobSpawnSettingsContext {
 
     /**
      * @param type entity type
-     * @return the {@link net.minecraft.world.level.biome.MobSpawnSettings.MobSpawnCost} for the given <code>type</code>
+     * @return the {@link MobSpawnSettings.MobSpawnCost} for the given <code>type</code>
      */
     @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> type);
 
@@ -116,4 +113,12 @@ public interface MobSpawnSettingsContext {
      * @see MobSpawnSettings.Builder#creatureGenerationProbability(float)
      */
     float getCreatureGenerationProbability();
+
+    /**
+     * Associated JSON property: <code>creature_spawn_probability</code>.
+     *
+     * @see MobSpawnSettings#getCreatureProbability()
+     * @see MobSpawnSettings.Builder#creatureGenerationProbability(float)
+     */
+    void setCreatureGenerationProbability(float probability);
 }

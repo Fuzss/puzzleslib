@@ -40,47 +40,47 @@ public final class RenderGuiElementEvents {
     /**
      * The hotbar shown on the bottom screen.
      */
-    public static final GuiOverlay HOTBAR = new GuiOverlay("hotbar");
+    public static final GuiOverlay HOTBAR = new GuiOverlay("hotbar", minecraft -> !minecraft.options.hideGui && minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR);
     /**
      * The cross-hair shown in the center of the screen, includes the cross-hair attack indicator.
      */
-    public static final GuiOverlay CROSSHAIR = new GuiOverlay("crosshair");
+    public static final GuiOverlay CROSSHAIR = new GuiOverlay("crosshair", minecraft -> !minecraft.options.hideGui);
     /**
      * The colorful health bar that shows while near a boss mob (ender dragon and wither in vanilla).
      */
-    public static final GuiOverlay BOSS_EVENT_PROGRESS = new GuiOverlay("boss_event_progress");
+    public static final GuiOverlay BOSS_EVENT_PROGRESS = new GuiOverlay("boss_event_progress", minecraft -> !minecraft.options.hideGui);
     /**
      * The hearts representing the player's current health shown to the left above the hotbar.
      */
-    public static final GuiOverlay PLAYER_HEALTH = new GuiOverlay("player_health");
+    public static final GuiOverlay PLAYER_HEALTH = new GuiOverlay("player_health", minecraft -> !minecraft.options.hideGui);
     /**
      * The armor icons representing the player's current protection level shown to the left above the hotbar.
      */
-    public static final GuiOverlay ARMOR_LEVEL = new GuiOverlay("armor_level");
+    public static final GuiOverlay ARMOR_LEVEL = new GuiOverlay("armor_level", minecraft -> !minecraft.options.hideGui);
     /**
      * The little meat shanks representing the player's current food level shown to the right above the hotbar.
      */
-    public static final GuiOverlay FOOD_LEVEL = new GuiOverlay("food_level");
+    public static final GuiOverlay FOOD_LEVEL = new GuiOverlay("food_level", minecraft -> !minecraft.options.hideGui);
     /**
      * The hearts representing the player's current mount's health shown to the right above the hotbar.
      */
-    public static final GuiOverlay MOUNT_HEALTH = new GuiOverlay("mount_health");
+    public static final GuiOverlay MOUNT_HEALTH = new GuiOverlay("mount_health", minecraft -> !minecraft.options.hideGui);
     /**
      * The air bubbles representing the player's left air supply while underwater shown to the right above the hotbar.
      */
-    public static final GuiOverlay AIR_LEVEL = new GuiOverlay("air_level");
+    public static final GuiOverlay AIR_LEVEL = new GuiOverlay("air_level", minecraft -> !minecraft.options.hideGui);
     /**
      * The jump bar shown when riding a mount that can jump such as horses, replaces the experience bar while active.
      */
-    public static final GuiOverlay JUMP_BAR = new GuiOverlay("jump_bar");
+    public static final GuiOverlay JUMP_BAR = new GuiOverlay("jump_bar", minecraft -> !minecraft.options.hideGui);
     /**
      * A bar representing the player's current experience level progress shown above the hotbar.
      */
-    public static final GuiOverlay EXPERIENCE_BAR = new GuiOverlay("experience_bar");
+    public static final GuiOverlay EXPERIENCE_BAR = new GuiOverlay("experience_bar", minecraft -> !minecraft.options.hideGui);
     /**
      * The name of the currently selected hotbar item shown right above the hotbar for a few seconds right after switching to that item.
      */
-    public static final GuiOverlay ITEM_NAME = new GuiOverlay("item_name", minecraft -> minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR);
+    public static final GuiOverlay ITEM_NAME = new GuiOverlay("item_name", minecraft -> !minecraft.options.hideGui && minecraft.gameMode.getPlayerMode() != GameType.SPECTATOR);
     /**
      * The screen fade effect that increasingly intensifies the longer the player lies in a bed.
      */
@@ -100,15 +100,15 @@ public final class RenderGuiElementEvents {
     /**
      * The title of the current record that is playing in a nearby jukebox shown above the hotbar.
      */
-    public static final GuiOverlay RECORD_OVERLAY = new GuiOverlay("record_overlay");
+    public static final GuiOverlay RECORD_OVERLAY = new GuiOverlay("record_overlay", minecraft -> !minecraft.options.hideGui);
     /**
      * Subtitles for in-game sound events shown in the bottom right of the screen.
      */
-    public static final GuiOverlay SUBTITLES = new GuiOverlay("subtitles");
+    public static final GuiOverlay SUBTITLES = new GuiOverlay("subtitles", minecraft -> !minecraft.options.hideGui);
     /**
      * A huge text shown in the center of the screen, triggered by the <code>/title</code> command.
      */
-    public static final GuiOverlay TITLE_TEXT = new GuiOverlay("title_text");
+    public static final GuiOverlay TITLE_TEXT = new GuiOverlay("title_text", minecraft -> !minecraft.options.hideGui);
     /**
      * The scoreboard display shown to the right of the screen.
      */
@@ -131,9 +131,9 @@ public final class RenderGuiElementEvents {
         return EventInvoker.lookup(Before.class, id);
     }
 
-    public static EventInvoker<Before> after(GuiOverlay id) {
+    public static EventInvoker<After> after(GuiOverlay id) {
         Objects.requireNonNull(id, "id is null");
-        return EventInvoker.lookup(Before.class, id);
+        return EventInvoker.lookup(After.class, id);
     }
 
     /**

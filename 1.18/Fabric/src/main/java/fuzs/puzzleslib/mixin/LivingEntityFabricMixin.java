@@ -3,15 +3,14 @@ package fuzs.puzzleslib.mixin;
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -21,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -31,10 +31,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityFabricMixin extends Entity {
+    @Shadow
+    @Final
+    private Map<MobEffect, MobEffectInstance> activeEffects;
     @Shadow
     protected ItemStack useItem;
     @Shadow
@@ -56,6 +60,12 @@ abstract class LivingEntityFabricMixin extends Entity {
     private DefaultedFloat puzzleslib$fallDistance;
     @Unique
     private DefaultedFloat puzzleslib$damageMultiplier;
+    @Unique
+    private DefaultedDouble puzzleslib$strength;
+    @Unique
+    private DefaultedDouble puzzleslib$ratioX;
+    @Unique
+    private DefaultedDouble puzzleslib$ratioZ;
 
     public LivingEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -82,7 +92,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(method = "updateUsingItem", at = @At("HEAD"))
     protected void updateUsingItem(ItemStack useItem, CallbackInfo callback) {
         // moved here from LivingEntity#updatingUsingItem on Forge, just a little more simple to implement
-        DefaultedInt useItemRemaining = DefaultedInt.fromValue(this.useItemRemaining);
+        DefaultedInt useItemRemaining = DefaultedInt.fromValue(useItem.getUseDuration());
         EventResult result = FabricLivingEvents.USE_ITEM_TICK.invoker().onUseItemTick(LivingEntity.class.cast(this), useItem, useItemRemaining);
         this.useItemRemaining = result.isInterrupt() ? 0 : useItemRemaining.getAsOptionalInt().orElse(this.useItemRemaining);
         // --this.useItemRemaining == 0 runs at the end of this method, since we will be below that LivingEntity#completeUsingItem does not run (intentionally)
@@ -177,7 +187,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0)
+    @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     protected float actuallyHurt(float damageAmount, DamageSource damageSource) {
         if (!this.isInvulnerableTo(damageSource)) {
             Objects.requireNonNull(this.puzzleslib$damageAmount, "damage amount is null");
@@ -228,7 +238,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 0)
+    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)
     public float causeFallDamage$1(float fallDistance) {
         Objects.requireNonNull(this.puzzleslib$fallDistance, "fall distance is null");
         fallDistance = this.puzzleslib$fallDistance.getAsOptionalFloat().orElse(fallDistance);
@@ -236,7 +246,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         return fallDistance;
     }
 
-    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 1)
+    @ModifyVariable(method = "causeFallDamage", at = @At(value = "HEAD"), ordinal = 1, argsOnly = true)
     public float causeFallDamage$2(float damageMultiplier) {
         Objects.requireNonNull(this.puzzleslib$damageMultiplier, "damage multiplier is null");
         damageMultiplier = this.puzzleslib$damageMultiplier.getAsOptionalFloat().orElse(damageMultiplier);
@@ -244,17 +254,37 @@ abstract class LivingEntityFabricMixin extends Entity {
         return damageMultiplier;
     }
 
-    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    public void die(DamageSource damageSource, CallbackInfo callback) {
-        if (FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource).isInterrupt()) {
+    @Inject(method = "knockback", at = @At("HEAD"), cancellable = true)
+    public void knockback$0(double strength, double ratioX, double ratioZ, CallbackInfo callback) {
+        this.puzzleslib$strength = DefaultedDouble.fromValue(strength);
+        this.puzzleslib$ratioX = DefaultedDouble.fromValue(ratioX);
+        this.puzzleslib$ratioZ = DefaultedDouble.fromValue(ratioZ);
+        if (FabricLivingEvents.LIVING_KNOCK_BACK.invoker().onLivingKnockBack(LivingEntity.class.cast(this), this.puzzleslib$strength, this.puzzleslib$ratioX, this.puzzleslib$ratioZ).isInterrupt()) {
             callback.cancel();
         }
     }
 
-    @Inject(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isSleeping()Z"), cancellable = true)
-    public void hurt$1(DamageSource damageSource, float amount, CallbackInfoReturnable<Boolean> callback) {
-        if (FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(LivingEntity.class.cast(this), damageSource, amount).isInterrupt()) {
-            callback.setReturnValue(false);
-        }
+    @ModifyVariable(method = "knockback", at = @At(value = "HEAD"), ordinal = 0, argsOnly = true)
+    public double knockback$1(double strength) {
+        Objects.requireNonNull(this.puzzleslib$strength, "strength is null");
+        strength = this.puzzleslib$strength.getAsOptionalDouble().orElse(strength);
+        this.puzzleslib$strength = null;
+        return strength;
+    }
+
+    @ModifyVariable(method = "knockback", at = @At(value = "HEAD"), ordinal = 1, argsOnly = true)
+    public double knockback$2(double ratioX) {
+        Objects.requireNonNull(this.puzzleslib$ratioX, "ratio x is null");
+        ratioX = this.puzzleslib$ratioX.getAsOptionalDouble().orElse(ratioX);
+        this.puzzleslib$ratioX = null;
+        return ratioX;
+    }
+
+    @ModifyVariable(method = "knockback", at = @At(value = "HEAD"), ordinal = 2, argsOnly = true)
+    public double knockback$3(double ratioZ) {
+        Objects.requireNonNull(this.puzzleslib$ratioZ, "ratio z is null");
+        ratioZ = this.puzzleslib$ratioZ.getAsOptionalDouble().orElse(ratioZ);
+        this.puzzleslib$ratioZ = null;
+        return ratioZ;
     }
 }

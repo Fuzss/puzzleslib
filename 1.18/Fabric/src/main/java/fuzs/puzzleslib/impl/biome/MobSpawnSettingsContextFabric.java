@@ -40,8 +40,8 @@ public class MobSpawnSettingsContextFabric implements MobSpawnSettingsContext {
     }
 
     @Override
-    public void setSpawnCost(EntityType<?> entityType, double mass, double gravityLimit) {
-        this.context.setSpawnCost(entityType, mass, gravityLimit);
+    public void setSpawnCost(EntityType<?> entityType, double energyBudget, double charge) {
+        this.context.setSpawnCost(entityType, charge, energyBudget);
     }
 
     @Override

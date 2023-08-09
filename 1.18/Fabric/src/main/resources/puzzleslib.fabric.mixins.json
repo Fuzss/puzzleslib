@@ -17,6 +17,7 @@
     "FarmBlockFabricMixin",
     "FoxBreedGoalFabricMixin",
     "ItemEntityFabricMixin",
+    "ItemStackFabricMixin",
     "LevelFabricMixin",
     "LivingEntityFabricMixin",
     "LootingEnchantFunctionFabricMixin",
@@ -53,6 +54,7 @@
     "client.SkullBlockRendererFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
+    "client.accessor.KeyMappingFabricAccessor",
     "client.accessor.MinecraftFabricAccessor"
   ],
   "injectors": {

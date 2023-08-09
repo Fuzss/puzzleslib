@@ -10,6 +10,7 @@ import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
@@ -27,9 +28,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
-import net.fabricmc.fabric.api.event.player.UseBlockCallback;
-import net.fabricmc.fabric.api.event.player.UseEntityCallback;
-import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
@@ -37,6 +36,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -73,6 +74,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return callback.onUseBlock(player, world, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
             };
         });
+        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, callback -> {
+            return (Player player, Level world, InteractionHand hand, BlockPos pos, Direction direction) -> {
+                return callback.onAttackBlock(player, world, hand, pos, direction).getInterrupt().orElse(InteractionResult.PASS);
+            };
+        });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
                 return callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
@@ -88,6 +94,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 if (hitResult == null) return InteractionResult.PASS;
                 return callback.onUseEntityAt(player, world, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
+            };
+        });
+        INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, callback -> {
+            return (Player player, Level world, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                EventResult result = callback.onAttackEntity(player, world, hand, entity);
+                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         });
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
@@ -237,6 +249,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return callback::onChunkUnload;
         });
         INSTANCE.register(ItemTossCallback.class, FabricPlayerEvents.ITEM_TOSS);
+        INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
+        INSTANCE.register(ItemAttributeModifiersCallback.class, FabricLivingEvents.ITEM_ATTRIBUTE_MODIFIERS);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         }

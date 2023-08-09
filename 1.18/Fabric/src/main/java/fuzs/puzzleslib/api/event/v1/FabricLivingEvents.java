@@ -75,4 +75,12 @@ public final class FabricLivingEvents {
      * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
      */
     public static final Event<LivingAttackCallback> LIVING_ATTACK = FabricEventFactory.createResult(LivingAttackCallback.class);
+    /**
+     * Called before an entity is knocked-back in {@link LivingEntity#knockback(double, double, double)}, allows for preventing the knock-back.
+     */
+    public static final Event<LivingKnockBackCallback> LIVING_KNOCK_BACK = FabricEventFactory.createResult(LivingKnockBackCallback.class);
+    /**
+     * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
+     */
+    public static final Event<ItemAttributeModifiersCallback> ITEM_ATTRIBUTE_MODIFIERS = FabricEventFactory.create(ItemAttributeModifiersCallback.class);
 }

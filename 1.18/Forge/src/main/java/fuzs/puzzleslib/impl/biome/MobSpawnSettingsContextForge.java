@@ -44,8 +44,8 @@ public class MobSpawnSettingsContextForge implements MobSpawnSettingsContext {
     }
 
     @Override
-    public void setSpawnCost(EntityType<?> entityType, double mass, double gravityLimit) {
-        this.context.addMobCharge(entityType, mass, gravityLimit);
+    public void setSpawnCost(EntityType<?> entityType, double energyBudget, double charge) {
+        this.context.addMobCharge(entityType, charge, energyBudget);
     }
 
     @Override

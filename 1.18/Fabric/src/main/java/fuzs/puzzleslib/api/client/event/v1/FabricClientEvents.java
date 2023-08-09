@@ -83,6 +83,10 @@ public final class FabricClientEvents {
      * Called when the local player is replaced from respawning.
      */
     public static final Event<ClientPlayerEvents.Copy> PLAYER_COPY = FabricEventFactory.create(ClientPlayerEvents.Copy.class);
+    /**
+     * Runs before the client performs an attack based on {@link Minecraft#hitResult}, either attacking an entity or mining a block.
+     */
+    public static final Event<InteractionInputEvents.Attack> ATTACK_INTERACTION_INPUT = FabricEventFactory.createResult(InteractionInputEvents.Attack.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.
