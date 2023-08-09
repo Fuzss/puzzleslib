@@ -83,11 +83,6 @@ public final class FabricClientEvents {
      * Called when the local player is replaced from respawning.
      */
     public static final Event<ClientPlayerEvents.Copy> PLAYER_COPY = FabricEventFactory.create(ClientPlayerEvents.Copy.class);
-    /**
-     * Called whenever the displayed items in {@link net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen} are rebuilt,
-     * allows for adding custom items to the end of a tab.
-     */
-    public static final Event<BuildCreativeContentsCallback> BUILD_CREATIVE_CONTENTS = FabricEventFactory.create(BuildCreativeContentsCallback.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

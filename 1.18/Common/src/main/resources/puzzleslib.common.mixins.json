@@ -6,8 +6,7 @@
   "refmap": "puzzleslib.refmap.json",
   "plugin": "fuzs.puzzleslib.mixin.ModMixinConfigPlugin",
   "mixins": [
-    "MobMixin",
-    "accessor.ItemAccessor"
+    "MobMixin"
   ],
   "client": [
     "client.ItemRendererMixin"

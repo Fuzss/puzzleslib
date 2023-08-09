@@ -29,6 +29,7 @@
     "ServerLevelFabricMixin",
     "ServerPlayerFabricMixin",
     "WolfFabricMixin",
+    "accessor.ItemAccessor",
     "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [
@@ -36,7 +37,6 @@
     "client.AbstractContainerScreenFabricMixin",
     "client.ClientLevelFabricMixin",
     "client.ClientPacketListenerMixin",
-    "client.CreativeModeInventoryScreenFabricMixin",
     "client.EffectRenderingInventoryScreenFabricMixin",
     "client.EntityRendererFabricMixin",
     "client.GameRendererFabricMixin",

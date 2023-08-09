@@ -3,13 +3,11 @@ package fuzs.puzzleslib.impl.client.event;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
-import fuzs.puzzleslib.impl.client.core.event.CreativeModeTabContentsEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.OverlayRegistry;
@@ -239,10 +237,6 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientPlayerEvents.Copy.class, ClientPlayerNetworkEvent.RespawnEvent.class, (ClientPlayerEvents.Copy callback, ClientPlayerNetworkEvent.RespawnEvent evt) -> {
             callback.onCopy(evt.getOldPlayer(), evt.getNewPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
-        });
-        INSTANCE.register(BuildCreativeContentsCallback.class, CreativeModeTabContentsEvent.class, (BuildCreativeContentsCallback callback, CreativeModeTabContentsEvent evt) -> {
-            ResourceLocation identifier = BuildCreativeContentsCallback.tryCreateIdentifier(evt.getTab());
-            callback.onBuildCreativeContents(identifier, evt.getTab(), evt.getOutput());
         });
     }
 

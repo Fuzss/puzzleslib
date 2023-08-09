@@ -107,6 +107,13 @@ public interface ModConstructor {
     }
 
     /**
+     * @param context add items to a creative tab
+     */
+    default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
+
+    }
+
+    /**
      * @param context register additional data pack sources
      */
     default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
