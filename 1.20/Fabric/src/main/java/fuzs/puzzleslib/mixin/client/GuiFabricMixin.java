@@ -61,6 +61,11 @@ abstract class GuiFabricMixin {
         FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.SPYGLASS.id()).invoker().onAfterRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))
+    public void render$2(GuiGraphics guiGraphics, float partialTick, CallbackInfo callback) {
+        this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onBeforeRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
+    }
+
     @Inject(method = "renderTextureOverlay", at = @At("HEAD"), cancellable = true)
     private void renderTextureOverlay$0(GuiGraphics guiGraphics, ResourceLocation resourceLocation, float f, CallbackInfo callback) {
         if (this.puzzleslib$interruptTextureOverlay) callback.cancel();
@@ -76,11 +81,6 @@ abstract class GuiFabricMixin {
         }
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))
-    public void render$2(GuiGraphics guiGraphics, float partialTick, CallbackInfo callback) {
-        this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onBeforeRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
-    }
-
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;oSpinningEffectIntensity:F"))
     public void render$3(GuiGraphics guiGraphics, float partialTick, CallbackInfo callback) {
         this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onBeforeRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
@@ -92,7 +92,7 @@ abstract class GuiFabricMixin {
         this.puzzleslib$interruptTextureOverlay = false;
     }
 
-    @Inject(method = "renderSpyglassOverlay", at = @At("TAIL"))
+    @Inject(method = "renderPortalOverlay", at = @At("TAIL"))
     private void renderPortalOverlay$1(GuiGraphics guiGraphics, float f, CallbackInfo callback) {
         FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onAfterRenderGuiElement(this.minecraft, guiGraphics, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }

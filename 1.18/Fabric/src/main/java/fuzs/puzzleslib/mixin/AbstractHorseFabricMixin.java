@@ -19,8 +19,8 @@ abstract class AbstractHorseFabricMixin extends Animal {
         super(entityType, level);
     }
 
-    @Inject(method = "executeRidersJump", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;hasImpulse:Z", shift = At.Shift.AFTER))
-    public void executeRidersJump(float playerJumpPendingScale, Vec3 travelVector, CallbackInfo callback) {
+    @Inject(method = "travel", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;hasImpulse:Z", shift = At.Shift.AFTER))
+    public void travel(Vec3 travelVector, CallbackInfo callback) {
         LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), this);
     }
 }

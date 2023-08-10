@@ -3,6 +3,9 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.0-1.18.2] - 2023-08-10
+- Parity with Puzzles Lib v8.0.18
+
 ## [v3.4.7-1.18.2] - 2023-08-09
 ### Changed
 - Rework internal creative mode tab handling to prevent dedicated Fabric servers from crashing, to allow mod items to show in JEI/REI and to greatly reduce the amount of mixins required for the implementation

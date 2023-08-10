@@ -51,34 +51,34 @@ abstract class GuiFabricMixin {
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("HEAD"), cancellable = true)
-    private void renderSpyglassOverlay$0(PoseStack poseStack, float f, CallbackInfo callback) {
+    private void renderSpyglassOverlay$0(float f, CallbackInfo callback) {
         if (this.puzzleslib$interruptSpyglassOverlay) callback.cancel();
         this.puzzleslib$interruptSpyglassOverlay = false;
     }
 
     @Inject(method = "renderSpyglassOverlay", at = @At("TAIL"))
-    private void renderSpyglassOverlay$1(PoseStack poseStack, float f, CallbackInfo callback) {
-        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.SPYGLASS.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
-    }
-
-    @Inject(method = "renderTextureOverlay", at = @At("HEAD"), cancellable = true)
-    private void renderTextureOverlay$0(PoseStack poseStack, ResourceLocation resourceLocation, float f, CallbackInfo callback) {
-        if (this.puzzleslib$interruptTextureOverlay) callback.cancel();
-        this.puzzleslib$interruptTextureOverlay = false;
-    }
-
-    @Inject(method = "renderTextureOverlay", at = @At("TAIL"))
-    private void renderTextureOverlay$1(PoseStack poseStack, ResourceLocation resourceLocation, float f, CallbackInfo callback) {
-        if (Objects.equals(resourceLocation, PUMPKIN_BLUR_LOCATION)) {
-            FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.HELMET.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
-        } else if (Objects.equals(resourceLocation, POWDER_SNOW_OUTLINE_LOCATION)) {
-            FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
-        }
+    private void renderSpyglassOverlay$1(float f, CallbackInfo callback) {
+        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.SPYGLASS.id()).invoker().onAfterRenderGuiElement(this.minecraft, null, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;getTicksFrozen()I"))
     public void render$2(PoseStack poseStack, float partialTick, CallbackInfo callback) {
         this.puzzleslib$interruptTextureOverlay = FabricClientEvents.beforeRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onBeforeRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight).isInterrupt();
+    }
+
+    @Inject(method = "renderTextureOverlay", at = @At("HEAD"), cancellable = true)
+    private void renderTextureOverlay$0(ResourceLocation resourceLocation, float f, CallbackInfo callback) {
+        if (this.puzzleslib$interruptTextureOverlay) callback.cancel();
+        this.puzzleslib$interruptTextureOverlay = false;
+    }
+
+    @Inject(method = "renderTextureOverlay", at = @At("TAIL"))
+    private void renderTextureOverlay$1(ResourceLocation resourceLocation, float f, CallbackInfo callback) {
+        if (Objects.equals(resourceLocation, PUMPKIN_BLUR_LOCATION)) {
+            FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.HELMET.id()).invoker().onAfterRenderGuiElement(this.minecraft, null, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
+        } else if (Objects.equals(resourceLocation, POWDER_SNOW_OUTLINE_LOCATION)) {
+            FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.FROSTBITE.id()).invoker().onAfterRenderGuiElement(this.minecraft, null, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
+        }
     }
 
     @Inject(method = "render", at = @At(value = "FIELD", target = "Lnet/minecraft/client/player/LocalPlayer;oPortalTime:F"))
@@ -87,14 +87,14 @@ abstract class GuiFabricMixin {
     }
 
     @Inject(method = "renderPortalOverlay", at = @At("HEAD"), cancellable = true)
-    private void renderPortalOverlay$0(PoseStack poseStack, float f, CallbackInfo callback) {
+    private void renderPortalOverlay$0(float f, CallbackInfo callback) {
         if (this.puzzleslib$interruptTextureOverlay) callback.cancel();
         this.puzzleslib$interruptTextureOverlay = false;
     }
 
-    @Inject(method = "renderSpyglassOverlay", at = @At("TAIL"))
-    private void renderPortalOverlay$1(PoseStack poseStack, float f, CallbackInfo callback) {
-        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onAfterRenderGuiElement(this.minecraft, poseStack, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
+    @Inject(method = "renderPortalOverlay", at = @At("TAIL"))
+    private void renderPortalOverlay$1(float f, CallbackInfo callback) {
+        FabricClientEvents.afterRenderGuiElement(RenderGuiElementEvents.PORTAL.id()).invoker().onAfterRenderGuiElement(this.minecraft, null, this.puzzleslib$partialTick, this.screenWidth, this.screenHeight);
     }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lcom/mojang/blaze3d/vertex/PoseStack;I)V"))

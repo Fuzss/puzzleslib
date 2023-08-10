@@ -5,14 +5,17 @@ import fuzs.puzzleslib.api.client.event.v1.FabricScreenEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Timer;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.Connection;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -27,6 +30,16 @@ import java.util.Objects;
 @Mixin(Minecraft.class)
 public abstract class MinecraftFabricMixin {
     @Shadow
+    @Final
+    public GameRenderer gameRenderer;
+    @Shadow
+    private boolean pause;
+    @Shadow
+    private float pausePartialTick;
+    @Shadow
+    @Final
+    private Timer timer;
+    @Shadow
     @Nullable
     public ClientLevel level;
     @Shadow
@@ -40,6 +53,16 @@ public abstract class MinecraftFabricMixin {
     public Screen screen;
     @Unique
     private DefaultedValue<Screen> puzzleslib$newScreen;
+
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.BEFORE))
+    private void runTick$0(boolean renderLevel, CallbackInfo callback) {
+        FabricClientEvents.BEFORE_GAME_RENDER.invoker().onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
+    }
+
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
+    private void runTick$1(boolean renderLevel, CallbackInfo callback) {
+        FabricClientEvents.AFTER_GAME_RENDER.invoker().onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
+    }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
     public void setScreen$0(@Nullable Screen newScreen, CallbackInfo callback) {

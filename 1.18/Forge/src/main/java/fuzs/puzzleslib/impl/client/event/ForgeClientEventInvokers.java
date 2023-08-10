@@ -347,6 +347,16 @@ public final class ForgeClientEventInvokers {
             callback.onRenderLevelAfterLevel(evt.getLevelRenderer(), minecraft.gameRenderer.getMainCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), capturedFrustum, minecraft.level);
             capturedFrustum = null;
         });
+        INSTANCE.register(GameRenderEvents.Before.class, TickEvent.RenderTickEvent.class, (GameRenderEvents.Before callback, TickEvent.RenderTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.START) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onBeforeGameRender(minecraft, minecraft.gameRenderer, evt.renderTickTime);
+        });
+        INSTANCE.register(GameRenderEvents.After.class, TickEvent.RenderTickEvent.class, (GameRenderEvents.After callback, TickEvent.RenderTickEvent evt) -> {
+            if (evt.phase != TickEvent.Phase.END) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onAfterGameRender(minecraft, minecraft.gameRenderer, evt.renderTickTime);
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {

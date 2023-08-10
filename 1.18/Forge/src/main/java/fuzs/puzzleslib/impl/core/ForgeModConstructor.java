@@ -5,7 +5,10 @@ import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.core.context.*;
+import fuzs.puzzleslib.impl.item.CopyTagRecipe;
+import fuzs.puzzleslib.impl.item.ForgeCopyTagRecipeSerializer;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
@@ -15,6 +18,8 @@ import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.Set;
 
@@ -26,10 +31,21 @@ public final class ForgeModConstructor {
 
     public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
+            registerContent(constructor, modId, modEventBus, flagsToHandle);
             registerModHandlers(constructor, modEventBus, availableFlags);
             registerHandlers(constructor);
             constructor.onConstructMod();
         });
+    }
+
+    private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Set<ContentRegistrationFlags> flagsToHandle) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
+            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.RECIPE_SERIALIZERS, modId);
+            deferredRegister.register(modEventBus);
+            if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
+                CopyTagRecipe.registerSerializers(deferredRegister::register, ForgeCopyTagRecipeSerializer::new);
+            }
+        }
     }
 
     private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Set<ContentRegistrationFlags> availableFlags) {

@@ -9,6 +9,7 @@ import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -16,8 +17,17 @@ import java.util.Objects;
 
 public abstract class AbstractModelProvider extends BlockStateProvider {
 
-    public AbstractModelProvider(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
+    public AbstractModelProvider(GatherDataEvent evt, String modId) {
+        this(evt.getGenerator(), evt.getExistingFileHelper(), modId);
+    }
+
+    public AbstractModelProvider(DataGenerator packOutput, ExistingFileHelper fileHelper, String modId) {
         super(packOutput, modId, fileHelper);
+    }
+
+    @Deprecated(forRemoval = true)
+    public AbstractModelProvider(DataGenerator packOutput, String modId, ExistingFileHelper fileHelper) {
+        this(packOutput, fileHelper, modId);
     }
 
     @Override
@@ -59,8 +69,7 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
      * @param particleTexture the particle texture
      */
     public void builtInBlock(Block block, ResourceLocation particleTexture) {
-        this.simpleBlock(block, this.models().getBuilder(this.name(block))
-                .texture("particle", particleTexture));
+        this.simpleBlock(block, this.models().getBuilder(this.name(block)).texture("particle", particleTexture));
     }
 
     public void cubeBottomTopBlock(Block block) {
@@ -89,9 +98,7 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
     }
 
     public ItemModelBuilder builtInItem(Item item, Block texture, ResourceLocation parent) {
-        return this.itemModels().getBuilder(this.itemName(item))
-                .parent(this.itemModels().getExistingFile(parent))
-                .texture("particle", this.blockTexture(texture));
+        return this.itemModels().getBuilder(this.itemName(item)).parent(this.itemModels().getExistingFile(parent)).texture("particle", this.blockTexture(texture));
     }
 
     public ResourceLocation extendKey(Block block, String... extensions) {
@@ -130,5 +137,25 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
 
     public ItemModelBuilder spawnEgg(ResourceLocation item) {
         return this.itemModels().getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("minecraft:item/template_spawn_egg"));
+    }
+
+    public ItemModelBuilder handheldItem(Item item) {
+        return this.handheldItem(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(item)));
+    }
+
+    public ItemModelBuilder handheldItem(ResourceLocation item) {
+        return this.itemModels().getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/handheld")).texture("layer0", new ResourceLocation(item.getNamespace(), "item/" + item.getPath()));
+    }
+
+    public ItemModelBuilder basicItem(Item item, ResourceLocation texture) {
+        return this.basicItem(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(item)), texture);
+    }
+
+    public ItemModelBuilder basicItem(ResourceLocation item, Item texture) {
+        return this.basicItem(item, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(texture)));
+    }
+
+    public ItemModelBuilder basicItem(ResourceLocation item, ResourceLocation texture) {
+        return this.itemModels().getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/generated")).texture("layer0", new ResourceLocation(texture.getNamespace(), "item/" + texture.getPath()));
     }
 }

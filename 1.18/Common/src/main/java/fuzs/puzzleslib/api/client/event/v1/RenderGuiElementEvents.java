@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.GameType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -176,7 +177,7 @@ public final class RenderGuiElementEvents {
          * @return {@link EventResult#INTERRUPT} to prevent the element from rendering,
          * {@link EventResult#PASS} to allow the element to render normally
          */
-        EventResult onBeforeRenderGuiElement(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
+        EventResult onBeforeRenderGuiElement(Minecraft minecraft, @Nullable PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
     }
 
     @FunctionalInterface
@@ -191,6 +192,6 @@ public final class RenderGuiElementEvents {
          * @param screenWidth  width of the window's screen
          * @param screenHeight height of the window's screen
          */
-        void onAfterRenderGuiElement(Minecraft minecraft, PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
+        void onAfterRenderGuiElement(Minecraft minecraft, @Nullable PoseStack poseStack, float tickDelta, int screenWidth, int screenHeight);
     }
 }

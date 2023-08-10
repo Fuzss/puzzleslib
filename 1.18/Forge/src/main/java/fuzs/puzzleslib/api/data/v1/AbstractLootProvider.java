@@ -17,7 +17,9 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -47,6 +49,10 @@ public final class AbstractLootProvider {
         private final LootTableProvider provider;
         private final String modId;
 
+        public Blocks(GatherDataEvent evt, String modId) {
+            this(evt.getGenerator(), modId);
+        }
+
         public Blocks(DataGenerator packOutput, String modId) {
             this.provider = createProvider(packOutput, this, LootContextParamSets.BLOCK);
             this.modId = modId;
@@ -62,8 +68,16 @@ public final class AbstractLootProvider {
             return "Block Loot Tables";
         }
 
+        public abstract void generate();
+
         @Override
-        public abstract void addTables();
+        public final void addTables() {
+            this.generate();
+        }
+
+        protected void dropNothing(Block block) {
+            this.add(block, noDrop());
+        }
 
         @Override
         protected Iterable<Block> getKnownBlocks() {
@@ -77,6 +91,10 @@ public final class AbstractLootProvider {
     public static abstract class EntityTypes extends EntityLoot implements DataProvider {
         private final LootTableProvider provider;
         private final String modId;
+
+        public EntityTypes(GatherDataEvent evt, String modId) {
+            this(evt.getGenerator(), modId);
+        }
 
         public EntityTypes(DataGenerator packOutput, String modId) {
             this.provider = createProvider(packOutput, this, LootContextParamSets.ENTITY);
@@ -92,8 +110,12 @@ public final class AbstractLootProvider {
             return "Entity Type Loot Tables";
         }
 
+        public abstract void generate();
+
         @Override
-        public abstract void addTables();
+        protected final void addTables() {
+            this.generate();
+        }
 
         @Override
         protected Iterable<EntityType<?>> getKnownEntities() {
@@ -109,17 +131,27 @@ public final class AbstractLootProvider {
     }
 
     public static abstract class Simple extends LootTableProvider implements DataProvider, Consumer<BiConsumer<ResourceLocation, LootTable.Builder>> {
-        private final Map<ResourceLocation, LootTable.Builder> values = Maps.newHashMap();
         private final List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> provider;
+        private final Map<ResourceLocation, LootTable.Builder> values = Maps.newHashMap();
 
-        public Simple(DataGenerator packOutput, String name, LootContextParamSet paramSet) {
+        @Deprecated(forRemoval = true)
+        public Simple(DataGenerator packOutput, LootContextParamSet paramSet) {
+            this(paramSet, packOutput, "");
+        }
+
+        public Simple(LootContextParamSet paramSet, GatherDataEvent evt, String modId) {
+            this(paramSet, evt.getGenerator(), modId);
+        }
+
+        public Simple(LootContextParamSet paramSet, DataGenerator packOutput, String modId) {
             super(packOutput);
             this.provider = ImmutableList.of(Pair.of(() -> this, paramSet));
         }
 
         @Override
         public String getName() {
-            return "Loot Tables";
+            // multiple data providers cannot have the same name, so handle it like this
+            return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(this.getClass().getSimpleName()), ' ');
         }
 
         @Override
