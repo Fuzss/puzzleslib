@@ -21,7 +21,7 @@ abstract class FishingHookFabricMixin extends Entity {
         super(entityType, level);
     }
 
-    @Inject(method = "checkCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;onHit(Lnet/minecraft/world/phys/HitResult;)V", shift = At.Shift.BEFORE), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
+    @Inject(method = "checkCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/projectile/FishingHook;onHit(Lnet/minecraft/world/phys/HitResult;)V"), cancellable = true, locals = LocalCapture.CAPTURE_FAILHARD)
     private void checkCollision(CallbackInfo callback, HitResult hitResult) {
         // implement this in Projectile::onHit, it's unlikely a subclass will override this
         if (hitResult.getType() == HitResult.Type.MISS) return;

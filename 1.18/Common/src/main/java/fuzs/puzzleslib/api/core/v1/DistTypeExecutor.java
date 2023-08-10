@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 /**
  * mostly copied from Forge's DistExecutor without pointless deprecation
  */
+@Deprecated(forRemoval = true)
 public class DistTypeExecutor {
 
     /**

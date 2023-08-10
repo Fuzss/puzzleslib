@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import net.minecraft.network.Connection;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,7 +27,7 @@ public class ForgeServerProxy implements ForgeProxy {
     }
 
     @Override
-    public Connection getClientConnection() {
+    public ClientPacketListener getClientPacketListener() {
         throw new RuntimeException("Client connection accessed for wrong side!");
     }
 

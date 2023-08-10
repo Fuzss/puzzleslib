@@ -10,18 +10,19 @@ import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 public interface CommonFactories {
     CommonFactories INSTANCE = ServiceProviderHelper.load(CommonFactories.class);
 
-    void constructMod(String modId, ModConstructor modConstructor, ContentRegistrationFlags... contentRegistrations);
+    void constructMod(String modId, ModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle);
 
     ModContext getModContext(String modId);
 
-    Supplier<Proxy> getClientProxy();
+    Proxy getClientProxy();
 
-    Supplier<Proxy> getServerProxy();
+    Proxy getServerProxy();
 
     PotionBrewingRegistry getPotionBrewingRegistry();
 

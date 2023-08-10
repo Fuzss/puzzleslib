@@ -3,12 +3,14 @@ package fuzs.puzzleslib.api.core.v1;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,9 +34,7 @@ public interface CommonAbstractions {
      * @param menuProvider menu factory
      */
     default void openMenu(ServerPlayer player, MenuProvider menuProvider) {
-        this.openMenu(player, menuProvider, (ServerPlayer serverPlayer, FriendlyByteBuf buf) -> {
-
-        });
+        this.openMenu(player, menuProvider, (ServerPlayer serverPlayer, FriendlyByteBuf buf) -> {});
     }
 
     /**
@@ -95,4 +95,14 @@ public interface CommonAbstractions {
      * @return is mob griefing allows to happen
      */
     boolean getMobGriefingRule(Level level, @Nullable Entity entity);
+
+    /**
+     * A trigger for running a Forge event for destroying an item.
+     * <p>Ideally this should be migrated to the event api, to also allow for firing the event on Fabric. Until that happens this functions as a workaround.
+     *
+     * @param player          the player destroying the item
+     * @param itemStack       the item stack before being destroyed
+     * @param interactionHand the hand holding the destroyed stack
+     */
+    void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand);
 }

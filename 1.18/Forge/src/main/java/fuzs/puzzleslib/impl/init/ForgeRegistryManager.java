@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.impl.init;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
@@ -24,6 +26,7 @@ import net.minecraftforge.registries.RegistryObject;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -64,17 +67,17 @@ public class ForgeRegistryManager implements RegistryManager {
 
     @Override
     public RegistryManager whenOn(ModLoader... allowedModLoaders) {
-        if (allowedModLoaders.length == 0) throw new IllegalArgumentException("Must provide at least one mod loader to register on");
-        this.allowedModLoaders = ImmutableSet.copyOf(allowedModLoaders);
+        Preconditions.checkPositionIndex(0, allowedModLoaders.length - 1, "mod loaders is empty");
+        this.allowedModLoaders = Sets.immutableEnumSet(Arrays.asList(allowedModLoaders));
         return this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> RegistryReference<T> register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
-        Set<ModLoader> modLoaders = this.allowedModLoaders;
+        Set<ModLoader> allowedModLoaders = this.allowedModLoaders;
         this.allowedModLoaders = null;
-        if (modLoaders != null && !modLoaders.contains(ModLoader.FORGE)) {
+        if (allowedModLoaders != null && !allowedModLoaders.contains(ModLoader.FORGE)) {
             return this.placeholder(registryKey, path);
         }
         DeferredRegister<?> register = this.deferredRegisters.computeIfAbsent(registryKey, key -> {

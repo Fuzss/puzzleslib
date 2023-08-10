@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
@@ -10,7 +11,10 @@ import java.util.Map;
 /**
  * Context for retrieving baked models from the model manager after they've been reloaded.
  * <p>Fired after the resource manager has reloaded models. Does not allow for modifying the models map, for that use {@link DynamicModifyBakingResultContext}.
+ *
+ * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.BakingCompleted}
  */
+@Deprecated(forRemoval = true)
 public interface DynamicBakingCompletedContext {
 
     /**
@@ -34,5 +38,7 @@ public interface DynamicBakingCompletedContext {
      * @param identifier model identifier
      * @return the model, possibly empty model instance
      */
-    BakedModel getModel(ResourceLocation identifier);
+    default BakedModel getModel(ResourceLocation identifier) {
+        return ClientAbstractions.INSTANCE.getBakedModel(this.modelManager(), identifier);
+    }
 }

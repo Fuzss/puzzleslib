@@ -7,7 +7,7 @@ import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.network.Connection;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +40,7 @@ public class FabricServerProxy implements FabricProxy {
     }
 
     @Override
-    public Connection getClientConnection() {
+    public ClientPacketListener getClientPacketListener() {
         throw new RuntimeException("Client connection accessed for wrong side!");
     }
 

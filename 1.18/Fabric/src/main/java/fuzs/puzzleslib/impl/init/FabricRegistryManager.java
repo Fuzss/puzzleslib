@@ -1,8 +1,10 @@
 package fuzs.puzzleslib.impl.init;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
@@ -22,10 +24,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -64,8 +63,8 @@ public class FabricRegistryManager implements RegistryManager {
 
     @Override
     public RegistryManager whenOn(ModLoader... allowedModLoaders) {
-        if (allowedModLoaders.length == 0) throw new IllegalArgumentException("Must provide at least one mod loader to register on");
-        this.allowedModLoaders = ImmutableSet.copyOf(allowedModLoaders);
+        Preconditions.checkPositionIndex(0, allowedModLoaders.length - 1, "mod loaders is empty");
+        this.allowedModLoaders = Sets.immutableEnumSet(Arrays.asList(allowedModLoaders));
         return this;
     }
 
@@ -83,19 +82,19 @@ public class FabricRegistryManager implements RegistryManager {
 
     @Override
     public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
-        Set<ModLoader> modLoaders = this.allowedModLoaders;
+        Set<ModLoader> allowedModLoaders = this.allowedModLoaders;
         this.allowedModLoaders = null;
         if (!this.deferred) {
-            return this.actuallyRegister(registryKey, path, supplier, modLoaders);
+            return this.actuallyRegister(registryKey, path, supplier, allowedModLoaders);
         } else {
-            this.registryToFactory.put(registryKey, () -> this.actuallyRegister(registryKey, path, supplier, modLoaders));
+            this.registryToFactory.put(registryKey, () -> this.actuallyRegister(registryKey, path, supplier, allowedModLoaders));
             return this.placeholder(registryKey, path);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, @Nullable Set<ModLoader> modLoaders) {
-        if (modLoaders != null && !modLoaders.contains(ModLoader.FABRIC)) {
+    private <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, @Nullable Set<ModLoader> allowedModLoaders) {
+        if (allowedModLoaders != null && !allowedModLoaders.contains(ModLoader.FABRIC)) {
             return this.placeholder(registryKey, path);
         }
         T value = supplier.get();
