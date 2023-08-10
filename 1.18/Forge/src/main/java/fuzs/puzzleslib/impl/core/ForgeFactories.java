@@ -13,13 +13,14 @@ import fuzs.puzzleslib.impl.init.PotionBrewingRegistryForge;
 import fuzs.puzzleslib.impl.item.ForgeToolTypeHelper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 public final class ForgeFactories implements CommonFactories {
 
     @Override
-    public void constructMod(String modId, ModConstructor modConstructor, ContentRegistrationFlags... contentRegistrations) {
-        ForgeModConstructor.construct(modConstructor, modId, contentRegistrations);
+    public void constructMod(String modId, ModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
+        ForgeModConstructor.construct(modConstructor, modId, availableFlags, flagsToHandle);
     }
 
     @Override
@@ -27,16 +28,14 @@ public final class ForgeFactories implements CommonFactories {
         return new ForgeModContext(modId);
     }
 
-    @SuppressWarnings("Convert2MethodRef")
     @Override
-    public Supplier<Proxy> getClientProxy() {
-        return () -> new ForgeClientProxy();
+    public Proxy getClientProxy() {
+        return new ForgeClientProxy();
     }
 
-    @SuppressWarnings("Convert2MethodRef")
     @Override
-    public Supplier<Proxy> getServerProxy() {
-        return () -> new ForgeServerProxy();
+    public Proxy getServerProxy() {
+        return new ForgeServerProxy();
     }
 
     @Override

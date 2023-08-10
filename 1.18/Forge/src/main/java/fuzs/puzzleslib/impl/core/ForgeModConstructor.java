@@ -16,21 +16,23 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 
+import java.util.Set;
+
 public final class ForgeModConstructor {
 
     private ForgeModConstructor() {
 
     }
 
-    public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
+    public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
-            registerModHandlers(constructor, modEventBus, contentRegistrations);
+            registerModHandlers(constructor, modEventBus, availableFlags);
             registerHandlers(constructor);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, ContentRegistrationFlags[] contentRegistrations) {
+    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Set<ContentRegistrationFlags> availableFlags) {
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             // we need this to run before search trees are created, this event fires right before that which suits us perfectly fine
             // all lifecycle events run way too late, but work for a dedicated server which doesn't have to create  any search trees
@@ -47,7 +49,7 @@ public final class ForgeModConstructor {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
                 constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
-                constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(contentRegistrations));
+                constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(availableFlags));
                 constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
                 constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextForgeImpl());
             });

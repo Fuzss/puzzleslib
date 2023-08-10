@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.init.v2;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
@@ -29,11 +31,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * handles registering to game registries
@@ -84,11 +86,8 @@ public interface RegistryManager {
      * @return this manager as a builder
      */
     default RegistryManager whenNotOn(ModLoader... forbiddenModLoaders) {
-        if (forbiddenModLoaders.length == 0) {
-            throw new IllegalArgumentException("Must provide at least one mod loader to not register on");
-        }
-        ModLoader[] allowedModLoaders = Stream.of(ModLoader.values()).filter(modLoader -> !ArrayUtils.contains(forbiddenModLoaders, modLoader)).toArray(ModLoader[]::new);
-        return this.whenOn(allowedModLoaders);
+        Preconditions.checkPositionIndex(0, forbiddenModLoaders.length - 1, "mod loaders is empty");
+        return this.whenOn(EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(forbiddenModLoaders), ModLoader.class)).toArray(ModLoader[]::new));
     }
 
     /**

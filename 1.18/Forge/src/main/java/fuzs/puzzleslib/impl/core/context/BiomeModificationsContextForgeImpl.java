@@ -27,16 +27,13 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public record BiomeModificationsContextForgeImpl(
-        ContentRegistrationFlags[] contentRegistrations) implements BiomeModificationsContext {
+        Set<ContentRegistrationFlags> availableFlags) implements BiomeModificationsContext {
     @SuppressWarnings("RedundantTypeArguments")
     private static final Map<BiomeLoadingPhase, EventPriority> BIOME_MODIFIER_PHASE_CONVERSIONS = Maps.<BiomeLoadingPhase, EventPriority>immutableEnumMap(new HashMap<>() {{
         this.put(BiomeLoadingPhase.ADDITIONS, EventPriority.HIGH);
@@ -50,7 +47,7 @@ public record BiomeModificationsContextForgeImpl(
 
     @Override
     public void register(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier) {
-        Preconditions.checkArgument(ArrayUtils.contains(this.contentRegistrations, ContentRegistrationFlags.BIOME_MODIFICATIONS), "biome modifications registration flag is missing");
+        Preconditions.checkArgument(this.availableFlags.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS), "biome modifications registration flag is missing");
         Objects.requireNonNull(phase, "phase is null");
         Objects.requireNonNull(selector, "selector is null");
         Objects.requireNonNull(modifier, "modifier is null");

@@ -31,6 +31,11 @@ public final class FabricClientEvents {
      */
     public static final Event<CustomizeChatPanelCallback> CUSTOMIZE_CHAT_PANEL = FabricEventFactory.create(CustomizeChatPanelCallback.class);
     /**
+     * Fired when an entity is added to the level on the client.
+     * <p>We do not use {@link net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents#ENTITY_LOAD} as it does not allow for preventing the entity from being added.
+     */
+    public static final Event<ClientEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(ClientEntityLevelEvents.Load.class);
+    /**
      * Called before a mouse button is clicked or released without a screen being open.
      */
     public static final Event<InputEvents.BeforeMouseAction> BEFORE_MOUSE_ACTION = FabricEventFactory.createResult(InputEvents.BeforeMouseAction.class);
@@ -99,6 +104,26 @@ public final class FabricClientEvents {
      * Called after {@link Input#tick(boolean, float)} has run for the {@link LocalPlayer}.
      */
     public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(MovementInputUpdateCallback.class);
+    /**
+     * Fired when the resource manager is reloading models and models have been baked, but before they are passed on for caching.
+     */
+    public static final Event<ModelEvents.ModifyBakingResult> MODIFY_BAKING_RESULT = FabricEventFactory.create(ModelEvents.ModifyBakingResult.class);
+    /**
+     * Fired after the resource manager has reloaded models. Does not allow for modifying the models map, for that use {@link ModelEvents.ModifyBakingResult}.
+     */
+    public static final Event<ModelEvents.BakingCompleted> BAKING_COMPLETED = FabricEventFactory.create(ModelEvents.BakingCompleted.class);
+    /**
+     * Called before a block overlay is rendered on the screen.
+     */
+    public static final Event<RenderBlockOverlayCallback> RENDER_BLOCK_OVERLAY = FabricEventFactory.createResult(RenderBlockOverlayCallback.class);
+    /**
+     * Called before fog is rendered, allows for controlling fog start and end distance.
+     */
+    public static final Event<FogEvents.Render> RENDER_FOG = FabricEventFactory.create(FogEvents.Render.class);
+    /**
+     * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the color.
+     */
+    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.createResult(FogEvents.ComputeColor.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

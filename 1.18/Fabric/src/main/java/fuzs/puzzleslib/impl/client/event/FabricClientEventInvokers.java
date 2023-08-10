@@ -2,8 +2,13 @@ package fuzs.puzzleslib.impl.client.event;
 
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
+import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
@@ -11,6 +16,9 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.HitResult;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +31,11 @@ import static fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl.INSTANCE
 public final class FabricClientEventInvokers {
 
     public static void register() {
+        INSTANCE.register(LoadCompleteCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
+            return (Minecraft client) -> {
+                callback.onLoadComplete();
+            };
+        });
         INSTANCE.register(ClientTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK, callback -> {
             return callback::onStartClientTick;
         });
@@ -124,13 +137,7 @@ public final class FabricClientEventInvokers {
             applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement(overlay.id()));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
-        INSTANCE.register(ClientEntityLevelEvents.Load.class, ClientEntityEvents.ENTITY_LOAD, callback -> {
-            return (Entity entity, ClientLevel world) -> {
-                if (callback.onEntityLoad(entity, world).isInterrupt()) {
-                    entity.setRemoved(Entity.RemovalReason.DISCARDED);
-                }
-            };
-        });
+        INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEvents.ENTITY_LOAD);
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onEntityUnload;
         });
@@ -167,11 +174,45 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientLevelEvents.Load.class, FabricClientEvents.LOAD_LEVEL);
         INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientEvents.UNLOAD_LEVEL);
         INSTANCE.register(MovementInputUpdateCallback.class, FabricClientEvents.MOVEMENT_INPUT_UPDATE);
+        INSTANCE.register(ModelEvents.ModifyBakingResult.class, FabricClientEvents.MODIFY_BAKING_RESULT);
+        INSTANCE.register(ModelEvents.BakingCompleted.class, FabricClientEvents.BAKING_COMPLETED);
+        INSTANCE.register(RenderBlockOverlayCallback.class, FabricClientEvents.RENDER_BLOCK_OVERLAY);
+        INSTANCE.register(FogEvents.Render.class, FabricClientEvents.RENDER_FOG);
+        INSTANCE.register(FogEvents.ComputeColor.class, FabricClientEvents.COMPUTE_FOG_COLOR);
+        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricScreenEvents.RENDER_TOOLTIP);
+        INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, callback -> {
+            return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
+                if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) return true;
+                Minecraft minecraft = Minecraft.getInstance();
+                if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return true;
+                EventResult result = callback.onRenderHighlight(context.worldRenderer(), context.camera(), context.gameRenderer(), hitResult, context.tickDelta(), context.matrixStack(), context.consumers(), context.world());
+                return result.isPass();
+            };
+        });
+        INSTANCE.register(RenderLevelEvents.AfterTerrain.class, WorldRenderEvents.BEFORE_ENTITIES, callback -> {
+            return (WorldRenderContext context) -> {
+                callback.onRenderLevelAfterTerrain(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+            };
+        });
+        INSTANCE.register(RenderLevelEvents.AfterEntities.class, WorldRenderEvents.AFTER_ENTITIES, callback -> {
+            return (WorldRenderContext context) -> {
+                callback.onRenderLevelAfterEntities(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+            };
+        });
+        INSTANCE.register(RenderLevelEvents.AfterTranslucent.class, WorldRenderEvents.AFTER_TRANSLUCENT, callback -> {
+            return (WorldRenderContext context) -> {
+                callback.onRenderLevelAfterTranslucent(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+            };
+        });
+        INSTANCE.register(RenderLevelEvents.AfterLevel.class, WorldRenderEvents.END, callback -> {
+            return (WorldRenderContext context) -> {
+                callback.onRenderLevelAfterLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+            };
+        });
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
         INSTANCE.register(clazz, eventType, converter, (context, applyToInvoker, removeInvoker) -> {
-            Objects.requireNonNull(context, "context is null");
             // we need to keep our own event invokers during the whole pre-init phase to guarantee phase ordering is applied correctly,
             // since this is managed in the event invokers and there seems to be no way to handle it with just the Fabric event
             // (since the Fabric event doesn't allow for retrieving already applied event phase orders),

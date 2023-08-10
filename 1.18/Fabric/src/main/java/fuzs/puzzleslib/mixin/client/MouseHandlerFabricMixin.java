@@ -48,7 +48,7 @@ abstract class MouseHandlerFabricMixin {
         }
     }
 
-    @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(method = "onScroll", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z"), cancellable = true)
     private void onScroll$0(long windowPointer, double xOffset, double yOffset, CallbackInfo callback) {
         // just recalculate this instead of capturing local, shouldn't be able to change in the meantime
         this.puzzleslib$verticalScrollAmount = this.minecraft.options.discreteMouseScroll ? Math.signum(yOffset) : yOffset * this.minecraft.options.mouseWheelSensitivity;

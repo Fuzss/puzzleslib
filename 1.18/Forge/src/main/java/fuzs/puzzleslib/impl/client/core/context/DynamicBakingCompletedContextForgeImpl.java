@@ -12,9 +12,4 @@ public record DynamicBakingCompletedContextForgeImpl(ModelManager modelManager,
                                                      Map<ResourceLocation, BakedModel> models,
                                                      ModelBakery modelBakery) implements DynamicBakingCompletedContext {
 
-    @SuppressWarnings("resource")
-    @Override
-    public BakedModel getModel(ResourceLocation identifier) {
-        return this.modelManager().getModel(identifier);
-    }
 }

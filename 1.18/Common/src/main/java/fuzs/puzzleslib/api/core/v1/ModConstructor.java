@@ -4,31 +4,36 @@ import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
  * a base class for a mods main common class, contains a bunch of methods for registering various things
  */
-public interface ModConstructor {
+public interface ModConstructor extends PairedModConstructor {
 
     /**
      * Construct the main {@link ModConstructor} instance provided as <code>supplier</code> to begin initialization of a mod.
      *
-     * @param modId                the mod id for registering events on Forge to the correct mod event bus
-     * @param supplier             the main mod instance for mod setup
-     * @param contentRegistrations specific content this mod uses that needs to be additionally registered
+     * @param modId    the mod id for registering events on Forge to the correct mod event bus
+     * @param supplier the main mod instance for mod setup
+     * @param flags    specific content this mod uses that needs to be additionally registered
      */
-    static void construct(String modId, Supplier<ModConstructor> supplier, ContentRegistrationFlags... contentRegistrations) {
+    static void construct(String modId, Supplier<ModConstructor> supplier, ContentRegistrationFlags... flags) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
-        PuzzlesLib.LOGGER.info("Constructing common components for mod {}", modId);
         // build first to force class being loaded for executing buildables
         ModConstructor modConstructor = supplier.get();
+        ResourceLocation identifier = ModContext.getPairingIdentifier(modId, modConstructor);
+        PuzzlesLib.LOGGER.info("Constructing common components for {}", identifier);
         ModContext modContext = ModContext.get(modId);
+        Set<ContentRegistrationFlags> availableFlags = Set.of(flags);
+        Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
         modContext.beforeModConstruction();
-        CommonFactories.INSTANCE.constructMod(modId, modConstructor, contentRegistrations);
-        modContext.afterModConstruction();
+        CommonFactories.INSTANCE.constructMod(modId, modConstructor, availableFlags, flagsToHandle);
+        modContext.afterModConstruction(identifier);
     }
 
     /**

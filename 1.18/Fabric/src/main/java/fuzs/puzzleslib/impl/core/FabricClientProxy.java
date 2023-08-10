@@ -9,7 +9,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,10 +31,10 @@ public class FabricClientProxy extends FabricServerProxy {
     }
 
     @Override
-    public Connection getClientConnection() {
+    public ClientPacketListener getClientPacketListener() {
         ClientPacketListener connection = Minecraft.getInstance().getConnection();
-        Objects.requireNonNull(connection, "Cannot send packets when not in game!");
-        return connection.getConnection();
+        Objects.requireNonNull(connection, "client packet listener is null");
+        return connection;
     }
 
     @Override

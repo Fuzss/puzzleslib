@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.core.v1.PairedModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
 import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
@@ -14,31 +15,38 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
  * a base class for a mods main client class, contains a bunch of methods for registering various things
  */
-public interface ClientModConstructor {
+public interface ClientModConstructor extends PairedModConstructor {
 
     /**
      * Construct the {@link ClientModConstructor} instance provided as <code>supplier</code> to begin client-side initialization of a mod.
      *
      * @param modId the mod id for registering events on Forge to the correct mod event bus
      * @param modConstructor       the main mod instance for mod setup
-     * @param contentRegistrations specific content this mod uses that needs to be additionally registered
+     * @param flags specific content this mod uses that needs to be additionally registered
      */
-    static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... contentRegistrations) {
+    static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... flags) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
+        ClientModConstructor instance = modConstructor.get();
+        ModContext modContext = ModContext.get(modId);
+        ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
         // not an issue on Fabric, but Forge might call client construction before common
-        ModContext.get(modId).scheduleClientModConstruction(() -> {
-            PuzzlesLib.LOGGER.info("Constructing client components for mod {}", modId);
-            ClientFactories.INSTANCE.constructClientMod(modId, modConstructor, contentRegistrations);
+        modContext.scheduleClientModConstruction(identifier, () -> {
+            PuzzlesLib.LOGGER.info("Constructing client components for {}", identifier);
+            Set<ContentRegistrationFlags> availableFlags = Set.of(flags);
+            Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
+            ClientFactories.INSTANCE.constructClientMod(modId, instance, availableFlags, flagsToHandle);
         });
     }
 
@@ -121,14 +129,20 @@ public interface ClientModConstructor {
 
     /**
      * @param context Context for modifying baked models right after they've been reloaded.
+     *
+     * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.ModifyBakingResult}
      */
+    @Deprecated(forRemoval = true)
     default void onModifyBakingResult(final DynamicModifyBakingResultContext context) {
 
     }
 
     /**
      * @param context Context for retrieving baked models from the model manager after they've been reloaded.
+     *
+     * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.BakingCompleted}
      */
+    @Deprecated(forRemoval = true)
     default void onBakingCompleted(final DynamicBakingCompletedContext context) {
 
     }

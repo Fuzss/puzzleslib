@@ -5,13 +5,15 @@ import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
 
+import java.util.Set;
+
 public final class FabricModConstructor {
 
     private FabricModConstructor() {
 
     }
 
-    public static void construct(ModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
+    public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         registerHandlers(constructor, modId);
     }
 

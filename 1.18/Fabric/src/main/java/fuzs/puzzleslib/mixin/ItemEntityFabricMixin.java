@@ -68,7 +68,7 @@ abstract class ItemEntityFabricMixin extends Entity {
         }
     }
 
-    @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V", shift = At.Shift.BEFORE))
+    @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"))
     public void playerTouch$1(Player player, CallbackInfo callback) {
         if (this.puzzleslib$originalItem.isEmpty()) return;
         ItemStack copy = this.puzzleslib$originalItem;

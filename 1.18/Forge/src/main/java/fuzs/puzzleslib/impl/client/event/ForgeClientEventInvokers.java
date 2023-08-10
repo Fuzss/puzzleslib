@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.client.event;
 
+import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -8,10 +9,13 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.gui.OverlayRegistry;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
@@ -19,7 +23,9 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Event;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -29,6 +35,15 @@ import static fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl.INSTANCE;
 
 @SuppressWarnings("unchecked")
 public final class ForgeClientEventInvokers {
+    @Nullable
+    private static Frustum capturedFrustum;
+
+    static {
+        MinecraftForge.EVENT_BUS.addListener((final RenderLevelStageEvent evt) -> {
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_WEATHER) return;
+            capturedFrustum = evt.getFrustum();
+        });
+    }
 
     public static void register() {
         INSTANCE.register(ClientTickEvents.Start.class, TickEvent.ClientTickEvent.class, (ClientTickEvents.Start callback, TickEvent.ClientTickEvent evt) -> {
@@ -64,8 +79,8 @@ public final class ForgeClientEventInvokers {
             }, () -> {
                 return availableSpace < 120 && evt.getResult() == Event.Result.DEFAULT || evt.getResult() == Event.Result.ALLOW;
             });
-            EventResult result = callback.onInventoryMobEffects(evt.getScreen(), availableSpace, fullSizeRendering, horizontalOffset);
-//            if (result.isInterrupt()) evt.setCanceled(true);
+            // the result is ignored, the Forge event on 1.18.2 doesn't allow for preventing mob effects from rendering at all
+            callback.onInventoryMobEffects(evt.getScreen(), availableSpace, fullSizeRendering, horizontalOffset);
         });
         INSTANCE.register(ScreenOpeningCallback.class, ScreenOpenEvent.class, (ScreenOpeningCallback callback, ScreenOpenEvent evt) -> {
             DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setScreen, evt::getScreen, evt::getScreen);
@@ -166,8 +181,14 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinWorldEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinWorldEvent evt) -> {
             if (!evt.getWorld().isClientSide) return;
-            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getWorld());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            if (callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getWorld()).isInterrupt()) {
+                if (evt.getEntity() instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
         });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveWorldEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveWorldEvent evt) -> {
             if (!evt.getWorld().isClientSide) return;
@@ -258,8 +279,73 @@ public final class ForgeClientEventInvokers {
             if (!(evt.getWorld() instanceof ClientLevel level)) return;
             callback.onLevelUnload(Minecraft.getInstance(), level);
         });
-        INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (callback, evt) -> {
-            callback.onMovementInputUpdate((LocalPlayer) evt.getPlayer(), evt.getInput());
+        INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (MovementInputUpdateCallback callback, MovementInputUpdateEvent evt) -> {
+            callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
+        });
+        INSTANCE.register(ModelEvents.ModifyBakingResult.class, ModelBakeEvent.class, (ModelEvents.ModifyBakingResult callback, ModelBakeEvent evt) -> {
+            callback.onModifyBakingResult(evt.getModelRegistry(), evt::getModelLoader);
+        });
+        INSTANCE.register(ModelEvents.BakingCompleted.class, ModelBakeEvent.class, (ModelEvents.BakingCompleted callback, ModelBakeEvent evt) -> {
+            callback.onBakingCompleted(evt::getModelManager, Collections.unmodifiableMap(evt.getModelRegistry()), evt::getModelLoader);
+        });
+        INSTANCE.register(RenderBlockOverlayCallback.class, RenderBlockOverlayEvent.class, (RenderBlockOverlayCallback callback, RenderBlockOverlayEvent evt) -> {
+            EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), evt.getBlockState());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(FogEvents.Render.class, EntityViewRenderEvent.RenderFogEvent.class, (FogEvents.Render callback, EntityViewRenderEvent.RenderFogEvent evt) -> {
+            MutableFloat nearPlaneDistance = MutableFloat.fromEvent(t -> {
+                evt.setNearPlaneDistance(t);
+                evt.setCanceled(true);
+            }, evt::getNearPlaneDistance);
+            MutableFloat farPlaneDistance = MutableFloat.fromEvent(t -> {
+                evt.setFarPlaneDistance(t);
+                evt.setCanceled(true);
+            }, evt::getFarPlaneDistance);
+            MutableValue<FogShape> fogShape = MutableValue.fromEvent(t -> {
+                evt.setFogShape(t);
+                evt.setCanceled(true);
+            }, evt::getFogShape);
+            callback.onRenderFog(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTicks(), evt.getMode(), evt.getCamera().getFluidInCamera(), nearPlaneDistance, farPlaneDistance, fogShape);
+        });
+        INSTANCE.register(FogEvents.ComputeColor.class, EntityViewRenderEvent.FogColors.class, (FogEvents.ComputeColor callback, EntityViewRenderEvent.FogColors evt) -> {
+            MutableFloat red = MutableFloat.fromEvent(evt::setRed, evt::getRed);
+            MutableFloat green = MutableFloat.fromEvent(evt::setGreen, evt::getGreen);
+            MutableFloat blue = MutableFloat.fromEvent(evt::setBlue, evt::getBlue);
+            callback.onComputeFogColor(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTicks(), red, green, blue);
+        });
+        INSTANCE.register(ScreenTooltipEvents.Render.class, RenderTooltipEvent.Pre.class, (ScreenTooltipEvents.Render callback, RenderTooltipEvent.Pre evt) -> {
+            EventResult result = callback.onRenderTooltip(evt.getPoseStack(), evt.getX(), evt.getY(), evt.getScreenWidth(), evt.getScreenHeight(), evt.getFont(), evt.getComponents());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderHighlightCallback.class, DrawSelectionEvent.class, (RenderHighlightCallback callback, DrawSelectionEvent evt) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
+            EventResult result = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getPartialTicks(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterTerrain.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterTerrain callback, RenderLevelStageEvent evt) -> {
+            // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterTerrain(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterEntities.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterEntities callback, RenderLevelStageEvent evt) -> {
+            // RenderLevelStageEvent.Stage.AFTER_ENTITIES doesn't exist in 1.18.2
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterEntities(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterTranslucent.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterTranslucent callback, RenderLevelStageEvent evt) -> {
+            // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
+            if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterTranslucent(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
+        });
+        INSTANCE.register(RenderLevelEvents.AfterLevel.class, RenderLevelLastEvent.class, (RenderLevelEvents.AfterLevel callback, RenderLevelLastEvent evt) -> {
+            Objects.requireNonNull(capturedFrustum, "captured frustum is null");
+            Minecraft minecraft = Minecraft.getInstance();
+            callback.onRenderLevelAfterLevel(evt.getLevelRenderer(), minecraft.gameRenderer.getMainCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), capturedFrustum, minecraft.level);
+            capturedFrustum = null;
         });
     }
 

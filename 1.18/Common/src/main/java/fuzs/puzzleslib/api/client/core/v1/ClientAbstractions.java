@@ -4,6 +4,9 @@ import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 
@@ -36,4 +39,13 @@ public interface ClientAbstractions {
      * @return the client tooltip components representation
      */
     ClientTooltipComponent createImageComponent(TooltipComponent imageComponent);
+
+    /**
+     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of {@link net.minecraft.client.resources.model.ModelResourceLocation}.
+     *
+     * @param modelManager the model manager instance for retrieving the model
+     * @param identifier   model identifier
+     * @return the model, possibly the missing model
+     */
+    BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier);
 }

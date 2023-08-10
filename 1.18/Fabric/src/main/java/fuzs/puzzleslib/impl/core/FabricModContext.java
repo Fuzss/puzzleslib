@@ -19,26 +19,17 @@ public final class FabricModContext extends ModContext {
 
     @Override
     public NetworkHandlerV2 getNetworkHandlerV2(boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        if (this.networkHandlerV2 == null) {
-            return this.networkHandlerV2 = new NetworkHandlerFabricV2(this.modId);
-        }
-        throw new IllegalStateException("only a single network handler allowed per mod");
+        return new NetworkHandlerFabricV2(this.modId + "-" + this.networkHandlers.incrementAndGet());
     }
 
     @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder() {
-        if (this.networkHandlerV3 == null) {
-            return this.networkHandlerV3 = this.addBuildable(new NetworkHandlerFabricV3(this.modId));
-        }
-        throw new IllegalStateException("only a single network handler allowed per mod");
+        return this.addBuildable(new NetworkHandlerFabricV3(this.modId + "-" + this.networkHandlers.incrementAndGet()));
     }
 
     @Override
     public ConfigHolder.Builder getConfigHolder$Builder() {
-        if (this.configHolder == null) {
-            return this.configHolder = this.addBuildable(new FabricConfigHolderImpl(this.modId));
-        }
-        throw new IllegalStateException("only a single config holder allowed per mod");
+        return this.addBuildable(new FabricConfigHolderImpl(this.modId));
     }
 
     @Override
