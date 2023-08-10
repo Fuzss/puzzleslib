@@ -56,7 +56,6 @@ public interface ClientAbstractions {
      * Get the current partial tick time.
      * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is paused in {@link Minecraft#isPaused()}.
      *
-     * @param minecraft minecraft singleton instance
      * @return current partial tick time
      */
     default float getPartialTick() {
@@ -67,6 +66,7 @@ public interface ClientAbstractions {
      * Get the current partial tick time.
      * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is paused in {@link Minecraft#isPaused()}.
      *
+     * @param minecraft minecraft singleton instance
      * @return current partial tick time
      */
     default float getPartialTick(Minecraft minecraft) {
