@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.18-1.20.1] - 2023-08-10
+### Added
+- Added `GameRenderEvents.Before` and `GameRenderEvents.After`
+- Added helper methods to `ClientAbstractions` for getting `partialTick` and `SearchRegistry`
+### Changed
+- Deprecated `SearchRegistryContext`
+
 ## [v8.0.17-1.20.1] - 2023-08-04
 ### Changed
 - Custom smithing upgrade recipes without a smithing template are now automatically turned into crafting recipes with the same items and functionality to be visible in recipe viewers like JEI without having to provide dedicated support

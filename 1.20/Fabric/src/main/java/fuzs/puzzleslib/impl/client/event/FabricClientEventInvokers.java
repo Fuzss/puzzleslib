@@ -233,6 +233,8 @@ public final class FabricClientEventInvokers {
                 callback.onRenderLevelAfterLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
+        INSTANCE.register(GameRenderEvents.Before.class, FabricClientEvents.BEFORE_GAME_RENDER);
+        INSTANCE.register(GameRenderEvents.After.class, FabricClientEvents.AFTER_GAME_RENDER);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

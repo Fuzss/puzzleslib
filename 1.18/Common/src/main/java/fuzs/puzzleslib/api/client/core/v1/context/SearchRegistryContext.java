@@ -1,20 +1,32 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.searchtree.MutableSearchTree;
 import net.minecraft.client.searchtree.SearchRegistry;
 
+import java.util.Objects;
+
 /**
- * register search tree to private registry in Minecraft singleton
+ * Register a search tree to {@link SearchRegistry}.
+ *
+ * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry(Minecraft)}
  */
-@FunctionalInterface
+@Deprecated(forRemoval = true)
 public interface SearchRegistryContext {
 
     /**
-     * registers a search tree to {@link SearchRegistry} in {@link net.minecraft.world.entity.vehicle.Minecart}
+     * Register a search tree to {@link SearchRegistry}.
      *
      * @param searchRegistryKey the search tree token
      * @param treeBuilder       builder supplier for search tree
      * @param <T>               type to be searched for
      */
-    <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, MutableSearchTree<T> treeBuilder);
+    default <T> void registerSearchTree(SearchRegistry.Key<T> searchRegistryKey, MutableSearchTree<T> treeBuilder) {
+        Objects.requireNonNull(searchRegistryKey, "search registry key is null");
+        Objects.requireNonNull(treeBuilder, "tree builder is null");
+        SearchRegistry searchRegistry = ClientAbstractions.INSTANCE.getSearchRegistry(Minecraft.getInstance());
+        Objects.requireNonNull(searchRegistry, "search tree manager is null");
+        searchRegistry.register(searchRegistryKey, treeBuilder);
+    }
 }

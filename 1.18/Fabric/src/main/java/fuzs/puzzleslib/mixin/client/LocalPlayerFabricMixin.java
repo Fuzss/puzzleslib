@@ -37,7 +37,7 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
         super(clientLevel, gameProfile);
     }
 
-    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(ZF)V", shift = At.Shift.AFTER))
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(Z)V", shift = At.Shift.AFTER))
     public void aiStep(CallbackInfo callback) {
         FabricClientEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this), this.input);
     }

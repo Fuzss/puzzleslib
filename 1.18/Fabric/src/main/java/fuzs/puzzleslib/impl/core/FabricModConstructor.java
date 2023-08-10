@@ -3,6 +3,10 @@ package fuzs.puzzleslib.impl.core;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.impl.core.context.*;
+import fuzs.puzzleslib.impl.item.CopyTagRecipe;
+import fuzs.puzzleslib.impl.item.FabricCopyTagRecipeSerializer;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 
 import java.util.Set;
@@ -14,7 +18,16 @@ public final class FabricModConstructor {
     }
 
     public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
+        registerContent(modId, flagsToHandle);
         registerHandlers(constructor, modId);
+    }
+
+    private static void registerContent(String modId, Set<ContentRegistrationFlags> flagsToHandle) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
+            CopyTagRecipe.registerSerializers((s, recipeSerializerSupplier) -> {
+                Registry.register(Registry.RECIPE_SERIALIZER, new ResourceLocation(modId, s), recipeSerializerSupplier.get());
+            }, FabricCopyTagRecipeSerializer::new);
+        }
     }
 
     private static void registerHandlers(ModConstructor constructor, String modId) {

@@ -68,6 +68,7 @@
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
     "client.accessor.KeyMappingFabricAccessor",
+    "client.accessor.MinecraftAccessor",
     "client.accessor.MinecraftFabricAccessor"
   ],
   "injectors": {

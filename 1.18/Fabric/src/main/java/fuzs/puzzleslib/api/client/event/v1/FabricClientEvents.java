@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -123,7 +124,15 @@ public final class FabricClientEvents {
     /**
      * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the color.
      */
-    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.createResult(FogEvents.ComputeColor.class);
+    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.create(FogEvents.ComputeColor.class);
+    /**
+     * Fires before the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+     */
+    public static final Event<GameRenderEvents.Before> BEFORE_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.Before.class);
+    /**
+     * Fires after the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+     */
+    public static final Event<GameRenderEvents.After> AFTER_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.After.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

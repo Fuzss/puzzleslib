@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.api.core.v1;
 
-import net.minecraft.world.item.crafting.UpgradeRecipe;
-
 /**
  * Allows for specifying certain mod contents that need something to be registered to enable the mod loader specific implementation to work (mostly intended for Forge).
  */
@@ -15,11 +13,16 @@ public enum ContentRegistrationFlags {
      */
     DYNAMIC_RENDERERS,
     /**
-     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for a recipe of type {@link UpgradeRecipe}
+     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for a recipe of type {@link fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe}
      * for upgrading gear without the need for a smithing template, just like the old smithing used to work.
      *
-     * @deprecated only available for Minecraft 1.19.4+
+     * @deprecated replaced by {@link #COPY_TAG_RECIPES}
      */
-    @Deprecated
-    LEGACY_SMITHING
+    @Deprecated(forRemoval = true)
+    LEGACY_SMITHING,
+    /**
+     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for custom crafting recipes that support copying the full item nbt tag of a single ingredient item to the result item.
+     * <p>Intended to be used for upgrading items to a higher tier, similar to the smithing table.
+     */
+    COPY_TAG_RECIPES
 }

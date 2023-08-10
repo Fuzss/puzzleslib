@@ -2,6 +2,7 @@ package fuzs.puzzleslib.mixin.client;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
@@ -36,11 +37,12 @@ abstract class FogRendererFabricMixin {
     }
 
     @Inject(method = "setupFog", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
-    private static void setupFog(Camera camera, FogRenderer.FogMode fogMode, float farPlaneDistance, boolean bl, float f, CallbackInfo callback, FogType fogType) {
+    private static void setupFog(Camera camera, FogRenderer.FogMode fogMode, float farPlaneDistance, boolean bl, CallbackInfo callback, FogType fogType) {
         Minecraft minecraft = Minecraft.getInstance();
+        float partialTick = ClientAbstractions.INSTANCE.getPartialTick(minecraft);
         MutableFloat fogStart = MutableFloat.fromEvent(RenderSystem::setShaderFogStart, RenderSystem::getShaderFogStart);
         MutableFloat fogEnd = MutableFloat.fromEvent(RenderSystem::setShaderFogEnd, RenderSystem::getShaderFogEnd);
         MutableValue<FogShape> fogShape = MutableValue.fromEvent(RenderSystem::setShaderFogShape, RenderSystem::getShaderFogShape);
-        FabricClientEvents.RENDER_FOG.invoker().onRenderFog(minecraft.gameRenderer, camera, f, fogMode, fogType, fogStart, fogEnd, fogShape);
+        FabricClientEvents.RENDER_FOG.invoker().onRenderFog(minecraft.gameRenderer, camera, partialTick, fogMode, fogType, fogStart, fogEnd, fogShape);
     }
 }

@@ -2,10 +2,13 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
+import fuzs.puzzleslib.mixin.client.accessor.MinecraftAccessor;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -48,4 +51,42 @@ public interface ClientAbstractions {
      * @return the model, possibly the missing model
      */
     BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier);
+
+    /**
+     * Get the current partial tick time.
+     * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is paused in {@link Minecraft#isPaused()}.
+     *
+     * @param minecraft minecraft singleton instance
+     * @return current partial tick time
+     */
+    default float getPartialTick() {
+        return this.getPartialTick(Minecraft.getInstance());
+    }
+
+    /**
+     * Get the current partial tick time.
+     * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is paused in {@link Minecraft#isPaused()}.
+     *
+     * @return current partial tick time
+     */
+    default float getPartialTick(Minecraft minecraft) {
+        return minecraft.isPaused() ? ((MinecraftAccessor) minecraft).puzzleslib$getPausePartialTick() : minecraft.getFrameTime();
+    }
+
+    /**
+     * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
+     *
+     * @return the search registry
+     */
+    default SearchRegistry getSearchRegistry() {
+        return this.getSearchRegistry(Minecraft.getInstance());
+    }
+
+    /**
+     * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
+     *
+     * @param minecraft minecraft singleton instance
+     * @return the search registry
+     */
+    SearchRegistry getSearchRegistry(Minecraft minecraft);
 }

@@ -19,7 +19,8 @@
     "client.MinecraftForgeMixin",
     "client.accessor.BlockColorsForgeAccessor",
     "client.accessor.ItemColorsForgeAccessor",
-    "client.accessor.ItemForgeAccessor"
+    "client.accessor.ItemForgeAccessor",
+    "client.accessor.MinecraftAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

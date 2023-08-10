@@ -53,7 +53,7 @@ public final class ForgeAbstractions implements CommonAbstractions {
     public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
         return ForgeEventFactory.getMobGriefingEvent(level, entity);
     }
-    
+
     @Override
     public void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand) {
         ForgeEventFactory.onPlayerDestroyItem(player, itemStack, interactionHand);

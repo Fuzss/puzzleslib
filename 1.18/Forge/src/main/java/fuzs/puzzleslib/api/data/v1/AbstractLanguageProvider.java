@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.api.data.v1;
 
+import fuzs.puzzleslib.api.init.v2.RegistryReference;
+import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatType;
@@ -14,9 +17,14 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.LanguageProvider;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 
 public abstract class AbstractLanguageProvider extends LanguageProvider {
     protected final String modId;
+
+    public AbstractLanguageProvider(GatherDataEvent evt, String modId) {
+        this(evt.getGenerator(), modId);
+    }
 
     public AbstractLanguageProvider(DataGenerator packOutput, String modId) {
         super(packOutput, modId, "en_us");
@@ -34,8 +42,8 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
         this.add(String.format("itemGroup.%s.%s", this.modId, tabId), value);
     }
 
-    public void add(Attribute entityAttribute, String value) {
-        this.add(entityAttribute.getDescriptionId(), value);
+    public void add(Attribute attribute, String value) {
+        this.add(attribute.getDescriptionId(), value);
     }
 
     public void add(StatType<?> statType, String value) {
@@ -62,24 +70,65 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
         this.add(identifier.getNamespace() + "." + identifier.getPath(), value);
     }
 
+    @Deprecated(forRemoval = true)
     public void addAdditional(Block block, String key, String value) {
         this.add(block.getDescriptionId() + "." + key, value);
     }
 
+    public void add(Block block, String additionalKey, String value) {
+        this.add(block.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(Item item, String key, String value) {
         this.add(item.getDescriptionId() + "." + key, value);
     }
 
+    public void add(Item item, String additionalKey, String value) {
+        this.add(item.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(Enchantment enchantment, String key, String value) {
         this.add(enchantment.getDescriptionId() + "." + key, value);
     }
 
+    public void add(Enchantment enchantment, String additionalKey, String value) {
+        this.add(enchantment.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(MobEffect mobEffect, String key, String value) {
         this.add(mobEffect.getDescriptionId() + "." + key, value);
     }
 
+    public void add(MobEffect mobEffect, String additionalKey, String value) {
+        this.add(mobEffect.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addAdditional(EntityType<?> entityType, String key, String value) {
         this.add(entityType.getDescriptionId() + "." + key, value);
+    }
+
+    public void add(EntityType<?> entityType, String additionalKey, String value) {
+        this.add(entityType.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    public void add(Attribute attribute, String additionalKey, String value) {
+        this.add(attribute.getDescriptionId() + "." + additionalKey, value);
+    }
+
+    public void add(StatType<?> statType, String additionalKey, String value) {
+        this.add(statType.getTranslationKey() + "." + additionalKey, value);
+    }
+
+    public void add(String key, String additionalKey, String value) {
+        this.add(key + "." + additionalKey, value);
+    }
+
+    public void add(ResourceLocation identifier, String additionalKey, String value) {
+        this.add(identifier.getNamespace() + "." + identifier.getPath() + "." + additionalKey, value);
     }
 
     /**
@@ -100,5 +149,17 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
 
     public void addItemDamageType(DamageSource damageSource, String value) {
         this.add("death.attack." + damageSource.msgId + ".item", value);
+    }
+
+    public void add(String registry, RegistryReference<?> registryReference, String value) {
+        this.add(registry, registryReference.getResourceLocation(), value);
+    }
+
+    public void add(String registry, ResourceKey<?> resourceKey, String value) {
+        this.add(registry, resourceKey.location(), value);
+    }
+
+    public void add(String registry, ResourceLocation resourceLocation, String value) {
+        this.add(Util.makeDescriptionId(registry, resourceLocation), value);
     }
 }
