@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.mixin;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
+import fuzs.puzzleslib.impl.event.LivingJumpHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,9 +32,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityFabricMixin extends Entity {
@@ -286,5 +286,70 @@ abstract class LivingEntityFabricMixin extends Entity {
         ratioZ = this.puzzleslib$ratioZ.getAsOptionalDouble().orElse(ratioZ);
         this.puzzleslib$ratioZ = null;
         return ratioZ;
+    }
+
+    @ModifyVariable(method = "addEffect(Lnet/minecraft/world/effect/MobEffectInstance;Lnet/minecraft/world/entity/Entity;)Z", at = @At("STORE"), ordinal = 1)
+    public MobEffectInstance addEffect(@Nullable MobEffectInstance oldEffectInstance, MobEffectInstance effectInstance, @Nullable Entity entity) {
+        FabricLivingEvents.MOB_EFFECT_APPLY.invoker().onMobEffectApply(LivingEntity.class.cast(this), effectInstance, oldEffectInstance, entity);
+        return oldEffectInstance;
+    }
+
+    @Inject(method = "canBeAffected", at = @At("HEAD"), cancellable = true)
+    public void canBeAffected(MobEffectInstance effectInstance, CallbackInfoReturnable<Boolean> callback) {
+        // Forge also adds this patch to spiders, but let's just say no one wants to remove poison immunity from them
+        // Forge is incomplete anyway, with mobs are not affected by this event when checking for the wither effect
+        EventResult result = FabricLivingEvents.MOB_EFFECT_AFFECTS.invoker().onMobEffectAffects(LivingEntity.class.cast(this), effectInstance);
+        if (result.isInterrupt()) callback.setReturnValue(result.getAsBoolean());
+    }
+
+    @Inject(method = "removeEffect", at = @At("HEAD"), cancellable = true)
+    public void removeEffect(MobEffect effect, CallbackInfoReturnable<Boolean> callback) {
+        EventResult result = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker().onMobEffectRemove(LivingEntity.class.cast(this), this.getEffect(effect));
+        if (result.isInterrupt()) callback.setReturnValue(false);
+    }
+
+    @Shadow
+    @Nullable
+    public abstract MobEffectInstance getEffect(MobEffect effect);
+
+    @Inject(method = "removeEffect", at = @At("HEAD"))
+    public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {
+        if (this.level.isClientSide) return;
+        Set<MobEffectInstance> activeEffectsToKeep = Sets.newIdentityHashSet();
+        for (MobEffectInstance mobEffectInstance : this.activeEffects.values()) {
+            EventResult result = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker().onMobEffectRemove(LivingEntity.class.cast(this), mobEffectInstance);
+            if (result.isInterrupt()) activeEffectsToKeep.add(mobEffectInstance);
+        }
+        if (!activeEffectsToKeep.isEmpty()) {
+            Iterator<MobEffectInstance> iterator = this.activeEffects.values().iterator();
+            boolean flag;
+            for(flag = false; iterator.hasNext(); flag = true) {
+                MobEffectInstance effect = iterator.next();
+                this.onEffectRemoved(effect);
+                iterator.remove();
+            }
+            callback.setReturnValue(flag);
+        }
+    }
+
+    @Shadow
+    protected abstract void onEffectRemoved(MobEffectInstance effectInstance);
+
+    @ModifyVariable(method = "tickEffects", at = @At(value = "INVOKE", target = "Ljava/util/Iterator;remove()V"), ordinal = 0)
+    protected MobEffectInstance tickEffects(MobEffectInstance mobEffectInstance) {
+        FabricLivingEvents.MOB_EFFECT_EXPIRE.invoker().onMobEffectExpire(LivingEntity.class.cast(this), mobEffectInstance);
+        return mobEffectInstance;
+    }
+
+    @Inject(method = "jumpFromGround", at = @At("TAIL"))
+    protected void jumpFromGround(CallbackInfo callback) {
+        LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
+    }
+
+    @ModifyVariable(method = "getVisibilityPercent", at = @At(value = "TAIL", shift = At.Shift.BEFORE), ordinal = 0)
+    public double getVisibilityPercent(double value, @Nullable Entity lookingEntity) {
+        DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
+        FabricLivingEvents.LIVING_VISIBILITY.invoker().onLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
+        return visibilityPercentage.getAsOptionalDouble().stream().map(t -> Math.max(t, 0.0)).findAny().orElse(value);
     }
 }

@@ -89,12 +89,22 @@ public abstract class MinecraftFabricMixin {
         return newScreen;
     }
 
+    @Inject(method = "setLevel", at = @At("HEAD"))
+    public void setLevel(ClientLevel clientLevel, CallbackInfo callback) {
+        if (this.level == null) return;
+        FabricClientEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
+    }
+
     @Inject(method = "clearLevel(Lnet/minecraft/client/gui/screens/Screen;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V", shift = At.Shift.AFTER))
     public void clearLevel(Screen screen, CallbackInfo callback) {
-        if (this.player == null || this.gameMode == null) return;
-        Connection connection = this.player.connection.getConnection();
-        Objects.requireNonNull(connection, "connection is null");
-        FabricClientEvents.PLAYER_LOGGED_OUT.invoker().onLoggedOut(this.player, this.gameMode, connection);
+        if (this.player != null && this.gameMode != null) {
+            Connection connection = this.player.connection.getConnection();
+            Objects.requireNonNull(connection, "connection is null");
+            FabricClientEvents.PLAYER_LOGGED_OUT.invoker().onLoggedOut(this.player, this.gameMode, connection);
+        }
+        if (this.level != null) {
+            FabricClientEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
+        }
     }
 
     @Inject(method = "handleKeybinds", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;isUsingItem()Z", ordinal = 0))

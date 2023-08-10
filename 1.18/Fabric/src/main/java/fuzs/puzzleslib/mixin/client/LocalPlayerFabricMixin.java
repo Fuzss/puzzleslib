@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.mixin.client;
 
 import com.mojang.authlib.GameProfile;
+import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
@@ -8,9 +9,11 @@ import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.sounds.SoundEvent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -21,6 +24,8 @@ import java.util.Objects;
 
 @Mixin(LocalPlayer.class)
 abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
+    @Shadow
+    public Input input;
     @Unique
     private DefaultedValue<SoundEvent> puzzleslib$sound;
     @Unique
@@ -30,6 +35,11 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
 
     public LocalPlayerFabricMixin(ClientLevel clientLevel, GameProfile gameProfile) {
         super(clientLevel, gameProfile);
+    }
+
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(ZF)V", shift = At.Shift.AFTER))
+    public void aiStep(CallbackInfo callback) {
+        FabricClientEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this), this.input);
     }
 
     @Inject(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At("HEAD"), cancellable = true)

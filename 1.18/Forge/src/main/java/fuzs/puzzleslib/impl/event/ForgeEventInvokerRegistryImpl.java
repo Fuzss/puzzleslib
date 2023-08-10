@@ -24,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.ItemStack;
@@ -401,6 +402,43 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ProjectileImpactCallback.class, ProjectileImpactEvent.class, (ProjectileImpactCallback callback, ProjectileImpactEvent evt) -> {
             if (callback.onProjectileImpact(evt.getProjectile(), evt.getRayTraceResult()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(PlayerEvents.BreakSpeed.class, PlayerEvent.BreakSpeed.class, (PlayerEvents.BreakSpeed callback, PlayerEvent.BreakSpeed evt) -> {
+            DefaultedFloat breakSpeed = DefaultedFloat.fromEvent(evt::setNewSpeed, evt::getNewSpeed, evt::getOriginalSpeed);
+            if (callback.onBreakSpeed(evt.getPlayer(), evt.getState(), breakSpeed).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(MobEffectEvents.Affects.class, PotionEvent.PotionApplicableEvent.class, (MobEffectEvents.Affects callback, PotionEvent.PotionApplicableEvent evt) -> {
+            EventResult result = callback.onMobEffectAffects(evt.getEntityLiving(), evt.getPotionEffect());
+            if (result.isInterrupt()) {
+                evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+            }
+        });
+        INSTANCE.register(MobEffectEvents.Apply.class, PotionEvent.PotionAddedEvent.class, (MobEffectEvents.Apply callback, PotionEvent.PotionAddedEvent evt) -> {
+            callback.onMobEffectApply(evt.getEntityLiving(), evt.getPotionEffect(), evt.getOldPotionEffect(), evt.getPotionSource());
+        });
+        INSTANCE.register(MobEffectEvents.Remove.class, PotionEvent.PotionRemoveEvent.class, (MobEffectEvents.Remove callback, PotionEvent.PotionRemoveEvent evt) -> {
+            if (callback.onMobEffectRemove(evt.getEntityLiving(), evt.getPotionEffect()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(MobEffectEvents.Expire.class, PotionEvent.PotionExpiryEvent.class, (MobEffectEvents.Expire callback, PotionEvent.PotionExpiryEvent evt) -> {
+            callback.onMobEffectExpire(evt.getEntityLiving(), evt.getPotionEffect());
+        });
+        INSTANCE.register(LivingEvents.Jump.class, LivingEvent.LivingJumpEvent.class, (LivingEvents.Jump callback, LivingEvent.LivingJumpEvent evt) -> {
+            LivingJumpHelper.onLivingJump(callback, evt.getEntityLiving());
+        });
+        INSTANCE.register(LivingEvents.Visibility.class, LivingEvent.LivingVisibilityEvent.class, (LivingEvents.Visibility callback, LivingEvent.LivingVisibilityEvent evt) -> {
+            callback.onLivingVisibility(evt.getEntityLiving(), evt.getLookingEntity(), MutableDouble.fromEvent(visibilityModifier -> {
+                evt.modifyVisibility(visibilityModifier / evt.getVisibilityModifier());
+            }, evt::getVisibilityModifier));
+        });
+        INSTANCE.register(LivingChangeTargetCallback.class, LivingChangeTargetEvent.class, (LivingChangeTargetCallback callback, LivingChangeTargetEvent evt) -> {
+            DefaultedValue<LivingEntity> target = DefaultedValue.fromEvent(evt::setNewTarget, evt::getNewTarget, evt::getOriginalTarget);
+            if (callback.onLivingChangeTarget(evt.getEntityLiving(), target).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });

@@ -1,14 +1,18 @@
 package fuzs.puzzleslib.api.event.v1.entity.player;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 
 public final class PlayerEvents {
+    public static final EventInvoker<BreakSpeed> BREAK_SPEED = EventInvoker.lookup(BreakSpeed.class);
     public static final EventInvoker<Copy> COPY = EventInvoker.lookup(Copy.class);
     public static final EventInvoker<Respawn> RESPAWN = EventInvoker.lookup(Respawn.class);
     public static final EventInvoker<StartTracking> START_TRACKING = EventInvoker.lookup(StartTracking.class);
@@ -23,6 +27,21 @@ public final class PlayerEvents {
     }
 
     @FunctionalInterface
+    public interface BreakSpeed {
+
+        /**
+         * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
+         *
+         * @param player     the player breaking <code>state</code>
+         * @param state      the block state being broken
+         * @param breakSpeed the speed at which the block is broken, usually a value around 1.0
+         * @return {@link EventResult#INTERRUPT} to prevent the block from breaking, effectively setting the break speed to -1.0,
+         * {@link EventResult#PASS} to allow the block to be broken at the defined break speed
+         */
+        EventResult onBreakSpeed(Player player, BlockState state, DefaultedFloat breakSpeed);
+    }
+
+    @FunctionalInterface
     public interface Copy {
 
         /**
@@ -30,7 +49,7 @@ public final class PlayerEvents {
          *
          * @param oldPlayer the old player
          * @param newPlayer the new player
-         * @param alive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         * @param alive     whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
          */
         void onCopy(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive);
     }
@@ -42,7 +61,7 @@ public final class PlayerEvents {
          * Called after player a has been respawned.
          *
          * @param player the player
-         * @param alive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         * @param alive  whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
          */
         void onRespawn(ServerPlayer player, boolean alive);
     }
@@ -54,7 +73,7 @@ public final class PlayerEvents {
          * Called before an entity starts getting tracked by a player, meaning the player receives updates about the entity like its motion.
          *
          * @param trackedEntity the entity that will be tracked
-         * @param player the player that will track the entity
+         * @param player        the player that will track the entity
          */
         void onStartTracking(Entity trackedEntity, ServerPlayer player);
     }
@@ -66,7 +85,7 @@ public final class PlayerEvents {
          * Called after an entity stops getting tracked by a player.
          *
          * @param trackedEntity the entity that is no longer being tracked
-         * @param player the player that is no longer tracking the entity
+         * @param player        the player that is no longer tracking the entity
          */
         void onStopTracking(Entity trackedEntity, ServerPlayer player);
     }
@@ -100,8 +119,8 @@ public final class PlayerEvents {
          * Called after a player has been moved to different world.
          *
          * @param player the player
-         * @param from the original world the player was in
-         * @param to the new world the player was moved to
+         * @param from   the original world the player was in
+         * @param to     the new world the player was moved to
          */
         void onAfterChangeDimension(ServerPlayer player, ServerLevel from, ServerLevel to);
     }

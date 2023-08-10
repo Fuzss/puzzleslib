@@ -12,6 +12,7 @@ public interface LivingHurtCallback {
 
     /**
      * Called right before any reduction on damage due to e.g. armor are done, cancelling prevents any damage / armor durability being taken.
+     * <p>This event runs at the beginning of {@link LivingEntity#actuallyHurt(DamageSource, float)}.
      *
      * @param entity the entity being hurt
      * @param source damage source entity is hurt by

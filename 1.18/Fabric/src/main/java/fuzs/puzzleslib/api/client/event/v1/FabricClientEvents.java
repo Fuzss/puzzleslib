@@ -87,6 +87,18 @@ public final class FabricClientEvents {
      * Runs before the client performs an attack based on {@link Minecraft#hitResult}, either attacking an entity or mining a block.
      */
     public static final Event<InteractionInputEvents.Attack> ATTACK_INTERACTION_INPUT = FabricEventFactory.createResult(InteractionInputEvents.Attack.class);
+    /**
+     * Fires before a client level is loaded.
+     */
+    public static final Event<ClientLevelEvents.Load> LOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Load.class);
+    /**
+     * Fires before a client level is unloaded.
+     */
+    public static final Event<ClientLevelEvents.Unload> UNLOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Unload.class);
+    /**
+     * Called after {@link Input#tick(boolean, float)} has run for the {@link LocalPlayer}.
+     */
+    public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(MovementInputUpdateCallback.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

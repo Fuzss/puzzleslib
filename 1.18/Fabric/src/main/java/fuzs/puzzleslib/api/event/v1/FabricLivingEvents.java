@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
@@ -83,6 +84,34 @@ public final class FabricLivingEvents {
      * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
      */
     public static final Event<ItemAttributeModifiersCallback> ITEM_ATTRIBUTE_MODIFIERS = FabricEventFactory.create(ItemAttributeModifiersCallback.class);
+    /**
+     * Called when the game checks whether a new {@link MobEffectInstance} can be applied to a {@link LivingEntity} in {@link LivingEntity#canBeAffected(MobEffectInstance)}.
+     */
+    public static final Event<MobEffectEvents.Affects> MOB_EFFECT_AFFECTS = FabricEventFactory.createResult(MobEffectEvents.Affects.class);
+    /**
+     * Called when a new {@link MobEffectInstance} is added to a {@link LivingEntity} in {@link LivingEntity#addEffect(MobEffectInstance, Entity)}.
+     */
+    public static final Event<MobEffectEvents.Apply> MOB_EFFECT_APPLY = FabricEventFactory.create(MobEffectEvents.Apply.class);
+    /**
+     * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in {@link LivingEntity#removeEffect(MobEffect)}.
+     */
+    public static final Event<MobEffectEvents.Remove> MOB_EFFECT_REMOVE = FabricEventFactory.createResult(MobEffectEvents.Remove.class);
+    /**
+     * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in <code>net.minecraft.world.entity.LivingEntity#tickEffects</code> due to the instance duration having run out.
+     */
+    public static final Event<MobEffectEvents.Expire> MOB_EFFECT_EXPIRE = FabricEventFactory.create(MobEffectEvents.Expire.class);
+    /**
+     * Called when an entity is jumping, allows for modifying the jump height as well as preventing the jump.
+     */
+    public static final Event<LivingEvents.Jump> LIVING_JUMP = FabricEventFactory.createResult(LivingEvents.Jump.class);
+    /**
+     * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another entity for applying a given percentage to the looking entity's original visibility range.
+     */
+    public static final Event<LivingEvents.Visibility> LIVING_VISIBILITY = FabricEventFactory.create(LivingEvents.Visibility.class);
+    /**
+     * Called when a {@link net.minecraft.world.entity.Mob} sets a new target.
+     */
+    public static final Event<LivingChangeTargetCallback> LIVING_CHANGE_TARGET = FabricEventFactory.createResult(LivingChangeTargetCallback.class);
 
     private FabricLivingEvents() {
 

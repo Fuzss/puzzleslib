@@ -19,7 +19,7 @@ public final class FabricModConstructor {
         constructor.onConstructMod();
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
         constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
-        constructor.onCommonSetup(Runnable::run);
+        constructor.onCommonSetup();
         constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
         constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
         constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());

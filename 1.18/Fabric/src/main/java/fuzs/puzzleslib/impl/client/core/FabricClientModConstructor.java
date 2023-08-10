@@ -32,7 +32,7 @@ public final class FabricClientModConstructor {
 
     public static void construct(ClientModConstructor constructor, String modId, ContentRegistrationFlags... contentRegistrations) {
         constructor.onConstructMod();
-        constructor.onClientSetup(Runnable::run);
+        constructor.onClientSetup();
         constructor.onRegisterEntityRenderers(new EntityRenderersContextFabricImpl());
         constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextFabricImpl());
         constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());

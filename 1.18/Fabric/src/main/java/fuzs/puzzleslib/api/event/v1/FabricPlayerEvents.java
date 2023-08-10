@@ -55,6 +55,10 @@ public final class FabricPlayerEvents {
      * Called when an item is tossed from the player inventory, either by pressing 'Q' or by clicking an item stack outside a container screen.
      */
     public static final Event<ItemTossCallback> ITEM_TOSS = FabricEventFactory.createResult(ItemTossCallback.class);
+    /**
+     * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
+     */
+    public static final Event<PlayerEvents.BreakSpeed> BREAK_SPEED = FabricEventFactory.createResult(PlayerEvents.BreakSpeed.class);
 
     private FabricPlayerEvents() {
 

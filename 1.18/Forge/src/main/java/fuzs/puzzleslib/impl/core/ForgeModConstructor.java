@@ -44,11 +44,13 @@ public final class ForgeModConstructor {
             constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl());
         });
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
-            constructor.onCommonSetup(evt::enqueueWork);
-            constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
-            constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(contentRegistrations));
-            constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
-            constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextForgeImpl());
+            evt.enqueueWork(() -> {
+                constructor.onCommonSetup();
+                constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
+                constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(contentRegistrations));
+                constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
+                constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextForgeImpl());
+            });
         });
         eventBus.addListener((final EntityAttributeCreationEvent evt) -> {
             constructor.onEntityAttributeCreation(new EntityAttributesCreateContextForgeImpl(evt::put));

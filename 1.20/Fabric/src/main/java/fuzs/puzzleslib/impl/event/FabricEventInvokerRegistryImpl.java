@@ -287,15 +287,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingChangeTargetCallback.class, FabricLivingEvents.LIVING_CHANGE_TARGET);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
-            INSTANCE.register(LoadCompleteCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
-                return (Minecraft client) -> {
-                    ModContext.testAllBuilt();
-                };
-            });
         } else {
             INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTED, callback -> {
                 return (MinecraftServer server) -> {
-                    ModContext.testAllBuilt();
+                    callback.onLoadComplete();
                 };
             });
         }
