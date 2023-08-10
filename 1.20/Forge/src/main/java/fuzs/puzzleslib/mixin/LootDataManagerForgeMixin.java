@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import java.util.Map;
 
 @Mixin(LootDataManager.class)
-abstract class LootDataManagerMixin {
+abstract class LootDataManagerForgeMixin {
     @Shadow
     private Map<LootDataId<?>, ?> elements;
 

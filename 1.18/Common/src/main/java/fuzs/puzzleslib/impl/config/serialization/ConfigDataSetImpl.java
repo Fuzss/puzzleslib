@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.config.serialization;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -153,8 +154,17 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
     @SuppressWarnings("unchecked")
     @Override
+    public <V> V get(T entry, int index) {
+        Preconditions.checkPositionIndex(index, this.dataSize - 1);
+        Object[] data = this.get(entry);
+        Objects.requireNonNull(data, "data is null");
+        return (V) data[index];
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public <V> Optional<V> getOptional(T entry, int index) {
-        if (index < 0 || index >= this.dataSize) throw new IndexOutOfBoundsException(index);
+        if (index < 0 || index >= this.dataSize) return Optional.empty();
         return Optional.ofNullable(this.get(entry)).map(data -> (V) data[index]);
     }
 
@@ -168,9 +178,6 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         return this.toMap().hashCode();
     }
 
-    /**
-     * dissolve {@link #values}, always call before retrieving any data from this set
-     */
     private void dissolve() {
         if (this.dissolved == null) {
             ImmutableMap.Builder<T, Object[]> builder = ImmutableMap.builder();

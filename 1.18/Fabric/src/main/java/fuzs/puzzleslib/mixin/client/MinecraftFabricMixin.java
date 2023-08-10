@@ -115,7 +115,7 @@ public abstract class MinecraftFabricMixin {
                     return FabricClientEvents.ATTACK_INTERACTION_INPUT.invoker().onAttackInteraction(client, player).isInterrupt();
                 }
             } else {
-                if (!player.isUsingItem() && client.hitResult.getType() != HitResult.Type.BLOCK) {
+                if (!player.isUsingItem() && client.hitResult.getType() == HitResult.Type.BLOCK) {
                     if (!client.level.isEmptyBlock(((BlockHitResult) client.hitResult).getBlockPos())) {
                         return FabricClientEvents.ATTACK_INTERACTION_INPUT.invoker().onAttackInteraction(client, player).isInterrupt();
                     }

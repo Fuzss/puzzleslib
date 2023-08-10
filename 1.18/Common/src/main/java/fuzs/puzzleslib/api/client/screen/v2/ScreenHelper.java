@@ -32,6 +32,7 @@ public interface ScreenHelper {
      * @param screen screen instance
      * @return item renderer
      */
+    @Deprecated(forRemoval = true)
     ItemRenderer getItemRenderer(Screen screen);
 
     /**

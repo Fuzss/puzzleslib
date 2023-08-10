@@ -3,12 +3,14 @@ package fuzs.puzzleslib.api.config.v3;
 import net.minecraftforge.common.ForgeConfigSpec;
 
 /**
- * config template interface for each config category, can be nested (fields in a subclass can be once again of type {@link ConfigCore})
+ * Config template interface for each config category.
+ * <p>Can be nested, meaning fields in a subclass can be once again of type {@link ConfigCore}).
  */
 public interface ConfigCore {
 
     /**
-     * add config entries
+     * Add config entries, legacy method, useful for types unsupported by annotation system.
+     * <p>Not available when constructing static config classes.
      *
      * @param builder builder to add entries to
      * @param callback register save callback
@@ -18,7 +20,9 @@ public interface ConfigCore {
     }
 
     /**
-     * transform config options to proper type after reload, e.g. strings to registry entries
+     * Transform config options to proper type after reload, e.g. list of strings to registry entries.
+     *
+     * @see fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet
      */
     default void afterConfigReload() {
 

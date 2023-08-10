@@ -20,12 +20,12 @@ public final class FabricModConstructor {
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
         constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
         constructor.onCommonSetup(Runnable::run);
-        constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
-        constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
-        constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
-        constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
         constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
         constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
+        constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
+        constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
+        constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
+        constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
         constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
         constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.SERVER_DATA, modId));
     }
