@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.Registry;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -22,6 +23,7 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -328,6 +330,31 @@ public interface RegistryManager {
     }
 
     /**
+     * Register a new simple particle type.
+     *
+     * @param path path for new entry
+     * @return registry object for <code>entry</code>
+     */
+    default RegistryReference<SimpleParticleType> registerParticleType(String path) {
+        return this.register(Registry.PARTICLE_TYPE_REGISTRY, path, () -> new SimpleParticleType(false));
+    }
+
+    /**
+     * Creates a new {@link TagKey} for any type of registry from a given path.
+     *
+     * @param registryKey key for registry to create key from
+     * @param path        path for new tag key
+     * @param <T>         registry type
+     * @return new tag key
+     *
+     * @deprecated renamed to {@link #registerTag(ResourceKey, String)}
+     */
+    @Deprecated(forRemoval = true)
+    default <T> TagKey<T> createTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return this.registerTag(registryKey, path);
+    }
+
+    /**
      * Creates a new {@link TagKey} for any type of registry from a given path.
      *
      * @param registryKey key for registry to create key from
@@ -335,7 +362,7 @@ public interface RegistryManager {
      * @param <T>         registry type
      * @return new tag key
      */
-    default <T> TagKey<T> createTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+    default <T> TagKey<T> registerTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
         return TagKey.create(registryKey, this.makeKey(path));
     }
 
@@ -359,7 +386,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Block> registerBlockTag(String path) {
-        return this.createTag(Registry.BLOCK_REGISTRY, path);
+        return this.registerTag(Registry.BLOCK_REGISTRY, path);
     }
 
     /**
@@ -369,7 +396,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Item> registerItemTag(String path) {
-        return this.createTag(Registry.ITEM_REGISTRY, path);
+        return this.registerTag(Registry.ITEM_REGISTRY, path);
     }
 
     /**
@@ -392,7 +419,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<EntityType<?>> registerEntityTypeTag(String path) {
-        return this.createTag(Registry.ENTITY_TYPE_REGISTRY, path);
+        return this.registerTag(Registry.ENTITY_TYPE_REGISTRY, path);
     }
 
     /**
@@ -402,7 +429,27 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<GameEvent> registerGameEventTag(String path) {
-        return this.createTag(Registry.GAME_EVENT_REGISTRY, path);
+        return this.registerTag(Registry.GAME_EVENT_REGISTRY, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for enchantments.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<Enchantment> registerEnchantmentTag(String path) {
+        return this.registerTag(Registry.ENCHANTMENT_REGISTRY, path);
+    }
+
+    /**
+     * Creates a new {@link TagKey} for biomes.
+     *
+     * @param path path for new tag key
+     * @return new tag key
+     */
+    default TagKey<Biome> registerBiomeTag(String path) {
+        return this.registerTag(Registry.BIOME_REGISTRY, path);
     }
 
     /**

@@ -44,14 +44,16 @@ public final class ForgeClientModConstructor {
 
     private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<ResourceManagerReloadListener> dynamicRenderers, ContentRegistrationFlags[] contentRegistrations) {
         eventBus.addListener((final FMLClientSetupEvent evt) -> {
-            constructor.onClientSetup(evt::enqueueWork);
-            constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
-            constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
-            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
-            constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
-            constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
-            constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl());
-            constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl());
+            evt.enqueueWork(() -> {
+                constructor.onClientSetup();
+                constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
+                constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
+                constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
+                constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
+                constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+                constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextForgeImpl());
+                constructor.onRegisterKeyMappings(new KeyMappingsContextForgeImpl());
+            });
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextForgeImpl(evt::registerEntityRenderer));

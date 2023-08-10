@@ -54,9 +54,20 @@ public interface ClientModConstructor {
      * used to set various values and settings for already registered content
      *
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
+     *
+     * @deprecated now always runs deferred, use {@link #onClientSetup()}
      */
+    @Deprecated(forRemoval = true)
     default void onClientSetup(final ModLifecycleContext context) {
 
+    }
+
+    /**
+     * runs after content has been registered, so it's safe to use here
+     * used to set various values and settings for already registered content
+     */
+    default void onClientSetup() {
+        this.onClientSetup(Runnable::run);
     }
 
     /**

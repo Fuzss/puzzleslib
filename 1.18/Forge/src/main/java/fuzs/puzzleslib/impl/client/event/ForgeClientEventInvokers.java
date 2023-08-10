@@ -7,6 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraftforge.client.event.*;
@@ -16,6 +17,7 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Objects;
@@ -247,6 +249,17 @@ public final class ForgeClientEventInvokers {
                 evt.setSwingHand(false);
                 evt.setCanceled(true);
             }
+        });
+        INSTANCE.register(ClientLevelEvents.Load.class, WorldEvent.Load.class, (ClientLevelEvents.Load callback, WorldEvent.Load evt) -> {
+            if (!(evt.getWorld() instanceof ClientLevel level)) return;
+            callback.onLevelLoad(Minecraft.getInstance(), level);
+        });
+        INSTANCE.register(ClientLevelEvents.Unload.class, WorldEvent.Unload.class, (ClientLevelEvents.Unload callback, WorldEvent.Unload evt) -> {
+            if (!(evt.getWorld() instanceof ClientLevel level)) return;
+            callback.onLevelUnload(Minecraft.getInstance(), level);
+        });
+        INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (callback, evt) -> {
+            callback.onMovementInputUpdate((LocalPlayer) evt.getPlayer(), evt.getInput());
         });
     }
 

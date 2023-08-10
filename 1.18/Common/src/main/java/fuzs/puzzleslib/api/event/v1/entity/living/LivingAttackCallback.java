@@ -11,6 +11,7 @@ public interface LivingAttackCallback {
 
     /**
      * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
+     * <p>This event runs at the beginning of {@link LivingEntity#hurt(DamageSource, float)}.
      *
      * @param entity the entity that is attacked
      * @param source the {@link DamageSource} {@code entity} has been attacked by

@@ -24,10 +24,10 @@ public final class FabricClientEventInvokers {
 
     public static void register() {
         INSTANCE.register(ClientTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK, callback -> {
-            return callback::onStartTick;
+            return callback::onStartClientTick;
         });
         INSTANCE.register(ClientTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK, callback -> {
-            return callback::onEndTick;
+            return callback::onEndClientTick;
         });
         INSTANCE.register(RenderGuiCallback.class, HudRenderCallback.EVENT, callback -> {
             return (matrixStack, tickDelta) -> {
@@ -164,6 +164,9 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientPlayerEvents.LoggedOut.class, FabricClientEvents.PLAYER_LOGGED_OUT);
         INSTANCE.register(ClientPlayerEvents.Copy.class, FabricClientEvents.PLAYER_COPY);
         INSTANCE.register(InteractionInputEvents.Attack.class, FabricClientEvents.ATTACK_INTERACTION_INPUT);
+        INSTANCE.register(ClientLevelEvents.Load.class, FabricClientEvents.LOAD_LEVEL);
+        INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientEvents.UNLOAD_LEVEL);
+        INSTANCE.register(MovementInputUpdateCallback.class, FabricClientEvents.MOVEMENT_INPUT_UPDATE);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
