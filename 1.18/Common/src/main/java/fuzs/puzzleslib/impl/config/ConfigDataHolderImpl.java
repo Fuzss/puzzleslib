@@ -36,15 +36,16 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
     private List<Runnable> configValueCallbacks = Lists.newArrayList();
     private boolean available;
 
-    protected ConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> config) {
+    protected ConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> supplier) {
         this.configType = configType;
-        this.config = config.get();
-        this.defaultConfigSupplier = config;
+        this.config = supplier.get();
+        this.defaultConfigSupplier = supplier;
         this.fileName = modId -> ConfigHolder.defaultName(modId, configType.extension());
     }
 
     @Override
     public T getConfig() {
+        Objects.requireNonNull(this.config, "config is null");
         return this.isAvailable() ? this.config : this.getOrCreateDefaultConfig();
     }
 
@@ -52,6 +53,7 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
         if (this.defaultConfig == null) {
             this.testAvailable();
             this.defaultConfig = this.defaultConfigSupplier.get();
+            Objects.requireNonNull(this.defaultConfig, "default config is null");
             this.defaultConfig.afterConfigReload();
             for (Consumer<T> callback : this.additionalCallbacks) {
                 callback.accept(this.defaultConfig);
@@ -72,8 +74,13 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
 
     @Override
     public <S, V extends ForgeConfigSpec.ConfigValue<S>> V accept(V entry, Consumer<S> save) {
-        this.configValueCallbacks.add(() -> save.accept(entry.get()));
+        Objects.requireNonNull(entry, "entry is null");
+        this.acceptValueCallback(() -> save.accept(entry.get()));
         return entry;
+    }
+
+    void acceptValueCallback(Runnable runnable) {
+        this.configValueCallbacks.add(runnable);
     }
 
     private void testAvailable() {
@@ -123,8 +130,6 @@ class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>,
     private ForgeConfigSpec buildSpec() {
         ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
         AnnotatedConfigBuilder.serialize(builder,this, this.config);
-        // add config reload callback last to make sure it runs together with value callback relods before the config is set to available in #onModConfig
-        this.configValueCallbacks.add(this.config::afterConfigReload);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }

@@ -197,7 +197,7 @@ public final class ForgeClientEventInvokers {
             MutableFloat pitch = MutableFloat.fromEvent(evt::setPitch, evt::getPitch);
             MutableFloat yaw = MutableFloat.fromEvent(evt::setYaw, evt::getYaw);
             MutableFloat roll = MutableFloat.fromEvent(evt::setRoll, evt::getRoll);
-            callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), evt.getPitch(), pitch, yaw, roll);
+            callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTicks(), pitch, yaw, roll);
         });
         INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
             EventResult result = callback.onBeforeRenderPlayer(evt.getPlayer(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());

@@ -54,7 +54,7 @@
     "client.GameRendererFabricMixin",
     "client.GuiFabricMixin",
     "client.GuiGraphicsFabricMixin",
-    "client.ItemInHandRendererMixin",
+    "client.ItemInHandRendererFabricMixin",
     "client.ItemRendererFabricMixin",
     "client.KeyboardHandlerFabricMixin",
     "client.LocalPlayerFabricMixin",

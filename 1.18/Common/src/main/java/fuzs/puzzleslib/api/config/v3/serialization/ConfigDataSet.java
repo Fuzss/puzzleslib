@@ -44,6 +44,19 @@ public interface ConfigDataSet<T> extends Collection<T> {
     Object[] get(T entry);
 
     /**
+     * Get data for an entry at an index, will throw an exception if index is out of bounds or no data is available.
+     *
+     * @param entry entry to query data for
+     * @param index index to get data at
+     * @param <V> type of data
+     * @return the data
+     */
+    <V> V get(T entry, int index);
+
+    /**
+     * A maximally light approach to retrieving data, will not throw an exception in any case.
+     * <p>If no data is found the optional will simply be empty.
+     *
      * @param entry entry to query data for
      * @param index index to get data at
      * @param <V> type of data
