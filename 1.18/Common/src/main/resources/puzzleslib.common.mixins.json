@@ -6,9 +6,11 @@
   "refmap": "puzzleslib.refmap.json",
   "plugin": "fuzs.puzzleslib.mixin.ModMixinConfigPlugin",
   "mixins": [
-    "MobMixin"
+    "MobMixin",
+    "accessor.ItemAccessor"
   ],
   "client": [
+    "client.accessor.MinecraftAccessor"
   ],
   "injectors": {
     "defaultRequire": 1
