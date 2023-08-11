@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.1-1.18.2] - 2023-08-11
+### Fixed
+- Fixed crash on Forge due to invalid accessor mixin
+- Fixed creative tabs not being built during data gen
+- Fixed `AbstractTagProvider` containing an unintended abstract method
+
 ## [v3.5.0-1.18.2] - 2023-08-10
 - Parity with Puzzles Lib v8.0.18
 

@@ -3,21 +3,20 @@ package fuzs.puzzleslib.impl.core;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.core.context.*;
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import fuzs.puzzleslib.impl.item.ForgeCopyTagRecipeSerializer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLDedicatedServerSetupEvent;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -49,15 +48,10 @@ public final class ForgeModConstructor {
     }
 
     private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Set<ContentRegistrationFlags> availableFlags) {
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            // we need this to run before search trees are created, this event fires right before that which suits us perfectly fine
-            // all lifecycle events run way too late, but work for a dedicated server which doesn't have to create  any search trees
-            eventBus.addListener((final RenderLevelStageEvent.RegisterStageEvent evt) -> {
-                constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl());
-                constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl());
-            });
-        }
-        eventBus.addListener((final FMLDedicatedServerSetupEvent evt) -> {
+        // we need to run this before search trees are created on the client, all lifecycle events that run after registration run way too late for this
+        // other events running in-between don't seem to run during data gen, which relies on items having valid creative tabs
+        // so since blocks and items are guaranteed to be registered first, we just pick basically any other registration type (they should run in alphabetical order)
+        eventBus.addGenericListener(Fluid.class, (final RegistryEvent<Fluid> evt) -> {
             constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl());
             constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl());
         });
