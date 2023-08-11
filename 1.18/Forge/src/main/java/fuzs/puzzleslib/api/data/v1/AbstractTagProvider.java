@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.data.v1;
 
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.tags.*;
 import net.minecraft.resources.ResourceKey;
@@ -226,7 +227,9 @@ public final class AbstractTagProvider {
 
         @SuppressWarnings("unchecked")
         default ResourceKey<? extends Registry<T>> registryKey() {
-            return ((Registry<Registry<T>>) Registry.REGISTRY).getResourceKey(this.registry()).orElseThrow();
+            return ((Registry<Registry<T>>) Registry.REGISTRY).getResourceKey(this.registry())
+                    .or(() -> ((Registry<Registry<T>>) BuiltinRegistries.REGISTRY).getResourceKey(this.registry()))
+                    .orElseThrow();
         }
 
         TagsProvider.TagAppender<T> tag(TagKey<T> tagKey);
