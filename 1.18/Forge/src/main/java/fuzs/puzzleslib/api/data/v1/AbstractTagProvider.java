@@ -148,5 +148,10 @@ public final class AbstractTagProvider {
 
         @Override
         protected abstract void addTags();
+
+        @Override
+        public final String getName() {
+            return "Tags for " + ((Registry<Registry<T>>) Registry.REGISTRY).getKey(this.registry);
+        }
     }
 }

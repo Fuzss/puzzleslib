@@ -10,7 +10,7 @@
     "accessor.BooleanValueForgeAccessor",
     "accessor.FireBlockForgeAccessor",
     "accessor.IntegerValueForgeAccessor",
-    "accessor.LootTableAccessor",
+    "accessor.LootTableForgeAccessor",
     "accessor.MobSpawnSettingsBuilderForgeAccessor",
     "accessor.PotionBrewingForgeAccessor"
   ],
