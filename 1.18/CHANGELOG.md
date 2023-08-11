@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.2-1.18.2] - 2023-08-11
+### Added
+- Added `TagProviderExtension`
+
 ## [v3.5.1-1.18.2] - 2023-08-11
 ### Fixed
 - Fixed crash on Forge due to invalid accessor mixin
