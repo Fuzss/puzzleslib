@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.3-1.18.2] - 2023-08-11
+### Fixed
+- Fixed mixins from the common module not applying
+
 ## [v3.5.2-1.18.2] - 2023-08-11
 ### Added
 - Added `TagProviderExtension`
