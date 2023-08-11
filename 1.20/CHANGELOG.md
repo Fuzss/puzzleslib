@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.19-1.20.1] - 2023-08-11
+### Added
+- Added `TagProviderExtension`
+
 ## [v8.0.18-1.20.1] - 2023-08-10
 ### Added
 - Added `GameRenderEvents.Before` and `GameRenderEvents.After`
