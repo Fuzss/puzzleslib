@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.5-1.18.2] - 2023-08-12
+### Fixed
+- Fixed `LivingDeathCallback` not firing for all living entities
+
 ## [v3.5.4-1.18.2] - 2023-08-12
 ### Added
 - Added `DeferredTooltipRendering`

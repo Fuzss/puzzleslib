@@ -177,6 +177,13 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Shadow
     protected abstract int getExperienceReward(Player player);
 
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
+    public void die(DamageSource damageSource, CallbackInfo callback) {
+        if (FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource).isInterrupt()) {
+            callback.cancel();
+        }
+    }
+
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback) {
         if (!this.isInvulnerableTo(damageSource)) {
