@@ -78,6 +78,7 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "startUsingItem", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I", shift = At.Shift.AFTER), cancellable = true)
     public void startUsingItem(InteractionHand hand, CallbackInfo callback) {
+        // this injects after the field is already updated, so it is fine to use instead of ItemStack::getUseDuration
         DefaultedInt useItemRemaining = DefaultedInt.fromValue(this.useItemRemaining);
         EventResult result = FabricLivingEvents.USE_ITEM_START.invoker().onUseItemStart(LivingEntity.class.cast(this), this.useItem, useItemRemaining);
         if (result.isInterrupt()) {
@@ -89,14 +90,39 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @Inject(method = "updateUsingItem", at = @At("HEAD"))
-    protected void updateUsingItem(ItemStack useItem, CallbackInfo callback) {
-        // moved here from LivingEntity#updatingUsingItem on Forge, just a little more simple to implement
-        DefaultedInt useItemRemaining = DefaultedInt.fromValue(useItem.getUseDuration());
-        EventResult result = FabricLivingEvents.USE_ITEM_TICK.invoker().onUseItemTick(LivingEntity.class.cast(this), useItem, useItemRemaining);
-        this.useItemRemaining = result.isInterrupt() ? 0 : useItemRemaining.getAsOptionalInt().orElse(this.useItemRemaining);
-        // --this.useItemRemaining == 0 runs at the end of this method, since we will be below that LivingEntity#completeUsingItem does not run (intentionally)
+    @Inject(method = "updateUsingItem", at = @At("HEAD"), cancellable = true)
+    protected void updateUsingItem(ItemStack usingItem, CallbackInfo callback) {
+        if (!usingItem.isEmpty()) {
+            DefaultedInt remainingUseDuration = DefaultedInt.fromValue(this.getUseItemRemainingTicks());
+            EventResult result = FabricLivingEvents.USE_ITEM_TICK.invoker().onUseItemTick(LivingEntity.class.cast(this), usingItem, remainingUseDuration);
+            // --this.useItemRemaining == 0 runs at the end of this method, when 0 is set increase by one again so that LivingEntity::completeUsingItem does run
+            remainingUseDuration.getAsOptionalInt().ifPresent(t -> this.useItemRemaining = t == 0 ? 1 : t);
+            if (result.isInterrupt()) {
+                // this copies LivingEntity::updateUsingItem without calling ItemStack::onUseTick
+                if (this.shouldTriggerItemUseEffects()) {
+                    this.triggerItemUseEffects(usingItem, 5);
+                }
+                if (--this.useItemRemaining == 0 && !this.level().isClientSide && !usingItem.useOnRelease()) {
+                    this.completeUsingItem();
+                }
+                callback.cancel();
+            }
+        }
     }
+
+    @Shadow
+    public abstract int getUseItemRemainingTicks();
+
+    @Shadow
+    private boolean shouldTriggerItemUseEffects() {
+        throw new RuntimeException();
+    }
+
+    @Shadow
+    protected abstract void triggerItemUseEffects(ItemStack stack, int amount);
+
+    @Shadow
+    protected abstract void completeUsingItem();
 
     @Shadow
     private void updatingUsingItem() {
