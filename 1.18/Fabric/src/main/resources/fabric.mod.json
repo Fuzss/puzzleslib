@@ -26,6 +26,7 @@
       "${modGroup}.impl.PuzzlesLibFabric"
     ],
     "client": [
+      "${modGroup}.impl.client.PuzzlesLibFabricClient"
     ],
     "cardinal-components": [
       "fuzs.puzzleslib.capability.CapabilityController"
