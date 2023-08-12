@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.4-1.18.2] - 2023-08-12
+### Added
+- Added `DeferredTooltipRendering`
+
 ## [v3.5.3-1.18.2] - 2023-08-11
 ### Fixed
 - Fixed mixins from the common module not applying
