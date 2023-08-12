@@ -3,7 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v3.5.6-1.20.1] - 2023-08-12
+## [v3.5.7-1.18.2] - 2023-08-12
+### Fixed
+- Fixed start-up crash when the [Emojiful](https://www.curseforge.com/minecraft/mc-mods/emojiful) mod is installed
+
+## [v3.5.6-1.18.2] - 2023-08-12
 ### Changed
 - Slightly reworked `DeferredTooltipRendering`
 ### Fixed
