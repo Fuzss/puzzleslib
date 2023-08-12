@@ -37,9 +37,22 @@ public final class DeferredTooltipRendering {
      *
      * @param minecraft minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
      * @param tooltip   the tooltip lines
+     *
+     * @deprecated migrate to {@link #setTooltipForNextRenderPass(Component)}
      */
+    @Deprecated(forRemoval = true)
     public static void setTooltipForNextRenderPass(Minecraft minecraft, Component tooltip) {
         setTooltipForNextRenderPass(splitTooltip(minecraft, tooltip));
+    }
+
+    /**
+     * Set a tooltip to be rendered at the end of the next {@link Screen#render(PoseStack, int, int, float)} call.
+     *
+     * @param minecraft minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
+     * @param tooltip   the tooltip lines
+     */
+    public static void setTooltipForNextRenderPass(Component tooltip) {
+        setTooltipForNextRenderPass(splitTooltip(tooltip));
     }
 
     /**
@@ -69,9 +82,22 @@ public final class DeferredTooltipRendering {
      * @param minecraft minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
      * @param tooltip   the tooltip lines to split
      * @return the split lines as a list
+     *
+     * @deprecated migrate to {@link #splitTooltip(FormattedText...)}
      */
+    @Deprecated(forRemoval = true)
     public static List<FormattedCharSequence> splitTooltip(Minecraft minecraft, FormattedText... tooltip) {
         return splitTooltip(minecraft, Arrays.asList(tooltip));
+    }
+
+    /**
+     * Splits a {@link Component} into multiple lines with a max width of <code>170</code> pixels.
+     *
+     * @param tooltip   the tooltip lines to split
+     * @return the split lines as a list
+     */
+    public static List<FormattedCharSequence> splitTooltip(FormattedText... tooltip) {
+        return splitTooltip(Arrays.asList(tooltip));
     }
 
     /**
@@ -80,9 +106,22 @@ public final class DeferredTooltipRendering {
      * @param minecraft minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
      * @param tooltip   the tooltip lines to split
      * @return the split lines as a list
+     *
+     * @deprecated migrate to {@link #splitTooltip(List)}
      */
+    @Deprecated(forRemoval = true)
     public static List<FormattedCharSequence> splitTooltip(Minecraft minecraft, List<? extends FormattedText> tooltip) {
-        return tooltip.stream().flatMap(t -> minecraft.font.split(t, 170).stream()).toList();
+        return splitTooltip(tooltip);
+    }
+
+    /**
+     * Splits a {@link Component} into multiple lines with a max width of <code>170</code> pixels.
+     *
+     * @param tooltip   the tooltip lines to split
+     * @return the split lines as a list
+     */
+    public static List<FormattedCharSequence> splitTooltip(List<? extends FormattedText> tooltip) {
+        return tooltip.stream().flatMap(t -> Minecraft.getInstance().font.split(t, 170).stream()).toList();
     }
 
     /**
@@ -91,9 +130,25 @@ public final class DeferredTooltipRendering {
      * @param minecraft      minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
      * @param abstractWidget the widget that shows the tooltip
      * @param tooltip        the tooltip lines to split
+     *
+     * @deprecated migrate to {@link #setTooltip(AbstractWidget, FormattedText...)}
      */
+    @Deprecated(forRemoval = true)
     public static void setTooltipForNextRenderPass(Minecraft minecraft, AbstractWidget abstractWidget, FormattedText... tooltip) {
-        setTooltip(abstractWidget, splitTooltip(minecraft, tooltip));
+        setTooltip(abstractWidget, tooltip);
+    }
+
+    /**
+     * Set a tooltip to a widget to be rendered when the widget is hovered or focused.
+     *
+     * @param minecraft      minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
+     * @param abstractWidget the widget that shows the tooltip
+     * @param tooltip        the tooltip lines to split
+     * @return the widget passed in
+     * @param <T> the widget type
+     */
+    public static <T extends AbstractWidget> T setTooltip(T abstractWidget, FormattedText... tooltip) {
+        return setTooltip(abstractWidget, Arrays.asList(tooltip));
     }
 
     /**
@@ -101,9 +156,24 @@ public final class DeferredTooltipRendering {
      *
      * @param abstractWidget the widget that shows the tooltip
      * @param tooltip        the tooltip lines to split
+     *
+     * @deprecated migrate to {@link #setTooltip(AbstractWidget, List)}
      */
+    @Deprecated(forRemoval = true)
     public static void setTooltipForNextRenderPass(AbstractWidget abstractWidget, List<? extends FormattedText> tooltip) {
-        setTooltip(abstractWidget, splitTooltip(Minecraft.getInstance(), tooltip));
+        setTooltip(abstractWidget, tooltip);
+    }
+
+    /**
+     * Set a tooltip to a widget to be rendered when the widget is hovered or focused.
+     *
+     * @param abstractWidget the widget that shows the tooltip
+     * @param tooltip        the tooltip lines to split
+     * @return the widget passed in
+     * @param <T> the widget type
+     */
+    public static <T extends AbstractWidget> T setTooltip(T abstractWidget, List<? extends FormattedText> tooltip) {
+        return setWidgetTooltip(abstractWidget, splitTooltip(tooltip));
     }
 
     /**
@@ -112,13 +182,16 @@ public final class DeferredTooltipRendering {
      *
      * @param abstractWidget the widget that shows the tooltip
      * @param tooltip        the tooltip lines, set to <code>null</code> to remove any previously set tooltip
+     * @return the widget passed in
+     * @param <T> the widget type
      */
-    public static void setTooltip(AbstractWidget abstractWidget, @Nullable List<FormattedCharSequence> tooltip) {
+    public static <T extends AbstractWidget> T setWidgetTooltip(T abstractWidget, @Nullable List<FormattedCharSequence> tooltip) {
         if (tooltip != null) {
             WIDGET_TOOLTIPS.put(abstractWidget, tooltip);
         } else {
             WIDGET_TOOLTIPS.remove(abstractWidget);
         }
+        return abstractWidget;
     }
 
     @ApiStatus.Internal
