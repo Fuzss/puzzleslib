@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.client.core;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
@@ -9,6 +10,7 @@ import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextForgeImpl;
+import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
@@ -22,6 +24,7 @@ import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -106,6 +109,15 @@ public final class ForgeClientModConstructor {
             if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
                 constructor.onAddResourcePackFinders(new ResourcePackSourcesContextForgeImpl(evt::addRepositorySource));
             }
+        });
+        eventBus.addListener((final RegisterShadersEvent evt) -> {
+            constructor.onRegisterCoreShaders((ResourceLocation resourceLocation, VertexFormat vertexFormat, Consumer<ShaderInstance> supplier) -> {
+                try {
+                    evt.registerShader(new ShaderInstance(evt.getResourceProvider(), resourceLocation, vertexFormat), supplier);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         });
     }
 

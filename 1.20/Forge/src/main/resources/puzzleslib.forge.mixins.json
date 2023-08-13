@@ -7,9 +7,7 @@
   "mixins": [
     "LootDataManagerForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
-    "accessor.BooleanValueForgeAccessor",
     "accessor.FireBlockForgeAccessor",
-    "accessor.IntegerValueForgeAccessor",
     "accessor.LootTableForgeAccessor",
     "accessor.MobSpawnSettingsBuilderForgeAccessor",
     "accessor.PotionBrewingForgeAccessor"
