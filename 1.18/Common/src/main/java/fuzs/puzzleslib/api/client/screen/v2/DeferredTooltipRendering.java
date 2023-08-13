@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.client.event.v1.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -42,7 +43,7 @@ public final class DeferredTooltipRendering {
      */
     @Deprecated(forRemoval = true)
     public static void setTooltipForNextRenderPass(Minecraft minecraft, Component tooltip) {
-        setTooltipForNextRenderPass(splitTooltip(minecraft, tooltip));
+        setTooltipForNextRenderPass(tooltip);
     }
 
     /**
@@ -87,7 +88,7 @@ public final class DeferredTooltipRendering {
      */
     @Deprecated(forRemoval = true)
     public static List<FormattedCharSequence> splitTooltip(Minecraft minecraft, FormattedText... tooltip) {
-        return splitTooltip(minecraft, Arrays.asList(tooltip));
+        return splitTooltip(Arrays.asList(tooltip));
     }
 
     /**
@@ -121,7 +122,14 @@ public final class DeferredTooltipRendering {
      * @return the split lines as a list
      */
     public static List<FormattedCharSequence> splitTooltip(List<? extends FormattedText> tooltip) {
-        return tooltip.stream().flatMap(t -> Minecraft.getInstance().font.split(t, 170).stream()).toList();
+        Font font = Minecraft.getInstance().font;
+        return tooltip.stream().flatMap(t -> {
+            List<FormattedCharSequence> list = font.split(t, 170);
+            // empty components yield an empty list
+            // since empty lines are desired on tooltips make sure they don't go missing
+            if (list.isEmpty()) list = List.of(FormattedCharSequence.EMPTY);
+            return list.stream();
+        }).toList();
     }
 
     /**

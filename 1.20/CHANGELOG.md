@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.22-1.20.1] - 2023-08-13
+### Added
+- Added `CoreShadersContext` for registering built-in shaders
+- Added `KeyActivationContext` to helper with registering keybinds that only work when a screen is open or while playing (no screen is open)
+### Changed
+- Overhauled `GameRulesFactory` to add many convenient overloads, as well as cleaning up the Forge implementation
+- Adjusted `ScreenTooltipFactory` to no longer require a `Font` instance as well as not remove empty lines from tooltips
+- Refactored `KeyMappingsContext` to require a `KeyActivationContext` instance
+
 ## [v8.0.21-1.20.1] - 2023-08-12
 ### Fixed
 - Fixed start-up crash when the [Emojiful](https://www.curseforge.com/minecraft/mc-mods/emojiful) mod is installed

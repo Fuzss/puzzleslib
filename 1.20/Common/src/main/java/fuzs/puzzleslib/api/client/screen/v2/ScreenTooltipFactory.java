@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.client.screen.v2;
 
 import fuzs.puzzleslib.mixin.client.accessor.TooltipAccessor;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.CommonComponents;
@@ -27,9 +28,12 @@ public final class ScreenTooltipFactory {
      * @param font       the font instance
      * @param components components to split and build the tooltip from
      * @return the tooltip instance
+     *
+     * @deprecated migrate to {@link #create(FormattedText...)}
      */
+    @Deprecated(forRemoval = true)
     public static Tooltip create(Font font, FormattedText... components) {
-        return create(font, Arrays.asList(components));
+        return create(components);
     }
 
     /**
@@ -39,9 +43,43 @@ public final class ScreenTooltipFactory {
      * @param components components to split and build the tooltip from
      * @return the tooltip instance
      */
+    public static Tooltip create(FormattedText... components) {
+        return create(Arrays.asList(components));
+    }
+
+    /**
+     * Create a new tooltip instance from multiple lines of text.
+     *
+     * @param font       the font instance
+     * @param components components to split and build the tooltip from
+     * @return the tooltip instance
+     *
+     * @deprecated migrate to {@link #create(List)}
+     */
+    @Deprecated(forRemoval = true)
     public static Tooltip create(Font font, List<? extends FormattedText> components) {
-        List<FormattedCharSequence> lines = components.stream().flatMap(t -> font.split(t, 170).stream()).collect(Collectors.toList());
-        return create(lines);
+        return create(components);
+    }
+
+    /**
+     * Create a new tooltip instance from multiple lines of text.
+     *
+     * @param font       the font instance
+     * @param components components to split and build the tooltip from
+     * @return the tooltip instance
+     */
+    public static Tooltip create(List<? extends FormattedText> components) {
+        Font font = Minecraft.getInstance().font;
+        List<FormattedCharSequence> lines = components.stream()
+                .flatMap(t -> {
+                    List<FormattedCharSequence> list = font.split(t, 170);
+                    // empty components yield an empty list
+                    // since empty lines are desired on tooltips make sure they don't go missing
+                    if (list.isEmpty()) list = List.of(FormattedCharSequence.EMPTY);
+                    return list.stream();
+                })
+                .collect(Collectors.toList());
+        return createTooltip(lines);
     }
 
     /**
@@ -50,7 +88,7 @@ public final class ScreenTooltipFactory {
      * @param lines the split lines to build the tooltip from
      * @return the tooltip instance
      */
-    public static Tooltip create(List<FormattedCharSequence> lines) {
+    public static Tooltip createTooltip(List<FormattedCharSequence> lines) {
         Tooltip tooltip = Tooltip.create(CommonComponents.EMPTY, null);
         ((TooltipAccessor) tooltip).puzzleslib$setCachedTooltip(lines);
         return tooltip;
