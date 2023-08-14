@@ -5,8 +5,12 @@ The format is based on [Keep a Changelog].
 
 ## [v8.0.22-1.20.1] - 2023-08-13
 ### Added
+- Added `GatherPotentialSpawnsCallback`
+- Added `ServerEntityLevelEvents$LoadV2`
+- Added `CheckMobDespawnCallback`
 - Added `CoreShadersContext` for registering built-in shaders
 - Added `KeyActivationContext` to helper with registering keybinds that only work when a screen is open or while playing (no screen is open)
+- Added a few more methods to `AbstractLanguageProvider`
 ### Changed
 - Overhauled `GameRulesFactory` to add many convenient overloads, as well as cleaning up the Forge implementation
 - Adjusted `ScreenTooltipFactory` to no longer require a `Font` instance as well as not remove empty lines from tooltips

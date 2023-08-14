@@ -17,10 +17,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class PersistentEntitySectionManagerFabricMixin<T extends EntityAccess> {
 
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
-    private void addEntity(T entityAccess, boolean worldGenSpawned, CallbackInfoReturnable<Boolean> callback) {
+    private void addEntity(T entityAccess, boolean loadedFromDisk, CallbackInfoReturnable<Boolean> callback) {
         if (entityAccess instanceof Entity entity) {
-            MobSpawnType spawnType = !worldGenSpawned && entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null;
+            MobSpawnType spawnType = !loadedFromDisk && entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null;
             if (FabricEntityEvents.ENTITY_LOAD.invoker().onEntityLoad(entity, (ServerLevel) entity.level(), spawnType).isInterrupt()) {
+                if (entity instanceof Player) {
+                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+                } else {
+                    callback.setReturnValue(false);
+                }
+            }
+            if (FabricEntityEvents.ENTITY_LOAD_V2.invoker().onEntityLoad(entity, (ServerLevel) entity.level(), loadedFromDisk, spawnType).isInterrupt()) {
                 if (entity instanceof Player) {
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
                 } else {

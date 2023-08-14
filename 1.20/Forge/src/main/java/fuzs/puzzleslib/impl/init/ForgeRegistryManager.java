@@ -20,6 +20,7 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.network.IContainerFactory;
@@ -109,5 +110,10 @@ public class ForgeRegistryManager implements RegistryManager {
             PoiTypeBuilder builder = entry.get();
             return new PoiType(ImmutableSet.copyOf(builder.blocks()), builder.ticketCount(), builder.searchDistance());
         });
+    }
+
+    @Override
+    public RegistryReference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Set<BlockState> matchingStates) {
+        return this.register(Registries.POINT_OF_INTEREST_TYPE, path, () -> new PoiType(matchingStates, maxTickets, validRange));
     }
 }

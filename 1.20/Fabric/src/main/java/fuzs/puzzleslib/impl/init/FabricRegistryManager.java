@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.init;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
@@ -24,6 +23,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -125,5 +125,13 @@ public class FabricRegistryManager implements RegistryManager {
         ResourceLocation key = this.makeKey(path);
         PoiType value = PointOfInterestHelper.register(key, builder.ticketCount(), builder.searchDistance(), builder.blocks());
         return new FabricRegistryReference<>(value, key, BuiltInRegistries.POINT_OF_INTEREST_TYPE);
+    }
+
+    @Override
+    public RegistryReference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Set<BlockState> matchingStates) {
+        ResourceLocation key = this.makeKey(path);
+        // the helper also registers the poi type, so just return a registry reference without calling our own register method
+        PoiType poiType = PointOfInterestHelper.register(key, maxTickets, validRange, matchingStates);
+        return new FabricRegistryReference<>(poiType, key, BuiltInRegistries.POINT_OF_INTEREST_TYPE);
     }
 }

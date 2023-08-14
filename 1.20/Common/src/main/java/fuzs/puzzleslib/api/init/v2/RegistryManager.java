@@ -32,14 +32,16 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -303,6 +305,12 @@ public interface RegistryManager {
      * @return registry object for <code>entry</code>
      */
     RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry);
+
+    default RegistryReference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Block... blocks) {
+        return this.registerPoiType(path, maxTickets, validRange, Stream.of(blocks).flatMap(t -> t.getStateDefinition().getPossibleStates().stream()).collect(Collectors.toSet()));
+    }
+
+    RegistryReference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Set<BlockState> matchingStates);
 
     /**
      * register a new type of recipe

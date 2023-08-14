@@ -15,7 +15,10 @@ import java.util.stream.Stream;
  * @param ticketCount    max amounts of tickets
  * @param searchDistance distance to search for this poi type
  * @param blocks         blocks states valid for this poi type
+ *
+ * @deprecated replaced with new methods in {@link fuzs.puzzleslib.api.init.v2.RegistryManager}
  */
+@Deprecated(forRemoval = true)
 public record PoiTypeBuilder(int ticketCount, int searchDistance, Iterable<BlockState> blocks) {
 
     /**

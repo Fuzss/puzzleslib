@@ -30,6 +30,7 @@
     "LootItemRandomChanceWithLootingConditionFabricMixin",
     "MagmaCubeFabricMixin",
     "MobFabricMixin",
+    "NaturalSpawnerFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",
     "ParrotFabricMixin",
@@ -41,7 +42,8 @@
     "StartAttackingFabricMixin",
     "ThrowableProjectileFabricMixin",
     "WolfFabricMixin",
-    "accessor.PackRepositoryFabricAccessor"
+    "accessor.PackRepositoryFabricAccessor",
+    "accessor.WeightedRandomListFabricAccessor"
   ],
   "client": [
     "client.AbstractClientPlayerFabricMixin",
