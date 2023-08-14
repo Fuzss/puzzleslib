@@ -57,7 +57,7 @@ public abstract class ModContext {
 
     public abstract ConfigHolder.Builder getConfigHolder$Builder();
 
-    public abstract RegistryManager getRegistryManager(boolean deferred);
+    public abstract RegistryManager getRegistryManager();
 
     public abstract CapabilityController getCapabilityController();
 
