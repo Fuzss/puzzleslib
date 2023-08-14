@@ -479,9 +479,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(evt.getSpawnerDataList(), spawnerData -> {
                 evt.addSpawnerData(spawnerData);
                 return true;
-            }, o -> {
-                return o instanceof MobSpawnSettings.SpawnerData spawnerData && evt.removeSpawnerData(spawnerData);
-            });
+            }, evt::removeSpawnerData);
             callback.onGatherPotentialSpawns(level, level.structureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
         });
         INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
