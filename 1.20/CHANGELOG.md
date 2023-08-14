@@ -3,18 +3,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.0.22-1.20.1] - 2023-08-13
+## [v8.0.22-1.20.1] - 2023-08-14
 ### Added
 - Added `GatherPotentialSpawnsCallback`
-- Added `ServerEntityLevelEvents$LoadV2`
+- Added `ServerEntityLevelEvents$LoadV2`, `ServerEntityLevelEvents$Load` is now deprecated
 - Added `CheckMobDespawnCallback`
-- Added `CoreShadersContext` for registering built-in shaders
+- Added `EntityRidingEvents$Start` and `EntityRidingEvents$Stop`
+- Added `CoreShadersContext` to `ClientModConstructor` for registering built-in shaders
 - Added `KeyActivationContext` to helper with registering keybinds that only work when a screen is open or while playing (no screen is open)
-- Added a few more methods to `AbstractLanguageProvider`
 ### Changed
 - Overhauled `GameRulesFactory` to add many convenient overloads, as well as cleaning up the Forge implementation
-- Adjusted `ScreenTooltipFactory` to no longer require a `Font` instance as well as not remove empty lines from tooltips
+- A few new methods in `AbstractLanguageProvider` for creative tabs and game rules
+- Adjusted `ScreenTooltipFactory` to no longer require a `Font` instance
 - Refactored `KeyMappingsContext` to require a `KeyActivationContext` instance
+- Reworked methods for registering new `PoiType`s in `RegistryManager` to no longer require a custom `PoiTypeBuilder` instance
+- Migrate some internals on Fabric to Fabric Api's new model loading api
+### Fixed
+- Fixed `ScreenTooltipFactory` removing empty lines from tooltips
 
 ## [v8.0.21-1.20.1] - 2023-08-12
 ### Fixed
