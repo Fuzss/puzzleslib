@@ -10,6 +10,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -107,6 +108,10 @@ public final class FabricLivingEvents {
      * Called when a {@link net.minecraft.world.entity.Mob} sets a new target.
      */
     public static final Event<LivingChangeTargetCallback> LIVING_CHANGE_TARGET = FabricEventFactory.createResult(LivingChangeTargetCallback.class);
+    /**
+     * Fires inside of {@link Mob#checkDespawn()} to help determine if the {@link Mob} should despawn.
+     */
+    public static final Event<CheckMobDespawnCallback> CHECK_MOB_DESPAWN = FabricEventFactory.createResult(CheckMobDespawnCallback.class);
 
     private FabricLivingEvents() {
 

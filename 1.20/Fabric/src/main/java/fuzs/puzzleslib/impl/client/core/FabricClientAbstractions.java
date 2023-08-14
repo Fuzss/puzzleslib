@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftFabricAccessor;
-import net.fabricmc.fabric.api.client.model.BakedModelManagerHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -29,7 +28,7 @@ public final class FabricClientAbstractions implements ClientAbstractions {
 
     @Override
     public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier) {
-        return BakedModelManagerHelper.getModel(modelManager, identifier);
+        return modelManager.getModel(identifier);
     }
 
     @Override

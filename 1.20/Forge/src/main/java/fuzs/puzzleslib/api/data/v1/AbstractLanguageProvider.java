@@ -3,6 +3,8 @@ package fuzs.puzzleslib.api.data.v1;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.data.LanguageProvider;
@@ -44,7 +47,15 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
     }
 
     public void addCreativeModeTab(String tabId, String value) {
-        this.add(CreativeModeTabRegistry.getTab(new ResourceLocation(this.modId, tabId)), value);
+        this.addCreativeModeTab(new ResourceLocation(this.modId, tabId), value);
+    }
+
+    public void addCreativeModeTab(ResourceLocation identifier, String value) {
+        this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, identifier), value);
+    }
+
+    public void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
+        this.add(BuiltInRegistries.CREATIVE_MODE_TAB.get(resourceKey), value);
     }
 
     public void add(CreativeModeTab tab, String value) {
@@ -82,6 +93,14 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
 
     public void add(ResourceLocation identifier, String value) {
         this.add(identifier.toLanguageKey(), value);
+    }
+
+    public void add(GameRules.Key<?> gameRule, String value) {
+        this.add(gameRule.getDescriptionId(), value);
+    }
+
+    public void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
+        this.add(gameRule.getDescriptionId() + ".description", value);
     }
 
     @Deprecated(forRemoval = true)

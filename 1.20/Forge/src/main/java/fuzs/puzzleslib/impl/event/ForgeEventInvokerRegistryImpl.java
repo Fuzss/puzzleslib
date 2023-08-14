@@ -33,6 +33,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
@@ -59,6 +60,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -307,6 +309,17 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
+        INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.LoadV2 callback, EntityJoinLevelEvent evt) -> {
+            if (evt.getLevel().isClientSide) return;
+            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), evt.loadedFromDisk(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+                if (evt.getEntity() instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
+        });
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
             callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
@@ -452,6 +465,22 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(LoadCompleteCallback.class, FMLLoadCompleteEvent.class, (LoadCompleteCallback callback, FMLLoadCompleteEvent evt) -> {
             callback.onLoadComplete();
+        });
+        INSTANCE.register(CheckMobDespawnCallback.class, MobSpawnEvent.AllowDespawn.class, (CheckMobDespawnCallback callback, MobSpawnEvent.AllowDespawn evt) -> {
+            EventResult result = callback.onCheckMobDespawn(evt.getEntity(), (ServerLevel) evt.getLevel());
+            if (result.isInterrupt()) {
+                evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+            }
+        });
+        INSTANCE.register(GatherPotentialSpawnsCallback.class, LevelEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, LevelEvent.PotentialSpawns evt) -> {
+            ServerLevel level = (ServerLevel) evt.getLevel();
+            List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(evt.getSpawnerDataList(), spawnerData -> {
+                evt.addSpawnerData(spawnerData);
+                return true;
+            }, o -> {
+                return o instanceof MobSpawnSettings.SpawnerData spawnerData && evt.removeSpawnerData(spawnerData);
+            });
+            callback.onGatherPotentialSpawns(level, level.structureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
