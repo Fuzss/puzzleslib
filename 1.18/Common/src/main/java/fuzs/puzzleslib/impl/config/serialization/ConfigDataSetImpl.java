@@ -180,19 +180,19 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
     private void dissolve() {
         if (this.dissolved == null) {
-            ImmutableMap.Builder<T, Object[]> builder = ImmutableMap.builder();
+            Map<T, Object[]> map = Maps.newIdentityHashMap();
             // split this to ensure data values from individual entries take precedence over tag entries
             for (EntryHolder<?, T> holder : this.values) {
                 if (holder instanceof ConfigDataSetImpl.TagEntryHolder<?>) {
-                    this.dissolveHolder(holder, builder::putAll);
+                    this.dissolveHolder(holder, map::putAll);
                 }
             }
             for (EntryHolder<?, T> holder : this.values) {
                 if (holder instanceof ConfigDataSetImpl.RegistryEntryHolder<?>) {
-                    this.dissolveHolder(holder, builder::putAll);
+                    this.dissolveHolder(holder, map::putAll);
                 }
             }
-            this.dissolved = builder.build();
+            this.dissolved = Collections.unmodifiableMap(map);
         }
     }
 

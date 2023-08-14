@@ -4,22 +4,22 @@ package fuzs.puzzleslib.api.capability.v2.data;
  * Modes determining how capability data should be handled when the player entity is recreated, which will usually happen when returning from the end dimension and when respawning.
  * <p>This is basically the same class as in {@see <a href="https://github.com/OnyxStudios/Cardinal-Components-API">https://github.com/OnyxStudios/Cardinal-Components-API</a>} for the Fabric mod loader.
  */
-public abstract class PlayerRespawnCopyStrategy {
+public enum PlayerRespawnCopyStrategy {
     /**
      * Always copy data when recreating player, independently of the cause of recreation.
      */
-    public static final PlayerRespawnCopyStrategy ALWAYS = new PlayerRespawnCopyStrategy() {
+    ALWAYS {
 
         @Override
         public void copy(CapabilityComponent oldCapability, CapabilityComponent newCapability, boolean returningFromEnd, boolean keepInventory) {
             actuallyCopy(oldCapability, newCapability);
         }
-    };
+    },
     /**
      * Copy data when inventory contents are copied, which is the case when successfully returning from the End dimension,
      * but also after dying when the <code>keepInventory</code> game rule is active.
      */
-    public static final PlayerRespawnCopyStrategy KEEP_INVENTORY = new PlayerRespawnCopyStrategy() {
+    KEEP_INVENTORY {
 
         @Override
         public void copy(CapabilityComponent oldCapability, CapabilityComponent newCapability, boolean returningFromEnd, boolean keepInventory) {
@@ -27,11 +27,11 @@ public abstract class PlayerRespawnCopyStrategy {
                 actuallyCopy(oldCapability, newCapability);
             }
         }
-    };
+    },
     /**
      * Copy data when returning from the End, but never after dying; even not when the <code>keepInventory</code> game rule is active.
      */
-    public static final PlayerRespawnCopyStrategy RETURNING_FROM_END = new PlayerRespawnCopyStrategy() {
+    RETURNING_FROM_END {
 
         @Override
         public void copy(CapabilityComponent oldCapability, CapabilityComponent newCapability, boolean returningFromEnd, boolean keepInventory) {
@@ -39,11 +39,11 @@ public abstract class PlayerRespawnCopyStrategy {
                 actuallyCopy(oldCapability, newCapability);
             }
         }
-    };
+    },
     /**
      * Never copy data, allows for manual handling if desired.
      */
-    public static final PlayerRespawnCopyStrategy NEVER = new PlayerRespawnCopyStrategy() {
+    NEVER {
 
         @Override
         public void copy(CapabilityComponent oldCapability, CapabilityComponent newCapability, boolean returningFromEnd, boolean keepInventory) {

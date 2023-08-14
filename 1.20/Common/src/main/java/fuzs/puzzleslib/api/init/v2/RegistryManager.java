@@ -84,12 +84,12 @@ public interface RegistryManager {
     }
 
     /**
-     * creates a placeholder registry reference for this {@link #namespace()}
+     * Creates a placeholder registry reference.
      *
      * @param registryKey key for registry to register to
      * @param path        path for new entry
      * @param <T>         registry type
-     * @return placeholder registry object for <code>entry</code>
+     * @return new placeholder registry object
      */
     default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<? super T>> registryKey, String path) {
         return RegistryReference.placeholder(registryKey, this.makeKey(path));
@@ -282,7 +282,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      *
-     * @deprecated migrate to {@link #registerPoiType(String, int, int, Block...)}
+     * @deprecated migrate to {@link #registerPoiType(String, Supplier)}
      */
     @Deprecated(forRemoval = true)
     RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry);
