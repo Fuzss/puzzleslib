@@ -37,9 +37,9 @@ abstract class NaturalSpawnerFabricMixin {
         List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(Collections.unmodifiableList(list), spawnerData -> {
             mutableBoolean.accept(true);
             return list.add(spawnerData);
-        }, o -> {
+        }, spawnerData -> {
             mutableBoolean.accept(true);
-            return list.remove(o);
+            return list.remove(spawnerData);
         });
         FabricLevelEvents.GATHER_POTENTIAL_SPAWNS.invoker().onGatherPotentialSpawns(level, structureManager, generator, category, pos, mobsAt);
         // try not to replace the return value weighted list, instead change it in hopes of better compatibility with other mixins
