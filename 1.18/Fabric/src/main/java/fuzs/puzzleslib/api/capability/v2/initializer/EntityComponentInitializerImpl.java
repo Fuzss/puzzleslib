@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.capability.v2.initializer;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
@@ -33,12 +33,7 @@ import java.util.function.Function;
  */
 @ApiStatus.Internal
 public final class EntityComponentInitializerImpl implements EntityComponentInitializer {
-    private static final Map<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>> COPY_STRATEGY_CONVERSIONS = ImmutableMap.<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>>builder()
-            .put(PlayerRespawnCopyStrategy.ALWAYS, RespawnCopyStrategy.ALWAYS_COPY)
-            .put(PlayerRespawnCopyStrategy.KEEP_INVENTORY, RespawnCopyStrategy.INVENTORY)
-            .put(PlayerRespawnCopyStrategy.RETURNING_FROM_END, RespawnCopyStrategy.LOSSLESS_ONLY)
-            .put(PlayerRespawnCopyStrategy.NEVER, RespawnCopyStrategy.NEVER_COPY)
-            .build();
+    private static final Map<PlayerRespawnCopyStrategy, RespawnCopyStrategy<Component>> COPY_STRATEGY_CONVERSIONS = Maps.immutableEnumMap(Map.of(PlayerRespawnCopyStrategy.ALWAYS, RespawnCopyStrategy.ALWAYS_COPY, PlayerRespawnCopyStrategy.KEEP_INVENTORY, RespawnCopyStrategy.INVENTORY, PlayerRespawnCopyStrategy.RETURNING_FROM_END, RespawnCopyStrategy.LOSSLESS_ONLY, PlayerRespawnCopyStrategy.NEVER, RespawnCopyStrategy.NEVER_COPY));
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {

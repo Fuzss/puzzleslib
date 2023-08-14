@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.impl.config.serialization;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.*;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
@@ -180,19 +183,19 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
     private void dissolve() {
         if (this.dissolved == null) {
-            ImmutableMap.Builder<T, Object[]> builder = ImmutableMap.builder();
+            Map<T, Object[]> map = Maps.newIdentityHashMap();
             // split this to ensure data values from individual entries take precedence over tag entries
             for (EntryHolder<?, T> holder : this.values) {
                 if (holder instanceof ConfigDataSetImpl.TagEntryHolder<?>) {
-                    this.dissolveHolder(holder, builder::putAll);
+                    this.dissolveHolder(holder, map::putAll);
                 }
             }
             for (EntryHolder<?, T> holder : this.values) {
                 if (holder instanceof ConfigDataSetImpl.RegistryEntryHolder<?>) {
-                    this.dissolveHolder(holder, builder::putAll);
+                    this.dissolveHolder(holder, map::putAll);
                 }
             }
-            this.dissolved = builder.build();
+            this.dissolved = Collections.unmodifiableMap(map);
         }
     }
 

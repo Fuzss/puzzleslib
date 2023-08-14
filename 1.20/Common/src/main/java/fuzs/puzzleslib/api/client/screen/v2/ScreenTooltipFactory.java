@@ -39,7 +39,6 @@ public final class ScreenTooltipFactory {
     /**
      * Create a new tooltip instance from multiple lines of text.
      *
-     * @param font       the font instance
      * @param components components to split and build the tooltip from
      * @return the tooltip instance
      */
@@ -64,7 +63,6 @@ public final class ScreenTooltipFactory {
     /**
      * Create a new tooltip instance from multiple lines of text.
      *
-     * @param font       the font instance
      * @param components components to split and build the tooltip from
      * @return the tooltip instance
      */
