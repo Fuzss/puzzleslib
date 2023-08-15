@@ -312,8 +312,19 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.LoadV2 callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), evt.loadedFromDisk(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+            if (evt.getLevel().isClientSide || !evt.loadedFromDisk()) return;
+            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel()).isInterrupt()) {
+                if (evt.getEntity() instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from loading in!");
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
+        });
+        INSTANCE.register(ServerEntityLevelEvents.Spawn.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Spawn callback, EntityJoinLevelEvent evt) -> {
+            if (evt.getLevel().isClientSide || evt.loadedFromDisk()) return;
+            if (callback.onEntitySpawn(evt.getEntity(), (ServerLevel) evt.getLevel(), evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -322,9 +333,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Remove.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Remove callback, EntityLeaveLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
+            callback.onEntityRemove(evt.getEntity(), (ServerLevel) evt.getLevel());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());

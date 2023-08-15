@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.23-1.20.1] - 2023-08-14
+### Added
+- Added `CommonAbstractions::getMobSpawnType`
+- Some refactors to `ServerEntityLevelEvents`, including the addition of `ServerEntityLevelEvents$Spawn`
+### Fixed
+- Fixed `ConfigDataSet` failing to dissolve when duplicate values are present
+
 ## [v8.0.22-1.20.1] - 2023-08-14
 ### Added
 - Added `GatherPotentialSpawnsCallback`

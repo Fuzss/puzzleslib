@@ -202,8 +202,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, FabricEntityEvents.ENTITY_LOAD_V2);
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
-            return callback::onEntityUnload;
+        INSTANCE.register(ServerEntityLevelEvents.Spawn.class, FabricEntityEvents.ENTITY_SPAWN);
+        INSTANCE.register(ServerEntityLevelEvents.Remove.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
+            return callback::onEntityRemove;
         });
         INSTANCE.register(LivingDeathCallback.class, ServerLivingEntityEvents.ALLOW_DEATH, callback -> {
             return (LivingEntity entity, DamageSource damageSource, float damageAmount) -> {
