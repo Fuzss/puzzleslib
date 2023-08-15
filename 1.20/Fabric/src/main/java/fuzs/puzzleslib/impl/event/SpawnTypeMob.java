@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.event;
 
 import net.minecraft.world.entity.MobSpawnType;
 
-public interface SpawnDataMob {
+public interface SpawnTypeMob {
 
     MobSpawnType puzzleslib$getSpawnType();
 }

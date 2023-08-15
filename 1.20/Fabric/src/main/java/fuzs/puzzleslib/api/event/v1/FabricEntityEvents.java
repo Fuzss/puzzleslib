@@ -14,13 +14,20 @@ public final class FabricEntityEvents {
     /**
      * Fired when an entity is added to the level on the server.
      * <p>We do not use {@link net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents#ENTITY_LOAD} as it does not allow for preventing the entity from being added.
+     *
+     * @deprecated migrate to {@link #ENTITY_LOAD_V2}
      */
+    @Deprecated(forRemoval = true)
     public static final Event<ServerEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(ServerEntityLevelEvents.Load.class);
     /**
-     * Fired when an entity is added to the level on the server.
+     * Fired when an entity is added to the level on the server after it has been loaded from chunk storage.
      * <p>We do not use {@link net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents#ENTITY_LOAD} as it does not allow for preventing the entity from being added.
      */
     public static final Event<ServerEntityLevelEvents.LoadV2> ENTITY_LOAD_V2 = FabricEventFactory.createResult(ServerEntityLevelEvents.LoadV2.class);
+    /**
+     * Fired when an entity is added to the level on the server after it has just been spawned in.
+     */
+    public static final Event<ServerEntityLevelEvents.Spawn> ENTITY_SPAWN = FabricEventFactory.createResult(ServerEntityLevelEvents.Spawn.class);
     /**
      * Fires when a projectile entity impacts on something, either a block or another entity.
      */

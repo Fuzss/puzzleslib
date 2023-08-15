@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
 import fuzs.puzzleslib.api.event.v1.FabricEntityEvents;
-import fuzs.puzzleslib.impl.event.SpawnDataMob;
+import fuzs.puzzleslib.impl.event.SpawnTypeMob;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.MobSpawnType;
@@ -19,19 +19,29 @@ abstract class PersistentEntitySectionManagerFabricMixin<T extends EntityAccess>
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
     private void addEntity(T entityAccess, boolean loadedFromDisk, CallbackInfoReturnable<Boolean> callback) {
         if (entityAccess instanceof Entity entity) {
-            MobSpawnType spawnType = !loadedFromDisk && entity instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null;
-            if (FabricEntityEvents.ENTITY_LOAD.invoker().onEntityLoad(entity, (ServerLevel) entity.level(), spawnType).isInterrupt()) {
+            MobSpawnType spawnType = entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
+            if (FabricEntityEvents.ENTITY_LOAD.invoker().onEntityLoad(entity, (ServerLevel) entity.level(), !loadedFromDisk ? spawnType : null).isInterrupt()) {
                 if (entity instanceof Player) {
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
                 } else {
                     callback.setReturnValue(false);
                 }
             }
-            if (FabricEntityEvents.ENTITY_LOAD_V2.invoker().onEntityLoad(entity, (ServerLevel) entity.level(), loadedFromDisk, spawnType).isInterrupt()) {
-                if (entity instanceof Player) {
-                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
-                } else {
-                    callback.setReturnValue(false);
+            if (loadedFromDisk) {
+                if (FabricEntityEvents.ENTITY_LOAD_V2.invoker().onEntityLoad(entity, (ServerLevel) entity.level()).isInterrupt()) {
+                    if (entity instanceof Player) {
+                        throw new UnsupportedOperationException("Cannot prevent player from loading in!");
+                    } else {
+                        callback.setReturnValue(false);
+                    }
+                }
+            } else {
+                if (FabricEntityEvents.ENTITY_SPAWN.invoker().onEntitySpawn(entity, (ServerLevel) entity.level(), spawnType).isInterrupt()) {
+                    if (entity instanceof Player) {
+                        throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+                    } else {
+                        callback.setReturnValue(false);
+                    }
                 }
             }
         }

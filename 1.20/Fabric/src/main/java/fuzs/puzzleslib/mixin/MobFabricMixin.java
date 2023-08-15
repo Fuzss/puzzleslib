@@ -3,7 +3,8 @@ package fuzs.puzzleslib.mixin;
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.impl.event.SpawnDataMob;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.event.SpawnTypeMob;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
@@ -21,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Mob.class)
-abstract class MobFabricMixin extends LivingEntity implements SpawnDataMob {
+abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     @Shadow
     @Nullable
     private LivingEntity target;
@@ -61,6 +62,26 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnDataMob {
                 this.noActionTime = 0;
             }
             callback.cancel();
+        }
+    }
+
+    @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
+    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo callback) {
+        if (this.puzzleslib$spawnType != null) {
+            String key = PuzzlesLib.id("spawn_type").toString();
+            compound.putString(key, this.puzzleslib$spawnType.name());
+        }
+    }
+
+    @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
+    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo callback) {
+        String key = PuzzlesLib.id("spawn_type").toString();
+        if (compound.contains(key)) {
+            try {
+                this.puzzleslib$spawnType = MobSpawnType.valueOf(compound.getString(key));
+            } catch (Exception ex) {
+                compound.remove(key);
+            }
         }
     }
 }

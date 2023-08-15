@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
+import fuzs.puzzleslib.impl.event.SpawnTypeMob;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
@@ -76,5 +77,10 @@ public final class FabricAbstractions implements CommonAbstractions {
     @Override
     public void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand) {
 
+    }
+
+    @Override
+    public @Nullable MobSpawnType getMobSpawnType(Mob mob) {
+        return ((SpawnTypeMob) mob).puzzleslib$getSpawnType();
     }
 }
