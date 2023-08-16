@@ -13,7 +13,7 @@ public enum ContentRegistrationFlags {
      */
     DYNAMIC_RENDERERS,
     /**
-     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for a recipe of type {@link fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe}
+     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for a recipe of type <code>fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe</code>
      * for upgrading gear without the need for a smithing template, just like the old smithing used to work.
      *
      * @deprecated replaced by {@link #COPY_TAG_RECIPES}

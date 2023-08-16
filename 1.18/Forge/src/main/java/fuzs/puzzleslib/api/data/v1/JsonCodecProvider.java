@@ -49,7 +49,7 @@ public class JsonCodecProvider<T> implements DataProvider {
     protected final Map<ResourceLocation, T> entries;
 
     /**
-     * @param output     {@linkplain PackOutput} provided by the {@link DataGenerator}.
+     * @param output     {@link DataGenerator}.
      * @param dynamicOps DynamicOps to encode values to jsons with using the provided Codec, e.g. {@link JsonOps#INSTANCE}.
      * @param packType   PackType specifying whether to generate entries in assets or data.
      * @param directory  String representing the directory to generate jsons in, e.g. "dimension" or "cheesemod/cheese".
