@@ -8,6 +8,7 @@ import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
 import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
@@ -26,18 +27,17 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
-import net.minecraftforge.event.entity.EntityLeaveWorldEvent;
-import net.minecraftforge.event.entity.PlaySoundAtEntityEvent;
-import net.minecraftforge.event.entity.ProjectileImpactEvent;
+import net.minecraftforge.event.entity.*;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
@@ -58,6 +58,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -297,7 +298,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinWorldEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinWorldEvent evt) -> {
             if (evt.getWorld().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getWorld(), !evt.loadedFromDisk() && evt.getEntity() instanceof SpawnDataMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
+            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getWorld(), !evt.loadedFromDisk() && evt.getEntity() instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -306,9 +307,31 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveWorldEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveWorldEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, EntityJoinWorldEvent.class, (ServerEntityLevelEvents.LoadV2 callback, EntityJoinWorldEvent evt) -> {
+            if (evt.getWorld().isClientSide || !evt.loadedFromDisk()) return;
+            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getWorld()).isInterrupt()) {
+                if (evt.getEntity() instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from loading in!");
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
+        });
+        INSTANCE.register(ServerEntityLevelEvents.Spawn.class, EntityJoinWorldEvent.class, (ServerEntityLevelEvents.Spawn callback, EntityJoinWorldEvent evt) -> {
+            if (evt.getWorld().isClientSide || evt.loadedFromDisk()) return;
+            if (callback.onEntitySpawn(evt.getEntity(), (ServerLevel) evt.getWorld(), evt.getEntity() instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null).isInterrupt()) {
+                if (evt.getEntity() instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
+        });
+        INSTANCE.register(ServerEntityLevelEvents.Remove.class, EntityLeaveWorldEvent.class, (ServerEntityLevelEvents.Remove callback, EntityLeaveWorldEvent evt) -> {
             if (evt.getWorld().isClientSide) return;
-            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getWorld());
+            callback.onEntityRemove(evt.getEntity(), (ServerLevel) evt.getWorld());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntityLiving(), evt.getSource());
@@ -451,6 +474,32 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(LoadCompleteCallback.class, FMLLoadCompleteEvent.class, (LoadCompleteCallback callback, FMLLoadCompleteEvent evt) -> {
             callback.onLoadComplete();
+        });
+        INSTANCE.register(CheckMobDespawnCallback.class, LivingSpawnEvent.AllowDespawn.class, (CheckMobDespawnCallback callback, LivingSpawnEvent.AllowDespawn evt) -> {
+            EventResult result = callback.onCheckMobDespawn((Mob) evt.getEntityLiving(), (ServerLevel) evt.getWorld());
+            if (result.isInterrupt()) {
+                evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+            }
+        });
+        INSTANCE.register(GatherPotentialSpawnsCallback.class, WorldEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, WorldEvent.PotentialSpawns evt) -> {
+            ServerLevel level = (ServerLevel) evt.getWorld();
+            List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(evt.getSpawnerDataList(), spawnerData -> {
+                evt.addSpawnerData(spawnerData);
+                return true;
+            }, evt::removeSpawnerData);
+            callback.onGatherPotentialSpawns(level, level.structureFeatureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
+        });
+        INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
+            if (evt.isDismounting()) return;
+            if (callback.onStartRiding(evt.getWorldObj(), evt.getEntity(), evt.getEntityBeingMounted()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(EntityRidingEvents.Stop.class, EntityMountEvent.class, (EntityRidingEvents.Stop callback, EntityMountEvent evt) -> {
+            if (evt.isMounting()) return;
+            if (callback.onStopRiding(evt.getWorldObj(), evt.getEntity(), evt.getEntityBeingMounted()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

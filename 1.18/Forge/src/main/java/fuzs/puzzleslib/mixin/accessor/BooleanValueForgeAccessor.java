@@ -12,6 +12,6 @@ public interface BooleanValueForgeAccessor {
 
     @Invoker("create")
     static GameRules.Type<GameRules.BooleanValue> puzzleslib$callCreate(boolean bl, BiConsumer<MinecraftServer, GameRules.BooleanValue> biConsumer) {
-        throw new IllegalStateException();
+        throw new RuntimeException();
     }
 }

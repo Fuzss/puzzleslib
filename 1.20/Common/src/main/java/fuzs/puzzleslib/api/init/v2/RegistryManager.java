@@ -38,6 +38,7 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -79,7 +80,7 @@ public interface RegistryManager {
      * @return this manager as a builder
      */
     default RegistryManager whenNotOn(ModLoader... forbiddenModLoaders) {
-        Preconditions.checkPositionIndex(1, forbiddenModLoaders.length, "mod loaders is empty");
+        Objects.checkIndex(0, forbiddenModLoaders.length);
         return this.whenOn(EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(forbiddenModLoaders), ModLoader.class)).toArray(ModLoader[]::new));
     }
 
@@ -262,7 +263,7 @@ public interface RegistryManager {
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>(entry.get(), FeatureFlags.VANILLA_SET));
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>(entry.get(), FeatureFlags.DEFAULT_FLAGS));
     }
 
     /**

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.LanguageProvider;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
@@ -68,6 +69,14 @@ public abstract class AbstractLanguageProvider extends LanguageProvider {
 
     public void add(ResourceLocation identifier, String value) {
         this.add(identifier.getNamespace() + "." + identifier.getPath(), value);
+    }
+
+    public void add(GameRules.Key<?> gameRule, String value) {
+        this.add(gameRule.getDescriptionId(), value);
+    }
+
+    public void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
+        this.add(gameRule.getDescriptionId() + ".description", value);
     }
 
     @Deprecated(forRemoval = true)

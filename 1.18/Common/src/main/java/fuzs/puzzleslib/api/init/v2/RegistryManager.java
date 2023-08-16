@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.init.v2;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
@@ -29,47 +28,38 @@ import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
- * handles registering to game registries
- * this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
- * originally based on RegistryHelper found in Vazkii's AutoRegLib mod
+ * Handles registering to game registries.
+ * <p>Originally based on RegistryHelper found in Vazkii's AutoRegLib mod.
  */
 public interface RegistryManager {
 
     /**
-     * Creates a new registry manager for <code>namespace</code> or returns an existing one.
-     * <p>Registration happens instantly for this manager.
+     * Creates a new registry manager for <code>modId</code> or returns an existing one.
      *
      * @param modId namespace used for registration
-     * @return new mod specific registry manager
+     * @return mod specific registry manager
      */
     static RegistryManager instant(String modId) {
-        return ModContext.get(modId).getRegistryManager(false);
+        return ModContext.get(modId).getRegistryManager();
     }
 
     /**
-     * Creates a new registry manager for <code>namespace</code> or returns an existing one.
-     * <p>Registration is deferred for this manager until {@link RegistryManager#applyRegistration()} is called.
-     *
-     * @param modId namespace used for registration
-     * @return new mod specific registry manager
+     * @param path path for location
+     * @return resource location for set namespace
      */
-    static RegistryManager deferred(String modId) {
-        return ModContext.get(modId).getRegistryManager(true);
-    }
-
-    /**
-     * @return namespace for this instance
-     */
-    String namespace();
+    ResourceLocation makeKey(String path);
 
     /**
      * allows for registering content in the common project for only a few mod loaders
@@ -86,25 +76,17 @@ public interface RegistryManager {
      * @return this manager as a builder
      */
     default RegistryManager whenNotOn(ModLoader... forbiddenModLoaders) {
-        Preconditions.checkPositionIndex(0, forbiddenModLoaders.length - 1, "mod loaders is empty");
+        Objects.checkIndex(0, forbiddenModLoaders.length);
         return this.whenOn(EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(forbiddenModLoaders), ModLoader.class)).toArray(ModLoader[]::new));
     }
 
     /**
-     * allow for deferring registration on Fabric, required when e.g. registering blocks in Fabric project, but related block entity is registered in common
-     * <p>follows the same order as Forge: blocks, items, everything else
-     */
-    default void applyRegistration() {
-        // registration is always deferred on Forge, so make this have a default variant
-    }
-
-    /**
-     * creates a placeholder registry reference for this {@link #namespace()}
+     * Creates a placeholder registry reference.
      *
      * @param registryKey key for registry to register to
      * @param path        path for new entry
      * @param <T>         registry type
-     * @return placeholder registry object for <code>entry</code>
+     * @return new placeholder registry object
      */
     default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<? super T>> registryKey, String path) {
         return RegistryReference.placeholder(registryKey, this.makeKey(path));
@@ -117,7 +99,7 @@ public interface RegistryManager {
      * @param path        path for new entry
      * @param supplier    supplier for entry to register
      * @param <T>         registry type
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 
@@ -126,7 +108,7 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<Block> registerBlock(String path, Supplier<Block> entry) {
         return this.register(Registry.BLOCK_REGISTRY, path, entry);
@@ -137,7 +119,7 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<Item> registerItem(String path, Supplier<Item> entry) {
         return this.register(Registry.ITEM_REGISTRY, path, entry);
@@ -192,7 +174,7 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
         return this.register(Registry.FLUID_REGISTRY, path, entry);
@@ -203,7 +185,7 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
         return this.register(Registry.MOB_EFFECT_REGISTRY, path, entry);
@@ -213,7 +195,7 @@ public interface RegistryManager {
      * register sound event entry with a path
      *
      * @param path path for new entry
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<SoundEvent> registerSoundEvent(String path) {
         return this.register(Registry.SOUND_EVENT_REGISTRY, path, () -> new SoundEvent(this.makeKey(path)));
@@ -224,7 +206,7 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<Potion> registerPotion(String path, Supplier<Potion> entry) {
         return this.register(Registry.POTION_REGISTRY, path, entry);
@@ -235,7 +217,7 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
         return this.register(Registry.ENCHANTMENT_REGISTRY, path, entry);
@@ -247,7 +229,7 @@ public interface RegistryManager {
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   entity type parameter
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     @SuppressWarnings("unchecked")
     default <T extends Entity> RegistryReference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
@@ -260,7 +242,7 @@ public interface RegistryManager {
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   block entity type parameter
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     @SuppressWarnings("unchecked")
     default <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
@@ -273,7 +255,7 @@ public interface RegistryManager {
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   container menu type parameter
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
@@ -286,7 +268,7 @@ public interface RegistryManager {
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   container menu type
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
 
@@ -295,16 +277,41 @@ public interface RegistryManager {
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return registry object for <code>entry</code>
+     * @return new registry object
+     *
+     * @deprecated migrate to {@link #registerPoiType(String, Supplier)}
      */
+    @Deprecated(forRemoval = true)
     RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry);
+
+    /**
+     * Creates and registers a new poi type entry.
+     *
+     * @param path   path for new entry
+     * @param blocks blocks valid for this poi type
+     * @return new registry object
+     */
+    default RegistryReference<PoiType> registerPoiType(String path, Supplier<Set<Block>> blocks) {
+        return this.registerPoiType(path, () -> blocks.get().stream().flatMap(t -> t.getStateDefinition().getPossibleStates().stream()).collect(Collectors.toSet()), 0, 1);
+    }
+
+    /**
+     * Creates and registers a new poi type entry.
+     *
+     * @param path           path for new entry
+     * @param matchingStates blocks states valid for this poi type
+     * @param maxTickets     max amount of accessor tickets
+     * @param validRange     distance to search for this poi type
+     * @return new registry object
+     */
+    RegistryReference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange);
 
     /**
      * register a new type of recipe
      *
      * @param path path for new entry
      * @param <T>  recipe type
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default <T extends Recipe<?>> RegistryReference<RecipeType<T>> registerRecipeType(String path) {
         return this.register(Registry.RECIPE_TYPE_REGISTRY, path, () -> new RecipeType<>() {
@@ -322,7 +329,7 @@ public interface RegistryManager {
      *
      * @param path               path for new entry
      * @param notificationRadius range in blocks in which this event will be listened to
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<GameEvent> registerGameEvent(String path, int notificationRadius) {
         return this.register(Registry.GAME_EVENT_REGISTRY, path, () -> new GameEvent(path, notificationRadius));
@@ -332,7 +339,7 @@ public interface RegistryManager {
      * Register a new simple particle type.
      *
      * @param path path for new entry
-     * @return registry object for <code>entry</code>
+     * @return new registry object
      */
     default RegistryReference<SimpleParticleType> registerParticleType(String path) {
         return this.register(Registry.PARTICLE_TYPE_REGISTRY, path, () -> new SimpleParticleType(false));
@@ -431,6 +438,16 @@ public interface RegistryManager {
         return this.registerTag(Registry.GAME_EVENT_REGISTRY, path);
     }
 
+//    /**
+//     * Creates a new {@link TagKey} for damage types.
+//     *
+//     * @param path path for new tag key
+//     * @return new tag key
+//     */
+//    default TagKey<DamageType> registerDamageTypeTag(String path) {
+//        return this.registerTag(Registries.DAMAGE_TYPE, path);
+//    }
+
     /**
      * Creates a new {@link TagKey} for enchantments.
      *
@@ -464,12 +481,13 @@ public interface RegistryManager {
         return ResourceKey.create(registryKey, this.makeKey(path));
     }
 
-    /**
-     * @param path path for location
-     * @return resource location for {@link #namespace}
-     */
-    default ResourceLocation makeKey(String path) {
-        if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("Can't register object without name");
-        return new ResourceLocation(this.namespace(), path);
-    }
+//    /**
+//     * Creates a new {@link ResourceKey} for a {@link DamageType}.
+//     *
+//     * @param path path for new resource key
+//     * @return new {@link ResourceKey}
+//     */
+//    default ResourceKey<DamageType> registerDamageType(String path) {
+//        return this.registerResourceKey(Registries.DAMAGE_TYPE, path);
+//    }
 }

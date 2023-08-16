@@ -2,6 +2,7 @@ package fuzs.puzzleslib.mixin;
 
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.FabricPlayerEvents;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -39,6 +40,12 @@ abstract class PlayerFabricMixin extends LivingEntity {
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick$1(CallbackInfo callback) {
         FabricPlayerEvents.PLAYER_TICK_END.invoker().onEndPlayerTick(Player.class.cast(this));
+    }
+
+    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+    public void hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
+        EventResult result = FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(this, source, amount);
+        if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)

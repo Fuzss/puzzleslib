@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.24-1.20.1] - 2023-08-16
+### Changed
+- Reworked implementation of `LivingDropsCallback` on Fabric to make it less likely for loot modifications from other mods to completely break all loot for a mob
+### Fixed
+- Fixed `ServiceProviderHelper` not loading as early as it should
+- Removed debug code related to testing out new key binding features
+
 ## [v8.0.23-1.20.1] - 2023-08-14
 ### Added
 - Added `CommonAbstractions::getMobSpawnType`

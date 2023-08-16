@@ -33,7 +33,7 @@ public final class ForgeModContext extends ModContext {
     }
 
     @Override
-    public RegistryManager getRegistryManager(boolean deferred) {
+    public RegistryManager getRegistryManager() {
         if (this.registryManager == null) {
             this.registryManager = new ForgeRegistryManager(this.modId);
         }

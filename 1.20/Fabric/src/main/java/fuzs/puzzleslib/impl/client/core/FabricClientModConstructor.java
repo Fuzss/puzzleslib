@@ -22,7 +22,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -96,13 +95,7 @@ public final class FabricClientModConstructor {
 
     private static void registerCoreShaders(Consumer<CoreShadersContext> modifyBakingResultConsumer) {
         CoreShaderRegistrationCallback.EVENT.register(context -> {
-            modifyBakingResultConsumer.accept((id, vertexFormat, loadCallback) -> {
-                try {
-                    context.register(id, vertexFormat, loadCallback);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+            modifyBakingResultConsumer.accept(new CoreShadersContextFabricImpl(context));
         });
     }
 }

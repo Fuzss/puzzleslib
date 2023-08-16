@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.client.core;
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
+import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
@@ -11,6 +12,7 @@ import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -57,6 +59,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
         constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
         constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
+        registerCoreShaders(constructor::onRegisterCoreShaders);
     }
 
     private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer, String modId) {
@@ -89,5 +92,11 @@ public final class FabricClientModConstructor {
                 }
             }
         }));
+    }
+
+    private static void registerCoreShaders(Consumer<CoreShadersContext> modifyBakingResultConsumer) {
+        CoreShaderRegistrationCallback.EVENT.register(context -> {
+            modifyBakingResultConsumer.accept(new CoreShadersContextFabricImpl(context));
+        });
     }
 }

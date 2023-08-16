@@ -248,4 +248,11 @@ public interface ClientModConstructor extends PairedModConstructor {
     default void onAddResourcePackFinders(final PackRepositorySourcesContext context) {
 
     }
+
+    /**
+     * @param context register new resource pack provided shaders
+     */
+    default void onRegisterCoreShaders(final CoreShadersContext context) {
+
+    }
 }

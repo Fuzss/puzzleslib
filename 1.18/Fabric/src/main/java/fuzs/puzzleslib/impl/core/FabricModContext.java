@@ -33,11 +33,9 @@ public final class FabricModContext extends ModContext {
     }
 
     @Override
-    public RegistryManager getRegistryManager(boolean deferred) {
+    public RegistryManager getRegistryManager() {
         if (this.registryManager == null) {
-            this.registryManager = new FabricRegistryManager(this.modId, deferred);
-        } else if (((FabricRegistryManager) this.registryManager).deferred != deferred) {
-            throw new IllegalArgumentException("deferred setting does not match existing value");
+            this.registryManager = new FabricRegistryManager(this.modId);
         }
         return this.registryManager;
     }
