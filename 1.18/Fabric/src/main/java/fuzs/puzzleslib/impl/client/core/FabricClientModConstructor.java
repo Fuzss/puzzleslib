@@ -12,7 +12,6 @@ import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
-import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
