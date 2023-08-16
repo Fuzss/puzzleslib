@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.fabricmc.fabric.api.client.rendering.v1;
+package fuzs.puzzleslib.impl.client.core;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import java.io.IOException;
