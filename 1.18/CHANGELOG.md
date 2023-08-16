@@ -3,13 +3,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.8-1.18.2] - 2023-08-16
+### Added
+- Added `CommonAbstractions::getMobSpawnType`
+- Added `GatherPotentialSpawnsCallback`
+- Some refactors to `ServerEntityLevelEvents`, including the addition of `ServerEntityLevelEvents$Spawn`
+- Added `CheckMobDespawnCallback`
+- Added `EntityRidingEvents$Start` and `EntityRidingEvents$Stop`
+- Added `CoreShadersContext` to `ClientModConstructor` for registering built-in shaders
+- Added `KeyActivationContext` to helper with registering keybinds that only work when a screen is open or while playing (no screen is open)
+### Changed
+- Overhauled `GameRulesFactory` to add many convenient overloads, as well as cleaning up the Forge implementation
+- A few new methods in `AbstractLanguageProvider` for game rules
+- Refactored `KeyMappingsContext` to require a `KeyActivationContext` instance
+- Reworked methods for registering new `PoiType`s in `RegistryManager` to no longer require a custom `PoiTypeBuilder` instance
+- Reworked implementation of `LivingDropsCallback` on Fabric to make it less likely for loot modifications from other mods to completely break all loot for a mob
+### Fixed
+- Fixed `LivingAttackCallback` not firing on Fabric
+- Fixed `ConfigDataSet` failing to dissolve when duplicate values are present
+- Fixed `DeferredTooltipRendering` removing empty lines from tooltips
+
 ## [v3.5.7-1.18.2] - 2023-08-12
 ### Fixed
 - Fixed start-up crash when the [Emojiful](https://www.curseforge.com/minecraft/mc-mods/emojiful) mod is installed
 
 ## [v3.5.6-1.18.2] - 2023-08-12
 ### Changed
-- Slightly reworked `DeferredTooltipRendering`
+- Slightly reworked `DeferredTooltipRendering` to no longer require a `Minecraft` / `Font` instance
 ### Fixed
 - Fixed implementation errors in `UseItemEvents.Tick` on Fabric which would prevent successfully using items like bows and tridents
 

@@ -12,6 +12,6 @@ public interface IntegerValueForgeAccessor {
 
     @Invoker("create")
     static GameRules.Type<GameRules.IntegerValue> puzzleslib$callCreate(int i, BiConsumer<MinecraftServer, GameRules.IntegerValue> biConsumer) {
-        throw new IllegalStateException();
+        throw new RuntimeException();
     }
 }

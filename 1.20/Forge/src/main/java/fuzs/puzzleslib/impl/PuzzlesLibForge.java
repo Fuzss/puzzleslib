@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
@@ -12,5 +13,10 @@ public class PuzzlesLibForge {
     @SubscribeEvent
     public static void onConstructMod(final FMLConstructModEvent evt) {
         ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLib::new);
+    }
+
+    @SubscribeEvent
+    public static void onGatherData(final GatherDataEvent evt) {
+
     }
 }

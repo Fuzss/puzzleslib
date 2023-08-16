@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
+import fuzs.puzzleslib.impl.event.DropEntityLootHelper;
 import fuzs.puzzleslib.impl.event.LivingJumpHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -20,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -49,9 +51,9 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Shadow
     protected int lastHurtByPlayerTime;
     @Unique
-    private int puzzleslib$lootingLevel;
+    private MutableInt puzzleslib$lootingLevel;
     @Unique
-    protected ThreadLocal<ItemStack> puzzleslib$originalUseItem = new ThreadLocal<>();
+    private final ThreadLocal<ItemStack> puzzleslib$originalUseItem = new ThreadLocal<>();
     @Unique
     private DefaultedFloat puzzleslib$damageAmount;
     @Unique
@@ -158,31 +160,37 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
-    protected void dropAllDeathLoot$0(DamageSource damageSource, CallbackInfo callback) {
-        this.puzzleslib$lootingLevel = 0;
-        ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(Lists.newArrayList());
-    }
-
     @ModifyVariable(method = "dropAllDeathLoot", at = @At("STORE"), ordinal = 0)
-    protected int dropAllDeathLoot$1(int lootingLevel, DamageSource damageSource) {
-        MutableInt mutableLootingLevel = MutableInt.fromValue(lootingLevel);
-        FabricLivingEvents.LOOTING_LEVEL.invoker().onLootingLevel(LivingEntity.class.cast(this), damageSource, mutableLootingLevel);
+    protected int dropAllDeathLoot$0(int lootingLevel, DamageSource damageSource) {
         // we do not have access to the local lootingLevel variable at TAIL later where it is needed for invoking LivingDropsCallback
         // (the local capture seems to fail due to the way the local lootingLevel variable is initialised)
         // so instead capture the value after our LootingLevelCallback has run, potentially missing out on changes applied by other mixins
-        return this.puzzleslib$lootingLevel = mutableLootingLevel.getAsInt();
+        this.puzzleslib$lootingLevel = DropEntityLootHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
+        return this.puzzleslib$lootingLevel.getAsInt();
+    }
+
+    @Inject(method = "dropAllDeathLoot", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;lastHurtByPlayerTime:I", shift = At.Shift.BEFORE))
+    protected void dropAllDeathLoot$1(DamageSource damageSource, CallbackInfo callback) {
+        ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(Lists.newArrayList());
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
     protected void dropAllDeathLoot$2(DamageSource damageSource, CallbackInfo callback) {
-        Collection<ItemEntity> capturedDrops = ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(null);
-        if (capturedDrops != null) {
-            EventResult result = FabricLivingEvents.LIVING_DROPS.invoker().onLivingDrops(LivingEntity.class.cast(this), damageSource, capturedDrops, this.puzzleslib$lootingLevel, this.lastHurtByPlayerTime > 0);
-            if (result.isPass()) capturedDrops.forEach(itemEntity -> this.level.addFreshEntity(itemEntity));
-        } else {
+        if (!DropEntityLootHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> this.puzzleslib$lootingLevel)) {
             PuzzlesLib.LOGGER.warn("Unable to invoke LivingDropsCallback for entity {}: Drops is null", this.getName().getString());
         }
+        this.puzzleslib$lootingLevel = null;
+    }
+
+    @Inject(method = "die", at = @At("TAIL"))
+    public void die$0(DamageSource damageSource, CallbackInfo callback) {
+        // this is a safety precaution, in case LivingEntity::dropAllDeathLoot does not reach TAIL and therefore doesn't spawn the captured drops (another mixin might cancel the method mid-way)
+        // this should work rather fine, as LivingEntity::dropAllDeathLoot is basically exclusively called from LivingEntity::die,
+        // and spawning captured drops in LivingEntity::dropAllDeathLoot only rarely has a conflict if any anyway
+        DropEntityLootHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> {
+            int lootingLevel = damageSource.getEntity() instanceof Player player ? EnchantmentHelper.getMobLooting(player) : 0;
+            return DropEntityLootHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
+        });
     }
 
     @Inject(method = "dropExperience", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"), cancellable = true)
@@ -203,7 +211,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     protected abstract int getExperienceReward(Player player);
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    public void die(DamageSource damageSource, CallbackInfo callback) {
+    public void die$1(DamageSource damageSource, CallbackInfo callback) {
         if (FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource).isInterrupt()) {
             callback.cancel();
         }
@@ -231,6 +239,13 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Shadow
     public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
+
+    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+    public void hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
+        if (Player.class.isInstance(this)) return;
+        EventResult result = FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(LivingEntity.class.cast(this), source, amount);
+        if (result.isInterrupt()) callback.setReturnValue(false);
+    }
 
     @ModifyVariable(method = "hurt", at = @At(value = "LOAD", ordinal = 1), ordinal = 0)
     public float hurt$0(float amount, DamageSource source) {

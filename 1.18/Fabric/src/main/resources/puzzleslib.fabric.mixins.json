@@ -28,6 +28,7 @@
     "LootItemRandomChanceWithLootingConditionFabricMixin",
     "MagmaCubeFabricMixin",
     "MobFabricMixin",
+    "NaturalSpawnerFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",
     "ParrotFabricMixin",
@@ -41,7 +42,8 @@
     "StartAttackingFabricMixin",
     "ThrowableProjectileFabricMixin",
     "WolfFabricMixin",
-    "accessor.PackRepositoryFabricAccessor"
+    "accessor.PackRepositoryFabricAccessor",
+    "accessor.WeightedRandomListFabricAccessor"
   ],
   "client": [
     "client.AbstractClientPlayerFabricMixin",
@@ -56,11 +58,13 @@
     "client.ItemInHandRendererFabricMixin",
     "client.ItemRendererFabricMixin",
     "client.KeyboardHandlerFabricMixin",
+    "client.KeyMappingFabricMixin",
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",
     "client.ModelManagerFabricMixin",
     "client.MouseHandlerFabricMixin",
     "client.PlayerRendererFabricMixin",
+    "client.RemotePlayerFabricMixin",
     "client.ScreenEffectRendererFabricMixin",
     "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",

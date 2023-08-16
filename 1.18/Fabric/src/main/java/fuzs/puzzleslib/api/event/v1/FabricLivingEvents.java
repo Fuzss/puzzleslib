@@ -112,6 +112,10 @@ public final class FabricLivingEvents {
      * Called when a {@link net.minecraft.world.entity.Mob} sets a new target.
      */
     public static final Event<LivingChangeTargetCallback> LIVING_CHANGE_TARGET = FabricEventFactory.createResult(LivingChangeTargetCallback.class);
+    /**
+     * Fires inside of {@link Mob#checkDespawn()} to help determine if the {@link Mob} should despawn.
+     */
+    public static final Event<CheckMobDespawnCallback> CHECK_MOB_DESPAWN = FabricEventFactory.createResult(CheckMobDespawnCallback.class);
 
     private FabricLivingEvents() {
 

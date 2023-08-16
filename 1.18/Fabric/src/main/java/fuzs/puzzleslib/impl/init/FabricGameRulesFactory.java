@@ -8,9 +8,6 @@ import net.minecraft.world.level.GameRules;
 
 import java.util.function.BiConsumer;
 
-/**
- * implementation on Fabric using methods conveniently provided by Fabric Api
- */
 public final class FabricGameRulesFactory implements GameRulesFactory {
 
     @Override
@@ -19,22 +16,12 @@ public final class FabricGameRulesFactory implements GameRulesFactory {
     }
 
     @Override
-    public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue) {
-        return GameRuleFactory.createBooleanRule(defaultValue);
+    public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> callback) {
+        return GameRuleFactory.createBooleanRule(defaultValue, callback);
     }
 
     @Override
-    public GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue, BiConsumer<MinecraftServer, GameRules.BooleanValue> changedCallback) {
-        return GameRuleFactory.createBooleanRule(defaultValue, changedCallback);
-    }
-
-    @Override
-    public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue) {
-        return GameRuleFactory.createIntRule(defaultValue);
-    }
-
-    @Override
-    public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> changedCallback) {
-        return GameRuleFactory.createIntRule(defaultValue, changedCallback);
+    public GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, int minimumValue, int maximumValue, BiConsumer<MinecraftServer, GameRules.IntegerValue> callback) {
+        return GameRuleFactory.createIntRule(defaultValue, minimumValue, maximumValue, callback);
     }
 }

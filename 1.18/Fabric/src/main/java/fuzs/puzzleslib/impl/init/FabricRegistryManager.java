@@ -1,12 +1,5 @@
 package fuzs.puzzleslib.impl.init;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
-import fuzs.puzzleslib.api.core.v1.ModLoader;
-import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
@@ -22,87 +15,28 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.block.state.BlockState;
 
-import java.util.*;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 
-/**
- * handles registering to forge registries
- * <p>this is a mod specific instance now for Fabric compatibility, Forge would support retrieving current namespace from mod loading context
- * <p>originally heavily inspired by RegistryHelper found in Vazkii's AutoRegLib mod
- */
-public class FabricRegistryManager implements RegistryManager {
-    /**
-     * namespace for this instance
-     */
-    private final String namespace;
-    /**
-     * defer registration for this manager until {@link #applyRegistration()} is called
-     */
-    public final boolean deferred;
-    /**
-     * internal storage for collecting and registering registry entries
-     */
-    private final Multimap<ResourceKey<? extends Registry<?>>, Runnable> registryToFactory = ArrayListMultimap.create();
-    /**
-     * mod loader sto register the next entry to, null by default for registering to any
-     */
-    @Nullable
-    private Set<ModLoader> allowedModLoaders;
+public final class FabricRegistryManager extends RegistryManagerImpl {
 
-    public FabricRegistryManager(String modId, boolean deferred) {
-        this.namespace = modId;
-        this.deferred = deferred;
-    }
-
-    @Override
-    public String namespace() {
-        return this.namespace;
-    }
-
-    @Override
-    public RegistryManager whenOn(ModLoader... allowedModLoaders) {
-        Preconditions.checkPositionIndex(0, allowedModLoaders.length - 1, "mod loaders is empty");
-        this.allowedModLoaders = Sets.immutableEnumSet(Arrays.asList(allowedModLoaders));
-        return this;
-    }
-
-    @Override
-    public void applyRegistration() {
-        if (!this.deferred || this.registryToFactory.isEmpty()) throw new IllegalStateException("No registry entries available for deferred registration");
-        // follow the same order as Forge: blocks, items, everything else
-        // this will run into issues for spawn eggs, as the eggs will be registered before the entity type is created -> we'll deal with this when it's required by a mod
-        this.registryToFactory.get(Registry.BLOCK_REGISTRY).forEach(Runnable::run);
-        this.registryToFactory.get(Registry.ITEM_REGISTRY).forEach(Runnable::run);
-        for (Map.Entry<ResourceKey<? extends Registry<?>>, Collection<Runnable>> entry : this.registryToFactory.asMap().entrySet()) {
-            if (entry.getKey() != Registry.BLOCK_REGISTRY && entry.getKey() != Registry.ITEM_REGISTRY) entry.getValue().forEach(Runnable::run);
-        }
-    }
-
-    @Override
-    public <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
-        Set<ModLoader> allowedModLoaders = this.allowedModLoaders;
-        this.allowedModLoaders = null;
-        if (!this.deferred) {
-            return this.actuallyRegister(registryKey, path, supplier, allowedModLoaders);
-        } else {
-            this.registryToFactory.put(registryKey, () -> this.actuallyRegister(registryKey, path, supplier, allowedModLoaders));
-            return this.placeholder(registryKey, path);
-        }
+    public FabricRegistryManager(String modId) {
+        super(modId);
     }
 
     @SuppressWarnings("unchecked")
-    private <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, @Nullable Set<ModLoader> allowedModLoaders) {
-        if (allowedModLoaders != null && !allowedModLoaders.contains(ModLoader.FABRIC)) {
-            return this.placeholder(registryKey, path);
-        }
+    @Override
+    protected <T> RegistryReference<T> actuallyRegister(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         T value = supplier.get();
+        Objects.requireNonNull(value, "value is null");
         Registry<? super T> registry = (Registry<? super T>) Registry.REGISTRY.get(registryKey.location());
-        Objects.requireNonNull(value, "Can't register null value");
-        Objects.requireNonNull(registry, "Registry %s not found".formatted(registryKey));
+        Objects.requireNonNull(registry, "registry %s is null".formatted(registryKey));
         ResourceLocation key = this.makeKey(path);
-        Registry.register(registry, key, value);
+        // PointOfInterestHelper also registers the poi type, so skip this call for that scenario
+        if (!registryKey.equals(Registry.POINT_OF_INTEREST_TYPE_REGISTRY)) Registry.register(registry, key, value);
         return new FabricRegistryReference<>(value, key, registry);
     }
 
@@ -119,9 +53,13 @@ public class FabricRegistryManager implements RegistryManager {
 
     @Override
     public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry) {
-        PoiTypeBuilder builder = entry.get();
-        ResourceLocation key = this.makeKey(path);
-        PoiType value = PointOfInterestHelper.register(key, builder.ticketCount(), builder.searchDistance(), builder.blocks());
-        return new FabricRegistryReference<>(value, key, Registry.POINT_OF_INTEREST_TYPE);
+        PoiTypeBuilder poiTypeBuilder = entry.get();
+        Supplier<PoiType> supplier = () -> PointOfInterestHelper.register(this.makeKey(path), poiTypeBuilder.ticketCount(), poiTypeBuilder.searchDistance(), poiTypeBuilder.blocks());
+        return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, supplier);
+    }
+
+    @Override
+    public RegistryReference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange) {
+        return this.register(Registry.POINT_OF_INTEREST_TYPE_REGISTRY, path, () -> PointOfInterestHelper.register(this.makeKey(path), maxTickets, validRange, matchingStates.get()));
     }
 }

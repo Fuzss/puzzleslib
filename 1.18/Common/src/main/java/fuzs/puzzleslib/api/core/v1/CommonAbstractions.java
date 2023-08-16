@@ -1,15 +1,13 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import fuzs.puzzleslib.impl.event.SpawnTypeMob;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -105,4 +103,15 @@ public interface CommonAbstractions {
      * @param interactionHand the hand holding the destroyed stack
      */
     void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand);
+
+    /**
+     * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)}.
+     * <p>Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
+     *
+     * @param mob the mob
+     * @return the spawn type or null if none has been set
+     */
+    default @Nullable MobSpawnType getMobSpawnType(Mob mob) {
+        return ((SpawnTypeMob) mob).puzzleslib$getSpawnType();
+    }
 }

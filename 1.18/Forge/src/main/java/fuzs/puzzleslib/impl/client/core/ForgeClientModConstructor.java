@@ -22,7 +22,6 @@ import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -105,6 +104,9 @@ public final class ForgeClientModConstructor {
             if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
                 constructor.onAddResourcePackFinders(new ResourcePackSourcesContextForgeImpl(evt::addRepositorySource));
             }
+        });
+        eventBus.addListener((final RegisterShadersEvent evt) -> {
+            constructor.onRegisterCoreShaders(new CoreShadersContextForgeImpl(evt::registerShader, evt.getResourceManager()));
         });
     }
 
