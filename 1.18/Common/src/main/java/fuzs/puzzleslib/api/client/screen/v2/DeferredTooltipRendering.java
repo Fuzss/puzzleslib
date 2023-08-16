@@ -49,7 +49,6 @@ public final class DeferredTooltipRendering {
     /**
      * Set a tooltip to be rendered at the end of the next {@link Screen#render(PoseStack, int, int, float)} call.
      *
-     * @param minecraft minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
      * @param tooltip   the tooltip lines
      */
     public static void setTooltipForNextRenderPass(Component tooltip) {
@@ -149,7 +148,6 @@ public final class DeferredTooltipRendering {
     /**
      * Set a tooltip to a widget to be rendered when the widget is hovered or focused.
      *
-     * @param minecraft      minecraft singleton to get {@link net.minecraft.client.gui.Font} instance from
      * @param abstractWidget the widget that shows the tooltip
      * @param tooltip        the tooltip lines to split
      * @return the widget passed in

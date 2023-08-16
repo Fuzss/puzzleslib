@@ -19,7 +19,7 @@ public interface GatherPotentialSpawnsCallback {
      * Fires when building a list of all possible entities that can spawn at the specified location.
      *
      * @param level            the current level instance
-     * @param structureManager the structure manager, used for applying {@link Structure#spawnOverrides()}
+     * @param structureManager the structure manager, used for applying {@link net.minecraft.world.level.levelgen.feature.ConfiguredStructureFeature#spawnOverrides}
      * @param generator        the chunk generator for calling {@link ChunkGenerator#getMobsAt(Holder, StructureManager, MobCategory, BlockPos)}
      * @param category         the mob category to retrieve potential spawns for
      * @param pos              the block position the spawn attempt is made at

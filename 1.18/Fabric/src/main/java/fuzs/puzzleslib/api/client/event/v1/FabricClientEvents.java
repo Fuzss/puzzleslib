@@ -102,7 +102,7 @@ public final class FabricClientEvents {
      */
     public static final Event<ClientLevelEvents.Unload> UNLOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Unload.class);
     /**
-     * Called after {@link Input#tick(boolean, float)} has run for the {@link LocalPlayer}.
+     * Called after {@link net.minecraft.client.player.Input#tick(boolean)} has run for the {@link net.minecraft.client.player.LocalPlayer}.
      */
     public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(MovementInputUpdateCallback.class);
     /**

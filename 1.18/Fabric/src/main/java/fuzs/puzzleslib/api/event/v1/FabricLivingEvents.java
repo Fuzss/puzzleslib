@@ -5,8 +5,10 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -81,11 +83,11 @@ public final class FabricLivingEvents {
      */
     public static final Event<LivingKnockBackCallback> LIVING_KNOCK_BACK = FabricEventFactory.createResult(LivingKnockBackCallback.class);
     /**
-     * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
+     * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link net.minecraft.world.entity.EquipmentSlot}, allows for modifying those attributes.
      */
     public static final Event<ItemAttributeModifiersCallback> ITEM_ATTRIBUTE_MODIFIERS = FabricEventFactory.create(ItemAttributeModifiersCallback.class);
     /**
-     * Called when the game checks whether a new {@link MobEffectInstance} can be applied to a {@link LivingEntity} in {@link LivingEntity#canBeAffected(MobEffectInstance)}.
+     * Called when the game checks whether a new {@link net.minecraft.world.effect.MobEffectInstance} can be applied to a {@link LivingEntity} in {@link LivingEntity#canBeAffected(MobEffectInstance)}.
      */
     public static final Event<MobEffectEvents.Affects> MOB_EFFECT_AFFECTS = FabricEventFactory.createResult(MobEffectEvents.Affects.class);
     /**

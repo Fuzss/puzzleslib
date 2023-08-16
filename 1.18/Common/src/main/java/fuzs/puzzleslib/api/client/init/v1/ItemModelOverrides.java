@@ -5,7 +5,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.Item;
 
 /**
- * Allows for registering model overrides for items that have a different model in {@link net.minecraft.client.renderer.entity.ItemRenderer} depending on {@link ItemDisplayContext} like {@link net.minecraft.world.item.Items#TRIDENT} and {@link net.minecraft.world.item.Items#SPYGLASS} in vanilla.
+ * Allows for registering model overrides for items that have a different model in {@link net.minecraft.client.renderer.entity.ItemRenderer} depending on {@link net.minecraft.client.renderer.block.model.ItemTransforms.TransformType} like {@link net.minecraft.world.item.Items#TRIDENT} and {@link net.minecraft.world.item.Items#SPYGLASS} in vanilla.
  */
 @Deprecated(forRemoval = true)
 public interface ItemModelOverrides {
