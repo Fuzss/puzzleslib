@@ -11,16 +11,30 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
+import net.fabricmc.fabric.api.event.client.player.ClientPickBlockApplyCallback;
+import net.fabricmc.fabric.api.event.client.player.ClientPickBlockGatherCallback;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
+import net.fabricmc.fabric.api.event.player.UseBlockCallback;
+import net.fabricmc.fabric.api.event.player.UseEntityCallback;
+import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,10 +47,19 @@ import static fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl.INSTANCE
 
 @SuppressWarnings("unchecked")
 public final class FabricClientEventInvokers {
+    // a custom item stack used for identity matching to be able to cancel our pick block event
+    private static final ItemStack INTERRUPT_PICK_ITEM_STACK = new ItemStack(Items.STONE);
+
+    static {
+        ClientPickBlockApplyCallback.EVENT.register((Player player, HitResult result, ItemStack stack) -> {
+            // match via reference identity so this can only be our dummy stack
+            return stack == INTERRUPT_PICK_ITEM_STACK ? ItemStack.EMPTY : stack;
+        });
+    }
 
     public static void register() {
         INSTANCE.register(LoadCompleteCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
-            return (Minecraft client) -> {
+            return (Minecraft minecraft) -> {
                 callback.onLoadComplete();
             };
         });
@@ -47,14 +70,16 @@ public final class FabricClientEventInvokers {
             return callback::onEndClientTick;
         });
         INSTANCE.register(RenderGuiCallback.class, HudRenderCallback.EVENT, callback -> {
-            return (matrixStack, tickDelta) -> {
+            return (GuiGraphics matrixStack, float tickDelta) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 Window window = minecraft.getWindow();
                 callback.onRenderGui(minecraft, matrixStack, tickDelta, window.getGuiScaledWidth(), window.getGuiScaledHeight());
             };
         });
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, callback -> {
-            return (stack, context, lines) -> callback.onItemTooltip(stack, Minecraft.getInstance().player, lines, context);
+            return (ItemStack stack, TooltipFlag context, List<Component> lines) -> {
+                callback.onItemTooltip(stack, Minecraft.getInstance().player, lines, context);
+            };
         });
         INSTANCE.register(RenderNameTagCallback.class, FabricClientEvents.RENDER_NAME_TAG);
         INSTANCE.register(ContainerScreenEvents.Background.class, FabricScreenEvents.CONTAINER_SCREEN_BACKGROUND);
@@ -63,14 +88,14 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ScreenOpeningCallback.class, FabricScreenEvents.SCREEN_OPENING);
         INSTANCE.register(ComputeFovModifierCallback.class, FabricClientEvents.COMPUTE_FOV_MODIFIER);
         INSTANCE.register(ScreenEvents.BeforeInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, callback -> {
-            return (client, screen, scaledWidth, scaledHeight) -> {
-                callback.onBeforeInit(client, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(Screens.getButtons(screen)));
+            return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
+                callback.onBeforeInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(Screens.getButtons(screen)));
             };
         });
         INSTANCE.register(ScreenEvents.AfterInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT, callback -> {
-            return (client, screen, scaledWidth, scaledHeight) -> {
+            return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 List<AbstractWidget> widgets = Screens.getButtons(screen);
-                callback.onAfterInit(client, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
+                callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
             };
         });
         registerScreenEvent(ScreenEvents.Remove.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.Remove.class, callback -> {
@@ -99,7 +124,7 @@ public final class FabricClientEventInvokers {
             return callback::onAfterMouseRelease;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseRelease);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseScroll.class, callback -> {
-            return (screen, mouseX, mouseY, horizontalAmount, verticalAmount) -> {
+            return (Screen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount) -> {
                 return callback.onBeforeMouseScroll(screen, mouseX, mouseY, horizontalAmount, verticalAmount).isPass();
             };
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseScroll);
@@ -107,7 +132,7 @@ public final class FabricClientEventInvokers {
             return callback::onAfterMouseScroll;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseScroll);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ExtraScreenMouseEvents.AllowMouseDrag.class, callback -> {
-            return (screen, mouseX, mouseY, button, dragX, dragY) -> {
+            return (Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
                 return callback.onBeforeMouseDrag(screen, mouseX, mouseY, button, dragX, dragY).isPass();
             };
         }, ExtraScreenMouseEvents::allowMouseDrag);
@@ -175,24 +200,91 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientPlayerEvents.LoggedOut.class, FabricClientEvents.PLAYER_LOGGED_OUT);
         INSTANCE.register(ClientPlayerEvents.Copy.class, FabricClientEvents.PLAYER_COPY);
         INSTANCE.register(InteractionInputEvents.Attack.class, ClientPreAttackCallback.EVENT, callback -> {
-            return (Minecraft client, LocalPlayer player, int clickCount) -> {
-                if (client.missTime <= 0 && client.hitResult != null) {
+            return (Minecraft minecraft, LocalPlayer player, int clickCount) -> {
+                if (minecraft.missTime <= 0 && minecraft.hitResult != null) {
                     if (clickCount != 0) {
                         if (!player.isHandsBusy()) {
                             ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-                            if (itemInHand.isItemEnabled(client.level.enabledFeatures())) {
-                                return callback.onAttackInteraction(client, player).isInterrupt();
+                            if (itemInHand.isItemEnabled(minecraft.level.enabledFeatures())) {
+                                return callback.onAttackInteraction(minecraft, player).isInterrupt();
                             }
                         }
                     } else {
-                        if (!player.isUsingItem() && client.hitResult.getType() == HitResult.Type.BLOCK) {
-                            if (!client.level.isEmptyBlock(((BlockHitResult) client.hitResult).getBlockPos())) {
-                                return callback.onAttackInteraction(client, player).isInterrupt();
+                        if (!player.isUsingItem() && minecraft.hitResult.getType() == HitResult.Type.BLOCK) {
+                            if (!minecraft.level.isEmptyBlock(((BlockHitResult) minecraft.hitResult).getBlockPos())) {
+                                return callback.onAttackInteraction(minecraft, player).isInterrupt();
                             }
                         }
                     }
                 }
                 return false;
+            };
+        });
+        INSTANCE.register(InteractionInputEvents.AttackV2.class, ClientPreAttackCallback.EVENT, callback -> {
+            return (Minecraft minecraft, LocalPlayer player, int clickCount) -> {
+                if (minecraft.missTime <= 0 && minecraft.hitResult != null) {
+                    if (clickCount != 0) {
+                        if (!player.isHandsBusy()) {
+                            ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+                            if (itemInHand.isItemEnabled(minecraft.level.enabledFeatures())) {
+                                return callback.onAttackInteraction(minecraft, player, minecraft.hitResult).isInterrupt();
+                            }
+                        }
+                    } else {
+                        if (!player.isUsingItem() && minecraft.hitResult.getType() == HitResult.Type.BLOCK) {
+                            if (!minecraft.level.isEmptyBlock(((BlockHitResult) minecraft.hitResult).getBlockPos())) {
+                                return callback.onAttackInteraction(minecraft, player, minecraft.hitResult).isInterrupt();
+                            }
+                        }
+                    }
+                }
+                return false;
+            };
+        });
+        INSTANCE.register(InteractionInputEvents.Use.class, UseBlockCallback.EVENT, callback -> {
+            return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
+                // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
+                // proper handling of the Fabric callback with the server-side component is implemented elsewhere
+                if (!level.isClientSide) return InteractionResult.PASS;
+                Minecraft minecraft = Minecraft.getInstance();
+                EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
+                // when interrupted cancel the interaction without the server being notified
+                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
+            };
+        }, true);
+        INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, callback -> {
+            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
+                // proper handling of the Fabric callback with the server-side component is implemented elsewhere
+                if (!level.isClientSide) return InteractionResult.PASS;
+                Minecraft minecraft = Minecraft.getInstance();
+                EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
+                // when interrupted cancel the interaction without the server being notified
+                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
+            };
+        }, true);
+        INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, callback -> {
+            return (Player player, Level level, InteractionHand hand) -> {
+                // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
+                // proper handling of the Fabric callback with the server-side component is implemented elsewhere
+                if (!level.isClientSide) return InteractionResultHolder.pass(ItemStack.EMPTY);
+                Minecraft minecraft = Minecraft.getInstance();
+                EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
+                // when interrupted cancel the interaction without the server being notified
+                return result.isInterrupt() ? InteractionResultHolder.fail(ItemStack.EMPTY) : InteractionResultHolder.pass(ItemStack.EMPTY);
+            };
+        }, true);
+        INSTANCE.register(InteractionInputEvents.Pick.class, ClientPickBlockGatherCallback.EVENT, callback -> {
+            return (Player player, HitResult hitResult) -> {
+                // add in more checks that also run on Forge
+                if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
+                    Minecraft minecraft = Minecraft.getInstance();
+                    EventResult result = callback.onPickInteraction(minecraft, (LocalPlayer) player, hitResult);
+                    // this uses a second event to filter out this custom item stack again to be able to cancel the interaction
+                    // otherwise just returning empty will do nothing and let the behavior continue
+                    return result.isInterrupt() ? INTERRUPT_PICK_ITEM_STACK : ItemStack.EMPTY;
+                }
+                return ItemStack.EMPTY;
             };
         });
         INSTANCE.register(ClientLevelEvents.Load.class, FabricClientEvents.LOAD_LEVEL);

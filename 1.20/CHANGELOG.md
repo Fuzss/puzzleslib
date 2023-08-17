@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.25-1.20.1] - 2023-08-17
+### Added
+- Added `InteractionInputEvents$AttackV2`, `InteractionInputEvents$Use` and `InteractionInputEvents$Pick`
+- Added `PlayerInteractEvents$AttackBlockV2` and `PlayerInteractEvents$UseItemV2`
+- Added a few new helper methods to `ScreenHelper`
+### Changed
+- Cleaned up small parts to the event system to reduce duplicate code
+- Revised implementation of all `PlayerInteractEvents` to match much more closely between Forge and Fabric
+
 ## [v8.0.24-1.20.1] - 2023-08-16
 ### Changed
 - Reworked implementation of `LivingDropsCallback` on Fabric to make it less likely for loot modifications from other mods to completely break all loot for a mob

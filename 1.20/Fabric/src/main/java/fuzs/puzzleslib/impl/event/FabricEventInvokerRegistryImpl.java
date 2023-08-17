@@ -5,10 +5,7 @@ import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.*;
-import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
+import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
 import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
@@ -85,6 +82,14 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
+                EventResultHolder<InteractionResult> result = callback.onAttackBlock(player, level, hand, pos, direction);
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
+                // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
+                return result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
+            };
+        });
+        INSTANCE.register(PlayerInteractEvents.AttackBlockV2.class, AttackBlockCallback.EVENT, callback -> {
+            return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
                 EventResult result = callback.onAttackBlock(player, level, hand, pos, direction);
                 // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
                 // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
@@ -102,6 +107,19 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemPacket(hand, id));
                 }
                 return holder;
+            };
+        });
+        INSTANCE.register(PlayerInteractEvents.UseItemV2.class, UseItemCallback.EVENT, callback -> {
+            return (Player player, Level level, InteractionHand hand) -> {
+                InteractionResult result = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResult.PASS);
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                if (level.isClientSide && result != InteractionResult.SUCCESS && result != InteractionResult.PASS) {
+                    // send the move packet like vanilla to ensure the position+view vectors are accurate
+                    Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
+                    // send interaction packet to the server with a new sequentially assigned id
+                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemPacket(hand, id));
+                }
+                return new InteractionResultHolder<>(result, ItemStack.EMPTY);
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, callback -> {
