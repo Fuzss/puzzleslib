@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
@@ -20,7 +19,7 @@ import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.core.FabricProxy;
-import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
+import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
@@ -38,6 +37,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
@@ -71,51 +71,61 @@ import java.util.function.Function;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
     public static final FabricEventInvokerRegistryImpl INSTANCE = new FabricEventInvokerRegistryImpl();
-    private static final Map<Class<?>, EventInvokerLike<?>> EVENT_INVOKER_LOOKUP = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
-    static {
+    public static void register() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
-                InteractionResult interactionResult = callback.onUseBlock(player, level, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
-                // this fixes an issue with Fabric Api where InteractionResult#CONSUME and InteractionResult#PARTIAL_SUCCESS when returned client-side do not trigger the server packet
-                // although InteractionResult#SUCCESS is generally desired for the client, there are cases where it is not, but the interaction should still consume
-                if (level.isClientSide && interactionResult != InteractionResult.SUCCESS && interactionResult.consumesAction()) {
+                InteractionResult result = callback.onUseBlock(player, level, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                if (level.isClientSide && result != InteractionResult.SUCCESS && result != InteractionResult.PASS) {
                     ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemOnPacket(hand, hitResult, id));
                 }
-                return interactionResult;
+                return result;
             };
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
-                return callback.onAttackBlock(player, level, hand, pos, direction).getInterrupt().orElse(InteractionResult.PASS);
+                EventResult result = callback.onAttackBlock(player, level, hand, pos, direction);
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
+                // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
+                return result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
-                InteractionResultHolder<ItemStack> result = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
-                // this fixes an issue with Fabric Api where InteractionResult#CONSUME and InteractionResult#PARTIAL_SUCCESS when returned client-side do not trigger the server packet
-                // although InteractionResult#SUCCESS is generally desired for the client, there are cases where it is not, but the interaction should still consume
-                if (level.isClientSide && result.getResult() != InteractionResult.SUCCESS && result.getResult().consumesAction()) {
+                InteractionResultHolder<ItemStack> holder = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                if (level.isClientSide && holder.getResult() != InteractionResult.SUCCESS && holder.getResult() != InteractionResult.PASS) {
                     // send the move packet like vanilla to ensure the position+view vectors are accurate
                     Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
                     // send interaction packet to the server with a new sequentially assigned id
                     ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemPacket(hand, id));
                 }
-                return result;
+                return holder;
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult != null) return InteractionResult.PASS;
-                return callback.onUseEntity(player, level, hand, entity).getInterrupt().orElse(InteractionResult.PASS);
+                InteractionResult result = callback.onUseEntity(player, level, hand, entity).getInterrupt().orElse(InteractionResult.PASS);
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                if (level.isClientSide && result == InteractionResult.FAIL) {
+                    Proxy.INSTANCE.getClientPacketListener().send(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand));
+                }
+                return result;
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult == null) return InteractionResult.PASS;
-                return callback.onUseEntityAt(player, level, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
+                InteractionResult result = callback.onUseEntityAt(player, level, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                if (level.isClientSide && result == InteractionResult.FAIL) {
+                    Proxy.INSTANCE.getClientPacketListener().send(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand, hitResult.getLocation()));
+                }
+                return result;
             };
         });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, callback -> {
@@ -300,40 +310,24 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
-        Objects.requireNonNull(clazz, "type is null");
-        EventInvokerLike<T> invokerLike = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
-        Objects.requireNonNull(invokerLike, "invoker for type %s is null".formatted(clazz));
-        EventInvoker<T> invoker = invokerLike.asEventInvoker(context);
-        Objects.requireNonNull(invoker, "invoker for type %s is null".formatted(clazz));
-        return invoker;
-    }
-
     @Override
-    public <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter) {
+    public <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(event, "event is null");
         Objects.requireNonNull(converter, "converter is null");
-        register(clazz, new FabricEventInvoker<>(event, converter));
+        EventInvokerImpl.register(clazz, new FabricEventInvoker<>(event, converter), joinInvokers);
     }
 
     @Override
-    public <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer) {
+    public <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(eventType, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        register(clazz, new FabricForwardingEventInvoker<>(converter, consumer));
+        EventInvokerImpl.register(clazz, new FabricForwardingEventInvoker<>(converter, consumer), joinInvokers);
     }
 
-    private static <T> void register(Class<T> clazz, EventInvokerLike<T> invoker) {
-        if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null) {
-            throw new IllegalArgumentException("duplicate event invoker for type %s".formatted(clazz));
-        }
-    }
-
-    private record FabricEventInvoker<T, E>(Event<E> event, Function<T, E> converter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerLike<T> {
+    private record FabricEventInvoker<T, E>(Event<E> event, Function<T, E> converter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricEventInvoker(Event<E> event, Function<T, E> converter) {
             this(event, converter, Collections.synchronizedSet(Sets.newIdentityHashSet()));
@@ -374,7 +368,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
     }
 
-    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerLike<T> {
+    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricForwardingEventInvoker(Function<T, E> converter, FabricEventContextConsumer<E> consumer) {
             this(event -> new FabricEventInvoker<>(event, converter), consumer, new MapMaker().weakKeys().makeMap());
