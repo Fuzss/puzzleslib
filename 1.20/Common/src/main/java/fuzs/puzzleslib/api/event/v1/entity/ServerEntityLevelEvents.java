@@ -22,8 +22,8 @@ public final class ServerEntityLevelEvents {
 
     }
 
-    @FunctionalInterface
     @Deprecated(forRemoval = true)
+    @FunctionalInterface
     public interface Load {
 
         /**

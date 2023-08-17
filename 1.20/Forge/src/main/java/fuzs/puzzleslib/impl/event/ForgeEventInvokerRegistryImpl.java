@@ -79,6 +79,12 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
+            EventResultHolder<InteractionResult> result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
+            if (result.isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(PlayerInteractEvents.AttackBlockV2.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlockV2 callback, PlayerInteractEvent.LeftClickBlock evt) -> {
             EventResult result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
             if (result.isInterrupt()) {
                 evt.setCanceled(true);
@@ -88,6 +94,15 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
             Optional<InteractionResult> optional = result.getInterrupt().map(InteractionResultHolder::getResult).filter(t -> t != InteractionResult.PASS);
+            if (optional.isPresent()) {
+                evt.setCancellationResult(optional.get());
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(PlayerInteractEvents.UseItemV2.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItemV2 callback, PlayerInteractEvent.RightClickItem evt) -> {
+            EventResultHolder<InteractionResult> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
+            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
+            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
             if (optional.isPresent()) {
                 evt.setCancellationResult(optional.get());
                 evt.setCanceled(true);
