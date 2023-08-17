@@ -3,14 +3,21 @@ package fuzs.puzzleslib.impl.client.event;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerInteractEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -156,7 +163,8 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel()).isInterrupt()) {
+            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
+            if (result.isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -239,13 +247,67 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(InteractionInputEvents.Attack.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Attack callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
             if (!evt.isAttack()) return;
             Minecraft minecraft = Minecraft.getInstance();
-            if (callback.onAttackInteraction(minecraft, minecraft.player).isInterrupt()) {
+            EventResult result = callback.onAttackInteraction(minecraft, minecraft.player);
+            if (result.isInterrupt()) {
                 // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
                 // just manually send swing hand packet if necessary
                 evt.setSwingHand(false);
                 evt.setCanceled(true);
             }
         });
+        INSTANCE.register(InteractionInputEvents.Use.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Use callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
+            if (!evt.isUseItem()) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            EventResult result = callback.onUseInteraction(minecraft, minecraft.player);
+            if (result.isInterrupt()) {
+                // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
+                // just manually send swing hand packet if necessary
+                evt.setSwingHand(false);
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(PlayerInteractEvents.UseEntity.class, InputEvent.InteractionKeyMappingTriggered.class, (PlayerInteractEvents.UseEntity callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
+            if (!evt.isUseItem()) return;
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.player.getItemInHand(evt.getHand()).isItemEnabled(minecraft.level.enabledFeatures())) {
+                if (minecraft.hitResult != null && minecraft.hitResult.getType() == HitResult.Type.ENTITY) {
+                    EntityHitResult hitResult = (EntityHitResult) minecraft.hitResult;
+                    Entity entity = hitResult.getEntity();
+                    if (minecraft.level.getWorldBorder().isWithinBounds(entity.blockPosition())) {
+                        Vec3 hitVector = hitResult.getLocation().subtract(entity.position());
+                        // calling this here is a little risky, but it shouldn't trigger any behavior client-side anyway, so we are hopefully good
+                        if (!entity.interactAt(minecraft.player, hitVector, evt.getHand()).consumesAction()) {
+                            EventResultHolder<InteractionResult> result = callback.onUseEntity(minecraft.player, minecraft.level, evt.getHand(), entity);
+                            if (result.isInterrupt()) {
+                                evt.setSwingHand(false);
+                                evt.setCanceled(true);
+                            }
+                        }
+                    }
+                }
+            }
+        }, true);
+        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, InputEvent.InteractionKeyMappingTriggered.class, (PlayerInteractEvents.UseEntityAt callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
+            if (!evt.isUseItem()) return;
+            // Forge runs PlayerInteractEvent.EntityInteractSpecific after the interaction packet to the server has already been sent, but we want to suppress the server being notified when the event is cancelled on the client,
+            // so we only use PlayerInteractEvent.EntityInteractSpecific server-side, and rely on this approach client-side which can be interrupted before the server is notified
+            // this is the
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.player.getItemInHand(evt.getHand()).isItemEnabled(minecraft.level.enabledFeatures())) {
+                if (minecraft.hitResult != null && minecraft.hitResult.getType() == HitResult.Type.ENTITY) {
+                    EntityHitResult hitResult = (EntityHitResult) minecraft.hitResult;
+                    Entity entity = hitResult.getEntity();
+                    if (minecraft.level.getWorldBorder().isWithinBounds(entity.blockPosition())) {
+                        Vec3 hitVector = hitResult.getLocation().subtract(entity.position());
+                        EventResultHolder<InteractionResult> result = callback.onUseEntityAt(minecraft.player, minecraft.level, evt.getHand(), entity, hitVector);
+                        if (result.isInterrupt()) {
+                            evt.setSwingHand(false);
+                            evt.setCanceled(true);
+                        }
+                    }
+                }
+            }
+        }, true);
         INSTANCE.register(ClientLevelEvents.Load.class, LevelEvent.Load.class, (ClientLevelEvents.Load callback, LevelEvent.Load evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onLevelLoad(Minecraft.getInstance(), level);

@@ -21,7 +21,21 @@ public interface ForgeEventInvokerRegistry {
      * @param <E>       Forge event type
      */
     default <T, E extends Event> void register(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
-        this.register(clazz, event, (T callback, E evt, Object context) -> converter.accept(callback, evt));
+        this.register(clazz, event, (T callback, E evt, Object context) -> converter.accept(callback, evt), false);
+    }
+
+    /**
+     * Registers an event.
+     *
+     * @param clazz        common event functional interface class
+     * @param event        Forge event implementation
+     * @param converter    passes parameters from the Forge event to the common event instance
+     * @param joinInvokers join this new event invoker with a possibly already existing one, otherwise an exception will be thrown when registering duplicates
+     * @param <T>          common event type
+     * @param <E>          Forge event type
+     */
+    default <T, E extends Event> void register(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter, boolean joinInvokers) {
+        this.register(clazz, event, (T callback, E evt, Object context) -> converter.accept(callback, evt), joinInvokers);
     }
 
     /**
@@ -33,7 +47,21 @@ public interface ForgeEventInvokerRegistry {
      * @param <T>       common event type
      * @param <E>       Forge event type
      */
-    <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter);
+    default <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter) {
+        this.register(clazz, event, converter, false);
+    }
+
+    /**
+     * Registers an event.
+     *
+     * @param clazz        common event functional interface class
+     * @param event        Forge event implementation
+     * @param converter    passes parameters from the Forge event to the common event instance, including a context
+     * @param joinInvokers join this new event invoker with a possibly already existing one, otherwise an exception will be thrown when registering duplicates
+     * @param <T>          common event type
+     * @param <E>          Forge event type
+     */
+    <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter, boolean joinInvokers);
 
     /**
      * A helper context for dealing with context based {@link EventInvoker} implementations.

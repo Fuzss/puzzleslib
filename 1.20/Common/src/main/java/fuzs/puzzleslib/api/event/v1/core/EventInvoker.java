@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import com.google.common.base.Suppliers;
+import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Supplier;
 
 /**
  * Main event class for common events.
@@ -35,18 +38,8 @@ public interface EventInvoker<T> {
      */
     static <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
         // due to static initializers the invoker might not be present in the lookup just yet, so use memoization instead
-        return new EventInvoker<>() {
-            @Nullable
-            private EventInvoker<T> invoker;
-
-            @Override
-            public void register(EventPhase phase, T callback) {
-                if (this.invoker == null) {
-                    this.invoker = CommonFactories.INSTANCE.getEventInvoker(clazz, context);
-                }
-                this.invoker.register(phase, callback);
-            }
-        };
+        Supplier<EventInvoker<T>> invoker = Suppliers.memoize(() -> EventInvokerImpl.lookup(clazz, context));
+        return (EventPhase phase, T callback) -> invoker.get().register(phase, callback);
     }
 
     /**

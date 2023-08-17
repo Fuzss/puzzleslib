@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.event;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
@@ -16,7 +15,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
-import fuzs.puzzleslib.impl.event.core.EventInvokerLike;
+import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -61,48 +60,54 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
     public static final ForgeEventInvokerRegistryImpl INSTANCE = new ForgeEventInvokerRegistryImpl();
-    private static final Map<Class<?>, EventInvokerLike<?>> EVENT_INVOKER_LOOKUP = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
-    static {
+    public static void register() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getHitVec());
-            if (result.isInterrupt()) {
-                evt.setCancellationResult(result.getInterrupt().orElseThrow());
+            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
+            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
+            if (optional.isPresent()) {
+                evt.setCancellationResult(optional.get());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
+            EventResult result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
             if (result.isInterrupt()) {
-                evt.setCancellationResult(result.getInterrupt().orElseThrow());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
             EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
-            if (result.isInterrupt()) {
-                evt.setCancellationResult(result.getInterrupt().orElseThrow().getResult());
+            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
+            Optional<InteractionResult> optional = result.getInterrupt().map(InteractionResultHolder::getResult).filter(t -> t != InteractionResult.PASS);
+            if (optional.isPresent()) {
+                evt.setCancellationResult(optional.get());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, PlayerInteractEvent.EntityInteract.class, (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseEntity(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget());
-            if (result.isInterrupt()) {
-                evt.setCancellationResult(result.getInterrupt().orElseThrow());
+            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
+            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
+            if (optional.isPresent()) {
+                evt.setCancellationResult(optional.get());
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, PlayerInteractEvent.EntityInteractSpecific.class, (PlayerInteractEvents.UseEntityAt callback, PlayerInteractEvent.EntityInteractSpecific evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseEntityAt(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget(), evt.getLocalPos());
-            if (result.isInterrupt()) {
-                evt.setCancellationResult(result.getInterrupt().orElseThrow());
+            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
+            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
+            if (optional.isPresent()) {
+                evt.setCancellationResult(optional.get());
                 evt.setCanceled(true);
             }
         });
@@ -510,18 +515,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         }
     }
 
-    @SuppressWarnings("unchecked")
-    public <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
-        Objects.requireNonNull(clazz, "type is null");
-        EventInvokerLike<T> invokerLike = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
-        Objects.requireNonNull(invokerLike, "invoker for type %s is null".formatted(clazz));
-        EventInvoker<T> invoker = invokerLike.asEventInvoker(context);
-        Objects.requireNonNull(invoker, "invoker for type %s is null".formatted(clazz));
-        return invoker;
-    }
-
     @Override
-    public <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter) {
+    public <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(converter, "converter is null");
         IEventBus eventBus;
@@ -532,16 +527,10 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         } else {
             eventBus = MinecraftForge.EVENT_BUS;
         }
-        register(clazz, new ForgeEventInvoker<>(eventBus, event, converter));
+        EventInvokerImpl.register(clazz, new ForgeEventInvoker<>(eventBus, event, converter), joinInvokers);
     }
 
-    private static <T> void register(Class<T> clazz, EventInvokerLike<T> invoker) {
-        if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null) {
-            throw new IllegalArgumentException("duplicate event invoker for type %s".formatted(clazz));
-        }
-    }
-
-    private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvokerLike<T> {
+    private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvokerImpl.EventInvokerLike<T> {
         private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = Map.of(EventPhase.FIRST, EventPriority.HIGHEST, EventPhase.BEFORE, EventPriority.HIGH, EventPhase.DEFAULT, EventPriority.NORMAL, EventPhase.AFTER, EventPriority.LOW, EventPhase.LAST, EventPriority.LOWEST);
 
         @Override
