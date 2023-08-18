@@ -101,12 +101,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                if (hitResult != null) return InteractionResult.PASS;
+                // this breaks this event on 1.18.2 as the Fabric event only runs for Entity::interactAt which always has a hit result
+                // this is different in 1.19+ where the hit result will be null when the Fabric event runs for Entity::interact
+//                if (hitResult != null) return InteractionResult.PASS;
                 return callback.onUseEntity(player, level, hand, entity).getInterrupt().orElse(InteractionResult.PASS);
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                // this check is not necessary on 1.18.2 as the Fabric event only runs for Entity::interactAt which always has a hit result
                 if (hitResult == null) return InteractionResult.PASS;
                 return callback.onUseEntityAt(player, level, hand, entity, hitResult.getLocation()).getInterrupt().orElse(InteractionResult.PASS);
             };

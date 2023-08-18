@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -73,6 +74,17 @@ public interface CreativeModeTabConfigurator {
      * @return builder instance
      */
     CreativeModeTabConfigurator icons(Supplier<ItemStack[]> icons);
+
+    /**
+     * fill this tab with custom items, fully overrides vanilla, useful for sorting purposes.
+     * <p>This overload exists purely for convenience when porting from 1.20+ where this method takes a BiConsumer, too.
+     *
+     * @return builder instance
+     */
+    @Deprecated
+    default CreativeModeTabConfigurator displayItems(BiConsumer<Object, DisplayItemsOutput> displayItemsGenerator) {
+        return this.displayItems(displayItemsOutput -> displayItemsGenerator.accept(null, displayItemsOutput));
+    }
 
     /**
      * fill this tab with custom items, fully overrides vanilla, useful for sorting purposes
