@@ -22,22 +22,25 @@ abstract class PersistentEntitySectionManagerFabricMixin<T extends EntityAccess>
             MobSpawnType spawnType = entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
             if (FabricEntityEvents.ENTITY_LOAD.invoker().onEntityLoad(entity, (ServerLevel) entity.level(), !loadedFromDisk ? spawnType : null).isInterrupt()) {
                 if (entity instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
                 } else {
                     callback.setReturnValue(false);
                 }
             }
-            if (loadedFromDisk) {
-                if (FabricEntityEvents.ENTITY_LOAD_V2.invoker().onEntityLoad(entity, (ServerLevel) entity.level()).isInterrupt()) {
-                    if (entity instanceof Player) {
-                        throw new UnsupportedOperationException("Cannot prevent player from loading in!");
-                    } else {
-                        callback.setReturnValue(false);
-                    }
+            if (FabricEntityEvents.ENTITY_LOAD_V2.invoker().onEntityLoad(entity, (ServerLevel) entity.level()).isInterrupt()) {
+                if (entity instanceof Player) {
+                    // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
+                    throw new UnsupportedOperationException("Cannot prevent player from loading in!");
+                } else {
+                    callback.setReturnValue(false);
+                    return;
                 }
-            } else {
+            }
+            if (!loadedFromDisk) {
                 if (FabricEntityEvents.ENTITY_SPAWN.invoker().onEntitySpawn(entity, (ServerLevel) entity.level(), spawnType).isInterrupt()) {
                     if (entity instanceof Player) {
+                        // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                         throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
                     } else {
                         callback.setReturnValue(false);

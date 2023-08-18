@@ -46,7 +46,7 @@ public final class ServerEntityLevelEvents {
     public interface LoadV2 {
 
         /**
-         * Fired when an entity is added to the level on the server after it has been loaded from chunk storage.
+         * Fired when an entity is added to the level on the server, either when being loaded from chunk storage or when just having been spawned in.
          *
          * @param entity         the entity that is being loaded
          * @param level          the level the entity is loaded in
@@ -60,11 +60,11 @@ public final class ServerEntityLevelEvents {
     public interface Spawn {
 
         /**
-         * Fired when an entity is added to the level on the server after it has just been spawned in.
+         * Fired when an entity is added to the level on the server when it has just been spawned in.
          *
          * @param entity         the entity that is being spawned
          * @param level          the level the entity is spawned in
-         * @param spawnType      this provides the spawn type which has been set in {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)} if it has been called, otherwise <code>null</code>
+         * @param spawnType      this provides the spawn type which has been captured in {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)} if it has been called, otherwise <code>null</code>
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively discarding it,
          * {@link EventResult#PASS} for the entity to be added normally
          */

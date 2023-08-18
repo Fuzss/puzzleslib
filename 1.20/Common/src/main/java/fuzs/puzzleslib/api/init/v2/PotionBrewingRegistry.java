@@ -12,10 +12,6 @@ import net.minecraft.world.item.crafting.Ingredient;
  * Forge uses a whole different system based on {@link Ingredient}, which does not allow specifying {@link Potion}s as vanilla does.
  */
 public interface PotionBrewingRegistry {
-    /**
-     * The singleton instance of the decorator registry.
-     * Use this instance to call the methods in this interface.
-     */
     PotionBrewingRegistry INSTANCE = CommonFactories.INSTANCE.getPotionBrewingRegistry();
 
     /**
@@ -42,6 +38,7 @@ public interface PotionBrewingRegistry {
 
     /**
      * Register an item that can hold potions.
+     * <p>We don't take an {@link Ingredient} here as Fabric natively doesn't support that and there isn't really much point to it.
      *
      * @param container the potion container item
      */

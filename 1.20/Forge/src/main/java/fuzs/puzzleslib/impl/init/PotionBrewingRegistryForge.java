@@ -3,84 +3,42 @@ package fuzs.puzzleslib.impl.init;
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.mixin.accessor.PotionBrewingForgeAccessor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionBrewing;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.brewing.BrewingRecipeRegistry;
-import net.minecraftforge.common.brewing.VanillaBrewingRecipe;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.Objects;
-import java.util.Optional;
 
+/**
+ * We do not use Forge's {@link net.minecraftforge.common.brewing.BrewingRecipeRegistry},
+ * as recipes added there are not fully supported by recipe viewer mods such as JEI.
+ */
 public final class PotionBrewingRegistryForge implements PotionBrewingRegistry {
 
     @Override
     public void registerContainerRecipe(PotionItem from, Ingredient ingredient, PotionItem to) {
-        Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(from, "from item is null");
+        Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(to, "to item is null");
-        BrewingRecipeRegistry.addRecipe(new MixBrewingRecipe<>(ForgeRegistries.ITEMS, from, ingredient, to) {
-
-            @Override
-            Optional<ItemStack> mix(PotionBrewing.Mix<Item> mix, ItemStack ingredient, Potion potion, Item item) {
-                if (mix.from.get() == item && mix.ingredient.test(ingredient)) {
-                    return Optional.of(PotionUtils.setPotion(new ItemStack(mix.to.get()), potion));
-                }
-                return Optional.empty();
-            }
-        });
+        PotionBrewing.Mix<Item> mix = new PotionBrewing.Mix<>(ForgeRegistries.ITEMS, from, ingredient, to);
+        PotionBrewingForgeAccessor.puzzleslib$getContainerMixes().add(mix);
     }
 
     @Override
-    public synchronized void registerPotionContainer(PotionItem container) {
-        Objects.requireNonNull(container, "container is null");
-        PotionBrewingForgeAccessor.puzzleslib$getAllowedContainers().add(Ingredient.of(container));
+    public void registerPotionContainer(PotionItem container) {
+        Objects.requireNonNull(container, "container item is null");
+        Ingredient ingredient = Ingredient.of(container);
+        PotionBrewingForgeAccessor.puzzleslib$getAllowedContainers().add(ingredient);
     }
 
     @Override
     public void registerPotionRecipe(Potion from, Ingredient ingredient, Potion to) {
-        Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(from, "from potion is null");
+        Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(to, "to potion is null");
-        BrewingRecipeRegistry.addRecipe(new MixBrewingRecipe<>(ForgeRegistries.POTIONS, from, ingredient, to) {
-
-            @Override
-            Optional<ItemStack> mix(PotionBrewing.Mix<Potion> mix, ItemStack ingredient, Potion potion, Item item) {
-                if (mix.from.get() == potion && mix.ingredient.test(ingredient)) {
-                    return Optional.of(PotionUtils.setPotion(new ItemStack(item), mix.to.get()));
-                }
-                return Optional.empty();
-            }
-        });
-    }
-
-    private static abstract class MixBrewingRecipe<T> extends VanillaBrewingRecipe {
-        private final PotionBrewing.Mix<T> mix;
-
-        public MixBrewingRecipe(IForgeRegistry<T> registry, T from, Ingredient ingredient, T to) {
-            this.mix = new PotionBrewing.Mix<>(registry, from, ingredient, to);
-        }
-
-        @Override
-        public boolean isIngredient(ItemStack stack) {
-            return this.mix.ingredient.test(stack);
-        }
-
-        @Override
-        public ItemStack getOutput(ItemStack input, ItemStack ingredient) {
-            if (!input.isEmpty()) {
-                Potion potion = PotionUtils.getPotion(input);
-                Item item = input.getItem();
-                return this.mix(this.mix, ingredient, potion, item).orElse(ItemStack.EMPTY);
-            }
-            return ItemStack.EMPTY;
-        }
-
-        abstract Optional<ItemStack> mix(PotionBrewing.Mix<T> mix, ItemStack ingredient, Potion potion, Item item);
+        PotionBrewing.Mix<Potion> mix = new PotionBrewing.Mix<>(ForgeRegistries.POTIONS, from, ingredient, to);
+        PotionBrewingForgeAccessor.puzzleslib$getPotionMixes().add(mix);
     }
 }
