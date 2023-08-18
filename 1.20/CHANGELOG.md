@@ -11,6 +11,9 @@ The format is based on [Keep a Changelog].
 ### Changed
 - Cleaned up small parts to the event system to reduce duplicate code
 - Revised implementation of all `PlayerInteractEvents` to match much more closely between Forge and Fabric
+- `ServerEntityLevelEvents$LoadV2` now fires for all loaded entities, not just when they are loaded from chunk storage, but also when they are freshly spawned in
+### Fixed
+- Fixed brewing recipes not showing in some recipe viewer mods on Forge
 
 ## [v8.0.24-1.20.1] - 2023-08-16
 ### Changed
