@@ -43,6 +43,7 @@
     "ThrowableProjectileFabricMixin",
     "WolfFabricMixin",
     "accessor.PackRepositoryFabricAccessor",
+    "accessor.ReferenceAccessor",
     "accessor.WeightedRandomListFabricAccessor"
   ],
   "client": [

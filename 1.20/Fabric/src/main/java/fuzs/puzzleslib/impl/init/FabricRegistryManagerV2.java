@@ -23,9 +23,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public final class FabricRegistryManager extends RegistryManagerImpl {
+public final class FabricRegistryManagerV2 extends RegistryManagerV2Impl {
 
-    public FabricRegistryManager(String modId) {
+    public FabricRegistryManagerV2(String modId) {
         super(modId);
     }
 

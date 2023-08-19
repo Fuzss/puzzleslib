@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public final class ForgeRegistryManager extends RegistryManagerImpl {
+public final class ForgeRegistryManagerV2 extends RegistryManagerV2Impl {
     private final IEventBus eventBus;
     private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> deferredRegisters = Maps.newIdentityHashMap();
 
-    public ForgeRegistryManager(String modId) {
+    public ForgeRegistryManagerV2(String modId) {
         super(modId);
         this.eventBus = ModContainerHelper.findModEventBus(modId).orElseThrow();
     }

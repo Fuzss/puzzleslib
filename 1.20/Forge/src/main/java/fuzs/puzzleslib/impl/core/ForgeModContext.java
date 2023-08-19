@@ -7,7 +7,8 @@ import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ForgeCapabilityController;
 import fuzs.puzzleslib.impl.config.ForgeConfigHolderImpl;
-import fuzs.puzzleslib.impl.init.ForgeRegistryManager;
+import fuzs.puzzleslib.impl.init.ForgeRegistryManagerV2;
+import fuzs.puzzleslib.impl.init.ForgeRegistryManagerV3;
 import fuzs.puzzleslib.impl.network.NetworkHandlerForgeV2;
 import fuzs.puzzleslib.impl.network.NetworkHandlerForgeV3;
 
@@ -33,11 +34,19 @@ public final class ForgeModContext extends ModContext {
     }
 
     @Override
-    public RegistryManager getRegistryManager() {
-        if (this.registryManager == null) {
-            this.registryManager = new ForgeRegistryManager(this.modId);
+    public RegistryManager getRegistryManagerV2() {
+        if (this.registryManagerV2 == null) {
+            this.registryManagerV2 = new ForgeRegistryManagerV2(this.modId);
         }
-        return this.registryManager;
+        return this.registryManagerV2;
+    }
+
+    @Override
+    public fuzs.puzzleslib.api.init.v3.RegistryManager getRegistryManagerV3() {
+        if (this.registryManagerV3 == null) {
+            this.registryManagerV3 = new ForgeRegistryManagerV3(this.modId);
+        }
+        return this.registryManagerV3;
     }
 
     @Override

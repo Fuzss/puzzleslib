@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.26-1.20.1] - 2023-08-19
+### Added
+- Added a new separate `RegistryManager` that returns instances of `Holder.Reference` instead of our own `RegistryReference` implementation to be more inline with the vanilla registration system
+
 ## [v8.0.25-1.20.1] - 2023-08-17
 ### Added
 - Added `InteractionInputEvents$AttackV2`, `InteractionInputEvents$Use` and `InteractionInputEvents$Pick`

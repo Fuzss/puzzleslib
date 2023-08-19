@@ -15,11 +15,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public abstract class RegistryManagerImpl implements RegistryManager {
+public abstract class RegistryManagerV2Impl implements RegistryManager {
     protected final String modId;
     protected Set<ModLoader> allowedModLoaders = EnumSet.allOf(ModLoader.class);
 
-    protected RegistryManagerImpl(String modId) {
+    protected RegistryManagerV2Impl(String modId) {
         this.modId = modId;
     }
 
