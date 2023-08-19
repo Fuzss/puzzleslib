@@ -29,7 +29,8 @@ public abstract class ModContext {
     private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
     private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
     protected final AtomicInteger networkHandlers = new AtomicInteger();
-    @Nullable RegistryManager registryManager;
+    @Nullable RegistryManager registryManagerV2;
+    @Nullable fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
     @Nullable CapabilityController capabilityController;
 
     ModContext(String modId) {
@@ -57,7 +58,9 @@ public abstract class ModContext {
 
     public abstract ConfigHolder.Builder getConfigHolder$Builder();
 
-    public abstract RegistryManager getRegistryManager();
+    public abstract RegistryManager getRegistryManagerV2();
+
+    public abstract fuzs.puzzleslib.api.init.v3.RegistryManager getRegistryManagerV3();
 
     public abstract CapabilityController getCapabilityController();
 

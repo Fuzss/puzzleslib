@@ -15,6 +15,14 @@ public interface PotionBrewingRegistry {
     PotionBrewingRegistry INSTANCE = CommonFactories.INSTANCE.getPotionBrewingRegistry();
 
     /**
+     * Register an item that can hold potions.
+     * <p>We don't take an {@link Ingredient} here as Fabric natively doesn't support that and there isn't really much point to it.
+     *
+     * @param container the potion container item
+     */
+    void registerPotionContainer(PotionItem container);
+
+    /**
      * Register a brewing stand recipe that converts a potion item container to another form, the potion inside will stay the same.
      * E.g. in vanilla convert a normal potion to a splash potion by adding gunpowder.
      *
@@ -35,14 +43,6 @@ public interface PotionBrewingRegistry {
      * @param to         the output potion container item
      */
     void registerContainerRecipe(PotionItem from, Ingredient ingredient, PotionItem to);
-
-    /**
-     * Register an item that can hold potions.
-     * <p>We don't take an {@link Ingredient} here as Fabric natively doesn't support that and there isn't really much point to it.
-     *
-     * @param container the potion container item
-     */
-    void registerPotionContainer(PotionItem container);
 
     /**
      * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay the same.

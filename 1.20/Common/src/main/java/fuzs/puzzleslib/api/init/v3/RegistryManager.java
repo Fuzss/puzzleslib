@@ -1,10 +1,10 @@
-package fuzs.puzzleslib.api.init.v2;
+package fuzs.puzzleslib.api.init.v3;
 
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
-import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
@@ -54,8 +54,21 @@ public interface RegistryManager {
      * @param modId namespace used for registration
      * @return mod specific registry manager
      */
-    static RegistryManager instant(String modId) {
-        return ModContext.get(modId).getRegistryManagerV2();
+    static RegistryManager from(String modId) {
+        return ModContext.get(modId).getRegistryManagerV3();
+    }
+
+    /**
+     * Creates a new {@link ResourceKey} for a provided registry from the given <code>path</code>.
+     *
+     * @param registryKey key for registry to create {@link ResourceKey} for
+     * @param path        path for new entry
+     * @param <T>         registry type
+     * @return {@link ResourceKey} for <code>path</code>
+     */
+    @SuppressWarnings("unchecked")
+    default <T> ResourceKey<T> makeResourceKey(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
+        return ResourceKey.create((ResourceKey<Registry<T>>) registryKey, this.makeKey(path));
     }
 
     /**
@@ -91,9 +104,7 @@ public interface RegistryManager {
      * @param <T>         registry type
      * @return new placeholder registry object
      */
-    default <T> RegistryReference<T> placeholder(final ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        return RegistryReference.placeholder(registryKey, this.makeKey(path));
-    }
+    <T> Holder.Reference<T> getHolder(ResourceKey<? extends Registry<? super T>> registryKey, String path);
 
     /**
      * register any type of registry entry with a path
@@ -104,7 +115,7 @@ public interface RegistryManager {
      * @param <T>         registry type
      * @return new registry object
      */
-    <T> RegistryReference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
+    <T> Holder.Reference<T> register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 
     /**
      * register block entry with a path
@@ -113,7 +124,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      */
-    default RegistryReference<Block> registerBlock(String path, Supplier<Block> entry) {
+    default Holder.Reference<Block> registerBlock(String path, Supplier<Block> entry) {
         return this.register(Registries.BLOCK, path, entry);
     }
 
@@ -124,7 +135,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      */
-    default RegistryReference<Item> registerItem(String path, Supplier<Item> entry) {
+    default Holder.Reference<Item> registerItem(String path, Supplier<Item> entry) {
         return this.register(Registries.ITEM, path, entry);
     }
 
@@ -134,7 +145,7 @@ public interface RegistryManager {
      * @param blockReference reference for block to register item variant for
      * @return registry object for the new block item
      */
-    default RegistryReference<Item> registerBlockItem(RegistryReference<Block> blockReference) {
+    default Holder.Reference<Item> registerBlockItem(Holder.Reference<Block> blockReference) {
         return this.registerBlockItem(blockReference, new Item.Properties());
     }
 
@@ -145,8 +156,8 @@ public interface RegistryManager {
      * @param itemProperties properties for item
      * @return registry object for the new block item
      */
-    default RegistryReference<Item> registerBlockItem(RegistryReference<Block> blockReference, Item.Properties itemProperties) {
-        return this.registerItem(blockReference.getResourceLocation().getPath(), () -> new BlockItem(blockReference.get(), itemProperties));
+    default Holder.Reference<Item> registerBlockItem(Holder.Reference<Block> blockReference, Item.Properties itemProperties) {
+        return this.registerItem(blockReference.key().location().getPath(), () -> new BlockItem(blockReference.value(), itemProperties));
     }
 
     /**
@@ -157,7 +168,7 @@ public interface RegistryManager {
      * @param highlightColor      spots color pf the spawn egg item
      * @return registry reference for the new spawn egg item
      */
-    default RegistryReference<Item> registerSpawnEggItem(RegistryReference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor) {
+    default Holder.Reference<Item> registerSpawnEggItem(Holder.Reference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor) {
         return this.registerSpawnEggItem(entityTypeReference, backgroundColor, highlightColor, new Item.Properties());
     }
 
@@ -170,7 +181,7 @@ public interface RegistryManager {
      * @param itemProperties      properties for the item
      * @return registry reference for the new spawn egg item
      */
-    RegistryReference<Item> registerSpawnEggItem(RegistryReference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
+    Holder.Reference<Item> registerSpawnEggItem(Holder.Reference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
 
     /**
      * register fluid entry with a path
@@ -179,7 +190,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      */
-    default RegistryReference<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
+    default Holder.Reference<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
         return this.register(Registries.FLUID, path, entry);
     }
 
@@ -190,7 +201,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      */
-    default RegistryReference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
+    default Holder.Reference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
         return this.register(Registries.MOB_EFFECT, path, entry);
     }
 
@@ -200,7 +211,7 @@ public interface RegistryManager {
      * @param path path for new entry
      * @return new registry object
      */
-    default RegistryReference<SoundEvent> registerSoundEvent(String path) {
+    default Holder.Reference<SoundEvent> registerSoundEvent(String path) {
         return this.register(Registries.SOUND_EVENT, path, () -> SoundEvent.createVariableRangeEvent(this.makeKey(path)));
     }
 
@@ -211,7 +222,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      */
-    default RegistryReference<Potion> registerPotion(String path, Supplier<Potion> entry) {
+    default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> entry) {
         return this.register(Registries.POTION, path, entry);
     }
 
@@ -222,7 +233,7 @@ public interface RegistryManager {
      * @param entry supplier for entry to register
      * @return new registry object
      */
-    default RegistryReference<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
+    default Holder.Reference<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
         return this.register(Registries.ENCHANTMENT, path, entry);
     }
 
@@ -235,7 +246,7 @@ public interface RegistryManager {
      * @return new registry object
      */
     @SuppressWarnings("unchecked")
-    default <T extends Entity> RegistryReference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
+    default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
         return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE, path, () -> entry.get().build(path));
     }
 
@@ -248,7 +259,7 @@ public interface RegistryManager {
      * @return new registry object
      */
     @SuppressWarnings("unchecked")
-    default <T extends BlockEntity> RegistryReference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE, path, () -> entry.get().build(null));
     }
 
@@ -261,7 +272,7 @@ public interface RegistryManager {
      * @return new registry object
      */
     @SuppressWarnings("unchecked")
-    default <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
+    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new MenuType<>(entry.get(), FeatureFlags.DEFAULT_FLAGS));
     }
 
@@ -273,19 +284,7 @@ public interface RegistryManager {
      * @param <T>   container menu type
      * @return new registry object
      */
-    <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
-
-    /**
-     * register poi type from custom builder
-     *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @return new registry object
-     *
-     * @deprecated migrate to {@link #registerPoiType(String, Supplier)}
-     */
-    @Deprecated(forRemoval = true)
-    RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry);
+    <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
 
     /**
      * Creates and registers a new poi type entry.
@@ -294,7 +293,7 @@ public interface RegistryManager {
      * @param blocks blocks valid for this poi type
      * @return new registry object
      */
-    default RegistryReference<PoiType> registerPoiType(String path, Supplier<Set<Block>> blocks) {
+    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<Block>> blocks) {
         return this.registerPoiType(path, () -> blocks.get().stream().flatMap(t -> t.getStateDefinition().getPossibleStates().stream()).collect(Collectors.toSet()), 0, 1);
     }
 
@@ -307,7 +306,7 @@ public interface RegistryManager {
      * @param validRange     distance to search for this poi type
      * @return new registry object
      */
-    RegistryReference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange);
+    Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange);
 
     /**
      * register a new type of recipe
@@ -316,7 +315,7 @@ public interface RegistryManager {
      * @param <T>  recipe type
      * @return new registry object
      */
-    default <T extends Recipe<?>> RegistryReference<RecipeType<T>> registerRecipeType(String path) {
+    default <T extends Recipe<?>> Holder.Reference<RecipeType<T>> registerRecipeType(String path) {
         return this.register(Registries.RECIPE_TYPE, path, () -> new RecipeType<>() {
             private final String id = RegistryManager.this.makeKey(path).toString();
 
@@ -334,7 +333,7 @@ public interface RegistryManager {
      * @param notificationRadius range in blocks in which this event will be listened to
      * @return new registry object
      */
-    default RegistryReference<GameEvent> registerGameEvent(String path, int notificationRadius) {
+    default Holder.Reference<GameEvent> registerGameEvent(String path, int notificationRadius) {
         return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(path, notificationRadius));
     }
 
@@ -344,8 +343,18 @@ public interface RegistryManager {
      * @param path path for new entry
      * @return new registry object
      */
-    default RegistryReference<SimpleParticleType> registerParticleType(String path) {
+    default Holder.Reference<SimpleParticleType> registerParticleType(String path) {
         return this.register(Registries.PARTICLE_TYPE, path, () -> new SimpleParticleType(false));
+    }
+
+    /**
+     * Creates a new {@link ResourceKey} for a {@link DamageType}.
+     *
+     * @param path path for new resource key
+     * @return new {@link ResourceKey}
+     */
+    default ResourceKey<DamageType> registerDamageType(String path) {
+        return this.makeResourceKey(Registries.DAMAGE_TYPE, path);
     }
 
     /**
@@ -356,7 +365,7 @@ public interface RegistryManager {
      * @param <T>         registry type
      * @return new tag key
      */
-    default <T> TagKey<T> registerTag(final ResourceKey<? extends Registry<T>> registryKey, String path) {
+    default <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
         return TagKey.create(registryKey, this.makeKey(path));
     }
 
@@ -367,7 +376,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Block> registerBlockTag(String path) {
-        return this.registerTag(Registries.BLOCK, path);
+        return this.registerTagKey(Registries.BLOCK, path);
     }
 
     /**
@@ -377,7 +386,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Item> registerItemTag(String path) {
-        return this.registerTag(Registries.ITEM, path);
+        return this.registerTagKey(Registries.ITEM, path);
     }
 
     /**
@@ -387,7 +396,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<EntityType<?>> registerEntityTypeTag(String path) {
-        return this.registerTag(Registries.ENTITY_TYPE, path);
+        return this.registerTagKey(Registries.ENTITY_TYPE, path);
     }
 
     /**
@@ -397,7 +406,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<GameEvent> registerGameEventTag(String path) {
-        return this.registerTag(Registries.GAME_EVENT, path);
+        return this.registerTagKey(Registries.GAME_EVENT, path);
     }
 
     /**
@@ -407,7 +416,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<DamageType> registerDamageTypeTag(String path) {
-        return this.registerTag(Registries.DAMAGE_TYPE, path);
+        return this.registerTagKey(Registries.DAMAGE_TYPE, path);
     }
 
     /**
@@ -417,7 +426,7 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Enchantment> registerEnchantmentTag(String path) {
-        return this.registerTag(Registries.ENCHANTMENT, path);
+        return this.registerTagKey(Registries.ENCHANTMENT, path);
     }
 
     /**
@@ -427,29 +436,6 @@ public interface RegistryManager {
      * @return new tag key
      */
     default TagKey<Biome> registerBiomeTag(String path) {
-        return this.registerTag(Registries.BIOME, path);
-    }
-
-    /**
-     * Creates a new {@link ResourceKey} for a provided registry from the given <code>path</code>.
-     * <p>Ideally used for content loading in via a dynamic registry.
-     *
-     * @param registryKey key for registry to create {@link ResourceKey} for
-     * @param path        path for new entry
-     * @param <T>         registry type
-     * @return {@link ResourceKey} for <code>entry</code>
-     */
-    default <T> ResourceKey<T> registerResourceKey(final ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return ResourceKey.create(registryKey, this.makeKey(path));
-    }
-
-    /**
-     * Creates a new {@link ResourceKey} for a {@link DamageType}.
-     *
-     * @param path path for new resource key
-     * @return new {@link ResourceKey}
-     */
-    default ResourceKey<DamageType> registerDamageType(String path) {
-        return this.registerResourceKey(Registries.DAMAGE_TYPE, path);
+        return this.registerTagKey(Registries.BIOME, path);
     }
 }
