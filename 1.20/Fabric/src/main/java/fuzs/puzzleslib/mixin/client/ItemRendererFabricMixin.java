@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.mixin.client;
 
-import fuzs.puzzleslib.api.client.init.v1.ItemModelDisplayOverrides;
-import fuzs.puzzleslib.impl.client.init.FabricItemDisplayOverrides;
+import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -15,6 +14,6 @@ abstract class ItemRendererFabricMixin {
 
     @ModifyVariable(method = "render", at = @At(value = "LOAD", ordinal = 0), ordinal = 0, argsOnly = true)
     public BakedModel render(BakedModel bakedModel, ItemStack stack, ItemDisplayContext itemDisplayContext) {
-        return ((FabricItemDisplayOverrides) ItemModelDisplayOverrides.INSTANCE).getItemModelDisplayOverride(bakedModel, itemDisplayContext);
+        return ItemDisplayOverridesImpl.INSTANCE.getItemModelDisplayOverride(bakedModel, itemDisplayContext);
     }
 }

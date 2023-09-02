@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import fuzs.puzzleslib.impl.core.ModContext;
+
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -103,8 +105,31 @@ public interface ModLoaderEnvironment {
      * @param modId mod id to check
      * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
      */
+    @Deprecated(forRemoval = true)
     default boolean isModLoadedSafe(String modId) {
+        return this.isModPresent(modId);
+    }
+
+    /**
+     * safe version of {@link #isModLoaded} on fml
+     *
+     * @param modId mod id to check
+     * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
+     */
+    default boolean isModPresent(String modId) {
         return this.isModLoaded(modId);
+    }
+
+    /**
+     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server.
+     * <p>Useful for altering client behavior depending on the server mod state.
+     * <p>This method CANNOT be used for checking the state of any arbitrary mod, only Puzzles Lib mods are supported.
+     *
+     * @param modId the mod to check
+     * @return is the mod installed on the server
+     */
+    default boolean isModPresentServerside(String modId) {
+        return ModContext.isPresentServerside(modId);
     }
 
     /**

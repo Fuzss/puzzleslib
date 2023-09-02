@@ -1,12 +1,15 @@
 package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.impl.event.SpawnTypeMob;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -26,6 +29,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 public final class FabricAbstractions implements CommonAbstractions {
+    private MinecraftServer gameServer;
+
+    {
+        // registers for game server starting and stopping, so we can keep an instance of the server here so that
+        // {@link FabricNetworkHandler} can be implemented much more similarly to Forge
+        ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, server -> this.gameServer = server);
+        ServerLifecycleEvents.STOPPED.register(EventPhase.LAST, server -> this.gameServer = null);
+    }
+
+    @Override
+    public MinecraftServer getGameServer() {
+        return this.gameServer;
+    }
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {

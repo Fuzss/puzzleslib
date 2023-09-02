@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
@@ -26,12 +25,12 @@ public final class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public Proxy getClientProxy() {
+    public ProxyImpl getClientProxy() {
         return new FabricClientProxy();
     }
 
     @Override
-    public Proxy getServerProxy() {
+    public ProxyImpl getServerProxy() {
         return new FabricServerProxy();
     }
 
