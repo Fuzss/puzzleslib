@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.core;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
@@ -16,11 +17,17 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
 public final class ForgeAbstractions implements CommonAbstractions {
+
+    @Override
+    public MinecraftServer getGameServer() {
+        return ServerLifecycleHooks.getCurrentServer();
+    }
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {

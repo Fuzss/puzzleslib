@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
@@ -17,9 +16,9 @@ public interface CommonFactories {
 
     ModContext getModContext(String modId);
 
-    Proxy getClientProxy();
+    ProxyImpl getClientProxy();
 
-    Proxy getServerProxy();
+    ProxyImpl getServerProxy();
 
     PotionBrewingRegistry getPotionBrewingRegistry();
 

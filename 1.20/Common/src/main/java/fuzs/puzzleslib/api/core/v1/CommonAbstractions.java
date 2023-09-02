@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.core.v1;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
@@ -22,10 +23,14 @@ import java.util.function.BiConsumer;
  * useful methods for gameplay related things that require mod loader specific abstractions
  */
 public interface CommonAbstractions {
-    /**
-     * instance of the common abstractions SPI
-     */
     CommonAbstractions INSTANCE = ServiceProviderHelper.load(CommonAbstractions.class);
+
+    /**
+     * Get the current game server which is captured to allow retrieval from anywhere.
+     *
+     * @return current game server, null when not in a world
+     */
+    MinecraftServer getGameServer();
 
     /**
      * opens a menu on both client and server

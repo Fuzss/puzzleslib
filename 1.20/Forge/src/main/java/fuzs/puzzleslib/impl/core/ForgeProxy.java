@@ -2,12 +2,11 @@ package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public interface ForgeProxy extends Proxy {
+public interface ForgeProxy extends ProxyImpl {
 
     <T extends Record & ClientboundMessage<T>> void registerClientReceiverV2(T message, Supplier<NetworkEvent.Context> supplier);
 

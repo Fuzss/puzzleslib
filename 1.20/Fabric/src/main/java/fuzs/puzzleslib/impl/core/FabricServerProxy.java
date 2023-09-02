@@ -1,76 +1,19 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 
 import java.util.function.Function;
-import java.util.function.IntFunction;
 
 public class FabricServerProxy implements FabricProxy {
-    private MinecraftServer gameServer;
-
-    public FabricServerProxy() {
-        // registers for game server starting and stopping, so we can keep an instance of the server here so that
-        // {@link FabricNetworkHandler} can be implemented much more similarly to Forge
-        ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, server -> this.gameServer = server);
-        ServerLifecycleEvents.STOPPED.register(EventPhase.LAST, server -> this.gameServer = null);
-    }
-
-    @Override
-    public Player getClientPlayer() {
-        throw new RuntimeException("Client player accessed for wrong side!");
-    }
-
-    @Override
-    public Level getClientLevel() {
-        throw new RuntimeException("Client level accessed for wrong side!");
-    }
-
-    @Override
-    public ClientPacketListener getClientPacketListener() {
-        throw new RuntimeException("Client connection accessed for wrong side!");
-    }
-
-    @Override
-    public MinecraftServer getGameServer() {
-        return this.gameServer;
-    }
-
-    @Override
-    public boolean hasControlDown() {
-        return false;
-    }
-
-    @Override
-    public boolean hasShiftDown() {
-        return false;
-    }
-
-    @Override
-    public boolean hasAltDown() {
-        return false;
-    }
-
-    @Override
-    public Component getKeyMappingComponent(String identifier) {
-        throw new RuntimeException("Key mapping component accessed for wrong side!");
-    }
 
     @Override
     public <T extends MessageV2<T>> void registerLegacyClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
@@ -96,10 +39,5 @@ public class FabricServerProxy implements FabricProxy {
             T message = factory.apply(buf);
             server.execute(() -> message.getHandler().handle(message, server, handler, player, player.serverLevel()));
         });
-    }
-
-    @Override
-    public void startClientPrediction(Level level, IntFunction<Packet<ServerGamePacketListener>> predictiveAction) {
-        throw new RuntimeException("Start client prediction accessed for wrong side!");
     }
 }

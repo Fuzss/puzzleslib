@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.init.v1.ItemModelDisplayOverrides;
+import fuzs.puzzleslib.impl.client.core.ClientFactories;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -13,6 +15,8 @@ import java.util.Map;
 import java.util.Objects;
 
 public abstract class ItemDisplayOverridesImpl implements ItemModelDisplayOverrides {
+    public static final ItemDisplayOverridesImpl INSTANCE = ClientFactories.INSTANCE.getItemModelDisplayOverrides();
+
     protected final Map<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> overrideLocations = Maps.newHashMap();
 
     @Override
@@ -27,5 +31,9 @@ public abstract class ItemDisplayOverridesImpl implements ItemModelDisplayOverri
                 throw new IllegalStateException("Attempting to register duplicate item model display override for model %s and display context %s".formatted(itemModel, context));
             }
         }
+    }
+
+    public BakedModel getItemModelDisplayOverride(BakedModel itemModel, ItemDisplayContext itemDisplayContext) {
+        throw new UnsupportedOperationException();
     }
 }

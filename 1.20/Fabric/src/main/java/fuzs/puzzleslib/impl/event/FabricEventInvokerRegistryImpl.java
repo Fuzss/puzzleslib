@@ -217,7 +217,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
             return callback::onServerStarting;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted.class, ServerLifecycleEvents.SERVER_STARTED, callback -> {
             return callback::onServerStarted;
         });
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping.class, ServerLifecycleEvents.SERVER_STOPPING, callback -> {
@@ -320,6 +320,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         } else {
+            // this runs for integrated servers, too, but this is fine as it is manually limited to dedicated servers via the if check
             INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTED, callback -> {
                 return (MinecraftServer server) -> {
                     callback.onLoadComplete();

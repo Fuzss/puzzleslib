@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.27-1.20.1] - 2023-09-02
+### Added
+- Added a helper system for checking if a mod is installed server-side, too
+
 ## [v8.0.26-1.20.1] - 2023-08-19
 ### Added
 - Added a new separate `RegistryManager` that returns instances of `Holder.Reference` instead of our own `RegistryReference` implementation to be more inline with the vanilla registration system
