@@ -15,14 +15,7 @@ import java.util.*;
 import java.util.function.BiPredicate;
 import java.util.stream.Stream;
 
-public class MobSpawnSettingsContextFabric implements MobSpawnSettingsContext {
-    private final MobSpawnSettings mobSpawnSettings;
-    private final BiomeModificationContext.SpawnSettingsContext context;
-
-    public MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings, BiomeModificationContext.SpawnSettingsContext context) {
-        this.mobSpawnSettings = mobSpawnSettings;
-        this.context = context;
-    }
+public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings, BiomeModificationContext.SpawnSettingsContext context) implements MobSpawnSettingsContext {
 
     @Override
     public void setCreatureGenerationProbability(float probability) {

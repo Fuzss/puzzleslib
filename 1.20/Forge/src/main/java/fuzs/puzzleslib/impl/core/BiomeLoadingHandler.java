@@ -56,7 +56,7 @@ public class BiomeLoadingHandler {
         private static BiomeModificationContext createBuilderBackedContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             ClimateSettingsContextForge climateSettings = new ClimateSettingsContextForge(builder.getClimateSettings());
             SpecialEffectsContextForge specialEffects = new SpecialEffectsContextForge(builder.getSpecialEffects());
-            GenerationSettingsContextForge generationSettings = GenerationSettingsContextForge.create(builder.getGenerationSettings());
+            GenerationSettingsContextForge generationSettings = new GenerationSettingsContextForge(builder.getGenerationSettings());
             MobSpawnSettingsContextForge mobSpawnSettings = new MobSpawnSettingsContextForge(builder.getMobSpawnSettings());
             return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
         }
@@ -69,7 +69,7 @@ public class BiomeLoadingHandler {
             if (loadingPhase == null) return;
             Collection<BiomeModification> modifications = this.biomeModifications.get(loadingPhase);
             if (modifications.isEmpty()) return;
-            BiomeLoadingContext filter = BiomeLoadingContextForge.create(biome);
+            BiomeLoadingContext filter = new BiomeLoadingContextForge(biome);
             BiomeModificationContext context = createBuilderBackedContext(builder);
             for (BiomeModification modification : modifications) {
                 modification.tryApply(filter, context);

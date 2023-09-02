@@ -13,14 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public class SpecialEffectsContextFabric implements SpecialEffectsContext {
-    private final BiomeSpecialEffects specialEffects;
-    private final BiomeModificationContext.EffectsContext context;
-
-    public SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects, BiomeModificationContext.EffectsContext context) {
-        this.specialEffects = specialEffects;
-        this.context = context;
-    }
+public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects, BiomeModificationContext.EffectsContext context) implements SpecialEffectsContext {
 
     @Override
     public void setFogColor(int fogColor) {

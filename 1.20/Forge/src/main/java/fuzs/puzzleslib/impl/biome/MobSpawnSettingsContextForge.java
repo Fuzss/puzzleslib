@@ -13,12 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
 
-public class MobSpawnSettingsContextForge implements MobSpawnSettingsContext {
-    private final MobSpawnSettingsBuilder context;
-
-    public MobSpawnSettingsContextForge(MobSpawnSettingsBuilder context) {
-        this.context = context;
-    }
+public record MobSpawnSettingsContextForge(MobSpawnSettingsBuilder context) implements MobSpawnSettingsContext {
 
     @Override
     public void setCreatureGenerationProbability(float probability) {

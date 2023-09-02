@@ -13,14 +13,7 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.List;
 
-public class GenerationSettingsContextFabric implements GenerationSettingsContext {
-    private final BiomeGenerationSettings generationSettings;
-    private final BiomeModificationContext.GenerationSettingsContext context;
-
-    public GenerationSettingsContextFabric(BiomeGenerationSettings generationSettings, BiomeModificationContext.GenerationSettingsContext context) {
-        this.generationSettings = generationSettings;
-        this.context = context;
-    }
+public record GenerationSettingsContextFabric(BiomeGenerationSettings generationSettings, BiomeModificationContext.GenerationSettingsContext context) implements GenerationSettingsContext {
 
     @Override
     public boolean removeFeature(GenerationStep.Decoration step, ResourceKey<PlacedFeature> featureKey) {
