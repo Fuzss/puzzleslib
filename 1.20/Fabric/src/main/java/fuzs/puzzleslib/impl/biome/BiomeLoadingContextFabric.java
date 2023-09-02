@@ -13,16 +13,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.Optional;
 
-public class BiomeLoadingContextFabric implements BiomeLoadingContext {
-    private final BiomeSelectionContext context;
-
-    private BiomeLoadingContextFabric(BiomeSelectionContext context) {
-        this.context = context;
-    }
-
-    public static BiomeLoadingContext create(BiomeSelectionContext context) {
-        return new BiomeLoadingContextFabric(context);
-    }
+public record BiomeLoadingContextFabric(BiomeSelectionContext context) implements BiomeLoadingContext {
 
     @Override
     public ResourceKey<Biome> getResourceKey() {

@@ -7,56 +7,34 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.dimension.LevelStem;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraft.world.level.levelgen.structure.Structure;
-import net.minecraft.world.level.storage.PrimaryLevelData;
-import net.minecraft.world.level.storage.WorldData;
 
 import java.util.Optional;
 
-public class BiomeLoadingContextForge implements BiomeLoadingContext {
-    private final RegistryAccess registryAccess;
-    private final PrimaryLevelData levelData;
-    private final ResourceKey<Biome> resourceKey;
-    private final Biome biome;
-    private final Holder<Biome> holder;
+public record BiomeLoadingContextForge(RegistryAccess registryAccess, Holder<Biome> holder) implements BiomeLoadingContext {
 
-    private BiomeLoadingContextForge(RegistryAccess registryAccess, PrimaryLevelData levelData, ResourceKey<Biome> resourceKey, Biome biome, Holder<Biome> holder) {
+    public BiomeLoadingContextForge(RegistryAccess registryAccess, Holder<Biome> holder) {
         this.registryAccess = registryAccess;
-        this.levelData = levelData;
-        this.resourceKey = resourceKey;
-        this.biome = biome;
         this.holder = holder;
     }
 
-    public static BiomeLoadingContext create(Holder<Biome> holder) {
-        MinecraftServer server = Proxy.INSTANCE.getGameServer();
-        WorldData worldData = server.getWorldData();
-        if (!(worldData instanceof PrimaryLevelData primaryLevelData)) {
-            throw new RuntimeException("Incompatible SaveProperties passed to MinecraftServer: " + worldData);
-        }
-        ResourceKey<Biome> resourceKey = holder.unwrapKey().orElseThrow();
-        return new BiomeLoadingContextForge(server.registryAccess(), primaryLevelData, resourceKey, holder.value(), holder);
+    public BiomeLoadingContextForge(Holder<Biome> holder) {
+        this(Proxy.INSTANCE.getGameServer().registryAccess(), holder);
     }
 
     @Override
     public ResourceKey<Biome> getResourceKey() {
-        return this.resourceKey;
+        return this.holder.unwrapKey().orElseThrow();
     }
 
     @Override
     public Biome getBiome() {
-        return this.biome;
-    }
-
-    @Override
-    public Holder<Biome> holder() {
-        return this.holder;
+        return this.holder.value();
     }
 
     @Override
@@ -74,12 +52,7 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
     @Override
     public boolean validForStructure(ResourceKey<Structure> key) {
         Structure instance = this.registryAccess.registryOrThrow(Registries.STRUCTURE).get(key);
-
-        if (instance == null) {
-            return false;
-        }
-
-        return instance.biomes().contains(this.holder());
+        return instance != null && instance.biomes().contains(this.holder());
     }
 
     @Override
@@ -91,12 +64,7 @@ public class BiomeLoadingContextForge implements BiomeLoadingContext {
     @Override
     public boolean canGenerateIn(ResourceKey<LevelStem> dimensionKey) {
         LevelStem dimension = this.registryAccess.registryOrThrow(Registries.LEVEL_STEM).get(dimensionKey);
-
-        if (dimension == null) {
-            return false;
-        }
-
-        return dimension.generator().getBiomeSource().possibleBiomes().stream().anyMatch(entry -> entry.value() == this.biome);
+        return dimension != null && dimension.generator().getBiomeSource().possibleBiomes().stream().anyMatch(entry -> entry.value() == this.getBiome());
     }
 
     @Override

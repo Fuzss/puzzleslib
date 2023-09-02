@@ -7,7 +7,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.carver.ConfiguredWorldCarver;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
@@ -15,20 +14,14 @@ import net.minecraftforge.common.world.BiomeGenerationSettingsBuilder;
 
 import java.util.Collections;
 
-public class GenerationSettingsContextForge implements GenerationSettingsContext {
-    private final Registry<ConfiguredWorldCarver<?>> carvers;
-    private final Registry<PlacedFeature> features;
-    private final BiomeGenerationSettingsBuilder context;
+public record GenerationSettingsContextForge(Registry<ConfiguredWorldCarver<?>> carvers, Registry<PlacedFeature> features, BiomeGenerationSettingsBuilder context) implements GenerationSettingsContext {
 
-    private GenerationSettingsContextForge(RegistryAccess registryAccess, BiomeGenerationSettingsBuilder context) {
-        this.carvers = registryAccess.registryOrThrow(Registries.CONFIGURED_CARVER);
-        this.features = registryAccess.registryOrThrow(Registries.PLACED_FEATURE);
-        this.context = context;
+    public GenerationSettingsContextForge(RegistryAccess registryAccess, BiomeGenerationSettingsBuilder context) {
+        this(registryAccess.registryOrThrow(Registries.CONFIGURED_CARVER), registryAccess.registryOrThrow(Registries.PLACED_FEATURE), context);
     }
 
-    public static GenerationSettingsContextForge create(BiomeGenerationSettingsBuilder context) {
-        MinecraftServer server = Proxy.INSTANCE.getGameServer();
-        return new GenerationSettingsContextForge(server.registryAccess(), context);
+    public GenerationSettingsContextForge(BiomeGenerationSettingsBuilder context) {
+        this(Proxy.INSTANCE.getGameServer().registryAccess(), context);
     }
 
     @Override
