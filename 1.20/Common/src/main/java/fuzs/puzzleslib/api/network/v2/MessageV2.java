@@ -5,6 +5,8 @@ import net.minecraft.world.entity.player.Player;
 
 /**
  * network message template
+ *
+ * @param <T> the message type for the handler
  */
 public interface MessageV2<T extends MessageV2<T>> {
 
@@ -23,7 +25,7 @@ public interface MessageV2<T extends MessageV2<T>> {
     void read(final FriendlyByteBuf buf);
 
     /**
-     * @return message handler for message, should be ok to implement as anonymous class
+     * @return message handler for message on reception side
      */
     MessageHandler<T> makeHandler();
 
