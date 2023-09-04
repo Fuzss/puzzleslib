@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.*;
+import fuzs.puzzleslib.api.core.v1.ModLoader;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -22,8 +24,13 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
-    public DistType getEnvironmentType() {
-        return ForgeDistTypeConverter.fromDist(FMLEnvironment.dist);
+    public boolean isClient() {
+        return FMLEnvironment.dist.isClient();
+    }
+
+    @Override
+    public boolean isServer() {
+        return FMLEnvironment.dist.isDedicatedServer();
     }
 
     @Override

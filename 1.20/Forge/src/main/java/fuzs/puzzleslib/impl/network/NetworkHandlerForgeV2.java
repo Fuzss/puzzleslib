@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.network;
 
-import fuzs.puzzleslib.api.core.v1.ForgeDistTypeConverter;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageDirection;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
@@ -40,15 +39,24 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends MessageV2<T>> void register(Class<? extends T> clazz, Supplier<T> factory, MessageDirection direction) {
-        BiConsumer<T, FriendlyByteBuf> encode = MessageV2::write;
-        Function<FriendlyByteBuf, T> decode = buf -> {
-            T message = factory.get();
-            message.read(buf);
-            return message;
-        };
+        Function<FriendlyByteBuf, T> decode = NetworkHandlerImplHelper.getDirectMessageDecoder(factory);
+        LogicalSide receptionSide = direction == MessageDirection.TO_CLIENT ? LogicalSide.CLIENT : LogicalSide.SERVER;
+        this.register((Class<T>) clazz, decode, receptionSide);
+    }
+
+    @Override
+    public <T extends MessageV2<T>> void registerClientbound(Class<T> clazz) {
+        this.register(clazz, NetworkHandlerImplHelper.getMessageDecoder(clazz), LogicalSide.CLIENT);
+    }
+
+    @Override
+    public <T extends MessageV2<T>> void registerServerbound(Class<T> clazz) {
+        this.register(clazz, NetworkHandlerImplHelper.getMessageDecoder(clazz), LogicalSide.SERVER);
+    }
+
+    private <T extends MessageV2<T>> void register(Class<T> clazz, Function<FriendlyByteBuf, T> decode, LogicalSide receptionSide) {
         BiConsumer<T, Supplier<NetworkEvent.Context>> handle = (message, supplier) -> {
             NetworkEvent.Context context = supplier.get();
-            final LogicalSide receptionSide = ForgeDistTypeConverter.toLogicalSide(direction.getReceptionSide());
             LogicalSide expectedReceptionSide = context.getDirection().getReceptionSide();
             if (expectedReceptionSide != receptionSide) {
                 throw new IllegalStateException(String.format("Received message on wrong side, expected %s, was %s", receptionSide, expectedReceptionSide));
@@ -65,7 +73,7 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
             });
             context.setPacketHandled(true);
         };
-        this.channel.registerMessage(this.discriminator.getAndIncrement(), (Class<T>) clazz, encode, decode, handle);
+        this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, MessageV2::write, decode, handle);
     }
 
     @SuppressWarnings("unchecked")

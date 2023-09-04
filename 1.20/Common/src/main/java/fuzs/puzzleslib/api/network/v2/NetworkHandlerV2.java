@@ -55,6 +55,22 @@ public interface NetworkHandlerV2 {
     <T extends MessageV2<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction);
 
     /**
+     * Register a message that will be sent to clients.
+     *
+     * @param clazz message class type
+     * @param <T>   message implementation
+     */
+    <T extends MessageV2<T>> void registerClientbound(Class<T> clazz);
+
+    /**
+     * Register a message that will be sent to servers.
+     *
+     * @param clazz message class type
+     * @param <T>   message implementation
+     */
+    <T extends MessageV2<T>> void registerServerbound(Class<T> clazz);
+
+    /**
      * creates a packet heading to the server side
      *
      * @param message message to create packet from

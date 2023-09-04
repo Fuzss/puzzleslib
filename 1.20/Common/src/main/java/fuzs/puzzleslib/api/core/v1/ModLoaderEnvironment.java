@@ -40,12 +40,16 @@ public interface ModLoaderEnvironment {
     /**
      * @return current physical environment
      */
-    DistType getEnvironmentType();
+    @Deprecated(forRemoval = true)
+    default DistType getEnvironmentType() {
+        return this.isClient() ? DistType.CLIENT : DistType.SERVER;
+    }
 
     /**
      * @param envType env to check
      * @return is this the current physical environment
      */
+    @Deprecated(forRemoval = true)
     default boolean isEnvironmentType(DistType envType) {
         return this.getEnvironmentType() == envType;
     }
@@ -53,16 +57,12 @@ public interface ModLoaderEnvironment {
     /**
      * @return is physical environment client
      */
-    default boolean isClient() {
-        return this.isEnvironmentType(DistType.CLIENT);
-    }
+    boolean isClient();
 
     /**
      * @return is physical environment server
      */
-    default boolean isServer() {
-        return !this.isClient();
-    }
+    boolean isServer();
 
     /**
      * @return the minecraft game directory (<code>.minecraft</code> for clients, otherwise the server directory)

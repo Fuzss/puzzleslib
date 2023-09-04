@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.*;
+import fuzs.puzzleslib.api.core.v1.ModLoader;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
+import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
@@ -16,8 +19,13 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
-    public DistType getEnvironmentType() {
-        return FabricDistTypeConverter.fromEnvType(FabricLoader.getInstance().getEnvironmentType());
+    public boolean isClient() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT;
+    }
+
+    @Override
+    public boolean isServer() {
+        return FabricLoader.getInstance().getEnvironmentType() == EnvType.SERVER;
     }
 
     @Override

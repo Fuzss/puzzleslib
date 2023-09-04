@@ -62,7 +62,8 @@ public abstract class ModContext {
     @Nullable RegistryManager registryManagerV2;
     @Nullable fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
     @Nullable CapabilityController capabilityController;
-    private boolean presentServerside;
+    // true by default for dedicated servers, is reset on client when joining new world
+    private boolean presentServerside = true;
 
     ModContext(String modId) {
         this.modId = modId;

@@ -1,18 +1,22 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import com.google.common.base.Defaults;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * helper class for reflection operations, similar to the Forge thing, but we want to use this on Fabric as well
@@ -246,8 +250,8 @@ public final class ReflectionHelper {
         if (field != null) {
             try {
                 return Optional.ofNullable((T) field.get(instance));
-            } catch (IllegalAccessException e) {
-                PuzzlesLib.LOGGER.warn("Unable to access field {}", getFieldName(field), e);
+            } catch (ReflectiveOperationException e) {
+                PuzzlesLib.LOGGER.warn("Unable to get field {}", getFieldName(field), e);
             }
         }
         return Optional.empty();
@@ -264,8 +268,8 @@ public final class ReflectionHelper {
             try {
                 field.set(instance, value);
                 return true;
-            } catch (IllegalAccessException e) {
-                PuzzlesLib.LOGGER.warn("Unable to access field {}", getFieldName(field), e);
+            } catch (ReflectiveOperationException e) {
+                PuzzlesLib.LOGGER.warn("Unable to set field {}", getFieldName(field), e);
             }
         }
         return false;
@@ -296,11 +300,31 @@ public final class ReflectionHelper {
         if (method != null) {
             try {
                 return Optional.ofNullable((T) method.invoke(instance, args));
-            } catch (InvocationTargetException | IllegalAccessException e) {
-                PuzzlesLib.LOGGER.warn("Unable to access method {}", getMethodName(method), e);
+            } catch (ReflectiveOperationException e) {
+                PuzzlesLib.LOGGER.warn("Unable to invoke method {}", getMethodName(method), e);
             }
         }
         return Optional.empty();
+    }
+
+    /**
+     * @param clazz clazz to get constructor from
+     * @return new instance or empty
+     * @param <T> instance object type
+     * @param <E> class type to create instance of
+     */
+    public static <T> Supplier<Optional<T>> newDefaultInstanceFactory(Class<T> clazz) {
+        Constructor<?> constructor = null;
+        for (Constructor<?> currentConstructor : clazz.getConstructors()) {
+            if (constructor == null || currentConstructor.getParameterCount() < constructor.getParameterCount()) {
+                constructor = currentConstructor;
+            }
+        }
+        if (constructor != null) {
+            Object[] args = Stream.of(constructor.getParameterTypes()).map(Defaults::defaultValue).toArray();
+            return newInstanceFactory((Constructor<T>) constructor, args);
+        }
+        return Optional::empty;
     }
 
     /**
@@ -316,20 +340,52 @@ public final class ReflectionHelper {
     }
 
     /**
+     * @param clazz clazz to get constructor from
+     * @param parameterTypes constructor arguments
+     * @param args constructor arguments
+     * @return new instance or empty
+     * @param <T> instance object type
+     * @param <E> class type to create instance of
+     */
+    public static <T> Supplier<Optional<T>> newInstanceFactory(Class<T> clazz, Class<?>[] parameterTypes, Object[] args) {
+        return newInstanceFactory(findConstructor(clazz, parameterTypes), args);
+    }
+
+    /**
      * @param constructor constructor instance, don't have to null check it before, it'll be done here
      * @param args constructor arguments
      * @param <T> instance object type
      * @return new instance
      */
     public static <T> Optional<T> newInstance(@Nullable Constructor<T> constructor, Object... args) {
+        return newInstanceFactory(constructor, args).get();
+    }
+
+    /**
+     * @param constructor constructor instance, don't have to null check it before, it'll be done here
+     * @param args constructor arguments
+     * @param <T> instance object type
+     * @return new instance
+     */
+    public static <T> Supplier<Optional<T>> newInstanceFactory(@Nullable Constructor<T> constructor, Object... args) {
         if (constructor != null) {
+            MethodHandle methodHandle;
             try {
-                return Optional.of(constructor.newInstance(args));
-            } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
+                methodHandle = MethodHandles.publicLookup().unreflectConstructor(constructor);
+            } catch (IllegalAccessException e) {
                 PuzzlesLib.LOGGER.warn("Unable to access constructor {}", getConstructorName(constructor), e);
+                return Optional::empty;
             }
+            return () -> {
+                try {
+                    return Optional.of((T) methodHandle.invoke(args));
+                } catch (Throwable e) {
+                    PuzzlesLib.LOGGER.warn("Unable to invoke constructor {}", getConstructorName(constructor), e);
+                }
+                return Optional.empty();
+            };
         }
-        return Optional.empty();
+        return Optional::empty;
     }
 
     /**
