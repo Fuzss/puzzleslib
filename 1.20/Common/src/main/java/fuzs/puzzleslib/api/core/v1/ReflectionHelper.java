@@ -311,7 +311,6 @@ public final class ReflectionHelper {
      * @param clazz clazz to get constructor from
      * @return new instance or empty
      * @param <T> instance object type
-     * @param <E> class type to create instance of
      */
     public static <T> Supplier<Optional<T>> newDefaultInstanceFactory(Class<T> clazz) {
         Constructor<?> constructor = null;
@@ -345,7 +344,6 @@ public final class ReflectionHelper {
      * @param args constructor arguments
      * @return new instance or empty
      * @param <T> instance object type
-     * @param <E> class type to create instance of
      */
     public static <T> Supplier<Optional<T>> newInstanceFactory(Class<T> clazz, Class<?>[] parameterTypes, Object[] args) {
         return newInstanceFactory(findConstructor(clazz, parameterTypes), args);

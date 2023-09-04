@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.client.event;
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -251,7 +252,7 @@ public final class FabricClientEventInvokers {
                 // when interrupted cancel the interaction without the server being notified
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
-        }, true);
+        }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
@@ -262,7 +263,7 @@ public final class FabricClientEventInvokers {
                 // when interrupted cancel the interaction without the server being notified
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
-        }, true);
+        }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
@@ -273,7 +274,7 @@ public final class FabricClientEventInvokers {
                 // when interrupted cancel the interaction without the server being notified
                 return result.isInterrupt() ? InteractionResultHolder.fail(ItemStack.EMPTY) : InteractionResultHolder.pass(ItemStack.EMPTY);
             };
-        }, true);
+        }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Pick.class, ClientPickBlockGatherCallback.EVENT, callback -> {
             return (Player player, HitResult hitResult) -> {
                 // add in more checks that also run on Forge

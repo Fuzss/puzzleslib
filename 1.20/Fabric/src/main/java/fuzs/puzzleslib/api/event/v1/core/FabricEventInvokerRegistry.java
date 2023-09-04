@@ -6,6 +6,7 @@ import net.minecraft.client.gui.screens.Screen;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * A registry for linking common events implemented as functional interfaces to the corresponding Fabric {@link Event} instances.
@@ -37,21 +38,22 @@ public interface FabricEventInvokerRegistry {
      * @param <E>       Fabric event type
      */
     default <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter) {
-        this.register(clazz, event, converter, false);
+        this.register(clazz, event, converter, UnaryOperator.identity(), false);
     }
 
     /**
      * Registers an event.
      * <p>Useful for linking an event already implemented on Fabric (most likely from Fabric Api) to the common implementation.
      *
-     * @param clazz        common event functional interface class
-     * @param event        Fabric event implementation
-     * @param converter    returns an implementation of the Fabric event that runs the passed in common event
-     * @param joinInvokers join this new event invoker with a possibly already existing one, otherwise an exception will be thrown when registering duplicates
-     * @param <T>          common event type
-     * @param <E>          Fabric event type
+     * @param clazz               common event functional interface class
+     * @param event               Fabric event implementation
+     * @param converter           returns an implementation of the Fabric event that runs the passed in common event
+     * @param eventPhaseConverter an operator for adjusting the provided event phase, intended to impose an ordering on different events that use the same underlying implementation
+     * @param joinInvokers        join this new event invoker with a possibly already existing one, otherwise an exception will be thrown when registering duplicates
+     * @param <T>                 common event type
+     * @param <E>                 Fabric event type
      */
-    <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter, boolean joinInvokers);
+    <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers);
 
     /**
      * Registers an event that uses the same type in both common and Fabric subprojects and depends on a certain context.
@@ -81,24 +83,25 @@ public interface FabricEventInvokerRegistry {
      * @param <E>       Fabric event type
      */
     default <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer) {
-        this.register(clazz, eventType, converter, consumer, false);
+        this.register(clazz, eventType, converter, consumer, UnaryOperator.identity(), false);
     }
 
     /**
      * Registers an event that depends on a certain context, such as screen events depending on a screen instance (they are not global like most events).
      * <p>Useful for linking an event already implemented on Fabric (most likely from Fabric Api) to the common implementation.
      *
-     * @param clazz        common event functional interface class
-     * @param eventType    Fabric event implementation type, since the actual instance changes and is therefore not available in this global context
-     * @param converter    returns an implementation of the Fabric event that runs the passed in common event
-     * @param consumer     a consumer that runs immediately upon event invoker creation, responsible for registering the actual event to run whenever it is triggered,
-     *                     like registering a screen event in {@link net.fabricmc.fabric.api.client.screen.v1.ScreenEvents#BEFORE_INIT},
-     *                     where registering to {@link net.fabricmc.fabric.api.client.screen.v1.ScreenEvents#BEFORE_INIT} happens immediately
-     * @param joinInvokers join this new event invoker with a possibly already existing one, otherwise an exception will be thrown when registering duplicates
-     * @param <T>          common event type
-     * @param <E>          Fabric event type
+     * @param clazz               common event functional interface class
+     * @param eventType           Fabric event implementation type, since the actual instance changes and is therefore not available in this global context
+     * @param converter           returns an implementation of the Fabric event that runs the passed in common event
+     * @param consumer            a consumer that runs immediately upon event invoker creation, responsible for registering the actual event to run whenever it is triggered,
+     *                            like registering a screen event in {@link net.fabricmc.fabric.api.client.screen.v1.ScreenEvents#BEFORE_INIT},
+     *                            where registering to {@link net.fabricmc.fabric.api.client.screen.v1.ScreenEvents#BEFORE_INIT} happens immediately
+     * @param eventPhaseConverter an operator for adjusting the provided event phase, intended to impose an ordering on different events that use the same underlying implementation
+     * @param joinInvokers        join this new event invoker with a possibly already existing one, otherwise an exception will be thrown when registering duplicates
+     * @param <T>                 common event type
+     * @param <E>                 Fabric event type
      */
-    <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer, boolean joinInvokers);
+    <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers);
 
     /**
      * A helper context for dealing with context based {@link EventInvoker} implementations.

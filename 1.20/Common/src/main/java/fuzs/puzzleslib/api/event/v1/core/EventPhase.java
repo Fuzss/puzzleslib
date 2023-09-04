@@ -44,9 +44,29 @@ public interface EventPhase {
     EventPhase parent();
 
     /**
-     * The ordering defines in which relation this event phase is to {@link #parent()}, if it is supposed to run before or afterwards.
+     * The ordering defines in which relation this event phase is to {@link #parent()}, if it is supposed to run before or afterward.
      *
      * @param consumer apply event phases to the Fabric event
      */
     void applyOrdering(BiConsumer<ResourceLocation, ResourceLocation> consumer);
+
+    /**
+     * Constructs a custom event phase that runs before <code>eventPhase</code>.
+     *
+     * @param eventPhase the event phase to run before
+     * @return the custom event phase
+     */
+    static EventPhase early(EventPhase eventPhase) {
+        return new EventPhaseImpl(PuzzlesLib.id("early_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.BEFORE);
+    }
+
+    /**
+     * Constructs a custom event phase that runs after <code>eventPhase</code>.
+     *
+     * @param eventPhase the event phase to run after
+     * @return the custom event phase
+     */
+    static EventPhase late(EventPhase eventPhase) {
+        return new EventPhaseImpl(PuzzlesLib.id("late_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.AFTER);
+    }
 }
