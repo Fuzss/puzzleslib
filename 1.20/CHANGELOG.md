@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.30-1.20.1] - 2023-09-05
+### Fixed
+- Fixed `LivingDeathCallback` only running on the server-side on Fabric
+
 ## [v8.0.29-1.20.1] - 2023-09-05
 ### Added
 - Added `RenderLivingEvents`

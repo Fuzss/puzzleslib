@@ -3,11 +3,10 @@ package fuzs.puzzleslib.api.client.event.v1;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 
 public final class RenderLivingEvents {
     public static final EventInvoker<Before> BEFORE = EventInvoker.lookup(Before.class);
@@ -32,7 +31,7 @@ public final class RenderLivingEvents {
          * @return {@link EventResult#INTERRUPT} to prevent the player model from rendering, this allows for taking over complete player rendering,
          * {@link EventResult#PASS} to allow the player model to render
          */
-        EventResult onBeforeRenderEntity(LivingEntity entity, LivingEntityRenderer<?, ?> renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
+        <T extends LivingEntity, M extends EntityModel<T>> EventResult onBeforeRenderEntity(T entity, LivingEntityRenderer<T, M> renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
     }
 
     @FunctionalInterface
@@ -48,6 +47,6 @@ public final class RenderLivingEvents {
          * @param packedLight       packet light the entity is rendered with
          * @param partialTick       current partial tick time
          */
-        void onAfterRenderEntity(LivingEntity entity, LivingEntityRenderer<?, ?> renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
+        <T extends LivingEntity, M extends EntityModel<T>> void onAfterRenderEntity(T entity, LivingEntityRenderer<T, M> renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
     }
 }
