@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.network.v3;
 
 import fuzs.puzzleslib.api.core.v1.Buildable;
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
@@ -83,7 +84,7 @@ public interface NetworkHandlerV3 {
      * @param message message to send
      */
     default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
+        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
     }
 
     /**
@@ -93,7 +94,7 @@ public interface NetworkHandlerV3 {
      * @param message message to send
      */
     default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(ServerPlayer exclude, T message) {
-        for (ServerPlayer player : Proxy.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
+        for (ServerPlayer player : CommonAbstractions.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
             if (player != exclude) this.sendTo(player, message);
         }
     }
@@ -135,7 +136,7 @@ public interface NetworkHandlerV3 {
      * @param message  message to send
      */
     default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level, T message) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
+        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
     /**
@@ -175,7 +176,7 @@ public interface NetworkHandlerV3 {
      * @param message   message to send
      */
     default <T extends Record & ClientboundMessage<T>> void sendToDimension(ResourceKey<Level> dimension, T message) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
+        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
     }
 
     /**

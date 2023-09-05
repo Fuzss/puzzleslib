@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.GenerationSettingsContext;
-import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -21,7 +21,7 @@ public record GenerationSettingsContextForge(Registry<ConfiguredWorldCarver<?>> 
     }
 
     public GenerationSettingsContextForge(BiomeGenerationSettingsBuilder context) {
-        this(Proxy.INSTANCE.getGameServer().registryAccess(), context);
+        this(CommonAbstractions.INSTANCE.getGameServer().registryAccess(), context);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.minecraft.server.level.ServerPlayer;
@@ -21,7 +22,7 @@ public class ForgeServerProxy implements ForgeProxy {
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
             Objects.requireNonNull(player, "player is null");
-            message.getHandler().handle(message, this.getGameServer(), player.connection, player, player.serverLevel());
+            message.getHandler().handle(message, CommonAbstractions.INSTANCE.getGameServer(), player.connection, player, player.serverLevel());
         });
         context.setPacketHandled(true);
     }

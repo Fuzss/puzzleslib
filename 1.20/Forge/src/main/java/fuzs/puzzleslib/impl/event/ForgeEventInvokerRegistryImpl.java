@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.Multimap;
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -374,7 +374,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onLoggedOut((ServerPlayer) evt.getEntity());
         });
         INSTANCE.register(PlayerEvents.AfterChangeDimension.class, PlayerEvent.PlayerChangedDimensionEvent.class, (PlayerEvents.AfterChangeDimension callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
-            MinecraftServer server = Proxy.INSTANCE.getGameServer();
+            MinecraftServer server = CommonAbstractions.INSTANCE.getGameServer();
             ServerLevel from = server.getLevel(evt.getFrom());
             ServerLevel to = server.getLevel(evt.getTo());
             Objects.requireNonNull(from, "level origin is null");

@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.api.config.v3.serialization;
 
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.impl.config.serialization.ConfigDataSetImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -150,9 +152,12 @@ public interface ConfigDataSet<T> extends Collection<T> {
     static <T> Registry<T> findRegistry(ResourceKey<? extends Registry<T>> registryKey, boolean dynamicRegistries) {
         Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
         if (registry != null) return registry;
-        if (dynamicRegistries && Proxy.INSTANCE.getGameServer() != null) {
-            registry = Proxy.INSTANCE.getGameServer().registryAccess().registry(registryKey).orElse(null);
-            if (registry != null) return registry;
+        if (dynamicRegistries) {
+            MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getGameServer();
+            if (minecraftServer != null) {
+                registry = minecraftServer.registryAccess().registry(registryKey).orElse(null);
+                if (registry != null) return registry;
+            }
         }
         throw new IllegalArgumentException("Registry for key %s not found".formatted(registryKey));
     }
