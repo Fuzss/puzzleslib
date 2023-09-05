@@ -33,7 +33,10 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityFabricMixin extends Entity {
@@ -75,6 +78,12 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo callback) {
         if (FabricLivingEvents.LIVING_TICK.invoker().onLivingTick(LivingEntity.class.cast(this)).isInterrupt()) callback.cancel();
+    }
+
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
+    public void die$0(DamageSource damageSource, CallbackInfo callback) {
+        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource);
+        if (result.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "startUsingItem", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I", shift = At.Shift.AFTER), cancellable = true)
@@ -183,7 +192,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     }
 
     @Inject(method = "die", at = @At("TAIL"))
-    public void die(DamageSource damageSource, CallbackInfo callback) {
+    public void die$1(DamageSource damageSource, CallbackInfo callback) {
         // this is a safety precaution, in case LivingEntity::dropAllDeathLoot does not reach TAIL and therefore doesn't spawn the captured drops (another mixin might cancel the method mid-way)
         // this should work rather fine, as LivingEntity::dropAllDeathLoot is basically exclusively called from LivingEntity::die,
         // and spawning captured drops in LivingEntity::dropAllDeathLoot only rarely has a conflict if any anyway
