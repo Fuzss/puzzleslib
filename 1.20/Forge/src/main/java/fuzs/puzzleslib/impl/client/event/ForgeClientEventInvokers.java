@@ -201,6 +201,13 @@ public final class ForgeClientEventInvokers {
             MutableFloat roll = MutableFloat.fromEvent(evt::setRoll, evt::getRoll);
             callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), pitch, yaw, roll);
         });
+        INSTANCE.register(RenderLivingEvents.Before.class, RenderLivingEvent.Pre.class, (callback, evt) -> {
+            EventResult result = callback.onBeforeRenderEntity(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(RenderLivingEvents.After.class, RenderLivingEvent.Post.class, (callback, evt) -> {
+            callback.onAfterRenderEntity(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+        });
         INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
             EventResult result = callback.onBeforeRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
             if (result.isInterrupt()) evt.setCanceled(true);

@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.29-1.20.1] - 2023-09-05
+### Added
+- Added `RenderLivingEvents`
+
 ## [v8.0.28-1.20.1] - 2023-09-04
 ### Changed
 - Deprecated `DistType`, this includes some refactors in `NetworkHandlerV2`

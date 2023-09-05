@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
-import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -24,7 +24,7 @@ public record BiomeLoadingContextForge(RegistryAccess registryAccess, Holder<Bio
     }
 
     public BiomeLoadingContextForge(Holder<Biome> holder) {
-        this(Proxy.INSTANCE.getGameServer().registryAccess(), holder);
+        this(CommonAbstractions.INSTANCE.getGameServer().registryAccess(), holder);
     }
 
     @Override

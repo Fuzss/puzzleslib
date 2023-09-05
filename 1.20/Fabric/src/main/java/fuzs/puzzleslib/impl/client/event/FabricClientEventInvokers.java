@@ -177,6 +177,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InputEvents.AfterMouseScroll.class, FabricClientEvents.AFTER_MOUSE_SCROLL);
         INSTANCE.register(InputEvents.BeforeKeyAction.class, FabricClientEvents.BEFORE_KEY_ACTION);
         INSTANCE.register(InputEvents.AfterKeyAction.class, FabricClientEvents.AFTER_KEY_ACTION);
+        INSTANCE.register(RenderLivingEvents.Before.class, FabricClientEvents.BEFORE_RENDER_LIVING);
+        INSTANCE.register(RenderLivingEvents.After.class, FabricClientEvents.AFTER_RENDER_LIVING);
         INSTANCE.register(RenderPlayerEvents.Before.class, FabricClientEvents.BEFORE_RENDER_PLAYER);
         INSTANCE.register(RenderPlayerEvents.After.class, FabricClientEvents.AFTER_RENDER_PLAYER);
         INSTANCE.register(RenderHandCallback.class, FabricClientEvents.RENDER_HAND);

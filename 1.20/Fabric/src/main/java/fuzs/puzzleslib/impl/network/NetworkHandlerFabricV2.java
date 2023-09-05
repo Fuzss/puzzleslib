@@ -39,13 +39,15 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     @Override
-    public <T extends MessageV2<T>> void registerClientbound(Class<T> clazz) {
+    public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz) {
         this.register(clazz, true, NetworkHandlerImplHelper.getMessageDecoder(clazz));
+        return this;
     }
 
     @Override
-    public <T extends MessageV2<T>> void registerServerbound(Class<T> clazz) {
+    public <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz) {
         this.register(clazz, false, NetworkHandlerImplHelper.getMessageDecoder(clazz));
+        return this;
     }
 
     private <T extends MessageV2<T>> void register(Class<T> clazz, boolean toClient, Function<FriendlyByteBuf, T> decode) {

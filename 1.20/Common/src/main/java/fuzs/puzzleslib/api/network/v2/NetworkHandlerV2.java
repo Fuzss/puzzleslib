@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.network.v2;
 
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.BlockPos;
@@ -52,6 +53,7 @@ public interface NetworkHandlerV2 {
      * @param direction side this message is to be executed at
      * @param <T>       message implementation
      */
+    @Deprecated(forRemoval = true)
     <T extends MessageV2<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction);
 
     /**
@@ -60,7 +62,7 @@ public interface NetworkHandlerV2 {
      * @param clazz message class type
      * @param <T>   message implementation
      */
-    <T extends MessageV2<T>> void registerClientbound(Class<T> clazz);
+    <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz);
 
     /**
      * Register a message that will be sent to servers.
@@ -68,7 +70,7 @@ public interface NetworkHandlerV2 {
      * @param clazz message class type
      * @param <T>   message implementation
      */
-    <T extends MessageV2<T>> void registerServerbound(Class<T> clazz);
+    <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz);
 
     /**
      * creates a packet heading to the server side
@@ -111,7 +113,7 @@ public interface NetworkHandlerV2 {
      * @param message message to send
      */
     default void sendToAll(MessageV2<?> message) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
+        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
     }
 
     /**
@@ -121,7 +123,7 @@ public interface NetworkHandlerV2 {
      * @param exclude client to exclude
      */
     default void sendToAllExcept(MessageV2<?> message, ServerPlayer exclude) {
-        for (ServerPlayer player : Proxy.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
+        for (ServerPlayer player : CommonAbstractions.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
             if (player != exclude) this.sendTo(message, player);
         }
     }
@@ -163,7 +165,7 @@ public interface NetworkHandlerV2 {
      * @param level    dimension key provider level
      */
     default void sendToAllNearExcept(MessageV2<?> message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
+        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
     /**
@@ -203,6 +205,6 @@ public interface NetworkHandlerV2 {
      * @param dimension dimension to send message in
      */
     default void sendToDimension(MessageV2<?> message, ResourceKey<Level> dimension) {
-        Proxy.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
+        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
     }
 }
