@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.core.v1;
 
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -52,41 +51,10 @@ public interface ModContainer {
     Map<String, String> getContactTypes();
 
     /**
-     * @param size preferred icon size
-     * @return path to the mod icon file if present
-     */
-    Optional<String> getIconPath(int size);
-
-    /**
-     * @return is this mod a client-only mod
-     */
-    boolean isClientOnly();
-
-    /**
-     * @return is this mod marked as a library mod
-     */
-    boolean isLibrary();
-
-    /**
      * Finds a resource in the mod jar file.
      *
      * @param path resource name, if entered as single string path components are separated using "/"
      * @return path to the resource if it exists, otherwise empty
      */
     Optional<Path> findResource(String... path);
-
-    /**
-     * @return a list of mod ids this mod depends on
-     */
-    List<String> getDependencyIds();
-
-    /**
-     * @return an url for manually downloading mod updates
-     */
-    Optional<String> getUpdateUrl();
-
-    /**
-     * @return is an update available for this mod
-     */
-    boolean isUpdateAvailable();
 }
