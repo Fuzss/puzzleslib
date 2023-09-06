@@ -16,7 +16,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.PlayerEvents;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
@@ -42,7 +42,7 @@ public abstract class ModContext {
             }
         });
         PlayerEvents.LOGGED_IN.register((ServerPlayer player) -> {
-            PuzzlesLib.NETWORK.sendTo(player, new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
+            PuzzlesLibMod.NETWORK.sendTo(player, new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ClientPlayerEvents.LOGGED_IN.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {

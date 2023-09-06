@@ -1,17 +1,28 @@
 package fuzs.puzzleslib.impl.core;
 
+import com.google.common.base.Suppliers;
+import com.google.common.collect.ImmutableMap;
+import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.fabricmc.loader.api.metadata.ModMetadata;
 
 import java.nio.file.Path;
-import java.util.Optional;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public final class FabricEnvironment implements ModLoaderEnvironment {
+    private final Supplier<Map<String, ModContainer>> modList = Suppliers.memoize(() -> {
+        return FabricLoader.getInstance().getAllMods().stream()
+                .map(FabricModContainer::new)
+                .sorted(Comparator.comparing(ModContainer::getModId))
+                // compiler cannot infer type arguments here
+                .collect(ImmutableMap.<FabricModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId, Function.identity()));
+    });
 
     @Override
     public ModLoader getModLoader() {
@@ -44,23 +55,13 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
-    public Optional<Path> findModResource(String id, String... pathName) {
-        return FabricLoader.getInstance().getModContainer(id).flatMap(modContainer -> modContainer.findPath(String.join("/", pathName)));
-    }
-
-    @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
     }
 
     @Override
-    public boolean isModLoaded(String modId) {
-        return FabricLoader.getInstance().isModLoaded(modId);
-    }
-
-    @Override
-    public Optional<String> getModName(String modId) {
-        return FabricLoader.getInstance().getModContainer(modId).map(ModContainer::getMetadata).map(ModMetadata::getName);
+    public Map<String, ModContainer> getModList() {
+        return this.modList.get();
     }
 
     @Override

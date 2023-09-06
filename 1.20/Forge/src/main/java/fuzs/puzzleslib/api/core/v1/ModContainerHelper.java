@@ -8,6 +8,7 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -43,7 +44,9 @@ public final class ModContainerHelper {
      * @return      the mod container
      */
     public static ModContainer findModContainer(String modId) {
-        return ModList.get().getModContainerById(modId)
+        ModList modList = ModList.get();
+        Objects.requireNonNull(modList, "mod list is null");
+        return modList.getModContainerById(modId)
                 .orElseThrow(() -> new IllegalArgumentException(String.format("No mod container for id %s exists", modId)));
     }
 }

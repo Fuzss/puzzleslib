@@ -12,7 +12,7 @@ public class PuzzlesLibForge {
 
     @SubscribeEvent
     public static void onConstructMod(final FMLConstructModEvent evt) {
-        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLib::new);
+        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibMod::new);
     }
 
     @SubscribeEvent

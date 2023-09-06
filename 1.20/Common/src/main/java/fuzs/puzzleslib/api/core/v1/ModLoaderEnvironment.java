@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.core.v1;
 import fuzs.puzzleslib.impl.core.ModContext;
 
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -80,44 +81,29 @@ public interface ModLoaderEnvironment {
     Path getConfigDirectory();
 
     /**
-     * Finds a resource in a mod jar file.
-     *
-     * @param id       the mod id to check the jar file from
-     * @param pathName resource name, if entered as single string path components are separated using "/"
-     * @return path to the resource if it exists, otherwise empty
-     */
-    Optional<Path> findModResource(String id, String... pathName);
-
-    /**
      * @return is this running in a development environment
      */
     boolean isDevelopmentEnvironment();
 
     /**
+     * @return a wrapped mod list
+     */
+    Map<String, ModContainer> getModList();
+
+    /**
      * @param modId mod id to check
      * @return is this mod loaded
      */
-    boolean isModLoaded(String modId);
-
-    /**
-     * safe version of {@link #isModLoaded} on fml
-     *
-     * @param modId mod id to check
-     * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
-     */
-    @Deprecated(forRemoval = true)
-    default boolean isModLoadedSafe(String modId) {
-        return this.isModPresent(modId);
+    default boolean isModLoaded(String modId) {
+        return this.getModList().containsKey(modId);
     }
 
     /**
-     * safe version of {@link #isModLoaded} on fml
-     *
      * @param modId mod id to check
-     * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
+     * @return the corresponding mod container if found
      */
-    default boolean isModPresent(String modId) {
-        return this.isModLoaded(modId);
+    default Optional<ModContainer> getModContainer(String modId) {
+        return this.isModLoaded(modId) ? Optional.of(this.getModList().get(modId)) : Optional.empty();
     }
 
     /**
@@ -133,12 +119,44 @@ public interface ModLoaderEnvironment {
     }
 
     /**
+     * safe version of {@link #isModLoaded} on fml
+     *
+     * @param modId mod id to check
+     * @return is this mod loaded or have available mods not been collected yet (mod list is still null)
+     *
+     * @deprecated no longer required, implementation on Forge now checks on its own which mod list to use
+     */
+    @Deprecated(forRemoval = true)
+    default boolean isModLoadedSafe(String modId) {
+        return this.isModLoaded(modId);
+    }
+
+    /**
      * Finds the display name associated with a certain <code>modId</code>.
      *
      * @param modId the mod id
      * @return the corresponding display name
+     *
+     * @deprecated use {@link #getModContainer(String)} and then {@link ModContainer#getDisplayName()} instead
      */
-    Optional<String> getModName(String modId);
+    @Deprecated(forRemoval = true)
+    default Optional<String> getModName(String modId) {
+        return this.getModContainer(modId).map(ModContainer::getDisplayName);
+    }
+
+    /**
+     * Finds a resource in a mod jar file.
+     *
+     * @param modId the mod id to check the jar file from
+     * @param path  resource name, if entered as single string path components are separated using "/"
+     * @return path to the resource if it exists, otherwise empty
+     *
+     * @deprecated use {@link #getModContainer(String)} and then {@link ModContainer#findResource(String...)} instead
+     */
+    @Deprecated(forRemoval = true)
+    default Optional<Path> findModResource(String modId, String... path) {
+        return this.getModContainer(modId).flatMap(t -> t.findResource(path));
+    }
 
     /**
      * @return a wrapper for Fabric's object share, will return a dummy wrapper on Forge
