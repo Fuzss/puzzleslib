@@ -7,6 +7,6 @@ public class PuzzlesLibFabric implements ModInitializer {
 
     @Override
     public void onInitialize() {
-        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLib::new);
+        ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibMod::new);
     }
 }

@@ -72,9 +72,11 @@ public abstract class AbstractModPackResources implements PackResources {
     public IoSupplier<InputStream> getRootResource(String... elements) {
         String path = String.join("/", elements);
         if ("pack.png".equals(path)) {
-            return ModLoaderEnvironment.INSTANCE.findModResource(this.logoModId, this.modLogoPath).<IoSupplier<InputStream>>map(modResource -> {
-                return () -> Files.newInputStream(modResource);
-            }).orElse(null);
+            return ModLoaderEnvironment.INSTANCE.getModContainer(this.logoModId)
+                    .flatMap(container -> container.findResource(this.modLogoPath))
+                    .<IoSupplier<InputStream>>map(modResource -> {
+                        return () -> Files.newInputStream(modResource);
+                    }).orElse(null);
         }
         return null;
     }

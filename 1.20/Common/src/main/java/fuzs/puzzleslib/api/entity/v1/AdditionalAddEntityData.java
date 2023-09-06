@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.entity.v1;
 
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
@@ -26,7 +26,7 @@ public interface AdditionalAddEntityData {
         ClientboundAddEntityPacket vanillaPacket = new ClientboundAddEntityPacket(entity);
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         entity.writeAdditionalAddEntityData(buf);
-        return PuzzlesLib.NETWORK.toClientboundPacket(new ClientboundAddEntityDataMessage(vanillaPacket, buf));
+        return PuzzlesLibMod.NETWORK.toClientboundPacket(new ClientboundAddEntityDataMessage(vanillaPacket, buf));
     }
 
     /**
