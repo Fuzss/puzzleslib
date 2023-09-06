@@ -3,7 +3,6 @@ package fuzs.puzzleslib.impl.core;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import net.minecraftforge.common.util.MavenVersionStringHelper;
-import net.minecraftforge.fml.VersionChecker;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 
@@ -73,40 +72,7 @@ public record ForgeModContainer(IModInfo metadata) implements ModContainer {
     }
 
     @Override
-    public Optional<String> getIconPath(int size) {
-        return Optional.ofNullable((String) this.metadata.getModProperties().get("catalogueImageIcon")).or(this.metadata::getLogoFile);
-    }
-
-    @Override
-    public boolean isClientOnly() {
-        // this is meant for server compatibility testing and has nothing to do whether a mod loads only client-side or not,
-        // but it's the closest Forge has to marking a mod client-only
-        return this.metadata.getConfig().<String>getConfigElement("displayTest").filter("IGNORE_ALL_VERSION"::equals).isPresent();
-    }
-
-    @Override
-    public boolean isLibrary() {
-        // Forge does not provide a way to mark mods as libraries
-        return false;
-    }
-
-    @Override
     public Optional<Path> findResource(String... path) {
         return Optional.of(this.metadata.getOwningFile().getFile().findResource(path)).filter(Files::exists);
-    }
-
-    @Override
-    public List<String> getDependencyIds() {
-        return this.metadata.getDependencies().stream().filter(IModInfo.ModVersion::isMandatory).map(IModInfo.ModVersion::getModId).toList();
-    }
-
-    @Override
-    public Optional<String> getUpdateUrl() {
-        return this.metadata.getUpdateURL().map(URL::toString);
-    }
-
-    @Override
-    public boolean isUpdateAvailable() {
-        return VersionChecker.getResult(this.metadata).status().isAnimated();
     }
 }
