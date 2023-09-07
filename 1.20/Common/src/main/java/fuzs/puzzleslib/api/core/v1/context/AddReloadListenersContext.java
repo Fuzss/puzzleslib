@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.api.core.v1.context;
 
+import fuzs.puzzleslib.api.core.v1.resources.SimpleReloadListener;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 /**
  * Adds a listener to the client (resource packs) or server (data packs) resource manager to reload at the end of all resources.
@@ -15,8 +17,28 @@ public interface AddReloadListenersContext {
     /**
      * Register a {@link PreparableReloadListener}.
      *
-     * @param id             id of this listener for identifying, only used on Fabric
-     * @param reloadListener the reload-listener to add
+     * @param id             id for this listener
+     * @param reloadListener the reload listener to add
      */
     void registerReloadListener(String id, PreparableReloadListener reloadListener);
+
+    /**
+     * Register a {@link ResourceManagerReloadListener}.
+     *
+     * @param id             id for this listener
+     * @param reloadListener the reload listener to add
+     */
+    default void registerReloadListener(String id, ResourceManagerReloadListener reloadListener) {
+        this.registerReloadListener(id, (PreparableReloadListener) reloadListener);
+    }
+
+    /**
+     * Register a {@link SimpleReloadListener}.
+     *
+     * @param id             id for this listener
+     * @param reloadListener the reload listener to add
+     */
+    default <T> void registerReloadListener(String id, SimpleReloadListener<T> reloadListener) {
+        this.registerReloadListener(id, (PreparableReloadListener) reloadListener);
+    }
 }

@@ -6,9 +6,9 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import fuzs.puzzleslib.impl.core.context.*;
+import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.common.MinecraftForge;
@@ -36,7 +36,7 @@ public final class ForgeModConstructor {
             Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
             registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
             registerModHandlers(constructor, modEventBus, biomeModifications, availableFlags);
-            registerHandlers(constructor);
+            registerHandlers(constructor, modId);
             constructor.onConstructMod();
         });
     }
@@ -86,9 +86,9 @@ public final class ForgeModConstructor {
         });
     }
 
-    private static void registerHandlers(ModConstructor constructor) {
+    private static void registerHandlers(ModConstructor constructor, String modId) {
         MinecraftForge.EVENT_BUS.addListener((AddReloadListenerEvent evt) -> {
-            constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextForgeImpl(evt::addListener));
+            constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextForgeImpl(modId, evt::addListener));
         });
     }
 }

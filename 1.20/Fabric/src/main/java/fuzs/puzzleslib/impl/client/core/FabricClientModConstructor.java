@@ -8,7 +8,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
+import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
@@ -82,7 +82,7 @@ public final class FabricClientModConstructor {
         List<ResourceManagerReloadListener> listeners = Lists.newArrayList();
         consumer.accept(new BuiltinModelItemRendererContextFabricImpl(listeners));
         if (listeners.isEmpty()) return;
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricResourceReloadListener(modId, "built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(modId, "built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
             for (ResourceManagerReloadListener listener : listeners) {
                 try {
                     listener.onResourceManagerReload(resourceManager);
