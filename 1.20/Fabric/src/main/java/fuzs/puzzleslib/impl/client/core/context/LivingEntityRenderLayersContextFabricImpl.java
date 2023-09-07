@@ -21,8 +21,9 @@ public final class LivingEntityRenderLayersContextFabricImpl implements LivingEn
         Objects.requireNonNull(entityType, "entity type is null");
         Objects.requireNonNull(factory, "render layer factory is null");
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register((EntityType<? extends LivingEntity> entityType1, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
-            if (entityType == entityType1)
+            if (entityType == entityType1) {
                 registrationHelper.register(factory.apply((RenderLayerParent<T, M>) entityRenderer, context));
+            }
         });
     }
 }

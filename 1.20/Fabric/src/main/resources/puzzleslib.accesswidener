@@ -28,3 +28,4 @@ transitive-accessible	class	net/minecraft/world/item/CreativeModeTab$Output
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    OUTER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    INNER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;
 transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$SpriteParticleRegistration
+transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
