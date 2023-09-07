@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.core.context;
 
 import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
-import fuzs.puzzleslib.api.core.v1.FabricResourceReloadListener;
+import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -14,6 +14,6 @@ public record AddReloadListenersContextFabricImpl(PackType packType, String modI
     public void registerReloadListener(String id, PreparableReloadListener reloadListener) {
         Objects.requireNonNull(id, "reload listener id is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        ResourceManagerHelper.get(this.packType).registerReloadListener(new FabricResourceReloadListener(this.modId, id, reloadListener));
+        ResourceManagerHelper.get(this.packType).registerReloadListener(new FabricReloadListener(this.modId, id, reloadListener));
     }
 }

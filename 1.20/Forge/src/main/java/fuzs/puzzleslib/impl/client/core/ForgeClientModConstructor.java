@@ -85,7 +85,7 @@ public final class ForgeClientModConstructor {
             constructor.onRegisterSkullRenderers(new SkullRenderersContextForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
         });
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
-            constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextForgeImpl(evt::registerReloadListener));
+            constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextForgeImpl(modId, evt::registerReloadListener));
         });
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             registerBuiltInItemModelRenderersReloadListeners(evt::registerReloadListener, modId, dynamicRenderers, availableFlags);
