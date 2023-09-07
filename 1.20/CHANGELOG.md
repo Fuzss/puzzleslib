@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.31-1.20.1] - 2023-09-07
+### Added
+- Add access widener for `EntityRenderDispatcher#renderers` on Fabric
+
 ## [v8.0.30-1.20.1] - 2023-09-05
 ### Added
 - Puzzles Lib now prints a list of all installed mods to the log on start-up in an effort to help diagnose issues when no crash-report has been generated or provided
