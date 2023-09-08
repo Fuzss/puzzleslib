@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.*;
+import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.PairedModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
 import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
@@ -28,24 +28,37 @@ import java.util.function.Supplier;
 /**
  * a base class for a mods main client class, contains a bunch of methods for registering various things
  */
-public interface ClientModConstructor extends PairedModConstructor {
+public interface ClientModConstructor extends BaseModConstructor {
 
     /**
      * Construct the {@link ClientModConstructor} instance provided as <code>supplier</code> to begin client-side initialization of a mod.
      *
-     * @param modId the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructor       the main mod instance for mod setup
-     * @param flags specific content this mod uses that needs to be additionally registered
+     * @param modId          the mod id for registering events on Forge to the correct mod event bus
+     * @param modConstructor the main mod instance for mod setup
      */
-    static void construct(String modId, Supplier<ClientModConstructor> modConstructor, ContentRegistrationFlags... flags) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id must not be empty");
-        ClientModConstructor instance = modConstructor.get();
+    static void construct(String modId, Supplier<ClientModConstructor> modConstructor) {
+        construct(modId, modConstructor, new ContentRegistrationFlags[0]);
+    }
+
+    /**
+     * Construct the {@link ClientModConstructor} instance provided as <code>supplier</code> to begin client-side initialization of a mod.
+     *
+     * @param modId    the mod id for registering events on Forge to the correct mod event bus
+     * @param supplier the main mod instance for mod setup
+     * @param flags    specific content this mod uses that needs to be additionally registered
+     * @deprecated replaced provided flags with {@link BaseModConstructor#getContentRegistrationFlags()}
+     */
+    @Deprecated(forRemoval = true)
+    static void construct(String modId, Supplier<ClientModConstructor> supplier, ContentRegistrationFlags... flags) {
+        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
+        ClientModConstructor instance = supplier.get();
         ModContext modContext = ModContext.get(modId);
         ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
         // not an issue on Fabric, but Forge might call client construction before common
         modContext.scheduleClientModConstruction(identifier, () -> {
             PuzzlesLib.LOGGER.info("Constructing client components for {}", identifier);
-            Set<ContentRegistrationFlags> availableFlags = Set.of(flags);
+            ContentRegistrationFlags[] builtInFlags = instance.getContentRegistrationFlags();
+            Set<ContentRegistrationFlags> availableFlags = Set.of(builtInFlags.length != 0 ? builtInFlags : flags);
             Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
             ClientFactories.INSTANCE.constructClientMod(modId, instance, availableFlags, flagsToHandle);
         });
@@ -63,7 +76,6 @@ public interface ClientModConstructor extends PairedModConstructor {
      * used to set various values and settings for already registered content
      *
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
-     *
      * @deprecated now always runs deferred, use {@link #onClientSetup()}
      */
     @Deprecated(forRemoval = true)
@@ -116,7 +128,6 @@ public interface ClientModConstructor extends PairedModConstructor {
 
     /**
      * @param context add a search tree builder together with a token
-     *
      * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry(Minecraft)}
      */
     @Deprecated(forRemoval = true)
@@ -126,7 +137,6 @@ public interface ClientModConstructor extends PairedModConstructor {
 
     /**
      * @param context Context for modifying baked models right after they've been reloaded.
-     *
      * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.ModifyBakingResult}
      */
     @Deprecated(forRemoval = true)
@@ -136,7 +146,6 @@ public interface ClientModConstructor extends PairedModConstructor {
 
     /**
      * @param context Context for retrieving baked models from the model manager after they've been reloaded.
-     *
      * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.BakingCompleted}
      */
     @Deprecated(forRemoval = true)

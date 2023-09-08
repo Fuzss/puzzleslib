@@ -10,7 +10,7 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.Buildable;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.PairedModConstructor;
+import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerEvents;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
@@ -77,7 +77,7 @@ public abstract class ModContext {
         return MOD_CONTEXTS.values().stream().map(context -> context.capabilityController).filter(Objects::nonNull);
     }
 
-    public static ResourceLocation getPairingIdentifier(String modId, PairedModConstructor modConstructor) {
+    public static ResourceLocation getPairingIdentifier(String modId, BaseModConstructor modConstructor) {
         ResourceLocation identifier = modConstructor.getPairingIdentifier();
         return identifier != null ? identifier : new ResourceLocation(modId, "main");
     }

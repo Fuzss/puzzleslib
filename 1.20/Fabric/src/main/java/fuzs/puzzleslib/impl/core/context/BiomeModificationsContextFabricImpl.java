@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
+import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
 import fuzs.puzzleslib.impl.biome.*;
 import net.fabricmc.fabric.api.biome.v1.BiomeModification;
@@ -15,11 +16,12 @@ import net.minecraft.world.level.biome.Biome;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public record BiomeModificationsContextFabricImpl(
-        BiomeModification biomeModification) implements BiomeModificationsContext {
+        BiomeModification biomeModification, Set<ContentRegistrationFlags> availableFlags) implements BiomeModificationsContext {
     @SuppressWarnings("RedundantTypeArguments")
     private static final Map<BiomeLoadingPhase, ModificationPhase> BIOME_PHASE_CONVERSIONS = Maps.<BiomeLoadingPhase, ModificationPhase>immutableEnumMap(new HashMap<>() {{
         this.put(BiomeLoadingPhase.ADDITIONS, ModificationPhase.ADDITIONS);
@@ -28,8 +30,8 @@ public record BiomeModificationsContextFabricImpl(
         this.put(BiomeLoadingPhase.POST_PROCESSING, ModificationPhase.POST_PROCESSING);
     }});
 
-    public BiomeModificationsContextFabricImpl(String modId) {
-        this(BiomeModifications.create(new ResourceLocation(modId, "biome_modifiers")));
+    public BiomeModificationsContextFabricImpl(String modId, Set<ContentRegistrationFlags> availableFlags) {
+        this(BiomeModifications.create(new ResourceLocation(modId, "biome_modifiers")), availableFlags);
     }
 
     private static BiomeModificationContext getBiomeModificationContext(net.fabricmc.fabric.api.biome.v1.BiomeModificationContext modificationContext, Biome biome) {
@@ -50,6 +52,13 @@ public record BiomeModificationsContextFabricImpl(
 
     @Override
     public void register(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier) {
-        registerBiomeModification(this.biomeModification, phase, selector, modifier);
+        if (this.availableFlags.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
+            Objects.requireNonNull(phase, "phase is null");
+            Objects.requireNonNull(selector, "selector is null");
+            Objects.requireNonNull(modifier, "modifier is null");
+            registerBiomeModification(this.biomeModification, phase, selector, modifier);
+        } else {
+            ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.BIOME_MODIFICATIONS);
+        }
     }
 }

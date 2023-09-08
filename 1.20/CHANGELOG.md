@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.32-1.20.1] - 2023-09-08
+### Added
+- Added `ClientParticleTypes` for registering fully client-side particle providers
+### Changed
+- `ContentRegistrationFlags` are now enabled via implementing `BaseModConstructor::getContentRegistrationFlags`
+- Fabric is now more strict in enforcing `ContentRegistrationFlags` even when not strictly required to improve parity with Forge
+- Greatly expanded upon `ParticleProvidersContext` to allow for more kinds of particle types to be registered
+- Overhauled `ForwardingReloadListener` to support forwarding a collection of `PreparableReloadListener`s instead of just a single one
+- Refactored `FabricReloadListener` into a more general `FabricReloadListenerHelper` class
+
 ## [v8.0.31-1.20.1] - 2023-09-07
 ### Added
 - Add access widener for `EntityRenderDispatcher#renderers` on Fabric
