@@ -6,8 +6,11 @@ import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerImpl;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
+import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
+import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesManager;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextForgeImpl;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
@@ -15,8 +18,6 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -36,19 +37,19 @@ public final class ForgeClientModConstructor {
 
     public static void construct(ClientModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
-            registerModHandlers(constructor, modId, eventBus, Lists.newArrayList(), availableFlags);
+            registerModHandlers(constructor, modId, eventBus, Lists.newArrayList(), availableFlags, flagsToHandle);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<ResourceManagerReloadListener> dynamicRenderers, Set<ContentRegistrationFlags> availableFlags) {
+    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<PreparableReloadListener> dynamicRenderers, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         eventBus.addListener((final FMLClientSetupEvent evt) -> {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
                 constructor.onClientSetup();
                 constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
-                constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(dynamicRenderers));
+                constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
                 constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
             });
@@ -86,9 +87,13 @@ public final class ForgeClientModConstructor {
         });
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextForgeImpl(modId, evt::registerReloadListener));
-        });
-        eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
-            registerBuiltInItemModelRenderersReloadListeners(evt::registerReloadListener, modId, dynamicRenderers, availableFlags);
+            if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
+                evt.registerReloadListener(new ForwardingReloadListenerImpl(modId, "built_in_model_item_renderers", dynamicRenderers));
+            }
+            if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
+                ClientParticleTypesManager particleTypesManager = ClientParticleTypesImpl.INSTANCE.getParticleTypesManager(modId);
+                evt.registerReloadListener(new ForwardingReloadListenerImpl(modId, "client_particle_types", particleTypesManager));
+            }
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
             constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextForgeImpl(evt));
@@ -125,21 +130,6 @@ public final class ForgeClientModConstructor {
             consumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
         } catch (Exception e) {
             PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
-        }
-    }
-
-    private static void registerBuiltInItemModelRenderersReloadListeners(Consumer<PreparableReloadListener> consumer, String modId, List<ResourceManagerReloadListener> dynamicRenderers, Set<ContentRegistrationFlags> availableFlags) {
-        if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
-            // always register this, the event runs before built-in model item renderers, so the list is always empty at this point
-            consumer.accept((ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-                for (ResourceManagerReloadListener listener : dynamicRenderers) {
-                    try {
-                        listener.onResourceManagerReload(resourceManager);
-                    } catch (Exception e) {
-                        PuzzlesLib.LOGGER.error("Unable to execute dynamic built-in model item renderers reload provided by {}", modId, e);
-                    }
-                }
-            });
         }
     }
 }

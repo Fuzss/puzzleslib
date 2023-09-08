@@ -4,12 +4,16 @@ import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerImpl;
 import fuzs.puzzleslib.impl.client.core.ForwardingClientItemExtensions;
 import fuzs.puzzleslib.mixin.client.accessor.ItemForgeAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -20,8 +24,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-public record BuiltinModelItemRendererContextForgeImpl(
-        List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
+public record BuiltinModelItemRendererContextForgeImpl(String modId,
+        List<PreparableReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
     public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
@@ -45,17 +49,19 @@ public record BuiltinModelItemRendererContextForgeImpl(
         };
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
-            setClientItemExtensions(item, itemExtensions);
+            setClientItemExtensions(item.asItem(), itemExtensions);
         }
         // store this to enable listening to resource reloads
-        this.dynamicRenderers.add(renderer);
+        String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
+        ResourceLocation identifier = new ResourceLocation(this.modId, itemName + "_built_in_model_renderer");
+        this.dynamicRenderers.add(new ForwardingReloadListenerImpl(identifier, renderer));
     }
 
-    private static void setClientItemExtensions(ItemLike item, IClientItemExtensions itemExtensions) {
+    private static void setClientItemExtensions(Item item, IClientItemExtensions itemExtensions) {
         // this solution is very dangerous as it relies on internal stuff in Forge
         // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
-        Object renderProperties = ((ItemForgeAccessor) item.asItem()).puzzleslib$getRenderProperties();
-        ((ItemForgeAccessor) item.asItem()).puzzleslib$setRenderProperties(renderProperties != null ? new ForwardingClientItemExtensions((IClientItemExtensions) renderProperties) {
+        Object renderProperties = ((ItemForgeAccessor) item).puzzleslib$getRenderProperties();
+        ((ItemForgeAccessor) item).puzzleslib$setRenderProperties(renderProperties != null ? new ForwardingClientItemExtensions((IClientItemExtensions) renderProperties) {
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {

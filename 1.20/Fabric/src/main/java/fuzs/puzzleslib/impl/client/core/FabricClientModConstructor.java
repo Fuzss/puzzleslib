@@ -2,25 +2,22 @@ package fuzs.puzzleslib.impl.client.core;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
-import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
-import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
-import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
+import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
+import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListenerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
+import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
+import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesManager;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 import java.util.List;
 import java.util.Map;
@@ -40,14 +37,14 @@ public final class FabricClientModConstructor {
         constructor.onRegisterEntityRenderers(new EntityRenderersContextFabricImpl());
         constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextFabricImpl());
         constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());
-        constructor.onRegisterParticleProviders(new ParticleProvidersContextFabricImpl());
+        registerClientParticleTypesManager(modId, constructor::onRegisterParticleProviders, flagsToHandle);
         constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         constructor.onRegisterSearchTrees(new SearchRegistryContextFabricImpl());
-        registerModelBakingListeners(constructor::onModifyBakingResult, constructor::onBakingCompleted, modId);
+        registerModelBakingListeners(modId, constructor::onModifyBakingResult, constructor::onBakingCompleted);
         constructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
         constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
-        registerBuiltinModelItemRenderers(constructor::onRegisterBuiltinModelItemRenderers, modId);
+        registerBuiltinModelItemRenderers(modId, constructor::onRegisterBuiltinModelItemRenderers, availableFlags);
         constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.CLIENT_RESOURCES, modId));
         constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
         constructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
@@ -61,7 +58,7 @@ public final class FabricClientModConstructor {
         registerCoreShaders(constructor::onRegisterCoreShaders);
     }
 
-    private static void registerModelBakingListeners(Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer, String modId) {
+    private static void registerModelBakingListeners(String modId, Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer) {
         ModelEvents.modifyBakingResult(null).register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             try {
                 modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery.get()));
@@ -78,19 +75,22 @@ public final class FabricClientModConstructor {
         });
     }
 
-    private static void registerBuiltinModelItemRenderers(Consumer<BuiltinModelItemRendererContext> consumer, String modId) {
-        List<ResourceManagerReloadListener> listeners = Lists.newArrayList();
-        consumer.accept(new BuiltinModelItemRendererContextFabricImpl(listeners));
-        if (listeners.isEmpty()) return;
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(modId, "built_in_model_item_renderers", (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-            for (ResourceManagerReloadListener listener : listeners) {
-                try {
-                    listener.onResourceManagerReload(resourceManager);
-                } catch (Exception e) {
-                    PuzzlesLib.LOGGER.error("Unable to execute dynamic built-in model item renderers reload provided by {}", modId, e);
-                }
-            }
-        }));
+    private static void registerClientParticleTypesManager(String modId, Consumer<ParticleProvidersContext> consumer, Set<ContentRegistrationFlags> flagsToHandle) {
+        consumer.accept(new ParticleProvidersContextFabricImpl());
+        if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
+            ClientParticleTypesManager particleTypesManager = ClientParticleTypesImpl.INSTANCE.getParticleTypesManager(modId);
+            FabricReloadListenerHelper.registerReloadListener(PackType.CLIENT_RESOURCES, modId, "client_particle_types", particleTypesManager);
+        }
+    }
+
+    private static void registerBuiltinModelItemRenderers(String modId, Consumer<BuiltinModelItemRendererContext> consumer, Set<ContentRegistrationFlags> availableFlags) {
+        List<PreparableReloadListener> dynamicRenderers = Lists.newArrayList();
+        consumer.accept(new BuiltinModelItemRendererContextFabricImpl(modId, dynamicRenderers));
+        if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
+            FabricReloadListenerHelper.registerReloadListener(PackType.CLIENT_RESOURCES, modId, "built_in_model_item_renderers", dynamicRenderers);
+        } else if (!dynamicRenderers.isEmpty()) {
+            ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.DYNAMIC_RENDERERS);
+        }
     }
 
     private static void registerCoreShaders(Consumer<CoreShadersContext> modifyBakingResultConsumer) {
