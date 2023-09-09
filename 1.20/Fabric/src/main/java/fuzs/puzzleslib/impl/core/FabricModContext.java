@@ -11,6 +11,7 @@ import fuzs.puzzleslib.impl.init.FabricRegistryManagerV2;
 import fuzs.puzzleslib.impl.init.FabricRegistryManagerV3;
 import fuzs.puzzleslib.impl.network.NetworkHandlerFabricV2;
 import fuzs.puzzleslib.impl.network.NetworkHandlerFabricV3;
+import net.minecraft.resources.ResourceLocation;
 
 public final class FabricModContext extends ModContext {
 
@@ -19,13 +20,15 @@ public final class FabricModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandlerV2 getNetworkHandlerV2(boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return new NetworkHandlerFabricV2(this.modId + "-" + this.networkHandlers.incrementAndGet());
+    public NetworkHandlerV2 getNetworkHandlerV2(int id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        if (id == -1) id = this.networkHandlers.incrementAndGet();
+        return new NetworkHandlerFabricV2(new ResourceLocation(this.modId, "play/" + id));
     }
 
     @Override
-    public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder() {
-        return this.addBuildable(new NetworkHandlerFabricV3(this.modId + "-" + this.networkHandlers.incrementAndGet()));
+    public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(int id) {
+        if (id == -1) id = this.networkHandlers.incrementAndGet();
+        return this.addBuildable(new NetworkHandlerFabricV3(new ResourceLocation(this.modId, "play/" + id)));
     }
 
     @Override

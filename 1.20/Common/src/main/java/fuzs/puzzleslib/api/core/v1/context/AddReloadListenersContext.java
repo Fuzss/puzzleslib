@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.core.v1.context;
 
-import fuzs.puzzleslib.api.core.v1.resources.SimpleReloadListener;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 
 /**
  * Adds a listener to the client (resource packs) or server (data packs) resource manager to reload at the end of all resources.
@@ -24,6 +24,7 @@ public interface AddReloadListenersContext {
 
     /**
      * Register a {@link ResourceManagerReloadListener}.
+     * <p>Exists as a dedicated overload to remind me this is a thing, and you do not need to always use the full-blown {@link PreparableReloadListener}.
      *
      * @param id             id for this listener
      * @param reloadListener the reload listener to add
@@ -33,12 +34,13 @@ public interface AddReloadListenersContext {
     }
 
     /**
-     * Register a {@link SimpleReloadListener}.
+     * Register a {@link SimplePreparableReloadListener}.
+     * <p>Exists as a dedicated overload to remind me this is a thing, and you do not need to always use the full-blown {@link PreparableReloadListener}.
      *
      * @param id             id for this listener
      * @param reloadListener the reload listener to add
      */
-    default <T> void registerReloadListener(String id, SimpleReloadListener<T> reloadListener) {
+    default <T> void registerReloadListener(String id, SimplePreparableReloadListener<T> reloadListener) {
         this.registerReloadListener(id, (PreparableReloadListener) reloadListener);
     }
 }

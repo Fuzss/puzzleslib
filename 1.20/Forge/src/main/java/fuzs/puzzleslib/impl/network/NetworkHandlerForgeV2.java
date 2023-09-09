@@ -30,8 +30,8 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
     public final boolean clientAcceptsVanillaOrMissing;
     public final boolean serverAcceptsVanillaOrMissing;
 
-    public NetworkHandlerForgeV2(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        this.channel = buildSimpleChannel(modId, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    public NetworkHandlerForgeV2(ResourceLocation channelIdentifier, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        this.channel = buildSimpleChannel(channelIdentifier, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
         this.clientAcceptsVanillaOrMissing = clientAcceptsVanillaOrMissing;
         this.serverAcceptsVanillaOrMissing = serverAcceptsVanillaOrMissing;
     }
@@ -90,9 +90,9 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
         return (Packet<ClientGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    private static SimpleChannel buildSimpleChannel(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         return NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(modId, "play"))
+                .named(resourceLocation)
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
                 .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)

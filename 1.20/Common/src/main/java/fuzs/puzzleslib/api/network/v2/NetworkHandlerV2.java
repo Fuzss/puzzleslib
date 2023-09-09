@@ -22,17 +22,28 @@ import java.util.function.Supplier;
 public interface NetworkHandlerV2 {
 
     /**
-     * creates a new network handler
+     * Creates a new network handler.
      *
      * @param modId id for channel name
      * @return mod specific network handler with default channel
      */
     static NetworkHandlerV2 build(String modId) {
-        return build(modId, false, false);
+        return build(modId, -1);
     }
 
     /**
-     * creates a new network handler
+     * Creates a new network handler.
+     *
+     * @param modId id for channel name
+     * @param id    an internal id for this channel in case multiple are registered using the same mod id
+     * @return mod specific network handler with default channel
+     */
+    static NetworkHandlerV2 build(String modId, int id) {
+        return build(modId, id, false, false);
+    }
+
+    /**
+     * Creates a new network handler.
      *
      * @param modId                         id for channel name
      * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
@@ -40,7 +51,20 @@ public interface NetworkHandlerV2 {
      * @return mod specific network handler with configured channel
      */
     static NetworkHandlerV2 build(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return ModContext.get(modId).getNetworkHandlerV2(clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+        return build(modId, -1, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    }
+
+    /**
+     * Creates a new network handler.
+     *
+     * @param modId                         id for channel name
+     * @param id                            an internal id for this channel in case multiple are registered using the same mod id
+     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
+     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
+     * @return mod specific network handler with configured channel
+     */
+    static NetworkHandlerV2 build(String modId, int id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return ModContext.get(modId).getNetworkHandlerV2(id, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     /**

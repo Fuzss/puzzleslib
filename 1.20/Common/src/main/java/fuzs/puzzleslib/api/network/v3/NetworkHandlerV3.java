@@ -40,7 +40,18 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return ModContext.get(modId).getNetworkHandlerV3$Builder();
+        return NetworkHandlerV3.builder(modId, -1);
+    }
+
+    /**
+     * Creates a new network handler builder.
+     *
+     * @param modId id for channel name
+     * @param id    an internal id for this channel in case multiple are registered using the same mod id
+     * @return builder for mod specific network handler with default channel
+     */
+    static Builder builder(String modId, int id) {
+        return ModContext.get(modId).getNetworkHandlerV3$Builder(id);
     }
 
     /**

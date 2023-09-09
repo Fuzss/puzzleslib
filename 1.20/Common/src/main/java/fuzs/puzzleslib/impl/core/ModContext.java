@@ -90,9 +90,9 @@ public abstract class ModContext {
         return MOD_CONTEXTS.containsKey(modId) && MOD_CONTEXTS.get(modId).presentServerside;
     }
 
-    public abstract NetworkHandlerV2 getNetworkHandlerV2(boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
+    public abstract NetworkHandlerV2 getNetworkHandlerV2(int id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
 
-    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3$Builder();
+    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(int id);
 
     public abstract ConfigHolder.Builder getConfigHolder$Builder();
 
