@@ -6,19 +6,21 @@ import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListenerHelper;
+import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
-import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesManager;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.util.List;
 import java.util.Map;
@@ -79,16 +81,19 @@ public final class FabricClientModConstructor {
     private static void registerClientParticleTypesManager(String modId, Consumer<ParticleProvidersContext> consumer, Set<ContentRegistrationFlags> flagsToHandle) {
         consumer.accept(new ParticleProvidersContextFabricImpl());
         if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
-            ClientParticleTypesManager particleTypesManager = ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId);
-            FabricReloadListenerHelper.registerReloadListener(PackType.CLIENT_RESOURCES, modId, "client_particle_types", particleTypesManager);
+            ResourceLocation identifier = new ResourceLocation(modId, "client_particle_types");
+            IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(identifier, ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId));
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         }
     }
 
     private static void registerBuiltinModelItemRenderers(String modId, Consumer<BuiltinModelItemRendererContext> consumer, Set<ContentRegistrationFlags> availableFlags) {
-        List<PreparableReloadListener> dynamicRenderers = Lists.newArrayList();
+        List<ResourceManagerReloadListener> dynamicRenderers = Lists.newArrayList();
         consumer.accept(new BuiltinModelItemRendererContextFabricImpl(modId, dynamicRenderers));
         if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
-            FabricReloadListenerHelper.registerReloadListener(PackType.CLIENT_RESOURCES, modId, "built_in_model_item_renderers", dynamicRenderers);
+            ResourceLocation identifier = new ResourceLocation(modId, "built_in_model_item_renderers");
+            IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(identifier, dynamicRenderers));
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         } else if (!dynamicRenderers.isEmpty()) {
             ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.DYNAMIC_RENDERERS);
         }

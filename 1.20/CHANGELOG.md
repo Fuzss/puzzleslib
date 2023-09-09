@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.33-1.20.1] - 2023-09-09
+### Changed
+- Reworked reload listener handling introduced in the last version to fix issues with mod loading getting stuck due to reload listeners that have not been properly completed
+- Changed handling of internal ids for multiple network handlers using the same namespace
+
 ## [v8.0.32-1.20.1] - 2023-09-08
 ### Added
 - Added `ClientParticleTypes` for registering fully client-side particle providers

@@ -7,7 +7,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultConte
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerImpl;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
@@ -18,7 +18,7 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -38,12 +38,13 @@ public final class ForgeClientModConstructor {
 
     public static void construct(ClientModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
-            registerModHandlers(constructor, modId, eventBus, Lists.newArrayList(), availableFlags, flagsToHandle);
+            registerModHandlers(constructor, modId, eventBus, availableFlags, flagsToHandle);
             constructor.onConstructMod();
         });
     }
 
-    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, List<PreparableReloadListener> dynamicRenderers, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
+    private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
+        List<ResourceManagerReloadListener> dynamicRenderers = Lists.newArrayList();
         eventBus.addListener((final FMLClientSetupEvent evt) -> {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
@@ -89,11 +90,11 @@ public final class ForgeClientModConstructor {
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextForgeImpl(modId, evt::registerReloadListener));
             if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
-                evt.registerReloadListener(new ForwardingReloadListenerImpl(modId, "built_in_model_item_renderers", dynamicRenderers));
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(new ResourceLocation(modId, "built_in_model_item_renderers"), dynamicRenderers));
             }
             if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
                 ClientParticleTypesManager particleTypesManager = ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId);
-                evt.registerReloadListener(new ForwardingReloadListenerImpl(modId, "client_particle_types", particleTypesManager));
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(new ResourceLocation(modId, "client_particle_types"), particleTypesManager));
             }
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
