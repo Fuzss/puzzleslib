@@ -3,17 +3,17 @@ package fuzs.puzzleslib.impl.client.core.context;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
-import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerImpl;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.level.ItemLike;
 
 import java.util.List;
 import java.util.Objects;
 
-public record BuiltinModelItemRendererContextFabricImpl(String modId, List<PreparableReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
+public record BuiltinModelItemRendererContextFabricImpl(String modId, List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
     public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
@@ -27,6 +27,6 @@ public record BuiltinModelItemRendererContextFabricImpl(String modId, List<Prepa
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
         ResourceLocation identifier = new ResourceLocation(this.modId, itemName + "_built_in_model_renderer");
-        this.dynamicRenderers.add(new ForwardingReloadListenerImpl(identifier, renderer));
+        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(identifier, renderer));
     }
 }

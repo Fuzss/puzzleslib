@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.impl.core.context;
 
-import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerImpl;
 import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 import java.util.Objects;
@@ -14,6 +15,6 @@ public record AddReloadListenersContextForgeImpl(String modId,
     public void registerReloadListener(String id, PreparableReloadListener reloadListener) {
         Objects.requireNonNull(id, "id is null");
         Objects.requireNonNull(reloadListener, "reload listener is null");
-        this.consumer.accept(new ForwardingReloadListenerImpl(this.modId, id, reloadListener));
+        this.consumer.accept(ForwardingReloadListenerHelper.fromReloadListener(new ResourceLocation(this.modId, id), reloadListener));
     }
 }
