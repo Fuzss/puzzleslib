@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Objects;
 
 public final class ClientParticleTypesImpl implements ClientParticleTypes {
-    public static final ClientParticleTypesImpl INSTANCE = new ClientParticleTypesImpl();
-
     private final Map<String, ClientParticleTypesManager> clientParticleTypeManagers = Maps.newConcurrentMap();
 
     @Override

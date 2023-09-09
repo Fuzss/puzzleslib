@@ -4,18 +4,19 @@ import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.List;
 
 public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Builder {
-    final String modId;
+    final ResourceLocation channelIdentifier;
     private final List<Class<?>> clientboundMessages = Lists.newArrayList();
     private final List<Class<?>> serverboundMessages = Lists.newArrayList();
     public boolean clientAcceptsVanillaOrMissing;
     public boolean serverAcceptsVanillaOrMissing;
 
-    NetworkHandlerRegistryImpl(String modId) {
-        this.modId = modId;
+    NetworkHandlerRegistryImpl(ResourceLocation channelIdentifier) {
+        this.channelIdentifier = channelIdentifier;
     }
 
     @Override

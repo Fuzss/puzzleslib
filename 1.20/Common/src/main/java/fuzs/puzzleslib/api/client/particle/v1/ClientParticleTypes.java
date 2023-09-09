@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Intended for client-only mods to allow for custom particles, which would otherwise be unavailable playing on dedicated servers if registered normally due to registry sync (at least on Forge).
  */
 public interface ClientParticleTypes {
-    ClientParticleTypes INSTANCE = ClientParticleTypesImpl.INSTANCE;
+    ClientParticleTypes INSTANCE = new ClientParticleTypesImpl();
 
     /**
      * A convenient overload for {@link #createParticle(ResourceLocation, ParticleOptions, double, double, double, double, double, double)} that does not require a likely useless {@link ParticleOptions} instance.

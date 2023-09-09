@@ -28,8 +28,8 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     private SimpleChannel channel;
     private final AtomicInteger discriminator = new AtomicInteger();
 
-    public NetworkHandlerForgeV3(String modId) {
-        super(modId);
+    public NetworkHandlerForgeV3(ResourceLocation channelIdentifier) {
+        super(channelIdentifier);
     }
 
     @Override
@@ -71,13 +71,13 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     @Override
     public void build() {
         if (this.channel != null) throw new IllegalStateException("channel is already built");
-        this.channel = buildSimpleChannel(this.modId, this.clientAcceptsVanillaOrMissing, this.serverAcceptsVanillaOrMissing);
+        this.channel = buildSimpleChannel(this.channelIdentifier, this.clientAcceptsVanillaOrMissing, this.serverAcceptsVanillaOrMissing);
         super.build();
     }
 
-    private static SimpleChannel buildSimpleChannel(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         return NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(modId, "play"))
+                .named(resourceLocation)
                 .networkProtocolVersion(() -> PROTOCOL_VERSION)
                 .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
                 .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)

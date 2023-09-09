@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
 import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
+import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerImpl;
@@ -91,7 +92,7 @@ public final class ForgeClientModConstructor {
                 evt.registerReloadListener(new ForwardingReloadListenerImpl(modId, "built_in_model_item_renderers", dynamicRenderers));
             }
             if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
-                ClientParticleTypesManager particleTypesManager = ClientParticleTypesImpl.INSTANCE.getParticleTypesManager(modId);
+                ClientParticleTypesManager particleTypesManager = ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId);
                 evt.registerReloadListener(new ForwardingReloadListenerImpl(modId, "client_particle_types", particleTypesManager));
             }
         });

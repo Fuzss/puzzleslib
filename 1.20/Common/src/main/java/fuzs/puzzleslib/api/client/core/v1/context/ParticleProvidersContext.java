@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
+import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
@@ -61,7 +62,7 @@ public interface ParticleProvidersContext {
      * @param <T>              type of particle
      */
     default <T extends ParticleOptions> void registerClientParticleProvider(ResourceLocation identifier, ParticleProvider<T> particleProvider) {
-        ClientParticleTypesImpl.INSTANCE.getParticleTypesManager(identifier.getNamespace()).register(identifier, particleProvider);
+        ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(identifier.getNamespace()).register(identifier, particleProvider);
     }
 
     /**
@@ -73,7 +74,7 @@ public interface ParticleProvidersContext {
      * @param <T>              type of particle
      */
     default <T extends ParticleOptions> void registerClientParticleProvider(ResourceLocation identifier, ParticleProvider.Sprite<T> particleProvider) {
-        ClientParticleTypesImpl.INSTANCE.getParticleTypesManager(identifier.getNamespace()).register(identifier, particleProvider);
+        ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(identifier.getNamespace()).register(identifier, particleProvider);
     }
 
     /**
@@ -85,6 +86,6 @@ public interface ParticleProvidersContext {
      * @param <T>             type of particle
      */
     default <T extends ParticleOptions> void registerClientParticleProvider(ResourceLocation identifier, ParticleEngine.SpriteParticleRegistration<T> particleFactory) {
-        ClientParticleTypesImpl.INSTANCE.getParticleTypesManager(identifier.getNamespace()).register(identifier, particleFactory);
+        ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(identifier.getNamespace()).register(identifier, particleFactory);
     }
 }

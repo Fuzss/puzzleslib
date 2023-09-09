@@ -28,8 +28,8 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     private final AtomicInteger discriminator = new AtomicInteger();
     private boolean building = true;
 
-    public NetworkHandlerFabricV3(String modId) {
-        super(modId);
+    public NetworkHandlerFabricV3(ResourceLocation channelIdentifier) {
+        super(channelIdentifier);
     }
 
     @SuppressWarnings("unchecked")
@@ -51,7 +51,7 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     }
 
     private ResourceLocation nextIdentifier() {
-        return new ResourceLocation(this.modId, "play/" + this.discriminator.getAndIncrement());
+        return new ResourceLocation(this.channelIdentifier.getNamespace(), this.channelIdentifier.getPath() + "/" + this.discriminator.getAndIncrement());
     }
 
     @Override

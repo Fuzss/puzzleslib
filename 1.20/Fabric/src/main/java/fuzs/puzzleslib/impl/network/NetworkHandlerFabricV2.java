@@ -25,11 +25,11 @@ import java.util.function.Supplier;
 
 public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     private final Map<Class<? extends MessageV2<?>>, MessageData> messages = Maps.newIdentityHashMap();
-    private final String modId;
+    private final ResourceLocation channelIdentifier;
     private final AtomicInteger discriminator = new AtomicInteger();
 
-    public NetworkHandlerFabricV2(String modId) {
-        this.modId = modId;
+    public NetworkHandlerFabricV2(ResourceLocation channelIdentifier) {
+        this.channelIdentifier = channelIdentifier;
     }
 
     @SuppressWarnings("unchecked")
@@ -63,7 +63,7 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     private ResourceLocation nextIdentifier() {
-        return new ResourceLocation(this.modId, "play/" + this.discriminator.getAndIncrement());
+        return new ResourceLocation(this.channelIdentifier.getNamespace(), this.channelIdentifier.getPath() + "/" + this.discriminator.getAndIncrement());
     }
 
     @Override
