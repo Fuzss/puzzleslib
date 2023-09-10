@@ -34,6 +34,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
+import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
@@ -152,6 +153,18 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             if (callback.onLivingExperienceDrop(evt.getEntity(), evt.getAttackingPlayer(), droppedExperience).isInterrupt()) {
                 evt.setCanceled(true);
             }
+        });
+        INSTANCE.register(BlockEvents.Break.class, BlockEvent.BreakEvent.class, (BlockEvents.Break callback, BlockEvent.BreakEvent evt) -> {
+            // match Fabric implementation
+            if (evt.getState().getBlock() instanceof GameMasterBlock && !evt.getPlayer().canUseGameMasterBlocks()) {
+                return;
+            }
+            EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(BlockEvents.DropExperience.class, BlockEvent.BreakEvent.class, (BlockEvents.DropExperience callback, BlockEvent.BreakEvent evt) -> {
+            MutableInt experienceToDrop = MutableInt.fromEvent(evt::setExpToDrop, evt::getExpToDrop);
+            callback.onDropExperience((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem(), experienceToDrop);
         });
         INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
             if (callback.onFarmlandTrample((Level) evt.getLevel(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {

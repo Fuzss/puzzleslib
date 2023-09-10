@@ -13,6 +13,10 @@ import net.minecraft.world.level.Explosion;
  */
 public final class FabricLevelEvents {
     /**
+     * Fires when a block is about to drop experience after being broken.
+     */
+    public static final Event<BlockEvents.DropExperience> DROP_BLOCK_EXPERIENCE = FabricEventFactory.create(BlockEvents.DropExperience.class);
+    /**
      * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block into dirt and destroying potential crops.
      */
     public static final Event<BlockEvents.FarmlandTrample> FARMLAND_TRAMPLE = FabricEventFactory.createResult(BlockEvents.FarmlandTrample.class);
