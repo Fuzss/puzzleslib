@@ -53,6 +53,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -158,6 +160,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
+        INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, callback -> {
+            return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
+                EventResult result = callback.onBreakBlock((ServerLevel) level, pos, state, player, player.getMainHandItem());
+                return result.isPass();
+            };
+        });
+        INSTANCE.register(BlockEvents.DropExperience.class, FabricLevelEvents.DROP_BLOCK_EXPERIENCE);
         INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricLevelEvents.FARMLAND_TRAMPLE);
         INSTANCE.register(PlayerTickEvents.Start.class, FabricPlayerEvents.PLAYER_TICK_START);
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);

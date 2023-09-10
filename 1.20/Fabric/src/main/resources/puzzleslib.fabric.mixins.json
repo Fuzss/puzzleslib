@@ -10,6 +10,7 @@
     "AbstractHurtingProjectileFabricMixin",
     "AnimalFabricMixin",
     "AnvilMenuFabricMixin",
+    "BlockFabricMixin",
     "BoneMealItemFabricMixin",
     "BowItemFabricMixin",
     "CatFabricMixin",
