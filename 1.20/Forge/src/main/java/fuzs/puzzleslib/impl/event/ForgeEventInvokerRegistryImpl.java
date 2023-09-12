@@ -49,8 +49,8 @@ import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.eventbus.api.Event;
@@ -303,7 +303,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 callback.onSyncDataPackContents(player, false);
             }
         });
-        INSTANCE.register(ServerLifecycleEvents.ServerStarting.class, ServerStartingEvent.class, (ServerLifecycleEvents.ServerStarting callback, ServerStartingEvent evt) -> {
+        INSTANCE.register(ServerLifecycleEvents.ServerStarting.class, ServerAboutToStartEvent.class, (ServerLifecycleEvents.ServerStarting callback, ServerAboutToStartEvent evt) -> {
             callback.onServerStarting(evt.getServer());
         });
         INSTANCE.register(ServerLifecycleEvents.ServerStarted.class, ServerStartedEvent.class, (ServerLifecycleEvents.ServerStarted callback, ServerStartedEvent evt) -> {
