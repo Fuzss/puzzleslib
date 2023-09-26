@@ -8,7 +8,7 @@ import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
 import fuzs.puzzleslib.impl.event.DropEntityLootHelper;
-import fuzs.puzzleslib.impl.event.LivingJumpHelper;
+import fuzs.puzzleslib.impl.event.EventImplHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -385,7 +385,7 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "jumpFromGround", at = @At("TAIL"))
     protected void jumpFromGround(CallbackInfo callback) {
-        LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
+        EventImplHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
     }
 
     @ModifyVariable(method = "getVisibilityPercent", at = @At(value = "TAIL", shift = At.Shift.BEFORE), ordinal = 0)

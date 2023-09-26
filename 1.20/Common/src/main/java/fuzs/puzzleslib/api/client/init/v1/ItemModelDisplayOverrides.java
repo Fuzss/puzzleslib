@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.client.init.v1;
 
-import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
+import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemDisplayContext;
  * depending on {@link ItemDisplayContext} like {@link net.minecraft.world.item.Items#TRIDENT} and {@link net.minecraft.world.item.Items#SPYGLASS} in vanilla.
  */
 public interface ItemModelDisplayOverrides {
-    ItemModelDisplayOverrides INSTANCE = ItemDisplayOverridesImpl.INSTANCE;
+    ItemModelDisplayOverrides INSTANCE = ClientFactories.INSTANCE.getItemModelDisplayOverrides();
 
     /**
      * Register an item model override for an item.

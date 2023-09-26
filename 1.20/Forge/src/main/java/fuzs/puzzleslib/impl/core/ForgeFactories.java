@@ -5,10 +5,12 @@ import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
+import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
 import fuzs.puzzleslib.impl.init.ForgeGameRulesFactory;
 import fuzs.puzzleslib.impl.init.PotionBrewingRegistryForge;
 import fuzs.puzzleslib.impl.item.ForgeToolTypeHelper;
+import fuzs.puzzleslib.impl.item.crafting.ForgeCombinedIngredients;
 
 import java.util.Set;
 
@@ -52,5 +54,10 @@ public final class ForgeFactories implements CommonFactories {
     @Override
     public ToolTypeHelper getToolTypeHelper() {
         return new ForgeToolTypeHelper();
+    }
+
+    @Override
+    public CombinedIngredients getCombinedIngredients() {
+        return new ForgeCombinedIngredients();
     }
 }

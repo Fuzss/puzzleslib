@@ -11,7 +11,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -27,7 +26,6 @@ import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -43,8 +41,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
- * Handles registering to game registries.
- * <p>Originally based on RegistryHelper found in Vazkii's AutoRegLib mod.
+ * Handles registering to game registries. Registration is performed instantly on Fabric and is deferred on Forge.
  */
 public interface RegistryManager {
 
@@ -355,87 +352,5 @@ public interface RegistryManager {
      */
     default ResourceKey<DamageType> registerDamageType(String path) {
         return this.makeResourceKey(Registries.DAMAGE_TYPE, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for any type of registry from a given path.
-     *
-     * @param registryKey key for registry to create key from
-     * @param path        path for new tag key
-     * @param <T>         registry type
-     * @return new tag key
-     */
-    default <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return TagKey.create(registryKey, this.makeKey(path));
-    }
-
-    /**
-     * Creates a new {@link TagKey} for blocks.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<Block> registerBlockTag(String path) {
-        return this.registerTagKey(Registries.BLOCK, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for items.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<Item> registerItemTag(String path) {
-        return this.registerTagKey(Registries.ITEM, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for entity types.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<EntityType<?>> registerEntityTypeTag(String path) {
-        return this.registerTagKey(Registries.ENTITY_TYPE, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for game events.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<GameEvent> registerGameEventTag(String path) {
-        return this.registerTagKey(Registries.GAME_EVENT, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for damage types.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<DamageType> registerDamageTypeTag(String path) {
-        return this.registerTagKey(Registries.DAMAGE_TYPE, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for enchantments.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<Enchantment> registerEnchantmentTag(String path) {
-        return this.registerTagKey(Registries.ENCHANTMENT, path);
-    }
-
-    /**
-     * Creates a new {@link TagKey} for biomes.
-     *
-     * @param path path for new tag key
-     * @return new tag key
-     */
-    default TagKey<Biome> registerBiomeTag(String path) {
-        return this.registerTagKey(Registries.BIOME, path);
     }
 }

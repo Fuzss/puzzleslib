@@ -13,10 +13,10 @@ public interface AnvilRepairCallback {
      * Called when the player takes the output item from an anvil, used to determine the chance by which the anvil will break down one stage.
      *
      * @param player      the player interacting with the anvil
-     * @param left        left input item stack
-     * @param right       right input item stack
+     * @param leftInput   left input item stack
+     * @param rightInput  right input item stack
      * @param output      the output stack the player is about to take
      * @param breakChance chance for the anvil to break down one stage
      */
-    void onAnvilRepair(Player player, ItemStack left, ItemStack right, ItemStack output, MutableFloat breakChance);
+    void onAnvilRepair(Player player, ItemStack leftInput, ItemStack rightInput, ItemStack output, MutableFloat breakChance);
 }

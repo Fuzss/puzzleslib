@@ -70,7 +70,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
-    public static final FabricEventInvokerRegistryImpl INSTANCE = new FabricEventInvokerRegistryImpl();
 
     public static void register() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
@@ -324,6 +323,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(GatherPotentialSpawnsCallback.class, FabricLevelEvents.GATHER_POTENTIAL_SPAWNS);
         INSTANCE.register(EntityRidingEvents.Start.class, FabricEntityEvents.ENTITY_START_RIDING);
         INSTANCE.register(EntityRidingEvents.Stop.class, FabricEntityEvents.ENTITY_STOP_RIDING);
+        INSTANCE.register(GrindstoneEvents.Update.class, FabricPlayerEvents.GRINDSTONE_UPDATE);
+        INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         } else {
@@ -337,7 +338,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     @Override
-    public <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
+    public <T, E> void register(Class<T> clazz, Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(event, "event is null");
         Objects.requireNonNull(converter, "converter is null");
@@ -350,32 +351,38 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         Objects.requireNonNull(eventType, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        EventInvokerImpl.register(clazz, new FabricForwardingEventInvoker<>(converter, consumer, eventPhaseConverter), joinInvokers);
+        EventInvokerImpl.register(clazz, new FabricForwardingEventInvoker<>((T callback, @Nullable Object context) -> converter.apply(callback), consumer, eventPhaseConverter), joinInvokers);
     }
 
-    private record FabricEventInvoker<T, E>(Event<E> event, Function<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
+    private record FabricEventInvoker<T, E>(Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
 
-        public FabricEventInvoker(Event<E> event, Function<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter) {
+        public FabricEventInvoker(Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter) {
             this(event, converter, eventPhaseConverter, Collections.synchronizedSet(Sets.newIdentityHashSet()));
         }
 
         @Override
         public EventInvoker<T> asEventInvoker(@Nullable Object context) {
-            return this;
+            return context != null ? (EventPhase phase, T callback) -> {
+                this.register(phase, callback, context);
+            } : this;
         }
 
         @Override
         public void register(EventPhase phase, T callback) {
+            this.register(phase, callback, null);
+        }
+
+        private void register(EventPhase phase, T callback, @Nullable Object context) {
             Objects.requireNonNull(phase, "phase is null");
             Objects.requireNonNull(callback, "callback is null");
             phase = this.eventPhaseConverter.apply(phase);
             // this is the default phase
             if (phase.parent() == null) {
-                this.event.register(this.converter.apply(callback));
+                this.event.register(this.converter.apply(callback, context));
             } else {
                 // make sure phase has consumer phase ordering, we keep track of phases we have already added an ordering for in this event in #knownEventPhases
                 this.testEventPhase(phase);
-                this.event.register(phase.identifier(), this.converter.apply(callback));
+                this.event.register(phase.identifier(), this.converter.apply(callback, context));
             }
         }
 
@@ -397,7 +404,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
     private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
 
-        public FabricForwardingEventInvoker(Function<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter) {
+        public FabricForwardingEventInvoker(FabricEventContextConverter<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter) {
             this(event -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().makeMap());
         }
 

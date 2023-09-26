@@ -6,10 +6,7 @@ import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -81,5 +78,14 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     protected static InventoryChangeTrigger.TriggerInstance has(ItemLike... items) {
         Preconditions.checkPositionIndex(0, items.length - 1, "items is empty");
         return inventoryTrigger(ItemPredicate.Builder.item().of(items).build());
+    }
+
+    protected static void stonecutterResultFromBase(String modId, Consumer<FinishedRecipe> exporter, RecipeCategory category, ItemLike result, ItemLike ingredient) {
+        stonecutterResultFromBase(modId, exporter, category, result, ingredient, 1);
+    }
+
+    protected static void stonecutterResultFromBase(String modId, Consumer<FinishedRecipe> exporter, RecipeCategory category, ItemLike result, ItemLike ingredient, int resultCount) {
+        String recipeId = getConversionRecipeName(result, ingredient) + "_stonecutting";
+        SingleItemRecipeBuilder.stonecutting(Ingredient.of(ingredient), category, result, resultCount).unlockedBy(getHasName(ingredient), has(ingredient)).save(exporter, new ResourceLocation(modId, recipeId));
     }
 }

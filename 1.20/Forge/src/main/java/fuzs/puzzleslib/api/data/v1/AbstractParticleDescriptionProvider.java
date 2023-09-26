@@ -22,6 +22,7 @@ import java.util.stream.IntStream;
 public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvider<List<ResourceLocation>> {
     private static final Codec<List<ResourceLocation>> CODEC = ResourceLocation.CODEC.listOf().fieldOf("textures").codec();
 
+    private final ExistingFileHelper.ResourceType textureResourceType;
     private final Map<ResourceLocation, List<ResourceLocation>> entries;
     private final ExistingFileHelper.ResourceType resourceType;
 
@@ -37,12 +38,19 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
         super(packOutput, fileHelper, modId, JsonOps.INSTANCE, PackType.CLIENT_RESOURCES, "particles", CODEC, entries);
         this.entries = entries;
         this.resourceType = new ExistingFileHelper.ResourceType(this.packType, ".json", this.directory);
+        this.textureResourceType = new ExistingFileHelper.ResourceType(this.packType, ".png", "textures/particle");
     }
 
     @Override
     protected final void gather(BiConsumer<ResourceLocation, List<ResourceLocation>> consumer) {
         this.addParticleDescriptions();
-        super.gather(consumer);
+        super.gather((id, textures) -> {
+            List<String> missing = textures.stream().filter(t -> !this.existingFileHelper.exists(t, this.textureResourceType)).map(ResourceLocation::toString).toList();
+            if (!missing.isEmpty()) {
+                throw new IllegalArgumentException("Couldn't define particle description %s as it is missing following texture(s): %s".formatted(id, String.join(",", missing)));
+            }
+            consumer.accept(id, textures);
+        });
     }
 
     protected abstract void addParticleDescriptions();

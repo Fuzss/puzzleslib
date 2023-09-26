@@ -11,6 +11,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
@@ -18,6 +19,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -98,5 +100,10 @@ public final class FabricAbstractions implements CommonAbstractions {
     @Override
     public @Nullable MobSpawnType getMobSpawnType(Mob mob) {
         return ((SpawnTypeMob) mob).puzzleslib$getSpawnType();
+    }
+
+    @Override
+    public Pack.Info createPackInfo(Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
+        return new Pack.Info(description, packVersion, features);
     }
 }

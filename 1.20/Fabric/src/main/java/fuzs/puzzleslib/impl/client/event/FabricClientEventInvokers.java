@@ -42,9 +42,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
-import static fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl.INSTANCE;
+import static fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry.INSTANCE;
 
 @SuppressWarnings("unchecked")
 public final class FabricClientEventInvokers {
@@ -97,6 +98,23 @@ public final class FabricClientEventInvokers {
             return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 List<AbstractWidget> widgets = Screens.getButtons(screen);
                 callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
+            };
+        });
+        INSTANCE.register(ScreenEvents.BeforeInitV2.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, (callback, context) -> {
+            Objects.requireNonNull(context, "context is null");
+            return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
+                if (!((Class<?>) context).isInstance(screen)) return;
+                callback.onBeforeInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(Screens.getButtons(screen)));
+            };
+        });
+        INSTANCE.register(ScreenEvents.AfterInitV2.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT, (callback, context) -> {
+            Objects.requireNonNull(context, "context is null");
+            return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
+                if (!((Class<?>) context).isInstance(screen)) return;
+                List<AbstractWidget> widgets = Screens.getButtons(screen);
+                ScreenEvents.ConsumingOperator<AbstractWidget> addWidget = new ScreenEvents.ConsumingOperator<>(widgets::add);
+                ScreenEvents.ConsumingOperator<AbstractWidget> removeWidget = new ScreenEvents.ConsumingOperator<>(widgets::remove);
+                callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), addWidget, removeWidget);
             };
         });
         registerScreenEvent(ScreenEvents.Remove.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.Remove.class, callback -> {
@@ -244,7 +262,7 @@ public final class FabricClientEventInvokers {
                 return false;
             };
         });
-        INSTANCE.register(InteractionInputEvents.Use.class, UseBlockCallback.EVENT, callback -> {
+        INSTANCE.register(InteractionInputEvents.Use.class, UseBlockCallback.EVENT, (callback, context) -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
@@ -255,7 +273,7 @@ public final class FabricClientEventInvokers {
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
-        INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, callback -> {
+        INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, (callback, context) -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
@@ -266,7 +284,7 @@ public final class FabricClientEventInvokers {
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
-        INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, callback -> {
+        INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, (callback, context) -> {
             return (Player player, Level level, InteractionHand hand) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
@@ -330,18 +348,19 @@ public final class FabricClientEventInvokers {
         });
         INSTANCE.register(GameRenderEvents.Before.class, FabricClientEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricClientEvents.AFTER_GAME_RENDER);
+        INSTANCE.register(AddToastCallback.class, FabricClientEvents.ADD_TOAST);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
-        INSTANCE.register(clazz, eventType, converter, (context, applyToInvoker, removeInvoker) -> {
+        INSTANCE.register(clazz, eventType, converter, (Object context, Consumer<Event<E>> applyToInvoker, Consumer<Event<E>> removeInvoker) -> {
             // we need to keep our own event invokers during the whole pre-init phase to guarantee phase ordering is applied correctly,
             // since this is managed in the event invokers and there seems to be no way to handle it with just the Fabric event
             // (since the Fabric event doesn't allow for retrieving already applied event phase orders),
             // so we register all screen events during pre-init, which allows post-init to already clear our internal map again
-            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT.register((Minecraft client, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (((Class<?>) context).isInstance(screen)) applyToInvoker.accept(eventGetter.apply(screen));
             });
-            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
+            net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT.register((Minecraft client, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (((Class<?>) context).isInstance(screen)) removeInvoker.accept(eventGetter.apply(screen));
             });
         });

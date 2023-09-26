@@ -127,6 +127,13 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register various block transformations triggered by right-clicking with certain vanilla tools
+     */
+    default void onRegisterBlockInteractions(BlockInteractionsContext context) {
+
+    }
+
+    /**
      * @param context register new creative mode tabs via the respective builder
      */
     default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {

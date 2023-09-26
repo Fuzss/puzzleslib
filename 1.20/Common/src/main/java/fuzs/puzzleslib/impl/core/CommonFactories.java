@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
+import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 
 import java.util.Set;
 
@@ -27,4 +28,6 @@ public interface CommonFactories {
     void registerEventInvokers();
 
     ToolTypeHelper getToolTypeHelper();
+
+    CombinedIngredients getCombinedIngredients();
 }

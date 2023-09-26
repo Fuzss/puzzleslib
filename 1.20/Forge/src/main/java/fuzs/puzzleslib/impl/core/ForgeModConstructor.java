@@ -35,7 +35,7 @@ public final class ForgeModConstructor {
         ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
             Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
             registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
-            registerModHandlers(constructor, modEventBus, biomeModifications, availableFlags);
+            registerModHandlers(constructor, modId, modEventBus, biomeModifications, availableFlags, flagsToHandle);
             registerHandlers(constructor, modId);
             constructor.onConstructMod();
         });
@@ -58,13 +58,14 @@ public final class ForgeModConstructor {
         }
     }
 
-    private static void registerModHandlers(ModConstructor constructor, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> availableFlags) {
+    private static void registerModHandlers(ModConstructor constructor, String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
                 constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextForgeImpl());
                 constructor.onRegisterBiomeModifications(new BiomeModificationsContextForgeImpl(biomeModifications, availableFlags));
                 constructor.onRegisterFlammableBlocks(new FlammableBlocksContextForgeImpl());
+                constructor.onRegisterBlockInteractions(new BlockInteractionsContextForgeImpl());
             });
         });
         eventBus.addListener((final SpawnPlacementRegisterEvent evt) -> {
@@ -82,6 +83,9 @@ public final class ForgeModConstructor {
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.SERVER_DATA) {
                 constructor.onAddDataPackFinders(new DataPackSourcesContextForgeImpl(evt::addRepositorySource));
+                if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
+                    evt.addRepositorySource(BiomeLoadingHandler.buildPack(modId));
+                }
             }
         });
     }

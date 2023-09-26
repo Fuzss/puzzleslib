@@ -10,11 +10,8 @@ import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 import java.util.Objects;
 
-public record FuelBurnTimesContextForgeImpl(Object2IntOpenHashMap<Item> fuelBurnTimes) implements FuelBurnTimesContext {
-
-    public FuelBurnTimesContextForgeImpl() {
-        this(new Object2IntOpenHashMap<>());
-    }
+public final class FuelBurnTimesContextForgeImpl implements FuelBurnTimesContext {
+    private final Object2IntOpenHashMap<Item> fuelBurnTimes = new Object2IntOpenHashMap<>();
 
     @Override
     public void registerFuel(int burnTime, ItemLike... items) {

@@ -3,14 +3,18 @@ package fuzs.puzzleslib.api.core.v1;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -20,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 
 /**
- * useful methods for gameplay related things that require mod loader specific abstractions
+ * Useful methods for gameplay related things that require mod loader specific abstractions.
  */
 public interface CommonAbstractions {
     CommonAbstractions INSTANCE = ServiceProviderHelper.load(CommonAbstractions.class);
@@ -33,17 +37,18 @@ public interface CommonAbstractions {
     MinecraftServer getGameServer();
 
     /**
-     * opens a menu on both client and server
+     * Opens a menu on both client and server.
      *
      * @param player       player to open menu for
      * @param menuProvider menu factory
      */
     default void openMenu(ServerPlayer player, MenuProvider menuProvider) {
-        this.openMenu(player, menuProvider, (ServerPlayer serverPlayer, FriendlyByteBuf buf) -> {});
+        this.openMenu(player, menuProvider, (ServerPlayer serverPlayer, FriendlyByteBuf buf) -> {
+        });
     }
 
     /**
-     * opens a menu on both client and server while also providing additional data
+     * Opens a menu on both client and server while also providing additional data.
      *
      * @param player                  player to open menu for
      * @param menuProvider            menu factory
@@ -118,6 +123,16 @@ public interface CommonAbstractions {
      * @param mob the mob
      * @return the spawn type or null if none has been set
      */
-    @Nullable
-    MobSpawnType getMobSpawnType(Mob mob);
+    @Nullable MobSpawnType getMobSpawnType(Mob mob);
+
+    /**
+     * Creates a new {@link Pack.Info} instance with additional parameters only supported on Forge.
+     *
+     * @param description the pack description component
+     * @param packVersion the pack version, ideally retrieved from {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
+     * @param features    the feature flags provided by this pack
+     * @param hidden      controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
+     * @return the created pack info instance
+     */
+    Pack.Info createPackInfo(Component description, int packVersion, FeatureFlagSet features, boolean hidden);
 }

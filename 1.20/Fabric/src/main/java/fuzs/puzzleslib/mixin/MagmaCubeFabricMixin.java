@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.impl.event.LivingJumpHelper;
+import fuzs.puzzleslib.impl.event.EventImplHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.MagmaCube;
 import net.minecraft.world.entity.monster.Slime;
@@ -20,6 +20,6 @@ abstract class MagmaCubeFabricMixin extends Slime {
 
     @Inject(method = "jumpFromGround", at = @At("TAIL"))
     protected void jumpFromGround(CallbackInfo callback) {
-        LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), this);
+        EventImplHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), this);
     }
 }
