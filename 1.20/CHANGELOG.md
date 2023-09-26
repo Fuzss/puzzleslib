@@ -3,9 +3,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.0.34-1.20.1] - 2023-09-10
+## [v8.0.34-1.20.1] - 2023-09-26
 ### Added
 - Added `BlockEvents$Break` and `BlockEvents$DropExperience`
+- Added `TickingBlockEntity` and `TickingEntityBlock` helper interfaces for creating ticking block entities without the need to use static ticker methods
+- Added `AddToastCallback` for handling client-side toasts
+- Added `ScreenEvents$BeforeInitV2` and `ScreenEvents$AfterInitV2` using type parameters for the screen instance
+- Added `CommonAbstractions::createPackInfo`
+- Added `ModConstructor::onRegisterBlockInteractions` for registering block conversions such as strippable logs or tillable dirt blocks
+- Added `GrindstoneEvents$Update` and `GrindstoneEvents$Use`
+- Added `TypedTagFactory` and `BoundTagFactory` for creating new `TagKey`s, tag keys have therefore been removed from the new `RegistryManager`
+- Added `CombinedIngredients` for creating more complex instances of `Ingredient`
+- Added `ShapesHelper`, mainly useful for rotating a `VoxelShape` to a given `Direction`
+### Changed
+- Refined `AbstractModPackResources` to better handle mod ids as well as allow for hiding a pack, a Forge exclusive feature
+- A mod providing biome modifications on Forge no longer needs to include its own biome modifier, the file is now automatically generated using a built-in data pack
+### Fixed
+- Fixed a class loading issue related to `ItemModelDisplayOverrides` and `EventInvokerRegistry` implementations
+- Fixed `AbstractParticleDescriptionProvider` not verifying the existence of used textures
 
 ## [v8.0.33-1.20.1] - 2023-09-09
 ### Changed

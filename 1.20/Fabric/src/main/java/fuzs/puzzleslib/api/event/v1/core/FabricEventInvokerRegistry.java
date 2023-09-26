@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.event.v1.core;
 import fuzs.puzzleslib.impl.event.FabricEventInvokerRegistryImpl;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.gui.screens.Screen;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -13,7 +14,7 @@ import java.util.function.UnaryOperator;
  * <p>See {@link FabricEventFactory} for easily creating dedicated Fabric events from common event implementations.
  */
 public interface FabricEventInvokerRegistry {
-    FabricEventInvokerRegistry INSTANCE = FabricEventInvokerRegistryImpl.INSTANCE;
+    FabricEventInvokerRegistry INSTANCE = new FabricEventInvokerRegistryImpl();
 
     /**
      * Registers an event that uses the same type in both common and Fabric subprojects.
@@ -38,6 +39,20 @@ public interface FabricEventInvokerRegistry {
      * @param <E>       Fabric event type
      */
     default <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter) {
+        this.register(clazz, event, (T callback, @Nullable Object context) -> converter.apply(callback));
+    }
+
+    /**
+     * Registers an event.
+     * <p>Useful for linking an event already implemented on Fabric (most likely from Fabric Api) to the common implementation.
+     *
+     * @param clazz     common event functional interface class
+     * @param event     Fabric event implementation
+     * @param converter returns an implementation of the Fabric event that runs the passed in common event
+     * @param <T>       common event type
+     * @param <E>       Fabric event type
+     */
+    default <T, E> void register(Class<T> clazz, Event<E> event, FabricEventContextConverter<T, E> converter) {
         this.register(clazz, event, converter, UnaryOperator.identity(), false);
     }
 
@@ -53,7 +68,7 @@ public interface FabricEventInvokerRegistry {
      * @param <T>                 common event type
      * @param <E>                 Fabric event type
      */
-    <T, E> void register(Class<T> clazz, Event<E> event, Function<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers);
+    <T, E> void register(Class<T> clazz, Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers);
 
     /**
      * Registers an event that uses the same type in both common and Fabric subprojects and depends on a certain context.
@@ -102,6 +117,25 @@ public interface FabricEventInvokerRegistry {
      * @param <E>                 Fabric event type
      */
     <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers);
+
+    /**
+     * A helper context for dealing with context based {@link EventInvoker} implementations.
+     *
+     * @param <T> common event type
+     * @param <E> Fabric event type
+     */
+    @FunctionalInterface
+    interface FabricEventContextConverter<T, E> {
+
+        /**
+         * Runs the converter.
+         *
+         * @param callback our callback implementation used in the returned Fabric event implementation
+         * @param context  the context object, can be anything, but ideally an identifier such as a {@link Class} or {@link net.minecraft.resources.ResourceLocation}
+         * @return the Fabric event implementation
+         */
+        E apply(T callback, @Nullable Object context);
+    }
 
     /**
      * A helper context for dealing with context based {@link EventInvoker} implementations.

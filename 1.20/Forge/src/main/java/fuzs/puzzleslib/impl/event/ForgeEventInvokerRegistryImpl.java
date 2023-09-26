@@ -67,7 +67,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
-    public static final ForgeEventInvokerRegistryImpl INSTANCE = new ForgeEventInvokerRegistryImpl();
 
     public static void register() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
@@ -218,6 +217,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), lootingLevel);
         });
         INSTANCE.register(AnvilUpdateCallback.class, AnvilUpdateEvent.class, (AnvilUpdateCallback callback, AnvilUpdateEvent evt) -> {
+            ItemStack originalOutput = evt.getOutput();
+            int originalEnchantmentCost = evt.getCost();
+            int originalMaterialCost = evt.getMaterialCost();
             MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
             MutableInt enchantmentCost = MutableInt.fromEvent(evt::setCost, evt::getCost);
             MutableInt materialCost = MutableInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost);
@@ -228,8 +230,10 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                     evt.setCanceled(true);
                 }
             } else {
-                // revert to an empty stack to allow vanilla behavior to execute
-                evt.setOutput(ItemStack.EMPTY);
+                // revert any changes made by us if the callback has not been cancelled
+                evt.setOutput(originalOutput);
+                evt.setCost(originalEnchantmentCost);
+                evt.setMaterialCost(originalMaterialCost);
             }
         });
         INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (LivingDropsCallback callback, LivingDropsEvent evt) -> {
@@ -496,7 +500,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onMobEffectExpire(evt.getEntity(), evt.getEffectInstance());
         });
         INSTANCE.register(LivingEvents.Jump.class, LivingEvent.LivingJumpEvent.class, (LivingEvents.Jump callback, LivingEvent.LivingJumpEvent evt) -> {
-            LivingJumpHelper.onLivingJump(callback, evt.getEntity());
+            EventImplHelper.onLivingJump(callback, evt.getEntity());
         });
         INSTANCE.register(LivingEvents.Visibility.class, LivingEvent.LivingVisibilityEvent.class, (LivingEvents.Visibility callback, LivingEvent.LivingVisibilityEvent evt) -> {
             callback.onLivingVisibility(evt.getEntity(), evt.getLookingEntity(), MutableDouble.fromEvent(visibilityModifier -> {
@@ -538,6 +542,36 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
+        INSTANCE.register(GrindstoneEvents.Update.class, GrindstoneEvent.OnPlaceItem.class, (GrindstoneEvents.Update callback, GrindstoneEvent.OnPlaceItem evt) -> {
+            ItemStack originalOutput = evt.getOutput();
+            int originalExperienceReward = evt.getXp();
+            MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
+            MutableInt experienceReward = MutableInt.fromEvent(evt::setXp, evt::getXp);
+            Player player = EventImplHelper.getGrindstoneUsingPlayer(evt.getTopItem(), evt.getBottomItem()).orElseThrow(NullPointerException::new);
+            EventResult result = callback.onGrindstoneUpdate(evt.getTopItem(), evt.getBottomItem(), output, experienceReward, player);
+            if (result.isInterrupt()) {
+                // interruption for allow will run properly as long as output is changed from an empty stack
+                if (!result.getAsBoolean()) {
+                    evt.setCanceled(true);
+                }
+            } else {
+                // revert any changes made by us if the callback has not been cancelled
+                evt.setOutput(originalOutput);
+                evt.setXp(originalExperienceReward);
+            }
+        });
+        INSTANCE.register(GrindstoneEvents.Use.class, GrindstoneEvent.OnTakeItem.class, (GrindstoneEvents.Use callback, GrindstoneEvent.OnTakeItem evt) -> {
+            DefaultedValue<ItemStack> topInput = DefaultedValue.fromValue(evt.getTopItem());
+            // set new item set by other event listeners
+            if (!evt.getNewTopItem().isEmpty()) topInput.accept(evt.getNewTopItem());
+            DefaultedValue<ItemStack> bottomInput = DefaultedValue.fromValue(evt.getBottomItem());
+            // set new item set by other event listeners
+            if (!evt.getNewBottomItem().isEmpty()) bottomInput.accept(evt.getNewBottomItem());
+            Player player = EventImplHelper.getGrindstoneUsingPlayer(evt.getTopItem(), evt.getBottomItem()).orElseThrow(NullPointerException::new);
+            callback.onGrindstoneUse(topInput, bottomInput, player);
+            topInput.getAsOptional().ifPresent(evt::setNewTopItem);
+            bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
         }
@@ -558,14 +592,19 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         EventInvokerImpl.register(clazz, new ForgeEventInvoker<>(eventBus, event, converter), joinInvokers);
     }
 
-    private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvokerImpl.EventInvokerLike<T> {
+    private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, ForgeEventContextConsumer<T, E> converter) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
         private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = Map.of(EventPhase.FIRST, EventPriority.HIGHEST, EventPhase.BEFORE, EventPriority.HIGH, EventPhase.DEFAULT, EventPriority.NORMAL, EventPhase.AFTER, EventPriority.LOW, EventPhase.LAST, EventPriority.LOWEST);
 
         @Override
         public EventInvoker<T> asEventInvoker(@Nullable Object context) {
-            return (EventPhase phase, T callback) -> {
+            return context != null ? (EventPhase phase, T callback) -> {
                 this.register(phase, callback, context);
-            };
+            } : this;
+        }
+
+        @Override
+        public void register(EventPhase phase, T callback) {
+            this.register(phase, callback, null);
         }
 
         private void register(EventPhase phase, T callback, @Nullable Object context) {

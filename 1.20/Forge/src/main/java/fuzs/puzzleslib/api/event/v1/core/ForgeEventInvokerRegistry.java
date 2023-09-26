@@ -9,7 +9,7 @@ import java.util.function.BiConsumer;
  * A registry for linking common events implemented as functional interfaces to the corresponding Forge {@link Event} instances.
  */
 public interface ForgeEventInvokerRegistry {
-    ForgeEventInvokerRegistry INSTANCE = ForgeEventInvokerRegistryImpl.INSTANCE;
+    ForgeEventInvokerRegistry INSTANCE = new ForgeEventInvokerRegistryImpl();
 
     /**
      * Registers an event.

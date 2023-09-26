@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
@@ -139,6 +140,10 @@ public final class FabricClientEvents {
      * Fires after the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
      */
     public static final Event<GameRenderEvents.After> AFTER_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.After.class);
+    /**
+     * Fires when a {@link Toast} is about to be queued in {@link net.minecraft.client.gui.components.toasts.ToastComponent#addToast(Toast)}.
+     */
+    public static final Event<AddToastCallback> ADD_TOAST = FabricEventFactory.createResult(AddToastCallback.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

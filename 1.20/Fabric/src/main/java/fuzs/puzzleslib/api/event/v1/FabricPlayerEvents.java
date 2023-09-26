@@ -7,6 +7,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
+import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -23,6 +24,10 @@ public final class FabricPlayerEvents {
      * <p>Useful for adding custom bone meal behavior to blocks, or for cancelling vanilla interactions.
      */
     public static final Event<BonemealCallback> BONEMEAL = FabricEventFactory.createResult(BonemealCallback.class);
+    /**
+     * Called before a result item is generated from the two input slots in an anvil in {@link AnvilMenu#createResult()}.
+     */
+    public static final Event<AnvilUpdateCallback> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilUpdateCallback.class);
     /**
      * Called when the player takes the output item from an anvil, used to determine the chance by which the anvil will break down one stage.
      */
@@ -49,10 +54,6 @@ public final class FabricPlayerEvents {
      */
     public static final Event<PlayerTickEvents.End> PLAYER_TICK_END = FabricEventFactory.create(PlayerTickEvents.End.class);
     /**
-     * Called before a result item is generated from the two input slots in an anvil in {@link AnvilMenu#createResult()}.
-     */
-    public static final Event<AnvilUpdateCallback> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilUpdateCallback.class);
-    /**
      * Called when an item is tossed from the player inventory, either by pressing 'Q' or by clicking an item stack outside a container screen.
      */
     public static final Event<ItemTossCallback> ITEM_TOSS = FabricEventFactory.createResult(ItemTossCallback.class);
@@ -60,6 +61,14 @@ public final class FabricPlayerEvents {
      * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
      */
     public static final Event<PlayerEvents.BreakSpeed> BREAK_SPEED = FabricEventFactory.createResult(PlayerEvents.BreakSpeed.class);
+    /**
+     * Called when the grindstone output slot is populated in {@link GrindstoneMenu#createResult()}.
+     */
+    public static final Event<GrindstoneEvents.Update> GRINDSTONE_UPDATE = FabricEventFactory.createResult(GrindstoneEvents.Update.class);
+    /**
+     * Called when the result item is taken from the output slot of a grindstone. This callback allows for handling input items present in the corresponding slots.
+     */
+    public static final Event<GrindstoneEvents.Use> GRINDSTONE_USE = FabricEventFactory.create(GrindstoneEvents.Use.class);
 
     private FabricPlayerEvents() {
 

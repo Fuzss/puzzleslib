@@ -1,8 +1,10 @@
 package fuzs.puzzleslib.api.resources.v1;
 
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.BuiltInMetadata;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -17,6 +19,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.Collections;
+import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -25,45 +29,37 @@ import java.util.function.Supplier;
  */
 public abstract class AbstractModPackResources implements PackResources {
     /**
-     * The id of the mod from whose jar to retrieve the logo from.
-     * <p>Defaults to the pack id from {@link #id}.
-     */
-    private String logoModId;
-    /**
      * Path to the mod logo inside the mod jar to be used in place of <code>pack.png</code> for the pack icon.
      * <p>Defaults to <code>mod_logo.png</code>, path is separated using "/".
      */
     private final String modLogoPath;
     /**
-     * Id of this pack, set internally using {@link #buildPack(PackType, Supplier, String, Component, Component, boolean, boolean)}.
+     * Id of this pack.
+     * <p>Set internally using {@link #buildPack(PackType, Supplier, ResourceLocation, Component, Component, boolean, boolean, FeatureFlagSet, boolean)}.
      */
-    private String id;
+    private ResourceLocation id;
     /**
-     * The metadata for the <code>pack.mcmeta</code> section, set internally using {@link #buildPack(PackType, Supplier, String, Component, Component, boolean, boolean)}.
+     * The metadata for the <code>pack.mcmeta</code> section.
+     * <p>Set internally using {@link #buildPack(PackType, Supplier, ResourceLocation, Component, Component, boolean, boolean, FeatureFlagSet, boolean)}.
      */
     private BuiltInMetadata metadata;
+    /**
+     * The pack type for this pack.
+     * <p>Set internally using {@link #buildPack(PackType, Supplier, ResourceLocation, Component, Component, boolean, boolean, FeatureFlagSet, boolean)}.
+     */
+    private PackType packType;
 
     /**
-     * Simple constructor with default parameters regarding the pack icon.
+     * Simple constructor with default file path parameter for the pack icon.
      */
     protected AbstractModPackResources() {
-        this(null);
-    }
-
-    /**
-     * Constructor that allows setting a custom mod id to retrieve <code>mod_logo.png</code> from.
-     * <p>A null value of mod id will default to the pack id from {@link #id}.
-     */
-    protected AbstractModPackResources(@Nullable String logoModId) {
-        this(logoModId, "mod_logo.png");
+        this("mod_logo.png");
     }
 
     /**
      * Constructor with full control over the pack icon.
-     * <p>A null value of mod id will default to the pack id from {@link #id}.
      */
-    protected AbstractModPackResources(@Nullable String logoModId, String modLogoPath) {
-        this.logoModId = logoModId;
+    protected AbstractModPackResources(String modLogoPath) {
         this.modLogoPath = modLogoPath;
     }
 
@@ -72,7 +68,7 @@ public abstract class AbstractModPackResources implements PackResources {
     public IoSupplier<InputStream> getRootResource(String... elements) {
         String path = String.join("/", elements);
         if ("pack.png".equals(path)) {
-            return ModLoaderEnvironment.INSTANCE.getModContainer(this.logoModId)
+            return ModLoaderEnvironment.INSTANCE.getModContainer(this.id.getNamespace())
                     .flatMap(container -> container.findResource(this.modLogoPath))
                     .<IoSupplier<InputStream>>map(modResource -> {
                         return () -> Files.newInputStream(modResource);
@@ -81,9 +77,20 @@ public abstract class AbstractModPackResources implements PackResources {
         return null;
     }
 
+    @Nullable
+    @Override
+    public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
+        return null;
+    }
+
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
 
+    }
+
+    @Override
+    public Set<String> getNamespaces(PackType type) {
+        return this.packType == PackType.SERVER_DATA ? Collections.singleton(this.id.getNamespace()) : Collections.emptySet();
     }
 
     @Nullable
@@ -94,7 +101,7 @@ public abstract class AbstractModPackResources implements PackResources {
 
     @Override
     public String packId() {
-        return this.id;
+        return this.id.toString();
     }
 
     @Override
@@ -108,17 +115,15 @@ public abstract class AbstractModPackResources implements PackResources {
     }
 
     @ApiStatus.Internal
-    static Pack buildPack(PackType packType, Supplier<AbstractModPackResources> factory, String id, Component title, Component description, boolean required, boolean fixedPosition) {
+    static Pack buildPack(PackType packType, Supplier<AbstractModPackResources> factory, ResourceLocation id, Component title, Component description, boolean required, boolean fixedPosition, FeatureFlagSet features, boolean hidden) {
         PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType));
         BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
-        Pack.Info info = new Pack.Info(description, metadataSection.getPackFormat(), FeatureFlagSet.of());
-        return Pack.create(id, title, required, $ -> {
+        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(description, metadataSection.getPackFormat(), features, hidden);
+        return Pack.create(id.toString(), title, required, $ -> {
             AbstractModPackResources packResources = factory.get();
             packResources.id = id;
             packResources.metadata = metadata;
-            if (packResources.logoModId == null) {
-                packResources.logoModId = id;
-            }
+            packResources.packType = packType;
             return packResources;
         }, info, packType, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
     }

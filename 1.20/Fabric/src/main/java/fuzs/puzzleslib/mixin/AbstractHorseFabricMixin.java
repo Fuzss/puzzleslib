@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
 import fuzs.puzzleslib.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.impl.event.LivingJumpHelper;
+import fuzs.puzzleslib.impl.event.EventImplHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -21,6 +21,6 @@ abstract class AbstractHorseFabricMixin extends Animal {
 
     @Inject(method = "executeRidersJump", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;hasImpulse:Z", shift = At.Shift.AFTER))
     public void executeRidersJump(float playerJumpPendingScale, Vec3 travelVector, CallbackInfo callback) {
-        LivingJumpHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), this);
+        EventImplHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), this);
     }
 }
