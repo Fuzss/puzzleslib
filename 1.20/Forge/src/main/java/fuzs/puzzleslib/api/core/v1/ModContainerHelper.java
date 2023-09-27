@@ -12,13 +12,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * small helper methods for Forge
+ * Small helper methods for mod containers and the corresponding mod event bus on Forge.
  */
 public final class ModContainerHelper {
 
-    /**
-     * private constructor
-     */
     private ModContainerHelper() {
 
     }
@@ -33,7 +30,7 @@ public final class ModContainerHelper {
         if (findModContainer(modId) instanceof FMLModContainer modContainer) {
             return Optional.of(modContainer.getEventBus());
         }
-        PuzzlesLib.LOGGER.error("No mod event bus for id %s exists, cannot proceed mod loading".formatted(modId));
+        PuzzlesLib.LOGGER.error("Mod event bus for {} is absent", modId, new RuntimeException());
         return Optional.empty();
     }
 
@@ -47,6 +44,6 @@ public final class ModContainerHelper {
         ModList modList = ModList.get();
         Objects.requireNonNull(modList, "mod list is null");
         return modList.getModContainerById(modId)
-                .orElseThrow(() -> new IllegalArgumentException(String.format("No mod container for id %s exists", modId)));
+                .orElseThrow(() -> new IllegalArgumentException("Mod container for %s is absent".formatted(modId)));
     }
 }

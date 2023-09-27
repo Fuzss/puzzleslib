@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.0.34-1.20.1] - 2023-09-26
+## [v8.0.34-1.20.1] - 2023-09-28
 ### Added
 - Added `BlockEvents$Break` and `BlockEvents$DropExperience`
 - Added `TickingBlockEntity` and `TickingEntityBlock` helper interfaces for creating ticking block entities without the need to use static ticker methods
@@ -15,12 +15,17 @@ The format is based on [Keep a Changelog].
 - Added `TypedTagFactory` and `BoundTagFactory` for creating new `TagKey`s, tag keys have therefore been removed from the new `RegistryManager`
 - Added `CombinedIngredients` for creating more complex instances of `Ingredient`
 - Added `ShapesHelper`, mainly useful for rotating a `VoxelShape` to a given `Direction`
+- Added `DynamicPackResources` for generating resources via data providers at runtime
+- Added `RegistryHelper` for various vanilla registry related helper methods 
 ### Changed
+- Overhauled data generation classes, moving and reworking them for the common project to be usable in the new `DynamicPackResources`
 - Refined `AbstractModPackResources` to better handle mod ids as well as allow for hiding a pack, a Forge exclusive feature
 - A mod providing biome modifications on Forge no longer needs to include its own biome modifier, the file is now automatically generated using a built-in data pack
+- Overhauled internal implementation of `ItemAttributeModifiersCallback`
 ### Fixed
 - Fixed a class loading issue related to `ItemModelDisplayOverrides` and `EventInvokerRegistry` implementations
 - Fixed `AbstractParticleDescriptionProvider` not verifying the existence of used textures
+- Fixed an issue where the current game server wouldn't be properly stored on Fabric
 
 ## [v8.0.33-1.20.1] - 2023-09-09
 ### Changed

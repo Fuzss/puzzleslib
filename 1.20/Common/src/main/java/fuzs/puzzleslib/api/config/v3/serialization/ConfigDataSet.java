@@ -1,13 +1,10 @@
 package fuzs.puzzleslib.api.config.v3.serialization;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
-import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.init.v3.RegistryHelper;
 import fuzs.puzzleslib.impl.config.serialization.ConfigDataSetImpl;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -118,7 +115,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
      * @return builder backed by <code>registry</code>
      */
     static <T> ConfigDataSet<T> from(final ResourceKey<? extends Registry<T>> registryKey, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
-        return new ConfigDataSetImpl<>(findRegistry(registryKey, false), values, filter, types);
+        return new ConfigDataSetImpl<>(RegistryHelper.findBuiltInRegistry(registryKey), values, filter, types);
     }
 
     /**
@@ -131,34 +128,12 @@ public interface ConfigDataSet<T> extends Collection<T> {
      */
     @SafeVarargs
     static <T> List<String> toString(final ResourceKey<? extends Registry<T>> registryKey, T... entries) {
-        Registry<? super T> registry = findRegistry(registryKey, false);
+        Registry<? super T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
         return Stream.of(entries)
                 .peek(Objects::requireNonNull)
                 .map(registry::getKey)
                 .filter(Objects::nonNull)
                 .map(ResourceLocation::toString)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Finds a built-in registry from the provided {@link ResourceKey}, dynamic registries are only supported when a game server is already running.
-     * <p>This cannot be used in configs unfortunately, as even for server configs no valid registry access has been created yet when the config is initialized.
-     *
-     * @param registryKey the key
-     * @param <T>         registry value type
-     * @return the corresponding registry
-     */
-    @SuppressWarnings("unchecked")
-    static <T> Registry<T> findRegistry(ResourceKey<? extends Registry<T>> registryKey, boolean dynamicRegistries) {
-        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
-        if (registry != null) return registry;
-        if (dynamicRegistries) {
-            MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getGameServer();
-            if (minecraftServer != null) {
-                registry = minecraftServer.registryAccess().registry(registryKey).orElse(null);
-                if (registry != null) return registry;
-            }
-        }
-        throw new IllegalArgumentException("Registry for key %s not found".formatted(registryKey));
     }
 }

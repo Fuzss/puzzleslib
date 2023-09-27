@@ -1,33 +1,32 @@
-package fuzs.puzzleslib.api.data.v2.client.model;
+package fuzs.puzzleslib.api.data.v2.client;
 
+import fuzs.puzzleslib.api.data.v2.core.ForgeDataProviderContext;
+import fuzs.puzzleslib.api.data.v2.client.model.ModItemModelProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.ModelProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Objects;
-
 public abstract class AbstractModelProvider extends BlockStateProvider {
+    private final ModItemModelProvider itemModels;
 
-    public AbstractModelProvider(GatherDataEvent evt, String modId) {
-        this(evt.getGenerator().getPackOutput(), evt.getExistingFileHelper(), modId);
+    public AbstractModelProvider(ForgeDataProviderContext context) {
+        this(context.getModId(), context.getPackOutput(), context.getFileHelper());
     }
 
-    public AbstractModelProvider(PackOutput packOutput, ExistingFileHelper fileHelper, String modId) {
+    public AbstractModelProvider(String modId, PackOutput packOutput, ExistingFileHelper fileHelper) {
         super(packOutput, modId, fileHelper);
+        this.itemModels = new ModItemModelProvider(packOutput, modId, fileHelper, this);
     }
 
-    @Deprecated(forRemoval = true)
-    public AbstractModelProvider(PackOutput packOutput, String modId, ExistingFileHelper fileHelper) {
-        this(packOutput, fileHelper, modId);
+    @Override
+    public final ModItemModelProvider itemModels() {
+        return this.itemModels;
     }
 
     @Override
@@ -39,7 +38,7 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
      * @param block the block whose id to use for both the block states file and the existing model reference
      */
     public void simpleExistingBlock(Block block) {
-        this.simpleBlock(block, existingBlockModel(block));
+        this.simpleBlock(block, this.existingBlockModel(block));
     }
 
     public void simpleExistingBlockWithItem(Block block) {

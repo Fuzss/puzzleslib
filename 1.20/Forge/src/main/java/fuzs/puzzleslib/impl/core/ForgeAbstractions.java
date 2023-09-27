@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
@@ -73,7 +74,7 @@ public final class ForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public Pack.Info createPackInfo(Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
+    public Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
         return new Pack.Info(description, packVersion, packVersion, features, hidden);
     }
 }

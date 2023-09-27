@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
+import fuzs.puzzleslib.api.init.v3.RegistryHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -40,7 +41,7 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     @Override
     public <T> Holder.Reference<T> getHolder(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        Registry<T> registry = findRegistry(registryKey);
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
         ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
         // Forge cannot use the holder from the registry as it does not exist yet
         // an alternative would be implementing a forwarding holder instance, but that would require returning Holder over Holder.Reference everywhere

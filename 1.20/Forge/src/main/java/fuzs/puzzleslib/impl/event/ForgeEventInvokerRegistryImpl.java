@@ -468,8 +468,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ItemAttributeModifiersCallback.class, ItemAttributeModifierEvent.class, (ItemAttributeModifiersCallback callback, ItemAttributeModifierEvent evt) -> {
-            Multimap<Attribute, AttributeModifier> attributeModifiers = new AttributeModifiersMultimap(evt::getModifiers, evt::addModifier, evt::removeModifier, evt::removeAttribute, evt::clearModifiers);
-            callback.onItemAttributeModifiers(evt.getItemStack(), evt.getSlotType(), attributeModifiers, evt.getOriginalModifiers());
+            Multimap<Attribute, AttributeModifier> attributeModifiers = new ForgeAttributeModifiersMultimap(evt::getModifiers, evt::addModifier, evt::removeModifier, evt::removeAttribute, evt::clearModifiers);
+            callback.onItemAttributeModifiers(evt.getItemStack(), evt.getSlotType(), attributeModifiers);
         });
         INSTANCE.register(ProjectileImpactCallback.class, ProjectileImpactEvent.class, (ProjectileImpactCallback callback, ProjectileImpactEvent evt) -> {
             if (callback.onProjectileImpact(evt.getProjectile(), evt.getRayTraceResult()).isInterrupt()) {

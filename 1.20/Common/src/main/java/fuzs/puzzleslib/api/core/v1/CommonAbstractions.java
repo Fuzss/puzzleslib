@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
@@ -128,11 +129,12 @@ public interface CommonAbstractions {
     /**
      * Creates a new {@link Pack.Info} instance with additional parameters only supported on Forge.
      *
+     * @param id          the pack identifier
      * @param description the pack description component
      * @param packVersion the pack version, ideally retrieved from {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
      * @param features    the feature flags provided by this pack
      * @param hidden      controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
      * @return the created pack info instance
      */
-    Pack.Info createPackInfo(Component description, int packVersion, FeatureFlagSet features, boolean hidden);
+    Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden);
 }
