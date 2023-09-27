@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.init.v3.RegistryManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.StringUtils;
@@ -52,12 +51,4 @@ public abstract class RegistryManagerV3Impl implements RegistryManager {
     }
 
     protected abstract <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
-
-    @SuppressWarnings("unchecked")
-    protected static <T> Registry<T> findRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
-        Objects.requireNonNull(registryKey, "registry key is null");
-        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(registryKey.location());
-        Objects.requireNonNull(registry, "registry %s is null".formatted(registryKey));
-        return registry;
-    }
 }

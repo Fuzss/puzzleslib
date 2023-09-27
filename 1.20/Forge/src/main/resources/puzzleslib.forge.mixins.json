@@ -6,6 +6,7 @@
   "refmap": "puzzleslib.refmap.json",
   "mixins": [
     "LootDataManagerForgeMixin",
+    "TagsProviderForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
     "accessor.FireBlockForgeAccessor",
     "accessor.LootTableForgeAccessor",

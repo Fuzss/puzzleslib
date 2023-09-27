@@ -8,7 +8,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.ItemStack;
@@ -80,10 +79,6 @@ public final class FabricLivingEvents {
      * Called before an entity is knocked-back in {@link LivingEntity#knockback(double, double, double)}, allows for preventing the knock-back.
      */
     public static final Event<LivingKnockBackCallback> LIVING_KNOCK_BACK = FabricEventFactory.createResult(LivingKnockBackCallback.class);
-    /**
-     * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
-     */
-    public static final Event<ItemAttributeModifiersCallback> ITEM_ATTRIBUTE_MODIFIERS = FabricEventFactory.create(ItemAttributeModifiersCallback.class);
     /**
      * Called when the game checks whether a new {@link MobEffectInstance} can be applied to a {@link LivingEntity} in {@link LivingEntity#canBeAffected(MobEffectInstance)}.
      */

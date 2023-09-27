@@ -1,24 +1,27 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.ForwardingMultimap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.function.BiPredicate;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public final class AttributeModifiersMultimap extends ForwardingMultimap<Attribute, AttributeModifier> {
+public final class ForgeAttributeModifiersMultimap extends ForwardingMultimap<Attribute, AttributeModifier> {
     private final Supplier<Multimap<Attribute, AttributeModifier>> getModifiers;
     private final BiPredicate<Attribute, AttributeModifier> addModifier;
     private final BiPredicate<Attribute, AttributeModifier> removeModifier;
     private final Function<Attribute, Collection<AttributeModifier>> removeAttribute;
     private final Runnable clearModifiers;
 
-    public AttributeModifiersMultimap(Supplier<Multimap<Attribute, AttributeModifier>> getModifiers, BiPredicate<Attribute, AttributeModifier> addModifier, BiPredicate<Attribute, AttributeModifier> removeModifier, Function<Attribute, Collection<AttributeModifier>> removeAttribute, Runnable clearModifiers) {
+    public ForgeAttributeModifiersMultimap(Supplier<Multimap<Attribute, AttributeModifier>> getModifiers, BiPredicate<Attribute, AttributeModifier> addModifier, BiPredicate<Attribute, AttributeModifier> removeModifier, Function<Attribute, Collection<AttributeModifier>> removeAttribute, Runnable clearModifiers) {
         this.getModifiers = getModifiers;
         this.addModifier = addModifier;
         this.removeModifier = removeModifier;
@@ -41,16 +44,22 @@ public final class AttributeModifiersMultimap extends ForwardingMultimap<Attribu
         return this.addModifier.test(key, value);
     }
 
-    @Deprecated
     @Override
     public boolean putAll(Attribute key, Iterable<? extends AttributeModifier> values) {
-        throw new UnsupportedOperationException();
+        boolean changed = false;
+        for (AttributeModifier value : values) {
+            changed |= this.put(key, value);
+        }
+        return changed;
     }
 
-    @Deprecated
     @Override
     public boolean putAll(Multimap<? extends Attribute, ? extends AttributeModifier> multimap) {
-        throw new UnsupportedOperationException();
+        boolean changed = false;
+        for (Map.Entry<? extends Attribute, ? extends AttributeModifier> entry : multimap.entries()) {
+            changed |= this.put(entry.getKey(), entry.getValue());
+        }
+        return changed;
     }
 
     @Override
@@ -63,9 +72,10 @@ public final class AttributeModifiersMultimap extends ForwardingMultimap<Attribu
         return key instanceof Attribute attribute ? this.removeAttribute.apply(attribute) : Collections.emptyList();
     }
 
-    @Deprecated
     @Override
     public Collection<AttributeModifier> replaceValues(Attribute key, Iterable<? extends AttributeModifier> values) {
-        throw new UnsupportedOperationException();
+        Collection<AttributeModifier> collection = this.removeAll(key);
+        this.putAll(key, values);
+        return collection;
     }
 }

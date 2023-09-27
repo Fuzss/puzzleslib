@@ -14,10 +14,9 @@ public interface ItemAttributeModifiersCallback {
     /**
      * Runs after attribute modifiers have been built for an {@link ItemStack} in a specific {@link EquipmentSlot}, allows for modifying those attributes.
      *
-     * @param stack                      the stack item attribute modifiers are being generated for
-     * @param equipmentSlot              the equipment slot <code>stack</code> is currently placed in, most attributes will only apply for a specific slot, like armor points
-     * @param attributeModifiers         a modifiable attribute modifiers map
-     * @param originalAttributeModifiers an unmodifiable via of vanilla's original attribute modifiers map
+     * @param stack              the stack item attribute modifiers are being generated for
+     * @param equipmentSlot      the equipment slot <code>stack</code> is currently placed in, most attributes will only apply for a specific slot, like armor points
+     * @param attributeModifiers a modifiable attribute modifiers map
      */
-    void onItemAttributeModifiers(ItemStack stack, EquipmentSlot equipmentSlot, Multimap<Attribute, AttributeModifier> attributeModifiers, Multimap<Attribute, AttributeModifier> originalAttributeModifiers);
+    void onItemAttributeModifiers(ItemStack stack, EquipmentSlot equipmentSlot, Multimap<Attribute, AttributeModifier> attributeModifiers);
 }

@@ -118,7 +118,7 @@ public abstract class AbstractModPackResources implements PackResources {
     static Pack buildPack(PackType packType, Supplier<AbstractModPackResources> factory, ResourceLocation id, Component title, Component description, boolean required, boolean fixedPosition, FeatureFlagSet features, boolean hidden) {
         PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType));
         BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
-        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(description, metadataSection.getPackFormat(), features, hidden);
+        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(id, description, metadataSection.getPackFormat(), features, hidden);
         return Pack.create(id.toString(), title, required, $ -> {
             AbstractModPackResources packResources = factory.get();
             packResources.id = id;

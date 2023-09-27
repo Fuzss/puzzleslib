@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.init;
 
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
+import fuzs.puzzleslib.api.init.v3.RegistryHelper;
 import fuzs.puzzleslib.mixin.accessor.ReferenceAccessor;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -30,7 +31,7 @@ public final class FabricRegistryManagerV3 extends RegistryManagerV3Impl {
     @SuppressWarnings("unchecked")
     @Override
     public <T> Holder.Reference<T> getHolder(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        Registry<T> registry = findRegistry(registryKey);
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
         ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
         Holder.Reference<T> holder = registry.getHolder(resourceKey).orElseThrow();
         if (!holder.isBound()) {
@@ -50,7 +51,7 @@ public final class FabricRegistryManagerV3 extends RegistryManagerV3Impl {
         Holder.Reference<T> holder;
         // PointOfInterestHelper also registers the poi type, so skip this call for that scenario
         if (!registryKey.equals(Registries.POINT_OF_INTEREST_TYPE)) {
-            holder = Registry.registerForHolder(findRegistry(registryKey), this.makeKey(path), value);
+            holder = Registry.registerForHolder(RegistryHelper.findBuiltInRegistry(registryKey), this.makeKey(path), value);
         } else {
             holder = this.getHolder(registryKey, path);
         }

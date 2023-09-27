@@ -8,13 +8,14 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 /**
- * {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer#renderByItem} as a functional interface
+ * Provides {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer#renderByItem} as a functional interface.
  */
 @FunctionalInterface
 public interface DynamicBuiltinItemRenderer extends ResourceManagerReloadListener {
 
     /**
-     * renders an item stack, kindly copied from Fabric Api :)
+     * Renders an item stack.
+     * <p>Kindly copied from Fabric Api :)
      *
      * @param stack             the rendered item stack
      * @param mode              the model transformation mode
