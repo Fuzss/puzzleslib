@@ -10,6 +10,9 @@ dependencies {
 
     // Forge Config Api Port
     api libs.forgeconfigapiport.common
+
+    // Puzzles Access Api
+    api libs.puzzlesaccessapi.common
 }
 
 loom {

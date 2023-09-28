@@ -19,6 +19,9 @@ dependencies {
     // Extensible Enums
 //    modApi(libs.extensibleenums.fabric.get()))
 
+    // Puzzles Access Api
+    modApi(include(libs.puzzlesaccessapi.fabric.get()))
+
     // Quality of Life Mods
     versionCatalog.findLibrary("modmenu.fabric").ifPresent {
         modLocalRuntime(it)

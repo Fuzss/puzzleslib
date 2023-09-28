@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog].
 - Added `DynamicPackResources` for generating resources via data providers at runtime
 - Added `RegistryHelper` for various vanilla registry related helper methods 
 ### Changed
+- The Puzzles Access Api mod is now bundled with Puzzles Lib
 - Overhauled data generation classes, moving and reworking them for the common project to be usable in the new `DynamicPackResources`
 - Refined `AbstractModPackResources` to better handle mod ids as well as allow for hiding a pack, a Forge exclusive feature
 - A mod providing biome modifications on Forge no longer needs to include its own biome modifier, the file is now automatically generated using a built-in data pack
@@ -39,7 +40,7 @@ The format is based on [Keep a Changelog].
 - `ContentRegistrationFlags` are now enabled via implementing `BaseModConstructor::getContentRegistrationFlags`
 - Fabric is now more strict in enforcing `ContentRegistrationFlags` even when not strictly required to improve parity with Forge
 - Greatly expanded upon `ParticleProvidersContext` to allow for more kinds of particle types to be registered
-- Overhauled `ForwardingReloadListener` to support forwarding a collection of `PreparableReloadListener`s instead of just a single one
+- Overhauled `ForwardingReloadListener` to support forwarding a collection of `PreparableReloadListener` instances instead of just a single one
 - Refactored `FabricReloadListener` into a more general `FabricReloadListenerHelper` class
 
 ## [v8.0.31-1.20.1] - 2023-09-07

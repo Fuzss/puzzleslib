@@ -65,7 +65,7 @@ public class BiomeLoadingHandler {
                     });
                 }
             }
-        });
+        }, false);
     }
 
     private record BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications,
