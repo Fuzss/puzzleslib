@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.api.data.v2.core;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 /**
  * An enhanced implementation of {@link DataProviderContext} that also holds an {@link ExistingFileHelper} instance.
@@ -43,5 +45,13 @@ public class ForgeDataProviderContext extends DataProviderContext {
      */
     public ExistingFileHelper getFileHelper() {
         return this.fileHelper;
+    }
+
+    /**
+     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about parametrized varargs.
+     */
+    @FunctionalInterface
+    public interface Factory extends Function<ForgeDataProviderContext, DataProvider> {
+
     }
 }
