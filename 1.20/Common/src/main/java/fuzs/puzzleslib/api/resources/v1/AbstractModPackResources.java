@@ -20,6 +20,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -32,20 +33,20 @@ public abstract class AbstractModPackResources implements PackResources {
      * Path to the mod logo inside the mod jar to be used in place of <code>pack.png</code> for the pack icon.
      * <p>Defaults to <code>mod_logo.png</code>, path is separated using "/".
      */
-    private final String modLogoPath;
+    protected final String modLogoPath;
     /**
      * Id of this pack.
-     * <p>Set internally using {@link #buildPack(PackType, Supplier, ResourceLocation, Component, Component, boolean, boolean, FeatureFlagSet, boolean)}.
+     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, boolean, boolean, FeatureFlagSet)}.
      */
     private ResourceLocation id;
     /**
      * The metadata for the <code>pack.mcmeta</code> section.
-     * <p>Set internally using {@link #buildPack(PackType, Supplier, ResourceLocation, Component, Component, boolean, boolean, FeatureFlagSet, boolean)}.
+     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, boolean, boolean, FeatureFlagSet)}.
      */
     private BuiltInMetadata metadata;
     /**
      * The pack type for this pack.
-     * <p>Set internally using {@link #buildPack(PackType, Supplier, ResourceLocation, Component, Component, boolean, boolean, FeatureFlagSet, boolean)}.
+     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, boolean, boolean, FeatureFlagSet)}.
      */
     private PackType packType;
 
@@ -60,6 +61,7 @@ public abstract class AbstractModPackResources implements PackResources {
      * Constructor with full control over the pack icon.
      */
     protected AbstractModPackResources(String modLogoPath) {
+        Objects.requireNonNull(modLogoPath, "mod logo path is null");
         this.modLogoPath = modLogoPath;
     }
 
@@ -68,7 +70,7 @@ public abstract class AbstractModPackResources implements PackResources {
     public IoSupplier<InputStream> getRootResource(String... elements) {
         String path = String.join("/", elements);
         if ("pack.png".equals(path)) {
-            return ModLoaderEnvironment.INSTANCE.getModContainer(this.id.getNamespace())
+            return ModLoaderEnvironment.INSTANCE.getModContainer(this.getNamespace())
                     .flatMap(container -> container.findResource(this.modLogoPath))
                     .<IoSupplier<InputStream>>map(modResource -> {
                         return () -> Files.newInputStream(modResource);
@@ -90,12 +92,14 @@ public abstract class AbstractModPackResources implements PackResources {
 
     @Override
     public Set<String> getNamespaces(PackType type) {
-        return this.packType == PackType.SERVER_DATA ? Collections.singleton(this.id.getNamespace()) : Collections.emptySet();
+        Objects.requireNonNull(this.packType, "pack type is null");
+        return this.packType == type ? Collections.singleton(this.getNamespace()) : Collections.emptySet();
     }
 
     @Nullable
     @Override
     public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) {
+        Objects.requireNonNull(this.metadata, "metadata is null");
         return this.metadata.get(deserializer);
     }
 
@@ -114,8 +118,24 @@ public abstract class AbstractModPackResources implements PackResources {
 
     }
 
+    /**
+     * @return the namespace from the internal id
+     */
+    protected final String getNamespace() {
+        Objects.requireNonNull(this.id, "id is null");
+        return this.id.getNamespace();
+    }
+
+    /**
+     * An internal setup helper intended for setting up {@link DynamicPackResources} after the id has been set.
+     */
     @ApiStatus.Internal
-    static Pack buildPack(PackType packType, Supplier<AbstractModPackResources> factory, ResourceLocation id, Component title, Component description, boolean required, boolean fixedPosition, FeatureFlagSet features, boolean hidden) {
+    void setup() {
+
+    }
+
+    @ApiStatus.Internal
+    static Pack buildPack(PackType packType, ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
         PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType));
         BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
         Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(id, description, metadataSection.getPackFormat(), features, hidden);
@@ -124,6 +144,7 @@ public abstract class AbstractModPackResources implements PackResources {
             packResources.id = id;
             packResources.metadata = metadata;
             packResources.packType = packType;
+            packResources.setup();
             return packResources;
         }, info, packType, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
     }
