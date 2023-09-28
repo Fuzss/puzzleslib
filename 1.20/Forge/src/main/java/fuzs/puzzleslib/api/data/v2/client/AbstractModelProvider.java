@@ -12,6 +12,10 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.ArrayUtils;
 
+/**
+ * @deprecated replaced by {@link fuzs.puzzleslib.api.client.data.v2.AbstractModelProvider}
+ */
+@Deprecated
 public abstract class AbstractModelProvider extends BlockStateProvider {
     private final ModItemModelProvider itemModels;
 

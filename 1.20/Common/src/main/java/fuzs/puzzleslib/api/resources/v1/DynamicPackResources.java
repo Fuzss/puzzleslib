@@ -62,7 +62,7 @@ public class DynamicPackResources extends AbstractModPackResources {
      * Runs all the supplied {@link net.minecraft.data.DataProvider}s,
      * but instead of writing the generated files to disk collects the input streams stored by {@link PackType} and path (in form of a {@link ResourceLocation}).
      *
-     * @param context   the mod id namespace required for the data provider context
+     * @param modId     the mod id namespace required for the data provider context
      * @param factories the data provider factories
      * @return map containing all generated files
      */

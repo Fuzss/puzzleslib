@@ -1,5 +1,4 @@
 accessWidener	v2	named
-
 transitive-accessible   method  net/minecraft/core/particles/ParticleType   <init>  (ZLnet/minecraft/core/particles/ParticleOptions$Deserializer;)V
 transitive-accessible   method  net/minecraft/core/particles/SimpleParticleType     <init>  (Z)V
 transitive-accessible   field   net/minecraft/world/entity/Mob  goalSelector    Lnet/minecraft/world/entity/ai/goal/GoalSelector;
