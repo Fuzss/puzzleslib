@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.36-1.20.1] - 2023-10-01
+### Changed
+- Reverted experimental changes to `AbstractModelProvider`
+
+## [v8.0.35-1.20.1] - 2023-09-29
+### Added
+- Added `ForgeDataProviderContext$Factory` to better support data generation on Forge
+### Changed
+- Some experimental changes to `AbstractModelProvider` to hopefully fix runtime on Forge mods
+- `ConfigDataSet` can now exclude entries by marking them with `!`
+
 ## [v8.0.34-1.20.1] - 2023-09-28
 ### Added
 - Added `BlockEvents$Break` and `BlockEvents$DropExperience`

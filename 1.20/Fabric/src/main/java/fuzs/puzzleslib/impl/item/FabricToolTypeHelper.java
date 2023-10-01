@@ -22,7 +22,7 @@ public final class FabricToolTypeHelper implements ToolTypeHelper {
     }
 
     @Override
-    public boolean isTrident(ItemStack stack) {
-        return ToolTypeHelper.super.isTrident(stack) || stack.is(ConventionalItemTags.SPEARS);
+    public boolean isTridentLike(ItemStack stack) {
+        return ToolTypeHelper.super.isTridentLike(stack) || stack.is(ConventionalItemTags.SPEARS);
     }
 }

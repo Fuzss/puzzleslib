@@ -22,7 +22,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
     /**
      * default config option comment for options backed by {@link ConfigDataSet}
      */
-    String CONFIG_DESCRIPTION = "Format for every entry is \"<namespace>:<path>\". Tags are supported, must be in the format of \"#<namespace>:<path>\". Namespace may be omitted to use \"minecraft\" by default. May use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*_shulker_box\" to match all shulker boxes no matter of color.";
+    String CONFIG_DESCRIPTION = "Format for every entry is \"<namespace>:<path>\". Tags are supported, must be in the format of \"#<namespace>:<path>\". Namespace may be omitted to use \"minecraft\" by default. May use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*_shulker_box\" to match all shulker boxes no matter of color. Begin an entry with \"!\" to make sure it is excluded, useful e.g. when it has already been matched by another pattern.";
 
     /**
      * @return the dissolved entry map backing this config data set (values are mostly an empty array, so this is more like a set actually)
@@ -89,6 +89,18 @@ public interface ConfigDataSet<T> extends Collection<T> {
     void clear();
 
     /**
+     * Creates a new {@link ConfigDataSet} instance for a given registry and a list of values to parse. The underlying data structure will be similar to a set.
+     *
+     * @param registryKey registry for type
+     * @param values      values backing this set
+     * @param <T>         registry type
+     * @return builder backed by <code>registry</code>
+     */
+    static <T> ConfigDataSet<T> from(final ResourceKey<? extends Registry<T>> registryKey, String... values) {
+        return from(registryKey, Arrays.asList(values));
+    }
+
+    /**
      * Creates a new {@link ConfigDataSet} instance for a given registry and a list of values to parse, possibly including attached data types.
      * <p>If no data types are specified, the config data set will only contain simple values, the underlying data structure will be similar to a set.
      * <p>Otherwise, the config data set will contain values as keys with associated data values in the form of <code>Object[]</code>, the underlying data structure is similar to a map.
@@ -115,7 +127,8 @@ public interface ConfigDataSet<T> extends Collection<T> {
      * @return builder backed by <code>registry</code>
      */
     static <T> ConfigDataSet<T> from(final ResourceKey<? extends Registry<T>> registryKey, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
-        return new ConfigDataSetImpl<>(RegistryHelper.findBuiltInRegistry(registryKey), values, filter, types);
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
+        return new ConfigDataSetImpl<>(registry, values, filter, types);
     }
 
     /**

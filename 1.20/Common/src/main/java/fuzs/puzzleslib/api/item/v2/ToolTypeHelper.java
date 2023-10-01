@@ -113,12 +113,12 @@ public interface ToolTypeHelper {
     }
 
     /**
-     * Tests if an {@link ItemStack} is a trident.
+     * Tests if an {@link ItemStack} is similar to a trident, like a spear.
      *
      * @param stack the stack to test
      * @return is this stack a trident
      */
-    default boolean isTrident(ItemStack stack) {
+    default boolean isTridentLike(ItemStack stack) {
         return stack.getItem() instanceof TridentItem;
     }
 
@@ -129,7 +129,7 @@ public interface ToolTypeHelper {
      * @return is this stack a melee weapon
      */
     default boolean isMeleeWeapon(ItemStack stack) {
-        return this.isSword(stack) || this.isAxe(stack) || this.isTrident(stack);
+        return this.isSword(stack) || this.isAxe(stack) || this.isTridentLike(stack);
     }
 
     /**
@@ -139,7 +139,7 @@ public interface ToolTypeHelper {
      * @return is this stack a ranged weapon
      */
     default boolean isRangedWeapon(ItemStack stack) {
-        return this.isBow(stack) || this.isCrossbow(stack) || this.isTrident(stack);
+        return this.isBow(stack) || this.isCrossbow(stack) || this.isTridentLike(stack);
     }
 
     /**

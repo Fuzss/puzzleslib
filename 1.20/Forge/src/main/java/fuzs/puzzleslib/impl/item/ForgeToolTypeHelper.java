@@ -58,7 +58,7 @@ public final class ForgeToolTypeHelper implements ToolTypeHelper {
     }
 
     @Override
-    public boolean isTrident(ItemStack stack) {
-        return ToolTypeHelper.super.isTrident(stack) || stack.is(Tags.Items.TOOLS_TRIDENTS);
+    public boolean isTridentLike(ItemStack stack) {
+        return ToolTypeHelper.super.isTridentLike(stack) || stack.is(Tags.Items.TOOLS_TRIDENTS);
     }
 }
