@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.37-1.20.1] - 2023-10-04
+### Changed
+- No longer set `ExistingFileHelper` on data providers during Forge data generation
+- A few new `null` checks in `AbstractLanguageProvider`
+
 ## [v8.0.36-1.20.1] - 2023-10-01
 ### Changed
 - Reverted experimental changes to `AbstractModelProvider`
