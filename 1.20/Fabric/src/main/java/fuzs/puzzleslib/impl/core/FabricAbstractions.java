@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -115,5 +116,15 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
 
     public boolean notHidden(String id) {
         return !this.hiddenPacks.contains(id);
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(Enchantment enchantment, ItemStack itemStack) {
+        return enchantment.category.canEnchant(itemStack.getItem());
+    }
+
+    @Override
+    public boolean isAllowedOnBooks(Enchantment enchantment) {
+        return true;
     }
 }
