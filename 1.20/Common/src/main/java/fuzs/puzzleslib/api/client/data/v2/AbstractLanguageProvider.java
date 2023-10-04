@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
@@ -10,6 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -82,6 +84,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         void add(String key, String value);
 
         default void add(String key, String additionalKey, String value) {
+            Objects.requireNonNull(additionalKey, "additional key is null");
             this.add(key + (additionalKey.isEmpty() ? "" : "." + additionalKey), value);
         }
 
@@ -90,18 +93,31 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(ResourceLocation identifier, String additionalKey, String value) {
+            Objects.requireNonNull(identifier, "identifier is null");
             this.add(identifier.toLanguageKey(), additionalKey, value);
         }
 
+        default void add(String registry, RegistryReference<?> holder, String value) {
+            Objects.requireNonNull(registry, "registry is null");
+            Objects.requireNonNull(holder, "holder is null");
+            this.add(registry, holder.getResourceKey(), value);
+        }
+
         default void add(String registry, Holder.Reference<?> holder, String value) {
+            Objects.requireNonNull(registry, "registry is null");
+            Objects.requireNonNull(holder, "holder is null");
             this.add(registry, holder.key(), value);
         }
 
         default void add(String registry, ResourceKey<?> resourceKey, String value) {
+            Objects.requireNonNull(registry, "registry is null");
+            Objects.requireNonNull(resourceKey, "resource key is null");
             this.add(registry, resourceKey.location(), value);
         }
 
         default void add(String registry, ResourceLocation resourceLocation, String value) {
+            Objects.requireNonNull(registry, "registry is null");
+            Objects.requireNonNull(resourceLocation, "resource location is null");
             this.add(Util.makeDescriptionId(registry, resourceLocation), value);
         }
 
@@ -110,6 +126,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(Block block, String additionalKey, String value) {
+            Objects.requireNonNull(block, "block is null");
             this.add(block.getDescriptionId(), additionalKey, value);
         }
 
@@ -118,6 +135,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(Item item, String additionalKey, String value) {
+            Objects.requireNonNull(item, "item is null");
             this.add(item.getDescriptionId(), additionalKey, value);
         }
 
@@ -126,6 +144,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(Enchantment enchantment, String additionalKey, String value) {
+            Objects.requireNonNull(enchantment, "enchantment is null");
             this.add(enchantment.getDescriptionId(), additionalKey, value);
         }
 
@@ -134,6 +153,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(MobEffect mobEffect, String additionalKey, String value) {
+            Objects.requireNonNull(mobEffect, "mob effect is null");
             this.add(mobEffect.getDescriptionId(), additionalKey, value);
         }
 
@@ -142,6 +162,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(EntityType<?> entityType, String additionalKey, String value) {
+            Objects.requireNonNull(entityType, "entity type is null");
             this.add(entityType.getDescriptionId(), additionalKey, value);
         }
 
@@ -150,6 +171,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(Attribute attribute, String additionalKey, String value) {
+            Objects.requireNonNull(attribute, "attribute is null");
             this.add(attribute.getDescriptionId(), additionalKey, value);
         }
 
@@ -158,6 +180,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(StatType<?> statType, String additionalKey, String value) {
+            Objects.requireNonNull(statType, "stat type is null");
             this.add(statType.getTranslationKey(), additionalKey, value);
         }
 
@@ -170,10 +193,12 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(GameRules.Key<?> gameRule, String additionalKey, String value) {
+            Objects.requireNonNull(gameRule, "game rule is null");
             this.add(gameRule.getDescriptionId(), additionalKey, value);
         }
 
         default void add(Potion potion, String value) {
+            Objects.requireNonNull(potion, "potion is null");
             String potionName = potion.getName("");
             this.add("item.minecraft.tipped_arrow.effect." + potionName, "Arrow of " + value);
             this.add("item.minecraft.potion.effect." + potionName, "Potion of " + value);
@@ -182,10 +207,12 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(SoundEvent soundEvent, String value) {
+            Objects.requireNonNull(soundEvent, "sound event is null");
             this.add("subtitles." + soundEvent.getLocation().getPath(), value);
         }
 
         default void add(KeyMapping keyMapping, String value) {
+            Objects.requireNonNull(keyMapping, "key mapping is null");
             this.add(keyMapping.getName(), value);
         }
 
@@ -194,35 +221,47 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addCreativeModeTab(String modId, String tabId, String value) {
+            Objects.requireNonNull(modId, "mod id is null");
+            Objects.requireNonNull(tabId, "tab id is null");
             this.addCreativeModeTab(new ResourceLocation(modId, tabId), value);
         }
 
         default void addCreativeModeTab(ResourceLocation identifier, String value) {
+            Objects.requireNonNull(identifier, "identifier is null");
             this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, identifier), value);
         }
 
         default void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
+            Objects.requireNonNull(resourceKey, "resource key is null");
             this.add(BuiltInRegistries.CREATIVE_MODE_TAB.get(resourceKey), value);
         }
 
         default void add(CreativeModeTab tab, String value) {
             Objects.requireNonNull(tab, "tab is null");
-            if (tab.getDisplayName().getContents() instanceof TranslatableContents contents) {
+            this.add(tab.getDisplayName(), value);
+        }
+
+        default void add(Component component, String value) {
+            Objects.requireNonNull(component, "component is null");
+            if (component.getContents() instanceof TranslatableContents contents) {
                 this.add(contents.getKey(), value);
             } else {
-                throw new UnsupportedOperationException("Cannot add language entry for tab %s".formatted(tab.getDisplayName().getString()));
+                throw new UnsupportedOperationException("Unsupported component: " + component);
             }
         }
 
         default void addGenericDamageType(ResourceKey<DamageType> damageType, String value) {
+            Objects.requireNonNull(damageType, "damage type is null");
             this.add("death.attack." + damageType.location().getPath(), value);
         }
 
         default void addPlayerDamageType(ResourceKey<DamageType> damageType, String value) {
+            Objects.requireNonNull(damageType, "damage type is null");
             this.add("death.attack." + damageType.location().getPath() + ".player", value);
         }
 
         default void addItemDamageType(ResourceKey<DamageType> damageType, String value) {
+            Objects.requireNonNull(damageType, "damage type is null");
             this.add("death.attack." + damageType.location().getPath() + ".item", value);
         }
     }

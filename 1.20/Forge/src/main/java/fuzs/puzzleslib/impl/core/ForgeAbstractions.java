@@ -15,6 +15,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
@@ -76,5 +77,15 @@ public final class ForgeAbstractions implements CommonAbstractions {
     @Override
     public Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
         return new Pack.Info(description, packVersion, packVersion, features, hidden);
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(Enchantment enchantment, ItemStack itemStack) {
+        return enchantment.canApplyAtEnchantingTable(itemStack);
+    }
+
+    @Override
+    public boolean isAllowedOnBooks(Enchantment enchantment) {
+        return enchantment.isAllowedOnBooks();
     }
 }

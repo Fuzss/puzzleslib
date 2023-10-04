@@ -17,6 +17,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -137,4 +138,21 @@ public interface CommonAbstractions {
      * @return the created pack info instance
      */
     Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden);
+
+    /**
+     * Can the given enchanted be applied to an item stack via enchanting (in an enchanting table).
+     *
+     * @param enchantment the enchantment to check
+     * @param itemStack   the item stack trying to receive the enchantment
+     * @return is the application allowed
+     */
+    boolean canApplyAtEnchantingTable(Enchantment enchantment, ItemStack itemStack);
+
+    /**
+     * Can the given enchantment be applied to enchanted books.
+     *
+     * @param enchantment the enchantment to check
+     * @return is the application allowed
+     */
+    boolean isAllowedOnBooks(Enchantment enchantment);
 }
