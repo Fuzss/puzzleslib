@@ -16,6 +16,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A simple helper class for creating new {@link TagKey} instances with a pre-set registry via {@link ResourceKey}.
@@ -83,7 +84,20 @@ public final class TypedTagFactory<T> {
      * @return the tag key
      */
     public TagKey<T> make(String namespace, String path) {
-        return TagKey.create(this.registryKey, new ResourceLocation(namespace, path));
+        Objects.requireNonNull(namespace, "namespace is null");
+        Objects.requireNonNull(path, "path is null");
+        return this.make(new ResourceLocation(namespace, path));
+    }
+
+    /**
+     * Creates a new tag key using a custom namespace.
+     *
+     * @param resourceLocation the tag key location
+     * @return the tag key
+     */
+    public TagKey<T> make(ResourceLocation resourceLocation) {
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        return TagKey.create(this.registryKey, resourceLocation);
     }
 
     /**
