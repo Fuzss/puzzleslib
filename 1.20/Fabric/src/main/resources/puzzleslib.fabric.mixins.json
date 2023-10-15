@@ -54,6 +54,7 @@
     "client.AbstractContainerScreenFabricMixin",
     "client.ClientLevelFabricMixin",
     "client.ClientPacketListenerFabricMixin",
+    "client.DebugScreenOverlayMixin",
     "client.EffectRenderingInventoryScreenFabricMixin",
     "client.EntityRendererFabricMixin",
     "client.FogRendererFabricMixin",
