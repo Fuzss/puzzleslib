@@ -396,9 +396,13 @@ public final class ForgeClientEventInvokers {
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (!minecraft.options.renderDebug) return;
             callback.onGatherLeftDebugText(evt.getLeft());
         });
         INSTANCE.register(GatherDebugTextEvents.Right.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Right callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (!minecraft.options.renderDebug) return;
             callback.onGatherRightDebugText(evt.getRight());
         });
     }
