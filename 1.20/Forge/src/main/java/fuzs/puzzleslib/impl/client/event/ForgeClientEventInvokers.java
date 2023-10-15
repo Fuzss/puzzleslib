@@ -395,6 +395,12 @@ public final class ForgeClientEventInvokers {
             EventResult result = callback.onAddToast(minecraft.getToasts(), evt.getToast());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
+        INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+            callback.onGatherLeftDebugText(evt.getLeft());
+        });
+        INSTANCE.register(GatherDebugTextEvents.Right.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Right callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+            callback.onGatherRightDebugText(evt.getRight());
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {

@@ -144,6 +144,14 @@ public final class FabricClientEvents {
      * Fires when a {@link Toast} is about to be queued in {@link net.minecraft.client.gui.components.toasts.ToastComponent#addToast(Toast)}.
      */
     public static final Event<AddToastCallback> ADD_TOAST = FabricEventFactory.createResult(AddToastCallback.class);
+    /**
+     * An event that runs just before rendering all left lines on the {@link net.minecraft.client.gui.components.DebugScreenOverlay}.
+     */
+    public static final Event<GatherDebugTextEvents.Left> GATHER_LEFT_DEBUG_TEXT = FabricEventFactory.create(GatherDebugTextEvents.Left.class);
+    /**
+     * An event that runs just before rendering all right lines on the {@link net.minecraft.client.gui.components.DebugScreenOverlay}.
+     */
+    public static final Event<GatherDebugTextEvents.Right> GATHER_RIGHT_DEBUG_TEXT = FabricEventFactory.create(GatherDebugTextEvents.Right.class);
 
     /**
      * Called before a gui element is rendered, allows for cancelling rendering.

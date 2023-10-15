@@ -349,6 +349,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GameRenderEvents.Before.class, FabricClientEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricClientEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricClientEvents.ADD_TOAST);
+        INSTANCE.register(GatherDebugTextEvents.Left.class, FabricClientEvents.GATHER_LEFT_DEBUG_TEXT);
+        INSTANCE.register(GatherDebugTextEvents.Right.class, FabricClientEvents.GATHER_RIGHT_DEBUG_TEXT);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
