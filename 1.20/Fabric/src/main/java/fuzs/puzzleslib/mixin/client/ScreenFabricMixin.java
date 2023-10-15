@@ -41,13 +41,13 @@ abstract class ScreenFabricMixin extends AbstractContainerEventHandler implement
 
     @Override
     public Event<ExtraScreenMouseEvents.BeforeMouseDrag> puzzleslib$getBeforeMouseDragEvent() {
-        Objects.requireNonNull(this.puzzleslib$allowMouseDragEvent, "before mouse drag event is null for screen " + this.getClass().getName());
+        Objects.requireNonNull(this.puzzleslib$beforeMouseDragEvent, "before mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$beforeMouseDragEvent;
     }
 
     @Override
     public Event<ExtraScreenMouseEvents.AfterMouseDrag> puzzleslib$getAfterMouseDragEvent() {
-        Objects.requireNonNull(this.puzzleslib$allowMouseDragEvent, "after mouse drag event is null for screen " + this.getClass().getName());
+        Objects.requireNonNull(this.puzzleslib$afterMouseDragEvent, "after mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$afterMouseDragEvent;
     }
 }
