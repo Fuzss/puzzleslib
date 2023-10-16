@@ -21,7 +21,7 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
     {
         ModelEvents.modifyBakingResult(PuzzlesLib.MOD_ID).register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             this.overrideModels = Maps.newIdentityHashMap();
-            for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : super.overrideLocations.entrySet()) {
+            for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : this.overrideLocations.entrySet()) {
                 BakedModel itemModel = models.get(entry.getKey());
                 Objects.requireNonNull(itemModel, "item model is null");
                 this.overrideModels.put(itemModel, entry.getValue().entrySet().stream().collect(Maps.toImmutableEnumMap(Map.Entry::getKey, t -> {

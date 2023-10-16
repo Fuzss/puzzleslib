@@ -12,14 +12,12 @@ import com.electronwill.nightconfig.core.file.FileWatcher;
 import com.electronwill.nightconfig.core.io.ParsingException;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.mojang.logging.LogUtils;
+import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigPaths;
+import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import net.minecraftforge.fml.ModContainer;
-import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.config.ConfigFileTypeHandler;
-import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLConfig;
 import org.slf4j.Logger;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
@@ -34,11 +32,11 @@ import java.util.function.Function;
  * <p>The only reason for this to extend the original Forge class is to be able to return this instance in {@link ModConfig#getHandler()}.
  * <p>Huge props to the Corail Woodcutter mod where this whole idea comes from, the mod can be found here: <a href="https://www.curseforge.com/minecraft/mc-mods/corail-woodcutter">Corail Woodcutter</a>.
  */
-public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
+public class FabricConfigFileTypeHandler extends ConfigFileTypeHandler {
     static final Marker CONFIG = MarkerFactory.getMarker("CONFIG");
     private static final Logger LOGGER = LogUtils.getLogger();
-    static final ConfigFileTypeHandler TOML = new ForgeConfigFileTypeHandler();
-    private static final Path DEFAULT_CONFIGS_PATH = ModLoaderEnvironment.INSTANCE.getGameDirectory().resolve(FMLConfig.defaultConfigPath());
+    static final ConfigFileTypeHandler TOML = new FabricConfigFileTypeHandler();
+    private static final Path DEFAULT_CONFIGS_PATH = ForgeConfigPaths.INSTANCE.getDefaultConfigsDirectory();
 
     // Puzzles Lib: custom method from Forge Config API Port to better handle config loading when a ParsingException occurs
     private static void tryLoadConfigFile(FileConfig configData) {
@@ -119,15 +117,11 @@ public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
         private final ModConfig modConfig;
         private final CommentedFileConfig commentedFileConfig;
         private final ClassLoader realClassLoader;
-        // Puzzles Lib: store found mod container, we need it for dispatching the config event
-        private final ModContainer modContainer;
 
         ConfigWatcher(final ModConfig modConfig, final CommentedFileConfig commentedFileConfig, final ClassLoader classLoader) {
             this.modConfig = modConfig;
             this.commentedFileConfig = commentedFileConfig;
             this.realClassLoader = classLoader;
-            // Puzzles Lib: store found mod container, we need it for dispatching the config event
-            this.modContainer = ModList.get().getModContainerById(modConfig.getModId()).orElseThrow();
         }
 
         @Override
@@ -150,7 +144,7 @@ public class ForgeConfigFileTypeHandler extends ConfigFileTypeHandler {
                 LOGGER.debug(CONFIG, "Config file {} changed, sending notifies", this.modConfig.getFileName());
                 this.modConfig.getSpec().afterReload();
                 // Puzzles Lib: we don't have access to the package-private method on ModConfig, so just copy the implementation here, no need to get all fancy with reflection/method handle
-                this.modContainer.dispatchConfigEvent(IConfigEvent.reloading(this.modConfig));
+                ModConfigEvents.reloading(this.modConfig.getModId()).invoker().onModConfigReloading(this.modConfig);
             }
         }
     }
