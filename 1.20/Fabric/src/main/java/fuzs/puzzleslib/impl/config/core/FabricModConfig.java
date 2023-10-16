@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.config.core;
 
-import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.config.ConfigFileTypeHandler;
 import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
@@ -12,16 +11,17 @@ import net.minecraftforge.fml.config.ModConfig;
  *
  * <p>This idea is taken from the Corail Woodcutter mod, found here: <a href="https://www.curseforge.com/minecraft/mc-mods/corail-woodcutter">Corail Woodcutter</a>
  */
-public class ForgeModConfig extends ModConfig {
+public class FabricModConfig extends ModConfig {
 
-    public ForgeModConfig(Type type, IConfigSpec<?> spec, ModContainer container, String fileName) {
-        super(type, spec, container, fileName);
+    @SuppressWarnings("UnstableApiUsage")
+    public FabricModConfig(Type type, IConfigSpec<?> spec, String modId, String fileName) {
+        super(type, spec, modId, fileName);
     }
 
     @Override
     public ConfigFileTypeHandler getHandler() {
         // We cannot have this in a field as this method is called from the super constructor when config tracking begins.
         // This causes an issue on Fabric where client and common configs are loaded immediately upon registration.
-        return ForgeConfigFileTypeHandler.TOML;
+        return FabricConfigFileTypeHandler.TOML;
     }
 }

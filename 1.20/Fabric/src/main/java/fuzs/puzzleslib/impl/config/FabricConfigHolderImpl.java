@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.config;
 
-import fuzs.forgeconfigapiport.api.config.v2.ForgeConfigRegistry;
 import fuzs.forgeconfigapiport.api.config.v2.ModConfigEvents;
+import fuzs.puzzleslib.impl.config.core.FabricModConfig;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
 
@@ -22,7 +22,7 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
             holder.onModConfig(config, true);
         });
         holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-            return ForgeConfigRegistry.INSTANCE.register(modId, type, spec, fileName.apply(modId));
+            return new FabricModConfig(type, spec, modId, fileName.apply(modId));
         });
     }
 }
