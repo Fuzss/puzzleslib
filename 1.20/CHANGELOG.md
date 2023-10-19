@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.38-1.20.1] - 2023-10-19
+### Added
+- Added `GatherDebugTextEvents$Left` and `GatherDebugTextEvents$Right`
+- Added `LivingEvents$Breathe` and `LivingEvents$Drown`
+### Changed
+- Allow for overriding global server configs when a local server config is present per world
+
 ## [v8.0.37-1.20.1] - 2023-10-04
 ### Changed
 - No longer set `ExistingFileHelper` on data providers during Forge data generation

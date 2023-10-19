@@ -19,6 +19,7 @@ import java.util.Objects;
  * A simplified version on {@link SmithingTransformRecipe} that allows for upgrading gear without the need for a smithing template, just like the old smithing used to work.
  * <p>Intended for simply netherite upgrades in mods that shouldn't necessarily be as expensive to consume a full netherite upgrade smithing template.
  */
+@Deprecated(forRemoval = true)
 public class LegacySmithingTransformRecipe extends CustomRecipe {
     /**
      * The recipe serializer id that is used during registration.

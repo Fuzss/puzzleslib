@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
@@ -51,10 +50,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -332,6 +328,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(EntityRidingEvents.Stop.class, FabricEntityEvents.ENTITY_STOP_RIDING);
         INSTANCE.register(GrindstoneEvents.Update.class, FabricPlayerEvents.GRINDSTONE_UPDATE);
         INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
+        INSTANCE.register(LivingEvents.Breathe.class, FabricLivingEvents.LIVING_BREATHE);
+        INSTANCE.register(LivingEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         } else {
@@ -412,7 +410,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricForwardingEventInvoker(FabricEventContextConverter<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter) {
-            this(event -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().makeMap());
+            this(event -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().concurrencyLevel(1).makeMap());
         }
 
         @Override

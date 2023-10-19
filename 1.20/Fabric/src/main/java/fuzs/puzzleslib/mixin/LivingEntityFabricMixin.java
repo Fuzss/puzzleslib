@@ -7,8 +7,8 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.CapturedDropsEntity;
-import fuzs.puzzleslib.impl.event.DropEntityLootHelper;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
+import fuzs.puzzleslib.impl.event.FabricEventImplHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -30,6 +30,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -40,9 +41,8 @@ import java.util.Set;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityFabricMixin extends Entity {
-    @Shadow
-    @Final
-    private Map<MobEffect, MobEffectInstance> activeEffects;
+    @Unique
+    private final ThreadLocal<ItemStack> puzzleslib$originalUseItem = new ThreadLocal<>();
     @Shadow
     protected ItemStack useItem;
     @Shadow
@@ -52,10 +52,11 @@ abstract class LivingEntityFabricMixin extends Entity {
     protected Player lastHurtByPlayer;
     @Shadow
     protected int lastHurtByPlayerTime;
+    @Shadow
+    @Final
+    private Map<MobEffect, MobEffectInstance> activeEffects;
     @Unique
     private MutableInt puzzleslib$lootingLevel;
-    @Unique
-    private final ThreadLocal<ItemStack> puzzleslib$originalUseItem = new ThreadLocal<>();
     @Unique
     private DefaultedFloat puzzleslib$damageAmount;
     @Unique
@@ -70,6 +71,8 @@ abstract class LivingEntityFabricMixin extends Entity {
     private DefaultedDouble puzzleslib$ratioX;
     @Unique
     private DefaultedDouble puzzleslib$ratioZ;
+    @Unique
+    private int puzzleslib$originalAirSupply;
 
     public LivingEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -77,7 +80,8 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     public void tick(CallbackInfo callback) {
-        if (FabricLivingEvents.LIVING_TICK.invoker().onLivingTick(LivingEntity.class.cast(this)).isInterrupt()) callback.cancel();
+        if (FabricLivingEvents.LIVING_TICK.invoker().onLivingTick(LivingEntity.class.cast(this)).isInterrupt())
+            callback.cancel();
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
@@ -160,7 +164,8 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(method = "releaseUsingItem", at = @At("HEAD"), cancellable = true)
     public void releaseUsingItem(CallbackInfo callback) {
         if (!this.useItem.isEmpty()) {
-            if (FabricLivingEvents.USE_ITEM_STOP.invoker().onUseItemStop(LivingEntity.class.cast(this), this.useItem, this.useItemRemaining).isPass()) return;
+            if (FabricLivingEvents.USE_ITEM_STOP.invoker().onUseItemStop(LivingEntity.class.cast(this), this.useItem, this.useItemRemaining).isPass())
+                return;
             if (this.useItem.useOnRelease()) {
                 this.updatingUsingItem();
             }
@@ -174,7 +179,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         // we do not have access to the local lootingLevel variable at TAIL later where it is needed for invoking LivingDropsCallback
         // (the local capture seems to fail due to the way the local lootingLevel variable is initialised)
         // so instead capture the value after our LootingLevelCallback has run, potentially missing out on changes applied by other mixins
-        this.puzzleslib$lootingLevel = DropEntityLootHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
+        this.puzzleslib$lootingLevel = FabricEventImplHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
         return this.puzzleslib$lootingLevel.getAsInt();
     }
 
@@ -185,7 +190,7 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
     protected void dropAllDeathLoot$2(DamageSource damageSource, CallbackInfo callback) {
-        if (!DropEntityLootHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> this.puzzleslib$lootingLevel)) {
+        if (!FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> this.puzzleslib$lootingLevel)) {
             PuzzlesLib.LOGGER.warn("Unable to invoke LivingDropsCallback for entity {}: Drops is null", this.getName().getString());
         }
         this.puzzleslib$lootingLevel = null;
@@ -195,10 +200,10 @@ abstract class LivingEntityFabricMixin extends Entity {
     public void die$1(DamageSource damageSource, CallbackInfo callback) {
         // this is a safety precaution, in case LivingEntity::dropAllDeathLoot does not reach TAIL and therefore doesn't spawn the captured drops (another mixin might cancel the method mid-way)
         // this should work rather fine, as LivingEntity::dropAllDeathLoot is basically exclusively called from LivingEntity::die,
-        // and spawning captured drops in LivingEntity::dropAllDeathLoot only rarely has a conflict if any anyway
-        DropEntityLootHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> {
+        // and spawning captured drops in LivingEntity::dropAllDeathLoot only rarely has a conflict if any at all
+        FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> {
             int lootingLevel = damageSource.getEntity() instanceof Player player ? EnchantmentHelper.getMobLooting(player) : 0;
-            return DropEntityLootHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
+            return FabricEventImplHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
         });
     }
 
@@ -365,7 +370,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         if (!activeEffectsToKeep.isEmpty()) {
             Iterator<MobEffectInstance> iterator = this.activeEffects.values().iterator();
             boolean flag;
-            for(flag = false; iterator.hasNext(); flag = true) {
+            for (flag = false; iterator.hasNext(); flag = true) {
                 MobEffectInstance effect = iterator.next();
                 this.onEffectRemoved(effect);
                 iterator.remove();
@@ -393,5 +398,69 @@ abstract class LivingEntityFabricMixin extends Entity {
         DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
         FabricLivingEvents.LIVING_VISIBILITY.invoker().onLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
         return visibilityPercentage.getAsOptionalDouble().stream().map(t -> Math.max(t, 0.0)).findAny().orElse(value);
+    }
+
+    @Inject(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isEyeInFluid(Lnet/minecraft/tags/TagKey;)Z", shift = At.Shift.BEFORE))
+    public void baseTick$0(CallbackInfo callback) {
+        this.puzzleslib$originalAirSupply = this.getAirSupply();
+    }
+
+    @Inject(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setAirSupply(I)V", ordinal = 0, shift = At.Shift.AFTER), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;decreaseAirSupply(I)I")))
+    public void baseTick$1(CallbackInfo callback) {
+        if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
+            FabricEventImplHelper.tickAirSupply(LivingEntity.class.cast(this), this.puzzleslib$originalAirSupply, false, true, false);
+            this.puzzleslib$originalAirSupply = Integer.MIN_VALUE;
+        }
+    }
+
+    @ModifyVariable(method = "baseTick", at = @At("LOAD"), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAbilities()Lnet/minecraft/world/entity/player/Abilities;")))
+    public boolean baseTick$2(boolean canLoseAir) {
+        if (!canLoseAir) {
+            if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
+                FabricEventImplHelper.tickAirSupply(LivingEntity.class.cast(this), this.puzzleslib$originalAirSupply, false, false, true);
+                this.puzzleslib$originalAirSupply = Integer.MIN_VALUE;
+            }
+        }
+        return canLoseAir;
+    }
+
+    @Inject(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;setAirSupply(I)V", ordinal = 0, shift = At.Shift.AFTER), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;increaseAirSupply(I)I")))
+    public void baseTick$3(CallbackInfo callback) {
+        if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
+            FabricEventImplHelper.tickAirSupply(LivingEntity.class.cast(this), this.puzzleslib$originalAirSupply, true, true);
+            this.puzzleslib$originalAirSupply = Integer.MIN_VALUE;
+        }
+    }
+
+    @Inject(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z", ordinal = 0, shift = At.Shift.BEFORE), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;increaseAirSupply(I)I")))
+    public void baseTick$4(CallbackInfo callback) {
+        if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
+            FabricEventImplHelper.tickAirSupply(LivingEntity.class.cast(this), this.puzzleslib$originalAirSupply, true, true);
+            this.puzzleslib$originalAirSupply = Integer.MIN_VALUE;
+        }
+    }
+
+    @Shadow
+    public abstract boolean canBreatheUnderwater();
+
+    @Inject(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getAirSupply()I", ordinal = 0), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;decreaseAirSupply(I)I")))
+    public void baseTick$5(CallbackInfo callback) {
+        EventResult result = FabricLivingEvents.LIVING_DROWN.invoker().onLivingDrown(LivingEntity.class.cast(this), this.getAirSupply(), this.getAirSupply() == -20);
+        if (result.isInterrupt()) {
+            this.puzzleslib$originalAirSupply = this.getAirSupply();
+            if (result.getAsBoolean()) {
+                this.setAirSupply(-20);
+            } else {
+                this.setAirSupply(0);
+            }
+        }
+    }
+
+    @Inject(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z", ordinal = 0, shift = At.Shift.BEFORE), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/damagesource/DamageSources;drown()Lnet/minecraft/world/damagesource/DamageSource;")))
+    public void baseTick$6(CallbackInfo callback) {
+        if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
+            this.setAirSupply(this.puzzleslib$originalAirSupply);
+            this.puzzleslib$originalAirSupply = Integer.MIN_VALUE;
+        }
     }
 }
