@@ -176,13 +176,11 @@ public final class FabricClientEventInvokers {
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
         INSTANCE.register(RenderGuiElementEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
-            applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement(overlay.id()));
+            applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
         });
         INSTANCE.register(RenderGuiElementEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
-            applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement(overlay.id()));
+            applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEvents.ENTITY_LOAD);

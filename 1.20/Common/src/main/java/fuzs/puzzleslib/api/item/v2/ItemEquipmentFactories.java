@@ -5,6 +5,7 @@ import fuzs.puzzleslib.impl.item.ArmorMaterialImpl;
 import fuzs.puzzleslib.impl.item.TierImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -33,6 +34,31 @@ public final class ItemEquipmentFactories {
      */
     public static Tier registerTier(int miningLevel, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, Supplier<Ingredient> repairIngredient) {
         return new TierImpl(miningLevel, itemDurability, miningSpeed, attackDamageBonus, enchantability, Suppliers.memoize(repairIngredient::get));
+    }
+
+    /**
+     * Creates a new {@link ArmorMaterial}.
+     *
+     * @param name                 name of this material, used for the texture location
+     * @param repairIngredient     the repair material used in an anvil for restoring item durability
+     * @return the new {@link ArmorMaterial}
+     */
+    public static ArmorMaterial registerArmorMaterial(ResourceLocation name, Supplier<Ingredient> repairIngredient) {
+        return registerArmorMaterial(name, 0, new int[]{1, 1, 1, 1}, 0, repairIngredient);
+    }
+
+    /**
+     * Creates a new {@link ArmorMaterial}.
+     *
+     * @param name                 name of this material, used for the texture location
+     * @param durabilityMultiplier multiplier for internal base durability per slot type
+     * @param protectionAmounts    protection value for each slot type, order is boots, leggings, chest plate, helmet
+     * @param enchantability       enchantment value, leather is 15, gold is 25, chain is 12, iron is 9, diamond is 10, turtle is 9, netherite is 15
+     * @param repairIngredient     the repair material used in an anvil for restoring item durability
+     * @return the new {@link ArmorMaterial}
+     */
+    public static ArmorMaterial registerArmorMaterial(ResourceLocation name, int durabilityMultiplier, int[] protectionAmounts, int enchantability, Supplier<Ingredient> repairIngredient) {
+        return registerArmorMaterial(name, durabilityMultiplier, protectionAmounts, enchantability, () -> SoundEvents.ARMOR_EQUIP_GENERIC, 0, 0, repairIngredient);
     }
 
     /**

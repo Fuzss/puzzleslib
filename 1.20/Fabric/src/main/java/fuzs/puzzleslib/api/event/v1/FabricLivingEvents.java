@@ -111,6 +111,14 @@ public final class FabricLivingEvents {
      * Fires inside of {@link Mob#checkDespawn()} to help determine if the {@link Mob} should despawn.
      */
     public static final Event<CheckMobDespawnCallback> CHECK_MOB_DESPAWN = FabricEventFactory.createResult(CheckMobDespawnCallback.class);
+    /**
+     * Runs when the game updates an entity's air supply depending on if the entity can currently breathe or not.
+     */
+    public static final Event<LivingEvents.Breathe> LIVING_BREATHE = FabricEventFactory.createResult(LivingEvents.Breathe.class);
+    /**
+     * Runs before the game checks if an entity that is submerged should be damaged from drowning.
+     */
+    public static final Event<LivingEvents.Drown> LIVING_DROWN = FabricEventFactory.createResult(LivingEvents.Drown.class);
 
     private FabricLivingEvents() {
 

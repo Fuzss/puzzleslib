@@ -25,6 +25,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -61,10 +62,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
 
@@ -571,6 +569,47 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onGrindstoneUse(topInput, bottomInput, player);
             topInput.getAsOptional().ifPresent(evt::setNewTopItem);
             bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
+        });
+        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
+            final int airAmountValue;
+            if (!evt.canBreathe()) {
+                airAmountValue = -evt.getConsumeAirAmount();
+            } else if (evt.canRefillAir()) {
+                airAmountValue = evt.getRefillAirAmount();
+            } else {
+                airAmountValue = 0;
+            }
+            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
+            LivingEntity entity = evt.getEntity();
+            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
+            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
+            EventResult result = callback.onLivingBreathe(entity, airAmount, evt.canRefillAir(), canLoseAir);
+            if (result.isInterrupt()) {
+                evt.setCanBreathe(true);
+                evt.setCanRefillAir(false);
+            } else {
+                OptionalInt optional = airAmount.getAsOptionalInt();
+                if (optional.isPresent()) {
+                    if (optional.getAsInt() < 0) {
+                        evt.setCanBreathe(false);
+                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
+                    } else {
+                        evt.setCanBreathe(true);
+                        evt.setCanRefillAir(true);
+                        evt.setRefillAirAmount(optional.getAsInt());
+                    }
+                }
+            }
+        });
+        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
+            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
+            if (result.isInterrupt()) {
+                if (result.getAsBoolean()) {
+                    evt.setDrowning(true);
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
