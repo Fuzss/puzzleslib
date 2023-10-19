@@ -440,18 +440,16 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @Shadow
-    public abstract boolean canBreatheUnderwater();
-
     @Inject(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;getAirSupply()I", ordinal = 0), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;decreaseAirSupply(I)I")))
     public void baseTick$5(CallbackInfo callback) {
-        EventResult result = FabricLivingEvents.LIVING_DROWN.invoker().onLivingDrown(LivingEntity.class.cast(this), this.getAirSupply(), this.getAirSupply() == -20);
+        if (this.getAirSupply() > 0) return;
+        EventResult result = FabricLivingEvents.LIVING_DROWN.invoker().onLivingDrown(LivingEntity.class.cast(this), this.getAirSupply(), this.getAirSupply() <= -20);
         if (result.isInterrupt()) {
             this.puzzleslib$originalAirSupply = this.getAirSupply();
             if (result.getAsBoolean()) {
                 this.setAirSupply(-20);
             } else {
-                this.setAirSupply(0);
+                this.setAirSupply(Integer.MAX_VALUE);
             }
         }
     }

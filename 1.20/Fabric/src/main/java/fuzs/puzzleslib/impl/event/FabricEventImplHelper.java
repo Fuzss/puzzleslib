@@ -56,14 +56,15 @@ public final class FabricEventImplHelper {
         } else {
             OptionalInt optional = airAmount.getAsOptionalInt();
             if (optional.isPresent()) {
-                entity.setAirSupply(Mth.clamp(originalAirSupply + optional.getAsInt(), -20, entity.getMaxAirSupply()));
+                entity.setAirSupply(Math.min(originalAirSupply + optional.getAsInt(), entity.getMaxAirSupply()));
             }
         }
         if (tryDrown) tryDrownEntity(entity);
     }
 
     private static void tryDrownEntity(LivingEntity entity) {
-        boolean isDrowning = entity.getAirSupply() == -20;
+        if (entity.getAirSupply() > 0) return;
+        boolean isDrowning = entity.getAirSupply() <= -20;
         EventResult result = FabricLivingEvents.LIVING_DROWN.invoker().onLivingDrown(entity, entity.getAirSupply(), isDrowning);
         if (result.isInterrupt()) isDrowning = result.getAsBoolean();
         if (isDrowning) {
