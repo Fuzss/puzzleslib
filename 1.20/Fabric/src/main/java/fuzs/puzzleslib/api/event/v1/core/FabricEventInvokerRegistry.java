@@ -13,7 +13,7 @@ import java.util.function.UnaryOperator;
  * A registry for linking common events implemented as functional interfaces to the corresponding Fabric {@link Event} instances.
  * <p>See {@link FabricEventFactory} for easily creating dedicated Fabric events from common event implementations.
  */
-public interface FabricEventInvokerRegistry {
+public interface FabricEventInvokerRegistry extends EventInvokerRegistry {
     FabricEventInvokerRegistry INSTANCE = new FabricEventInvokerRegistryImpl();
 
     /**

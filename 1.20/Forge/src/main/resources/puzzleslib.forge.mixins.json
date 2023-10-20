@@ -9,6 +9,7 @@
     "TagsProviderForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
     "accessor.FireBlockForgeAccessor",
+    "accessor.ForgeRegistryForgeAccessor",
     "accessor.LootTableForgeAccessor",
     "accessor.MobSpawnSettingsBuilderForgeAccessor",
     "accessor.PotionBrewingForgeAccessor"

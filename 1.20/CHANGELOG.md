@@ -3,12 +3,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.0.38-1.20.1] - 2023-10-19
+## [v8.0.38-1.20.1] - 2023-10-20
 ### Added
 - Added `GatherDebugTextEvents$Left` and `GatherDebugTextEvents$Right`
 - Added `LivingEvents$Breathe` and `LivingEvents$Drown`
+- Added `RegistryEntryAddedCallback`
+- Added `ServerChunkEvents$Watch` and `ServerChunkEvents$Unwatch`
 ### Changed
 - Allow for overriding global server configs when a local server config is present per world
+- Allow for creating common events that do not necessarily require a mod loader specific event to be implemented
+### Fixed
+- Fixed an error being logged on Quilt when unsuccessfully trying to access to Fabric internal field required for the biome modifications api
+- Fixed a crash when trying to deserialize invalid `ResourceLocation`s provided by config entries
 
 ## [v8.0.37-1.20.1] - 2023-10-04
 ### Changed

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.core.v1;
 
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
@@ -21,29 +20,76 @@ public final class ModContainerHelper {
     }
 
     /**
-     * find the {@link IEventBus} for a specific <code>modId</code> so we do not have to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}
+     * Find the active {@link IEventBus} supplied via {@link FMLJavaModLoadingContext#get()}.
      *
-     * @param modId id for mod container
-     * @return      the mod event bus
+     * @return the active mod event bus
      */
-    public static Optional<IEventBus> findModEventBus(String modId) {
-        if (findModContainer(modId) instanceof FMLModContainer modContainer) {
-            return Optional.of(modContainer.getEventBus());
-        }
-        PuzzlesLib.LOGGER.error("Mod event bus for {} is absent", modId, new RuntimeException());
-        return Optional.empty();
+    public static IEventBus getActiveModEventBus() {
+        return getOptionalActiveModEventBus().orElseThrow(() -> new NullPointerException("active event bus is null"));
     }
 
     /**
-     * find the {@link ModContainer} for a specific <code>modId</code> so we do not have to rely on {@link ModLoadingContext#get()}
+     * Find the active {@link IEventBus} supplied via {@link FMLJavaModLoadingContext#get()}.
+     *
+     * @return the active mod event bus
+     */
+    public static Optional<IEventBus> getOptionalActiveModEventBus() {
+        return Optional.ofNullable(FMLJavaModLoadingContext.get()).map(FMLJavaModLoadingContext::getModEventBus);
+    }
+
+    /**
+     * Find the {@link IEventBus} for a specific <code>modId</code>.
+     * <p>This bypasses having to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}.
      *
      * @param modId id for mod container
-     * @return      the mod container
+     * @return the mod event bus
      */
-    public static ModContainer findModContainer(String modId) {
+    public static IEventBus getModEventBus(String modId) {
+        return getOptionalModEventBus(modId).orElseThrow(() -> new NullPointerException("event bus for %s is null".formatted(modId)));
+    }
+
+    /**
+     * Find the {@link IEventBus} for a specific <code>modId</code>.
+     * <p>This bypasses having to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}.
+     *
+     * @param modId id for mod container
+     * @return the mod event bus
+     */
+    public static Optional<IEventBus> getOptionalModEventBus(String modId) {
+        return getOptionalModContainer(modId).filter(FMLModContainer.class::isInstance).map(FMLModContainer.class::cast).map(FMLModContainer::getEventBus);
+    }
+
+    /**
+     * Find the {@link ModContainer} for a specific <code>modId</code>.
+     * <p>This bypasses having to rely on {@link ModLoadingContext#get()}.
+     *
+     * @param modId id for mod container
+     * @return the mod container
+     */
+    public static ModContainer getModContainer(String modId) {
+        return getOptionalModContainer(modId).orElseThrow(() -> new NullPointerException("mod container for %s is null".formatted(modId)));
+    }
+
+    /**
+     * Find the {@link ModContainer} for a specific <code>modId</code>.
+     * <p>This bypasses having to rely on {@link ModLoadingContext#get()}.
+     *
+     * @param modId id for mod container
+     * @return the mod container
+     */
+    public static Optional<? extends ModContainer> getOptionalModContainer(String modId) {
         ModList modList = ModList.get();
         Objects.requireNonNull(modList, "mod list is null");
-        return modList.getModContainerById(modId)
-                .orElseThrow(() -> new IllegalArgumentException("Mod container for %s is absent".formatted(modId)));
+        return modList.getModContainerById(modId);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static Optional<IEventBus> findModEventBus(String modId) {
+        return getOptionalModEventBus(modId);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static ModContainer findModContainer(String modId) {
+        return getModContainer(modId);
     }
 }

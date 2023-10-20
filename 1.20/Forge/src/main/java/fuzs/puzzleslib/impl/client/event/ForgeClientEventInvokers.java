@@ -22,6 +22,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.Event;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -146,7 +147,7 @@ public final class ForgeClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, ScreenEvent.KeyReleased.Post.class, (callback, evt) -> {
             callback.onAfterKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
         });
-        INSTANCE.register(RenderGuiElementEvents.Before.class, RenderGuiOverlayEvent.Pre.class, (RenderGuiElementEvents.Before callback, RenderGuiOverlayEvent.Pre evt, Object context) -> {
+        INSTANCE.register(RenderGuiElementEvents.Before.class, RenderGuiOverlayEvent.Pre.class, (RenderGuiElementEvents.Before callback, RenderGuiOverlayEvent.Pre evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
             RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
             Minecraft minecraft = Minecraft.getInstance();
@@ -154,7 +155,7 @@ public final class ForgeClientEventInvokers {
             EventResult result = callback.onBeforeRenderGuiElement(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(RenderGuiElementEvents.After.class, RenderGuiOverlayEvent.Post.class, (RenderGuiElementEvents.After callback, RenderGuiOverlayEvent.Post evt, Object context) -> {
+        INSTANCE.register(RenderGuiElementEvents.After.class, RenderGuiOverlayEvent.Post.class, (RenderGuiElementEvents.After callback, RenderGuiOverlayEvent.Post evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
             RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
             Minecraft minecraft = Minecraft.getInstance();
@@ -408,7 +409,7 @@ public final class ForgeClientEventInvokers {
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
-        INSTANCE.register(clazz, event, (T callback, E evt, Object context) -> {
+        INSTANCE.register(clazz, event, (T callback, E evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
             if (!((Class<?>) context).isInstance(evt.getScreen())) return;
             converter.accept(callback, evt);

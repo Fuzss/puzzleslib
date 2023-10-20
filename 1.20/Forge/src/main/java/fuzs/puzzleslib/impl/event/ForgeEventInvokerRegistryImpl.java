@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.impl.event;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
 import fuzs.puzzleslib.api.event.v1.core.*;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
@@ -16,7 +18,11 @@ import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
+import fuzs.puzzleslib.mixin.accessor.ForgeRegistryForgeAccessor;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -46,10 +52,7 @@ import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
 import net.minecraftforge.event.entity.living.*;
 import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.ChunkEvent;
-import net.minecraftforge.event.level.ExplosionEvent;
-import net.minecraftforge.event.level.LevelEvent;
+import net.minecraftforge.event.level.*;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -60,9 +63,14 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.IForgeRegistryInternal;
+import net.minecraftforge.registries.RegisterEvent;
+import net.minecraftforge.registries.RegistryManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
 
@@ -611,8 +619,49 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
+        INSTANCE.register(RegistryEntryAddedCallback.class, ForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
+        INSTANCE.register(ServerChunkEvents.Watch.class, ChunkWatchEvent.Watch.class, (ServerChunkEvents.Watch callback, ChunkWatchEvent.Watch evt) -> {
+            callback.onChunkWatch(evt.getPlayer(), evt.getChunk(), evt.getLevel());
+        });
+        INSTANCE.register(ServerChunkEvents.Unwatch.class, ChunkWatchEvent.UnWatch.class, (ServerChunkEvents.Unwatch callback, ChunkWatchEvent.UnWatch evt) -> {
+            callback.onChunkUnwatch(evt.getPlayer(), evt.getPos(), evt.getLevel());
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
+        Objects.requireNonNull(context, "context is null");
+        ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
+        IForgeRegistry<T> registry = RegistryManager.ACTIVE.getRegistry(resourceKey);
+        boolean[] loadComplete = new boolean[1];
+        final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) registry).puzzleslib$getAdd();
+        final IForgeRegistry.AddCallback<T> newAddCallback = (owner, stage, id, key, obj, oldObj) -> {
+            if (loadComplete[0] || oldObj != null) return;
+            callback.onRegistryEntryAdded(key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+                owner.register(resourceLocation, supplier.get());
+            });
+        };
+        ((ForgeRegistryForgeAccessor<T>) registry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
+            originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
+            newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
+        } : newAddCallback);
+        IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
+        eventBus.addListener((final FMLLoadCompleteEvent evt) -> {
+            loadComplete[0] = true;
+        });
+        Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
+        for (Map.Entry<ResourceKey<T>, T> entry : registry.getEntries()) {
+            callback.onRegistryEntryAdded(entry.getKey().location(), entry.getValue(), toRegister::put);
+        }
+        if (!toRegister.isEmpty()) {
+            eventBus.addListener((final RegisterEvent evt) -> {
+                toRegister.forEach((ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+                    evt.register(resourceKey, resourceLocation, supplier);
+                });
+            });
         }
     }
 
@@ -653,7 +702,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             IEventBus eventBus = this.eventBus;
             if (eventBus == null) {
                 Objects.requireNonNull(context, "mod id context is null");
-                eventBus = ModContainerHelper.findModEventBus((String) context).orElseThrow();
+                eventBus = ModContainerHelper.getModEventBus((String) context);
             }
             if (eventBus == MinecraftForge.EVENT_BUS || eventPriority == EventPriority.NORMAL) {
                 // we don't support receiving cancelled events since the event api on Fabric is not designed for it
