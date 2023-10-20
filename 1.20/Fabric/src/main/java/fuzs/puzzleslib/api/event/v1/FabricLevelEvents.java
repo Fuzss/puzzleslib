@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.FabricEventFactory;
-import fuzs.puzzleslib.api.event.v1.level.BlockEvents;
-import fuzs.puzzleslib.api.event.v1.level.ExplosionEvents;
-import fuzs.puzzleslib.api.event.v1.level.GatherPotentialSpawnsCallback;
-import fuzs.puzzleslib.api.event.v1.level.PlayLevelSoundEvents;
+import fuzs.puzzleslib.api.event.v1.level.*;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.level.Explosion;
 
@@ -40,6 +37,14 @@ public final class FabricLevelEvents {
      * Fires when building a list of all possible entities that can spawn at the specified location.
      */
     public static final Event<GatherPotentialSpawnsCallback> GATHER_POTENTIAL_SPAWNS = FabricEventFactory.create(GatherPotentialSpawnsCallback.class);
+    /**
+     * Fires when a server player begins watching a chunk.
+     */
+    public static final Event<ServerChunkEvents.Watch> WATCH_CHUNK = FabricEventFactory.create(ServerChunkEvents.Watch.class);
+    /**
+     * Fires when a server player stops watching a chunk.
+     */
+    public static final Event<ServerChunkEvents.Unwatch> UNWATCH_CHUNK = FabricEventFactory.create(ServerChunkEvents.Unwatch.class);
 
     private FabricLevelEvents() {
 

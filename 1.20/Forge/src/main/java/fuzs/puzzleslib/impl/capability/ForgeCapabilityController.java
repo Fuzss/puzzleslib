@@ -38,7 +38,7 @@ public final class ForgeCapabilityController implements CapabilityController {
     public ForgeCapabilityController(String namespace) {
         this.namespace = namespace;
         // for registering capabilities
-        ModContainerHelper.findModEventBus(namespace).ifPresent(eventBus -> {
+        ModContainerHelper.getOptionalModEventBus(namespace).ifPresent(eventBus -> {
             eventBus.addListener(this::onRegisterCapabilities);
         });
         // for attaching capabilities via AttachCapabilitiesEvent, this is the only method that supports using

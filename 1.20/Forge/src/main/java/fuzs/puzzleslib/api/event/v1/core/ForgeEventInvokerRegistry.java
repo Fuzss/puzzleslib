@@ -2,13 +2,14 @@ package fuzs.puzzleslib.api.event.v1.core;
 
 import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
 import net.minecraftforge.eventbus.api.Event;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 
 /**
  * A registry for linking common events implemented as functional interfaces to the corresponding Forge {@link Event} instances.
  */
-public interface ForgeEventInvokerRegistry {
+public interface ForgeEventInvokerRegistry extends EventInvokerRegistry {
     ForgeEventInvokerRegistry INSTANCE = new ForgeEventInvokerRegistryImpl();
 
     /**
@@ -35,7 +36,7 @@ public interface ForgeEventInvokerRegistry {
      * @param <E>          Forge event type
      */
     default <T, E extends Event> void register(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter, boolean joinInvokers) {
-        this.register(clazz, event, (T callback, E evt, Object context) -> converter.accept(callback, evt), joinInvokers);
+        this.register(clazz, event, (T callback, E evt, @Nullable Object context) -> converter.accept(callback, evt), joinInvokers);
     }
 
     /**
@@ -79,6 +80,6 @@ public interface ForgeEventInvokerRegistry {
          * @param event    the Forge event that is firing at this very moment
          * @param context  the context object, can be anything, but ideally an identifier such as a {@link Class} or {@link net.minecraft.resources.ResourceLocation}
          */
-        void accept(T callback, E event, Object context);
+        void accept(T callback, E event, @Nullable Object context);
     }
 }

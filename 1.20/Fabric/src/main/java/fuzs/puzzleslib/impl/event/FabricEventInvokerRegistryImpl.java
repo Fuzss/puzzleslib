@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.event;
 
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
@@ -14,6 +15,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
+import fuzs.puzzleslib.api.init.v3.RegistryHelper;
 import fuzs.puzzleslib.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.impl.core.FabricProxy;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
@@ -27,6 +29,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.item.v1.ModifyItemAttributeModifiersCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
@@ -35,10 +38,12 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -67,7 +72,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
@@ -330,6 +337,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
         INSTANCE.register(LivingEvents.Breathe.class, FabricLivingEvents.LIVING_BREATHE);
         INSTANCE.register(LivingEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
+        INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
+        INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         } else {
@@ -340,6 +350,24 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 };
             });
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void onRegistryEntryAdded(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
+        Objects.requireNonNull(context, "context is null");
+        ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
+        BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+            Registry.register(registry, resourceLocation, supplier.get());
+        };
+        RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
+            callback.onRegistryEntryAdded(id, object, registrar);
+        });
+        Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
+        for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
+            callback.onRegistryEntryAdded(entry.getKey().location(), entry.getValue(), toRegister::put);
+        }
+        toRegister.forEach(registrar);
     }
 
     @Override

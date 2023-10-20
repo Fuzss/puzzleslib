@@ -37,7 +37,7 @@ public final class ForgeClientModConstructor {
 
 
     public static void construct(ClientModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
+        ModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             registerModHandlers(constructor, modId, eventBus, availableFlags, flagsToHandle);
             constructor.onConstructMod();
         });

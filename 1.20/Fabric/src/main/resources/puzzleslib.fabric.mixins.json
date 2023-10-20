@@ -14,6 +14,7 @@
     "BoneMealItemFabricMixin",
     "BowItemFabricMixin",
     "CatFabricMixin",
+    "ChunkMapFabricMixin",
     "CrossbowItemFabricMixin",
     "EntityFabricMixin",
     "ExperienceOrbFabricMixin",

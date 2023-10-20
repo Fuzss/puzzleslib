@@ -36,7 +36,7 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     public ForgeRegistryManagerV3(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.findModEventBus(modId).orElseThrow();
+        this.eventBus = ModContainerHelper.getModEventBus(modId);
     }
 
     @Override

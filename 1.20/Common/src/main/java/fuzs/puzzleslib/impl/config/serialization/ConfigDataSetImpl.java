@@ -341,7 +341,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private Collection<D> findRegistryMatches(String source) {
             Collection<D> matches = Sets.newHashSet();
             if (!source.contains("*")) {
-                this.toValue(new ResourceLocation(source)).ifPresent(matches::add);
+                Optional.ofNullable(ResourceLocation.tryParse(source)).flatMap(this::toValue).ifPresent(matches::add);
             } else {
                 String regexSource = source.replace("*", "[a-z0-9/._-]*");
                 this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(Map.Entry::getValue).forEach(matches::add);

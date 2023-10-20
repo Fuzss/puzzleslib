@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.biome;
 
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.ReflectionHelper;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -65,6 +66,7 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings, B
     }
 
     private Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> findFabricSpawners() {
+        if (!ModLoaderEnvironment.INSTANCE.isFabric()) return Optional.empty();
         Field field = ReflectionHelper.findField("net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl", "fabricSpawners", true);
         return ReflectionHelper.getValue(field, this.context);
     }

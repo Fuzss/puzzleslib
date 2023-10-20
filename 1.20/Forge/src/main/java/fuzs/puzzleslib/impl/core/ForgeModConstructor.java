@@ -32,7 +32,7 @@ public final class ForgeModConstructor {
     }
 
     public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        ModContainerHelper.findModEventBus(modId).ifPresent(modEventBus -> {
+        ModContainerHelper.getOptionalModEventBus(modId).ifPresent(modEventBus -> {
             Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
             registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
             registerModHandlers(constructor, modId, modEventBus, biomeModifications, availableFlags, flagsToHandle);

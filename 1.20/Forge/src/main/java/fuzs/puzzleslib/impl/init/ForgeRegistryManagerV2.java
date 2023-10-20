@@ -33,7 +33,7 @@ public final class ForgeRegistryManagerV2 extends RegistryManagerV2Impl {
 
     public ForgeRegistryManagerV2(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.findModEventBus(modId).orElseThrow();
+        this.eventBus = ModContainerHelper.getModEventBus(modId);
     }
 
     @SuppressWarnings("unchecked")

@@ -27,7 +27,7 @@ public final class DataProviderHelper {
     public static void registerDataProviders(String modId, ForgeDataProviderContext.Factory... factories) {
         if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
         Objects.checkIndex(0, factories.length);
-        ModContainerHelper.findModEventBus(modId).ifPresent(eventBus -> {
+        ModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             eventBus.addListener((final GatherDataEvent evt) -> {
                 onGatherData(evt, modId, factories);
             });

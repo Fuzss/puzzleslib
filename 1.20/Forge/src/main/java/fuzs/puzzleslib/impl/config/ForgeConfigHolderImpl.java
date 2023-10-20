@@ -19,7 +19,7 @@ public class ForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     void bake(ConfigDataHolderImpl<?> holder, String modId) {
-        Optional<IEventBus> optional = ModContainerHelper.findModEventBus(modId);
+        Optional<IEventBus> optional = ModContainerHelper.getOptionalModEventBus(modId);
         optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Loading evt) -> {
             holder.onModConfig(evt.getConfig(), false);
         }));
@@ -27,7 +27,7 @@ public class ForgeConfigHolderImpl extends ConfigHolderImpl {
             holder.onModConfig(evt.getConfig(), true);
         }));
         holder.register((ModConfig.Type type, ForgeConfigSpec spec, UnaryOperator<String> fileName) -> {
-            ModContainer modContainer = ModContainerHelper.findModContainer(modId);
+            ModContainer modContainer = ModContainerHelper.getModContainer(modId);
             ModConfig modConfig = new ForgeModConfig(type, spec, modContainer, fileName.apply(modId));
             modContainer.addConfig(modConfig);
             return modConfig;
