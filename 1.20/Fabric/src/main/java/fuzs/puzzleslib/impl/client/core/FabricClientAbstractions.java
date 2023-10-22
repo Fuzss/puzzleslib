@@ -7,7 +7,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -27,17 +26,18 @@ public final class FabricClientAbstractions implements ClientAbstractions {
     }
 
     @Override
-    public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier) {
-        return modelManager.getModel(identifier);
+    public BakedModel getBakedModel(ResourceLocation identifier) {
+        return Minecraft.getInstance().getModelManager().getModel(identifier);
     }
 
     @Override
-    public float getPartialTick(Minecraft minecraft) {
+    public float getPartialTick() {
+        Minecraft minecraft = Minecraft.getInstance();
         return minecraft.isPaused() ? ((MinecraftFabricAccessor) minecraft).puzzleslib$getPausePartialTick() : minecraft.getFrameTime();
     }
 
     @Override
-    public SearchRegistry getSearchRegistry(Minecraft minecraft) {
-        return ((MinecraftFabricAccessor) minecraft).puzzleslib$getSearchRegistry();
+    public SearchRegistry getSearchRegistry() {
+        return ((MinecraftFabricAccessor) Minecraft.getInstance()).puzzleslib$getSearchRegistry();
     }
 }

@@ -6,7 +6,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -24,17 +23,17 @@ public final class ForgeClientAbstractions implements ClientAbstractions {
     }
 
     @Override
-    public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier) {
-        return modelManager.getModel(identifier);
+    public BakedModel getBakedModel(ResourceLocation identifier) {
+        return Minecraft.getInstance().getModelManager().getModel(identifier);
     }
 
     @Override
-    public float getPartialTick(Minecraft minecraft) {
-        return minecraft.getPartialTick();
+    public float getPartialTick() {
+        return Minecraft.getInstance().getPartialTick();
     }
 
     @Override
-    public SearchRegistry getSearchRegistry(Minecraft minecraft) {
-        return minecraft.getSearchTreeManager();
+    public SearchRegistry getSearchRegistry() {
+        return Minecraft.getInstance().getSearchTreeManager();
     }
 }

@@ -15,6 +15,7 @@
     "accessor.PotionBrewingForgeAccessor"
   ],
   "client": [
+    "client.ModelManagerForgeMixin",
     "client.accessor.BlockColorsForgeAccessor",
     "client.accessor.ItemColorsForgeAccessor",
     "client.accessor.ItemForgeAccessor"

@@ -1,12 +1,19 @@
 package fuzs.puzzleslib.impl.client.event;
 
+import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
+import fuzs.puzzleslib.mixin.client.accessor.ModelBakeryFabricAccessor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelResolver;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
@@ -24,7 +31,12 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -41,6 +53,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -349,6 +362,51 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(AddToastCallback.class, FabricClientEvents.ADD_TOAST);
         INSTANCE.register(GatherDebugTextEvents.Left.class, FabricClientEvents.GATHER_LEFT_DEBUG_TEXT);
         INSTANCE.register(GatherDebugTextEvents.Right.class, FabricClientEvents.GATHER_RIGHT_DEBUG_TEXT);
+        INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register(pluginContext -> {
+                Map<ResourceLocation, UnbakedModel> additionalUnbakedModels = Maps.newHashMap();
+                Map<UnbakedModel, UnbakedModel> modelCache = Maps.newIdentityHashMap();
+                pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
+                    // only invoke for top level models just like Forge
+                    if (!((ModelBakeryFabricAccessor) context.loader()).puzzleslib$getTopLevelModels().containsKey(context.id())) return model;
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), model, context.loader()::getModel, additionalUnbakedModels::put, modelCache.get(model));
+                    result.getInterrupt().ifPresent(unbakedModel -> modelCache.put(model, unbakedModel));
+                    return modelCache.getOrDefault(model, model);
+                });
+                pluginContext.resolveModel().register((ModelResolver.Context context) -> {
+                    return additionalUnbakedModels.get(context.id());
+                });
+            });
+        });
+        INSTANCE.register(ModelEvents.ModifyBakedModel.class, (ModelEvents.ModifyBakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register(pluginContext -> {
+                pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
+                    // only invoke for top level models just like Forge
+                    if (model == null || !((ModelBakeryFabricAccessor) context.loader()).puzzleslib$getTopLevelModels().containsKey(context.id())) return model;
+                    Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.id(), model, context::baker, (ResourceLocation resourceLocation) -> {
+                        return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                    }, models::putIfAbsent);
+                    return result.getInterrupt().orElse(model);
+                });
+            });
+        });
+        INSTANCE.register(ModelEvents.AdditionalBakedModel.class, (ModelEvents.AdditionalBakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register(pluginContext -> {
+                pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
+                    // all we want is access to the top level baked models map to be able to insert our own models
+                    // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
+                    if (context.id().equals(ModelBakery.MISSING_MODEL_LOCATION)) {
+                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                        // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
+                        callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
+                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                        }, context::baker);
+                    }
+                    return model;
+                });
+            });
+        });
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
