@@ -45,7 +45,6 @@ public interface ClientAbstractions {
     /**
      * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of {@link net.minecraft.client.resources.model.ModelResourceLocation}.
      *
-     * @param modelManager the model manager instance for retrieving the model
      * @param identifier   model identifier
      * @return the model, possibly the missing model
      */

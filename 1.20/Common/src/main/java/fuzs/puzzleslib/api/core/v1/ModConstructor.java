@@ -63,6 +63,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
      * @deprecated now always runs deferred, use {@link #onCommonSetup()}
      */
+    @Deprecated(forRemoval = true)
     default void onCommonSetup(final ModLifecycleContext context) {
 
     }
