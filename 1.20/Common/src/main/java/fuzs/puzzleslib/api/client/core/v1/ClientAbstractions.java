@@ -49,7 +49,19 @@ public interface ClientAbstractions {
      * @param identifier   model identifier
      * @return the model, possibly the missing model
      */
-    BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier);
+    BakedModel getBakedModel(ResourceLocation identifier);
+
+    /**
+     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of {@link net.minecraft.client.resources.model.ModelResourceLocation}.
+     *
+     * @param modelManager the model manager instance for retrieving the model
+     * @param identifier   model identifier
+     * @return the model, possibly the missing model
+     */
+    @Deprecated(forRemoval = true)
+    default BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier) {
+        return this.getBakedModel(identifier);
+    }
 
     /**
      * Get the current partial tick time.
@@ -57,9 +69,7 @@ public interface ClientAbstractions {
      *
      * @return current partial tick time
      */
-    default float getPartialTick() {
-        return this.getPartialTick(Minecraft.getInstance());
-    }
+    float getPartialTick();
 
     /**
      * Get the current partial tick time.
@@ -68,16 +78,17 @@ public interface ClientAbstractions {
      * @param minecraft minecraft singleton instance
      * @return current partial tick time
      */
-    float getPartialTick(Minecraft minecraft);
+    @Deprecated(forRemoval = true)
+    default float getPartialTick(Minecraft minecraft) {
+        return this.getPartialTick();
+    }
 
     /**
      * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
      *
      * @return the search registry
      */
-    default SearchRegistry getSearchRegistry() {
-        return this.getSearchRegistry(Minecraft.getInstance());
-    }
+    SearchRegistry getSearchRegistry();
 
     /**
      * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
@@ -85,5 +96,8 @@ public interface ClientAbstractions {
      * @param minecraft minecraft singleton instance
      * @return the search registry
      */
-    SearchRegistry getSearchRegistry(Minecraft minecraft);
+    @Deprecated(forRemoval = true)
+    default SearchRegistry getSearchRegistry(Minecraft minecraft) {
+        return this.getSearchRegistry();
+    }
 }

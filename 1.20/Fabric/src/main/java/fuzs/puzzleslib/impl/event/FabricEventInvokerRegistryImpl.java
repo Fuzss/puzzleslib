@@ -361,11 +361,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             Registry.register(registry, resourceLocation, supplier.get());
         };
         RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
-            callback.onRegistryEntryAdded(id, object, registrar);
+            callback.onRegistryEntryAdded(registry, id, object, registrar);
         });
+        // do not register directly to prevent ConcurrentModificationException
         Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
         for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
-            callback.onRegistryEntryAdded(entry.getKey().location(), entry.getValue(), toRegister::put);
+            callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), toRegister::put);
         }
         toRegister.forEach(registrar);
     }

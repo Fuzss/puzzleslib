@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.event;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
@@ -16,6 +16,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
+import fuzs.puzzleslib.api.init.v3.RegistryHelper;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.mixin.accessor.ForgeRegistryForgeAccessor;
@@ -70,6 +71,8 @@ import net.minecraftforge.registries.RegistryManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
@@ -635,34 +638,43 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
     private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        IForgeRegistry<T> registry = RegistryManager.ACTIVE.getRegistry(resourceKey);
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
+        IForgeRegistry<T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(resourceKey);
         boolean[] loadComplete = new boolean[1];
-        final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) registry).puzzleslib$getAdd();
+        final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
         final IForgeRegistry.AddCallback<T> newAddCallback = (owner, stage, id, key, obj, oldObj) -> {
+            // we probably don't want to handle replacements...
             if (loadComplete[0] || oldObj != null) return;
-            callback.onRegistryEntryAdded(key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+            callback.onRegistryEntryAdded(registry, key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
                 owner.register(resourceLocation, supplier.get());
             });
         };
-        ((ForgeRegistryForgeAccessor<T>) registry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
+        ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
             originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
             newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
         } : newAddCallback);
         IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
+        // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
+        // but that doesn't allow for adding content
+        // do not simply revert to the original add callback above as other events might have run in the meantime
         eventBus.addListener((final FMLLoadCompleteEvent evt) -> {
             loadComplete[0] = true;
         });
-        Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
-        for (Map.Entry<ResourceKey<T>, T> entry : registry.getEntries()) {
-            callback.onRegistryEntryAdded(entry.getKey().location(), entry.getValue(), toRegister::put);
+        // store all event invocations for vanilla game content already registered before the registration event runs
+        // the add callback above won't trigger for those as they are already registered when mods are constructed
+        Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> events = Sets.newLinkedHashSet();
+        for (Map.Entry<ResourceKey<T>, T> entry : forgeRegistry.getEntries()) {
+            events.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
+                callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
+            });
         }
-        if (!toRegister.isEmpty()) {
-            eventBus.addListener((final RegisterEvent evt) -> {
-                toRegister.forEach((ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+        eventBus.addListener((final RegisterEvent evt) -> {
+            events.forEach((Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer) -> {
+                consumer.accept((ResourceLocation resourceLocation, Supplier<T> supplier) -> {
                     evt.register(resourceKey, resourceLocation, supplier);
                 });
             });
-        }
+        });
     }
 
     @Override

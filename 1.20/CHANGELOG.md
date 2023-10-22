@@ -3,6 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.39-1.20.1] - 2023-10-22
+### Added
+- Added `ModifyUnbakedModel`, `ModifyBakedModel` and `AdditionalBakedModel` for finer control over models based entirely on mod loader specific implementations
+- Added helper methods for setting `BlockItem` blocks
+### Changed
+- Providing the `Minecraft` instance is no longer required in `ClientAbstractions`
+- `RegistryEntryAddedCallback` now includes the current registry
+- Deprecated old model events
+### Fixed
+- Fixed `RegistryEntryAddedCallback` running too early on Forge, leading to problems with implementations relying on content registered during the event
+
 ## [v8.0.38-1.20.1] - 2023-10-20
 ### Added
 - Added `GatherDebugTextEvents$Left` and `GatherDebugTextEvents$Right`

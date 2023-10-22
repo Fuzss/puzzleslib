@@ -1,15 +1,26 @@
 package fuzs.puzzleslib.impl.client.event;
 
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
@@ -24,10 +35,14 @@ import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static fuzs.puzzleslib.api.event.v1.core.ForgeEventInvokerRegistry.INSTANCE;
 
@@ -405,6 +420,97 @@ public final class ForgeClientEventInvokers {
             Minecraft minecraft = Minecraft.getInstance();
             if (!minecraft.options.renderDebug) return;
             callback.onGatherRightDebugText(evt.getRight());
+        });
+        INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            Map<ResourceLocation, BakedModel> models = evt.getModels();
+            Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
+            Function<ResourceLocation, UnbakedModel> modelGetter = (ResourceLocation resourceLocation) -> {
+                if (additionalModels.containsKey(resourceLocation)) {
+                    return additionalModels.get(resourceLocation);
+                } else {
+                    return evt.getModelBakery().getModel(resourceLocation);
+                }
+            };
+            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
+            Map<ForgeModelBakerImpl.ModelBakingKey, BakedModel> bakedCache = Maps.newIdentityHashMap();
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            Objects.requireNonNull(missingModel, "missing model is null");
+            Map<UnbakedModel, UnbakedModel> modelCache = Maps.newIdentityHashMap();
+            for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
+                ResourceLocation resourceLocation = entry.getKey();
+                UnbakedModel model = evt.getModelBakery().getModel(resourceLocation);
+                UnbakedModel cachedModel = modelCache.get(model);
+                EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(resourceLocation, model, modelGetter, additionalModels::put, cachedModel);
+                if (result.isInterrupt()) {
+                    UnbakedModel unbakedModel = result.getInterrupt().get();
+                    if (cachedModel != unbakedModel) {
+                        additionalModels.put(resourceLocation, unbakedModel);
+                        modelCache.put(model, unbakedModel);
+                    }
+                }
+                if (modelCache.containsKey(model)) {
+                    ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(resourceLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
+                    entry.setValue(modelBaker.bake(modelCache.get(model), resourceLocation));
+                }
+            }
+            missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
+                PuzzlesLib.LOGGER.warn("Missing textures in model {}:\n{}", resourceLocation, materials.stream().sorted(Material.COMPARATOR).map((material) -> {
+                    return "    " + material.atlasLocation() + ":" + material.texture();
+                }).collect(Collectors.joining("\n")));
+            });
+            PuzzlesLib.LOGGER.info("Modifying unbaked models took {} millisecond(s)", stopwatch.stop().elapsed().toMillis());
+        });
+        INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            Map<ResourceLocation, BakedModel> models = evt.getModels();
+            Map<ResourceLocation, BakedModel> additionalModels = Maps.newLinkedHashMap();
+            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
+            Map<ForgeModelBakerImpl.ModelBakingKey, BakedModel> bakedCache = Maps.newIdentityHashMap();
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            Objects.requireNonNull(missingModel, "missing model is null");
+            // Forge has no event firing for every baked model like Fabric,
+            // instead go through the baked models map and fire the event for every model manually
+            for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
+                EventResultHolder<BakedModel> result = callback.onModifyBakedModel(entry.getKey(), entry.getValue(), () -> {
+                    return new ForgeModelBakerImpl(entry.getKey(), bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
+                }, (ResourceLocation resourceLocation) -> {
+                    if (additionalModels.containsKey(resourceLocation)) {
+                        return additionalModels.get(resourceLocation);
+                    } else {
+                        // never return null, use missing model if absent
+                        return models.getOrDefault(resourceLocation, missingModel);
+                    }
+                }, additionalModels::put);
+                result.getInterrupt().ifPresent(entry::setValue);
+            }
+            additionalModels.forEach(models::putIfAbsent);
+            missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
+                PuzzlesLib.LOGGER.warn("Missing textures in model {}:\n{}", resourceLocation, materials.stream().sorted(Material.COMPARATOR).map((material) -> {
+                    return "    " + material.atlasLocation() + ":" + material.texture();
+                }).collect(Collectors.joining("\n")));
+            });
+            PuzzlesLib.LOGGER.info("Modifying baked models took {} millisecond(s)", stopwatch.stop().elapsed().toMillis());
+        });
+        INSTANCE.register(ModelEvents.AdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            Map<ResourceLocation, BakedModel> models = evt.getModels();
+            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
+            Map<ForgeModelBakerImpl.ModelBakingKey, BakedModel> bakedCache = Maps.newIdentityHashMap();
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            Objects.requireNonNull(missingModel, "missing model is null");
+            callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
+                return models.getOrDefault(resourceLocation, missingModel);
+            }, () -> {
+                // just use a dummy model, we cut this out when printing missing textures to the log
+                return new ForgeModelBakerImpl(ModelBakery.MISSING_MODEL_LOCATION, bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
+            });
+            missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
+                PuzzlesLib.LOGGER.warn("Missing textures:\n{}", materials.stream().sorted(Material.COMPARATOR).map((material) -> {
+                    return "    " + material.atlasLocation() + ":" + material.texture();
+                }).collect(Collectors.joining("\n")));
+            });
+            PuzzlesLib.LOGGER.info("Adding additional baked models took {} millisecond(s)", stopwatch.stop().elapsed().toMillis());
         });
     }
 
