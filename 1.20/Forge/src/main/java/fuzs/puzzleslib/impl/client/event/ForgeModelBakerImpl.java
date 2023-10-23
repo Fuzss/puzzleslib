@@ -90,9 +90,7 @@ public record ForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, Fun
         return this.modelTextureGetter;
     }
 
-    /**
-     * Copied from {@link ModelBakery.BakedCacheKey}.
-     */
+    // copied from net.minecraft.client.resources.model.ModelBakery$BakedCacheKey
     public record BakedCacheKey(ResourceLocation resourceLocation, Transformation rotation, boolean isUvLocked) {
 
     }

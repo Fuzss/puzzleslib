@@ -10,7 +10,6 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -128,7 +127,7 @@ public interface ClientModConstructor extends BaseModConstructor {
 
     /**
      * @param context add a search tree builder together with a token
-     * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry(Minecraft)}
+     * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry()}
      */
     @Deprecated(forRemoval = true)
     default void onRegisterSearchTrees(final SearchRegistryContext context) {

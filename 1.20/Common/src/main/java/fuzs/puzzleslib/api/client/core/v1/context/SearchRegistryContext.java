@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.searchtree.SearchRegistry;
 
 import java.util.Objects;
@@ -9,7 +8,7 @@ import java.util.Objects;
 /**
  * Register a search tree to {@link SearchRegistry}.
  *
- * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry(Minecraft)}
+ * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry()}
  */
 @Deprecated(forRemoval = true)
 public interface SearchRegistryContext {
