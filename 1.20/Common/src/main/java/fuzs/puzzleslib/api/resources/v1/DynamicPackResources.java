@@ -67,6 +67,7 @@ public class DynamicPackResources extends AbstractModPackResources {
      * @return map containing all generated files
      */
     protected static Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
+        PuzzlesLib.LOGGER.info("Running data generation for dynamic pack resources provided by {}...", modId);
         DataProviderContext context = DataProviderContext.fromModId(modId);
         try {
             Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> packTypes = Stream.of(PackType.values()).collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
@@ -89,7 +90,7 @@ public class DynamicPackResources extends AbstractModPackResources {
             });
             return Maps.immutableEnumMap(packTypes);
         } catch (Throwable throwable) {
-            PuzzlesLib.LOGGER.error("Unable to construct dynamic pack resources", throwable);
+            PuzzlesLib.LOGGER.error("Unable to complete data generation for dynamic pack resources provided by {}", modId, throwable);
             return Map.of();
         }
     }

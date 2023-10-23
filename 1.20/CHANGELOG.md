@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.40-1.20.1] - 2023-10-23
+### Changed
+- Refined performance for new model events on Forge
+
 ## [v8.0.39-1.20.1] - 2023-10-22
 ### Added
 - Added `ModifyUnbakedModel`, `ModifyBakedModel` and `AdditionalBakedModel` for finer control over models based entirely on mod loader specific implementations

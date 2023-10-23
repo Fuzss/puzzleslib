@@ -44,11 +44,10 @@ public final class ModelEvents {
          * @param unbakedModel  the unbaked model
          * @param modelGetter   get unbaked models from the model bakery
          * @param modelAdder    add additional unbaked models that are used in the returned model (like as part of {@link net.minecraft.client.renderer.block.model.multipart.Selector}s in {@link net.minecraft.client.renderer.block.model.multipart.MultiPart} models)
-         * @param cachedModel   when an unbaked model is modified the result is cached and provided here for future invocations, when this is present it should probably be returned without additional calculations
          * @return {@link EventResultHolder#interrupt(Object)} to replace the unbaked model,
          * {@link EventResultHolder#pass()} to let the original unbaked model go ahead
          */
-        EventResultHolder<UnbakedModel> onModifyUnbakedModel(ResourceLocation modelLocation, UnbakedModel unbakedModel, Function<ResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, UnbakedModel> modelAdder, @Nullable UnbakedModel cachedModel);
+        EventResultHolder<UnbakedModel> onModifyUnbakedModel(ResourceLocation modelLocation, UnbakedModel unbakedModel, Function<ResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, UnbakedModel> modelAdder);
     }
 
     @FunctionalInterface

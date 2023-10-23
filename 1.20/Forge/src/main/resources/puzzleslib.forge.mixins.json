@@ -18,7 +18,8 @@
     "client.ModelManagerForgeMixin",
     "client.accessor.BlockColorsForgeAccessor",
     "client.accessor.ItemColorsForgeAccessor",
-    "client.accessor.ItemForgeAccessor"
+    "client.accessor.ItemForgeAccessor",
+    "client.accessor.ModelBakeryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

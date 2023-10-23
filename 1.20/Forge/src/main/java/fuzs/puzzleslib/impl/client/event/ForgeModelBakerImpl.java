@@ -3,6 +3,8 @@ package fuzs.puzzleslib.impl.client.event;
 import com.mojang.math.Transformation;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.mixin.client.accessor.ModelBakeryAccessor;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
@@ -14,11 +16,11 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public record ForgeModelBakerImpl(Map<ModelBakingKey, BakedModel> bakedCache, Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
+public record ForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
                                   Function<Material, TextureAtlasSprite> modelTextureGetter, BakedModel missingModel) implements ModelBaker {
     private static Map<ResourceLocation, AtlasSet.StitchResult> capturedAtlasPreparations;
 
-    public ForgeModelBakerImpl(ResourceLocation modelLocation, Map<ModelBakingKey, BakedModel> bakedCache, Function<ResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, Material> missingTextureConsumer, BakedModel missingModel) {
+    public ForgeModelBakerImpl(ResourceLocation modelLocation, Map<BakedCacheKey, BakedModel> bakedCache, Function<ResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, Material> missingTextureConsumer, BakedModel missingModel) {
         this(bakedCache, modelGetter, (Material material) -> {
             Map<ResourceLocation, AtlasSet.StitchResult> atlasPreparations = capturedAtlasPreparations;
             Objects.requireNonNull(atlasPreparations, "atlas preparations is null");
@@ -64,17 +66,23 @@ public record ForgeModelBakerImpl(Map<ModelBakingKey, BakedModel> bakedCache, Fu
     }
 
     private BakedModel bake(UnbakedModel unbakedModel, ResourceLocation resourceLocation, ModelState modelState, Function<Material, TextureAtlasSprite> modelTextureGetter) {
-        // our cache works differently from vanilla as we use the unbaked model instance and not the current resource location
-        // vanilla bakes most unbaked models many times despite the outcome being the same just because the resource location is different
-        // haven't found an issue with this approach so far so the Forge implementation will stick with it for now
-        return this.bakedCache.computeIfAbsent(new ModelBakingKey(unbakedModel, modelState.getRotation(), modelState.isUvLocked()), key -> {
+        // implementation is pretty much the same as the vanilla model baker in the model bakery
+        // do not use Map::computeIfAbsent, it will throw ConcurrentModificationException due to the map potentially being modified in the provided Function
+        BakedCacheKey key = new BakedCacheKey(resourceLocation, modelState.getRotation(), modelState.isUvLocked());
+        BakedModel bakedModel = this.bakedCache.get(key);
+        if (bakedModel == null) {
+            if (unbakedModel instanceof BlockModel blockModel && blockModel.getRootModel() == ModelBakery.GENERATION_MARKER) {
+                return ModelBakeryAccessor.puzzleslib$getItemModelGenerator().generateBlockModel(modelTextureGetter, blockModel).bake(this, blockModel, modelTextureGetter, modelState, resourceLocation, false);
+            }
             try {
-                return key.unbakedModel().bake(this, modelTextureGetter, modelState, resourceLocation);
+                bakedModel = unbakedModel.bake(this, modelTextureGetter, modelState, resourceLocation);
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.warn("Unable to bake model: '{}': {}", resourceLocation, exception);
-                return this.missingModel;
+                bakedModel = this.missingModel;
             }
-        });
+            this.bakedCache.put(key, bakedModel);
+        }
+        return bakedModel;
     }
 
     @Override
@@ -82,7 +90,10 @@ public record ForgeModelBakerImpl(Map<ModelBakingKey, BakedModel> bakedCache, Fu
         return this.modelTextureGetter;
     }
 
-    public record ModelBakingKey(UnbakedModel unbakedModel, Transformation rotation, boolean isUvLocked) {
+    /**
+     * Copied from {@link ModelBakery.BakedCacheKey}.
+     */
+    public record BakedCacheKey(ResourceLocation resourceLocation, Transformation rotation, boolean isUvLocked) {
 
     }
 }
