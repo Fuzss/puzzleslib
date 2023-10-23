@@ -15,10 +15,7 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -432,26 +429,37 @@ public final class ForgeClientEventInvokers {
                     return evt.getModelBakery().getModel(resourceLocation);
                 }
             };
+            // do not use resource location keys or rely on the baked cache used by the model baker, it will rebake different block states even though the model is the same
+            // this also means we cannot use baked models as keys since they are different instances despite having been baked from the same unbaked model
+            Map<UnbakedModel, BakedModel> unbakedCache = Maps.newIdentityHashMap();
+            // just like bakedCache in ModelBakery
+            Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
-            Map<ForgeModelBakerImpl.ModelBakingKey, BakedModel> bakedCache = Maps.newIdentityHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
-            Map<UnbakedModel, UnbakedModel> modelCache = Maps.newIdentityHashMap();
+            // Forge does not grant access to unbaked models, so lookup every unbaked model and replace the baked model if necessary
+            // this also means the event is limited to top level models which should be fine though, the same restriction is applied on Fabric
             for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
-                ResourceLocation resourceLocation = entry.getKey();
-                UnbakedModel model = evt.getModelBakery().getModel(resourceLocation);
-                UnbakedModel cachedModel = modelCache.get(model);
-                EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(resourceLocation, model, modelGetter, additionalModels::put, cachedModel);
-                if (result.isInterrupt()) {
-                    UnbakedModel unbakedModel = result.getInterrupt().get();
-                    if (cachedModel != unbakedModel) {
-                        additionalModels.put(resourceLocation, unbakedModel);
-                        modelCache.put(model, unbakedModel);
+                ResourceLocation modelLocation = entry.getKey();
+                UnbakedModel model = evt.getModelBakery().getModel(modelLocation);
+                if (!unbakedCache.containsKey(model)) {
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, model, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
+                        // the Fabric callback for adding additional models does not work with model resource locations, so force that restriction here, too
+                        if (resourceLocation instanceof ModelResourceLocation) {
+                            throw new IllegalArgumentException("model resource location is not supported");
+                        } else {
+                            additionalModels.put(resourceLocation, unbakedModel);
+                        }
+                    });
+                    if (result.isInterrupt()) {
+                        UnbakedModel unbakedModel = result.getInterrupt().get();
+                        additionalModels.put(modelLocation, unbakedModel);
+                        ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(modelLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
+                        unbakedCache.put(model, modelBaker.bake(unbakedModel, modelLocation));
                     }
                 }
-                if (modelCache.containsKey(model)) {
-                    ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(resourceLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
-                    entry.setValue(modelBaker.bake(modelCache.get(model), resourceLocation));
+                if (unbakedCache.containsKey(model)) {
+                    entry.setValue(unbakedCache.get(model));
                 }
             }
             missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
@@ -466,7 +474,7 @@ public final class ForgeClientEventInvokers {
             Map<ResourceLocation, BakedModel> models = evt.getModels();
             Map<ResourceLocation, BakedModel> additionalModels = Maps.newLinkedHashMap();
             Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
-            Map<ForgeModelBakerImpl.ModelBakingKey, BakedModel> bakedCache = Maps.newIdentityHashMap();
+            Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
             // Forge has no event firing for every baked model like Fabric,
@@ -496,7 +504,7 @@ public final class ForgeClientEventInvokers {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ResourceLocation, BakedModel> models = evt.getModels();
             Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
-            Map<ForgeModelBakerImpl.ModelBakingKey, BakedModel> bakedCache = Maps.newIdentityHashMap();
+            Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
             callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {

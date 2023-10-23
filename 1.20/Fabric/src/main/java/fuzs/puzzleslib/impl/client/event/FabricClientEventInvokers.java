@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.mixin.client.accessor.ModelBakeryFabricAccessor;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -31,10 +30,7 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -364,17 +360,27 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GatherDebugTextEvents.Right.class, FabricClientEvents.GATHER_RIGHT_DEBUG_TEXT);
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register(pluginContext -> {
-                Map<ResourceLocation, UnbakedModel> additionalUnbakedModels = Maps.newHashMap();
-                Map<UnbakedModel, UnbakedModel> modelCache = Maps.newIdentityHashMap();
+                Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
+                Map<UnbakedModel, UnbakedModel> unbakedCache = Maps.newIdentityHashMap();
                 pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
                     // only invoke for top level models just like Forge
                     if (!((ModelBakeryFabricAccessor) context.loader()).puzzleslib$getTopLevelModels().containsKey(context.id())) return model;
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), model, context.loader()::getModel, additionalUnbakedModels::put, modelCache.get(model));
-                    result.getInterrupt().ifPresent(unbakedModel -> modelCache.put(model, unbakedModel));
-                    return modelCache.getOrDefault(model, model);
+                    if (!unbakedCache.containsKey(model)) {
+                        // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
+                        EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), model, context.loader()::getModel, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
+                            // the Fabric callback for adding additional models does not work with model resource locations
+                            if (resourceLocation instanceof ModelResourceLocation) {
+                                throw new IllegalArgumentException("model resource location is not supported");
+                            } else {
+                                additionalModels.put(resourceLocation, unbakedModel);
+                            }
+                        });
+                        result.getInterrupt().ifPresent(unbakedModel -> unbakedCache.put(model, unbakedModel));
+                    }
+                    return unbakedCache.getOrDefault(model, model);
                 });
                 pluginContext.resolveModel().register((ModelResolver.Context context) -> {
-                    return additionalUnbakedModels.get(context.id());
+                    return additionalModels.get(context.id());
                 });
             });
         });

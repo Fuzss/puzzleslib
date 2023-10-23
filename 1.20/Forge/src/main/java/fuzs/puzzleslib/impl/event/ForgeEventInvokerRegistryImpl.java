@@ -662,14 +662,15 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         // store all event invocations for vanilla game content already registered before the registration event runs
         // the add callback above won't trigger for those as they are already registered when mods are constructed
-        Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> events = Sets.newLinkedHashSet();
+        Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> callbacks = Sets.newLinkedHashSet();
         for (Map.Entry<ResourceKey<T>, T> entry : forgeRegistry.getEntries()) {
-            events.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
+            callbacks.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
                 callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
             });
         }
         eventBus.addListener((final RegisterEvent evt) -> {
-            events.forEach((Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer) -> {
+            if (evt.getRegistryKey() != resourceKey) return;
+            callbacks.forEach((Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer) -> {
                 consumer.accept((ResourceLocation resourceLocation, Supplier<T> supplier) -> {
                     evt.register(resourceKey, resourceLocation, supplier);
                 });
