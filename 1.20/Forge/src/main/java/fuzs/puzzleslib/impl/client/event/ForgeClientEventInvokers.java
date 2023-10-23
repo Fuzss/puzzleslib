@@ -467,7 +467,7 @@ public final class ForgeClientEventInvokers {
                     return "    " + material.atlasLocation() + ":" + material.texture();
                 }).collect(Collectors.joining("\n")));
             });
-            PuzzlesLib.LOGGER.info("Modifying unbaked models took {} millisecond(s)", stopwatch.stop().elapsed().toMillis());
+            PuzzlesLib.LOGGER.info("Modifying unbaked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
@@ -498,7 +498,7 @@ public final class ForgeClientEventInvokers {
                     return "    " + material.atlasLocation() + ":" + material.texture();
                 }).collect(Collectors.joining("\n")));
             });
-            PuzzlesLib.LOGGER.info("Modifying baked models took {} millisecond(s)", stopwatch.stop().elapsed().toMillis());
+            PuzzlesLib.LOGGER.info("Modifying baked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
         INSTANCE.register(ModelEvents.AdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
@@ -518,7 +518,7 @@ public final class ForgeClientEventInvokers {
                     return "    " + material.atlasLocation() + ":" + material.texture();
                 }).collect(Collectors.joining("\n")));
             });
-            PuzzlesLib.LOGGER.info("Adding additional baked models took {} millisecond(s)", stopwatch.stop().elapsed().toMillis());
+            PuzzlesLib.LOGGER.info("Adding additional baked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
     }
 

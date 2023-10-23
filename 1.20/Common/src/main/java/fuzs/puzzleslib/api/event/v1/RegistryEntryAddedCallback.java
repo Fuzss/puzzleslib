@@ -56,7 +56,7 @@ public interface RegistryEntryAddedCallback<T> {
         Objects.requireNonNull(block, "block is null");
         Objects.requireNonNull(item, "item is null");
         Item.BY_BLOCK.put(block, item);
-        ((BlockAccessor) block).diagonalwalls$setItem(item);
+        ((BlockAccessor) block).puzzleslib$setItem(item);
     }
 
     /**
@@ -69,6 +69,9 @@ public interface RegistryEntryAddedCallback<T> {
     static void setBlockForItem(BlockItem item, Block block) {
         Objects.requireNonNull(item, "item is null");
         Objects.requireNonNull(block, "block is null");
-        ((BlockItemAccessor) item).diagonalwalls$setBlock(block);
+        Block oldBlock = item.getBlock();
+        // block can somehow be null on Forge apparently
+        if (oldBlock != null) ((BlockAccessor) oldBlock).puzzleslib$setItem(item);
+        ((BlockItemAccessor) item).puzzleslib$setBlock(block);
     }
 }

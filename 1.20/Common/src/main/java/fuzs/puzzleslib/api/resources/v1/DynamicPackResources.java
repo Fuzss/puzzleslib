@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.resources.v1;
 
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
@@ -67,8 +68,10 @@ public class DynamicPackResources extends AbstractModPackResources {
      * @return map containing all generated files
      */
     protected static Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
-        PuzzlesLib.LOGGER.info("Running data generation for dynamic pack resources provided by {}...", modId);
+        PuzzlesLib.LOGGER.info("Running data generation for dynamic pack resources provided by {}", modId);
+        Stopwatch stopwatch = Stopwatch.createStarted();
         DataProviderContext context = DataProviderContext.fromModId(modId);
+        Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths;
         try {
             Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> packTypes = Stream.of(PackType.values()).collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
             for (DataProviderContext.Factory provider : factories) {
@@ -88,11 +91,13 @@ public class DynamicPackResources extends AbstractModPackResources {
             packTypes.replaceAll((packType, map) -> {
                 return ImmutableMap.copyOf(map);
             });
-            return Maps.immutableEnumMap(packTypes);
+            paths = Maps.immutableEnumMap(packTypes);
         } catch (Throwable throwable) {
             PuzzlesLib.LOGGER.error("Unable to complete data generation for dynamic pack resources provided by {}", modId, throwable);
-            return Map.of();
+            paths = Map.of();
         }
+        PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by {} took {}ms", modId, stopwatch.stop().elapsed().toMillis());
+        return paths;
     }
 
     @Override
