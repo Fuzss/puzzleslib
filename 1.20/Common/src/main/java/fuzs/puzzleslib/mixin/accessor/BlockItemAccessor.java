@@ -11,5 +11,5 @@ public interface BlockItemAccessor {
 
     @Accessor("block")
     @Mutable
-    void diagonalwalls$setBlock(Block block);
+    void puzzleslib$setBlock(Block block);
 }

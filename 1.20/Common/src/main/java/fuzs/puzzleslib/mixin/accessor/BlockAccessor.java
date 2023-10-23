@@ -9,5 +9,5 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface BlockAccessor {
 
     @Accessor("item")
-    void diagonalwalls$setItem(Item item);
+    void puzzleslib$setItem(Item item);
 }
