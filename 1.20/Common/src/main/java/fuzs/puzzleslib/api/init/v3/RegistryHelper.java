@@ -7,6 +7,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.Fluid;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -144,7 +149,19 @@ public final class RegistryHelper {
      * @param <T>    tag and game object type
      * @return is the game object contained in the tag
      */
+    @SuppressWarnings({"unchecked", "deprecation"})
     public static <T> boolean is(TagKey<T> tagKey, T object) {
+        if (object instanceof Block block) {
+            return block.builtInRegistryHolder().is((TagKey<Block>) tagKey);
+        } else if (object instanceof Item item) {
+            return item.builtInRegistryHolder().is((TagKey<Item>) tagKey);
+        } else if (object instanceof EntityType<?> entityType) {
+            return entityType.builtInRegistryHolder().is((TagKey<EntityType<?>>) tagKey);
+        } else if (object instanceof GameEvent gameEvent) {
+            return gameEvent.builtInRegistryHolder().is((TagKey<GameEvent>) tagKey);
+        } else if (object instanceof Fluid fluid) {
+            return fluid.builtInRegistryHolder().is((TagKey<Fluid>) tagKey);
+        }
         Registry<T> registry = findRegistry(tagKey.registry());
         return tagKey.isFor(registry.key()) && registry.wrapAsHolder(object).is(tagKey);
     }
