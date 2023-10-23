@@ -39,6 +39,6 @@ public interface DynamicBakingCompletedContext {
      * @return the model, possibly empty model instance
      */
     default BakedModel getModel(ResourceLocation identifier) {
-        return ClientAbstractions.INSTANCE.getBakedModel(this.modelManager(), identifier);
+        return ClientAbstractions.INSTANCE.getBakedModel(identifier);
     }
 }
