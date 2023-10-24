@@ -6,10 +6,13 @@ import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.level.block.Block;
 
 public final class FabricClientAbstractions implements ClientAbstractions {
 
@@ -28,6 +31,11 @@ public final class FabricClientAbstractions implements ClientAbstractions {
     @Override
     public BakedModel getBakedModel(ResourceLocation identifier) {
         return Minecraft.getInstance().getModelManager().getModel(identifier);
+    }
+
+    @Override
+    public RenderType getRenderType(Block block) {
+        return ItemBlockRenderTypes.getChunkRenderType(block.defaultBlockState());
     }
 
     @Override

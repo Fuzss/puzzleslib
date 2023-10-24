@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.blockentity.v1;
+package fuzs.puzzleslib.api.block.v1;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

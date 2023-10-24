@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.client.core.v1.context.RenderTypesContext;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -19,5 +20,10 @@ public final class FluidRenderTypesContextForgeImpl implements RenderTypesContex
             Objects.requireNonNull(fluid, "fluid is null");
             ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
         }
+    }
+
+    @Override
+    public RenderType getRenderType(Fluid object) {
+        return ClientAbstractions.INSTANCE.getRenderType(object);
     }
 }

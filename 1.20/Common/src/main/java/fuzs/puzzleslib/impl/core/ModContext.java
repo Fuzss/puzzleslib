@@ -36,9 +36,9 @@ public abstract class ModContext {
         LoadCompleteCallback.EVENT.register(() -> {
             for (ModContext context : MOD_CONTEXTS.values()) {
                 if (!context.buildables.isEmpty())
-                    throw new IllegalStateException("mod context for %s has un-built buildables".formatted(context.modId));
+                    throw new IllegalStateException("mod context for %s has un-built buildables: %s".formatted(context.modId, context.buildables));
                 if (!context.clientModConstructors.isEmpty())
-                    throw new IllegalStateException("mod context for %s has un-built client mod constructors".formatted(context.modId));
+                    throw new IllegalStateException("mod context for %s has un-built client mod constructors: %s".formatted(context.modId, context.clientModConstructors));
             }
         });
         PlayerEvents.LOGGED_IN.register((ServerPlayer player) -> {

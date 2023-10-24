@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.init;
 
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.RegistryHelper;
-import fuzs.puzzleslib.mixin.accessor.ReferenceAccessor;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.core.Holder;
@@ -28,7 +27,6 @@ public final class FabricRegistryManagerV3 extends RegistryManagerV3Impl {
         super(modId);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> Holder.Reference<T> getHolder(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
         Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
@@ -38,12 +36,11 @@ public final class FabricRegistryManagerV3 extends RegistryManagerV3Impl {
             T value = registry.get(resourceKey);
             Objects.requireNonNull(value, "value is null");
             // bind the value immediately, so we can use it, Forge does this, too
-            ((ReferenceAccessor<T>) holder).puzzleslib$callBindValue(value);
+            holder.bindValue(value);
         }
         return holder;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         T value = supplier.get();
@@ -56,7 +53,7 @@ public final class FabricRegistryManagerV3 extends RegistryManagerV3Impl {
             holder = this.getHolder(registryKey, path);
         }
         // bind the value immediately, so we can use it, Forge does this, too
-        if (!holder.isBound()) ((ReferenceAccessor<T>) holder).puzzleslib$callBindValue(value);
+        if (!holder.isBound()) holder.bindValue(value);
         return holder;
     }
 

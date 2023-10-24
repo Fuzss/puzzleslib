@@ -15,8 +15,11 @@ transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$Spr
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
+transitive-accessible   method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
+transitive-accessible   method  net/minecraft/core/Holder$Reference bindKey (Lnet/minecraft/resources/ResourceKey;)V
+transitive-accessible   method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 
-# fabric-item-group-api-v1.accesswidener
+# fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	COLORED_BLOCKS	Lnet/minecraft/resources/ResourceKey;
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	NATURAL_BLOCKS	Lnet/minecraft/resources/ResourceKey;
@@ -34,7 +37,7 @@ transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	INVENTORY	
 transitive-accessible	class	net/minecraft/world/item/CreativeModeTab$TabVisibility
 transitive-accessible	class	net/minecraft/world/item/CreativeModeTab$Output
 
-# fabric-data-generation-api-v1.accesswidener
+# fabric-data-generation-api-v1
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createSilkTouchOnlyTable	(Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createPotFlowerItemTable	(Lnet/minecraft/world/level/ItemLike;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createSelfDropDispatchTable	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;Lnet/minecraft/world/level/storage/loot/entries/LootPoolEntryContainer$Builder;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
