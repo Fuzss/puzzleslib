@@ -5,12 +5,16 @@ import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 /**
  * useful methods for client related things that require mod loader specific abstractions
@@ -60,6 +64,26 @@ public interface ClientAbstractions {
     @Deprecated(forRemoval = true)
     default BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier) {
         return this.getBakedModel(identifier);
+    }
+
+    /**
+     * Allows for retrieving the {@link RenderType} that has been registered for a block.
+     * <p>When not render type is registered {@link RenderType#solid()} is returned.
+     *
+     * @param block the block to get the render type for
+     * @return the render type
+     */
+    RenderType getRenderType(Block block);
+
+    /**
+     * Allows for retrieving the {@link RenderType} that has been registered for a fluid.
+     * <p>When not render type is registered {@link RenderType#solid()} is returned.
+     *
+     * @param fluid the fluid to get the render type for
+     * @return the render type
+     */
+    default RenderType getRenderType(Fluid fluid) {
+        return ItemBlockRenderTypes.getRenderLayer(fluid.defaultFluidState());
     }
 
     /**

@@ -3,7 +3,7 @@ package fuzs.puzzleslib.impl.client.core;
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.*;
-import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
+import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
@@ -12,9 +12,11 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
 import fuzs.puzzleslib.impl.core.context.AddReloadListenersContextFabricImpl;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
@@ -53,23 +55,20 @@ public final class FabricClientModConstructor {
         constructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
         constructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
         constructor.onRegisterKeyMappings(new KeyMappingsContextFabricImpl());
-        constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextFabricImpl());
-        constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextFabricImpl());
-        constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
-        constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
         constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
+        registerRenderProperties(constructor);
         registerCoreShaders(constructor::onRegisterCoreShaders);
     }
 
     private static void registerModelBakingListeners(String modId, Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer) {
-        ModelEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
+        FabricClientEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             try {
                 modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery.get()));
             } catch (Exception e) {
                 PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
             }
         });
-        ModelEvents.BAKING_COMPLETED.register((Supplier<ModelManager> modelManager, Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
+        FabricClientEvents.BAKING_COMPLETED.register((Supplier<ModelManager> modelManager, Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             try {
                 bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager.get(), models, modelBakery.get()));
             } catch (Exception e) {
@@ -99,8 +98,18 @@ public final class FabricClientModConstructor {
         }
     }
 
+    private static void registerRenderProperties(ClientModConstructor constructor) {
+        // run this as late as possible and not during client init so that maps are already fully populated with vanilla content
+        ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft client) -> {
+            constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextFabricImpl());
+            constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextFabricImpl());
+            constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
+            constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
+        });
+    }
+
     private static void registerCoreShaders(Consumer<CoreShadersContext> modifyBakingResultConsumer) {
-        CoreShaderRegistrationCallback.EVENT.register(context -> {
+        CoreShaderRegistrationCallback.EVENT.register((CoreShaderRegistrationCallback.RegistrationContext context) -> {
             modifyBakingResultConsumer.accept(new CoreShadersContextFabricImpl(context));
         });
     }

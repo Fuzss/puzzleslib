@@ -9,7 +9,6 @@ import net.minecraft.world.level.material.Fluid;
  *
  * @param <T> object type supported by provider, either {@link Block} or {@link Fluid}
  */
-@FunctionalInterface
 public interface RenderTypesContext<T> {
 
     /**
@@ -20,4 +19,13 @@ public interface RenderTypesContext<T> {
      */
     @SuppressWarnings("unchecked")
     void registerRenderType(RenderType renderType, T... objects);
+
+    /**
+     * Allows for retrieving the {@link RenderType} that has been registered for an object type.
+     * <p>When not render type is registered {@link RenderType#solid()} is returned.
+     *
+     * @param object the object type to get the render type for
+     * @return the render type
+     */
+    RenderType getRenderType(T object);
 }

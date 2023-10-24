@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.client.core.v1.context.RenderTypesContext;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
@@ -19,5 +20,10 @@ public final class FluidRenderTypesContextFabricImpl implements RenderTypesConte
             Objects.requireNonNull(fluid, "fluid is null");
             BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
         }
+    }
+
+    @Override
+    public RenderType getRenderType(Fluid object) {
+        return ClientAbstractions.INSTANCE.getRenderType(object);
     }
 }

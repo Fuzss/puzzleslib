@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.0.41-1.20.1] - 2023-10-24
+### Added
+- Added common helper methods for obtaining `RenderType`s
+- Added `BlockConversionHelper` from merging various block related utility methods
+
 ## [v8.0.40-1.20.1] - 2023-10-23
 ### Changed
 - Refined performance for new model events on Forge

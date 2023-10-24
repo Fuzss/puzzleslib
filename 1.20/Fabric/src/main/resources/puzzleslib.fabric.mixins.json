@@ -47,7 +47,6 @@
     "WolfFabricMixin",
     "accessor.GrindstoneMenuFabricAccessor",
     "accessor.PackRepositoryFabricAccessor",
-    "accessor.ReferenceAccessor",
     "accessor.WeightedRandomListFabricAccessor"
   ],
   "client": [
