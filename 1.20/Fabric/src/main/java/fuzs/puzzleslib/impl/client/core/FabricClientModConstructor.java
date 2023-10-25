@@ -89,12 +89,11 @@ public final class FabricClientModConstructor {
     private static void registerBuiltinModelItemRenderers(String modId, Consumer<BuiltinModelItemRendererContext> consumer, Set<ContentRegistrationFlags> availableFlags) {
         List<ResourceManagerReloadListener> dynamicRenderers = Lists.newArrayList();
         consumer.accept(new BuiltinModelItemRendererContextFabricImpl(modId, dynamicRenderers));
+        // do not punish ContentRegistrationFlags#DYNAMIC_RENDERERS being absent as not every built-in item renderer needs to reload
         if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
             ResourceLocation identifier = new ResourceLocation(modId, "built_in_model_item_renderers");
             IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(identifier, dynamicRenderers));
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
-        } else if (!dynamicRenderers.isEmpty()) {
-            ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.DYNAMIC_RENDERERS);
         }
     }
 
