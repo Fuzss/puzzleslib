@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * Provides {@link net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer#renderByItem} as a functional interface.
+ * <p>TODO separate ResourceManagerReloadListener and change up {@link fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext} with a separate method
  */
 @FunctionalInterface
 public interface DynamicBuiltinItemRenderer extends ResourceManagerReloadListener {
