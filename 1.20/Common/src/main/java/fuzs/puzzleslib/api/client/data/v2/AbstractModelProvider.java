@@ -2,7 +2,9 @@ package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import fuzs.puzzlesaccessapi.api.client.data.v2.BlockModelBuilder;
 import fuzs.puzzlesaccessapi.api.client.data.v2.ItemModelBuilder;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
@@ -12,13 +14,13 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.models.ModelProvider;
 import net.minecraft.data.models.blockstates.BlockStateGenerator;
-import net.minecraft.data.models.model.DelegatedModel;
-import net.minecraft.data.models.model.ModelLocationUtils;
+import net.minecraft.data.models.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +31,9 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class AbstractModelProvider extends ModelProvider {
+    public static final String BLOCK_PATH = "block";
+    public static final String ITEM_PATH = "item";
+
     private final String modId;
     private final PackOutput.PathProvider blockStatePathProvider;
     private final PackOutput.PathProvider modelPathProvider;
@@ -47,6 +52,10 @@ public abstract class AbstractModelProvider extends ModelProvider {
     public abstract void addBlockModels(BlockModelBuilder builder);
 
     public abstract void addItemModels(ItemModelBuilder builder);
+
+    protected boolean throwForMissingBlocks() {
+        return true;
+    }
 
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
@@ -67,9 +76,14 @@ public abstract class AbstractModelProvider extends ModelProvider {
         };
         this.addBlockModels(new BlockModelBuilder(blockStateOutput, modelOutput, skippedAutoModels::add));
         this.addItemModels(new ItemModelBuilder(modelOutput));
-        List<Block> missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {
-            return entry.getKey().location().getNamespace().equals(this.modId) && !generators.containsKey(entry.getValue());
-        }).map(Map.Entry::getValue).toList();
+        List<Block> missingBlocks;
+        if (this.throwForMissingBlocks()) {
+            missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {
+                return entry.getKey().location().getNamespace().equals(this.modId) && !generators.containsKey(entry.getValue());
+            }).map(Map.Entry::getValue).toList();
+        } else {
+            missingBlocks = Collections.emptyList();
+        }
         if (!missingBlocks.isEmpty()) {
             throw new IllegalStateException("Missing block state definitions for " + missingBlocks);
         } else {
@@ -99,5 +113,96 @@ public abstract class AbstractModelProvider extends ModelProvider {
             JsonElement jsonElement = entry.getValue().get();
             return DataProvider.saveStable(output, jsonElement, path);
         }).toArray(CompletableFuture[]::new));
+    }
+
+    public static ResourceLocation getModelLocation(Block block) {
+        return decorateBlockModelLocation(getLocation(block));
+    }
+
+    public static ResourceLocation decorateBlockModelLocation(ResourceLocation resourceLocation) {
+        return resourceLocation.withPrefix(BLOCK_PATH + "/");
+    }
+
+    public static ResourceLocation getLocation(Block block) {
+        return BuiltInRegistries.BLOCK.getKey(block);
+    }
+
+    public static String getName(Block block) {
+        return getLocation(block).getPath();
+    }
+
+    public static ResourceLocation getModelLocation(Item item) {
+        return decorateItemModelLocation(getLocation(item));
+    }
+
+    public static ResourceLocation decorateItemModelLocation(ResourceLocation resourceLocation) {
+        return resourceLocation.withPrefix(ITEM_PATH + "/");
+    }
+
+    public static ResourceLocation getLocation(Item item) {
+        return BuiltInRegistries.ITEM.getKey(item);
+    }
+
+    public static String getName(Item item) {
+        return getLocation(item).getPath();
+    }
+
+    /**
+     * Removes everything from the beginning of a resource location path up until and including the last occurrence of the specified string.
+     * <p>Useful for e.g. removing directories from a path, like <code>minecraft:item/stick</code> -> <code>minecraft:stick</code> by passing <code>/</code>.
+     */
+    public static ResourceLocation stripUntil(ResourceLocation resourceLocation, String s) {
+        String path = resourceLocation.getPath();
+        if (path.contains(s)) {
+            path = path.substring(path.lastIndexOf(s) + 1);
+            return new ResourceLocation(resourceLocation.getNamespace(), path);
+        } else {
+            return resourceLocation;
+        }
+    }
+
+    /**
+     * Use in conjunction with {@link ModelTemplate#create(ResourceLocation, TextureMapping, BiConsumer, ModelTemplate.JsonFactory)}.
+     */
+    public static ModelTemplate.JsonFactory overrides(ModelTemplate modelTemplate, ItemOverride.Factory... factories) {
+        return (ResourceLocation resourceLocation, Map<TextureSlot, ResourceLocation> map) -> {
+            JsonObject jsonObject = modelTemplate.createBaseTemplate(resourceLocation, map);
+            JsonArray jsonArray = new JsonArray();
+            for (ItemOverride.Factory factory : factories) {
+                jsonArray.add(factory.apply(resourceLocation).toJson());
+            }
+            jsonObject.add("overrides", jsonArray);
+            return jsonObject;
+        };
+    }
+
+    public record ItemOverride(ResourceLocation model, Map<ResourceLocation, Float> predicates) {
+
+        public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1) {
+            return new ItemOverride(model, Map.of(p1, f1));
+        }
+
+        public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1, ResourceLocation p2, float f2) {
+            return new ItemOverride(model, Map.of(p1, f1, p2, f2));
+        }
+
+        public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1, ResourceLocation p2, float f2, ResourceLocation p3, float f3) {
+            return new ItemOverride(model, Map.of(p1, f1, p2, f2, p3, f3));
+        }
+
+        JsonElement toJson() {
+            JsonObject jsonObject = new JsonObject();
+            JsonObject predicates = new JsonObject();
+            for (Map.Entry<ResourceLocation, Float> entry : this.predicates.entrySet()) {
+                predicates.addProperty(entry.getKey().toString(), entry.getValue());
+            }
+            jsonObject.add("predicate", predicates);
+            jsonObject.addProperty("model", this.model.toString());
+            return jsonObject;
+        }
+
+        public interface Factory extends Function<ResourceLocation, ItemOverride> {
+
+        }
     }
 }
