@@ -7,10 +7,10 @@ import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.client.event.v1.ClientPlayerEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.core.v1.Buildable;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerEvents;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
@@ -32,7 +32,22 @@ import java.util.stream.Stream;
 public abstract class ModContext {
     private static final Map<String, ModContext> MOD_CONTEXTS = Maps.newConcurrentMap();
 
-    static {
+    final AtomicInteger networkHandlers = new AtomicInteger();
+    final String modId;
+    private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
+    private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
+    private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
+    private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
+    @Nullable RegistryManager registryManagerV2;
+    @Nullable fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
+    @Nullable CapabilityController capabilityController;
+    // true by default for dedicated servers, is reset on client when joining new world
+    private boolean presentServerside = true;
+    ModContext(String modId) {
+        this.modId = modId;
+    }
+
+    public static void registerHandlers() {
         LoadCompleteCallback.EVENT.register(() -> {
             for (ModContext context : MOD_CONTEXTS.values()) {
                 if (!context.buildables.isEmpty())
@@ -51,22 +66,6 @@ public abstract class ModContext {
                 }
             });
         }
-    }
-
-    final AtomicInteger networkHandlers = new AtomicInteger();
-    final String modId;
-    private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
-    private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
-    private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
-    private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
-    @Nullable RegistryManager registryManagerV2;
-    @Nullable fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
-    @Nullable CapabilityController capabilityController;
-    // true by default for dedicated servers, is reset on client when joining new world
-    private boolean presentServerside = true;
-
-    ModContext(String modId) {
-        this.modId = modId;
     }
 
     public static ModContext get(String modId) {
@@ -129,9 +128,6 @@ public abstract class ModContext {
     }
 
     public final Set<ContentRegistrationFlags> getFlagsToHandle(Set<ContentRegistrationFlags> availableFlags) {
-        return availableFlags.stream()
-                .filter(Predicate.not(this.handledFlags::contains))
-                .peek(this.handledFlags::add)
-                .collect(ImmutableSet.toImmutableSet());
+        return availableFlags.stream().filter(Predicate.not(this.handledFlags::contains)).peek(this.handledFlags::add).collect(ImmutableSet.toImmutableSet());
     }
 }
