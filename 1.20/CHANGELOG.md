@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.0-1.20.1] - 2023-10-26
+- Public release of all versions that have come after v8.0.24
+### Changed
+- Expanded `AbstractModelProvider`
+
 ## [v8.0.41-1.20.1] - 2023-10-24
 ### Added
 - Added common helper methods for obtaining `RenderType`s
