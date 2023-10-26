@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.1-1.20.1] - 2023-10-26
+### Fixed
+- Fixed event classes possibly being loaded too early under some circumstances, resolves crashes on start-up when installed together with e.g. Stylish Effects
+- Fixed required Forge version being incorrectly set (47.2.0 is required now, not 47.1.0)
+- Fixed Puzzles Lib crashing the game on Forge when there are any unmet mod version requirements, preventing the Forge screen informing the user from showing
+
 ## [v8.1.0-1.20.1] - 2023-10-26
 - Public release of all versions that have come after v8.0.24
 ### Changed

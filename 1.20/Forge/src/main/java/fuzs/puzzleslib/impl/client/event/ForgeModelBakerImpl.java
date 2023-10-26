@@ -40,8 +40,10 @@ public record ForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, Fun
     }
 
     static {
-        ModContainerHelper.getModEventBus(PuzzlesLib.MOD_ID).addListener((final ModelEvent.BakingCompleted evt) -> {
-            capturedAtlasPreparations = null;
+        ModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent(eventBus -> {
+            eventBus.addListener((final ModelEvent.BakingCompleted evt) -> {
+                capturedAtlasPreparations = null;
+            });
         });
     }
 

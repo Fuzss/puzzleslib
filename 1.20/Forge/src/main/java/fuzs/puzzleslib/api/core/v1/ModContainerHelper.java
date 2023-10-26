@@ -40,6 +40,8 @@ public final class ModContainerHelper {
     /**
      * Find the {@link IEventBus} for a specific <code>modId</code>.
      * <p>This bypasses having to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}.
+     * <p>Be careful with this, the mod event bus is not available e.g. when mod loading has failed due to unmet mod dependencies,
+     * so we don't want to crash then so Forge can show the proper screen informing the user.
      *
      * @param modId id for mod container
      * @return the mod event bus

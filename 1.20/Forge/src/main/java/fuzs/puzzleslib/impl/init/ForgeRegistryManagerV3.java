@@ -24,6 +24,7 @@ import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ObjectHolderRegistry;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -31,12 +32,13 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
+    @Nullable
     private final IEventBus eventBus;
     private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> registers = Maps.newIdentityHashMap();
 
     public ForgeRegistryManagerV3(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.getModEventBus(modId);
+        this.eventBus = ModContainerHelper.getOptionalModEventBus(modId).orElse(null);
     }
 
     @Override
@@ -75,6 +77,7 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
     protected <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         DeferredRegister<T> register = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.modId);
+            Objects.requireNonNull(this.eventBus, "mod event bus for %s is null".formatted(this.modId));
             deferredRegister.register(this.eventBus);
             return deferredRegister;
         });

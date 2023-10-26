@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
+import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 
@@ -22,6 +23,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     @Override
     public void onConstructMod() {
+        ModContext.registerHandlers();
         EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
     }
 }
