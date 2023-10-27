@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.2-1.20.1] - 2023-10-27
+### Fixed
+- Set required Forge version so that NeoForge is still supported
+
 ## [v8.1.1-1.20.1] - 2023-10-26
 ### Fixed
 - Fixed event classes possibly being loaded too early under some circumstances, resolves crashes on start-up when installed together with e.g. Stylish Effects
