@@ -47,7 +47,7 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public MinecraftServer getGameServer() {
+    public MinecraftServer getMinecraftServer() {
         return this.gameServer;
     }
 

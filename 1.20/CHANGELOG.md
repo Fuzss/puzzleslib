@@ -3,6 +3,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.3-1.20.1] - 2023-10-28
+### Changed
+- Disabled `LivingEvents$Breathe` and `LivingEvents$Drown` to be able to lower the required Forge version to 47.1.3
+- Added a way in `DataProviderHelper` to support legacy data providers
+- Refactored some parts of `NetworkHandlerV3`
+- Be more careful when firing `RegistryEntryAddedCallback` by introducing a lock and catching possible exceptions to avoid the whole registration process from failing
+- Ensure exceptions thrown during model events are caught and no longer crash the game
+### Fixed
+- Fixed dynamic data generation failing on Windows
+
 ## [v8.1.2-1.20.1] - 2023-10-27
 ### Fixed
 - Set required Forge version so that NeoForge is still supported

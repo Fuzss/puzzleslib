@@ -36,7 +36,7 @@ public interface CommonAbstractions {
      *
      * @return current game server, null when not in a world
      */
-    MinecraftServer getGameServer();
+    MinecraftServer getMinecraftServer();
 
     /**
      * Opens a menu on both client and server.

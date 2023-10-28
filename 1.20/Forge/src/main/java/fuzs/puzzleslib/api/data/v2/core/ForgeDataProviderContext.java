@@ -7,6 +7,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -52,6 +53,14 @@ public class ForgeDataProviderContext extends DataProviderContext {
      */
     @FunctionalInterface
     public interface Factory extends Function<ForgeDataProviderContext, DataProvider> {
+
+    }
+
+    /**
+     * Another factory to support the old data providers that have a constructor taking the Forge event directly with an additional mod id.
+     */
+    @FunctionalInterface
+    public interface LegacyFactory extends BiFunction<GatherDataEvent, String, DataProvider> {
 
     }
 }

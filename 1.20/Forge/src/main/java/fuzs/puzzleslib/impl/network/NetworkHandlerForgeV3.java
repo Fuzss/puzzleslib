@@ -47,7 +47,7 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     private <T> void register(Class<T> clazz, BiConsumer<T, Supplier<NetworkEvent.Context>> handle, NetworkDirection networkDirection) {
         if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         Objects.requireNonNull(this.channel, "channel is null");
-        BiConsumer<T, FriendlyByteBuf> encode = (t, friendlyByteBuf) -> {
+        BiConsumer<T, FriendlyByteBuf> encode = (T t, FriendlyByteBuf friendlyByteBuf) -> {
             MessageSerializers.findByType(clazz).write(friendlyByteBuf, t);
         };
         Function<FriendlyByteBuf, T> decode = MessageSerializers.findByType(clazz)::read;
@@ -58,6 +58,7 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     @Override
     public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
         Objects.requireNonNull(this.channel, "channel is null");
+        Objects.requireNonNull(message, "message is null");
         return (Packet<ClientGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
     }
 
@@ -65,6 +66,7 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     @Override
     public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
         Objects.requireNonNull(this.channel, "channel is null");
+        Objects.requireNonNull(message, "message is null");
         return (Packet<ServerGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER);
     }
 

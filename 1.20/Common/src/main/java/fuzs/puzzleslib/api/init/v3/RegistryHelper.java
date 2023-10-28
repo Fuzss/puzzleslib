@@ -62,7 +62,7 @@ public final class RegistryHelper {
         Objects.requireNonNull(registryKey, "registry key is null");
         Optional<Registry<T>> registry = Optional.empty();
         if (!onlyBuiltIn) {
-            MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getGameServer();
+            MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
             if (minecraftServer != null) {
                 registry = minecraftServer.registryAccess().registry((ResourceKey<Registry<T>>) registryKey);
             }

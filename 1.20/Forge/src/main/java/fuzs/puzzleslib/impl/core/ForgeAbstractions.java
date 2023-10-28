@@ -30,7 +30,7 @@ import java.util.function.BiConsumer;
 public final class ForgeAbstractions implements CommonAbstractions {
 
     @Override
-    public MinecraftServer getGameServer() {
+    public MinecraftServer getMinecraftServer() {
         return ServerLifecycleHooks.getCurrentServer();
     }
 

@@ -32,11 +32,11 @@ public interface Proxy {
     /**
      * @return current game server, null when not in a world
      *
-     * @deprecated moved to {@link CommonAbstractions#getGameServer()}
+     * @deprecated moved to {@link CommonAbstractions#getMinecraftServer()}
      */
     @Deprecated(forRemoval = true)
     default MinecraftServer getGameServer() {
-        return CommonAbstractions.INSTANCE.getGameServer();
+        return CommonAbstractions.INSTANCE.getMinecraftServer();
     }
 
     /**

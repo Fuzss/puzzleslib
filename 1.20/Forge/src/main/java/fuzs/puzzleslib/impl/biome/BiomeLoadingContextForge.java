@@ -24,7 +24,7 @@ public record BiomeLoadingContextForge(RegistryAccess registryAccess, Holder<Bio
     }
 
     public BiomeLoadingContextForge(Holder<Biome> holder) {
-        this(CommonAbstractions.INSTANCE.getGameServer().registryAccess(), holder);
+        this(CommonAbstractions.INSTANCE.getMinecraftServer().registryAccess(), holder);
     }
 
     @Override
