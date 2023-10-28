@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.apache.commons.lang3.mutable.MutableObject;
 
@@ -27,7 +26,7 @@ public final class ServerChunkEvents {
          * @param level the server level the chunk is in
          * @param chunk the chunk being loaded
          */
-        void onChunkLoad(ServerLevel level, ChunkAccess chunk);
+        void onChunkLoad(ServerLevel level, LevelChunk chunk);
     }
 
     @FunctionalInterface
@@ -39,7 +38,7 @@ public final class ServerChunkEvents {
          * @param level the server level the chunk is in
          * @param chunk the chunk being unloaded
          */
-        void onChunkUnload(ServerLevel level, ChunkAccess chunk);
+        void onChunkUnload(ServerLevel level, LevelChunk chunk);
     }
 
     @FunctionalInterface

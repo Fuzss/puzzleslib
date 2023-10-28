@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.4-1.20.1] - 2023-10-28
+### Fixed
+- Fixed chunk events chunk type
+
 ## [v8.1.3-1.20.1] - 2023-10-28
 ### Changed
 - Disabled `LivingEvents$Breathe` and `LivingEvents$Drown` to be able to lower the required Forge version to 47.1.3
