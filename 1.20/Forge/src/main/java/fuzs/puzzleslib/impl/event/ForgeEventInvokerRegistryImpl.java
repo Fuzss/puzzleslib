@@ -17,6 +17,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.RegistryHelper;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.mixin.accessor.ForgeRegistryForgeAccessor;
@@ -32,7 +33,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -71,6 +71,8 @@ import net.minecraftforge.registries.RegistryManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -400,7 +402,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onLoggedOut((ServerPlayer) evt.getEntity());
         });
         INSTANCE.register(PlayerEvents.AfterChangeDimension.class, PlayerEvent.PlayerChangedDimensionEvent.class, (PlayerEvents.AfterChangeDimension callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
-            MinecraftServer server = CommonAbstractions.INSTANCE.getGameServer();
+            MinecraftServer server = CommonAbstractions.INSTANCE.getMinecraftServer();
             ServerLevel from = server.getLevel(evt.getFrom());
             ServerLevel to = server.getLevel(evt.getTo());
             Objects.requireNonNull(from, "level origin is null");
@@ -581,47 +583,47 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             topInput.getAsOptional().ifPresent(evt::setNewTopItem);
             bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
         });
-        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
-            final int airAmountValue;
-            if (!evt.canBreathe()) {
-                airAmountValue = -evt.getConsumeAirAmount();
-            } else if (evt.canRefillAir()) {
-                airAmountValue = evt.getRefillAirAmount();
-            } else {
-                airAmountValue = 0;
-            }
-            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
-            LivingEntity entity = evt.getEntity();
-            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
-            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
-            EventResult result = callback.onLivingBreathe(entity, airAmount, evt.canRefillAir(), canLoseAir);
-            if (result.isInterrupt()) {
-                evt.setCanBreathe(true);
-                evt.setCanRefillAir(false);
-            } else {
-                OptionalInt optional = airAmount.getAsOptionalInt();
-                if (optional.isPresent()) {
-                    if (optional.getAsInt() < 0) {
-                        evt.setCanBreathe(false);
-                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
-                    } else {
-                        evt.setCanBreathe(true);
-                        evt.setCanRefillAir(true);
-                        evt.setRefillAirAmount(optional.getAsInt());
-                    }
-                }
-            }
-        });
-        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
-            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
-            if (result.isInterrupt()) {
-                if (result.getAsBoolean()) {
-                    evt.setDrowning(true);
-                } else {
-                    evt.setCanceled(true);
-                }
-            }
-        });
+//        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
+//            final int airAmountValue;
+//            if (!evt.canBreathe()) {
+//                airAmountValue = -evt.getConsumeAirAmount();
+//            } else if (evt.canRefillAir()) {
+//                airAmountValue = evt.getRefillAirAmount();
+//            } else {
+//                airAmountValue = 0;
+//            }
+//            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
+//            LivingEntity entity = evt.getEntity();
+//            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
+//            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
+//            EventResult result = callback.onLivingBreathe(entity, airAmount, evt.canRefillAir(), canLoseAir);
+//            if (result.isInterrupt()) {
+//                evt.setCanBreathe(true);
+//                evt.setCanRefillAir(false);
+//            } else {
+//                OptionalInt optional = airAmount.getAsOptionalInt();
+//                if (optional.isPresent()) {
+//                    if (optional.getAsInt() < 0) {
+//                        evt.setCanBreathe(false);
+//                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
+//                    } else {
+//                        evt.setCanBreathe(true);
+//                        evt.setCanRefillAir(true);
+//                        evt.setRefillAirAmount(optional.getAsInt());
+//                    }
+//                }
+//            }
+//        });
+//        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
+//            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
+//            if (result.isInterrupt()) {
+//                if (result.getAsBoolean()) {
+//                    evt.setDrowning(true);
+//                } else {
+//                    evt.setCanceled(true);
+//                }
+//            }
+//        });
         INSTANCE.register(RegistryEntryAddedCallback.class, ForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(ServerChunkEvents.Watch.class, ChunkWatchEvent.Watch.class, (ServerChunkEvents.Watch callback, ChunkWatchEvent.Watch evt) -> {
             callback.onChunkWatch(evt.getPlayer(), evt.getChunk(), evt.getLevel());
@@ -641,18 +643,34 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
         IForgeRegistry<T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(resourceKey);
         boolean[] loadComplete = new boolean[1];
-        final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
-        final IForgeRegistry.AddCallback<T> newAddCallback = (owner, stage, id, key, obj, oldObj) -> {
-            // we probably don't want to handle replacements...
-            if (loadComplete[0] || oldObj != null) return;
-            callback.onRegistryEntryAdded(registry, key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
-                owner.register(resourceLocation, supplier.get());
-            });
-        };
-        ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
-            originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
-            newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
-        } : newAddCallback);
+        Lock lock = new ReentrantLock();
+        lock.lock();
+        try {
+            final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
+            final IForgeRegistry.AddCallback<T> newAddCallback = (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
+                // we probably don't want to handle replacements...
+                if (loadComplete[0] || oldObj != null) return;
+                try {
+                    callback.onRegistryEntryAdded(registry, key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+                        try {
+                            T t = supplier.get();
+                            Objects.requireNonNull(t, "entry is null");
+                            owner.register(resourceLocation, t);
+                        } catch (Exception exception) {
+                            PuzzlesLib.LOGGER.error("Failed to register new entry", exception);
+                        }
+                    });
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
+                }
+            };
+            ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
+                originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
+                newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
+            } : newAddCallback);
+        } finally {
+            lock.unlock();
+        }
         IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
         // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
         // but that doesn't allow for adding content
@@ -665,7 +683,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> callbacks = Sets.newLinkedHashSet();
         for (Map.Entry<ResourceKey<T>, T> entry : forgeRegistry.getEntries()) {
             callbacks.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
-                callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
+                try {
+                    callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
+                }
             });
         }
         eventBus.addListener((final RegisterEvent evt) -> {
@@ -675,6 +697,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                     evt.register(resourceKey, resourceLocation, supplier);
                 });
             });
+            callbacks.clear();
         });
     }
 

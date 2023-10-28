@@ -13,6 +13,7 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.List;
@@ -31,12 +32,12 @@ public class DynamicPackResources extends AbstractModPackResources {
     /**
      * Helper map for quickly turning a pack type directory back into the {@link PackType}.
      */
-    private static final Map<String, PackType> PATHS_FOR_TYPE = Stream.of(PackType.values()).collect(ImmutableMap.toImmutableMap(PackType::getDirectory, Function.identity()));
+    public static final Map<String, PackType> PATHS_FOR_TYPE = Stream.of(PackType.values()).collect(ImmutableMap.toImmutableMap(PackType::getDirectory, Function.identity()));
 
     /**
      * The {@link net.minecraft.data.DataProvider} factories used by this pack resources instances.
      */
-    private final DataProviderContext.Factory[] factories;
+    protected final DataProviderContext.Factory[] factories;
     /**
      * A map containing all generated files stored by {@link PackType} and path (in form of a {@link ResourceLocation}).
      */
@@ -45,7 +46,7 @@ public class DynamicPackResources extends AbstractModPackResources {
     /**
      * @param factories the {@link net.minecraft.data.DataProvider} factories used by this pack resources instances
      */
-    protected DynamicPackResources(DataProviderContext.Factory[] factories) {
+    protected DynamicPackResources(DataProviderContext.Factory... factories) {
         this.factories = factories;
     }
 
@@ -76,7 +77,8 @@ public class DynamicPackResources extends AbstractModPackResources {
             Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> packTypes = Stream.of(PackType.values()).collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
             for (DataProviderContext.Factory provider : factories) {
                 provider.apply(context).run((Path filePath, byte[] data, HashCode hashCode) -> {
-                    List<String> strings = FileUtil.decomposePath(filePath.normalize().toString()).get().left().filter(list -> list.size() >= 2).orElse(null);
+                    // good times with Windows...
+                    List<String> strings = FileUtil.decomposePath(filePath.normalize().toString().replace(File.separator, "/")).get().left().filter(list -> list.size() >= 2).orElse(null);
                     if (strings != null) {
                         PackType packType = PATHS_FOR_TYPE.get(strings.get(0));
                         Objects.requireNonNull(packType, "pack type for directory %s is null".formatted(strings.get(0)));

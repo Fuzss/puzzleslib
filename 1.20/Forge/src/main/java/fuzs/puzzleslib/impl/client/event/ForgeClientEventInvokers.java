@@ -443,19 +443,23 @@ public final class ForgeClientEventInvokers {
                 ResourceLocation modelLocation = entry.getKey();
                 UnbakedModel model = evt.getModelBakery().getModel(modelLocation);
                 if (!unbakedCache.containsKey(model)) {
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, model, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                        // the Fabric callback for adding additional models does not work with model resource locations, so force that restriction here, too
-                        if (resourceLocation instanceof ModelResourceLocation) {
-                            throw new IllegalArgumentException("model resource location is not supported");
-                        } else {
-                            additionalModels.put(resourceLocation, unbakedModel);
+                    try {
+                        EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, model, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
+                            // the Fabric callback for adding additional models does not work with model resource locations, so force that restriction here, too
+                            if (resourceLocation instanceof ModelResourceLocation) {
+                                throw new IllegalArgumentException("model resource location is not supported");
+                            } else {
+                                additionalModels.put(resourceLocation, unbakedModel);
+                            }
+                        });
+                        if (result.isInterrupt()) {
+                            UnbakedModel unbakedModel = result.getInterrupt().get();
+                            additionalModels.put(modelLocation, unbakedModel);
+                            ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(modelLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
+                            unbakedCache.put(model, modelBaker.bake(unbakedModel, modelLocation));
                         }
-                    });
-                    if (result.isInterrupt()) {
-                        UnbakedModel unbakedModel = result.getInterrupt().get();
-                        additionalModels.put(modelLocation, unbakedModel);
-                        ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(modelLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
-                        unbakedCache.put(model, modelBaker.bake(unbakedModel, modelLocation));
+                    } catch (Exception exception) {
+                        PuzzlesLib.LOGGER.error("Failed to modify unbaked model", exception);
                     }
                 }
                 if (unbakedCache.containsKey(model)) {
@@ -480,17 +484,21 @@ public final class ForgeClientEventInvokers {
             // Forge has no event firing for every baked model like Fabric,
             // instead go through the baked models map and fire the event for every model manually
             for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
-                EventResultHolder<BakedModel> result = callback.onModifyBakedModel(entry.getKey(), entry.getValue(), () -> {
-                    return new ForgeModelBakerImpl(entry.getKey(), bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
-                }, (ResourceLocation resourceLocation) -> {
-                    if (additionalModels.containsKey(resourceLocation)) {
-                        return additionalModels.get(resourceLocation);
-                    } else {
-                        // never return null, use missing model if absent
-                        return models.getOrDefault(resourceLocation, missingModel);
-                    }
-                }, additionalModels::put);
-                result.getInterrupt().ifPresent(entry::setValue);
+                try {
+                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(entry.getKey(), entry.getValue(), () -> {
+                        return new ForgeModelBakerImpl(entry.getKey(), bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
+                    }, (ResourceLocation resourceLocation) -> {
+                        if (additionalModels.containsKey(resourceLocation)) {
+                            return additionalModels.get(resourceLocation);
+                        } else {
+                            // never return null, use missing model if absent
+                            return models.getOrDefault(resourceLocation, missingModel);
+                        }
+                    }, additionalModels::put);
+                    result.getInterrupt().ifPresent(entry::setValue);
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to modify baked model", exception);
+                }
             }
             additionalModels.forEach(models::putIfAbsent);
             missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
@@ -507,12 +515,16 @@ public final class ForgeClientEventInvokers {
             Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
-            callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
-                return models.getOrDefault(resourceLocation, missingModel);
-            }, () -> {
-                // just use a dummy model, we cut this out when printing missing textures to the log
-                return new ForgeModelBakerImpl(ModelBakery.MISSING_MODEL_LOCATION, bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
-            });
+            try {
+                callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
+                    return models.getOrDefault(resourceLocation, missingModel);
+                }, () -> {
+                    // just use a dummy model, we cut this out when printing missing textures to the log
+                    return new ForgeModelBakerImpl(ModelBakery.MISSING_MODEL_LOCATION, bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
+                });
+            } catch (Exception exception) {
+                PuzzlesLib.LOGGER.error("Failed to add additional baked models", exception);
+            }
             missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
                 PuzzlesLib.LOGGER.warn("Missing textures:\n{}", materials.stream().sorted(Material.COMPARATOR).map((material) -> {
                     return "    " + material.atlasLocation() + ":" + material.texture();

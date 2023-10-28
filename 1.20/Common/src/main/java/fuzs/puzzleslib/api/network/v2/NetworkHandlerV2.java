@@ -137,7 +137,7 @@ public interface NetworkHandlerV2 {
      * @param message message to send
      */
     default void sendToAll(MessageV2<?> message) {
-        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
+        CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
     }
 
     /**
@@ -147,7 +147,7 @@ public interface NetworkHandlerV2 {
      * @param exclude client to exclude
      */
     default void sendToAllExcept(MessageV2<?> message, ServerPlayer exclude) {
-        for (ServerPlayer player : CommonAbstractions.INSTANCE.getGameServer().getPlayerList().getPlayers()) {
+        for (ServerPlayer player : CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().getPlayers()) {
             if (player != exclude) this.sendTo(message, player);
         }
     }
@@ -189,7 +189,7 @@ public interface NetworkHandlerV2 {
      * @param level    dimension key provider level
      */
     default void sendToAllNearExcept(MessageV2<?> message, @Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level) {
-        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
+        CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
     /**
@@ -229,6 +229,6 @@ public interface NetworkHandlerV2 {
      * @param dimension dimension to send message in
      */
     default void sendToDimension(MessageV2<?> message, ResourceKey<Level> dimension) {
-        CommonAbstractions.INSTANCE.getGameServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
+        CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), dimension);
     }
 }

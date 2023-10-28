@@ -57,12 +57,14 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     @Override
     public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
+        Objects.requireNonNull(message, "message is null");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     @Override
     public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
+        Objects.requireNonNull(message, "message is null");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 

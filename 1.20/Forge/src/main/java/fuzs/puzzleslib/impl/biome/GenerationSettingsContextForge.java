@@ -21,7 +21,7 @@ public record GenerationSettingsContextForge(Registry<ConfiguredWorldCarver<?>> 
     }
 
     public GenerationSettingsContextForge(BiomeGenerationSettingsBuilder context) {
-        this(CommonAbstractions.INSTANCE.getGameServer().registryAccess(), context);
+        this(CommonAbstractions.INSTANCE.getMinecraftServer().registryAccess(), context);
     }
 
     @Override
