@@ -43,6 +43,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
@@ -459,11 +460,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerChunkEvents.Load.class, ChunkEvent.Load.class, (ServerChunkEvents.Load callback, ChunkEvent.Load evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onChunkLoad(level, evt.getChunk());
+            callback.onChunkLoad(level, (LevelChunk) evt.getChunk());
         });
         INSTANCE.register(ServerChunkEvents.Unload.class, ChunkEvent.Unload.class, (ServerChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onChunkUnload(level, evt.getChunk());
+            callback.onChunkUnload(level, (LevelChunk) evt.getChunk());
         });
         INSTANCE.register(ItemTossCallback.class, ItemTossEvent.class, (ItemTossCallback callback, ItemTossEvent evt) -> {
             if (callback.onItemToss(evt.getEntity(), evt.getPlayer()).isInterrupt()) {
