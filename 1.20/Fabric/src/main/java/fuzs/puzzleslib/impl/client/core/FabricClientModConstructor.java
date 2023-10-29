@@ -100,8 +100,8 @@ public final class FabricClientModConstructor {
     private static void registerRenderProperties(ClientModConstructor constructor) {
         // run this as late as possible and not during client init so that maps are already fully populated with vanilla content
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft client) -> {
-            constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextFabricImpl());
-            constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextFabricImpl());
+            constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
+            constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
             constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
             constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
         });

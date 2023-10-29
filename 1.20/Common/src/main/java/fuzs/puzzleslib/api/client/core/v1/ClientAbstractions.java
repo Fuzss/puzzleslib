@@ -49,7 +49,7 @@ public interface ClientAbstractions {
     /**
      * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of {@link net.minecraft.client.resources.model.ModelResourceLocation}.
      *
-     * @param identifier   model identifier
+     * @param identifier model identifier
      * @return the model, possibly the missing model
      */
     BakedModel getBakedModel(ResourceLocation identifier);
@@ -85,6 +85,24 @@ public interface ClientAbstractions {
     default RenderType getRenderType(Fluid fluid) {
         return ItemBlockRenderTypes.getRenderLayer(fluid.defaultFluidState());
     }
+
+    /**
+     * Allows for registering a {@link RenderType} for a block.
+     * <p>When not render type is registered {@link RenderType#solid()} is used.
+     *
+     * @param block      the block to register the render type for
+     * @param renderType the render type
+     */
+    void registerRenderType(Block block, RenderType renderType);
+
+    /**
+     * Allows for registering a {@link RenderType} for a fluid.
+     * <p>When not render type is registered {@link RenderType#solid()} is used.
+     *
+     * @param fluid      the fluid to register the render type for
+     * @param renderType the render type
+     */
+    void registerRenderType(Fluid fluid, RenderType renderType);
 
     /**
      * Get the current partial tick time.

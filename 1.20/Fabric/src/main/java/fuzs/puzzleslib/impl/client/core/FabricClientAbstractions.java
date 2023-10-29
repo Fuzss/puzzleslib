@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.mixin.client.accessor.MinecraftFabricAccessor;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -13,6 +14,7 @@ import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 
 public final class FabricClientAbstractions implements ClientAbstractions {
 
@@ -36,6 +38,16 @@ public final class FabricClientAbstractions implements ClientAbstractions {
     @Override
     public RenderType getRenderType(Block block) {
         return ItemBlockRenderTypes.getChunkRenderType(block.defaultBlockState());
+    }
+
+    @Override
+    public void registerRenderType(Block block, RenderType renderType) {
+        BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
+    }
+
+    @Override
+    public void registerRenderType(Fluid fluid, RenderType renderType) {
+        BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
     }
 
     @Override

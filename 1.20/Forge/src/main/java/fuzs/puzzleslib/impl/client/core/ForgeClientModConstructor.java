@@ -52,8 +52,8 @@ public final class ForgeClientModConstructor {
                 constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
                 constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(modId, dynamicRenderers));
-                constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextForgeImpl());
-                constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextForgeImpl());
+                constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
+                constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
             });
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
