@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.impl.client.event;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -15,11 +17,15 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.*;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.event.*;
@@ -32,9 +38,7 @@ import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -45,6 +49,7 @@ import static fuzs.puzzleslib.api.event.v1.core.ForgeEventInvokerRegistry.INSTAN
 
 @SuppressWarnings("unchecked")
 public final class ForgeClientEventInvokers {
+    private static final Supplier<Set<ResourceLocation>> TOP_LEVEL_MODEL_LOCATIONS = Suppliers.memoize(ForgeClientEventInvokers::getTopLevelModelLocations);
 
     public static void register() {
         INSTANCE.register(ClientTickEvents.Start.class, TickEvent.ClientTickEvent.class, (ClientTickEvents.Start callback, TickEvent.ClientTickEvent evt) -> {
@@ -421,6 +426,11 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ResourceLocation, BakedModel> models = evt.getModels();
+            // just like bakedCache in ModelBakery
+            Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
+            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            Objects.requireNonNull(missingModel, "missing model is null");
             Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
             Function<ResourceLocation, UnbakedModel> modelGetter = (ResourceLocation resourceLocation) -> {
                 if (additionalModels.containsKey(resourceLocation)) {
@@ -432,38 +442,32 @@ public final class ForgeClientEventInvokers {
             // do not use resource location keys or rely on the baked cache used by the model baker, it will rebake different block states even though the model is the same
             // this also means we cannot use baked models as keys since they are different instances despite having been baked from the same unbaked model
             Map<UnbakedModel, BakedModel> unbakedCache = Maps.newIdentityHashMap();
-            // just like bakedCache in ModelBakery
-            Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
-            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
-            Objects.requireNonNull(missingModel, "missing model is null");
             // Forge does not grant access to unbaked models, so lookup every unbaked model and replace the baked model if necessary
             // this also means the event is limited to top level models which should be fine though, the same restriction is applied on Fabric
-            for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
-                ResourceLocation modelLocation = entry.getKey();
-                UnbakedModel model = evt.getModelBakery().getModel(modelLocation);
-                if (!unbakedCache.containsKey(model)) {
-                    try {
-                        EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, model, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                            // the Fabric callback for adding additional models does not work with model resource locations, so force that restriction here, too
-                            if (resourceLocation instanceof ModelResourceLocation) {
-                                throw new IllegalArgumentException("model resource location is not supported");
-                            } else {
-                                additionalModels.put(resourceLocation, unbakedModel);
-                            }
-                        });
-                        if (result.isInterrupt()) {
-                            UnbakedModel unbakedModel = result.getInterrupt().get();
-                            additionalModels.put(modelLocation, unbakedModel);
-                            ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(modelLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
-                            unbakedCache.put(model, modelBaker.bake(unbakedModel, modelLocation));
+            // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
+            for (ResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
+                try {
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, () -> {
+                        return modelGetter.apply(modelLocation);
+                    }, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
+                        // the Fabric callback for adding additional models does not work with model resource locations, so force that restriction here, too
+                        if (resourceLocation instanceof ModelResourceLocation) {
+                            throw new IllegalArgumentException("model resource location is not supported");
+                        } else {
+                            additionalModels.put(resourceLocation, unbakedModel);
                         }
-                    } catch (Exception exception) {
-                        PuzzlesLib.LOGGER.error("Failed to modify unbaked model", exception);
+                    });
+                    if (result.isInterrupt()) {
+                        UnbakedModel unbakedModel = result.getInterrupt().get();
+                        additionalModels.put(modelLocation, unbakedModel);
+                        BakedModel bakedModel = unbakedCache.computeIfAbsent(unbakedModel, $ -> {
+                            ForgeModelBakerImpl modelBaker = new ForgeModelBakerImpl(modelLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
+                            return modelBaker.bake(unbakedModel, modelLocation);
+                        });
+                        models.put(modelLocation, bakedModel);
                     }
-                }
-                if (unbakedCache.containsKey(model)) {
-                    entry.setValue(unbakedCache.get(model));
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to modify unbaked model", exception);
                 }
             }
             missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
@@ -476,31 +480,38 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ResourceLocation, BakedModel> models = evt.getModels();
-            Map<ResourceLocation, BakedModel> additionalModels = Maps.newLinkedHashMap();
-            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
+            // just like bakedCache in ModelBakery
             Map<ForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
+            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
+            Function<ResourceLocation, ModelBaker> modelBaker = resourceLocation -> {
+                return new ForgeModelBakerImpl(resourceLocation, bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
+            };
+            Function<ResourceLocation, BakedModel> modelGetter = (ResourceLocation resourceLocation) -> {
+                if (models.containsKey(resourceLocation)) {
+                    return models.get(resourceLocation);
+                } else {
+                    return modelBaker.apply(resourceLocation).bake(resourceLocation, BlockModelRotation.X0_Y0);
+                }
+            };
             // Forge has no event firing for every baked model like Fabric,
             // instead go through the baked models map and fire the event for every model manually
-            for (Map.Entry<ResourceLocation, BakedModel> entry : models.entrySet()) {
+            // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
+            for (ResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
                 try {
-                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(entry.getKey(), entry.getValue(), () -> {
-                        return new ForgeModelBakerImpl(entry.getKey(), bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
-                    }, (ResourceLocation resourceLocation) -> {
-                        if (additionalModels.containsKey(resourceLocation)) {
-                            return additionalModels.get(resourceLocation);
-                        } else {
-                            // never return null, use missing model if absent
-                            return models.getOrDefault(resourceLocation, missingModel);
-                        }
-                    }, additionalModels::put);
-                    result.getInterrupt().ifPresent(entry::setValue);
+                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(modelLocation, () -> {
+                        return modelGetter.apply(modelLocation);
+                    }, () -> {
+                        return modelBaker.apply(modelLocation);
+                    }, modelGetter, models::putIfAbsent);
+                    result.getInterrupt().ifPresent(bakedModel -> {
+                        models.put(modelLocation, bakedModel);
+                    });
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Failed to modify baked model", exception);
                 }
             }
-            additionalModels.forEach(models::putIfAbsent);
             missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
                 PuzzlesLib.LOGGER.warn("Missing textures in model {}:\n{}", resourceLocation, materials.stream().sorted(Material.COMPARATOR).map((material) -> {
                     return "    " + material.atlasLocation() + ":" + material.texture();
@@ -532,6 +543,9 @@ public final class ForgeClientEventInvokers {
             });
             PuzzlesLib.LOGGER.info("Adding additional baked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
+        INSTANCE.register(ModelEvents.AfterModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.AfterModelLoading callback, ModelEvent.BakingCompleted evt) -> {
+            callback.onAfterModelLoading(evt::getModelManager);
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
@@ -542,4 +556,19 @@ public final class ForgeClientEventInvokers {
         });
     }
 
+    private static Set<ResourceLocation> getTopLevelModelLocations() {
+        Set<ResourceLocation> modelLocations = Sets.newHashSet(ModelBakery.MISSING_MODEL_LOCATION);
+        for (Block block : BuiltInRegistries.BLOCK) {
+            block.getStateDefinition().getPossibleStates().forEach(blockState -> {
+                modelLocations.add(BlockModelShaper.stateToModelLocation(blockState));
+            });
+        }
+        for (ResourceLocation resourcelocation : BuiltInRegistries.ITEM.keySet()) {
+            modelLocations.add(new ModelResourceLocation(resourcelocation, "inventory"));
+        }
+        modelLocations.add(ItemRenderer.TRIDENT_IN_HAND_MODEL);
+        modelLocations.add(ItemRenderer.SPYGLASS_IN_HAND_MODEL);
+        // skip the Forge additional models call, we probably don't need those and better to avoid accessing internals
+        return Collections.unmodifiableSet(modelLocations);
+    }
 }

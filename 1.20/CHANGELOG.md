@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.5-1.20.1] - 2023-10-29
+### Changed
+- Adjusted `ModelEvents` to work with ModernFix's dynamic resources
+
 ## [v8.1.4-1.20.1] - 2023-10-28
 ### Fixed
 - Fixed chunk events chunk type
