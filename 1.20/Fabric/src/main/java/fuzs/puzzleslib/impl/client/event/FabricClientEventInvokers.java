@@ -3,11 +3,12 @@ package fuzs.puzzleslib.impl.client.event;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.mixin.client.accessor.ModelBakeryFabricAccessor;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -24,6 +25,8 @@ import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -33,6 +36,7 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -45,6 +49,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -60,6 +65,7 @@ import static fuzs.puzzleslib.api.event.v1.core.FabricEventInvokerRegistry.INSTA
 public final class FabricClientEventInvokers {
     // a custom item stack used for identity matching to be able to cancel our pick block event
     private static final ItemStack INTERRUPT_PICK_ITEM_STACK = new ItemStack(Items.STONE);
+    private static final MutableInt MODEL_LOADING_LISTENERS = new MutableInt();
 
     static {
         ClientPickBlockApplyCallback.EVENT.register((Player player, HitResult result, ItemStack stack) -> {
@@ -361,23 +367,17 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register(pluginContext -> {
                 Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
-                Map<UnbakedModel, UnbakedModel> unbakedCache = Maps.newIdentityHashMap();
                 pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
-                    // only invoke for top level models just like Forge
-                    if (!((ModelBakeryFabricAccessor) context.loader()).puzzleslib$getTopLevelModels().containsKey(context.id())) return model;
-                    if (!unbakedCache.containsKey(model)) {
-                        // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
-                        EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), model, context.loader()::getModel, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                            // the Fabric callback for adding additional models does not work with model resource locations
-                            if (resourceLocation instanceof ModelResourceLocation) {
-                                throw new IllegalArgumentException("model resource location is not supported");
-                            } else {
-                                additionalModels.put(resourceLocation, unbakedModel);
-                            }
-                        });
-                        result.getInterrupt().ifPresent(unbakedModel -> unbakedCache.put(model, unbakedModel));
-                    }
-                    return unbakedCache.getOrDefault(model, model);
+                    // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), () -> model, context.loader()::getModel, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
+                        // the Fabric callback for adding additional models does not work with model resource locations
+                        if (resourceLocation instanceof ModelResourceLocation) {
+                            throw new IllegalArgumentException("model resource location is not supported");
+                        } else {
+                            additionalModels.put(resourceLocation, unbakedModel);
+                        }
+                    });
+                    return result.getInterrupt().orElse(model);
                 });
                 pluginContext.resolveModel().register((ModelResolver.Context context) -> {
                     return additionalModels.get(context.id());
@@ -387,13 +387,15 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, (ModelEvents.ModifyBakedModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register(pluginContext -> {
                 pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
-                    // only invoke for top level models just like Forge
-                    if (model == null || !((ModelBakeryFabricAccessor) context.loader()).puzzleslib$getTopLevelModels().containsKey(context.id())) return model;
-                    Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
-                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.id(), model, context::baker, (ResourceLocation resourceLocation) -> {
-                        return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
-                    }, models::putIfAbsent);
-                    return result.getInterrupt().orElse(model);
+                    if (model != null) {
+                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                        EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.id(), () -> model, context::baker, (ResourceLocation resourceLocation) -> {
+                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                        }, models::putIfAbsent);
+                        return result.getInterrupt().orElse(model);
+                    } else {
+                        return null;
+                    }
                 });
             });
         });
@@ -412,6 +414,13 @@ public final class FabricClientEventInvokers {
                     return model;
                 });
             });
+        });
+        INSTANCE.register(ModelEvents.AfterModelLoading.class, (ModelEvents.AfterModelLoading callback, @Nullable Object o) -> {
+            ResourceLocation resourceLocation = PuzzlesLib.id("after_model_loading/" + MODEL_LOADING_LISTENERS.incrementAndGet());
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(resourceLocation, resourceManager -> {
+                Minecraft minecraft = Minecraft.getInstance();
+                callback.onAfterModelLoading(minecraft::getModelManager);
+            }, ResourceReloadListenerKeys.MODELS));
         });
     }
 

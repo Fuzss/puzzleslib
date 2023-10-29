@@ -79,7 +79,6 @@
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
     "client.accessor.MinecraftFabricAccessor",
-    "client.accessor.ModelBakeryFabricAccessor",
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "injectors": {
