@@ -12,6 +12,7 @@ import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.ChunkRenderTypeSet;
 
 public final class ForgeClientAbstractions implements ClientAbstractions {
@@ -36,6 +37,16 @@ public final class ForgeClientAbstractions implements ClientAbstractions {
     public RenderType getRenderType(Block block) {
         ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(block.defaultBlockState());
         return renderTypes.isEmpty() ? RenderType.solid() : renderTypes.iterator().next();
+    }
+
+    @Override
+    public void registerRenderType(Block block, RenderType renderType) {
+        ItemBlockRenderTypes.setRenderLayer(block, renderType);
+    }
+
+    @Override
+    public void registerRenderType(Fluid fluid, RenderType renderType) {
+        ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
     }
 
     @Override

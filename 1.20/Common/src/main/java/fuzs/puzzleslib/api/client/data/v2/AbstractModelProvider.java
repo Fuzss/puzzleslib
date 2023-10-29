@@ -12,7 +12,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.models.ModelProvider;
 import net.minecraft.data.models.blockstates.BlockStateGenerator;
 import net.minecraft.data.models.model.*;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +29,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-public abstract class AbstractModelProvider extends ModelProvider {
+public abstract class AbstractModelProvider implements DataProvider {
     public static final String BLOCK_PATH = "block";
     public static final String ITEM_PATH = "item";
 
@@ -43,7 +42,6 @@ public abstract class AbstractModelProvider extends ModelProvider {
     }
 
     public AbstractModelProvider(String modId, PackOutput packOutput) {
-        super(packOutput);
         this.modId = modId;
         this.blockStatePathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "blockstates");
         this.modelPathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models");
@@ -105,6 +103,11 @@ public abstract class AbstractModelProvider extends ModelProvider {
                 return this.blockStatePathProvider.json(block.builtInRegistryHolder().key().location());
             }), saveCollection(output, models, this.modelPathProvider::json));
         }
+    }
+
+    @Override
+    public final String getName() {
+        return "Model Definitions";
     }
 
     private static <T> CompletableFuture<?> saveCollection(CachedOutput output, Map<T, ? extends Supplier<JsonElement>> map, Function<T, Path> pathExtractor) {

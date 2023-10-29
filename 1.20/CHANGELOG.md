@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.6-1.20.1] - 2023-10-29
+### Changed
+- Moved methods for registering block and fluid render types to `ClientAbstractions`
+### Fixed
+- Fixed a crash with Forgified Fabric Api due to a faulty Mixin in `ModelProvider`
+
 ## [v8.1.5-1.20.1] - 2023-10-29
 ### Changed
 - Adjusted `ModelEvents` to work with ModernFix's dynamic resources
