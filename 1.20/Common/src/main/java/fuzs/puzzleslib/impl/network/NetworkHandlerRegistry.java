@@ -7,6 +7,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -14,6 +15,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collection;
 
 public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
@@ -39,14 +42,20 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
-        NetworkHandlerV3.super.sendToAll(message);
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, T message) {
+        NetworkHandlerV3.super.sendToAll(server, message);
     }
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(@Nullable ServerPlayer exclude, T message) {
-        NetworkHandlerV3.super.sendToAllExcept(exclude, message);
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, T message) {
+        NetworkHandlerV3.super.sendToAll(server, exclude, message);
+    }
+
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, T message) {
+        NetworkHandlerV3.super.sendToAll(playerList, exclude, message);
     }
 
     @Deprecated
@@ -69,8 +78,8 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
-        NetworkHandlerV3.super.sendToAllNearExcept(exclude, posX, posY, posZ, distance, level, message);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
+        NetworkHandlerV3.super.sendToAllNear(exclude, posX, posY, posZ, distance, level, message);
     }
 
     @Deprecated
@@ -93,13 +102,7 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @Deprecated
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingExcept(Entity entity, T message) {
-        NetworkHandlerV3.super.sendToAllTrackingExcept(entity, message);
-    }
-
-    @Deprecated
-    @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(ServerPlayer player, T message) {
-        NetworkHandlerV3.super.sendToAllTracking(player, message);
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message, boolean includeSelf) {
+        NetworkHandlerV3.super.sendToAllTracking(entity, message, includeSelf);
     }
 }

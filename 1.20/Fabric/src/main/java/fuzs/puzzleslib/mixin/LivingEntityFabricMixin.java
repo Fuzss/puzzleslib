@@ -14,10 +14,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ExperienceOrb;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -33,6 +30,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -247,6 +245,13 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Shadow
     public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
 
+    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
+    public void hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
+        if (Player.class.isInstance(this)) return;
+        EventResult result = FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(LivingEntity.class.cast(this), source, amount);
+        if (result.isInterrupt()) callback.setReturnValue(false);
+    }
+
     @ModifyVariable(method = "hurt", at = @At(value = "LOAD", ordinal = 1), ordinal = 0)
     public float hurt$0(float amount, DamageSource source) {
         // hook in before any blocking checks are done, there is no good way to cancel the block after this
@@ -460,5 +465,10 @@ abstract class LivingEntityFabricMixin extends Entity {
             this.setAirSupply(this.puzzleslib$originalAirSupply);
             this.puzzleslib$originalAirSupply = Integer.MIN_VALUE;
         }
+    }
+
+    @Inject(method = "collectEquipmentChanges", at = @At(value = "INVOKE", target = "Ljava/util/Map;put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;"), locals = LocalCapture.CAPTURE_FAILHARD)
+    private void collectEquipmentChanges(CallbackInfoReturnable<Map<EquipmentSlot, ItemStack>> callback, Map<EquipmentSlot, ItemStack> map, EquipmentSlot[] values, int $0, int $1, EquipmentSlot equipmentSlot, ItemStack oldItemStack, ItemStack newItemStack) {
+        FabricLivingEvents.LIVING_EQUIPMENT_CHANGE.invoker().onLivingEquipmentChange(LivingEntity.class.cast(this), equipmentSlot, oldItemStack, newItemStack);
     }
 }

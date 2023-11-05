@@ -3,6 +3,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.7-1.20.1] - 2023-11-07
+### Added
+- Added `ComponentHelper` for converting various text instances back to `Component`
+- Added `LivingEquipmentChangeCallback`
+### Changed
+- Improve parity for `BlockEvents.Break`, `LivingAttackCallback`, and `PlayerInteractEvents.AttackBlock` between different mod loaders
+### Fixed
+- Ensure backwards compatibility of `NetworkHandlerV3`
+
 ## [v8.1.6-1.20.1] - 2023-10-29
 ### Changed
 - Moved methods for registering block and fluid render types to `ClientAbstractions`

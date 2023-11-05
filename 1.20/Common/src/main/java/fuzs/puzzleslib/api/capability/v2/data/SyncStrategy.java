@@ -26,7 +26,7 @@ public interface SyncStrategy {
      * <p>Useful for capabilities that affect rendering (e.g. a glider is gliding).
      */
     SyncStrategy SELF_AND_TRACKING = new SyncStrategyImpl((message, entity) -> {
-        PuzzlesLibMod.NETWORK.sendToAllTracking(entity, message);
+        PuzzlesLibMod.NETWORK.sendToAllTracking(entity, message, true);
     });
 
     <T extends Record & ClientboundMessage<T>> void sendTo(T message, ServerPlayer player);

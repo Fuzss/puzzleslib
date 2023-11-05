@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.core;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
@@ -21,6 +22,10 @@ public interface FabricProxy extends ProxyImpl {
     <T extends Record & ClientboundMessage<T>> void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory);
 
     <T extends Record & ServerboundMessage<T>> void registerServerReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory);
+
+    default boolean shouldStartDestroyBlock(BlockPos blockPos) {
+        throw new RuntimeException("Should start destroy block accessed for wrong side!");
+    }
 
     default void startClientPrediction(Level level, IntFunction<Packet<ServerGamePacketListener>> predictiveAction) {
         throw new RuntimeException("Start client prediction accessed for wrong side!");

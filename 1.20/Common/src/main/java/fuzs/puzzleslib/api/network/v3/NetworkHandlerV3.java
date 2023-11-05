@@ -18,9 +18,10 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
@@ -99,21 +100,35 @@ public interface NetworkHandlerV3 {
     /**
      * Send message from server to all players.
      *
+     * @param server  server for retrieving the player list
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
-        CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().broadcastAll(this.toClientboundPacket(message));
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, T message) {
+        this.sendToAll(server, null, message);
     }
 
     /**
-     * Send message from server to all players except the provided player.
+     * Send message from server to all players except one player.
      *
+     * @param server  server for retrieving the player list
      * @param exclude player to exclude
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllExcept(@Nullable ServerPlayer exclude, T message) {
-        List<ServerPlayer> players = CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().getPlayers();
-        for (ServerPlayer player : players) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, T message) {
+        Objects.requireNonNull(server, "server is null");
+        this.sendToAll(server.getPlayerList().getPlayers(), exclude, message);
+    }
+
+    /**
+     * Send message from server to all players except one player.
+     *
+     * @param playerList all players to send the message to
+     * @param exclude    player to exclude
+     * @param message    message to send
+     */
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, T message) {
+        Objects.requireNonNull(playerList, "player list is null");
+        for (ServerPlayer player : playerList) {
             if (player != exclude) this.sendTo(player, message);
         }
     }
@@ -126,7 +141,9 @@ public interface NetworkHandlerV3 {
      */
     default <T extends Record & ClientboundMessage<T>> void sendToAll(ServerLevel level, T message) {
         Objects.requireNonNull(level, "level is null");
-        level.getServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), level.dimension());
+        for (ServerPlayer player : level.players()) {
+            this.sendTo(player, message);
+        }
     }
 
     /**
@@ -144,14 +161,14 @@ public interface NetworkHandlerV3 {
     /**
      * Send message from server to all players near a given position.
      *
-     * @param posX     source position x
-     * @param posY     source position y
-     * @param posZ     source position z
-     * @param level    the current level
-     * @param message  message to send
+     * @param posX    source position x
+     * @param posY    source position y
+     * @param posZ    source position z
+     * @param level   the current level
+     * @param message message to send
      */
     default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, ServerLevel level, T message) {
-        this.sendToAllNearExcept(null, posX, posY, posZ, 64.0, level, message);
+        this.sendToAllNear(null, posX, posY, posZ, 64.0, level, message);
     }
 
     /**
@@ -165,7 +182,7 @@ public interface NetworkHandlerV3 {
      * @param level    the current level
      * @param message  message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
+    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
         Objects.requireNonNull(level, "level is null");
         level.getServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
@@ -207,69 +224,81 @@ public interface NetworkHandlerV3 {
         Objects.requireNonNull(level, "level is null");
         Objects.requireNonNull(chunkPos, "chunk pos is null");
         List<ServerPlayer> players = level.getChunkSource().chunkMap.getPlayers(chunkPos, false);
-        for (ServerPlayer player : players) {
-            this.sendTo(player, message);
+        this.sendToAll(players, null, message);
+    }
+
+    /**
+     * Send message from server to all players tracking a given entity.
+     *
+     * @param entity      the tracked entity
+     * @param message     message to send
+     * @param includeSelf when the tracked entity is a player will they receive the message as well
+     */
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message, boolean includeSelf) {
+        Objects.requireNonNull(entity, "entity is null");
+        Preconditions.checkState(!entity.getCommandSenderWorld().isClientSide, "entity level is client level");
+        ServerChunkCache chunkSource = ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource();
+        if (includeSelf) {
+            chunkSource.broadcastAndSend(entity, this.toClientboundPacket(message));
+        } else {
+            chunkSource.broadcast(entity, this.toClientboundPacket(message));
         }
     }
 
-    /**
-     * Send message from server to all players tracking a given entity. When the tracked entity is a player it will not receive the message.
-     *
-     * @param entity  the tracked entity
-     * @param message message to send
-     */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingExcept(Entity entity, T message) {
-        Objects.requireNonNull(entity, "entity is null");
-        Preconditions.checkState(!entity.getCommandSenderWorld().isClientSide, "entity level is client level");
-        ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource().broadcast(entity, this.toClientboundPacket(message));
+    @Deprecated(forRemoval = true)
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
+        this.sendToAll(CommonAbstractions.INSTANCE.getMinecraftServer(), message);
     }
 
-    /**
-     * Send message from server to all players tracking another player. The tracked player will receive the message as well.
-     *
-     * @param player  the tracked player
-     * @param message message to send
-     */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(ServerPlayer player, T message) {
-        Objects.requireNonNull(player, "player is null");
-        player.serverLevel().getChunkSource().broadcastAndSend(player, this.toClientboundPacket(message));
+    @Deprecated(forRemoval = true)
+    default <T extends Record & ClientboundMessage<T>> void sendToAll(@Nullable ServerPlayer exclude, T message) {
+        this.sendToAll(CommonAbstractions.INSTANCE.getMinecraftServer(), exclude, message);
     }
 
     @Deprecated(forRemoval = true)
     default <T extends Record & ClientboundMessage<T>> void sendToAllNear(BlockPos pos, Level level, T message) {
-        Objects.requireNonNull(pos, "pos is null");
-        this.sendToAllNear(pos.getX(), pos.getY(), pos.getZ(), -1.0, level, message);
+        Objects.requireNonNull(level, "level is null");
+        Preconditions.checkState(!level.isClientSide, "level is client level");
+        this.sendToAllNear((Vec3i) pos, (ServerLevel) level, message);
     }
 
     @Deprecated(forRemoval = true)
     default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, double distance, Level level, T message) {
-        this.sendToAllNearExcept(null, posX, posY, posZ, 64.0, level, message);
+        Objects.requireNonNull(level, "level is null");
+        Preconditions.checkState(!level.isClientSide, "level is client level");
+        this.sendToAllNear(posX, posY, posZ, (ServerLevel) level, message);
     }
 
     @Deprecated(forRemoval = true)
     default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level, T message) {
         Objects.requireNonNull(level, "level is null");
-        PlayerList players = CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList();
-        players.broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
+        Preconditions.checkState(!level.isClientSide, "level is client level");
+        this.sendToAllNear(exclude, posX, posY, posZ, distance, (ServerLevel) level, message);
+    }
+
+    @Deprecated(forRemoval = true)
+    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message) {
+        this.sendToAllTracking(entity, message, false);
     }
 
     @Deprecated(forRemoval = true)
     default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(Entity entity, T message) {
-        Objects.requireNonNull(entity, "entity is null");
-        Preconditions.checkState(!entity.level().isClientSide, "entity level is client level");
-        ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource().broadcastAndSend(entity, this.toClientboundPacket(message));
+        this.sendToAllTracking(entity, message, true);
     }
 
     @Deprecated(forRemoval = true)
     default <T extends Record & ClientboundMessage<T>> void sendToDimension(Level level, T message) {
         Objects.requireNonNull(level, "level is null");
-        this.sendToDimension(level.dimension(), message);
+        Preconditions.checkState(!level.isClientSide, "level is client level");
+        this.sendToAll((ServerLevel) level, message);
     }
 
     @Deprecated(forRemoval = true)
     default <T extends Record & ClientboundMessage<T>> void sendToDimension(ResourceKey<Level> resourceKey, T message) {
         Objects.requireNonNull(resourceKey, "resource key is null");
-        CommonAbstractions.INSTANCE.getMinecraftServer().getPlayerList().broadcastAll(this.toClientboundPacket(message), resourceKey);
+        ServerLevel level = CommonAbstractions.INSTANCE.getMinecraftServer().getLevel(resourceKey);
+        Objects.requireNonNull(level, "level is null");
+        this.sendToAll(level, message);
     }
 
     /**

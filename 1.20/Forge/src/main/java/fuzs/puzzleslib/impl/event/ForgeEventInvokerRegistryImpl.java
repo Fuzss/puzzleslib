@@ -40,6 +40,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
@@ -168,6 +169,13 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(BlockEvents.Break.class, BlockEvent.BreakEvent.class, (BlockEvents.Break callback, BlockEvent.BreakEvent evt) -> {
             // match Fabric implementation
             if (evt.getState().getBlock() instanceof GameMasterBlock && !evt.getPlayer().canUseGameMasterBlocks()) {
+                return;
+            }
+            GameType gameType = ((ServerPlayer) evt.getPlayer()).gameMode.getGameModeForPlayer();
+            if (evt.getPlayer().blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
+                return;
+            }
+            if (evt.getPlayer().getMainHandItem().onBlockStartBreak(evt.getPos(), evt.getPlayer())) {
                 return;
             }
             EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
@@ -631,6 +639,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerChunkEvents.Unwatch.class, ChunkWatchEvent.UnWatch.class, (ServerChunkEvents.Unwatch callback, ChunkWatchEvent.UnWatch evt) -> {
             callback.onChunkUnwatch(evt.getPlayer(), evt.getPos(), evt.getLevel());
+        });
+        INSTANCE.register(LivingEquipmentChangeCallback.class, LivingEquipmentChangeEvent.class, (LivingEquipmentChangeCallback callback, LivingEquipmentChangeEvent evt) -> {
+            callback.onLivingEquipmentChange(evt.getEntity(), evt.getSlot(), evt.getFrom(), evt.getTo());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
