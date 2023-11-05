@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 public final class ClientChunkEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
@@ -21,7 +21,7 @@ public final class ClientChunkEvents {
          * @param level the client level the chunk is in
          * @param chunk the chunk being loaded
          */
-        void onChunkLoad(ClientLevel level, ChunkAccess chunk);
+        void onChunkLoad(ClientLevel level, LevelChunk chunk);
     }
 
     @FunctionalInterface
@@ -33,6 +33,6 @@ public final class ClientChunkEvents {
          * @param level the client level the chunk is in
          * @param chunk the chunk being unloaded
          */
-        void onChunkUnload(ClientLevel level, ChunkAccess chunk);
+        void onChunkUnload(ClientLevel level, LevelChunk chunk);
     }
 }

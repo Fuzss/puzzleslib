@@ -26,6 +26,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.event.*;
@@ -257,11 +258,11 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(ClientChunkEvents.Load.class, ChunkEvent.Load.class, (ClientChunkEvents.Load callback, ChunkEvent.Load evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onChunkLoad(level, evt.getChunk());
+            callback.onChunkLoad(level, (LevelChunk) evt.getChunk());
         });
         INSTANCE.register(ClientChunkEvents.Unload.class, ChunkEvent.Unload.class, (ClientChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onChunkUnload(level, evt.getChunk());
+            callback.onChunkUnload(level, (LevelChunk) evt.getChunk());
         });
         INSTANCE.register(ClientPlayerEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggingIn.class, (ClientPlayerEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggingIn evt) -> {
             callback.onLoggedIn(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());

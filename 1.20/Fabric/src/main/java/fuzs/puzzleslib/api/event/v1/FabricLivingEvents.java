@@ -76,6 +76,10 @@ public final class FabricLivingEvents {
      */
     public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(AnimalTameCallback.class);
     /**
+     * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
+     */
+    public static final Event<LivingAttackCallback> LIVING_ATTACK = FabricEventFactory.createResult(LivingAttackCallback.class);
+    /**
      * Called before an entity is knocked-back in {@link LivingEntity#knockback(double, double, double)}, allows for preventing the knock-back.
      */
     public static final Event<LivingKnockBackCallback> LIVING_KNOCK_BACK = FabricEventFactory.createResult(LivingKnockBackCallback.class);
@@ -119,6 +123,10 @@ public final class FabricLivingEvents {
      * Runs before the game checks if an entity that is submerged should be damaged from drowning.
      */
     public static final Event<LivingEvents.Drown> LIVING_DROWN = FabricEventFactory.createResult(LivingEvents.Drown.class);
+    /**
+     * Fires whenever equipment changes are detected on an entity in {@link LivingEntity#collectEquipmentChanges()} from {@link LivingEntity#tick()}.
+     */
+    public static final Event<LivingEquipmentChangeCallback> LIVING_EQUIPMENT_CHANGE = FabricEventFactory.create(LivingEquipmentChangeCallback.class);
 
     private FabricLivingEvents() {
 

@@ -30,6 +30,14 @@ import java.util.function.Function;
  *     ]
  *   }
  * </code></pre>
+ * Additionally, registering every individual component is achieved like so:
+ * <pre><code>
+ *   "custom": {
+ *     "cardinal-components": [
+ *       "${modId}:&lt;identifier&gt;"
+ *     ]
+ *   }
+ * </code></pre>
  */
 @ApiStatus.Internal
 public final class EntityComponentInitializerImpl implements EntityComponentInitializer {
