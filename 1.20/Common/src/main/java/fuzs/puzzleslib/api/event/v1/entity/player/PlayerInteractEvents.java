@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 
 public final class PlayerInteractEvents {
     public static final EventInvoker<UseBlock> USE_BLOCK = EventInvoker.lookup(UseBlock.class);
+    @Deprecated(forRemoval = true)
     public static final EventInvoker<AttackBlock> ATTACK_BLOCK = EventInvoker.lookup(AttackBlock.class);
     public static final EventInvoker<AttackBlockV2> ATTACK_BLOCK_V2 = EventInvoker.lookup(AttackBlockV2.class);
     @Deprecated(forRemoval = true)
@@ -43,7 +44,7 @@ public final class PlayerInteractEvents {
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand <code>player</code> is using to interact
          * @param hitResult       the targeted block
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
          * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseBlock(Player player, Level level, InteractionHand interactionHand, BlockHitResult hitResult);
@@ -61,7 +62,7 @@ public final class PlayerInteractEvents {
          * @param interactionHand the hand <code>player</code> is using to interact
          * @param pos             the position of the block in the <code>level</code>
          * @param direction       the direction the block is clicked at
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
          * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
          */
         EventResultHolder<InteractionResult> onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction);
@@ -94,7 +95,7 @@ public final class PlayerInteractEvents {
          * @param player          the player using the item
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand <code>player</code> is holding the item
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
          * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
          */
         EventResultHolder<InteractionResultHolder<ItemStack>> onUseItem(Player player, Level level, InteractionHand interactionHand);
@@ -109,7 +110,7 @@ public final class PlayerInteractEvents {
          * @param player          the player using the item
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand <code>player</code> is holding the item
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
          * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseItem(Player player, Level level, InteractionHand interactionHand);
@@ -126,7 +127,7 @@ public final class PlayerInteractEvents {
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand <code>player</code> is using to interact
          * @param entity          the entity this interaction is happening on
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
          * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseEntity(Player player, Level level, InteractionHand interactionHand, Entity entity);
@@ -144,7 +145,7 @@ public final class PlayerInteractEvents {
          * @param interactionHand the hand <code>player</code> is using to interact
          * @param entity          the entity this interaction is happening on
          * @param hitVector       the exact position where the player has clicked on the entity's bounding box
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
          * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseEntityAt(Player player, Level level, InteractionHand interactionHand, Entity entity, Vec3 hitVector);
