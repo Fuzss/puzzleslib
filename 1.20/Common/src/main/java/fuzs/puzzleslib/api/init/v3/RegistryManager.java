@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.init.v3;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
@@ -38,7 +39,6 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Handles registering to game registries. Registration is performed instantly on Fabric and is deferred on Forge.
@@ -286,12 +286,12 @@ public interface RegistryManager {
     /**
      * Creates and registers a new poi type entry.
      *
-     * @param path   path for new entry
-     * @param blocks blocks valid for this poi type
+     * @param path  path for new entry
+     * @param block block valid for this poi type
      * @return new registry object
      */
-    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<Block>> blocks) {
-        return this.registerPoiType(path, () -> blocks.get().stream().flatMap(t -> t.getStateDefinition().getPossibleStates().stream()).collect(Collectors.toSet()), 0, 1);
+    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Block> block) {
+        return this.registerPoiType(path, () -> ImmutableSet.copyOf(block.get().getStateDefinition().getPossibleStates()), 0, 1);
     }
 
     /**
