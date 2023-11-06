@@ -106,37 +106,45 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
             EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            Optional<InteractionResult> optional = result.getInterrupt().map(InteractionResultHolder::getResult).filter(t -> t != InteractionResult.PASS);
-            if (optional.isPresent()) {
-                evt.setCancellationResult(optional.get());
-                evt.setCanceled(true);
+            if (result.isInterrupt()) {
+                InteractionResultHolder<ItemStack> holder = result.getInterrupt().get();
+                if (holder.getResult() != InteractionResult.PASS) {
+                    evt.setCancellationResult(holder.getResult());
+                    evt.setCanceled(true);
+                }
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseItemV2.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItemV2 callback, PlayerInteractEvent.RightClickItem evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
-            if (optional.isPresent()) {
-                evt.setCancellationResult(optional.get());
-                evt.setCanceled(true);
+            if (result.isInterrupt()) {
+                InteractionResult interactionResult = result.getInterrupt().get();
+                if (interactionResult != InteractionResult.PASS) {
+                    evt.setCancellationResult(interactionResult);
+                    evt.setCanceled(true);
+                }
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, PlayerInteractEvent.EntityInteract.class, (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseEntity(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
-            if (optional.isPresent()) {
-                evt.setCancellationResult(optional.get());
-                evt.setCanceled(true);
+            if (result.isInterrupt()) {
+                InteractionResult interactionResult = result.getInterrupt().get();
+                if (interactionResult != InteractionResult.PASS) {
+                    evt.setCancellationResult(interactionResult);
+                    evt.setCanceled(true);
+                }
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, PlayerInteractEvent.EntityInteractSpecific.class, (PlayerInteractEvents.UseEntityAt callback, PlayerInteractEvent.EntityInteractSpecific evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseEntityAt(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget(), evt.getLocalPos());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
-            if (optional.isPresent()) {
-                evt.setCancellationResult(optional.get());
-                evt.setCanceled(true);
+            if (result.isInterrupt()) {
+                InteractionResult interactionResult = result.getInterrupt().get();
+                if (interactionResult != InteractionResult.PASS) {
+                    evt.setCancellationResult(interactionResult);
+                    evt.setCanceled(true);
+                }
             }
         });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityEvent.class, (PlayerInteractEvents.AttackEntity callback, AttackEntityEvent evt) -> {

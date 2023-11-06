@@ -117,8 +117,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
+                // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
+                if (player.isSpectator()) {
+                    return InteractionResultHolder.pass(ItemStack.EMPTY);
+                } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand).getItem())) {
+                    return InteractionResultHolder.pass(ItemStack.EMPTY);
+                }
                 InteractionResultHolder<ItemStack> holder = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
                 // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
                 if (level.isClientSide && holder.getResult() != InteractionResult.SUCCESS && holder.getResult() != InteractionResult.PASS) {
                     // send the move packet like vanilla to ensure the position+view vectors are accurate
                     Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
@@ -130,8 +137,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.UseItemV2.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
+                // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
+                if (player.isSpectator()) {
+                    return InteractionResultHolder.pass(ItemStack.EMPTY);
+                } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand).getItem())) {
+                    return InteractionResultHolder.pass(ItemStack.EMPTY);
+                }
                 InteractionResult result = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResult.PASS);
                 // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
                 if (level.isClientSide && result != InteractionResult.SUCCESS && result != InteractionResult.PASS) {
                     // send the move packet like vanilla to ensure the position+view vectors are accurate
                     Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
