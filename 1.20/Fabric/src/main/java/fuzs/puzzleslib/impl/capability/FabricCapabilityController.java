@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.impl.capability;
 
-import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
@@ -28,7 +30,7 @@ import java.util.function.Function;
 
 public final class FabricCapabilityController implements CapabilityController {
     private final String namespace;
-    private final Multimap<Class<?>, Consumer<Object>> providerClazzToRegistration = ArrayListMultimap.create();
+    private final Multimap<Class<?>, Consumer<Object>> capabilityTypes = Multimaps.newListMultimap(Maps.newIdentityHashMap(), Lists::newArrayList);
 
     public FabricCapabilityController(String namespace) {
         this.namespace = namespace;
@@ -69,18 +71,21 @@ public final class FabricCapabilityController implements CapabilityController {
     }
 
     private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<?> objectType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, ComponentFactoryRegistry<T> capabilityRegistry, FabricCapabilityKey.FabricCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
+        if (!VALID_CAPABILITY_TYPES.contains(objectType)) {
+            throw new IllegalArgumentException(objectType + " is an invalid type");
+        }
         final ComponentKey<ComponentHolder> componentKey = ComponentRegistryV3.INSTANCE.getOrCreate(new ResourceLocation(this.namespace, capabilityKey), ComponentHolder.class);
-        this.providerClazzToRegistration.put(objectType, o -> capabilityRegistry.accept(o, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1))));
+        this.capabilityTypes.put(objectType, o -> capabilityRegistry.accept(o, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1))));
         return capabilityKeyFactory.apply(componentKey, capabilityType);
     }
 
     public static <T> void registerComponentFactories(Class<?> baseType, T registry) {
         Collection<FabricCapabilityController> controllers = ModContext.getCapabilityControllers().map(FabricCapabilityController.class::cast).toList();
         for (FabricCapabilityController controller : controllers) {
-            for (Consumer<Object> factoryRegistration : controller.providerClazzToRegistration.get(baseType)) {
+            for (Consumer<Object> factoryRegistration : controller.capabilityTypes.get(baseType)) {
                 factoryRegistration.accept(registry);
             }
-            controller.providerClazzToRegistration.get(baseType).clear();
+            controller.capabilityTypes.get(baseType).clear();
         }
     }
 }

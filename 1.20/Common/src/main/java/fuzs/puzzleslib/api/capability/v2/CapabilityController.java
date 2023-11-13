@@ -13,6 +13,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -26,6 +27,11 @@ public interface CapabilityController {
      */
     @ApiStatus.Internal
     Map<ResourceLocation, CapabilityKey<?>> CAPABILITY_KEY_REGISTRY = Maps.newConcurrentMap();
+    /**
+     * Valid classes used internally for managing registered capabilities.
+     */
+    @ApiStatus.Internal
+    Set<Class<?>> VALID_CAPABILITY_TYPES = Set.of(Entity.class, BlockEntity.class, LevelChunk.class, Level.class);
 
     /**
      * called from constructors of mod loader specific {@link CapabilityComponent} implementations
