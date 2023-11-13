@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.block.v1;
 import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
 import fuzs.puzzleslib.mixin.accessor.BlockAccessor;
 import fuzs.puzzleslib.mixin.accessor.BlockItemAccessor;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
@@ -39,8 +40,8 @@ public final class BlockConversionHelper {
      * @param item  the new item
      */
     public static void setItemForBlock(Block block, Item item) {
-        Objects.requireNonNull(block, "block is null");
-        Objects.requireNonNull(item, "item is null");
+        Objects.requireNonNull(block, "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "") + "is null");
+        Objects.requireNonNull(item, "item for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' is null");
         Item.BY_BLOCK.put(block, item);
         ((BlockAccessor) block).puzzleslib$setItem(item);
     }
@@ -53,8 +54,8 @@ public final class BlockConversionHelper {
      * @param block the new block
      */
     public static void setBlockForItem(BlockItem item, Block block) {
-        Objects.requireNonNull(item, "item is null");
-        Objects.requireNonNull(block, "block is null");
+        Objects.requireNonNull(item, "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "") + "is null");
+        Objects.requireNonNull(block, "block for item '" + BuiltInRegistries.ITEM.getKey(item) + "' is null");
         Block oldBlock = item.getBlock();
         // block can somehow be null on Forge apparently
         if (oldBlock != null) ((BlockAccessor) oldBlock).puzzleslib$setItem(item);
@@ -70,6 +71,8 @@ public final class BlockConversionHelper {
      */
     @SuppressWarnings("deprecation")
     public static void copyBoundTags(Block from, Block to) {
+        Objects.requireNonNull(from, "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "") + "is null");
+        Objects.requireNonNull(to, "target for source '" + BuiltInRegistries.BLOCK.getKey(from) + "' is null");
         if (to.builtInRegistryHolder().tags().findAny().isPresent()) {
             throw new IllegalStateException("target block tags not empty");
         }

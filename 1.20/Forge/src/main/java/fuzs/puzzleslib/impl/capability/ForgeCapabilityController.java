@@ -1,8 +1,10 @@
 package fuzs.puzzleslib.impl.capability;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.capability.v2.data.*;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
@@ -23,17 +25,15 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 public final class ForgeCapabilityController implements CapabilityController {
     private final String namespace;
-    private final Multimap<Class<?>, ResourceLocation> providerClazzToIds = HashMultimap.create();
-    private final Map<ResourceLocation, CapabilityData<?, ?>> idToCapabilityData = Maps.newHashMap();
+    private final Multimap<Class<?>, CapabilityData<?, ?>> capabilityTypes = Multimaps.newListMultimap(Maps.newIdentityHashMap(), Lists::newArrayList);
 
     public ForgeCapabilityController(String namespace) {
         this.namespace = namespace;
@@ -81,18 +81,22 @@ public final class ForgeCapabilityController implements CapabilityController {
     }
 
     private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
+        if (!VALID_CAPABILITY_TYPES.contains(providerType)) {
+            throw new IllegalArgumentException(providerType + " is an invalid type");
+        }
         ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
-        this.providerClazzToIds.put(providerType, key);
+        CapabilityData<T, C1> capabilityData = new CapabilityData<>(key, capabilityType, filter);
+        this.capabilityTypes.put(providerType, capabilityData);
         return capabilityKeyFactory.apply(key, capabilityType, token -> {
             final Capability<C1> capability = CapabilityManager.get(token);
-            this.idToCapabilityData.put(key, new CapabilityData<T, C1>(key, capabilityType, o -> new CapabilityHolder<>(capability, capabilityFactory.apply(o)), filter));
+            capabilityData.setFactory(o -> new CapabilityHolder<>(capability, capabilityFactory.apply(o)));
             return capability;
         });
     }
 
     private void onRegisterCapabilities(final RegisterCapabilitiesEvent evt) {
-        for (CapabilityData<?, ?> data : this.toCapabilityData(this.providerClazzToIds.values())) {
-            evt.register(data.capabilityType());
+        for (CapabilityData<?, ?> data : this.capabilityTypes.values()) {
+            evt.register(data.getType());
         }
     }
 
@@ -100,22 +104,46 @@ public final class ForgeCapabilityController implements CapabilityController {
     @SubscribeEvent
     public <T> void onAttachCapabilities(final AttachCapabilitiesEvent<?> evt) {
         Class<?> providerClazz = (Class<?>) evt.getGenericType();
-        for (CapabilityData<?, ?> data : this.toCapabilityData(this.providerClazzToIds.get(providerClazz))) {
-            if (data.filter().test(evt.getObject())) {
-                evt.addCapability(data.capabilityKey(), ((CapabilityData<T, ?>) data).capabilityFactory().apply((T) evt.getObject()));
+        for (CapabilityData<?, ?> data : this.capabilityTypes.get(providerClazz)) {
+            if (data.test(evt.getObject())) {
+                evt.addCapability(data.getKey(), ((CapabilityData<T, ?>) data).make((T) evt.getObject()));
             }
         }
     }
 
-    private Collection<? extends CapabilityData<?, ?>> toCapabilityData(Collection<ResourceLocation> keys) {
-        return keys.stream().map(key -> {
-            CapabilityData<?, ?> data = this.idToCapabilityData.get(key);
-            Objects.requireNonNull(data, "No valid capability implementation registered for %s".formatted(key));
-            return data;
-        }).toList();
-    }
+    private static final class CapabilityData<T, C extends CapabilityComponent> {
+        private final ResourceLocation key;
+        private final Class<C> type;
+        private final Predicate<Object> filter;
+        @Nullable
+        private Function<T, CapabilityHolder<C>> factory;
 
-    private record CapabilityData<T, C extends CapabilityComponent>(ResourceLocation capabilityKey, Class<C> capabilityType, Function<T, CapabilityHolder<C>> capabilityFactory, Predicate<Object> filter) {
+        private CapabilityData(ResourceLocation key, Class<C> type, Predicate<Object> filter) {
+            this.key = key;
+            this.type = type;
+            this.filter = filter;
+        }
 
+        public ResourceLocation getKey() {
+            return this.key;
+        }
+
+        public Class<C> getType() {
+            return this.type;
+        }
+
+        public void setFactory(Function<T, CapabilityHolder<C>> factory) {
+            Preconditions.checkState(this.factory == null, "Capability factory for %s already set".formatted(this.key));
+            this.factory = factory;
+        }
+
+        public CapabilityHolder<C> make(T t) {
+            Objects.requireNonNull(this.factory, "Found no capability factory for " + this.key);
+            return this.factory.apply(t);
+        }
+
+        public boolean test(Object o) {
+            return this.filter.test(o);
+        }
     }
 }
