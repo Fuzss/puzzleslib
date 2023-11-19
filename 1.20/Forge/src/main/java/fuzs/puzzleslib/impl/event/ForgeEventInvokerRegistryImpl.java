@@ -73,8 +73,6 @@ import net.minecraftforge.registries.RegistryManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -663,9 +661,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
         IForgeRegistry<T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(resourceKey);
         boolean[] loadComplete = new boolean[1];
-        Lock lock = new ReentrantLock();
-        lock.lock();
-        try {
+        // synchronize on the Forge registry to allow other mods requiring synchronization here to do so as well
+        synchronized (forgeRegistry) {
             final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
             final IForgeRegistry.AddCallback<T> newAddCallback = (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
                 // we probably don't want to handle replacements...
@@ -688,8 +685,6 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
                 newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
             } : newAddCallback);
-        } finally {
-            lock.unlock();
         }
         IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
         // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
