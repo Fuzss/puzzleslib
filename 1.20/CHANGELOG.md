@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.9-1.20.1] - 2023-11-19
+### Changed
+- Minor capability related code cleanup
+- Error messages from `BlockConversionHelper` now include more context
+### Fixed
+- Fixed `RegistryEntryAddedCallback` not being synchronized correctly
+
 ## [v8.1.8-1.20.1] - 2023-11-07
 ### Fixed
 - Implement a temporary workaround for screens crashing the game when opened with [Controlify](https://www.curseforge.com/minecraft/mc-mods/controlify) installed
