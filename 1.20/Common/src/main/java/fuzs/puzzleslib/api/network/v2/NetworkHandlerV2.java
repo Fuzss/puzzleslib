@@ -28,18 +28,18 @@ public interface NetworkHandlerV2 {
      * @return mod specific network handler with default channel
      */
     static NetworkHandlerV2 build(String modId) {
-        return build(modId, -1);
+        return build(modId, null);
     }
 
     /**
      * Creates a new network handler.
      *
-     * @param modId id for channel name
-     * @param id    an internal id for this channel in case multiple are registered using the same mod id
+     * @param modId   id for channel name
+     * @param context an internal id for this channel in case multiple are registered using the same mod id
      * @return mod specific network handler with default channel
      */
-    static NetworkHandlerV2 build(String modId, int id) {
-        return build(modId, id, false, false);
+    static NetworkHandlerV2 build(String modId, @Nullable String context) {
+        return build(modId, context, false, false);
     }
 
     /**
@@ -51,7 +51,7 @@ public interface NetworkHandlerV2 {
      * @return mod specific network handler with configured channel
      */
     static NetworkHandlerV2 build(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return build(modId, -1, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+        return build(modId, null, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     /**
@@ -63,7 +63,7 @@ public interface NetworkHandlerV2 {
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
-    static NetworkHandlerV2 build(String modId, int id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+    static NetworkHandlerV2 build(String modId, @Nullable String id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
         return ModContext.get(modId).getNetworkHandlerV2(id, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 

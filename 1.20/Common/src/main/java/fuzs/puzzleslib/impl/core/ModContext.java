@@ -43,6 +43,7 @@ public abstract class ModContext {
     @Nullable CapabilityController capabilityController;
     // true by default for dedicated servers, is reset on client when joining new world
     private boolean presentServerside = true;
+
     ModContext(String modId) {
         this.modId = modId;
     }
@@ -89,9 +90,9 @@ public abstract class ModContext {
         return MOD_CONTEXTS.containsKey(modId) && MOD_CONTEXTS.get(modId).presentServerside;
     }
 
-    public abstract NetworkHandlerV2 getNetworkHandlerV2(int id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
+    public abstract NetworkHandlerV2 getNetworkHandlerV2(@Nullable String context, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing);
 
-    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(int id);
+    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(@Nullable String context);
 
     public abstract ConfigHolder.Builder getConfigHolder$Builder();
 
