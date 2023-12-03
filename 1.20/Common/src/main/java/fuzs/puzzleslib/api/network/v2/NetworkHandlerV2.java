@@ -58,13 +58,13 @@ public interface NetworkHandlerV2 {
      * Creates a new network handler.
      *
      * @param modId                         id for channel name
-     * @param id                            an internal id for this channel in case multiple are registered using the same mod id
+     * @param context                            an internal id for this channel in case multiple are registered using the same mod id
      * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
      * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
-    static NetworkHandlerV2 build(String modId, @Nullable String id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return ModContext.get(modId).getNetworkHandlerV2(id, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    static NetworkHandlerV2 build(String modId, @Nullable String context, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return ModContext.get(modId).getNetworkHandlerV2(context, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     /**
