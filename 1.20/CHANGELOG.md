@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.10-1.20.1] - 2023-12-03
+### Changed
+- Use string ids for network handler instead of numeric
+
 ## [v8.1.9-1.20.1] - 2023-11-19
 ### Changed
 - Minor capability related code cleanup

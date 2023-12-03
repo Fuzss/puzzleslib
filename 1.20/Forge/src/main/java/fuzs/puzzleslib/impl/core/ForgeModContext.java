@@ -12,6 +12,7 @@ import fuzs.puzzleslib.impl.init.ForgeRegistryManagerV3;
 import fuzs.puzzleslib.impl.network.NetworkHandlerForgeV2;
 import fuzs.puzzleslib.impl.network.NetworkHandlerForgeV3;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 public final class ForgeModContext extends ModContext {
 
@@ -20,15 +21,13 @@ public final class ForgeModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandlerV2 getNetworkHandlerV2(int id, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        if (id == -1) id = this.networkHandlers.incrementAndGet();
-        return new NetworkHandlerForgeV2(new ResourceLocation(this.modId, "play/" + id), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    public NetworkHandlerV2 getNetworkHandlerV2(@Nullable String context, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+        return new NetworkHandlerForgeV2(new ResourceLocation(this.modId, context == null ? "play" : context), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     @Override
-    public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(int id) {
-        if (id == -1) id = this.networkHandlers.incrementAndGet();
-        return this.addBuildable(new NetworkHandlerForgeV3(new ResourceLocation(this.modId, "play/" + id)));
+    public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(@Nullable String context) {
+        return this.addBuildable(new NetworkHandlerForgeV3(new ResourceLocation(this.modId, context == null ? "play" : context)));
     }
 
     @Override
