@@ -22,12 +22,14 @@ public final class ForgeModContext extends ModContext {
 
     @Override
     public NetworkHandlerV2 getNetworkHandlerV2(@Nullable String context, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return new NetworkHandlerForgeV2(new ResourceLocation(this.modId, context == null ? "play" : context), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+        if (context == null) context = String.valueOf(this.networkHandlers.incrementAndGet());
+        return new NetworkHandlerForgeV2(new ResourceLocation(this.modId, context), clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
     }
 
     @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(@Nullable String context) {
-        return this.addBuildable(new NetworkHandlerForgeV3(new ResourceLocation(this.modId, context == null ? "play" : context)));
+        if (context == null) context = String.valueOf(this.networkHandlers.incrementAndGet());
+        return this.addBuildable(new NetworkHandlerForgeV3(new ResourceLocation(this.modId, context)));
     }
 
     @Override
