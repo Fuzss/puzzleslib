@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.12-1.20.1] - 2024-01-05
+### Fixed
+- Fixed missing `ToolTypeHelper::isTrident` method
+
 ## [v8.1.11-1.20.1] - 2023-12-03
 ### Fixed
 - Fixed anonymous network handlers allowing for duplicate ids
