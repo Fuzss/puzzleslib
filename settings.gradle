@@ -1,0 +1,38 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            name = 'Sponge'
+            url = 'https://repo.spongepowered.org/repository/maven-public/'
+        }
+        maven {
+            name = 'Quilt'
+            url = 'https://maven.quiltmc.org/repository/release'
+        }
+        maven {
+            name = 'Minecraft Forge'
+            url = 'https://maven.minecraftforge.net/'
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        maven {
+            name = "Fuzs Mod Resources"
+            url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/"
+        }
+    }
+    versionCatalogs {
+        libs {
+            from("fuzs.sharedcatalogs:sharedcatalogs:${dependenciesVersionCatalog}")
+        }
+    }
+}
+
+rootProject.name = "${modName.replaceAll("[^a-zA-Z]", "")}-${dependenciesVersionCatalog.replaceAll("-v\\d+", "")}"
+include("Common", "Fabric", "Forge")
