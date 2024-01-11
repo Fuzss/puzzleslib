@@ -1,0 +1,19 @@
+apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v2/forge.gradle"
+
+dependencies {
+    // Forge Config Api Port
+    modApi libs.forgeconfigapiport.forge
+
+    // Puzzles Lib
+//    modApi libs.puzzleslib.forge
+
+    var versionCatalog = rootProject.extensions.getByType(VersionCatalogsExtension).named("libs")
+
+    // Quality of Life Mods
+    versionCatalog.findLibrary("bettermodsbutton.forge").ifPresent {
+        modLocalRuntime it
+    }
+    versionCatalog.findLibrary("forgeconfigscreens.forge").ifPresent {
+        modLocalRuntime it
+    }
+}
