@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.forge.impl.event.EventImplHelper;
+import fuzs.puzzleslib.impl.event.EventImplHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;

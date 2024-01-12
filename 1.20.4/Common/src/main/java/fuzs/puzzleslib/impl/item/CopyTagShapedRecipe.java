@@ -8,10 +8,16 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
 public class CopyTagShapedRecipe extends ShapedRecipe implements CopyTagRecipe {
+    private final RecipeSerializer<?> recipeSerializer;
     private final Ingredient copyFrom;
 
-    public CopyTagShapedRecipe(ShapedRecipe shapedRecipe, Ingredient copyFrom) {
-        super(shapedRecipe.getId(), shapedRecipe.getGroup(), shapedRecipe.category(), shapedRecipe.getWidth(), shapedRecipe.getHeight(), shapedRecipe.getIngredients(), shapedRecipe.getResultItem(RegistryAccess.EMPTY), shapedRecipe.showNotification());
+    public CopyTagShapedRecipe(String modId, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
+        this(CopyTagRecipe.getModSerializer(modId, CopyTagRecipe.SHAPED_RECIPE_SERIALIZER_ID), shapedRecipe, copyFrom);
+    }
+
+    public CopyTagShapedRecipe(RecipeSerializer<?> recipeSerializer, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
+        super(shapedRecipe.getGroup(), shapedRecipe.category(), shapedRecipe.pattern, shapedRecipe.getResultItem(RegistryAccess.EMPTY), shapedRecipe.showNotification());
+        this.recipeSerializer = recipeSerializer;
         this.copyFrom = copyFrom;
     }
 
@@ -24,7 +30,7 @@ public class CopyTagShapedRecipe extends ShapedRecipe implements CopyTagRecipe {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CopyTagRecipe.getModSerializer(this.getId().getNamespace(), CopyTagRecipe.SHAPED_RECIPE_SERIALIZER_ID);
+        return this.recipeSerializer;
     }
 
     @Override

@@ -5,7 +5,7 @@ import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.entity.Entity;
 
@@ -22,7 +22,7 @@ public interface AdditionalAddEntityData {
      * @param <T>    entity type
      * @return the vanilla packet to be sent
      */
-    static <T extends Entity & AdditionalAddEntityData> Packet<ClientGamePacketListener> getPacket(T entity) {
+    static <T extends Entity & AdditionalAddEntityData> Packet<ClientCommonPacketListener> getPacket(T entity) {
         ClientboundAddEntityPacket vanillaPacket = new ClientboundAddEntityPacket(entity);
         FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
         entity.writeAdditionalAddEntityData(buf);

@@ -17,7 +17,7 @@ abstract class AbstractContainerScreenFabricMixin extends Screen {
         super(component);
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderBg(Lnet/minecraft/client/gui/GuiGraphics;FII)V", shift = At.Shift.AFTER))
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;render(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
     public void render$0(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo callback) {
         FabricScreenEvents.CONTAINER_SCREEN_BACKGROUND.invoker().onDrawBackground(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
     }

@@ -66,7 +66,7 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings, B
     }
 
     private Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> findFabricSpawners() {
-        if (!ModLoaderEnvironment.INSTANCE.isFabric()) return Optional.empty();
+        if (!ModLoaderEnvironment.INSTANCE.getModLoader().isFabric()) return Optional.empty();
         Field field = ReflectionHelper.findField("net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl", "fabricSpawners", true);
         return ReflectionHelper.getValue(field, this.context);
     }

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
@@ -8,7 +7,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 public interface ProxyImpl extends Proxy {
-    ProxyImpl INSTANCE = ModLoaderEnvironment.INSTANCE.isClient() ? CommonFactories.INSTANCE.getClientProxy() : CommonFactories.INSTANCE.getServerProxy();
 
     @Override
     default Player getClientPlayer() {

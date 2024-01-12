@@ -49,30 +49,30 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.*;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.event.entity.EntityMountEvent;
-import net.minecraftforge.event.entity.ProjectileImpactEvent;
-import net.minecraftforge.event.entity.item.ItemTossEvent;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.event.entity.player.*;
-import net.minecraftforge.event.level.*;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.event.server.ServerStartedEvent;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.IModBusEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.IForgeRegistryInternal;
-import net.minecraftforge.registries.RegisterEvent;
-import net.minecraftforge.registries.RegistryManager;
+import net.neoforged.neoforge.common.MinecraftForge;
+import net.neoforged.neoforge.event.*;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityMountEvent;
+import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.living.*;
+import net.neoforged.neoforge.event.entity.player.*;
+import net.neoforged.neoforge.event.level.*;
+import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.eventbus.api.Event;
+import net.neoforged.neoforge.eventbus.api.EventPriority;
+import net.neoforged.neoforge.eventbus.api.IEventBus;
+import net.neoforged.neoforge.fml.event.IModBusEvent;
+import net.neoforged.neoforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.neoforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.neoforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.registries.IForgeRegistryInternal;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import net.neoforged.neoforge.registries.RegistryManager;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -98,7 +98,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayerInteractEvents.AttackBlockV2.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlockV2 callback, PlayerInteractEvent.LeftClickBlock evt) -> {
+        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
             EventResult result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
             if (result.isInterrupt()) {
                 evt.setCanceled(true);
@@ -115,7 +115,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(PlayerInteractEvents.UseItemV2.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItemV2 callback, PlayerInteractEvent.RightClickItem evt) -> {
+        INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
             if (result.isInterrupt()) {
@@ -377,7 +377,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.LoadV2 callback, EntityJoinLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
             if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel()).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
@@ -399,9 +399,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.Remove.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Remove callback, EntityLeaveLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            callback.onEntityRemove(evt.getEntity(), (ServerLevel) evt.getLevel());
+            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());

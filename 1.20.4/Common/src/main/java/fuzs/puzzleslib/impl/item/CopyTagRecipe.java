@@ -1,17 +1,17 @@
 package fuzs.puzzleslib.impl.item;
 
-import com.google.gson.JsonObject;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public interface CopyTagRecipe {
@@ -39,7 +39,7 @@ public interface CopyTagRecipe {
     }
 
     static void registerSerializers(BiConsumer<String, Supplier<RecipeSerializer<?>>> registrar) {
-        registrar.accept(SHAPED_RECIPE_SERIALIZER_ID, () -> new Serializer<>(new ShapedRecipe.Serializer(), CopyTagShapedRecipe::new));
+        registrar.accept(SHAPED_RECIPE_SERIALIZER_ID, () -> new Serializer<ShapedRecipe, CopyTagShapedRecipe>(new ShapedRecipe.Serializer(), CopyTagShapedRecipe::new));
         registrar.accept(SHAPELESS_RECIPE_SERIALIZER_ID, () -> new Serializer<>(new ShapelessRecipe.Serializer(), CopyTagShapelessRecipe::new));
     }
 
@@ -55,21 +55,31 @@ public interface CopyTagRecipe {
         }
     }
 
+    @FunctionalInterface
+    interface Factory<T extends CraftingRecipe, S extends CraftingRecipe & CopyTagRecipe> {
+
+        S apply(RecipeSerializer<?> recipeSerializer, T craftingRecipe, Ingredient ingredient);
+    }
+
     record Serializer<T extends CraftingRecipe, S extends CraftingRecipe & CopyTagRecipe>(
-            RecipeSerializer<T> serializer, BiFunction<T, Ingredient, S> factory) implements RecipeSerializer<S> {
+            RecipeSerializer<T> serializer, Factory<T, S> factory) implements RecipeSerializer<S> {
 
         @Override
-        public S fromJson(ResourceLocation recipeId, JsonObject serializedRecipe) {
-            T recipe = this.serializer.fromJson(recipeId, serializedRecipe);
-            Ingredient ingredient = Ingredient.fromJson(GsonHelper.getNonNull(serializedRecipe, "copy_from"));
-            return this.factory.apply(recipe, ingredient);
+        public Codec<S> codec() {
+            return RecordCodecBuilder.create((instance) -> {
+                return instance.group(((MapCodec.MapCodecCodec<T>) this.serializer.codec()).codec().forGetter((arg) -> {
+                    return (T) arg;
+                }), Ingredient.CODEC.fieldOf("copy_from").forGetter((arg) -> {
+                    return arg.getCopyTagSource();
+                })).apply(instance, (T craftingRecipe, Ingredient ingredient) -> this.factory.apply(this, craftingRecipe, ingredient));
+            });
         }
 
         @Override
-        public S fromNetwork(ResourceLocation recipeId, FriendlyByteBuf buffer) {
-            T recipe = this.serializer.fromNetwork(recipeId, buffer);
+        public S fromNetwork(FriendlyByteBuf buffer) {
+            T recipe = this.serializer.fromNetwork(buffer);
             Ingredient ingredient = Ingredient.fromNetwork(buffer);
-            return this.factory.apply(recipe, ingredient);
+            return this.factory.apply(this, recipe, ingredient);
         }
 
         @Override

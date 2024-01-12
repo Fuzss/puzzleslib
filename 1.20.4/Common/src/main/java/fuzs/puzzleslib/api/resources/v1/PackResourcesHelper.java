@@ -22,23 +22,6 @@ public final class PackResourcesHelper {
      * Creates a new resource pack repository source (for the client).
      * <p>Can be added via {@link fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)}.
      *
-     * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
-     * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
-     * @param title         the title of this pack shown in the pack selection screen
-     * @param description   the description for this pack shown in the pack selection screen
-     * @param required      a required pack cannot be disabled, like in the pack selection screen the pack cannot be moved to the left side; this is used for the vanilla resource pack
-     * @param fixedPosition a fixed pack cannot be moved up or down, like a server or world resource pack
-     * @return the {@link RepositorySource} to be added to the {@link net.minecraft.server.packs.repository.PackRepository}
-     */
-    @Deprecated(forRemoval = true)
-    public static RepositorySource buildClientPack(Supplier<AbstractModPackResources> factory, String id, Component title, Component description, boolean required, boolean fixedPosition) {
-        return buildClientPack(new ResourceLocation(id, "main"), factory, title, description, required, fixedPosition, false);
-    }
-
-    /**
-     * Creates a new resource pack repository source (for the client).
-     * <p>Can be added via {@link fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)}.
-     *
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
      * @param hidden  controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
@@ -65,23 +48,6 @@ public final class PackResourcesHelper {
         return consumer -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES, id, factory, title, description, required, fixedPosition, hidden, FeatureFlagSet.of()));
         };
-    }
-
-    /**
-     * Creates a new data pack repository source (for the server).
-     * <p>Can be added via {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackFinders(PackRepositorySourcesContext)}.
-     *
-     * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
-     * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
-     * @param title         the title of this pack shown in the pack selection screen
-     * @param description   the description for this pack shown in the pack selection screen
-     * @param required      a required pack cannot be disabled, like in the pack selection screen the pack cannot be moved to the left side; this is used for the vanilla resource pack
-     * @param fixedPosition a fixed pack cannot be moved up or down, like a server or world resource pack
-     * @return the {@link RepositorySource} to be added to the {@link net.minecraft.server.packs.repository.PackRepository}
-     */
-    @Deprecated(forRemoval = true)
-    public static RepositorySource buildServerPack(Supplier<AbstractModPackResources> factory, String id, Component title, Component description, boolean required, boolean fixedPosition) {
-        return buildServerPack(new ResourceLocation(id, "main"), factory, title, description, required, fixedPosition, false);
     }
 
     /**

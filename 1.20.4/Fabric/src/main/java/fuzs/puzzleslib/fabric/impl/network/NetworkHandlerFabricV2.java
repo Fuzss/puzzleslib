@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.network;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.network.v2.MessageDirection;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
@@ -22,7 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     private final Map<Class<? extends MessageV2<?>>, MessageData> messages = Maps.newIdentityHashMap();
@@ -31,12 +29,6 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
 
     public NetworkHandlerFabricV2(ResourceLocation channelIdentifier) {
         this.channelIdentifier = channelIdentifier;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends MessageV2<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction) {
-        this.register((Class<T>) clazz, direction == MessageDirection.TO_CLIENT, NetworkHandlerImplHelper.getDirectMessageDecoder(supplier));
     }
 
     @Override

@@ -53,7 +53,7 @@ abstract class ClientLevelFabricMixin extends Level {
     }
 
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
-    private void addEntity(int entityId, Entity entityToSpawn, CallbackInfo callback) {
+    private void addEntity(Entity entityToSpawn, CallbackInfo callback) {
         if (FabricClientEvents.ENTITY_LOAD.invoker().onEntityLoad(entityToSpawn, ClientLevel.class.cast(this)).isInterrupt()) {
             if (entityToSpawn instanceof Player) {
                 // we do not support players as it isn't as straight-forward to implement for the server event on Fabric

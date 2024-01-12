@@ -114,16 +114,6 @@ public final class FabricClientEvents {
      */
     public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(MovementInputUpdateCallback.class);
     /**
-     * Fired when the resource manager is reloading models and models have been baked, but before they are passed on for caching.
-     */
-    @Deprecated(forRemoval = true)
-    public static final Event<ModelEvents.ModifyBakingResult> MODIFY_BAKING_RESULT = FabricEventFactory.create(ModelEvents.ModifyBakingResult.class);
-    /**
-     * Fired after the resource manager has reloaded models. Does not allow for modifying the models map, for that use {@link ModelEvents.ModifyBakingResult}.
-     */
-    @Deprecated(forRemoval = true)
-    public static final Event<ModelEvents.BakingCompleted> BAKING_COMPLETED = FabricEventFactory.create(ModelEvents.BakingCompleted.class);
-    /**
      * Called before a block overlay is rendered on the screen.
      */
     public static final Event<RenderBlockOverlayCallback> RENDER_BLOCK_OVERLAY = FabricEventFactory.createResult(RenderBlockOverlayCallback.class);

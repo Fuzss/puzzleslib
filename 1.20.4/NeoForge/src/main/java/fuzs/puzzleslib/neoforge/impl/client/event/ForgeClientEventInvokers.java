@@ -288,7 +288,7 @@ public final class ForgeClientEventInvokers {
                 }
             }
         });
-        INSTANCE.register(InteractionInputEvents.AttackV2.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.AttackV2 callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
+        INSTANCE.register(InteractionInputEvents.Attack.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Attack callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
             if (!evt.isAttack()) return;
             Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.hitResult != null) {

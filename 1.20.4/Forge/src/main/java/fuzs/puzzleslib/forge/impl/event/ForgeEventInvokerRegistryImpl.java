@@ -101,7 +101,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayerInteractEvents.AttackBlockV2.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlockV2 callback, PlayerInteractEvent.LeftClickBlock evt) -> {
+        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
             EventResult result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
             if (result.isInterrupt()) {
                 evt.setCanceled(true);
@@ -118,7 +118,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(PlayerInteractEvents.UseItemV2.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItemV2 callback, PlayerInteractEvent.RightClickItem evt) -> {
+        INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
             if (result.isInterrupt()) {
@@ -380,7 +380,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.LoadV2 callback, EntityJoinLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
             if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel()).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
@@ -402,9 +402,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(ServerEntityLevelEvents.Remove.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Remove callback, EntityLeaveLevelEvent evt) -> {
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            callback.onEntityRemove(evt.getEntity(), (ServerLevel) evt.getLevel());
+            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());

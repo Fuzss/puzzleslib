@@ -5,24 +5,22 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.neoforge.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
-import fuzs.puzzleslib.forge.impl.core.context.*;
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
+import fuzs.puzzleslib.neoforge.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.core.context.*;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddPackFindersEvent;
-import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
-import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
-import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.AddPackFindersEvent;
+import net.neoforged.neoforge.event.AddReloadListenerEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
+import net.neoforged.neoforge.event.entity.SpawnPlacementRegisterEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Set;
 
@@ -47,15 +45,10 @@ public final class ForgeModConstructor {
         if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             BiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
-        if (flagsToHandle.contains(ContentRegistrationFlags.LEGACY_SMITHING) || flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
-            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.RECIPE_SERIALIZERS, modId);
+        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
+            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER, modId);
             deferredRegister.register(modEventBus);
-            if (flagsToHandle.contains(ContentRegistrationFlags.LEGACY_SMITHING)) {
-                deferredRegister.register(LegacySmithingTransformRecipe.RECIPE_SERIALIZER_ID, LegacySmithingTransformRecipe.Serializer::new);
-            }
-            if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
-                CopyTagRecipe.registerSerializers(deferredRegister::register);
-            }
+            CopyTagRecipe.registerSerializers(deferredRegister::register);
         }
     }
 
@@ -92,7 +85,7 @@ public final class ForgeModConstructor {
     }
 
     private static void registerHandlers(ModConstructor constructor, String modId) {
-        MinecraftForge.EVENT_BUS.addListener((AddReloadListenerEvent evt) -> {
+        NeoForge.EVENT_BUS.addListener((AddReloadListenerEvent evt) -> {
             constructor.onRegisterDataPackReloadListeners(new AddReloadListenersContextForgeImpl(modId, evt::addListener));
         });
     }

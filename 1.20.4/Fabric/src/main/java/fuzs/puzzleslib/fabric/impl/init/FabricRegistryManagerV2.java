@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.init;
 
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
-import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import fuzs.puzzleslib.impl.init.RegistryManagerV2Impl;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -52,13 +51,6 @@ public final class FabricRegistryManagerV2 extends RegistryManagerV2Impl {
     @Override
     public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new ExtendedScreenHandlerType<>(entry.get()::create));
-    }
-
-    @Override
-    public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry) {
-        PoiTypeBuilder poiTypeBuilder = entry.get();
-        Supplier<PoiType> supplier = () -> PointOfInterestHelper.register(this.makeKey(path), poiTypeBuilder.ticketCount(), poiTypeBuilder.searchDistance(), poiTypeBuilder.blocks());
-        return this.register(Registries.POINT_OF_INTEREST_TYPE, path, supplier);
     }
 
     @Override

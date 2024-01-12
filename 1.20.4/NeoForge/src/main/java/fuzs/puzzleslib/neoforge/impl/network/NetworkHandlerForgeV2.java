@@ -39,14 +39,6 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
         this.serverAcceptsVanillaOrMissing = serverAcceptsVanillaOrMissing;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends MessageV2<T>> void register(Class<? extends T> clazz, Supplier<T> factory, MessageDirection direction) {
-        Function<FriendlyByteBuf, T> decode = NetworkHandlerImplHelper.getDirectMessageDecoder(factory);
-        LogicalSide receptionSide = direction == MessageDirection.TO_CLIENT ? LogicalSide.CLIENT : LogicalSide.SERVER;
-        this.register((Class<T>) clazz, decode, receptionSide);
-    }
-
     @Override
     public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz) {
         this.register(clazz, NetworkHandlerImplHelper.getMessageDecoder(clazz), LogicalSide.CLIENT);
