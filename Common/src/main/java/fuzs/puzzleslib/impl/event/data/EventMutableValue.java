@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.forge.impl.event.data;
+package fuzs.puzzleslib.impl.event.data;
 
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 

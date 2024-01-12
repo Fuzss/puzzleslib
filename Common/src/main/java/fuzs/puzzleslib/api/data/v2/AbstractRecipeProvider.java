@@ -5,21 +5,27 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mojang.serialization.JsonOps;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import net.minecraft.Util;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -71,11 +77,11 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
         return jsonElement;
     }
 
-    protected static String getHasName(ItemLike item, ItemLike... items) {
+    public static String getHasName(ItemLike item, ItemLike... items) {
         return "has_" + Stream.concat(Stream.of(item), Stream.of(items)).map(RecipeProvider::getItemName).collect(Collectors.joining("_and_"));
     }
 
-    protected static InventoryChangeTrigger.TriggerInstance has(ItemLike item, ItemLike... items) {
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item, ItemLike... items) {
         return inventoryTrigger(ItemPredicate.Builder.item().of(Stream.concat(Stream.of(item), Stream.of(items)).toArray(ItemLike[]::new)).build());
     }
 
@@ -83,27 +89,38 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     public CompletableFuture<?> run(CachedOutput output) {
         Set<ResourceLocation> set = Sets.newHashSet();
         List<CompletableFuture<?>> list = new ArrayList<>();
-        this.buildRecipes((finishedRecipe) -> {
-            ResourceLocation id = new ResourceLocation(this.modId, finishedRecipe.getId().getPath());
-            if (!set.add(id)) {
-                throw new IllegalStateException("Duplicate recipe " + id);
-            } else {
-                list.add(DataProvider.saveStable(output, finishedRecipe.serializeRecipe(), this.recipePathProvider.json(id)));
-                JsonElement jsonElement = finishedRecipe.serializeAdvancement();
-                if (jsonElement != null) {
-                    jsonElement = searchAndReplaceValue(jsonElement, finishedRecipe.getId(), id);
-                    ResourceLocation advancementId = new ResourceLocation(this.modId, finishedRecipe.getAdvancementId().getPath());
-                    list.add(DataProvider.saveStable(output, jsonElement, this.advancementPathProvider.json(advancementId)));
+        this.buildRecipes(new RecipeOutput() {
+
+            @Override
+            public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+                final ResourceLocation oldLocation = location;
+                location = new ResourceLocation(AbstractRecipeProvider.this.modId, location.getPath());
+                if (!set.add(location)) {
+                    throw new IllegalStateException("Duplicate recipe " + location);
+                } else {
+                    list.add(DataProvider.saveStable(output, Recipe.CODEC, recipe, AbstractRecipeProvider.this.recipePathProvider.json(location)));
+                    if (advancement != null) {
+                        JsonElement jsonElement = Util.getOrThrow(Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()), IllegalStateException::new);
+                        jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
+                        ResourceLocation advancementLocation = new ResourceLocation(AbstractRecipeProvider.this.modId, advancement.id().getPath());
+                        list.add(DataProvider.saveStable(output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
+                    }
                 }
+            }
+
+            @SuppressWarnings("removal")
+            @Override
+            public Advancement.Builder advancement() {
+                return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
             }
         });
         return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
     }
 
     @Override
-    public final void buildRecipes(Consumer<FinishedRecipe> exporter) {
+    public final void buildRecipes(RecipeOutput exporter) {
         this.addRecipes(exporter);
     }
 
-    public abstract void addRecipes(Consumer<FinishedRecipe> exporter);
+    public abstract void addRecipes(RecipeOutput exporter);
 }

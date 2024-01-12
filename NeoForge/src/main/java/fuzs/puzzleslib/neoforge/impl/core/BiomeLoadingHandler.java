@@ -8,18 +8,17 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.api.resources.v1.AbstractModPackResources;
 import fuzs.puzzleslib.api.resources.v1.PackResourcesHelper;
-import fuzs.puzzleslib.forge.impl.biome.*;
 import fuzs.puzzleslib.neoforge.impl.biome.*;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraftforge.common.world.BiomeModifier;
-import net.minecraftforge.common.world.ModifiableBiomeInfo;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.world.BiomeModifier;
+import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayInputStream;
@@ -44,12 +43,12 @@ public class BiomeLoadingHandler {
         this.put(BiomeModifier.Phase.AFTER_EVERYTHING, BiomeLoadingPhase.POST_PROCESSING);
     }});
     private static final String BIOME_MODIFICATIONS_NAME_KEY = "biome_modifications";
-    private static final String BIOME_MODIFIERS_DATA_KEY = ForgeRegistries.Keys.BIOME_MODIFIERS.location().toString().replace(":", "/");
+    private static final String BIOME_MODIFIERS_DATA_KEY = NeoForgeRegistries.Keys.BIOME_MODIFIERS.location().toString().replace(":", "/");
     private static final Function<String, ResourceLocation> BIOME_MODIFICATIONS_FILE_KEY = id -> new ResourceLocation(id, BIOME_MODIFIERS_DATA_KEY + "/" + id + ".json");
     private static final Function<ResourceLocation, String> BIOME_MODIFICATIONS_FILE_CONTENTS = id -> "{\"type\":\"" + id + "\"}";
 
     public static void register(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications) {
-        DeferredRegister<Codec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
+        DeferredRegister<Codec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
         deferredRegister.register(modEventBus);
         deferredRegister.register(BIOME_MODIFICATIONS_NAME_KEY, new BiomeModifierImpl(biomeModifications)::codec);
     }

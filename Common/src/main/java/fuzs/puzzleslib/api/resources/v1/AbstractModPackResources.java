@@ -11,6 +11,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -21,6 +22,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -135,17 +137,25 @@ public abstract class AbstractModPackResources implements PackResources {
     }
 
     @ApiStatus.Internal
-    static Pack buildPack(PackType packType, ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
-        PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType));
+    static Pack buildPack(PackType packType, ResourceLocation identifier, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
+        PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType), Optional.empty());
         BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
-        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(id, description, metadataSection.getPackFormat(), features, hidden);
-        return Pack.create(id.toString(), title, required, $ -> {
-            AbstractModPackResources packResources = factory.get();
-            packResources.id = id;
-            packResources.metadata = metadata;
-            packResources.packType = packType;
-            packResources.setup();
-            return packResources;
-        }, info, packType, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
+        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(identifier, description, PackCompatibility.COMPATIBLE, features, hidden);
+        return Pack.create(identifier.toString(), title, required, new Pack.ResourcesSupplier() {
+            @Override
+            public PackResources openPrimary(String id) {
+                AbstractModPackResources packResources = factory.get();
+                packResources.id = identifier;
+                packResources.metadata = metadata;
+                packResources.packType = packType;
+                packResources.setup();
+                return packResources;
+            }
+
+            @Override
+            public PackResources openFull(String id, Pack.Info info) {
+                return this.openPrimary(id);
+            }
+        }, info, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
     }
 }

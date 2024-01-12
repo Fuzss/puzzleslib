@@ -55,18 +55,6 @@ public interface ClientAbstractions {
     BakedModel getBakedModel(ResourceLocation identifier);
 
     /**
-     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of {@link net.minecraft.client.resources.model.ModelResourceLocation}.
-     *
-     * @param modelManager the model manager instance for retrieving the model
-     * @param identifier   model identifier
-     * @return the model, possibly the missing model
-     */
-    @Deprecated(forRemoval = true)
-    default BakedModel getBakedModel(ModelManager modelManager, ResourceLocation identifier) {
-        return this.getBakedModel(identifier);
-    }
-
-    /**
      * Allows for retrieving the {@link RenderType} that has been registered for a block.
      * <p>When not render type is registered {@link RenderType#solid()} is returned.
      *
@@ -113,32 +101,9 @@ public interface ClientAbstractions {
     float getPartialTick();
 
     /**
-     * Get the current partial tick time.
-     * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is paused in {@link Minecraft#isPaused()}.
-     *
-     * @param minecraft minecraft singleton instance
-     * @return current partial tick time
-     */
-    @Deprecated(forRemoval = true)
-    default float getPartialTick(Minecraft minecraft) {
-        return this.getPartialTick();
-    }
-
-    /**
      * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
      *
      * @return the search registry
      */
     SearchRegistry getSearchRegistry();
-
-    /**
-     * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
-     *
-     * @param minecraft minecraft singleton instance
-     * @return the search registry
-     */
-    @Deprecated(forRemoval = true)
-    default SearchRegistry getSearchRegistry(Minecraft minecraft) {
-        return this.getSearchRegistry();
-    }
 }

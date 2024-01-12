@@ -5,16 +5,14 @@ import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Supplier;
 
 /**
  * handler for network communications of all puzzles lib mods
@@ -68,19 +66,6 @@ public interface NetworkHandlerV2 {
     }
 
     /**
-     * register a message for a side
-     *
-     * @param clazz     message class type
-     * @param supplier  supplier for message (called when receiving at executing end)
-     *                  we use this additional supplier to avoid having to invoke the class via reflection
-     *                  and so that a default constructor in every message cannot be forgotten
-     * @param direction side this message is to be executed at
-     * @param <T>       message implementation
-     */
-    @Deprecated(forRemoval = true)
-    <T extends MessageV2<T>> void register(Class<? extends T> clazz, Supplier<T> supplier, MessageDirection direction);
-
-    /**
      * Register a message that will be sent to clients.
      *
      * @param clazz message class type
@@ -102,7 +87,7 @@ public interface NetworkHandlerV2 {
      * @param message message to create packet from
      * @return packet for message
      */
-    Packet<ServerGamePacketListener> toServerboundPacket(MessageV2<?> message);
+    Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message);
 
     /**
      * creates a packet heading to the client side
@@ -110,7 +95,7 @@ public interface NetworkHandlerV2 {
      * @param message message to create packet from
      * @return packet for message
      */
-    Packet<ClientGamePacketListener> toClientboundPacket(MessageV2<?> message);
+    Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message);
 
     /**
      * send message from client to server

@@ -1,10 +1,11 @@
-package fuzs.puzzleslib.impl.init;
+package fuzs.puzzleslib.forge.impl.init;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.RegistryHelper;
+import fuzs.puzzleslib.impl.init.RegistryManagerV3Impl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;

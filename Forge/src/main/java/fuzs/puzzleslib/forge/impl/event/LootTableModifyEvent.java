@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.event;
+package fuzs.puzzleslib.forge.impl.event;
 
 import fuzs.puzzleslib.forge.mixin.accessor.LootTableForgeAccessor;
 import net.minecraft.resources.ResourceLocation;

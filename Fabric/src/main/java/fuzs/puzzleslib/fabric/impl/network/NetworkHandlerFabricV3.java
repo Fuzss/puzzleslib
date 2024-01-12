@@ -13,8 +13,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
@@ -56,14 +56,14 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     }
 
     @Override
-    public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
+    public <T extends Record & ClientboundMessage<T>> Packet<ClientCommonPacketListener> toClientboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
         Objects.requireNonNull(message, "message is null");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     @Override
-    public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
+    public <T extends Record & ServerboundMessage<T>> Packet<ServerCommonPacketListener> toServerboundPacket(T message) {
         if (this.building) throw new IllegalStateException("channel is null");
         Objects.requireNonNull(message, "message is null");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);

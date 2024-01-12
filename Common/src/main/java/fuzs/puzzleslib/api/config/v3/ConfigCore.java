@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.config.v3;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 /**
  * Config template interface for each config category.
@@ -15,7 +15,7 @@ public interface ConfigCore {
      * @param builder builder to add entries to
      * @param callback register save callback
      */
-    default void addToBuilder(ForgeConfigSpec.Builder builder, ValueCallback callback) {
+    default void addToBuilder(ModConfigSpec.Builder builder, ValueCallback callback) {
 
     }
 

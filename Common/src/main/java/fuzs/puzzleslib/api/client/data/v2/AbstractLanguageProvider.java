@@ -181,7 +181,12 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         default void add(StatType<?> statType, String additionalKey, String value) {
             Objects.requireNonNull(statType, "stat type is null");
-            this.add(statType.getTranslationKey(), additionalKey, value);
+            Objects.requireNonNull(statType.getDisplayName(), "component is null");
+            if (statType.getDisplayName().getContents() instanceof TranslatableContents contents) {
+                this.add(contents.getKey(), value);
+            } else {
+                throw new UnsupportedOperationException("Unsupported component: " + statType.getDisplayName());
+            }
         }
 
         default void add(GameRules.Key<?> gameRule, String value) {

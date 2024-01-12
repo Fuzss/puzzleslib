@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,12 +22,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.network.NetworkHooks;
 import net.minecraftforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.function.BiConsumer;
 
+@SuppressWarnings("UnstableApiUsage")
 public final class ForgeAbstractions implements CommonAbstractions {
 
     @Override
@@ -36,7 +38,7 @@ public final class ForgeAbstractions implements CommonAbstractions {
 
     @Override
     public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {
-        NetworkHooks.openScreen(player, menuProvider, buf -> screenOpeningDataWriter.accept(player, buf));
+        player.openMenu(menuProvider, buf -> screenOpeningDataWriter.accept(player, buf));
     }
 
     @Override
@@ -75,8 +77,8 @@ public final class ForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
-        return new Pack.Info(description, packVersion, packVersion, features, hidden);
+    public Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
+        return new Pack.Info(description, packCompatibility, features, Collections.emptyList(), hidden);
     }
 
     @Override

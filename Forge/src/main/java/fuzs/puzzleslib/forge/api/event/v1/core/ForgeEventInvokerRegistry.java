@@ -2,7 +2,7 @@ package fuzs.puzzleslib.forge.api.event.v1.core;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventInvokerRegistry;
-import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
+import fuzs.puzzleslib.forge.impl.event.ForgeEventInvokerRegistryImpl;
 import net.minecraftforge.eventbus.api.Event;
 import org.jetbrains.annotations.Nullable;
 

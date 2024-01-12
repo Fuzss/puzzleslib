@@ -1,10 +1,10 @@
-package fuzs.puzzleslib.impl.item.crafting;
+package fuzs.puzzleslib.forge.impl.item.crafting;
 
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.crafting.*;
+import net.minecraftforge.common.crafting.ingredients.*;
 
 import java.util.Objects;
 

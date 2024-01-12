@@ -118,14 +118,14 @@ public final class FabricClientEventInvokers {
                 callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
             };
         });
-        INSTANCE.register(ScreenEvents.BeforeInitV2.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, (callback, context) -> {
+        INSTANCE.register(ScreenEvents.BeforeInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, (callback, context) -> {
             Objects.requireNonNull(context, "context is null");
             return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (!((Class<?>) context).isInstance(screen)) return;
                 callback.onBeforeInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(Screens.getButtons(screen)));
             };
         });
-        INSTANCE.register(ScreenEvents.AfterInitV2.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT, (callback, context) -> {
+        INSTANCE.register(ScreenEvents.AfterInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT, (callback, context) -> {
             Objects.requireNonNull(context, "context is null");
             return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (!((Class<?>) context).isInstance(screen)) return;

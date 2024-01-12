@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.AddReloadListenersContext;
-import fuzs.puzzleslib.api.core.v1.context.ModLifecycleContext;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
@@ -36,28 +35,14 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param modConstructor the main mod instance for mod setup
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructor) {
-        construct(modId, modConstructor, new ContentRegistrationFlags[0]);
-    }
-
-    /**
-     * Construct the {@link ClientModConstructor} instance provided as <code>supplier</code> to begin client-side initialization of a mod.
-     *
-     * @param modId    the mod id for registering events on Forge to the correct mod event bus
-     * @param supplier the main mod instance for mod setup
-     * @param flags    specific content this mod uses that needs to be additionally registered
-     * @deprecated replaced provided flags with {@link BaseModConstructor#getContentRegistrationFlags()}
-     */
-    @Deprecated(forRemoval = true)
-    static void construct(String modId, Supplier<ClientModConstructor> supplier, ContentRegistrationFlags... flags) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
-        ClientModConstructor instance = supplier.get();
+        ClientModConstructor instance = modConstructor.get();
         ModContext modContext = ModContext.get(modId);
         ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
         // not an issue on Fabric, but Forge might call client construction before common
         modContext.scheduleClientModConstruction(identifier, () -> {
             PuzzlesLib.LOGGER.info("Constructing client components for {}", identifier);
-            ContentRegistrationFlags[] builtInFlags = instance.getContentRegistrationFlags();
-            Set<ContentRegistrationFlags> availableFlags = Set.of(builtInFlags.length != 0 ? builtInFlags : flags);
+            Set<ContentRegistrationFlags> availableFlags = Set.of(instance.getContentRegistrationFlags());
             Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
             ClientFactories.INSTANCE.constructClientMod(modId, instance, availableFlags, flagsToHandle);
         });
@@ -73,21 +58,9 @@ public interface ClientModConstructor extends BaseModConstructor {
     /**
      * runs after content has been registered, so it's safe to use here
      * used to set various values and settings for already registered content
-     *
-     * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
-     * @deprecated now always runs deferred, use {@link #onClientSetup()}
-     */
-    @Deprecated(forRemoval = true)
-    default void onClientSetup(final ModLifecycleContext context) {
-
-    }
-
-    /**
-     * runs after content has been registered, so it's safe to use here
-     * used to set various values and settings for already registered content
      */
     default void onClientSetup() {
-        this.onClientSetup(Runnable::run);
+
     }
 
     /**

@@ -9,6 +9,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
@@ -130,14 +131,14 @@ public interface CommonAbstractions {
     /**
      * Creates a new {@link Pack.Info} instance with additional parameters only supported on Forge.
      *
-     * @param id          the pack identifier
-     * @param description the pack description component
-     * @param packVersion the pack version, ideally retrieved from {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
-     * @param features    the feature flags provided by this pack
-     * @param hidden      controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
+     * @param id                the pack identifier
+     * @param description       the pack description component
+     * @param packCompatibility the pack version, ideally retrieved from {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
+     * @param features          the feature flags provided by this pack
+     * @param hidden            controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
      * @return the created pack info instance
      */
-    Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden);
+    Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden);
 
     /**
      * Can the given enchanted be applied to an item stack via enchanting (in an enchanting table).

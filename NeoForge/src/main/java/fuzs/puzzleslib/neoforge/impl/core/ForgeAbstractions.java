@@ -8,6 +8,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
@@ -75,8 +76,8 @@ public final class ForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
-        return new Pack.Info(description, packVersion, packVersion, features, hidden);
+    public Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
+        return new Pack.Info(description, packCompatibility, packCompatibility, features, hidden);
     }
 
     @Override

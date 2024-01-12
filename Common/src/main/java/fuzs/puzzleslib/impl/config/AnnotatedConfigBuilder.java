@@ -8,7 +8,7 @@ import com.google.common.collect.ObjectArrays;
 import fuzs.puzzleslib.api.config.v3.Config;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ValueCallback;
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +29,7 @@ public class AnnotatedConfigBuilder {
      * @param context callback
      * @param target object instance
      */
-    public static <T extends ConfigCore> void serialize(ForgeConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @NotNull T target) {
+    public static <T extends ConfigCore> void serialize(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @NotNull T target) {
         serialize(builder, context, target.getClass(), target);
     }
 
@@ -38,7 +38,7 @@ public class AnnotatedConfigBuilder {
      * @param context callback
      * @param target target class
      */
-    public static <T extends ConfigCore> void serialize(ForgeConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, Class<? extends T> target) {
+    public static <T extends ConfigCore> void serialize(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, Class<? extends T> target) {
         serialize(builder, context, target, null);
     }
 
@@ -49,7 +49,7 @@ public class AnnotatedConfigBuilder {
      * @param instance object instance, null when static
      * @param <T> <code>instance</code> type
      */
-    public static <T extends ConfigCore> void serialize(final ForgeConfigSpec.Builder builder, final ConfigDataHolderImpl<?> context, Class<? extends T> target, @Nullable T instance) {
+    public static <T extends ConfigCore> void serialize(final ModConfigSpec.Builder builder, final ConfigDataHolderImpl<?> context, Class<? extends T> target, @Nullable T instance) {
         // we support defining config values in categories that don't actually exist in dedicated classes by setting Config::category
         // those categories will be created here instead of inside #buildConfig, so they don't support their own category comments
         Map<List<String>, Collection<Field>> pathToFields = setupFields(target);
@@ -115,7 +115,7 @@ public class AnnotatedConfigBuilder {
      * @param annotation config annotation for config value data
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static void buildConfig(final ForgeConfigSpec.Builder builder, final ConfigDataHolderImpl<?> context, @Nullable Object instance, Field field, Config annotation) {
+    private static void buildConfig(final ModConfigSpec.Builder builder, final ConfigDataHolderImpl<?> context, @Nullable Object instance, Field field, Config annotation) {
         // get the name from the config, often this is left blank, so instead we create it from the field's name with an underscore format
         String name = annotation.name();
         if (StringUtils.isBlank(name)) {
@@ -231,7 +231,7 @@ public class AnnotatedConfigBuilder {
      * @param field field to save to
      * @param instance object instance, null when static
      */
-    private static void addCallback(ValueCallback context, ForgeConfigSpec.ConfigValue<?> configValue, Field field, @Nullable Object instance) {
+    private static void addCallback(ValueCallback context, ModConfigSpec.ConfigValue<?> configValue, Field field, @Nullable Object instance) {
         context.accept(configValue, value -> {
             try {
                 MethodHandles.lookup().unreflectSetter(field).invoke(instance, configValue.get());

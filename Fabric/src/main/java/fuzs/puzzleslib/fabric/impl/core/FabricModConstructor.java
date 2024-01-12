@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import fuzs.puzzleslib.fabric.impl.core.context.*;
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import net.minecraft.core.Registry;
@@ -24,9 +23,6 @@ public final class FabricModConstructor {
     }
 
     private static void registerContent(String modId, Set<ContentRegistrationFlags> flagsToHandle) {
-        if (flagsToHandle.contains(ContentRegistrationFlags.LEGACY_SMITHING)) {
-            Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(modId, LegacySmithingTransformRecipe.RECIPE_SERIALIZER_ID), new LegacySmithingTransformRecipe.Serializer());
-        }
         if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
             CopyTagRecipe.registerSerializers((s, recipeSerializerSupplier) -> {
                 Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, new ResourceLocation(modId, s), recipeSerializerSupplier.get());

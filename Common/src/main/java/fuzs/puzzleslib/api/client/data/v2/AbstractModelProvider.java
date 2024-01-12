@@ -5,13 +5,13 @@ import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import fuzs.puzzlesaccessapi.api.client.data.v2.BlockModelBuilder;
-import fuzs.puzzlesaccessapi.api.client.data.v2.ItemModelBuilder;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.blockstates.BlockStateGenerator;
 import net.minecraft.data.models.model.*;
 import net.minecraft.resources.ResourceLocation;
@@ -47,9 +47,9 @@ public abstract class AbstractModelProvider implements DataProvider {
         this.modelPathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models");
     }
 
-    public abstract void addBlockModels(BlockModelBuilder builder);
+    public abstract void addBlockModels(BlockModelGenerators builder);
 
-    public abstract void addItemModels(ItemModelBuilder builder);
+    public abstract void addItemModels(ItemModelGenerators builder);
 
     protected boolean throwForMissingBlocks() {
         return true;
@@ -72,8 +72,8 @@ public abstract class AbstractModelProvider implements DataProvider {
                 throw new IllegalStateException("Duplicate model definition for " + resourceLocation);
             }
         };
-        this.addBlockModels(new BlockModelBuilder(blockStateOutput, modelOutput, skippedAutoModels::add));
-        this.addItemModels(new ItemModelBuilder(modelOutput));
+        this.addBlockModels(new BlockModelGenerators(blockStateOutput, modelOutput, skippedAutoModels::add));
+        this.addItemModels(new ItemModelGenerators(modelOutput));
         List<Block> missingBlocks;
         if (this.throwForMissingBlocks()) {
             missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {

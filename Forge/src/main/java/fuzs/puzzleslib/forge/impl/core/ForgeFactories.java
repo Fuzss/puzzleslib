@@ -6,14 +6,14 @@ import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
+import fuzs.puzzleslib.forge.impl.init.ForgeGameRulesFactory;
+import fuzs.puzzleslib.forge.impl.init.PotionBrewingRegistryForge;
+import fuzs.puzzleslib.forge.impl.item.ForgeToolTypeHelper;
+import fuzs.puzzleslib.forge.impl.item.crafting.ForgeCombinedIngredients;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.ProxyImpl;
 import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
-import fuzs.puzzleslib.impl.init.ForgeGameRulesFactory;
-import fuzs.puzzleslib.impl.init.PotionBrewingRegistryForge;
-import fuzs.puzzleslib.impl.item.ForgeToolTypeHelper;
-import fuzs.puzzleslib.impl.item.crafting.ForgeCombinedIngredients;
 
 import java.util.Set;
 

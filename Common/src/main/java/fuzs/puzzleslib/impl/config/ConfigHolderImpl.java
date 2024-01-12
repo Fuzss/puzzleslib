@@ -6,7 +6,6 @@ import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import net.minecraftforge.fml.config.ModConfig;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -48,7 +47,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     public <T extends ConfigCore> Builder client(Class<T> clazz) {
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
         Supplier<T> supplier = ModLoaderEnvironment.INSTANCE.isClient() ? construct(clazz) : () -> null;
-        if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.CLIENT, supplier)) != null) {
+        if (this.configsByClass.put(clazz, this.client(supplier)) != null) {
             throw new IllegalStateException("Duplicate registration for client config of type " + clazz);
         }
         return this;
@@ -56,7 +55,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     @Override
     public <T extends ConfigCore> Builder common(Class<T> clazz) {
-        if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.COMMON, construct(clazz))) != null) {
+        if (this.configsByClass.put(clazz, this.common(construct(clazz))) != null) {
             throw new IllegalStateException("Duplicate registration for common config of type " + clazz);
         }
         return this;
@@ -64,11 +63,17 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     @Override
     public <T extends ConfigCore> Builder server(Class<T> clazz) {
-        if (this.configsByClass.put(clazz, new ConfigDataHolderImpl<>(ModConfig.Type.SERVER, construct(clazz))) != null) {
+        if (this.configsByClass.put(clazz, this.server(construct(clazz))) != null) {
             throw new IllegalStateException("Duplicate registration for server config of type " + clazz);
         }
         return this;
     }
+
+    protected abstract <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier);
+
+    protected abstract <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier);
+
+    protected abstract <T extends ConfigCore> ConfigDataHolderImpl<T> server(Supplier<T> supplier);
 
     @Override
     public <T extends ConfigCore> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName) {
@@ -87,5 +92,5 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
         }
     }
 
-    abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
+    protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
 }
