@@ -29,7 +29,7 @@ public class ModMixinConfigPlugin implements IMixinConfigPlugin {
     }
 
     private static void printModList() {
-        if (!ModLoaderEnvironment.INSTANCE.isForge()) return;
+        if (!ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) return;
         Collection<ModContainer> mods = ModLoaderEnvironment.INSTANCE.getModList().values();
         PuzzlesLib.LOGGER.info(dumpModList(mods));
     }

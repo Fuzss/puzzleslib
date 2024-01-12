@@ -15,6 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.BiConsumer;
 
@@ -110,9 +112,9 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public Pack.Info createPackInfo(ResourceLocation id, Component description, int packVersion, FeatureFlagSet features, boolean hidden) {
+    public Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
         if (hidden) this.hiddenPacks.add(id.toString());
-        return new Pack.Info(description, packVersion, features);
+        return new Pack.Info(description, packCompatibility, features, Collections.emptyList());
     }
 
     public boolean notHidden(String id) {

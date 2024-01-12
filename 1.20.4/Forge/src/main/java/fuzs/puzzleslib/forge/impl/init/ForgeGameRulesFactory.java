@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.init;
+package fuzs.puzzleslib.forge.impl.init;
 
 import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
 import net.minecraft.server.MinecraftServer;

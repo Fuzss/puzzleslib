@@ -9,13 +9,13 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.List;
 
 public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Builder {
-    final ResourceLocation channelIdentifier;
+    protected final ResourceLocation channelIdentifier;
     private final List<Class<?>> clientboundMessages = Lists.newArrayList();
     private final List<Class<?>> serverboundMessages = Lists.newArrayList();
     public boolean clientAcceptsVanillaOrMissing;
     public boolean serverAcceptsVanillaOrMissing;
 
-    NetworkHandlerRegistryImpl(ResourceLocation channelIdentifier) {
+    protected NetworkHandlerRegistryImpl(ResourceLocation channelIdentifier) {
         this.channelIdentifier = channelIdentifier;
     }
 
@@ -57,7 +57,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
         this.serverboundMessages.clear();
     }
 
-    abstract <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz);
+    protected abstract <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz);
 
-    abstract <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz);
+    protected abstract <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz);
 }

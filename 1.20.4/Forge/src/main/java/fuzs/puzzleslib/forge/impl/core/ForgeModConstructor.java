@@ -6,7 +6,6 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.api.item.v2.LegacySmithingTransformRecipe;
 import fuzs.puzzleslib.forge.impl.core.context.*;
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import net.minecraft.server.packs.PackType;
@@ -46,15 +45,10 @@ public final class ForgeModConstructor {
         if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             BiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
-        if (flagsToHandle.contains(ContentRegistrationFlags.LEGACY_SMITHING) || flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
             DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.RECIPE_SERIALIZERS, modId);
             deferredRegister.register(modEventBus);
-            if (flagsToHandle.contains(ContentRegistrationFlags.LEGACY_SMITHING)) {
-                deferredRegister.register(LegacySmithingTransformRecipe.RECIPE_SERIALIZER_ID, LegacySmithingTransformRecipe.Serializer::new);
-            }
-            if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
-                CopyTagRecipe.registerSerializers(deferredRegister::register);
-            }
+            CopyTagRecipe.registerSerializers(deferredRegister::register);
         }
     }
 

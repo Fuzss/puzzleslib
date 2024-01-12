@@ -106,10 +106,10 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (ScreenEvents.AfterInit callback, ScreenEvent.Init.Post evt) -> {
             callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), evt::addListener, evt::removeListener);
         });
-        registerScreenEvent(ScreenEvents.BeforeInitV2.class, ScreenEvent.Init.Pre.class, (callback, evt) -> {
+        registerScreenEvent(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (callback, evt) -> {
             callback.onBeforeInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables));
         });
-        registerScreenEvent(ScreenEvents.AfterInitV2.class, ScreenEvent.Init.Post.class, (callback, evt) -> {
+        registerScreenEvent(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (callback, evt) -> {
             ScreenEvents.ConsumingOperator<GuiEventListener> addWidget = new ScreenEvents.ConsumingOperator<>(evt::addListener);
             ScreenEvents.ConsumingOperator<GuiEventListener> removeWidget = new ScreenEvents.ConsumingOperator<>(evt::removeListener);
             callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), addWidget, removeWidget);

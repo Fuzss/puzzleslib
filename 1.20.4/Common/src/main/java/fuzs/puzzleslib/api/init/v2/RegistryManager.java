@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.init.v2;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
-import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -276,18 +275,6 @@ public interface RegistryManager {
     <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
 
     /**
-     * register poi type from custom builder
-     *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @return new registry object
-     *
-     * @deprecated migrate to {@link #registerPoiType(String, Supplier)}
-     */
-    @Deprecated(forRemoval = true)
-    RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry);
-
-    /**
      * Creates and registers a new poi type entry.
      *
      * @param path   path for new entry
@@ -335,7 +322,7 @@ public interface RegistryManager {
      * @return new registry object
      */
     default RegistryReference<GameEvent> registerGameEvent(String path, int notificationRadius) {
-        return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(path, notificationRadius));
+        return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(notificationRadius));
     }
 
     /**

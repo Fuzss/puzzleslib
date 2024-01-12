@@ -1,29 +1,26 @@
-package fuzs.puzzleslib.impl.network;
+package fuzs.puzzleslib.forge.impl.network;
 
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.forge.impl.core.ForgeProxy;
+import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.minecraftforge.event.network.CustomPayloadEvent;
+import net.minecraftforge.network.*;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
-    private static final String PROTOCOL_VERSION = Integer.toString(1);
+    private static final int PROTOCOL_VERSION = 1;
 
     private SimpleChannel channel;
     private final AtomicInteger discriminator = new AtomicInteger();
@@ -44,30 +41,31 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
         this.register((Class<T>) clazz, ((ForgeProxy) Proxy.INSTANCE)::registerServerReceiverV2, NetworkDirection.PLAY_TO_SERVER);
     }
 
-    private <T> void register(Class<T> clazz, BiConsumer<T, Supplier<NetworkEvent.Context>> handle, NetworkDirection networkDirection) {
+    private <T> void register(Class<T> clazz, BiConsumer<T, CustomPayloadEvent.Context> handle, NetworkDirection networkDirection) {
         if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         Objects.requireNonNull(this.channel, "channel is null");
-        BiConsumer<T, FriendlyByteBuf> encode = (T t, FriendlyByteBuf friendlyByteBuf) -> {
+        BiConsumer<T, FriendlyByteBuf> encoder = (T t, FriendlyByteBuf friendlyByteBuf) -> {
             MessageSerializers.findByType(clazz).write(friendlyByteBuf, t);
         };
-        Function<FriendlyByteBuf, T> decode = MessageSerializers.findByType(clazz)::read;
-        this.channel.registerMessage(this.discriminator.getAndIncrement(), clazz, encode, decode, handle, Optional.of(networkDirection));
+        Function<FriendlyByteBuf, T> decoder = MessageSerializers.findByType(clazz)::read;
+        this.channel.messageBuilder(clazz, this.discriminator.getAndIncrement(), networkDirection)
+                .encoder(encoder).decoder(decoder).consumerMainThread(handle).add();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message) {
+    public <T extends Record & ClientboundMessage<T>> Packet<ClientCommonPacketListener> toClientboundPacket(T message) {
         Objects.requireNonNull(this.channel, "channel is null");
         Objects.requireNonNull(message, "message is null");
-        return (Packet<ClientGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
+        return (Packet<ClientCommonPacketListener>) NetworkDirection.PLAY_TO_CLIENT.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message) {
+    public <T extends Record & ServerboundMessage<T>> Packet<ServerCommonPacketListener> toServerboundPacket(T message) {
         Objects.requireNonNull(this.channel, "channel is null");
         Objects.requireNonNull(message, "message is null");
-        return (Packet<ServerGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER);
+        return (Packet<ServerCommonPacketListener>) NetworkDirection.PLAY_TO_SERVER.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
     }
 
     @Override
@@ -78,11 +76,11 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     }
 
     private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return NetworkRegistry.ChannelBuilder
+        return ChannelBuilder
                 .named(resourceLocation)
-                .networkProtocolVersion(() -> PROTOCOL_VERSION)
-                .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
-                .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? NetworkRegistry.acceptMissingOr(PROTOCOL_VERSION) : PROTOCOL_VERSION::equals)
+                .networkProtocolVersion(PROTOCOL_VERSION)
+                .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(1))
+                .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(1))
                 .simpleChannel();
     }
 }

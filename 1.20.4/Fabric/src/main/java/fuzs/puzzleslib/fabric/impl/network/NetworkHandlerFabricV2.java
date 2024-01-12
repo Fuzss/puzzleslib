@@ -13,8 +13,8 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
@@ -68,13 +68,13 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     @Override
-    public Packet<ServerGamePacketListener> toServerboundPacket(MessageV2<?> message) {
+    public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
         if (this.messages.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending serverbound message to client side");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     @Override
-    public Packet<ClientGamePacketListener> toClientboundPacket(MessageV2<?> message) {
+    public Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message) {
         if (!this.messages.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending clientbound message to server side");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }

@@ -331,7 +331,7 @@ public interface RegistryManager {
      * @return new registry object
      */
     default Holder.Reference<GameEvent> registerGameEvent(String path, int notificationRadius) {
-        return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(path, notificationRadius));
+        return this.register(Registries.GAME_EVENT, path, () -> new GameEvent(notificationRadius));
     }
 
     /**

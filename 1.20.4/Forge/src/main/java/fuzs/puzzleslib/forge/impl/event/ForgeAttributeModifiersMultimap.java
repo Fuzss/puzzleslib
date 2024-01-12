@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.event;
+package fuzs.puzzleslib.forge.impl.event;
 
 import com.google.common.collect.ForwardingMultimap;
 import com.google.common.collect.Multimap;

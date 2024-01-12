@@ -19,30 +19,16 @@ public interface ModConstructor extends BaseModConstructor {
      * Construct the main {@link ModConstructor} instance provided as <code>supplier</code> to begin initialization of a mod.
      *
      * @param modId    the mod id for registering events on Forge to the correct mod event bus
-     * @param supplier the main mod instance for mod setup
+     * @param modConstructor the main mod instance for mod setup
      */
-    static void construct(String modId, Supplier<ModConstructor> supplier) {
-        construct(modId, supplier, new ContentRegistrationFlags[0]);
-    }
-
-    /**
-     * Construct the main {@link ModConstructor} instance provided as <code>supplier</code> to begin initialization of a mod.
-     *
-     * @param modId    the mod id for registering events on Forge to the correct mod event bus
-     * @param supplier the main mod instance for mod setup
-     * @param flags    specific content this mod uses that needs to be additionally registered
-     * @deprecated replaced provided flags with {@link BaseModConstructor#getContentRegistrationFlags()}
-     */
-    @Deprecated(forRemoval = true)
-    static void construct(String modId, Supplier<ModConstructor> supplier, ContentRegistrationFlags... flags) {
+    static void construct(String modId, Supplier<ModConstructor> modConstructor) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
         // build first to force class being loaded for executing buildables
-        ModConstructor instance = supplier.get();
+        ModConstructor instance = modConstructor.get();
         ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
         PuzzlesLib.LOGGER.info("Constructing common components for {}", identifier);
         ModContext modContext = ModContext.get(modId);
-        ContentRegistrationFlags[] builtInFlags = instance.getContentRegistrationFlags();
-        Set<ContentRegistrationFlags> availableFlags = Set.of(builtInFlags.length != 0 ? builtInFlags : flags);
+        Set<ContentRegistrationFlags> availableFlags = Set.of(instance.getContentRegistrationFlags());
         Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
         modContext.beforeModConstruction();
         CommonFactories.INSTANCE.constructMod(modId, instance, availableFlags, flagsToHandle);
@@ -59,21 +45,9 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * runs after content has been registered, so it's safe to use here
      * used to set various values and settings for already registered content
-     *
-     * @param context enqueue work to be run sequentially for all mods as the setup phase runs in parallel on Forge
-     * @deprecated now always runs deferred, use {@link #onCommonSetup()}
-     */
-    @Deprecated(forRemoval = true)
-    default void onCommonSetup(final ModLifecycleContext context) {
-
-    }
-
-    /**
-     * runs after content has been registered, so it's safe to use here
-     * used to set various values and settings for already registered content
      */
     default void onCommonSetup() {
-        this.onCommonSetup(Runnable::run);
+
     }
 
     /**

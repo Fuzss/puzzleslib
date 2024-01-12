@@ -90,7 +90,7 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
         } else {
             Objects.requireNonNull(this.icons, "both icon suppliers are null");
             // since no single icon is set and multiple icons are only processed on Forge, this would otherwise be an empty icon for Fabric / Quilt
-            if (!ModLoaderEnvironment.INSTANCE.isForge()) {
+            if (!ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
                 builder.icon(() -> {
                     ItemStack[] icons = this.icons.get();
                     Preconditions.checkPositionIndex(1, icons.length, "icons is empty");

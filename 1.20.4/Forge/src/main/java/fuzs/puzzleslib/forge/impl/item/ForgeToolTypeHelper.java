@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.item;
+package fuzs.puzzleslib.forge.impl.item;
 
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import net.minecraft.world.item.ItemStack;

@@ -2,20 +2,18 @@ package fuzs.puzzleslib.api.network.v3;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.Buildable;
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistry;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
@@ -65,7 +63,7 @@ public interface NetworkHandlerV3 {
      * @param message message to create packet from
      * @return packet for message
      */
-    <T extends Record & ClientboundMessage<T>> Packet<ClientGamePacketListener> toClientboundPacket(T message);
+    <T extends Record & ClientboundMessage<T>> Packet<ClientCommonPacketListener> toClientboundPacket(T message);
 
     /**
      * creates a packet heading to the server side
@@ -73,7 +71,7 @@ public interface NetworkHandlerV3 {
      * @param message message to create packet from
      * @return packet for message
      */
-    <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message);
+    <T extends Record & ServerboundMessage<T>> Packet<ServerCommonPacketListener> toServerboundPacket(T message);
 
     /**
      * Send message from client to server.
@@ -243,62 +241,6 @@ public interface NetworkHandlerV3 {
         } else {
             chunkSource.broadcast(entity, this.toClientboundPacket(message));
         }
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(T message) {
-        this.sendToAll(CommonAbstractions.INSTANCE.getMinecraftServer(), message);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(@Nullable ServerPlayer exclude, T message) {
-        this.sendToAll(CommonAbstractions.INSTANCE.getMinecraftServer(), exclude, message);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(BlockPos pos, Level level, T message) {
-        Objects.requireNonNull(level, "level is null");
-        Preconditions.checkState(!level.isClientSide, "level is client level");
-        this.sendToAllNear((Vec3i) pos, (ServerLevel) level, message);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, double distance, Level level, T message) {
-        Objects.requireNonNull(level, "level is null");
-        Preconditions.checkState(!level.isClientSide, "level is client level");
-        this.sendToAllNear(posX, posY, posZ, (ServerLevel) level, message);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNearExcept(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, Level level, T message) {
-        Objects.requireNonNull(level, "level is null");
-        Preconditions.checkState(!level.isClientSide, "level is client level");
-        this.sendToAllNear(exclude, posX, posY, posZ, distance, (ServerLevel) level, message);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message) {
-        this.sendToAllTracking(entity, message, false);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTrackingAndSelf(Entity entity, T message) {
-        this.sendToAllTracking(entity, message, true);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToDimension(Level level, T message) {
-        Objects.requireNonNull(level, "level is null");
-        Preconditions.checkState(!level.isClientSide, "level is client level");
-        this.sendToAll((ServerLevel) level, message);
-    }
-
-    @Deprecated(forRemoval = true)
-    default <T extends Record & ClientboundMessage<T>> void sendToDimension(ResourceKey<Level> resourceKey, T message) {
-        Objects.requireNonNull(resourceKey, "resource key is null");
-        ServerLevel level = CommonAbstractions.INSTANCE.getMinecraftServer().getLevel(resourceKey);
-        Objects.requireNonNull(level, "level is null");
-        this.sendToAll(level, message);
     }
 
     /**

@@ -25,39 +25,11 @@ public final class ScreenTooltipFactory {
     /**
      * Create a new tooltip instance from multiple lines of text.
      *
-     * @param font       the font instance
-     * @param components components to split and build the tooltip from
-     * @return the tooltip instance
-     *
-     * @deprecated migrate to {@link #create(FormattedText...)}
-     */
-    @Deprecated(forRemoval = true)
-    public static Tooltip create(Font font, FormattedText... components) {
-        return create(components);
-    }
-
-    /**
-     * Create a new tooltip instance from multiple lines of text.
-     *
      * @param components components to split and build the tooltip from
      * @return the tooltip instance
      */
     public static Tooltip create(FormattedText... components) {
         return create(Arrays.asList(components));
-    }
-
-    /**
-     * Create a new tooltip instance from multiple lines of text.
-     *
-     * @param font       the font instance
-     * @param components components to split and build the tooltip from
-     * @return the tooltip instance
-     *
-     * @deprecated migrate to {@link #create(List)}
-     */
-    @Deprecated(forRemoval = true)
-    public static Tooltip create(Font font, List<? extends FormattedText> components) {
-        return create(components);
     }
 
     /**

@@ -9,7 +9,7 @@ import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraftforge.common.world.BiomeSpecialEffectsBuilder;
+import net.neoforged.neoforge.common.world.BiomeSpecialEffectsBuilder;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;

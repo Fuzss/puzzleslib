@@ -7,6 +7,8 @@ import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.impl.network.NetworkHandlerImplHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.ClientCommonPacketListener;
+import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -81,13 +83,13 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Packet<ServerGamePacketListener> toServerboundPacket(MessageV2<?> message) {
+    public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
         return (Packet<ServerGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_SERVER);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Packet<ClientGamePacketListener> toClientboundPacket(MessageV2<?> message) {
+    public Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message) {
         return (Packet<ClientGamePacketListener>) this.channel.toVanillaPacket(message, NetworkDirection.PLAY_TO_CLIENT);
     }
 

@@ -17,7 +17,7 @@ public final class NetworkHandlerImplHelper {
     }
 
     @SuppressWarnings("unchecked")
-    static <T extends MessageV2<T>> Function<FriendlyByteBuf, T> getMessageDecoder(Class<T> clazz) {
+    public static <T extends MessageV2<T>> Function<FriendlyByteBuf, T> getMessageDecoder(Class<T> clazz) {
         Supplier<T> supplier = () -> ReflectionHelper.newDefaultInstanceFactory(clazz).get().orElseThrow();
         return Stream.of(clazz.getConstructors())
                 .filter(currentConstructor -> currentConstructor.getParameterCount() == 1)
@@ -27,7 +27,7 @@ public final class NetworkHandlerImplHelper {
                 .orElseGet(() -> getDirectMessageDecoder(supplier));
     }
 
-    static <T extends MessageV2<T>> Function<FriendlyByteBuf, T> getDirectMessageDecoder(Supplier<T> supplier) {
+    public static <T extends MessageV2<T>> Function<FriendlyByteBuf, T> getDirectMessageDecoder(Supplier<T> supplier) {
         return buf -> Util.make(supplier.get(), message -> message.read(buf));
     }
 }

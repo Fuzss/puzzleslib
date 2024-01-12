@@ -32,19 +32,19 @@ import java.util.stream.Stream;
 public abstract class ModContext {
     private static final Map<String, ModContext> MOD_CONTEXTS = Maps.newConcurrentMap();
 
-    final AtomicInteger networkHandlers = new AtomicInteger();
-    final String modId;
+    protected final AtomicInteger networkHandlers = new AtomicInteger();
+    protected final String modId;
     private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
     private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
     private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
     private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
-    @Nullable RegistryManager registryManagerV2;
-    @Nullable fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
-    @Nullable CapabilityController capabilityController;
+    @Nullable protected RegistryManager registryManagerV2;
+    @Nullable protected fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
+    @Nullable protected CapabilityController capabilityController;
     // true by default for dedicated servers, is reset on client when joining new world
     private boolean presentServerside = true;
 
-    ModContext(String modId) {
+    protected ModContext(String modId) {
         this.modId = modId;
     }
 
@@ -102,7 +102,7 @@ public abstract class ModContext {
 
     public abstract CapabilityController getCapabilityController();
 
-    <T extends Buildable> T addBuildable(T buildable) {
+    protected <T extends Buildable> T addBuildable(T buildable) {
         Objects.requireNonNull(buildable, "buildable is null");
         this.buildables.offer(buildable);
         return buildable;

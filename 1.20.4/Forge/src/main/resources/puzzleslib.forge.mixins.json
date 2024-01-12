@@ -5,7 +5,6 @@
   "package": "${modGroup}.forge.mixin",
   "mixins": [
     "LootDataManagerForgeMixin",
-    "TagsProviderForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
     "accessor.FireBlockForgeAccessor",
     "accessor.ForgeRegistryForgeAccessor",
