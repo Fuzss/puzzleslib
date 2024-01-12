@@ -6,7 +6,7 @@ import fuzs.puzzleslib.neoforge.mixin.accessor.MobSpawnSettingsBuilderForgeAcces
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
-import net.minecraftforge.common.world.MobSpawnSettingsBuilder;
+import net.neoforged.neoforge.common.world.MobSpawnSettingsBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;

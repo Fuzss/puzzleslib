@@ -5,12 +5,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.apache.commons.lang3.mutable.MutableObject;
 
 public final class ServerChunkEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
     public static final EventInvoker<Watch> WATCH = EventInvoker.lookup(Watch.class);
+    public static final EventInvoker<Sent> SENT = EventInvoker.lookup(Sent.class);
     public static final EventInvoker<Unwatch> UNWATCH = EventInvoker.lookup(Unwatch.class);
 
     private ServerChunkEvents() {
@@ -46,8 +46,6 @@ public final class ServerChunkEvents {
 
         /**
          * Fires when a server player begins watching a chunk.
-         * <p>Useful for syncing additional chunk data to the client.
-         * <p>Fires in {@link net.minecraft.server.level.ChunkMap#playerLoadedChunk(ServerPlayer, MutableObject, LevelChunk)}.
          *
          * @param player the player watching the chunk
          * @param chunk  the chunk
@@ -57,12 +55,23 @@ public final class ServerChunkEvents {
     }
 
     @FunctionalInterface
+    public interface Sent {
+
+        /**
+         * Fires when a chunk has just been sent to a client, useful for syncing additional chunk data.
+         *
+         * @param player the player watching the chunk
+         * @param chunk  the chunk
+         * @param level  the level the chunk is in
+         */
+        void onChunkSent(ServerPlayer player, LevelChunk chunk, ServerLevel level);
+    }
+
+    @FunctionalInterface
     public interface Unwatch {
 
         /**
          * Fires when a server player stops watching a chunk.
-         * <p>Useful for syncing additional chunk data to the client.
-         * <p>Fires in {@link net.minecraft.server.level.ChunkMap#updateChunkTracking(ServerPlayer, ChunkPos, MutableObject, boolean, boolean)}.
          *
          * @param player the player watching the chunk
          * @param chunkPos  the chunk position

@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.client.screen.v2.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
 import net.minecraft.client.KeyMapping;
 
 import java.util.Objects;
@@ -13,20 +12,13 @@ import java.util.Objects;
 public interface KeyMappingsContext {
 
     /**
-     * Forge supports much more here for the key mapping (like conflicts, and modifiers, but we keep it simple for the sake of Fabric).
+     * Register a key mapping together for the universal activation context.
      *
-     * @param keyMappings the key mappings to register
-     *
-     * @deprecated migrate to {@link #registerKeyMapping(KeyMapping, KeyMappingActivationHelper.KeyActivationContext)}
+     * @param keyMapping the key mapping
      */
-    @Deprecated(forRemoval = true)
-    default void registerKeyMapping(KeyMapping... keyMappings) {
-        Objects.requireNonNull(keyMappings, "key mappings is null");
-        Preconditions.checkPositionIndex(1, keyMappings.length, "key mappings is empty");
-        for (KeyMapping keyMapping : keyMappings) {
-            Objects.requireNonNull(keyMapping, "key mapping is null");
-            this.registerKeyMapping(keyMapping, KeyMappingActivationHelper.KeyActivationContext.UNIVERSAL);
-        }
+    default void registerKeyMapping(KeyMapping keyMapping) {
+        Objects.requireNonNull(keyMapping, "key mapping is null");
+        this.registerKeyMapping(keyMapping, KeyActivationContext.UNIVERSAL);
     }
 
     /**
@@ -35,5 +27,5 @@ public interface KeyMappingsContext {
      * @param keyMapping the key mapping
      * @param keyActivationContext an activation context for key mappings
      */
-    void registerKeyMapping(KeyMapping keyMapping, KeyMappingActivationHelper.KeyActivationContext keyActivationContext);
+    void registerKeyMapping(KeyMapping keyMapping, KeyActivationContext keyActivationContext);
 }

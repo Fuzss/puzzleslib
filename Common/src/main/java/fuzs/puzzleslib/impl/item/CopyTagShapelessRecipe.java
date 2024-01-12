@@ -8,10 +8,16 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
 public class CopyTagShapelessRecipe extends ShapelessRecipe implements CopyTagRecipe {
+    private final RecipeSerializer<?> recipeSerializer;
     private final Ingredient copyFrom;
 
-    public CopyTagShapelessRecipe(ShapelessRecipe other, Ingredient copyFrom) {
-        super(other.getId(), other.getGroup(), other.category(), other.getResultItem(RegistryAccess.EMPTY), other.getIngredients());
+    public CopyTagShapelessRecipe(String modId, ShapelessRecipe shapelessRecipe, Ingredient copyFrom) {
+        this(CopyTagRecipe.getModSerializer(modId, CopyTagRecipe.SHAPELESS_RECIPE_SERIALIZER_ID), shapelessRecipe, copyFrom);
+    }
+
+    public CopyTagShapelessRecipe(RecipeSerializer<?> recipeSerializer, ShapelessRecipe shapelessRecipe, Ingredient copyFrom) {
+        super(shapelessRecipe.getGroup(), shapelessRecipe.category(), shapelessRecipe.getResultItem(RegistryAccess.EMPTY), shapelessRecipe.getIngredients());
+        this.recipeSerializer = recipeSerializer;
         this.copyFrom = copyFrom;
     }
 
@@ -24,7 +30,7 @@ public class CopyTagShapelessRecipe extends ShapelessRecipe implements CopyTagRe
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return CopyTagRecipe.getModSerializer(this.getId().getNamespace(), CopyTagRecipe.SHAPELESS_RECIPE_SERIALIZER_ID);
+        return this.recipeSerializer;
     }
 
     @Override

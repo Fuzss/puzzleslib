@@ -2,6 +2,7 @@ package fuzs.puzzleslib.forge.impl.client.screen;
 
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
+import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
 import fuzs.puzzleslib.api.client.screen.v2.KeyMappingActivationHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.client.settings.IKeyConflictContext;

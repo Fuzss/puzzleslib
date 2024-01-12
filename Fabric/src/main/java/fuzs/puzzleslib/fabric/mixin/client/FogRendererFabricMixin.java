@@ -26,7 +26,7 @@ abstract class FogRendererFabricMixin {
     @Shadow
     private static float fogBlue;
 
-    @Inject(method = "setupColor", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clearColor(FFFF)V", ordinal = 1))
+    @Inject(method = "setupColor", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;clearColor(FFFF)V", ordinal = 1, remap = false))
     private static void setupColor(Camera activeRenderInfo, float partialTicks, ClientLevel level, int renderDistanceChunks, float bossColorModifier, CallbackInfo callback) {
         Minecraft minecraft = Minecraft.getInstance();
         MutableFloat red = MutableFloat.fromEvent(t -> fogRed = t, () -> fogRed);

@@ -8,9 +8,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.phys.HitResult;
 
 public final class InteractionInputEvents {
-    @Deprecated(forRemoval = true)
     public static final EventInvoker<Attack> ATTACK = EventInvoker.lookup(Attack.class);
-    public static final EventInvoker<AttackV2> ATTACK_V2 = EventInvoker.lookup(AttackV2.class);
     public static final EventInvoker<Use> USE = EventInvoker.lookup(Use.class);
     public static final EventInvoker<Pick> PICK = EventInvoker.lookup(Pick.class);
 
@@ -18,24 +16,8 @@ public final class InteractionInputEvents {
 
     }
 
-    @Deprecated(forRemoval = true)
     @FunctionalInterface
     public interface Attack {
-
-        /**
-         * Runs before the client performs an attack based on {@link Minecraft#hitResult}, either attacking an entity or mining a block (this includes holding to mine a block).
-         * <p>This event is placed at the beginning of both {@link net.minecraft.client.Minecraft#startAttack()} and {@link net.minecraft.client.Minecraft#continueAttack(boolean)}.
-         *
-         * @param minecraft the minecraft singleton instance
-         * @param player    the current client player
-         * @return {@link EventResult#INTERRUPT} to prevent the attack interaction from happening, no packet will be sent to the server,
-         * {@link EventResult#PASS} to allow the attack, the server will be notified for further processing
-         */
-        EventResult onAttackInteraction(Minecraft minecraft, LocalPlayer player);
-    }
-
-    @FunctionalInterface
-    public interface AttackV2 {
 
         /**
          * Runs before the client performs an attack based on {@link Minecraft#hitResult}, either attacking an entity or mining a block (this includes holding to mine a block).

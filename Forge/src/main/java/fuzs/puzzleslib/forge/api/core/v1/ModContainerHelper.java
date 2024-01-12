@@ -84,14 +84,4 @@ public final class ModContainerHelper {
         Objects.requireNonNull(modList, "mod list is null");
         return modList.getModContainerById(modId);
     }
-
-    @Deprecated(forRemoval = true)
-    public static Optional<IEventBus> findModEventBus(String modId) {
-        return getOptionalModEventBus(modId);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static ModContainer findModContainer(String modId) {
-        return getModContainer(modId);
-    }
 }

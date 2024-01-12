@@ -96,20 +96,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
                 InteractionResult interactionResult;
                 if (!level.isClientSide || !player.isCreative() && ((FabricProxy) Proxy.INSTANCE).shouldStartDestroyBlock(pos)) {
-                    EventResultHolder<InteractionResult> result = callback.onAttackBlock(player, level, hand, pos, direction);
-                    // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
-                    // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
-                    interactionResult = result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
-                } else {
-                    interactionResult = InteractionResult.PASS;
-                }
-                return interactionResult;
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.AttackBlockV2.class, AttackBlockCallback.EVENT, callback -> {
-            return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
-                InteractionResult interactionResult;
-                if (!level.isClientSide || !player.isCreative() && ((FabricProxy) Proxy.INSTANCE).shouldStartDestroyBlock(pos)) {
                     EventResult result = callback.onAttackBlock(player, level, hand, pos, direction);
                     // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
                     // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
@@ -121,26 +107,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
-            return (Player player, Level level, InteractionHand hand) -> {
-                // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
-                if (player.isSpectator()) {
-                    return InteractionResultHolder.pass(ItemStack.EMPTY);
-                } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand).getItem())) {
-                    return InteractionResultHolder.pass(ItemStack.EMPTY);
-                }
-                InteractionResultHolder<ItemStack> holder = callback.onUseItem(player, level, hand).getInterrupt().orElse(InteractionResultHolder.pass(ItemStack.EMPTY));
-                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
-                if (level.isClientSide && holder.getResult() != InteractionResult.SUCCESS && holder.getResult() != InteractionResult.PASS) {
-                    // send the move packet like vanilla to ensure the position+view vectors are accurate
-                    Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
-                    // send interaction packet to the server with a new sequentially assigned id
-                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemPacket(hand, id));
-                }
-                return holder;
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.UseItemV2.class, UseItemCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand) -> {
                 // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
                 if (player.isSpectator()) {
@@ -274,10 +240,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
-        INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, FabricEntityEvents.ENTITY_LOAD_V2);
         INSTANCE.register(ServerEntityLevelEvents.Spawn.class, FabricEntityEvents.ENTITY_SPAWN);
-        INSTANCE.register(ServerEntityLevelEvents.Remove.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
-            return callback::onEntityRemove;
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
+            return callback::onEntityUnload;
         });
         // do not use ServerLivingEntityEvents#ALLOW_DEATH from Fabric Api as it only runs server-side
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
@@ -363,6 +328,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
+        INSTANCE.register(ServerChunkEvents.Sent.class, FabricLevelEvents.SENT_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {

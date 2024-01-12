@@ -3,14 +3,14 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
-import fuzs.puzzleslib.fabric.api.client.event.v1.ExtraScreenMouseEvents;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricScreenEvents;
-import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.fabric.api.client.event.v1.ExtraScreenMouseEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricScreenEvents;
+import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -107,17 +107,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InventoryMobEffectsCallback.class, FabricScreenEvents.INVENTORY_MOB_EFFECTS);
         INSTANCE.register(ScreenOpeningCallback.class, FabricScreenEvents.SCREEN_OPENING);
         INSTANCE.register(ComputeFovModifierCallback.class, FabricClientEvents.COMPUTE_FOV_MODIFIER);
-        INSTANCE.register(ScreenEvents.BeforeInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, callback -> {
-            return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
-                callback.onBeforeInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(Screens.getButtons(screen)));
-            };
-        });
-        INSTANCE.register(ScreenEvents.AfterInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AFTER_INIT, callback -> {
-            return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
-                List<AbstractWidget> widgets = Screens.getButtons(screen);
-                callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), widgets::add, widgets::remove);
-            };
-        });
         INSTANCE.register(ScreenEvents.BeforeInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, (callback, context) -> {
             Objects.requireNonNull(context, "context is null");
             return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
@@ -243,27 +232,6 @@ public final class FabricClientEventInvokers {
                         if (!player.isHandsBusy()) {
                             ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
                             if (itemInHand.isItemEnabled(minecraft.level.enabledFeatures())) {
-                                return callback.onAttackInteraction(minecraft, player).isInterrupt();
-                            }
-                        }
-                    } else {
-                        if (!player.isUsingItem() && minecraft.hitResult.getType() == HitResult.Type.BLOCK) {
-                            if (!minecraft.level.isEmptyBlock(((BlockHitResult) minecraft.hitResult).getBlockPos())) {
-                                return callback.onAttackInteraction(minecraft, player).isInterrupt();
-                            }
-                        }
-                    }
-                }
-                return false;
-            };
-        });
-        INSTANCE.register(InteractionInputEvents.AttackV2.class, ClientPreAttackCallback.EVENT, callback -> {
-            return (Minecraft minecraft, LocalPlayer player, int clickCount) -> {
-                if (minecraft.missTime <= 0 && minecraft.hitResult != null) {
-                    if (clickCount != 0) {
-                        if (!player.isHandsBusy()) {
-                            ItemStack itemInHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-                            if (itemInHand.isItemEnabled(minecraft.level.enabledFeatures())) {
                                 return callback.onAttackInteraction(minecraft, player, minecraft.hitResult).isInterrupt();
                             }
                         }
@@ -327,8 +295,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientLevelEvents.Load.class, FabricClientEvents.LOAD_LEVEL);
         INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientEvents.UNLOAD_LEVEL);
         INSTANCE.register(MovementInputUpdateCallback.class, FabricClientEvents.MOVEMENT_INPUT_UPDATE);
-        INSTANCE.register(ModelEvents.ModifyBakingResult.class, FabricClientEvents.MODIFY_BAKING_RESULT);
-        INSTANCE.register(ModelEvents.BakingCompleted.class, FabricClientEvents.BAKING_COMPLETED);
         INSTANCE.register(RenderBlockOverlayCallback.class, FabricClientEvents.RENDER_BLOCK_OVERLAY);
         INSTANCE.register(FogEvents.Render.class, FabricClientEvents.RENDER_FOG);
         INSTANCE.register(FogEvents.ComputeColor.class, FabricClientEvents.COMPUTE_FOG_COLOR);

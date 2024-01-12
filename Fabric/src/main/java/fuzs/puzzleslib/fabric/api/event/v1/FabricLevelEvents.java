@@ -42,6 +42,10 @@ public final class FabricLevelEvents {
      */
     public static final Event<ServerChunkEvents.Watch> WATCH_CHUNK = FabricEventFactory.create(ServerChunkEvents.Watch.class);
     /**
+     * Fires when a chunk has just been sent to a client, useful for syncing additional chunk data.
+     */
+    public static final Event<ServerChunkEvents.Sent> SENT_CHUNK = FabricEventFactory.create(ServerChunkEvents.Sent.class);
+    /**
      * Fires when a server player stops watching a chunk.
      */
     public static final Event<ServerChunkEvents.Unwatch> UNWATCH_CHUNK = FabricEventFactory.create(ServerChunkEvents.Unwatch.class);

@@ -37,19 +37,6 @@ public interface ParticleProvidersContext {
      * @param particleType    common particle type
      * @param particleFactory particle factory
      * @param <T>             type of particle
-     * @deprecated renamed to {@link #registerParticleProvider(ParticleType, ParticleEngine.SpriteParticleRegistration)}
-     */
-    @Deprecated(forRemoval = true)
-    default <T extends ParticleOptions> void registerParticleFactory(ParticleType<T> particleType, ParticleEngine.SpriteParticleRegistration<T> particleFactory) {
-        this.registerParticleProvider(particleType, particleFactory);
-    }
-
-    /**
-     * Register a client-side sprite based factory for a particle type.
-     *
-     * @param particleType    common particle type
-     * @param particleFactory particle factory
-     * @param <T>             type of particle
      */
     <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> particleType, ParticleEngine.SpriteParticleRegistration<T> particleFactory);
 

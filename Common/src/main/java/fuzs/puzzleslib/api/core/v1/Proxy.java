@@ -1,9 +1,8 @@
 package fuzs.puzzleslib.api.core.v1;
 
-import fuzs.puzzleslib.impl.core.ProxyImpl;
+import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -12,7 +11,7 @@ import net.minecraft.world.level.Level;
  * mainly used for handling content not present on a physical server
  */
 public interface Proxy {
-    Proxy INSTANCE = ProxyImpl.INSTANCE;
+    Proxy INSTANCE = ModLoaderEnvironment.INSTANCE.isClient() ? CommonFactories.INSTANCE.getClientProxy() : CommonFactories.INSTANCE.getServerProxy();
 
     /**
      * @return client player from Minecraft singleton when on physical client, otherwise null
@@ -28,16 +27,6 @@ public interface Proxy {
      * @return the connection to the server on physical client, otherwise null
      */
     ClientPacketListener getClientPacketListener();
-
-    /**
-     * @return current game server, null when not in a world
-     *
-     * @deprecated moved to {@link CommonAbstractions#getMinecraftServer()}
-     */
-    @Deprecated(forRemoval = true)
-    default MinecraftServer getGameServer() {
-        return CommonAbstractions.INSTANCE.getMinecraftServer();
-    }
 
     /**
      * Used to check if the control key (command on Mac) is pressed, useful for item tooltips.

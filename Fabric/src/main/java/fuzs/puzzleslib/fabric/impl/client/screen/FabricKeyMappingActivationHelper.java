@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
+import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
 import fuzs.puzzleslib.api.client.screen.v2.KeyMappingActivationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;

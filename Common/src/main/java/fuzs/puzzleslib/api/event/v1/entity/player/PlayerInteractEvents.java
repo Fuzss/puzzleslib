@@ -7,12 +7,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -20,12 +18,8 @@ import net.minecraft.world.phys.Vec3;
 
 public final class PlayerInteractEvents {
     public static final EventInvoker<UseBlock> USE_BLOCK = EventInvoker.lookup(UseBlock.class);
-    @Deprecated(forRemoval = true)
     public static final EventInvoker<AttackBlock> ATTACK_BLOCK = EventInvoker.lookup(AttackBlock.class);
-    public static final EventInvoker<AttackBlockV2> ATTACK_BLOCK_V2 = EventInvoker.lookup(AttackBlockV2.class);
-    @Deprecated(forRemoval = true)
     public static final EventInvoker<UseItem> USE_ITEM = EventInvoker.lookup(UseItem.class);
-    public static final EventInvoker<UseItemV2> USE_ITEM_V2 = EventInvoker.lookup(UseItemV2.class);
     public static final EventInvoker<UseEntity> USE_ENTITY = EventInvoker.lookup(UseEntity.class);
     public static final EventInvoker<UseEntityAt> USE_ENTITY_AT = EventInvoker.lookup(UseEntityAt.class);
     public static final EventInvoker<AttackEntity> ATTACK_ENTITY = EventInvoker.lookup(AttackEntity.class);
@@ -50,26 +44,8 @@ public final class PlayerInteractEvents {
         EventResultHolder<InteractionResult> onUseBlock(Player player, Level level, InteractionHand interactionHand, BlockHitResult hitResult);
     }
 
-    @Deprecated(forRemoval = true)
     @FunctionalInterface
     public interface AttackBlock {
-
-        /**
-         * This event is fired on both sides before the player triggers {@link net.minecraft.world.level.block.Block#attack(BlockState, Level, BlockPos, Player)} by left-clicking.
-         *
-         * @param player          the player interacting with the block
-         * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is using to interact
-         * @param pos             the position of the block in the <code>level</code>
-         * @param direction       the direction the block is clicked at
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
-         * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
-         */
-        EventResultHolder<InteractionResult> onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction);
-    }
-
-    @FunctionalInterface
-    public interface AttackBlockV2 {
 
         /**
          * This event is fired on both sides before the player triggers {@link net.minecraft.world.level.block.Block#attack(BlockState, Level, BlockPos, Player)} by left-clicking.
@@ -85,24 +61,8 @@ public final class PlayerInteractEvents {
         EventResult onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction);
     }
 
-    @Deprecated(forRemoval = true)
     @FunctionalInterface
     public interface UseItem {
-
-        /**
-         * This event is fired on both sides before the player triggers {@link Item#use(Level, Player, InteractionHand)} by right-clicking an item.
-         *
-         * @param player          the player using the item
-         * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is holding the item
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
-         * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
-         */
-        EventResultHolder<InteractionResultHolder<ItemStack>> onUseItem(Player player, Level level, InteractionHand interactionHand);
-    }
-
-    @FunctionalInterface
-    public interface UseItemV2 {
 
         /**
          * This event is fired on both sides before the player triggers {@link Item#use(Level, Player, InteractionHand)} by right-clicking an item.

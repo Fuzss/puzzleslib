@@ -99,33 +99,6 @@ public interface ClientModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context add a search tree builder together with a token
-     * @deprecated replaced with direct access to the search registry via {@link ClientAbstractions#getSearchRegistry()}
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterSearchTrees(final SearchRegistryContext context) {
-
-    }
-
-    /**
-     * @param context Context for modifying baked models right after they've been reloaded.
-     * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.ModifyBakingResult}
-     */
-    @Deprecated(forRemoval = true)
-    default void onModifyBakingResult(final DynamicModifyBakingResultContext context) {
-
-    }
-
-    /**
-     * @param context Context for retrieving baked models from the model manager after they've been reloaded.
-     * @deprecated migrate to {@link fuzs.puzzleslib.api.client.event.v1.ModelEvents.BakingCompleted}
-     */
-    @Deprecated(forRemoval = true)
-    default void onBakingCompleted(final DynamicBakingCompletedContext context) {
-
-    }
-
-    /**
      * @param context add external models to be loaded
      */
     default void onRegisterAdditionalModels(final AdditionalModelsContext context) {

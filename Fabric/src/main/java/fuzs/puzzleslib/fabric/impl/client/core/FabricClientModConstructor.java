@@ -2,35 +2,30 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.*;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
+import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
+import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
+import fuzs.puzzleslib.api.client.core.v1.context.ParticleProvidersContext;
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.impl.client.core.context.*;
 import fuzs.puzzleslib.fabric.impl.core.context.AddReloadListenersContextFabricImpl;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.core.DynamicModifyBakingResultContextImpl;
-import fuzs.puzzleslib.impl.client.core.context.*;
+import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
+import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public final class FabricClientModConstructor {
 
@@ -46,8 +41,6 @@ public final class FabricClientModConstructor {
         constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());
         registerClientParticleTypesManager(modId, constructor::onRegisterParticleProviders, flagsToHandle);
         constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
-        constructor.onRegisterSearchTrees(new SearchRegistryContextFabricImpl());
-        registerModelBakingListeners(modId, constructor::onModifyBakingResult, constructor::onBakingCompleted);
         constructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
         constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
@@ -60,23 +53,6 @@ public final class FabricClientModConstructor {
         constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
         registerRenderProperties(constructor);
         registerCoreShaders(constructor::onRegisterCoreShaders);
-    }
-
-    private static void registerModelBakingListeners(String modId, Consumer<DynamicModifyBakingResultContext> modifyBakingResultConsumer, Consumer<DynamicBakingCompletedContext> bakingCompletedConsumer) {
-        FabricClientEvents.MODIFY_BAKING_RESULT.register((Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
-            try {
-                modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery.get()));
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
-            }
-        });
-        FabricClientEvents.BAKING_COMPLETED.register((Supplier<ModelManager> modelManager, Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
-            try {
-                bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager.get(), models, modelBakery.get()));
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
-            }
-        });
     }
 
     private static void registerClientParticleTypesManager(String modId, Consumer<ParticleProvidersContext> consumer, Set<ContentRegistrationFlags> flagsToHandle) {

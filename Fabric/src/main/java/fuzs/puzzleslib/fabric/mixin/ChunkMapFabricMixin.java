@@ -2,14 +2,12 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.mojang.datafixers.DataFixer;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
-import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.storage.ChunkStorage;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -29,13 +27,13 @@ abstract class ChunkMapFabricMixin extends ChunkStorage {
         super(regionFolder, fixerUpper, sync);
     }
 
-    @Inject(method = "updateChunkTracking", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;untrackChunk(Lnet/minecraft/world/level/ChunkPos;)V", shift = At.Shift.AFTER))
-    protected void updateChunkTracking(ServerPlayer player, ChunkPos chunkPos, MutableObject<ClientboundLevelChunkWithLightPacket> packetCache, boolean wasLoaded, boolean load, CallbackInfo callback) {
-        FabricLevelEvents.UNWATCH_CHUNK.invoker().onChunkUnwatch(player, chunkPos, this.level);
+    @Inject(method = "markChunkPendingToSend", at = @At("TAIL"))
+    private static void markChunkPendingToSend(ServerPlayer player, LevelChunk chunk, CallbackInfo callback) {
+        FabricLevelEvents.WATCH_CHUNK.invoker().onChunkWatch(player, chunk, player.serverLevel());
     }
 
-    @Inject(method = "playerLoadedChunk", at = @At("TAIL"))
-    private void playerLoadedChunk(ServerPlayer player, MutableObject<ClientboundLevelChunkWithLightPacket> packetCache, LevelChunk chunk, CallbackInfo callback) {
-        FabricLevelEvents.WATCH_CHUNK.invoker().onChunkWatch(player, chunk, this.level);
+    @Inject(method = "dropChunk", at = @At("HEAD"))
+    private static void dropChunk(ServerPlayer player, ChunkPos chunkPos, CallbackInfo callback) {
+        FabricLevelEvents.UNWATCH_CHUNK.invoker().onChunkUnwatch(player, chunkPos, player.serverLevel());
     }
 }
