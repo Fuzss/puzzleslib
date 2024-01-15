@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.forge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.data.*;
+import fuzs.puzzleslib.api.capability.v3.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -10,7 +10,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 
 /**
- * implementation of {@link fuzs.puzzleslib.api.capability.v2.data.CapabilityKey} for players on Forge
+ * implementation of {@link fuzs.puzzleslib.api.capability.v3.data.CapabilityKey} for players on Forge
  *
  * @param <C> capability type
  */

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.api.capability.v2.data.*;
+import fuzs.puzzleslib.api.capability.v3.data.*;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;

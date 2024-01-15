@@ -27,12 +27,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public final class ForgeRegistryManager extends RegistryManagerImpl {
+public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     @Nullable
     private final IEventBus eventBus;
     private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> registers = Maps.newIdentityHashMap();
 
-    public ForgeRegistryManager(String modId) {
+    public NeoForgeRegistryManager(String modId) {
         super(modId);
         this.eventBus = NeoForgeModContainerHelper.getOptionalModEventBus(modId).orElse(null);
     }

@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.capability;
 
-import fuzs.puzzleslib.api.capability.v2.CapabilityController;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.api.network.v3.ClientMessageListener;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.minecraft.client.Minecraft;

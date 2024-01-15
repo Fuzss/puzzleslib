@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.EntityCapabilityKey;
-import fuzs.puzzleslib.api.capability.v2.data.SyncStrategy;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.EntityCapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredHolder;

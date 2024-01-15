@@ -1,7 +1,7 @@
-package fuzs.puzzleslib.forge.api.capability.v2;
+package fuzs.puzzleslib.forge.api.capability.v3;
 
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgeCapabilityKey;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;

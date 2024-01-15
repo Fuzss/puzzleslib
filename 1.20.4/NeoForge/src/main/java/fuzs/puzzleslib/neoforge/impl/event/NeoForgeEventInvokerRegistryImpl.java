@@ -621,13 +621,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(LivingEquipmentChangeCallback.class, LivingEquipmentChangeEvent.class, (LivingEquipmentChangeCallback callback, LivingEquipmentChangeEvent evt) -> {
             callback.onLivingEquipmentChange(evt.getEntity(), evt.getSlot(), evt.getFrom(), evt.getTo());
         });
-        INSTANCE.register(LivingConversionEvents.Before.class, LivingConversionEvent.Pre.class, (LivingConversionEvents.Before callback, LivingConversionEvent.Pre evt) -> {
-            if (callback.onBeforeLivingConversion(evt.getEntity(), evt.getOutcome()).isInterrupt()) {
-                evt.setCanceled(true);
-            }
-        });
-        INSTANCE.register(LivingConversionEvents.After.class, LivingConversionEvent.Post.class, (LivingConversionEvents.After callback, LivingConversionEvent.Post evt) -> {
-            callback.onAfterLivingConversion(evt.getEntity(), evt.getOutcome());
+        INSTANCE.register(LivingConversionCallback.class, LivingConversionEvent.Post.class, (LivingConversionCallback callback, LivingConversionEvent.Post evt) -> {
+            callback.onLivingConversion(evt.getEntity(), evt.getOutcome());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.register();

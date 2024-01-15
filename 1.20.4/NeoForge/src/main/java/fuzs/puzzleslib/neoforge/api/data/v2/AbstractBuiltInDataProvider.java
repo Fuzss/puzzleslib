@@ -19,7 +19,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.armortrim.TrimMaterial;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;

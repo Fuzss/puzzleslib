@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.capability.v2.data;
+package fuzs.puzzleslib.api.capability.v3.data;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.minecraft.server.level.ServerPlayer;

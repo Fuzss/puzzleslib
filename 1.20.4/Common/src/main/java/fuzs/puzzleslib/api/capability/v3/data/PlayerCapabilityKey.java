@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.capability.v2.data;
+package fuzs.puzzleslib.api.capability.v3.data;
 
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;

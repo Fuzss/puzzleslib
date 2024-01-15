@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.data.*;
+import fuzs.puzzleslib.api.capability.v3.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
