@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(FireBlock.class)
-public interface FireBlockForgeAccessor {
+public interface FireBlockNeoForgeAccessor {
 
     @Invoker("setFlammable")
     void puzzleslib$setFlammable(Block block, int encouragement, int flammability);

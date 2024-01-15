@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(Item.class)
-public interface ItemForgeAccessor {
+public interface ItemNeoForgeAccessor {
 
     @Accessor(value = "renderProperties", remap = false)
     Object puzzleslib$getRenderProperties();

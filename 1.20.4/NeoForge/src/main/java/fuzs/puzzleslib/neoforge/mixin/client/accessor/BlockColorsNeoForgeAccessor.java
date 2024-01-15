@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.Map;
 
 @Mixin(BlockColors.class)
-public interface BlockColorsForgeAccessor {
+public interface BlockColorsNeoForgeAccessor {
 
     @Accessor("blockColors")
     Map<Holder.Reference<Block>, BlockColor> puzzleslib$getBlockColors();

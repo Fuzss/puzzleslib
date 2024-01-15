@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
 import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
-import fuzs.puzzleslib.neoforge.mixin.accessor.PotionBrewingForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.accessor.PotionBrewingNeoForgeAccessor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.Potion;
@@ -22,14 +22,14 @@ public final class NeoForgePotionBrewingRegistry implements PotionBrewingRegistr
         Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(to, "to item is null");
         PotionBrewing.Mix<Item> mix = new PotionBrewing.Mix<>(from, ingredient, to);
-        PotionBrewingForgeAccessor.puzzleslib$getContainerMixes().add(mix);
+        PotionBrewingNeoForgeAccessor.puzzleslib$getContainerMixes().add(mix);
     }
 
     @Override
     public void registerPotionContainer(PotionItem container) {
         Objects.requireNonNull(container, "container item is null");
         Ingredient ingredient = Ingredient.of(container);
-        PotionBrewingForgeAccessor.puzzleslib$getAllowedContainers().add(ingredient);
+        PotionBrewingNeoForgeAccessor.puzzleslib$getAllowedContainers().add(ingredient);
     }
 
     @Override
@@ -38,6 +38,6 @@ public final class NeoForgePotionBrewingRegistry implements PotionBrewingRegistr
         Objects.requireNonNull(ingredient, "ingredient is null");
         Objects.requireNonNull(to, "to potion is null");
         PotionBrewing.Mix<Potion> mix = new PotionBrewing.Mix<>(from, ingredient, to);
-        PotionBrewingForgeAccessor.puzzleslib$getPotionMixes().add(mix);
+        PotionBrewingNeoForgeAccessor.puzzleslib$getPotionMixes().add(mix);
     }
 }

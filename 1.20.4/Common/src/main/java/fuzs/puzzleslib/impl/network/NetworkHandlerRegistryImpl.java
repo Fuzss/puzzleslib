@@ -13,17 +13,17 @@ import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Queue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Builder {
     private final Map<Class<?>, ResourceLocation> messageNames = Maps.newIdentityHashMap();
-    private final List<Class<?>> clientboundMessages = Lists.newArrayList();
-    private final List<Class<?>> serverboundMessages = Lists.newArrayList();
+    private final Queue<Class<?>> clientboundMessages = Lists.newLinkedList();
+    private final Queue<Class<?>> serverboundMessages = Lists.newLinkedList();
     protected final AtomicInteger discriminator = new AtomicInteger();
     protected final ResourceLocation channelName;
     protected boolean optional;
@@ -32,7 +32,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
         this.channelName = channelName;
     }
 
-    public static int getModProtocolVersion(String modId) {
+    public static int getProtocolVersion(String modId) {
         String modVersion = ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getVersion).orElse(String.valueOf(1));
         return Integer.parseInt(modVersion.replaceAll("\\D", ""));
     }
@@ -63,14 +63,12 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
 
     @Override
     public void build() {
-        for (Class<?> message : this.clientboundMessages) {
-            this.registerClientbound$Internal(message);
+        while (!this.clientboundMessages.isEmpty()) {
+            this.registerClientbound$Internal(this.clientboundMessages.poll());
         }
-        for (Class<?> message : this.serverboundMessages) {
-            this.registerServerbound$Internal(message);
+        while (!this.serverboundMessages.isEmpty()) {
+            this.registerServerbound$Internal(this.serverboundMessages.poll());
         }
-        this.clientboundMessages.clear();
-        this.serverboundMessages.clear();
     }
 
     protected ResourceLocation registerMessageType(Class<?> clazz) {

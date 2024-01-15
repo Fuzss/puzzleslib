@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.biome;
 
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
-import fuzs.puzzleslib.neoforge.mixin.accessor.MobSpawnSettingsBuilderForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.accessor.MobSpawnSettingsBuilderNeoForgeAccessor;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -45,7 +45,7 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
 
     @Override
     public boolean clearSpawnCost(EntityType<?> entityType) {
-        return ((MobSpawnSettingsBuilderForgeAccessor) this.context).puzzleslib$getMobSpawnCosts().remove(entityType) != null;
+        return ((MobSpawnSettingsBuilderNeoForgeAccessor) this.context).puzzleslib$getMobSpawnCosts().remove(entityType) != null;
     }
 
     @Override

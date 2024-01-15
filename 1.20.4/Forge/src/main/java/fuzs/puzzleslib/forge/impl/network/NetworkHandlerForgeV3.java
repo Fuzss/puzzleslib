@@ -74,7 +74,7 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     }
 
     private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
-        int protocolVersion = getModProtocolVersion(resourceLocation.getNamespace());
+        int protocolVersion = getProtocolVersion(resourceLocation.getNamespace());
         return ChannelBuilder
                 .named(resourceLocation)
                 .networkProtocolVersion(protocolVersion)

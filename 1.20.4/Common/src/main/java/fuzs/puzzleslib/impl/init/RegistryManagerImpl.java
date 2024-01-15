@@ -15,11 +15,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public abstract class RegistryManagerV3Impl implements RegistryManager {
+public abstract class RegistryManagerImpl implements RegistryManager {
     protected final String modId;
     protected Set<ModLoader> allowedModLoaders = EnumSet.allOf(ModLoader.class);
 
-    protected RegistryManagerV3Impl(String modId) {
+    protected RegistryManagerImpl(String modId) {
         this.modId = modId;
     }
 
@@ -37,12 +37,12 @@ public abstract class RegistryManagerV3Impl implements RegistryManager {
     }
 
     @Override
-    public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+    public final <T> Holder<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(supplier, "supplier is null");
-        Holder.Reference<T> holder;
+        Holder<T> holder;
         if (!this.allowedModLoaders.contains(ModLoaderEnvironment.INSTANCE.getModLoader())) {
-            holder = this.getHolder(registryKey, path);
+            holder = this.getHolderReference(registryKey, path);
         } else {
             holder = this.register$Internal(registryKey, path, supplier);
         }
@@ -50,5 +50,5 @@ public abstract class RegistryManagerV3Impl implements RegistryManager {
         return holder;
     }
 
-    protected abstract <T> Holder.Reference<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
+    protected abstract <T> Holder<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 }

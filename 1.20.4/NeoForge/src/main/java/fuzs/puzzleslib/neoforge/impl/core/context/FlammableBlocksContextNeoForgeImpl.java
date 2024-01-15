@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.FlammableBlocksContext;
-import fuzs.puzzleslib.neoforge.mixin.accessor.FireBlockForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.accessor.FireBlockNeoForgeAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 
@@ -18,7 +18,7 @@ public final class FlammableBlocksContextNeoForgeImpl implements FlammableBlocks
         Preconditions.checkPositionIndex(1, blocks.length, "blocks is empty");
         for (Block block : blocks) {
             Objects.requireNonNull(block, "block is null");
-            ((FireBlockForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(block, encouragement, flammability);
+            ((FireBlockNeoForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(block, encouragement, flammability);
         }
     }
 }

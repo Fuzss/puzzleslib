@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Map;
 
 @Mixin(ModelManager.class)
-abstract class ModelManagerForgeMixin {
+abstract class ModelManagerNeoForgeMixin {
 
     @Inject(method = "loadModels", at = @At("HEAD"))
     private void loadModels(ProfilerFiller profilerFiller, Map<ResourceLocation, AtlasSet.StitchResult> atlasPreparations, ModelBakery modelBakery, CallbackInfoReturnable<Object> callback) {

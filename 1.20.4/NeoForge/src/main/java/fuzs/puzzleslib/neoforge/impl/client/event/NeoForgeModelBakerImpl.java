@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.event;
 import com.mojang.math.Transformation;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.neoforge.mixin.client.accessor.ModelBakeryAccessor;
+import fuzs.puzzleslib.neoforge.mixin.client.accessor.ModelBakeryNeoForgeAccessor;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
@@ -74,7 +74,7 @@ public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, 
         BakedModel bakedModel = this.bakedCache.get(key);
         if (bakedModel == null) {
             if (unbakedModel instanceof BlockModel blockModel && blockModel.getRootModel() == ModelBakery.GENERATION_MARKER) {
-                return ModelBakeryAccessor.puzzleslib$getItemModelGenerator().generateBlockModel(modelTextureGetter, blockModel).bake(this, blockModel, modelTextureGetter, modelState, resourceLocation, false);
+                return ModelBakeryNeoForgeAccessor.puzzleslib$getItemModelGenerator().generateBlockModel(modelTextureGetter, blockModel).bake(this, blockModel, modelTextureGetter, modelState, resourceLocation, false);
             }
             try {
                 bakedModel = unbakedModel.bake(this, modelTextureGetter, modelState, resourceLocation);

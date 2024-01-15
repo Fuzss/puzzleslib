@@ -13,7 +13,7 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerEvents;
-import fuzs.puzzleslib.api.init.v2.RegistryManager;
+import fuzs.puzzleslib.api.init.v3.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
@@ -25,21 +25,18 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public abstract class ModContext {
     private static final Map<String, ModContext> MOD_CONTEXTS = Maps.newConcurrentMap();
 
-    protected final AtomicInteger networkHandlers = new AtomicInteger();
     protected final String modId;
     private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
     private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
     private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
     private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
-    @Nullable protected RegistryManager registryManagerV2;
-    @Nullable protected fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
+    @Nullable protected RegistryManager registryManager;
     @Nullable protected CapabilityController capabilityController;
     // true by default for dedicated servers, is reset on client when joining new world
     private boolean presentServerside = true;
@@ -96,9 +93,7 @@ public abstract class ModContext {
 
     public abstract ConfigHolder.Builder getConfigHolder$Builder();
 
-    public abstract RegistryManager getRegistryManagerV2();
-
-    public abstract fuzs.puzzleslib.api.init.v3.RegistryManager getRegistryManagerV3();
+    public abstract RegistryManager getRegistryManager();
 
     public abstract CapabilityController getCapabilityController();
 

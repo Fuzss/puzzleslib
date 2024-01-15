@@ -17,7 +17,7 @@
     "client.accessor.BlockColorsForgeAccessor",
     "client.accessor.ItemColorsForgeAccessor",
     "client.accessor.ItemForgeAccessor",
-    "client.accessor.ModelBakeryAccessor"
+    "client.accessor.ModelBakeryForgeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

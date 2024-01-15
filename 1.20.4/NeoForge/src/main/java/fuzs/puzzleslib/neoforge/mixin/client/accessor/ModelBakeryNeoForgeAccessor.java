@@ -6,7 +6,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(ModelBakery.class)
-public interface ModelBakeryAccessor {
+public interface ModelBakeryNeoForgeAccessor {
 
     @Accessor("ITEM_MODEL_GENERATOR")
     static ItemModelGenerator puzzleslib$getItemModelGenerator() {

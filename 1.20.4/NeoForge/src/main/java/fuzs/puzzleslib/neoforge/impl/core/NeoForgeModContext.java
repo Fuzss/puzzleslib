@@ -2,14 +2,12 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.neoforge.impl.capability.NeoForgeCapabilityController;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
-import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.neoforge.impl.init.ForgeRegistryManagerV2;
-import fuzs.puzzleslib.neoforge.impl.init.ForgeRegistryManagerV3;
+import fuzs.puzzleslib.neoforge.impl.init.ForgeRegistryManager;
 import fuzs.puzzleslib.neoforge.impl.network.NetworkHandlerNeoForgeV2;
 import fuzs.puzzleslib.neoforge.impl.network.NetworkHandlerNeoForgeV3;
 import net.minecraft.resources.ResourceLocation;
@@ -36,19 +34,11 @@ public final class NeoForgeModContext extends ModContext {
     }
 
     @Override
-    public RegistryManager getRegistryManagerV2() {
-        if (this.registryManagerV2 == null) {
-            this.registryManagerV2 = new ForgeRegistryManagerV2(this.modId);
+    public fuzs.puzzleslib.api.init.v3.RegistryManager getRegistryManager() {
+        if (this.registryManager == null) {
+            this.registryManager = new ForgeRegistryManager(this.modId);
         }
-        return this.registryManagerV2;
-    }
-
-    @Override
-    public fuzs.puzzleslib.api.init.v3.RegistryManager getRegistryManagerV3() {
-        if (this.registryManagerV3 == null) {
-            this.registryManagerV3 = new ForgeRegistryManagerV3(this.modId);
-        }
-        return this.registryManagerV3;
+        return this.registryManager;
     }
 
     @Override

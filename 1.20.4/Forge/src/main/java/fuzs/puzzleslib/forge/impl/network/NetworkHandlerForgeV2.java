@@ -35,17 +35,18 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
 
     @Override
     public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz) {
-        this.register(clazz, NetworkHandlerImplHelper.getMessageDecoder(clazz), LogicalSide.CLIENT);
+        this.register(clazz, LogicalSide.CLIENT);
         return this;
     }
 
     @Override
     public <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz) {
-        this.register(clazz, NetworkHandlerImplHelper.getMessageDecoder(clazz), LogicalSide.SERVER);
+        this.register(clazz, LogicalSide.SERVER);
         return this;
     }
 
-    private <T extends MessageV2<T>> void register(Class<T> clazz, Function<FriendlyByteBuf, T> decoder, LogicalSide receptionSide) {
+    private <T extends MessageV2<T>> void register(Class<T> clazz, LogicalSide receptionSide) {
+        Function<FriendlyByteBuf, T> decoder = NetworkHandlerImplHelper.getMessageDecoder(clazz);
         BiConsumer<T, CustomPayloadEvent.Context> handle = (T message, CustomPayloadEvent.Context context) -> {
             LogicalSide expectedReceptionSide = context.getDirection().getReceptionSide();
             if (expectedReceptionSide != receptionSide) {
@@ -66,18 +67,18 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
 
     @SuppressWarnings("unchecked")
     @Override
-    public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
-        return (Packet<ServerCommonPacketListener>) NetworkDirection.PLAY_TO_SERVER.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
     public Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message) {
         return (Packet<ClientCommonPacketListener>) NetworkDirection.PLAY_TO_CLIENT.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
+        return (Packet<ServerCommonPacketListener>) NetworkDirection.PLAY_TO_SERVER.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
+    }
+
     private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
-        int protocolVersion = NetworkHandlerRegistryImpl.getModProtocolVersion(resourceLocation.getNamespace());
+        int protocolVersion = NetworkHandlerRegistryImpl.getProtocolVersion(resourceLocation.getNamespace());
         return ChannelBuilder
                 .named(resourceLocation)
                 .networkProtocolVersion(protocolVersion)

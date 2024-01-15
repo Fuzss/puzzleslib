@@ -27,7 +27,6 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
-import fuzs.puzzleslib.neoforge.mixin.accessor.ForgeRegistryForgeAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -74,7 +73,7 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import net.neoforged.neoforge.registries.RegistryManager;
+import net.neoforged.neoforge.registries.callback.AddCallback;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -640,20 +639,17 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
         Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
-        IForgeRegistry<T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(resourceKey);
         boolean[] loadComplete = new boolean[1];
-        // synchronize on the Forge registry to allow other mods requiring synchronization here to do so as well
-        synchronized (forgeRegistry) {
-            final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
-            final IForgeRegistry.AddCallback<T> newAddCallback = (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
-                // we probably don't want to handle replacements...
-                if (loadComplete[0] || oldObj != null) return;
+        // synchronize on the registry to allow other mods requiring synchronization here to do so as well
+        synchronized (registry) {
+            registry.addCallback((AddCallback<T>) (Registry<T> callbackRegistry, int id, ResourceKey<T> key, T value) -> {
+                if (loadComplete[0]) return;
                 try {
-                    callback.onRegistryEntryAdded(registry, key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+                    callback.onRegistryEntryAdded(callbackRegistry, key.location(), value, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
                         try {
                             T t = supplier.get();
                             Objects.requireNonNull(t, "entry is null");
-                            owner.register(resourceLocation, t);
+                            Registry.register(registry, resourceLocation, t);
                         } catch (Exception exception) {
                             PuzzlesLib.LOGGER.error("Failed to register new entry", exception);
                         }
@@ -661,11 +657,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
                 }
-            };
-            ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
-                originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
-                newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
-            } : newAddCallback);
+            });
         }
         IEventBus eventBus = NeoForgeModContainerHelper.getActiveModEventBus();
         // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
@@ -677,7 +669,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         // store all event invocations for vanilla game content already registered before the registration event runs
         // the add callback above won't trigger for those as they are already registered when mods are constructed
         Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> callbacks = Sets.newLinkedHashSet();
-        for (Map.Entry<ResourceKey<T>, T> entry : forgeRegistry.getEntries()) {
+        for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
             callbacks.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
                 try {
                     callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);

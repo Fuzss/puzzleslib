@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.SpecialEffectsContext;
-import fuzs.puzzleslib.neoforge.mixin.accessor.BiomeSpecialEffectsBuilderForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
@@ -63,7 +63,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setFoliageColorOverride(Optional<Integer> foliageColorOverride) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(foliageColorOverride);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(foliageColorOverride);
     }
 
     @Override
@@ -73,7 +73,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setGrassColorOverride(Optional<Integer> grassColorOverride) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setGrassColorOverride(grassColorOverride);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setGrassColorOverride(grassColorOverride);
     }
 
     @Override
@@ -94,7 +94,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientParticle(ambientParticleSettings);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientParticle(ambientParticleSettings);
     }
 
     @Override
@@ -104,7 +104,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(ambientLoopSoundEvent);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(ambientLoopSoundEvent);
     }
 
     @Override
@@ -114,7 +114,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(ambientMoodSettings);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(ambientMoodSettings);
     }
 
     @Override
@@ -124,7 +124,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(ambientAdditionsSettings);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(ambientAdditionsSettings);
     }
 
     @Override
@@ -134,7 +134,7 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setBackgroundMusic(Optional<Music> backgroundMusic) {
-        ((BiomeSpecialEffectsBuilderForgeAccessor) this.context).puzzleslib$setBackgroundMusic(backgroundMusic);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setBackgroundMusic(backgroundMusic);
     }
 
     @Override

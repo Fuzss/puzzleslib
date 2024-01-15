@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.ColorProvidersContext;
-import fuzs.puzzleslib.neoforge.mixin.client.accessor.ItemColorsForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.client.accessor.ItemColorsNeoForgeAccessor;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.world.item.Item;
@@ -29,6 +29,6 @@ public record ItemColorProvidersContextNeoForgeImpl(BiConsumer<ItemColor, ItemLi
 
     @Override
     public @Nullable ItemColor getProvider(Item item) {
-        return ((ItemColorsForgeAccessor) this.itemColors).puzzleslib$getItemColors().get(ForgeRegistries.ITEMS.getDelegateOrThrow(item));
+        return ((ItemColorsNeoForgeAccessor) this.itemColors).puzzleslib$getItemColors().get(ForgeRegistries.ITEMS.getDelegateOrThrow(item));
     }
 }
