@@ -13,9 +13,14 @@ import java.util.Objects;
  */
 public abstract class CapabilityComponent<T> {
     private boolean initialized;
-    private Runnable callback;
+    private CapabilityKey<T, CapabilityComponent<T>> capabilityKey;
     private T holder;
 
+    /**
+     * Getter for the holder of this component.
+     *
+     * @return the component holder
+     */
     protected final T getHolder() {
         Objects.requireNonNull(this.holder, "holder is null");
         return this.holder;
@@ -25,9 +30,7 @@ public abstract class CapabilityComponent<T> {
     public final void initialize(CapabilityKey<T, CapabilityComponent<T>> capabilityKey, T holder) {
         if (!this.initialized) {
             this.initialized = true;
-            this.callback = () -> {
-                capabilityKey.setChanged(this);
-            };
+            this.capabilityKey = capabilityKey;
             this.holder = holder;
         } else {
             throw new IllegalStateException("Capability component '%s' already initialized".formatted(capabilityKey.identifier()));
@@ -35,6 +38,8 @@ public abstract class CapabilityComponent<T> {
     }
 
     /**
+     * Serialize the component to a {@link CompoundTag}.
+     *
      * @param tag tag to write to
      */
     @ApiStatus.OverrideOnly
@@ -43,6 +48,8 @@ public abstract class CapabilityComponent<T> {
     }
 
     /**
+     * Deserialize the component from a {@link CompoundTag}.
+     *
      * @param tag tag to read from
      */
     @ApiStatus.OverrideOnly
@@ -51,7 +58,9 @@ public abstract class CapabilityComponent<T> {
     }
 
     /**
-     * @return this capability serialized to {@link CompoundTag}
+     * Serialize the component to a {@link CompoundTag}.
+     *
+     * @return the capability serialized to {@link CompoundTag}
      */
     @ApiStatus.Internal
     public CompoundTag toCompoundTag() {
@@ -62,9 +71,11 @@ public abstract class CapabilityComponent<T> {
 
     /**
      * To be called when capability data changed and requires serializing and / or syncing.
+     *
+     * <p>Should basically be called in all setters after the new value has been set.
      */
     @MustBeInvokedByOverriders
     public void setChanged() {
-        this.callback.run();
+        this.capabilityKey.setChanged(this);
     }
 }

@@ -7,6 +7,8 @@ import com.google.common.collect.Multimaps;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
+import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.fabric.api.capability.v2.initializer.BlockComponentInitializerImpl;
 import fuzs.puzzleslib.fabric.api.capability.v2.initializer.ChunkComponentInitializerImpl;
@@ -15,6 +17,7 @@ import fuzs.puzzleslib.fabric.api.capability.v2.initializer.WorldComponentInitia
 import fuzs.puzzleslib.fabric.impl.capability.data.ComponentHolder;
 import fuzs.puzzleslib.fabric.impl.capability.data.FabricCapabilityKey;
 import fuzs.puzzleslib.fabric.impl.capability.data.FabricPlayerCapabilityKey;
+import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -71,7 +74,7 @@ public final class FabricCapabilityController implements CapabilityController {
     }
 
     private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<?> objectType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, ComponentFactoryRegistry<T> capabilityRegistry, FabricCapabilityKey.FabricCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
-        if (!VALID_CAPABILITY_TYPES.contains(objectType)) {
+        if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(objectType)) {
             throw new IllegalArgumentException(objectType + " is an invalid type");
         }
         final ComponentKey<ComponentHolder> componentKey = ComponentRegistryV3.INSTANCE.getOrCreate(new ResourceLocation(this.namespace, capabilityKey), ComponentHolder.class);

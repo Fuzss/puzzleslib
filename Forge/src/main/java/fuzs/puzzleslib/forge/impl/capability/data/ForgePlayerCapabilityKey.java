@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.forge.impl.capability.data;
 
+import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
+import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -23,7 +25,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     /**
      * strategy for syncing this capability data to remote
      */
-    private SyncStrategy syncStrategy = SyncStrategies.MANUAL;
+    private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
 
     /**
      * @param id                capability id
@@ -57,11 +59,11 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
      * @return                  builder
      */
     public ForgePlayerCapabilityKey<C> setSyncStrategy(SyncStrategy syncStrategy) {
-        if (this.syncStrategy != SyncStrategies.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
+        if (this.syncStrategy != SyncStrategy.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
         this.syncStrategy = syncStrategy;
         MinecraftForge.EVENT_BUS.addListener(this::onPlayerLoggedIn);
         MinecraftForge.EVENT_BUS.addListener(this::onPlayerChangedDimension);
-        if (syncStrategy == SyncStrategies.SELF_AND_TRACKING) {
+        if (syncStrategy == SyncStrategy.TRACKING) {
             MinecraftForge.EVENT_BUS.addListener(this::onStartTracking);
         }
         return this;
@@ -100,7 +102,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     private void onStartTracking(final PlayerEvent.StartTracking evt) {
         this.maybeGet(evt.getTarget()).ifPresent(capability -> {
             // we only want to sync to the client that just started tracking, so use SyncStrategy#SELF
-            PlayerCapabilityKey.syncCapabilityToRemote(evt.getTarget(), (ServerPlayer) evt.getEntity(), SyncStrategies.SELF, capability, this.identifier(), true);
+            PlayerCapabilityKey.syncCapabilityToRemote(evt.getTarget(), (ServerPlayer) evt.getEntity(), SyncStrategy.SELF, capability, this.identifier(), true);
         });
     }
 }

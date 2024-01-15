@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
+import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
@@ -18,7 +18,7 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
     public NeoForgeCapabilityKey(DeferredHolder<AttachmentType<?>, AttachmentType<C>> holder, Predicate<Object> filter) {
         this.holder = holder;
         this.filter = filter;
-        CapabilityController.register(this);
+        GlobalCapabilityRegister.register(this);
     }
 
     @Override
@@ -43,8 +43,8 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
     }
 
     @FunctionalInterface
-    public interface Factory<T, C extends CapabilityComponent<T>, F extends CapabilityKey<T, C>> {
+    public interface Factory<T, C1 extends CapabilityComponent<T>, C2 extends CapabilityKey<T, C1>> {
 
-        F apply(DeferredHolder<AttachmentType<?>, AttachmentType<C>> holder, Predicate<Object> filter);
+        C2 apply(DeferredHolder<AttachmentType<?>, AttachmentType<C1>> holder, Predicate<Object> filter);
     }
 }

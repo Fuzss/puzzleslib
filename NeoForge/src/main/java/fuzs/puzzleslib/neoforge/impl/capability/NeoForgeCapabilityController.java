@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.capability;
 
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.*;
+import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.capability.data.*;
 import net.minecraft.nbt.CompoundTag;
@@ -29,7 +30,7 @@ public final class NeoForgeCapabilityController implements CapabilityController 
     }
 
     @Override
-    public <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType) {
+    public <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType) {
         return this.registerCapability(Entity.class, identifier, capabilityFactory, entityType::isInstance, NeoForgeEntityCapabilityKey::new);
     }
 
@@ -53,7 +54,7 @@ public final class NeoForgeCapabilityController implements CapabilityController 
     }
 
     private <T, C1 extends CapabilityComponent<T>, C2 extends CapabilityKey<T, C1>> C2 registerCapability(Class<? extends IAttachmentHolder> providerType, String identifier, Supplier<C1> capabilityFactory, Predicate<Object> filter, NeoForgeCapabilityKey.Factory<T, C1, C2> capabilityKeyFactory) {
-        if (!VALID_CAPABILITY_TYPES.contains(providerType)) {
+        if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(providerType)) {
             throw new IllegalArgumentException(providerType + " is an invalid type");
         }
         C2[] capabilityKey = (C2[]) new Object[1];

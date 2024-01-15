@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
+import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +34,7 @@ public class FabricCapabilityKey<C extends CapabilityComponent> implements Capab
     public FabricCapabilityKey(ComponentKey<ComponentHolder> capability, Class<C> componentClass) {
         this.capability = capability;
         this.componentClass = componentClass;
-        CapabilityController.register(this);
+        GlobalCapabilityRegister.register(this);
     }
 
     @Override

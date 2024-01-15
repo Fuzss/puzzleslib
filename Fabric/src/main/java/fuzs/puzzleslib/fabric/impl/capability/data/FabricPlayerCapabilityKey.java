@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
+import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.*;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
@@ -20,7 +21,7 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
     /**
      * strategy for syncing this capability data to remote
      */
-    private SyncStrategy syncStrategy = SyncStrategies.MANUAL;
+    private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
 
     /**
      * @param capability     the wrapped {@link ComponentKey}
@@ -35,7 +36,7 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
      * @return                  builder
      */
     public FabricPlayerCapabilityKey<C> setSyncStrategy(SyncStrategy syncStrategy) {
-        if (this.syncStrategy != SyncStrategies.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
+        if (this.syncStrategy != SyncStrategy.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
         this.syncStrategy = syncStrategy;
         ServerEntityEvents.ENTITY_LOAD.register((Entity entity, ServerLevel world) -> {
             this.maybeGet(entity).ifPresent(capability -> {
@@ -47,11 +48,11 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
                 PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, capability, this.identifier(), true);
             });
         });
-        if (syncStrategy == SyncStrategies.SELF_AND_TRACKING) {
+        if (syncStrategy == SyncStrategy.TRACKING) {
             EntityTrackingEvents.START_TRACKING.register((Entity trackedEntity, ServerPlayer player) -> {
                 this.maybeGet(trackedEntity).ifPresent(capability -> {
                     // we only want to sync to the client that just started tracking, so use SyncStrategy#SELF
-                    PlayerCapabilityKey.syncCapabilityToRemote(trackedEntity, player, SyncStrategies.SELF, capability, this.identifier(), true);
+                    PlayerCapabilityKey.syncCapabilityToRemote(trackedEntity, player, SyncStrategy.SELF, capability, this.identifier(), true);
                 });
             });
         }
