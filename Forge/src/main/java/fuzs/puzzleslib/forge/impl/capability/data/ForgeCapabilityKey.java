@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.forge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.CapabilityController;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;

@@ -4,8 +4,8 @@ import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;

@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.neoforge.impl.data.ExistingFileHelperHolder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.Objects;
 import java.util.stream.Stream;

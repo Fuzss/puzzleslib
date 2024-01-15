@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.capability.v2.data;
+package fuzs.puzzleslib.api.capability.v3.data;
 
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;

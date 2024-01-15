@@ -29,7 +29,7 @@ abstract class ScreenFabricMixin extends AbstractContainerEventHandler implement
 
     @Inject(method = "init(Lnet/minecraft/client/Minecraft;II)V", at = @At("HEAD"))
     public void init(Minecraft client, int width, int height, CallbackInfo callback) {
-        this.puzzleslib$allowMouseDragEvent = FabricEventFactory.createSimpleResult(ExtraScreenMouseEvents.AllowMouseDrag.class, false);
+        this.puzzleslib$allowMouseDragEvent = FabricEventFactory.createBooleanResult(ExtraScreenMouseEvents.AllowMouseDrag.class, false);
         this.puzzleslib$beforeMouseDragEvent = FabricEventFactory.create(ExtraScreenMouseEvents.BeforeMouseDrag.class);
         this.puzzleslib$afterMouseDragEvent = FabricEventFactory.create(ExtraScreenMouseEvents.AfterMouseDrag.class);
     }
@@ -38,7 +38,7 @@ abstract class ScreenFabricMixin extends AbstractContainerEventHandler implement
     public Event<ExtraScreenMouseEvents.AllowMouseDrag> puzzleslib$getAllowMouseDragEvent() {
         // TODO remove in 1.20.2, it is fixed in Controlify by then
         if (ModLoaderEnvironment.INSTANCE.isModLoaded("controlify") && this.puzzleslib$allowMouseDragEvent == null) {
-            this.puzzleslib$allowMouseDragEvent = FabricEventFactory.createSimpleResult(ExtraScreenMouseEvents.AllowMouseDrag.class, false);
+            this.puzzleslib$allowMouseDragEvent = FabricEventFactory.createBooleanResult(ExtraScreenMouseEvents.AllowMouseDrag.class, false);
         }
         Objects.requireNonNull(this.puzzleslib$allowMouseDragEvent, "allow mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$allowMouseDragEvent;

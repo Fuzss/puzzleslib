@@ -5,8 +5,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.event.v1.*;
-import fuzs.puzzleslib.api.event.v1.core.*;
+import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
 import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
@@ -330,6 +332,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
+        INSTANCE.register(LivingConversionCallback.class, FabricLivingEvents.LIVING_CONVERSION);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.register();
         } else {

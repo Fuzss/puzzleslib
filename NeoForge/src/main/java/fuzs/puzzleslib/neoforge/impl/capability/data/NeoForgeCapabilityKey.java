@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.CapabilityController;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;

@@ -24,8 +24,8 @@ import fuzs.puzzleslib.forge.api.event.v1.core.ForgeEventInvokerRegistry;
 import fuzs.puzzleslib.forge.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.forge.mixin.accessor.ForgeRegistryForgeAccessor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.event.EventImplHelper;
 import fuzs.puzzleslib.impl.event.AttributeModifiersMultimap;
+import fuzs.puzzleslib.impl.event.EventImplHelper;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.core.Holder;
@@ -629,13 +629,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(LivingEquipmentChangeCallback.class, LivingEquipmentChangeEvent.class, (LivingEquipmentChangeCallback callback, LivingEquipmentChangeEvent evt) -> {
             callback.onLivingEquipmentChange(evt.getEntity(), evt.getSlot(), evt.getFrom(), evt.getTo());
         });
-        INSTANCE.register(LivingConversionEvents.Before.class, LivingConversionEvent.Pre.class, (LivingConversionEvents.Before callback, LivingConversionEvent.Pre evt) -> {
-            if (callback.onBeforeLivingConversion(evt.getEntity(), evt.getOutcome()).isInterrupt()) {
-                evt.setCanceled(true);
-            }
-        });
-        INSTANCE.register(LivingConversionEvents.After.class, LivingConversionEvent.Post.class, (LivingConversionEvents.After callback, LivingConversionEvent.Post evt) -> {
-            callback.onAfterLivingConversion(evt.getEntity(), evt.getOutcome());
+        INSTANCE.register(LivingConversionCallback.class, LivingConversionEvent.Post.class, (LivingConversionCallback callback, LivingConversionEvent.Post evt) -> {
+            callback.onLivingConversion(evt.getEntity(), evt.getOutcome());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();

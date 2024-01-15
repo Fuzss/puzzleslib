@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.capability;
 
-import fuzs.puzzleslib.api.capability.v2.CapabilityController;
-import fuzs.puzzleslib.api.capability.v2.data.*;
+import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.capability.data.*;
 import net.minecraft.nbt.CompoundTag;

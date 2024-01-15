@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.forge.impl.core;
 
-import fuzs.puzzleslib.api.capability.v2.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.init.v3.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;

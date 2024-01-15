@@ -1,19 +1,23 @@
-package fuzs.puzzleslib.neoforge.api.data.v1.recipes;
+package fuzs.puzzleslib.neoforge.api.data.v2.recipes;
 
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
-import net.minecraft.advancements.CriterionTriggerInstance;
-import net.minecraft.data.recipes.FinishedRecipe;
+import fuzs.puzzleslib.impl.item.CopyTagShapelessRecipe;
+import net.minecraft.advancements.Advancement;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.advancements.Criterion;
 import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
+import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
 
 public class CopyTagShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     private Ingredient copyFrom;
@@ -61,7 +65,7 @@ public class CopyTagShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     @Override
-    public CopyTagShapelessRecipeBuilder unlockedBy(String criterionName, CriterionTriggerInstance criterionTrigger) {
+    public CopyTagShapelessRecipeBuilder unlockedBy(String criterionName, Criterion<?> criterionTrigger) {
         super.unlockedBy(criterionName, criterionTrigger);
         return this;
     }
@@ -82,12 +86,20 @@ public class CopyTagShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     @Override
-    public void save(Consumer<FinishedRecipe> finishedRecipeConsumer, ResourceLocation resourceLocation) {
-        super.save(finishedRecipe -> {
-            RecipeSerializer<?> recipeSerializer = CopyTagRecipe.getModSerializer(resourceLocation.getNamespace(), CopyTagRecipe.SHAPELESS_RECIPE_SERIALIZER_ID);
-            finishedRecipeConsumer.accept(new ForwardingFinishedRecipe(finishedRecipe, json -> {
-                json.add("copy_from", this.copyFrom.toJson());
-            }, recipeSerializer));
+    public void save(RecipeOutput recipeOutput, ResourceLocation resourceLocation) {
+        super.save(new RecipeOutput() {
+
+            @Override
+            public Advancement.Builder advancement() {
+                return recipeOutput.advancement();
+            }
+
+            @Override
+            public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
+                RecipeSerializer<?> recipeSerializer = CopyTagRecipe.getModSerializer(resourceLocation.getNamespace(), CopyTagRecipe.SHAPELESS_RECIPE_SERIALIZER_ID);
+                recipe = new CopyTagShapelessRecipe(recipeSerializer, (ShapelessRecipe) recipe, CopyTagShapelessRecipeBuilder.this.copyFrom);
+                recipeOutput.accept(id, recipe, advancement, conditions);
+            }
         }, resourceLocation);
     }
 }

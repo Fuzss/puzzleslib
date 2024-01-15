@@ -6,7 +6,7 @@ import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
 import dev.onyxstudios.cca.api.v3.entity.RespawnCopyStrategy;
-import fuzs.puzzleslib.api.capability.v2.data.CopyStrategy;
+import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistry;
 import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
 import fuzs.puzzleslib.fabric.impl.capability.data.ComponentHolder;

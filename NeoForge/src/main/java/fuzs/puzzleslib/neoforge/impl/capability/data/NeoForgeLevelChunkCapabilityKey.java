@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.LevelChunkCapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.LevelChunkCapabilityKey;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.DeferredHolder;

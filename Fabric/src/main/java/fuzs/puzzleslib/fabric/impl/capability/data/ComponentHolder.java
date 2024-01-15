@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import net.minecraft.nbt.CompoundTag;
 
 /**

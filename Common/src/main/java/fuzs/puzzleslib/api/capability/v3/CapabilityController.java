@@ -1,7 +1,7 @@
-package fuzs.puzzleslib.api.capability.v2;
+package fuzs.puzzleslib.api.capability.v3;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.capability.v2.data.*;
+import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;

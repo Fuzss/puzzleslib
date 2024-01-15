@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.forge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.Capability;

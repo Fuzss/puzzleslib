@@ -14,7 +14,9 @@ import java.lang.reflect.Proxy;
 
 /**
  * A helper class for avoiding boilerplate code when defining new events on Fabric.
+ *
  * <p>Especially useful when converting events from common to dedicated Fabric {@link Event}s.
+ *
  * <p>Thanks a lot to <a href="https://github.com/architectury/architectury-api/blob/1.19.3/common/src/main/java/dev/architectury/event/EventFactory.java">EventFactory.java</a> from Architectury API for this implementation.
  */
 @SuppressWarnings("unchecked")
@@ -42,6 +44,7 @@ public final class FabricEventFactory {
 
     /**
      * Creates a new event from a functional interface with an event result, meaning the interface method returns {@link EventResult}.
+     *
      * <p>The implementation stops for the first callback that does not return {@link EventResult#PASS}.
      *
      * @param type event type
@@ -66,6 +69,7 @@ public final class FabricEventFactory {
 
     /**
      * Creates a new event from a functional interface with an event result holder, meaning the interface method returns an instance of {@link EventResultHolder}.
+     *
      * <p>The implementation stops for the first callback that does not return {@link EventResultHolder#pass()}.
      *
      * @param type event type
@@ -90,16 +94,17 @@ public final class FabricEventFactory {
 
     /**
      * Creates a new event from a functional interface with a boolean result, meaning the interface method returns a primitive boolean.
+     *
      * <p>The implementation stops for the first callback that returns the same value as provided by <code>inverted</code>.
-     * <p>While our own implementations are encouraged to use the custom {@link EventResult} class for returning a result,
-     * this helper method exists to aid in creating events similar to implementations in Fabric Api.
+     *
+     * <p>This helper method exists to aid in creating events similar to implementations in Fabric Api.
      *
      * @param type     event type
      * @param inverted should boolean result be inverted when determining when to interrupt event invocation
      * @param <T>      event type
      * @return the Fabric event
      */
-    public static <T> Event<T> createSimpleResult(Class<? super T> type, boolean inverted) {
+    public static <T> Event<T> createBooleanResult(Class<? super T> type, boolean inverted) {
         return EventFactory.createArrayBacked(type, events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type}, new AbstractInvocationHandler() {
 
             @Override
@@ -117,15 +122,16 @@ public final class FabricEventFactory {
 
     /**
      * Creates a new event from a functional interface with a vanilla result, meaning the interface method returns {@link InteractionResult}.
+     *
      * <p>The implementation stops for the first callback that does not return {@link InteractionResult#PASS}.
-     * <p>While our own implementations are encouraged to use the custom {@link EventResult} class for returning a result,
-     * this helper method exists to aid in creating events similar to implementations in Fabric Api.
+     *
+     * <p>This helper method exists to aid in creating events similar to implementations in Fabric Api.
      *
      * @param type event type
      * @param <T>  event type
      * @return the Fabric event
      */
-    public static <T> Event<T> createVanillaResult(Class<? super T> type) {
+    public static <T> Event<T> createInteractionResult(Class<? super T> type) {
         return EventFactory.createArrayBacked(type, events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type}, new AbstractInvocationHandler() {
 
             @Override

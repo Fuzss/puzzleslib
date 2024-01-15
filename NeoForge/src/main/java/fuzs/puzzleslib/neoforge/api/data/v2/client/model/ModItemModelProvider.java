@@ -15,6 +15,7 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
+@Deprecated
 public class ModItemModelProvider extends ItemModelProvider {
     private final BlockStateProvider provider;
 

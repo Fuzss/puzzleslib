@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.capability.v2.data;
+package fuzs.puzzleslib.api.capability.v3.data;
 
 /**
  * Modes determining how capability data should be handled when the player entity is recreated, which will usually happen when returning from the end dimension and when respawning.
