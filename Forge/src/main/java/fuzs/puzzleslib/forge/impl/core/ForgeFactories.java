@@ -7,13 +7,13 @@ import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.forge.impl.init.ForgeGameRulesFactory;
-import fuzs.puzzleslib.forge.impl.init.PotionBrewingRegistryForge;
+import fuzs.puzzleslib.forge.impl.init.ForgePotionBrewingRegistry;
 import fuzs.puzzleslib.forge.impl.item.ForgeToolTypeHelper;
 import fuzs.puzzleslib.forge.impl.item.crafting.ForgeCombinedIngredients;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.ProxyImpl;
-import fuzs.puzzleslib.impl.event.ForgeEventInvokerRegistryImpl;
+import fuzs.puzzleslib.forge.impl.event.ForgeEventInvokerRegistryImpl;
 
 import java.util.Set;
 
@@ -41,7 +41,7 @@ public final class ForgeFactories implements CommonFactories {
 
     @Override
     public PotionBrewingRegistry getPotionBrewingRegistry() {
-        return new PotionBrewingRegistryForge();
+        return new ForgePotionBrewingRegistry();
     }
 
     @Override

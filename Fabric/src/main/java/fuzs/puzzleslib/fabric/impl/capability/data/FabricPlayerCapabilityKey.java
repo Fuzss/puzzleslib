@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.capability.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityKey;
-import fuzs.puzzleslib.api.capability.v2.data.PlayerCapabilityKey;
-import fuzs.puzzleslib.api.capability.v2.data.SyncStrategy;
+import fuzs.puzzleslib.api.capability.v2.data.*;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
@@ -23,7 +20,7 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
     /**
      * strategy for syncing this capability data to remote
      */
-    private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
+    private SyncStrategy syncStrategy = SyncStrategies.MANUAL;
 
     /**
      * @param capability     the wrapped {@link ComponentKey}
@@ -38,23 +35,23 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
      * @return                  builder
      */
     public FabricPlayerCapabilityKey<C> setSyncStrategy(SyncStrategy syncStrategy) {
-        if (this.syncStrategy != SyncStrategy.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
+        if (this.syncStrategy != SyncStrategies.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
         this.syncStrategy = syncStrategy;
         ServerEntityEvents.ENTITY_LOAD.register((Entity entity, ServerLevel world) -> {
             this.maybeGet(entity).ifPresent(capability -> {
-                PlayerCapabilityKey.syncCapabilityToRemote(entity, (ServerPlayer) entity, this.syncStrategy, capability, this.getId(), true);
+                PlayerCapabilityKey.syncCapabilityToRemote(entity, (ServerPlayer) entity, this.syncStrategy, capability, this.identifier(), true);
             });
         });
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register((ServerPlayer player, ServerLevel origin, ServerLevel destination) -> {
             this.maybeGet(player).ifPresent(capability -> {
-                PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, capability, this.getId(), true);
+                PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, capability, this.identifier(), true);
             });
         });
-        if (syncStrategy == SyncStrategy.SELF_AND_TRACKING) {
+        if (syncStrategy == SyncStrategies.SELF_AND_TRACKING) {
             EntityTrackingEvents.START_TRACKING.register((Entity trackedEntity, ServerPlayer player) -> {
                 this.maybeGet(trackedEntity).ifPresent(capability -> {
                     // we only want to sync to the client that just started tracking, so use SyncStrategy#SELF
-                    PlayerCapabilityKey.syncCapabilityToRemote(trackedEntity, player, SyncStrategy.SELF, capability, this.getId(), true);
+                    PlayerCapabilityKey.syncCapabilityToRemote(trackedEntity, player, SyncStrategies.SELF, capability, this.identifier(), true);
                 });
             });
         }
@@ -63,6 +60,6 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
 
     @Override
     public void syncToRemote(ServerPlayer player) {
-        PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, this.orThrow(player), this.getId(), false);
+        PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, this.orThrow(player), this.identifier(), false);
     }
 }

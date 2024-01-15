@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
-import fuzs.puzzleslib.forge.impl.client.core.ForwardingClientItemExtensions;
+import fuzs.puzzleslib.forge.impl.client.core.ForgeClientItemExtensionsImpl;
 import fuzs.puzzleslib.forge.mixin.client.accessor.ItemForgeAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -61,7 +61,7 @@ public record BuiltinModelItemRendererContextForgeImpl(String modId,
         // this solution is very dangerous as it relies on internal stuff in Forge
         // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
         Object renderProperties = ((ItemForgeAccessor) item).puzzleslib$getRenderProperties();
-        ((ItemForgeAccessor) item).puzzleslib$setRenderProperties(renderProperties != null ? new ForwardingClientItemExtensions((IClientItemExtensions) renderProperties) {
+        ((ItemForgeAccessor) item).puzzleslib$setRenderProperties(renderProperties != null ? new ForgeClientItemExtensionsImpl((IClientItemExtensions) renderProperties) {
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {

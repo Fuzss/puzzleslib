@@ -2,22 +2,16 @@ package fuzs.puzzleslib.forge.impl.client.core;
 
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.core.v1.context.DynamicBakingCompletedContext;
-import fuzs.puzzleslib.api.client.core.v1.context.DynamicModifyBakingResultContext;
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.impl.client.core.context.*;
 import fuzs.puzzleslib.forge.impl.core.context.AddReloadListenersContextForgeImpl;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.core.DynamicModifyBakingResultContextImpl;
-import fuzs.puzzleslib.impl.client.core.context.*;
+import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
+import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesManager;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -27,9 +21,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public final class ForgeClientModConstructor {
 
@@ -39,7 +31,7 @@ public final class ForgeClientModConstructor {
 
 
     public static void construct(ClientModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        ModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
+        ForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             registerModHandlers(constructor, modId, eventBus, availableFlags, flagsToHandle);
             constructor.onConstructMod();
         });
@@ -51,7 +43,6 @@ public final class ForgeClientModConstructor {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
                 constructor.onClientSetup();
-                constructor.onRegisterSearchTrees(new SearchRegistryContextForgeImpl());
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
                 constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
@@ -70,12 +61,6 @@ public final class ForgeClientModConstructor {
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
             constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextForgeImpl(evt::registerLayerDefinition));
-        });
-        eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
-            onModifyBakingResult(constructor::onModifyBakingResult, modId, evt.getModels(), evt.getModelBakery());
-        });
-        eventBus.addListener((final ModelEvent.BakingCompleted evt) -> {
-            onBakingCompleted(constructor::onBakingCompleted, modId, evt.getModelManager(), evt.getModels(), evt.getModelBakery());
         });
         eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
             constructor.onRegisterAdditionalModels(new AdditionalModelsContextForgeImpl(evt::register));
@@ -119,21 +104,5 @@ public final class ForgeClientModConstructor {
         eventBus.addListener((final RegisterShadersEvent evt) -> {
             constructor.onRegisterCoreShaders(new CoreShadersContextForgeImpl(evt::registerShader, evt.getResourceProvider()));
         });
-    }
-
-    private static void onBakingCompleted(Consumer<DynamicBakingCompletedContext> consumer, String modId, ModelManager modelManager, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
-        try {
-            consumer.accept(new DynamicBakingCompletedContextForgeImpl(modelManager, models, modelBakery));
-        } catch (Exception e) {
-            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
-        }
-    }
-
-    private static void onModifyBakingResult(Consumer<DynamicModifyBakingResultContext> consumer, String modId, Map<ResourceLocation, BakedModel> models, ModelBakery modelBakery) {
-        try {
-            consumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery));
-        } catch (Exception e) {
-            PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
-        }
     }
 }

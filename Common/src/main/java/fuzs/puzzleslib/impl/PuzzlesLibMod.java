@@ -16,7 +16,7 @@ import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     public static final NetworkHandlerV3 NETWORK = NetworkHandlerV3.builder(MOD_ID)
             .registerSerializer(ClientboundAddEntityPacket.class, (friendlyByteBuf, clientboundAddEntityPacket) -> clientboundAddEntityPacket.write(friendlyByteBuf), ClientboundAddEntityPacket::new)
-            .allAcceptVanillaOrMissing()
+            .optional()
             .registerClientbound(ClientboundSyncCapabilityMessage.class)
             .registerClientbound(ClientboundAddEntityDataMessage.class)
             .registerClientbound(ClientboundModListMessage.class);

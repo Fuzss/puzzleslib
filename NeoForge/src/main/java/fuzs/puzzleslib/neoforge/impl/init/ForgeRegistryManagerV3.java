@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.impl.init.RegistryManagerV3Impl;
-import fuzs.puzzleslib.neoforge.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.RegistryHelper;
+import fuzs.puzzleslib.impl.init.RegistryManagerV3Impl;
+import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -17,14 +17,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
-import net.minecraftforge.common.ForgeSpawnEggItem;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ObjectHolderRegistry;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.common.DeferredSpawnEggItem;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.event.TagsUpdatedEvent;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.ObjectHolderRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -39,7 +39,7 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     public ForgeRegistryManagerV3(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.getOptionalModEventBus(modId).orElse(null);
+        this.eventBus = NeoForgeModContainerHelper.getOptionalModEventBus(modId).orElse(null);
     }
 
     @Override
@@ -61,11 +61,11 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
         // so we replicate those calls which is easy since Forge has events everywhere right after tags update
         // this possibly might break with other mods interfering that rely on calling this themselves,
         // in such a case switch to the implementation outlined above
-        MinecraftForge.EVENT_BUS.addListener((final TagsUpdatedEvent evt) -> {
+        NeoForge.EVENT_BUS.addListener((final TagsUpdatedEvent evt) -> {
             holder.bindTags(registry.getHolder(resourceKey).stream().flatMap(Holder.Reference::tags).toList());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            MinecraftForge.EVENT_BUS.addListener((final ClientPlayerNetworkEvent.LoggingIn evt) -> {
+            NeoForge.EVENT_BUS.addListener((final ClientPlayerNetworkEvent.LoggingIn evt) -> {
                 if (evt.getConnection().isMemoryConnection()) return;
                 holder.bindTags(Set.of());
             });
@@ -75,14 +75,14 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
-        DeferredRegister<T> register = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
+    protected <T> Holder.Reference<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.modId);
             Objects.requireNonNull(this.eventBus, "mod event bus for %s is null".formatted(this.modId));
             deferredRegister.register(this.eventBus);
             return deferredRegister;
         });
-        register.register(path, () -> {
+        registrar.register(path, () -> {
             T value = supplier.get();
             Objects.requireNonNull(value, "value is null");
             return value;
@@ -92,13 +92,13 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     @Override
     public Holder.Reference<Item> registerSpawnEggItem(Holder.Reference<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
-        return this.registerItem(entityTypeReference.key().location().getPath() + "_spawn_egg", () -> new ForgeSpawnEggItem(entityTypeReference, backgroundColor, highlightColor, itemProperties));
+        return this.registerItem(entityTypeReference.key().location().getPath() + "_spawn_egg", () -> new DeferredSpawnEggItem(entityTypeReference::value, backgroundColor, highlightColor, itemProperties));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> IForgeMenuType.create(entry.get()::create));
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> IMenuTypeExtension.create(entry.get()::create));
     }
 
     @Override

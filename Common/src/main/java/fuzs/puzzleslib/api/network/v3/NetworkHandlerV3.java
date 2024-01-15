@@ -16,6 +16,7 @@ import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerLevel;
@@ -43,7 +44,7 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return NetworkHandlerV3.builder(modId, null);
+        return NetworkHandlerV3.builder(new ResourceLocation(modId, "main"));
     }
 
     /**
@@ -53,8 +54,8 @@ public interface NetworkHandlerV3 {
      * @param context an internal id for this channel in case multiple are registered using the same mod id
      * @return builder for mod specific network handler with default channel
      */
-    static Builder builder(String modId, @Nullable String context) {
-        return ModContext.get(modId).getNetworkHandlerV3$Builder(context);
+    static Builder builder(ResourceLocation channelName) {
+        return ModContext.get(channelName.getNamespace()).getNetworkHandlerV3$Builder(channelName);
     }
 
     /**
@@ -311,32 +312,12 @@ public interface NetworkHandlerV3 {
         <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz);
 
         /**
-         * Are servers without this mod or vanilla servers compatible.
+         * Are clients & servers without this mod or vanilla clients & servers compatible.
          *
-         * <p>Only supported on Forge right now.
-         *
-         * @return this builder instance
-         */
-        Builder clientAcceptsVanillaOrMissing();
-
-        /**
-         * Are clients without this mod or vanilla clients compatible.
-         *
-         * <p>Only supported on Forge right now.
+         * <p>Not supported on Fabric-like environments.
          *
          * @return this builder instance
          */
-        Builder serverAcceptsVanillaOrMissing();
-
-        /**
-         * Are clients and servers without this mod or vanilla clients and servers compatible.
-         *
-         * <p>Only supported on Forge right now.
-         *
-         * @return this builder instance
-         */
-        default Builder allAcceptVanillaOrMissing() {
-            return this.clientAcceptsVanillaOrMissing().serverAcceptsVanillaOrMissing();
-        }
+        Builder optional();
     }
 }

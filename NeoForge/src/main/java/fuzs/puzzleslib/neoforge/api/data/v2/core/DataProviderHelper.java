@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.core;
 
-import fuzs.puzzleslib.neoforge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.neoforge.impl.data.ExistingFileHelperHolder;
 import net.minecraft.data.DataGenerator;
@@ -44,7 +44,7 @@ public final class DataProviderHelper {
     public static void registerDataProviders(String modId, ForgeDataProviderContext.LegacyFactory... factories) {
         if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
         Objects.checkIndex(0, factories.length);
-        ModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
+        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             eventBus.addListener((final GatherDataEvent evt) -> {
                 onGatherData(evt, modId, factories);
             });

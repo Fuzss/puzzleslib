@@ -12,21 +12,20 @@ import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.network.*;
+import net.minecraftforge.network.Channel;
+import net.minecraftforge.network.ChannelBuilder;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.SimpleChannel;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
-    private static final int PROTOCOL_VERSION = 1;
-
     private SimpleChannel channel;
-    private final AtomicInteger discriminator = new AtomicInteger();
 
-    public NetworkHandlerForgeV3(ResourceLocation channelIdentifier) {
-        super(channelIdentifier);
+    public NetworkHandlerForgeV3(ResourceLocation channelName) {
+        super(channelName);
     }
 
     @Override
@@ -42,7 +41,6 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     }
 
     private <T> void register(Class<T> clazz, BiConsumer<T, CustomPayloadEvent.Context> handle, NetworkDirection networkDirection) {
-        if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         Objects.requireNonNull(this.channel, "channel is null");
         BiConsumer<T, FriendlyByteBuf> encoder = (T t, FriendlyByteBuf friendlyByteBuf) -> {
             MessageSerializers.findByType(clazz).write(friendlyByteBuf, t);
@@ -71,16 +69,17 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     @Override
     public void build() {
         if (this.channel != null) throw new IllegalStateException("channel is already built");
-        this.channel = buildSimpleChannel(this.channelIdentifier, this.clientAcceptsVanillaOrMissing, this.serverAcceptsVanillaOrMissing);
+        this.channel = buildSimpleChannel(this.channelName, this.optional);
         super.build();
     }
 
-    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
+        int protocolVersion = getModProtocolVersion(resourceLocation.getNamespace());
         return ChannelBuilder
                 .named(resourceLocation)
-                .networkProtocolVersion(PROTOCOL_VERSION)
-                .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(1))
-                .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(1))
+                .networkProtocolVersion(protocolVersion)
+                .clientAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
+                .serverAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
                 .simpleChannel();
     }
 }

@@ -23,12 +23,12 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
-    private final Map<Class<? extends MessageV2<?>>, MessageData> messages = Maps.newIdentityHashMap();
-    private final ResourceLocation channelIdentifier;
+    private final Map<Class<? extends MessageV2<?>>, MessageData> messageNames = Maps.newIdentityHashMap();
+    private final ResourceLocation channelName;
     private final AtomicInteger discriminator = new AtomicInteger();
 
-    public NetworkHandlerFabricV2(ResourceLocation channelIdentifier) {
-        this.channelIdentifier = channelIdentifier;
+    public NetworkHandlerFabricV2(ResourceLocation channelName) {
+        this.channelName = channelName;
     }
 
     @Override
@@ -44,35 +44,35 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     private <T extends MessageV2<T>> void register(Class<T> clazz, boolean toClient, Function<FriendlyByteBuf, T> decode) {
-        ResourceLocation channelName = this.nextIdentifier();
-        this.messages.put(clazz, new MessageData(clazz, channelName, toClient));
+        ResourceLocation messageName = this.nextIdentifier();
+        this.messageNames.put(clazz, new MessageData(clazz, messageName, toClient));
         BiConsumer<ResourceLocation, Function<FriendlyByteBuf, T>> registrar;
         if (toClient) {
             registrar = ((FabricProxy) Proxy.INSTANCE)::registerLegacyClientReceiver;
         } else {
             registrar = ((FabricProxy) Proxy.INSTANCE)::registerLegacyServerReceiver;
         }
-        registrar.accept(channelName, decode);
+        registrar.accept(messageName, decode);
     }
 
     private ResourceLocation nextIdentifier() {
-        return new ResourceLocation(this.channelIdentifier.getNamespace(), this.channelIdentifier.getPath() + "/" + this.discriminator.getAndIncrement());
+        return new ResourceLocation(this.channelName.getNamespace(), this.channelName.getPath() + "/" + this.discriminator.getAndIncrement());
     }
 
     @Override
     public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
-        if (this.messages.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending serverbound message to client side");
+        if (this.messageNames.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending serverbound message to client side");
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     @Override
     public Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message) {
-        if (!this.messages.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending clientbound message to server side");
+        if (!this.messageNames.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending clientbound message to server side");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
     }
 
     private <T extends PacketListener> Packet<T> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<T>> packetFactory, MessageV2<?> message) {
-        ResourceLocation identifier = this.messages.get(message.getClass()).identifier();
+        ResourceLocation identifier = this.messageNames.get(message.getClass()).identifier();
         FriendlyByteBuf byteBuf = PacketByteBufs.create();
         message.write(byteBuf);
         return packetFactory.apply(identifier, byteBuf);

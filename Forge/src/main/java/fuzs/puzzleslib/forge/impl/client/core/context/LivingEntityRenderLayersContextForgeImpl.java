@@ -24,11 +24,11 @@ public record LivingEntityRenderLayersContextForgeImpl(
         Objects.requireNonNull(entityType, "entity type is null");
         Objects.requireNonNull(factory, "render layer factory is null");
         if (entityType == EntityType.PLAYER) {
-            this.evt.getSkins().stream().map(this.evt::getSkin).filter(Objects::nonNull).map(entityRenderer -> ((LivingEntityRenderer<T, M>) entityRenderer)).forEach(entityRenderer -> {
+            this.evt.getSkins().stream().map(this.evt::getPlayerSkin).filter(Objects::nonNull).map(entityRenderer -> ((LivingEntityRenderer<T, M>) entityRenderer)).forEach(entityRenderer -> {
                 this.actuallyRegisterRenderLayer(entityRenderer, factory);
             });
         } else {
-            LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) this.evt.getRenderer(entityType);
+            LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) this.evt.getEntityRenderer(entityType);
             Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(ForgeRegistries.ENTITY_TYPES.getKey(entityType).toString()));
             this.actuallyRegisterRenderLayer(entityRenderer, factory);
         }

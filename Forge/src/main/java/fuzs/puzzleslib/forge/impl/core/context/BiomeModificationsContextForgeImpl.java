@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
-import fuzs.puzzleslib.forge.impl.core.BiomeLoadingHandler;
+import fuzs.puzzleslib.forge.impl.core.ForgeBiomeLoadingHandler;
 
 import java.util.Objects;
 import java.util.Set;
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public record BiomeModificationsContextForgeImpl(
-        Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeEntries,
+        Multimap<BiomeLoadingPhase, ForgeBiomeLoadingHandler.BiomeModification> biomeEntries,
         Set<ContentRegistrationFlags> availableFlags) implements BiomeModificationsContext {
 
     @Override
@@ -23,7 +23,7 @@ public record BiomeModificationsContextForgeImpl(
             Objects.requireNonNull(phase, "phase is null");
             Objects.requireNonNull(selector, "selector is null");
             Objects.requireNonNull(modifier, "modifier is null");
-            this.biomeEntries.put(phase, new BiomeLoadingHandler.BiomeModification(selector, modifier));
+            this.biomeEntries.put(phase, new ForgeBiomeLoadingHandler.BiomeModification(selector, modifier));
         } else {
             ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.BIOME_MODIFICATIONS);
         }

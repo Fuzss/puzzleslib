@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.impl.core.context.*;
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import net.minecraft.server.packs.PackType;
@@ -31,8 +31,8 @@ public final class ForgeModConstructor {
     }
 
     public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        ModContainerHelper.getOptionalModEventBus(modId).ifPresent(modEventBus -> {
-            Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
+        ForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(modEventBus -> {
+            Multimap<BiomeLoadingPhase, ForgeBiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
             registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
             registerModHandlers(constructor, modId, modEventBus, biomeModifications, availableFlags, flagsToHandle);
             registerHandlers(constructor, modId);
@@ -40,10 +40,10 @@ public final class ForgeModConstructor {
         });
     }
 
-    private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> flagsToHandle) {
+    private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, ForgeBiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> flagsToHandle) {
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextForgeImpl(modEventBus));
         if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
-            BiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
+            ForgeBiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
         if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
             DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(ForgeRegistries.Keys.RECIPE_SERIALIZERS, modId);
@@ -52,7 +52,7 @@ public final class ForgeModConstructor {
         }
     }
 
-    private static void registerModHandlers(ModConstructor constructor, String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, BiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
+    private static void registerModHandlers(ModConstructor constructor, String modId, IEventBus eventBus, Multimap<BiomeLoadingPhase, ForgeBiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
@@ -78,7 +78,7 @@ public final class ForgeModConstructor {
             if (evt.getPackType() == PackType.SERVER_DATA) {
                 constructor.onAddDataPackFinders(new DataPackSourcesContextForgeImpl(evt::addRepositorySource));
                 if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
-                    evt.addRepositorySource(BiomeLoadingHandler.buildPack(modId));
+                    evt.addRepositorySource(ForgeBiomeLoadingHandler.buildPack(modId));
                 }
             }
         });

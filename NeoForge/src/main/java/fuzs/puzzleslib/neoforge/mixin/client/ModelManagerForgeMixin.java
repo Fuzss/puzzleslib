@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.mixin.client;
 
-import fuzs.puzzleslib.neoforge.impl.client.event.ForgeModelBakerImpl;
+import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeModelBakerImpl;
 import net.minecraft.client.resources.model.AtlasSet;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
@@ -18,6 +18,6 @@ abstract class ModelManagerForgeMixin {
 
     @Inject(method = "loadModels", at = @At("HEAD"))
     private void loadModels(ProfilerFiller profilerFiller, Map<ResourceLocation, AtlasSet.StitchResult> atlasPreparations, ModelBakery modelBakery, CallbackInfoReturnable<Object> callback) {
-        ForgeModelBakerImpl.setAtlasPreparations(atlasPreparations);
+        NeoForgeModelBakerImpl.setAtlasPreparations(atlasPreparations);
     }
 }

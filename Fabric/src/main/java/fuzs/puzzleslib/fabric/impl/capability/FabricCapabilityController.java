@@ -42,12 +42,12 @@ public final class FabricCapabilityController implements CapabilityController {
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, PlayerRespawnCopyStrategy respawnStrategy) {
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, EntityComponentInitializerImpl.getPlayerFactory(respawnStrategy), FabricPlayerCapabilityKey<C>::new);
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, PlayerRespawnCopyStrategy respawnStrategy, SyncStrategy syncStrategy) {
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy, SyncStrategy syncStrategy) {
         return ((FabricPlayerCapabilityKey<C>) this.registerPlayerCapability(capabilityKey, capabilityType, capabilityFactory, respawnStrategy)).setSyncStrategy(syncStrategy);
     }
 

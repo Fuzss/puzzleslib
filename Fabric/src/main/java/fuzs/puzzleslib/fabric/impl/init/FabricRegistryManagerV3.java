@@ -43,7 +43,7 @@ public final class FabricRegistryManagerV3 extends RegistryManagerV3Impl {
     }
 
     @Override
-    protected <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+    protected <T> Holder.Reference<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         T value = supplier.get();
         Objects.requireNonNull(value, "value is null");
         Holder.Reference<T> holder;

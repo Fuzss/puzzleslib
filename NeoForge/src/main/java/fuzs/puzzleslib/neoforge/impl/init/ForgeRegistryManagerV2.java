@@ -1,12 +1,10 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.impl.init.RegistryManagerV2Impl;
-import fuzs.puzzleslib.neoforge.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
-import fuzs.puzzleslib.api.init.v2.builder.PoiTypeBuilder;
+import fuzs.puzzleslib.impl.init.RegistryManagerV2Impl;
+import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -37,7 +35,7 @@ public final class ForgeRegistryManagerV2 extends RegistryManagerV2Impl {
 
     public ForgeRegistryManagerV2(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.getOptionalModEventBus(modId).orElse(null);
+        this.eventBus = NeoForgeModContainerHelper.getOptionalModEventBus(modId).orElse(null);
     }
 
     @SuppressWarnings("unchecked")
@@ -63,14 +61,6 @@ public final class ForgeRegistryManagerV2 extends RegistryManagerV2Impl {
     @Override
     public <T extends AbstractContainerMenu> RegistryReference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> IForgeMenuType.create(entry.get()::create));
-    }
-
-    @Override
-    public RegistryReference<PoiType> registerPoiTypeBuilder(String path, Supplier<PoiTypeBuilder> entry) {
-        return this.register(Registries.POINT_OF_INTEREST_TYPE, path, () -> {
-            PoiTypeBuilder poiTypeBuilder = entry.get();
-            return new PoiType(ImmutableSet.copyOf(poiTypeBuilder.blocks()), poiTypeBuilder.ticketCount(), poiTypeBuilder.searchDistance());
-        });
     }
 
     @Override

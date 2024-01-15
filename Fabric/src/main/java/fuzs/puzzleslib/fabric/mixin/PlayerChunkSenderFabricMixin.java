@@ -15,6 +15,6 @@ abstract class PlayerChunkSenderFabricMixin {
 
     @Inject(method = "sendChunk", at = @At("TAIL"))
     private static void sendChunk(ServerGamePacketListenerImpl packetListener, ServerLevel level, LevelChunk chunk, CallbackInfo callback) {
-        FabricLevelEvents.SENT_CHUNK.invoker().onChunkSent(packetListener.getPlayer(), chunk, level);
+        FabricLevelEvents.WATCH_CHUNK.invoker().onChunkWatch(packetListener.getPlayer(), chunk, level);
     }
 }

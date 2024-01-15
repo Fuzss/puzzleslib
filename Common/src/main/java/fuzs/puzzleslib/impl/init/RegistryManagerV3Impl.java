@@ -44,11 +44,11 @@ public abstract class RegistryManagerV3Impl implements RegistryManager {
         if (!this.allowedModLoaders.contains(ModLoaderEnvironment.INSTANCE.getModLoader())) {
             holder = this.getHolder(registryKey, path);
         } else {
-            holder = this._register(registryKey, path, supplier);
+            holder = this.register$Internal(registryKey, path, supplier);
         }
         this.allowedModLoaders = EnumSet.allOf(ModLoader.class);
         return holder;
     }
 
-    protected abstract <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
+    protected abstract <T> Holder.Reference<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 }

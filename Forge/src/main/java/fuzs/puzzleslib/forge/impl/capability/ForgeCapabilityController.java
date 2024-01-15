@@ -7,7 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.capability.v2.data.*;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgeCapabilityKey;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgePlayerCapabilityKey;
 import fuzs.puzzleslib.forge.impl.capability.data.CapabilityHolder;
@@ -38,7 +38,7 @@ public final class ForgeCapabilityController implements CapabilityController {
     public ForgeCapabilityController(String namespace) {
         this.namespace = namespace;
         // for registering capabilities
-        ModContainerHelper.getOptionalModEventBus(namespace).ifPresent(eventBus -> {
+        ForgeModContainerHelper.getOptionalModEventBus(namespace).ifPresent(eventBus -> {
             eventBus.addListener(this::onRegisterCapabilities);
         });
         // for attaching capabilities via AttachCapabilitiesEvent, this is the only method that supports using
@@ -52,12 +52,12 @@ public final class ForgeCapabilityController implements CapabilityController {
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, PlayerRespawnCopyStrategy respawnStrategy) {
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy) {
         return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, Player.class::isInstance, ForgePlayerCapabilityKey<C>::new).setRespawnStrategy(respawnStrategy);
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, PlayerRespawnCopyStrategy respawnStrategy, SyncStrategy syncStrategy) {
+    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy, SyncStrategy syncStrategy) {
         return ((ForgePlayerCapabilityKey<C>) this.registerPlayerCapability(capabilityKey, capabilityType, capabilityFactory, respawnStrategy)).setSyncStrategy(syncStrategy);
     }
 
