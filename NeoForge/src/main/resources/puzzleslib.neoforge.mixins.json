@@ -4,21 +4,20 @@
   "compatibilityLevel": "JAVA_17",
   "package": "${modGroup}.neoforge.mixin",
   "mixins": [
-    "LootDataManagerForgeMixin",
-    "TagsProviderForgeMixin",
-    "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
-    "accessor.FireBlockForgeAccessor",
-    "accessor.ForgeRegistryForgeAccessor",
-    "accessor.LootTableForgeAccessor",
-    "accessor.MobSpawnSettingsBuilderForgeAccessor",
-    "accessor.PotionBrewingForgeAccessor"
+    "LootDataManagerNeoForgeMixin",
+    "TagsProviderNeoForgeMixin",
+    "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
+    "accessor.FireBlockNeoForgeAccessor",
+    "accessor.LootTableNeoForgeAccessor",
+    "accessor.MobSpawnSettingsBuilderNeoForgeAccessor",
+    "accessor.PotionBrewingNeoForgeAccessor"
   ],
   "client": [
-    "client.ModelManagerForgeMixin",
-    "client.accessor.BlockColorsForgeAccessor",
-    "client.accessor.ItemColorsForgeAccessor",
-    "client.accessor.ItemForgeAccessor",
-    "client.accessor.ModelBakeryAccessor"
+    "client.ModelManagerNeoForgeMixin",
+    "client.accessor.BlockColorsNeoForgeAccessor",
+    "client.accessor.ItemColorsNeoForgeAccessor",
+    "client.accessor.ItemNeoForgeAccessor",
+    "client.accessor.ModelBakeryNeoForgeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

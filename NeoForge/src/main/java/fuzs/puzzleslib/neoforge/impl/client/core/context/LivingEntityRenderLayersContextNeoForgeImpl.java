@@ -25,16 +25,16 @@ public record LivingEntityRenderLayersContextNeoForgeImpl(
         Objects.requireNonNull(factory, "render layer factory is null");
         if (entityType == EntityType.PLAYER) {
             this.evt.getSkins().stream().map(this.evt::getSkin).filter(Objects::nonNull).map(entityRenderer -> ((LivingEntityRenderer<T, M>) entityRenderer)).forEach(entityRenderer -> {
-                this.actuallyRegisterRenderLayer(entityRenderer, factory);
+                this.register(entityRenderer, factory);
             });
         } else {
             LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) this.evt.getRenderer(entityType);
             Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString()));
-            this.actuallyRegisterRenderLayer(entityRenderer, factory);
+            this.register(entityRenderer, factory);
         }
     }
 
-    private <T extends LivingEntity, M extends EntityModel<T>> void actuallyRegisterRenderLayer(LivingEntityRenderer<T, M> entityRenderer, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+    private <T extends LivingEntity, M extends EntityModel<T>> void register(LivingEntityRenderer<T, M> entityRenderer, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
         Minecraft minecraft = Minecraft.getInstance();
         // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
         EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, this.evt.getEntityModels(), minecraft.font);

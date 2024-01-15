@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.ColorProvidersContext;
-import fuzs.puzzleslib.neoforge.mixin.client.accessor.BlockColorsForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.client.accessor.BlockColorsNeoForgeAccessor;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.level.block.Block;
@@ -28,6 +28,6 @@ public record BlockColorProvidersContextNeoForgeImpl(BiConsumer<BlockColor, Bloc
 
     @Override
     public @Nullable BlockColor getProvider(Block block) {
-        return ((BlockColorsForgeAccessor) this.blockColors).puzzleslib$getBlockColors().get(ForgeRegistries.BLOCKS.getDelegateOrThrow(block));
+        return ((BlockColorsNeoForgeAccessor) this.blockColors).puzzleslib$getBlockColors().get(ForgeRegistries.BLOCKS.getDelegateOrThrow(block));
     }
 }

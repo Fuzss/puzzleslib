@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.List;
 
 @Mixin(LootTable.class)
-public interface LootTableForgeAccessor {
+public interface LootTableNeoForgeAccessor {
 
     @Accessor("pools")
     List<LootPool> puzzleslib$getPools();

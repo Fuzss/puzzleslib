@@ -108,7 +108,7 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
                 if (this.optional) {
                     this.channel = registrar.optional();
                 } else {
-                    int protocolVersion = getModProtocolVersion(this.channelName.getNamespace());
+                    int protocolVersion = getProtocolVersion(this.channelName.getNamespace());
                     this.channel = registrar.versioned(String.valueOf(protocolVersion));
                 }
                 super.build();
@@ -117,7 +117,7 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
         });
     }
 
-    private record MessageHolder<T>(T message) implements CustomPacketPayload {
+    record MessageHolder<T>(T message) implements CustomPacketPayload {
 
         @Override
         public void write(FriendlyByteBuf buffer) {
@@ -134,7 +134,7 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
         }
     }
 
-    private interface GenericPayloadHandler<T> extends BiConsumer<IDirectionAwarePayloadHandlerBuilder<MessageHolder<T>, IPlayPayloadHandler<MessageHolder<T>>>, IPlayPayloadHandler<MessageHolder<T>>> {
+    interface GenericPayloadHandler<T> extends BiConsumer<IDirectionAwarePayloadHandlerBuilder<MessageHolder<T>, IPlayPayloadHandler<MessageHolder<T>>>, IPlayPayloadHandler<MessageHolder<T>>> {
 
     }
 }

@@ -60,15 +60,15 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     @Override
-    public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
-        if (this.messageNames.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending serverbound message to client side");
-        return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
-    }
-
-    @Override
     public Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message) {
         if (!this.messageNames.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending clientbound message to server side");
         return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
+    }
+
+    @Override
+    public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
+        if (this.messageNames.get(message.getClass()).toClient()) throw new IllegalStateException("Attempted sending serverbound message to client side");
+        return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
     private <T extends PacketListener> Packet<T> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<T>> packetFactory, MessageV2<?> message) {

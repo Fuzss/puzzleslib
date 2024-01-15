@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import java.util.Map;
 
 @Mixin(MobSpawnSettings.Builder.class)
-public interface MobSpawnSettingsBuilderForgeAccessor {
+public interface MobSpawnSettingsBuilderNeoForgeAccessor {
 
     @Accessor("mobSpawnCosts")
     Map<EntityType<?>, MobSpawnSettings.MobSpawnCost> puzzleslib$getMobSpawnCosts();

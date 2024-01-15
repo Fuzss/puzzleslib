@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContex
 import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.NeoForgeClientItemExtensionsImpl;
-import fuzs.puzzleslib.neoforge.mixin.client.accessor.ItemForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.client.accessor.ItemNeoForgeAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -60,8 +60,8 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(String modId,
     private static void setClientItemExtensions(Item item, IClientItemExtensions itemExtensions) {
         // this solution is very dangerous as it relies on internal stuff in Forge
         // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
-        Object renderProperties = ((ItemForgeAccessor) item).puzzleslib$getRenderProperties();
-        ((ItemForgeAccessor) item).puzzleslib$setRenderProperties(renderProperties != null ? new NeoForgeClientItemExtensionsImpl((IClientItemExtensions) renderProperties) {
+        Object renderProperties = ((ItemNeoForgeAccessor) item).puzzleslib$getRenderProperties();
+        ((ItemNeoForgeAccessor) item).puzzleslib$setRenderProperties(renderProperties != null ? new NeoForgeClientItemExtensionsImpl((IClientItemExtensions) renderProperties) {
 
             @Override
             public BlockEntityWithoutLevelRenderer getCustomRenderer() {

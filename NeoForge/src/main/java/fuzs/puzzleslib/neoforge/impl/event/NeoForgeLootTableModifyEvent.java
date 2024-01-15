@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.event;
 
-import fuzs.puzzleslib.neoforge.mixin.accessor.LootTableForgeAccessor;
+import fuzs.puzzleslib.neoforge.mixin.accessor.LootTableNeoForgeAccessor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -37,11 +37,11 @@ public class NeoForgeLootTableModifyEvent extends Event {
     }
 
     public void addPool(LootPool pool) {
-        ((LootTableForgeAccessor) this.lootTable).puzzleslib$getPools().add(pool);
+        ((LootTableNeoForgeAccessor) this.lootTable).puzzleslib$getPools().add(pool);
     }
 
     public boolean removePool(int index) {
-        List<LootPool> pools = ((LootTableForgeAccessor) this.lootTable).puzzleslib$getPools();
+        List<LootPool> pools = ((LootTableNeoForgeAccessor) this.lootTable).puzzleslib$getPools();
         if (index >= 0 && index < pools.size()) {
             pools.remove(index);
             return true;

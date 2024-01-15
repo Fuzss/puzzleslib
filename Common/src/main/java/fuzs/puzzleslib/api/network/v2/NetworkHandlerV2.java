@@ -59,20 +59,20 @@ public interface NetworkHandlerV2 {
     <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz);
 
     /**
-     * creates a packet heading to the server side
-     *
-     * @param message message to create packet from
-     * @return packet for message
-     */
-    Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message);
-
-    /**
      * creates a packet heading to the client side
      *
      * @param message message to create packet from
      * @return packet for message
      */
     Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message);
+
+    /**
+     * creates a packet heading to the server side
+     *
+     * @param message message to create packet from
+     * @return packet for message
+     */
+    Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message);
 
     /**
      * send message from client to server
