@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
@@ -14,6 +15,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * handler for network communications of all puzzles lib mods
@@ -45,18 +49,50 @@ public interface NetworkHandlerV2 {
     /**
      * Register a message that will be sent to clients.
      *
-     * @param clazz message class type
-     * @param <T>   message implementation
+     * @param <T>     message implementation
+     * @param clazz   message class type
+     * @param factory message factory
      */
-    <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz);
+    default <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz, Supplier<T> factory) {
+        return this.registerClientbound(clazz, (FriendlyByteBuf friendlyByteBuf) -> {
+            T message = factory.get();
+            message.read(friendlyByteBuf);
+            return message;
+        });
+    }
 
     /**
      * Register a message that will be sent to servers.
      *
-     * @param clazz message class type
-     * @param <T>   message implementation
+     * @param <T>     message implementation
+     * @param clazz   message class type
+     * @param factory message factory
      */
-    <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz);
+    default <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz, Supplier<T> factory) {
+        return this.registerServerbound(clazz, (FriendlyByteBuf friendlyByteBuf) -> {
+            T message = factory.get();
+            message.read(friendlyByteBuf);
+            return message;
+        });
+    }
+
+    /**
+     * Register a message that will be sent to clients.
+     *
+     * @param <T>     message implementation
+     * @param clazz   message class type
+     * @param factory message factory
+     */
+    <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory);
+
+    /**
+     * Register a message that will be sent to servers.
+     *
+     * @param <T>     message implementation
+     * @param clazz   message class type
+     * @param factory message factory
+     */
+    <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory);
 
     /**
      * creates a packet heading to the client side

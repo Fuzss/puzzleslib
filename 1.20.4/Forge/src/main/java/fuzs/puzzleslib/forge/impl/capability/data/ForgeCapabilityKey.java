@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.forge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
+import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
@@ -45,7 +45,7 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
         this.id = id;
         this.componentClass = componentClass;
         this.factory = factory;
-        CapabilityController.register(this);
+        GlobalCapabilityRegister.register(this);
     }
 
     /**

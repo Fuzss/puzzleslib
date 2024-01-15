@@ -6,11 +6,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
+import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgeCapabilityKey;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgePlayerCapabilityKey;
 import fuzs.puzzleslib.forge.impl.capability.data.CapabilityHolder;
+import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -81,7 +84,7 @@ public final class ForgeCapabilityController implements CapabilityController {
     }
 
     private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
-        if (!VALID_CAPABILITY_TYPES.contains(providerType)) {
+        if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(providerType)) {
             throw new IllegalArgumentException(providerType + " is an invalid type");
         }
         ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);

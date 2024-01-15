@@ -73,9 +73,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
 
     protected ResourceLocation registerMessageType(Class<?> clazz) {
         ResourceLocation messageName = new ResourceLocation(this.channelName.getNamespace(), this.channelName.getPath() + "/" + this.discriminator.getAndIncrement());
-        if (this.messageNames.put(clazz, messageName) != null) {
-            throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
-        }
+        this.messageNames.put(clazz, messageName);
         return messageName;
     }
 

@@ -3,32 +3,42 @@ package fuzs.puzzleslib.api.capability.v3.data;
 import net.minecraft.resources.ResourceLocation;
 
 /**
- * Common wrapper for Component / AttachmentType / Capability.
+ * Common wrapper for Fabric's Component / NeoForge's AttachmentType / Forge's Capability.
  *
- * @param <C> capability type
+ * @param <T> capability component holder type
+ * @param <C> capability component type
  */
 public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
 
     /**
+     * Identifier for this capability used for synchronization and serialization.
+     *
      * @return capability id
      */
     ResourceLocation identifier();
 
     /**
-     * Get capability implementation directly from a <code>holder</code>.
+     * Get capability implementation from a holder.
      *
      * @param holder provider to get capability from
-     * @return capability implementation for this <code>holder</code>
+     * @return capability implementation for given holder
      */
     C get(T holder);
 
     /**
-     * checks if a capability is present on the given <code>holder</code>
+     * Checks if a capability is compatible with a holder.
      *
-     * @param holder provider to get capability from
-     * @return is this capability present on the given <code>holder</code>
+     * @param holder provider to test
+     * @return is this holder compatible
      */
     boolean isProvidedBy(Object holder);
 
+    /**
+     * Called from {@link CapabilityComponent#setChanged()} to notify that the component has changed and needs to be serialized / synchronized.
+     *
+     * <p>Actual behavior varies depending on the type of holder, for that see implementations in sub-interfaces.
+     *
+     * @param capabilityComponent the component that has changed
+     */
     void setChanged(C capabilityComponent);
 }

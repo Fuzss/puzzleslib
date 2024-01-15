@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.capability;
 
-import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.api.network.v3.ClientMessageListener;
@@ -13,7 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
-public record ClientboundSyncCapabilityMessage(ResourceLocation id, int holderId, CompoundTag tag) implements ClientboundMessage<ClientboundSyncCapabilityMessage> {
+public record ClientboundSyncCapabilityMessage(ResourceLocation identifier, int entityId, CompoundTag tag) implements ClientboundMessage<ClientboundSyncCapabilityMessage> {
 
     @Override
     public ClientMessageListener<ClientboundSyncCapabilityMessage> getHandler() {
@@ -21,9 +20,9 @@ public record ClientboundSyncCapabilityMessage(ResourceLocation id, int holderId
 
             @Override
             public void handle(ClientboundSyncCapabilityMessage message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
-                Entity entity = level.getEntity(message.holderId);
+                Entity entity = level.getEntity(message.entityId);
                 if (entity != null) {
-                    CapabilityKey<?, ?> capabilityKey = CapabilityController.retrieve(message.id);
+                    CapabilityKey<?, ?> capabilityKey = GlobalCapabilityRegister.retrieve(message.identifier);
                     if (capabilityKey.isProvidedBy(entity)) {
                         this.getCapabilityComponent(capabilityKey, entity).read(message.tag);
                     }

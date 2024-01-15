@@ -3,7 +3,6 @@ package fuzs.puzzleslib.forge.impl.network;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.impl.network.NetworkHandlerImplHelper;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
@@ -34,19 +33,18 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
     }
 
     @Override
-    public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz) {
-        this.register(clazz, LogicalSide.CLIENT);
+    public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory) {
+        this.register(clazz, factory, LogicalSide.CLIENT);
         return this;
     }
 
     @Override
-    public <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz) {
-        this.register(clazz, LogicalSide.SERVER);
+    public <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory) {
+        this.register(clazz, factory, LogicalSide.SERVER);
         return this;
     }
 
-    private <T extends MessageV2<T>> void register(Class<T> clazz, LogicalSide receptionSide) {
-        Function<FriendlyByteBuf, T> decoder = NetworkHandlerImplHelper.getMessageDecoder(clazz);
+    private <T extends MessageV2<T>> void register(Class<T> clazz, Function<FriendlyByteBuf, T> factory, LogicalSide receptionSide) {
         BiConsumer<T, CustomPayloadEvent.Context> handle = (T message, CustomPayloadEvent.Context context) -> {
             LogicalSide expectedReceptionSide = context.getDirection().getReceptionSide();
             if (expectedReceptionSide != receptionSide) {
@@ -62,7 +60,7 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
             message.makeHandler().handle(message, player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
         };
         NetworkDirection networkDirection = receptionSide.isClient() ? NetworkDirection.PLAY_TO_CLIENT : NetworkDirection.PLAY_TO_SERVER;
-        this.channel.messageBuilder(clazz, this.discriminator.getAndIncrement(), networkDirection).encoder(MessageV2::write).decoder(decoder).consumerMainThread(handle).add();
+        this.channel.messageBuilder(clazz, this.discriminator.getAndIncrement(), networkDirection).encoder(MessageV2::write).decoder(factory).consumerMainThread(handle).add();
     }
 
     @SuppressWarnings("unchecked")

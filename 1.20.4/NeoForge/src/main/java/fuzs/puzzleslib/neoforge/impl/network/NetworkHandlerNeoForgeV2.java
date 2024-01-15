@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.impl.network.NetworkHandlerImplHelper;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.network.FriendlyByteBuf;
@@ -60,19 +59,18 @@ public class NetworkHandlerNeoForgeV2 implements NetworkHandlerV2 {
     }
 
     @Override
-    public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz) {
-        this.register(clazz, LogicalSide.CLIENT, IDirectionAwarePayloadHandlerBuilder::client, IDirectionAwarePayloadHandlerBuilder::server);
+    public <T extends MessageV2<T>> NetworkHandlerV2 registerClientbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory) {
+        this.register(clazz, factory, LogicalSide.CLIENT, IDirectionAwarePayloadHandlerBuilder::client, IDirectionAwarePayloadHandlerBuilder::server);
         return this;
     }
 
     @Override
-    public <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz) {
-        this.register(clazz, LogicalSide.SERVER, IDirectionAwarePayloadHandlerBuilder::server, IDirectionAwarePayloadHandlerBuilder::client);
+    public <T extends MessageV2<T>> NetworkHandlerV2 registerServerbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory) {
+        this.register(clazz, factory, LogicalSide.SERVER, IDirectionAwarePayloadHandlerBuilder::server, IDirectionAwarePayloadHandlerBuilder::client);
         return this;
     }
 
-    private <T extends MessageV2<T>> void register(Class<T> clazz, LogicalSide receptionSide, NetworkHandlerNeoForgeV3.GenericPayloadHandler<T> receiverHandler, NetworkHandlerNeoForgeV3.GenericPayloadHandler<T> senderHandler) {
-        Function<FriendlyByteBuf, T> factory = NetworkHandlerImplHelper.getMessageDecoder(clazz);
+    private <T extends MessageV2<T>> void register(Class<T> clazz, Function<FriendlyByteBuf, T> factory, LogicalSide receptionSide, NetworkHandlerNeoForgeV3.GenericPayloadHandler<T> receiverHandler, NetworkHandlerNeoForgeV3.GenericPayloadHandler<T> senderHandler) {
         this.messageRegisters.offer((IPayloadRegistrar registrar) -> {
             registrar.play(this.registerMessageType(clazz), (FriendlyByteBuf friendlyByteBuf) -> {
                 return new NetworkHandlerNeoForgeV3.MessageHolder<>(factory.apply(friendlyByteBuf));
