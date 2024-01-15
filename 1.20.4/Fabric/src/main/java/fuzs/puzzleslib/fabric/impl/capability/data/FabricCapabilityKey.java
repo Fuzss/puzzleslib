@@ -34,11 +34,11 @@ public class FabricCapabilityKey<C extends CapabilityComponent> implements Capab
     public FabricCapabilityKey(ComponentKey<ComponentHolder> capability, Class<C> componentClass) {
         this.capability = capability;
         this.componentClass = componentClass;
-        CapabilityController.submit(this);
+        CapabilityController.register(this);
     }
 
     @Override
-    public ResourceLocation getId() {
+    public ResourceLocation identifier() {
         return this.capability.getId();
     }
 

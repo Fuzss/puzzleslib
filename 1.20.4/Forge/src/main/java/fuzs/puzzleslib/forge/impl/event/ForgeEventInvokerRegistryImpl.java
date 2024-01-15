@@ -19,12 +19,13 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.RegistryHelper;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.api.event.v1.core.ForgeEventInvokerRegistry;
 import fuzs.puzzleslib.forge.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.forge.mixin.accessor.ForgeRegistryForgeAccessor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
+import fuzs.puzzleslib.impl.event.AttributeModifiersMultimap;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.core.Holder;
@@ -38,7 +39,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -96,26 +97,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
-            if (result.isInterrupt()) {
-                evt.setCanceled(true);
-            }
-        });
-        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
             EventResult result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
             if (result.isInterrupt()) {
                 evt.setCanceled(true);
-            }
-        });
-        INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
-            EventResultHolder<InteractionResultHolder<ItemStack>> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
-            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            if (result.isInterrupt()) {
-                InteractionResultHolder<ItemStack> holder = result.getInterrupt().get();
-                if (holder.getResult() != InteractionResult.PASS) {
-                    evt.setCancellationResult(holder.getResult());
-                    evt.setCanceled(true);
-                }
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
@@ -224,7 +208,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
             callback.onReplaceLootTable(evt.getName(), table);
         });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableModifyEvent.class, (LootTableLoadEvents.Modify callback, LootTableModifyEvent evt) -> {
+        INSTANCE.register(LootTableLoadEvents.Modify.class, ForgeLootTableModifyEvent.class, (LootTableLoadEvents.Modify callback, ForgeLootTableModifyEvent evt) -> {
             callback.onModifyLootTable(evt.getLootDataManager(), evt.getIdentifier(), evt::addPool, evt::removePool);
         });
         INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
@@ -371,17 +355,6 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
-                if (evt.getEntity() instanceof Player) {
-                    // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
-                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
-                } else {
-                    evt.setCanceled(true);
-                }
-            }
-        });
-        INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
             if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel()).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
@@ -500,7 +473,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ItemAttributeModifiersCallback.class, ItemAttributeModifierEvent.class, (ItemAttributeModifiersCallback callback, ItemAttributeModifierEvent evt) -> {
-            Multimap<Attribute, AttributeModifier> attributeModifiers = new ForgeAttributeModifiersMultimap(evt::getModifiers, evt::addModifier, evt::removeModifier, evt::removeAttribute, evt::clearModifiers);
+            Multimap<Attribute, AttributeModifier> attributeModifiers = new AttributeModifiersMultimap(evt::getModifiers, evt::addModifier, evt::removeModifier, evt::removeAttribute, evt::clearModifiers);
             callback.onItemAttributeModifiers(evt.getItemStack(), evt.getSlotType(), attributeModifiers);
         });
         INSTANCE.register(ProjectileImpactCallback.class, ProjectileImpactEvent.class, (ProjectileImpactCallback callback, ProjectileImpactEvent evt) -> {
@@ -604,47 +577,48 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             topInput.getAsOptional().ifPresent(evt::setNewTopItem);
             bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
         });
-//        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
-//            final int airAmountValue;
-//            if (!evt.canBreathe()) {
-//                airAmountValue = -evt.getConsumeAirAmount();
-//            } else if (evt.canRefillAir()) {
-//                airAmountValue = evt.getRefillAirAmount();
-//            } else {
-//                airAmountValue = 0;
-//            }
-//            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
-//            LivingEntity entity = evt.getEntity();
-//            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
-//            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
-//            EventResult result = callback.onLivingBreathe(entity, airAmount, evt.canRefillAir(), canLoseAir);
-//            if (result.isInterrupt()) {
-//                evt.setCanBreathe(true);
-//                evt.setCanRefillAir(false);
-//            } else {
-//                OptionalInt optional = airAmount.getAsOptionalInt();
-//                if (optional.isPresent()) {
-//                    if (optional.getAsInt() < 0) {
-//                        evt.setCanBreathe(false);
-//                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
-//                    } else {
-//                        evt.setCanBreathe(true);
-//                        evt.setCanRefillAir(true);
-//                        evt.setRefillAirAmount(optional.getAsInt());
-//                    }
-//                }
-//            }
-//        });
-//        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
-//            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
-//            if (result.isInterrupt()) {
-//                if (result.getAsBoolean()) {
-//                    evt.setDrowning(true);
-//                } else {
-//                    evt.setCanceled(true);
-//                }
-//            }
-//        });
+        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
+            final int airAmountValue;
+            if (!evt.canBreathe()) {
+                airAmountValue = -evt.getConsumeAirAmount();
+            } else if (evt.canRefillAir()) {
+                airAmountValue = evt.getRefillAirAmount();
+            } else {
+                airAmountValue = 0;
+            }
+            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
+            LivingEntity entity = evt.getEntity();
+            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
+            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
+            EventResult result = callback.onLivingBreathe(entity, airAmount, evt.canRefillAir(), canLoseAir);
+            if (result.isInterrupt()) {
+                // just some trickery so the event does nothing
+                evt.setCanBreathe(true);
+                evt.setCanRefillAir(false);
+            } else {
+                OptionalInt optional = airAmount.getAsOptionalInt();
+                if (optional.isPresent()) {
+                    if (optional.getAsInt() < 0) {
+                        evt.setCanBreathe(false);
+                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
+                    } else {
+                        evt.setCanBreathe(true);
+                        evt.setCanRefillAir(true);
+                        evt.setRefillAirAmount(optional.getAsInt());
+                    }
+                }
+            }
+        });
+        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
+            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
+            if (result.isInterrupt()) {
+                if (result.getAsBoolean()) {
+                    evt.setDrowning(true);
+                } else {
+                    evt.setCanceled(true);
+                }
+            }
+        });
         INSTANCE.register(RegistryEntryAddedCallback.class, ForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(ServerChunkEvents.Watch.class, ChunkWatchEvent.Watch.class, (ServerChunkEvents.Watch callback, ChunkWatchEvent.Watch evt) -> {
             callback.onChunkWatch(evt.getPlayer(), evt.getChunk(), evt.getLevel());
@@ -654,6 +628,14 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(LivingEquipmentChangeCallback.class, LivingEquipmentChangeEvent.class, (LivingEquipmentChangeCallback callback, LivingEquipmentChangeEvent evt) -> {
             callback.onLivingEquipmentChange(evt.getEntity(), evt.getSlot(), evt.getFrom(), evt.getTo());
+        });
+        INSTANCE.register(LivingConversionEvents.Before.class, LivingConversionEvent.Pre.class, (LivingConversionEvents.Before callback, LivingConversionEvent.Pre evt) -> {
+            if (callback.onBeforeLivingConversion(evt.getEntity(), evt.getOutcome()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(LivingConversionEvents.After.class, LivingConversionEvent.Post.class, (LivingConversionEvents.After callback, LivingConversionEvent.Post evt) -> {
+            callback.onAfterLivingConversion(evt.getEntity(), evt.getOutcome());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
@@ -692,7 +674,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
             } : newAddCallback);
         }
-        IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
+        IEventBus eventBus = ForgeModContainerHelper.getActiveModEventBus();
         // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
         // but that doesn't allow for adding content
         // do not simply revert to the original add callback above as other events might have run in the meantime
@@ -759,7 +741,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             IEventBus eventBus = this.eventBus;
             if (eventBus == null) {
                 Objects.requireNonNull(context, "mod id context is null");
-                eventBus = ModContainerHelper.getModEventBus((String) context);
+                eventBus = ForgeModContainerHelper.getModEventBus((String) context);
             }
             if (eventBus == MinecraftForge.EVENT_BUS || eventPriority == EventPriority.NORMAL) {
                 // we don't support receiving cancelled events since the event api on Fabric is not designed for it

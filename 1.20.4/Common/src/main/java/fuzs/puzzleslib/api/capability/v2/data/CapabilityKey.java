@@ -1,66 +1,34 @@
 package fuzs.puzzleslib.api.capability.v2.data;
 
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 /**
- * common wrapper for Capability (Forge) and Component (Fabric)
+ * Common wrapper for Component / AttachmentType / Capability.
  *
  * @param <C> capability type
  */
-public interface CapabilityKey<C extends CapabilityComponent> {
+public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
 
     /**
      * @return capability id
      */
-    ResourceLocation getId();
+    ResourceLocation identifier();
 
     /**
-     * @return capability type
-     */
-    Class<C> getComponentClass();
-
-    /**
-     * get capability implementation from <code>provider</code> directly
+     * Get capability implementation directly from a <code>holder</code>.
      *
-     * @param provider      provider to get capability from
-     * @param <V>           provider type
-     * @return              capability implementation for this <code>provider</code>
+     * @param holder provider to get capability from
+     * @return capability implementation for this <code>holder</code>
      */
-    @Nullable
-    <V> C get(@Nullable V provider);
+    C get(T holder);
 
     /**
-     * get capability implementation from <code>provider</code> as optional
+     * checks if a capability is present on the given <code>holder</code>
      *
-     * @param provider      provider to get capability from
-     * @param <V>           provider type
-     * @return              capability implementation for this <code>provider</code> as optional
+     * @param holder provider to get capability from
+     * @return is this capability present on the given <code>holder</code>
      */
-    <V> Optional<C> maybeGet(@Nullable V provider);
+    boolean isProvidedBy(Object holder);
 
-    /**
-     * get capability implementation from <code>provider</code> directly
-     * alternative to {@link #get}, will throw an exception if not present
-     *
-     * @param provider      provider to get capability from
-     * @param <V>           provider type
-     * @return              capability implementation for this <code>provider</code>
-     */
-    default <V> C orThrow(@Nullable V provider) {
-        return this.maybeGet(provider).orElseThrow(IllegalStateException::new);
-    }
-
-    /**
-     * checks if a capability is present on the given <code>provider</code>
-     *
-     * @param provider      provider to get capability from
-     * @param <V>           provider type
-     * @return              is this capability present on the given <code>provider</code>
-     */
-    default <V> boolean isProvidedBy(@Nullable V provider) {
-        return this.get(provider) != null;
-    }
+    void setChanged(C capabilityComponent);
 }

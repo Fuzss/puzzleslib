@@ -3,7 +3,7 @@ package fuzs.puzzleslib.forge.impl.init;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.impl.init.ForgeRegistryReference;
 import fuzs.puzzleslib.impl.init.RegistryManagerV2Impl;
 import net.minecraft.core.Registry;
@@ -36,7 +36,7 @@ public final class ForgeRegistryManagerV2 extends RegistryManagerV2Impl {
 
     public ForgeRegistryManagerV2(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.getOptionalModEventBus(modId).orElse(null);
+        this.eventBus = ForgeModContainerHelper.getOptionalModEventBus(modId).orElse(null);
     }
 
     @SuppressWarnings("unchecked")

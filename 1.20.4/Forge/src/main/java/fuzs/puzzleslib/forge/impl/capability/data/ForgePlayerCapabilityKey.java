@@ -1,9 +1,6 @@
 package fuzs.puzzleslib.forge.impl.capability.data;
 
-import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v2.data.PlayerCapabilityKey;
-import fuzs.puzzleslib.api.capability.v2.data.PlayerRespawnCopyStrategy;
-import fuzs.puzzleslib.api.capability.v2.data.SyncStrategy;
+import fuzs.puzzleslib.api.capability.v2.data.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +23,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     /**
      * strategy for syncing this capability data to remote
      */
-    private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
+    private SyncStrategy syncStrategy = SyncStrategies.MANUAL;
 
     /**
      * @param id                capability id
@@ -41,7 +38,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
      * @param respawnStrategy   respawn strategy for players for copying capability data
      * @return                  builder
      */
-    public ForgePlayerCapabilityKey<C> setRespawnStrategy(PlayerRespawnCopyStrategy respawnStrategy) {
+    public ForgePlayerCapabilityKey<C> setRespawnStrategy(CopyStrategy respawnStrategy) {
         // do this to avoid registering the event multiple times accidentally somehow
         if (this.respawnStrategy) throw new IllegalStateException("Attempting to set new player respawn strategy when it has already been set");
         this.respawnStrategy = true;
@@ -52,7 +49,7 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     @Override
     void validateCapability() {
         super.validateCapability();
-        if (!this.respawnStrategy) throw new IllegalStateException("Player respawn strategy missing from capability %s".formatted(this.getId()));
+        if (!this.respawnStrategy) throw new IllegalStateException("Player respawn strategy missing from capability %s".formatted(this.identifier()));
     }
 
     /**
@@ -60,11 +57,11 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
      * @return                  builder
      */
     public ForgePlayerCapabilityKey<C> setSyncStrategy(SyncStrategy syncStrategy) {
-        if (this.syncStrategy != SyncStrategy.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
+        if (this.syncStrategy != SyncStrategies.MANUAL) throw new IllegalStateException("Attempting to set new sync behaviour when it has already been set");
         this.syncStrategy = syncStrategy;
         MinecraftForge.EVENT_BUS.addListener(this::onPlayerLoggedIn);
         MinecraftForge.EVENT_BUS.addListener(this::onPlayerChangedDimension);
-        if (syncStrategy == SyncStrategy.SELF_AND_TRACKING) {
+        if (syncStrategy == SyncStrategies.SELF_AND_TRACKING) {
             MinecraftForge.EVENT_BUS.addListener(this::onStartTracking);
         }
         return this;
@@ -72,10 +69,10 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
 
     @Override
     public void syncToRemote(ServerPlayer player) {
-        PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, this.orThrow(player), this.getId(), false);
+        PlayerCapabilityKey.syncCapabilityToRemote(player, player, this.syncStrategy, this.orThrow(player), this.identifier(), false);
     }
 
-    private void onPlayerClone(final PlayerEvent.Clone evt, PlayerRespawnCopyStrategy respawnStrategy) {
+    private void onPlayerClone(final PlayerEvent.Clone evt, CopyStrategy respawnStrategy) {
         // we have to revive caps and then invalidate them again since 1.17+
         evt.getOriginal().reviveCaps();
         this.maybeGet(evt.getOriginal()).ifPresent(oldCapability -> {
@@ -89,21 +86,21 @@ public class ForgePlayerCapabilityKey<C extends CapabilityComponent> extends For
     private void onPlayerLoggedIn(final PlayerEvent.PlayerLoggedInEvent evt) {
         Player player = evt.getEntity();
         this.maybeGet(player).ifPresent(capability -> {
-            PlayerCapabilityKey.syncCapabilityToRemote(player, (ServerPlayer) player, this.syncStrategy, capability, this.getId(), true);
+            PlayerCapabilityKey.syncCapabilityToRemote(player, (ServerPlayer) player, this.syncStrategy, capability, this.identifier(), true);
         });
     }
 
     private void onPlayerChangedDimension(final PlayerEvent.PlayerChangedDimensionEvent evt) {
         Player player = evt.getEntity();
         this.maybeGet(player).ifPresent(capability -> {
-            PlayerCapabilityKey.syncCapabilityToRemote(player, (ServerPlayer) player, this.syncStrategy, capability, this.getId(), true);
+            PlayerCapabilityKey.syncCapabilityToRemote(player, (ServerPlayer) player, this.syncStrategy, capability, this.identifier(), true);
         });
     }
 
     private void onStartTracking(final PlayerEvent.StartTracking evt) {
         this.maybeGet(evt.getTarget()).ifPresent(capability -> {
             // we only want to sync to the client that just started tracking, so use SyncStrategy#SELF
-            PlayerCapabilityKey.syncCapabilityToRemote(evt.getTarget(), (ServerPlayer) evt.getEntity(), SyncStrategy.SELF, capability, this.getId(), true);
+            PlayerCapabilityKey.syncCapabilityToRemote(evt.getTarget(), (ServerPlayer) evt.getEntity(), SyncStrategies.SELF, capability, this.identifier(), true);
         });
     }
 }

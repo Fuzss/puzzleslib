@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.impl.network.NetworkHandlerImplHelper;
+import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
@@ -23,17 +24,13 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
-    private static final int PROTOCOL_VERSION = 1;
-
     private final AtomicInteger discriminator = new AtomicInteger();
+    private final ResourceLocation channelName;
     private final SimpleChannel channel;
-    public final boolean clientAcceptsVanillaOrMissing;
-    public final boolean serverAcceptsVanillaOrMissing;
 
-    public NetworkHandlerForgeV2(ResourceLocation channelIdentifier, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        this.channel = buildSimpleChannel(channelIdentifier, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
-        this.clientAcceptsVanillaOrMissing = clientAcceptsVanillaOrMissing;
-        this.serverAcceptsVanillaOrMissing = serverAcceptsVanillaOrMissing;
+    public NetworkHandlerForgeV2(ResourceLocation channelName, boolean optional) {
+        this.channelName = channelName;
+        this.channel = buildSimpleChannel(channelName, optional);
     }
 
     @Override
@@ -52,7 +49,7 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
         BiConsumer<T, CustomPayloadEvent.Context> handle = (T message, CustomPayloadEvent.Context context) -> {
             LogicalSide expectedReceptionSide = context.getDirection().getReceptionSide();
             if (expectedReceptionSide != receptionSide) {
-                throw new IllegalStateException(String.format("Received message on wrong side, expected %s, was %s", receptionSide, expectedReceptionSide));
+                throw new IllegalStateException("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), this.channelName.getNamespace()));
             }
             // this needs to happen in here, otherwise Minecraft#player might still be null for events fired on login/entity creation
             Player player;
@@ -63,8 +60,8 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
             }
             message.makeHandler().handle(message, player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
         };
-        this.channel.messageBuilder(clazz, this.discriminator.getAndIncrement(), receptionSide.isClient() ? NetworkDirection.PLAY_TO_CLIENT : NetworkDirection.PLAY_TO_SERVER)
-                .encoder(MessageV2::write).decoder(decoder).consumerMainThread(handle).add();
+        NetworkDirection networkDirection = receptionSide.isClient() ? NetworkDirection.PLAY_TO_CLIENT : NetworkDirection.PLAY_TO_SERVER;
+        this.channel.messageBuilder(clazz, this.discriminator.getAndIncrement(), networkDirection).encoder(MessageV2::write).decoder(decoder).consumerMainThread(handle).add();
     }
 
     @SuppressWarnings("unchecked")
@@ -79,12 +76,13 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
         return (Packet<ClientCommonPacketListener>) NetworkDirection.PLAY_TO_CLIENT.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
     }
 
-    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
+    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
+        int protocolVersion = NetworkHandlerRegistryImpl.getModProtocolVersion(resourceLocation.getNamespace());
         return ChannelBuilder
                 .named(resourceLocation)
-                .networkProtocolVersion(PROTOCOL_VERSION)
-                .clientAcceptedVersions(clientAcceptsVanillaOrMissing ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(1))
-                .serverAcceptedVersions(serverAcceptsVanillaOrMissing ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(1))
+                .networkProtocolVersion(protocolVersion)
+                .clientAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
+                .serverAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
                 .simpleChannel();
     }
 }

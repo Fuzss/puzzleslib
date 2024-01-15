@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.network;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
@@ -17,20 +16,17 @@ import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
-    private final Map<Class<?>, ResourceLocation> messageChannelNames = Maps.newIdentityHashMap();
-    private final AtomicInteger discriminator = new AtomicInteger();
     private boolean building = true;
 
-    public NetworkHandlerFabricV3(ResourceLocation channelIdentifier) {
-        super(channelIdentifier);
+    public NetworkHandlerFabricV3(ResourceLocation channelName) {
+        super(channelName);
     }
 
     @SuppressWarnings("unchecked")
@@ -44,15 +40,8 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
     }
 
     private <T> void register(Class<T> clazz, BiConsumer<ResourceLocation, Function<FriendlyByteBuf, T>> register) {
-        if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
         if (this.building) throw new IllegalStateException("channel is null");
-        ResourceLocation channelName = this.nextIdentifier();
-        if (this.messageChannelNames.put(clazz, channelName) != null) throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
-        register.accept(channelName, MessageSerializers.findByType(clazz)::read);
-    }
-
-    private ResourceLocation nextIdentifier() {
-        return new ResourceLocation(this.channelIdentifier.getNamespace(), this.channelIdentifier.getPath() + "/" + this.discriminator.getAndIncrement());
+        register.accept(this.registerMessageType(clazz), MessageSerializers.findByType(clazz)::read);
     }
 
     @Override
@@ -69,15 +58,12 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
         return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends Record, S extends PacketListener> Packet<S> toPacket(BiFunction<ResourceLocation, FriendlyByteBuf, Packet<S>> packetFactory, T message) {
-        Class<T> clazz = (Class<T>) message.getClass();
-        if (!clazz.isRecord()) throw new IllegalArgumentException("Message of type %s is not a record".formatted(clazz));
-        FriendlyByteBuf byteBuf = PacketByteBufs.create();
-        MessageSerializers.findByType(clazz).write(byteBuf, message);
-        ResourceLocation channelName = this.messageChannelNames.get(clazz);
-        Objects.requireNonNull(channelName, "Unknown message of type %s".formatted(clazz));
-        return packetFactory.apply(channelName, byteBuf);
+        return this.toPacket(message, (ResourceLocation resourceLocation, Consumer<FriendlyByteBuf> consumer) -> {
+            FriendlyByteBuf friendlyByteBuf = PacketByteBufs.create();
+            consumer.accept(friendlyByteBuf);
+            return packetFactory.apply(resourceLocation, friendlyByteBuf);
+        });
     }
 
     @Override

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.forge.impl.client.event;
 
 import com.mojang.math.Transformation;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.forge.mixin.client.accessor.ModelBakeryAccessor;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -40,7 +40,7 @@ public record ForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, Fun
     }
 
     static {
-        ModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent(eventBus -> {
+        ForgeModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent(eventBus -> {
             eventBus.addListener((final ModelEvent.BakingCompleted evt) -> {
                 capturedAtlasPreparations = null;
             });

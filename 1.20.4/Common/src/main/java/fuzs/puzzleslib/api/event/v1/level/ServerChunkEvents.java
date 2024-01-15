@@ -10,7 +10,6 @@ public final class ServerChunkEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
     public static final EventInvoker<Watch> WATCH = EventInvoker.lookup(Watch.class);
-    public static final EventInvoker<Sent> SENT = EventInvoker.lookup(Sent.class);
     public static final EventInvoker<Unwatch> UNWATCH = EventInvoker.lookup(Unwatch.class);
 
     private ServerChunkEvents() {
@@ -45,26 +44,14 @@ public final class ServerChunkEvents {
     public interface Watch {
 
         /**
-         * Fires when a server player begins watching a chunk.
+         * Fires when a server player begins watching a chunk, and it has just been sent to a client.
+         * <p>Useful for syncing additional chunk data.
          *
          * @param player the player watching the chunk
          * @param chunk  the chunk
          * @param level  the level the chunk is in
          */
         void onChunkWatch(ServerPlayer player, LevelChunk chunk, ServerLevel level);
-    }
-
-    @FunctionalInterface
-    public interface Sent {
-
-        /**
-         * Fires when a chunk has just been sent to a client, useful for syncing additional chunk data.
-         *
-         * @param player the player watching the chunk
-         * @param chunk  the chunk
-         * @param level  the level the chunk is in
-         */
-        void onChunkSent(ServerPlayer player, LevelChunk chunk, ServerLevel level);
     }
 
     @FunctionalInterface

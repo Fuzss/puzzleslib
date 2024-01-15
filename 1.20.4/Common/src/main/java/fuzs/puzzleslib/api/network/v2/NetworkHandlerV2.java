@@ -8,6 +8,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerChunkCache;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -22,47 +23,23 @@ public interface NetworkHandlerV2 {
     /**
      * Creates a new network handler.
      *
-     * @param modId id for channel name
-     * @return mod specific network handler with default channel
-     */
-    static NetworkHandlerV2 build(String modId) {
-        return build(modId, null);
-    }
-
-    /**
-     * Creates a new network handler.
-     *
-     * @param modId   id for channel name
-     * @param context an internal id for this channel in case multiple are registered using the same mod id
-     * @return mod specific network handler with default channel
-     */
-    static NetworkHandlerV2 build(String modId, @Nullable String context) {
-        return build(modId, context, false, false);
-    }
-
-    /**
-     * Creates a new network handler.
-     *
-     * @param modId                         id for channel name
-     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
-     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
+     * @param modId    id for channel name
+     * @param optional are client & servers without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
-    static NetworkHandlerV2 build(String modId, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return build(modId, null, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    static NetworkHandlerV2 build(String modId, boolean optional) {
+        return build(new ResourceLocation(modId, "main"), optional);
     }
 
     /**
      * Creates a new network handler.
      *
-     * @param modId                         id for channel name
-     * @param context                            an internal id for this channel in case multiple are registered using the same mod id
-     * @param clientAcceptsVanillaOrMissing are servers without this mod or vanilla compatible
-     * @param serverAcceptsVanillaOrMissing are clients without this mod or vanilla compatible
+     * @param channelName the channel name
+     * @param optional    are client & servers without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
-    static NetworkHandlerV2 build(String modId, @Nullable String context, boolean clientAcceptsVanillaOrMissing, boolean serverAcceptsVanillaOrMissing) {
-        return ModContext.get(modId).getNetworkHandlerV2(context, clientAcceptsVanillaOrMissing, serverAcceptsVanillaOrMissing);
+    static NetworkHandlerV2 build(ResourceLocation channelName, boolean optional) {
+        return ModContext.get(channelName.getNamespace()).getNetworkHandlerV2(channelName, optional);
     }
 
     /**

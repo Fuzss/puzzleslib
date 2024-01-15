@@ -5,6 +5,7 @@ import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
 /**
  * a special capability key implementation with additional methods for players
@@ -12,20 +13,20 @@ import net.minecraft.world.entity.Entity;
  *
  * @param <C> capability type
  */
-public interface PlayerCapabilityKey<C extends CapabilityComponent> extends CapabilityKey<C> {
+public interface PlayerCapabilityKey<C extends CapabilityComponent<Player>> extends CapabilityKey<Player, C> {
 
     /**
      * get this capability from <code>player</code> and sync with remote(s) as defined by {@link SyncStrategy}
      * the player must have this capability or an exception will be raised
      *
-     * @param player    target for retrieving capability
+     * @param receiver    target for retrieving capability
      */
-    void syncToRemote(ServerPlayer player);
+    void syncToRemote(ServerPlayer receiver);
 
     /**
      * sync capability to player as defined by <code>syncStrategy</code>>
      *
-     * @param holder            holder for this capability
+     * @param entity            holder for this capability
      * @param receiver          player to sync to
      * @param syncStrategy      sync strategy to use
      * @param capability        capability to sync
@@ -33,8 +34,8 @@ public interface PlayerCapabilityKey<C extends CapabilityComponent> extends Capa
      * @param force             this is a forced sync (e.g. entity creation), so don't throw/log errors
      * @param <C>               capability type
      */
-    static <C extends CapabilityComponent> void syncCapabilityToRemote(Entity holder, ServerPlayer receiver, SyncStrategy syncStrategy, C capability, ResourceLocation id, boolean force) {
-        if (syncStrategy != SyncStrategy.MANUAL) {
+    static <T extends Entity, C extends CapabilityComponent<T>> void syncCapabilityToRemote(T entity, ServerPlayer receiver, SyncStrategy syncStrategy, C capability, ResourceLocation id, boolean force) {
+        if (syncStrategy != SyncStrategies.MANUAL) {
             if (!(capability instanceof SyncedCapabilityComponent syncedCapability)) {
                 if (!force) {
                     throw new IllegalStateException("Unable to sync capability component that is not of type %s".formatted(SyncedCapabilityComponent.class));
@@ -43,7 +44,7 @@ public interface PlayerCapabilityKey<C extends CapabilityComponent> extends Capa
                 }
             }
             if (force || syncedCapability.isDirty()) {
-                syncStrategy.sendTo(new ClientboundSyncCapabilityMessage(id, holder, capability.toCompoundTag()), receiver);
+                syncStrategy.sendTo(new ClientboundSyncCapabilityMessage(id, entity.getId(), capability.toCompoundTag()), receiver);
                 // always mark clean after syncing
                 syncedCapability.markClean();
             }

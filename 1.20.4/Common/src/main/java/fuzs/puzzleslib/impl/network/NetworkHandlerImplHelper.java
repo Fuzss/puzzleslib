@@ -23,7 +23,9 @@ public final class NetworkHandlerImplHelper {
                 .filter(currentConstructor -> currentConstructor.getParameterCount() == 1)
                 .filter(currentConstructor -> currentConstructor.getParameterTypes()[0] == FriendlyByteBuf.class)
                 .findAny()
-                .<Function<FriendlyByteBuf, T>>map(constructor -> buf -> ReflectionHelper.newInstance((Constructor<T>) constructor, buf).orElseThrow())
+                .<Function<FriendlyByteBuf, T>>map(constructor -> (FriendlyByteBuf buf) -> {
+                    return ReflectionHelper.newInstance((Constructor<T>) constructor, buf).orElseThrow();
+                })
                 .orElseGet(() -> getDirectMessageDecoder(supplier));
     }
 

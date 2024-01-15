@@ -12,6 +12,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -100,19 +101,13 @@ public final class ForgeClientEventInvokers {
             Supplier<Float> supplier = () -> (evt.getNewFovModifier() - 1.0F) / fovEffectScale + 1.0F;
             callback.onComputeFovModifier(evt.getPlayer(), DefaultedFloat.fromEvent(consumer, supplier, evt::getFovModifier));
         });
-        INSTANCE.register(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (ScreenEvents.BeforeInit callback, ScreenEvent.Init.Pre evt) -> {
-            callback.onBeforeInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables));
-        });
-        INSTANCE.register(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (ScreenEvents.AfterInit callback, ScreenEvent.Init.Post evt) -> {
-            callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), evt::addListener, evt::removeListener);
-        });
         registerScreenEvent(ScreenEvents.BeforeInit.class, ScreenEvent.Init.Pre.class, (callback, evt) -> {
-            callback.onBeforeInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables));
+            callback.onBeforeInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ScreenButtonList(evt.getScreen().renderables));
         });
         registerScreenEvent(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (callback, evt) -> {
             ScreenEvents.ConsumingOperator<GuiEventListener> addWidget = new ScreenEvents.ConsumingOperator<>(evt::addListener);
             ScreenEvents.ConsumingOperator<GuiEventListener> removeWidget = new ScreenEvents.ConsumingOperator<>(evt::removeListener);
-            callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ForgeButtonList(evt.getScreen().renderables), addWidget, removeWidget);
+            callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ScreenButtonList(evt.getScreen().renderables), addWidget, removeWidget);
         });
         registerScreenEvent(ScreenEvents.Remove.class, ScreenEvent.Closing.class, (callback, evt) -> {
             callback.onRemove(evt.getScreen());
@@ -138,11 +133,11 @@ public final class ForgeClientEventInvokers {
             callback.onAfterMouseRelease(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class, ScreenEvent.MouseScrolled.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDelta(), evt.getScrollDelta());
+            EventResult result = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getDeltaX(), evt.getDeltaY());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class, ScreenEvent.MouseScrolled.Post.class, (callback, evt) -> {
-            callback.onAfterMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDelta(), evt.getScrollDelta());
+            callback.onAfterMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getDeltaX(), evt.getDeltaY());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ScreenEvent.MouseDragged.Pre.class, (callback, evt) -> {
             EventResult result = callback.onBeforeMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
@@ -209,12 +204,12 @@ public final class ForgeClientEventInvokers {
             callback.onAfterMouseAction(evt.getButton(), evt.getAction(), evt.getModifiers());
         });
         INSTANCE.register(InputEvents.BeforeMouseScroll.class, InputEvent.MouseScrollingEvent.class, (InputEvents.BeforeMouseScroll callback, InputEvent.MouseScrollingEvent evt) -> {
-            EventResult result = callback.onBeforeMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDelta(), evt.getScrollDelta());
+            EventResult result = callback.onBeforeMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getDeltaX(), evt.getDeltaY());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(InputEvents.AfterMouseScroll.class, InputEvent.MouseScrollingEvent.class, (InputEvents.AfterMouseScroll callback, InputEvent.MouseScrollingEvent evt) -> {
             // Forge doesn't have this, but shouldn't be important really
-            callback.onAfterMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDelta(), evt.getScrollDelta());
+            callback.onAfterMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getDeltaX(), evt.getDeltaY());
         });
         INSTANCE.register(InputEvents.BeforeKeyAction.class, InputEvent.Key.class, (InputEvents.BeforeKeyAction callback, InputEvent.Key evt) -> {
             // result is ignored, as before event doesn't exist on Forge, so there is nothing to cancel the input
@@ -279,19 +274,6 @@ public final class ForgeClientEventInvokers {
             if (!evt.isAttack()) return;
             Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.hitResult != null) {
-                EventResult result = callback.onAttackInteraction(minecraft, minecraft.player);
-                if (result.isInterrupt()) {
-                    // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
-                    // just manually send swing hand packet if necessary
-                    evt.setSwingHand(false);
-                    evt.setCanceled(true);
-                }
-            }
-        });
-        INSTANCE.register(InteractionInputEvents.Attack.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Attack callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
-            if (!evt.isAttack()) return;
-            Minecraft minecraft = Minecraft.getInstance();
-            if (minecraft.hitResult != null) {
                 EventResult result = callback.onAttackInteraction(minecraft, minecraft.player, minecraft.hitResult);
                 if (result.isInterrupt()) {
                     // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
@@ -335,12 +317,6 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (MovementInputUpdateCallback callback, MovementInputUpdateEvent evt) -> {
             callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
-        });
-        INSTANCE.register(ModelEvents.ModifyBakingResult.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakingResult callback, ModelEvent.ModifyBakingResult evt) -> {
-            callback.onModifyBakingResult(evt.getModels(), evt::getModelBakery);
-        });
-        INSTANCE.register(ModelEvents.BakingCompleted.class, ModelEvent.BakingCompleted.class, (ModelEvents.BakingCompleted callback, ModelEvent.BakingCompleted evt) -> {
-            callback.onBakingCompleted(evt::getModelManager, evt.getModels(), evt::getModelBakery);
         });
         INSTANCE.register(RenderBlockOverlayCallback.class, RenderBlockScreenEffectEvent.class, (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent evt) -> {
             EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), evt.getBlockState());
@@ -416,12 +392,12 @@ public final class ForgeClientEventInvokers {
         });
         INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            if (!minecraft.options.renderDebug) return;
+            if (!minecraft.getDebugOverlay().showDebugScreen()) return;
             callback.onGatherLeftDebugText(evt.getLeft());
         });
         INSTANCE.register(GatherDebugTextEvents.Right.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Right callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            if (!minecraft.options.renderDebug) return;
+            if (!minecraft.getDebugOverlay().showDebugScreen()) return;
             callback.onGatherRightDebugText(evt.getRight());
         });
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {

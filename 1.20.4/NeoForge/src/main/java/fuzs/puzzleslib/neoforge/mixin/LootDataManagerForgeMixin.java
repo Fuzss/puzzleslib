@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.mixin;
 
-import fuzs.puzzleslib.neoforge.impl.event.LootTableModifyEvent;
+import fuzs.puzzleslib.neoforge.impl.event.NeoForgeLootTableModifyEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootDataId;
 import net.minecraft.world.level.storage.loot.LootDataManager;
@@ -24,7 +24,7 @@ abstract class LootDataManagerForgeMixin {
     private void apply(Map<LootDataType<?>, Map<ResourceLocation, ?>> map, CallbackInfo callback) {
         for (Map.Entry<LootDataId<?>, ?> entry : this.elements.entrySet()) {
             if (entry.getKey().type() == LootDataType.TABLE) {
-                MinecraftForge.EVENT_BUS.post(new LootTableModifyEvent(LootDataManager.class.cast(this), entry.getKey().location(), (LootTable) entry.getValue()));
+                MinecraftForge.EVENT_BUS.post(new NeoForgeLootTableModifyEvent(LootDataManager.class.cast(this), entry.getKey().location(), (LootTable) entry.getValue()));
             }
         }
     }

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.forge.impl.init;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.forge.api.core.v1.ModContainerHelper;
+import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.RegistryHelper;
@@ -39,7 +39,7 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     public ForgeRegistryManagerV3(String modId) {
         super(modId);
-        this.eventBus = ModContainerHelper.getOptionalModEventBus(modId).orElse(null);
+        this.eventBus = ForgeModContainerHelper.getOptionalModEventBus(modId).orElse(null);
     }
 
     @Override
@@ -75,14 +75,14 @@ public final class ForgeRegistryManagerV3 extends RegistryManagerV3Impl {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T> Holder.Reference<T> _register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
-        DeferredRegister<T> register = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
+    protected <T> Holder.Reference<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.modId);
             Objects.requireNonNull(this.eventBus, "mod event bus for %s is null".formatted(this.modId));
             deferredRegister.register(this.eventBus);
             return deferredRegister;
         });
-        register.register(path, () -> {
+        registrar.register(path, () -> {
             T value = supplier.get();
             Objects.requireNonNull(value, "value is null");
             return value;

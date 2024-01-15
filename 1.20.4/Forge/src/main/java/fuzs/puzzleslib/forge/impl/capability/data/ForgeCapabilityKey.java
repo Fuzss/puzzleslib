@@ -45,7 +45,7 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
         this.id = id;
         this.componentClass = componentClass;
         this.factory = factory;
-        CapabilityController.submit(this);
+        CapabilityController.register(this);
     }
 
     /**
@@ -58,7 +58,7 @@ public class ForgeCapabilityKey<C extends CapabilityComponent> implements Capabi
     }
 
     @Override
-    public ResourceLocation getId() {
+    public ResourceLocation identifier() {
         return this.id;
     }
 

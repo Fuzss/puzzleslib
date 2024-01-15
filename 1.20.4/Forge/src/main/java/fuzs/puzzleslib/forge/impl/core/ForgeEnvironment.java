@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
+import fuzs.puzzleslib.impl.core.EmptyObjectShareAccessImpl;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -78,6 +79,6 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public ObjectShareAccess getObjectShareAccess() {
-        return ForgeObjectShareAccess.INSTANCE;
+        return EmptyObjectShareAccessImpl.INSTANCE;
     }
 }

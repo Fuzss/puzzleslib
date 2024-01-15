@@ -8,7 +8,7 @@ import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
-import fuzs.puzzleslib.fabric.impl.init.PotionBrewingRegistryFabric;
+import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingRegistry;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -41,7 +41,7 @@ public final class FabricFactories implements CommonFactories {
 
     @Override
     public PotionBrewingRegistry getPotionBrewingRegistry() {
-        return new PotionBrewingRegistryFabric();
+        return new FabricPotionBrewingRegistry();
     }
 
     @Override
