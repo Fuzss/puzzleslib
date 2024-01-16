@@ -30,7 +30,9 @@ public abstract class CapabilityComponent<T> {
     public final void initialize(CapabilityKey<T, CapabilityComponent<T>> capabilityKey, T holder) {
         if (!this.initialized) {
             this.initialized = true;
+            Objects.requireNonNull(capabilityKey, "capability key is null");
             this.capabilityKey = capabilityKey;
+            Objects.requireNonNull(holder, "capability holder is null");
             this.holder = holder;
         } else {
             throw new IllegalStateException("Capability component '%s' already initialized".formatted(capabilityKey.identifier()));
@@ -62,7 +64,7 @@ public abstract class CapabilityComponent<T> {
      *
      * @return the capability serialized to {@link CompoundTag}
      */
-    @ApiStatus.Internal
+    @ApiStatus.NonExtendable
     public CompoundTag toCompoundTag() {
         CompoundTag tag = new CompoundTag();
         this.write(tag);

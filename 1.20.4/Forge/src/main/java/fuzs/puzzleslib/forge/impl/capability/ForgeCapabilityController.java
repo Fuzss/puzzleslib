@@ -1,32 +1,21 @@
 package fuzs.puzzleslib.forge.impl.capability;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
-import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
-import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
+import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
-import fuzs.puzzleslib.forge.impl.capability.data.CapabilityHolder;
-import fuzs.puzzleslib.forge.impl.capability.data.ForgeCapabilityKey;
-import fuzs.puzzleslib.forge.impl.capability.data.ForgePlayerCapabilityKey;
+import fuzs.puzzleslib.forge.impl.capability.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
@@ -34,118 +23,118 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public final class ForgeCapabilityController implements CapabilityController {
-    private final String namespace;
-    private final Multimap<Class<?>, CapabilityData<?, ?>> capabilityTypes = Multimaps.newListMultimap(Maps.newIdentityHashMap(), Lists::newArrayList);
+    private final Multimap<Class<?>, CapabilityData<?, ?>> capabilityData = Multimaps.newListMultimap(Maps.newIdentityHashMap(), Lists::newArrayList);
+    private final String modId;
 
-    public ForgeCapabilityController(String namespace) {
-        this.namespace = namespace;
-        // for registering capabilities
-        ForgeModContainerHelper.getOptionalModEventBus(namespace).ifPresent(eventBus -> {
+    public ForgeCapabilityController(String modId) {
+        this.modId = modId;
+        ForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             eventBus.addListener(this::onRegisterCapabilities);
         });
+    }
+
+    {
         // for attaching capabilities via AttachCapabilitiesEvent, this is the only method that supports using
         // a wildcard for the generic event, allowing to listen to all subtypes simultaneously
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     @Override
-    public <T extends Entity, C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Class<T> entityType) {
-        return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, entityType::isInstance);
+    public <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType) {
+        return this.registerCapability(Entity.class, identifier, capabilityType, capabilityFactory, entityType::isInstance, (ForgeCapabilityKey.ForgeCapabilityKeyFactory<T, C, ForgeEntityCapabilityKey<T, C>>) ForgeEntityCapabilityKey::new);
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy) {
-        return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, Player.class::isInstance, ForgePlayerCapabilityKey<C>::new).setRespawnStrategy(respawnStrategy);
+    public <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> blockEntityType) {
+        return this.registerCapability(BlockEntity.class, identifier, capabilityType, capabilityFactory, blockEntityType::isInstance, (ForgeCapabilityKey.ForgeCapabilityKeyFactory<T, C, ForgeBlockEntityCapabilityKey<T, C>>) ForgeBlockEntityCapabilityKey::new);
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy, SyncStrategy syncStrategy) {
-        return ((ForgePlayerCapabilityKey<C>) this.registerPlayerCapability(capabilityKey, capabilityType, capabilityFactory, respawnStrategy)).setSyncStrategy(syncStrategy);
+    public <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
+        return this.registerCapability(LevelChunk.class, identifier, capabilityType, capabilityFactory, (ForgeCapabilityKey.ForgeCapabilityKeyFactory<LevelChunk, C, ForgeLevelChunkCapabilityKey<C>>) ForgeLevelChunkCapabilityKey::new);
     }
 
     @Override
-    public <T extends BlockEntity, C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Class<T> blockEntityType) {
-        return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, capabilityFactory, blockEntityType::isInstance);
+    public <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
+        return this.registerCapability(Level.class, identifier, capabilityType, capabilityFactory, (ForgeCapabilityKey.ForgeCapabilityKeyFactory<Level, C, ForgeLevelCapabilityKey<C>>) ForgeLevelCapabilityKey::new);
     }
 
-    @Override
-    public <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, Function<ChunkAccess, C> capabilityFactory) {
-        return this.registerCapability(LevelChunk.class, capabilityKey, capabilityType, capabilityFactory, o -> true);
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ICapabilityProvider> holderType, String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, ForgeCapabilityKey.ForgeCapabilityKeyFactory<T, C, K> capabilityKeyFactory) {
+        return this.registerCapability(holderType, identifier, capabilityType, capabilityFactory, holderType::isInstance, capabilityKeyFactory);
     }
 
-    @Override
-    public <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, Function<Level, C> capabilityFactory) {
-        return this.registerCapability(Level.class, capabilityKey, capabilityType, capabilityFactory, o -> true);
-    }
-
-    private <T, C extends CapabilityComponent> CapabilityKey<C> registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Predicate<Object> filter) {
-        return this.registerCapability(providerType, capabilityKey, capabilityType, capabilityFactory, filter, ForgeCapabilityKey<C>::new);
-    }
-
-    private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<? extends ICapabilityProvider> holderType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
+    @SuppressWarnings("unchecked")
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ICapabilityProvider> holderType, String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
-        ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
-        CapabilityData<T, C1> capabilityData = new CapabilityData<>(key, capabilityType, filter);
-        this.capabilityTypes.put(holderType, capabilityData);
-        return capabilityKeyFactory.apply(key, capabilityType, token -> {
-            final Capability<C1> capability = CapabilityManager.get(token);
-            capabilityData.setFactory(o -> new CapabilityHolder<>(capability, capabilityFactory.apply(o)));
+        ResourceLocation capabilityName = new ResourceLocation(this.modId, identifier);
+        CapabilityData<T, C> capabilityData = new CapabilityData<>(capabilityName, capabilityType, filter);
+        this.capabilityData.put(holderType, capabilityData);
+        Object[] capabilityKey = new Object[1];
+        ForgeCapabilityKey.CapabilityTokenFactory<T, C> tokenFactory = (CapabilityToken<C> token) -> {
+            Capability<C> capability = CapabilityManager.get(token);
+            capabilityData.setFactory((T t) -> {
+                C capabilityComponent = capabilityFactory.get();
+                Objects.requireNonNull(capabilityComponent, "capability component is null");
+                capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], t);
+                return new CapabilityAdapter<>(capability, capabilityComponent);
+            });
             return capability;
-        });
+        };
+        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(capabilityName, tokenFactory));
     }
 
     private void onRegisterCapabilities(final RegisterCapabilitiesEvent evt) {
-        for (CapabilityData<?, ?> data : this.capabilityTypes.values()) {
-            evt.register(data.getType());
+        for (CapabilityData<?, ?> data : this.capabilityData.values()) {
+            evt.register(data.type());
         }
     }
 
     @SuppressWarnings("unchecked")
     @SubscribeEvent
     public <T> void onAttachCapabilities(final AttachCapabilitiesEvent<?> evt) {
-        Class<?> providerClazz = (Class<?>) evt.getGenericType();
-        for (CapabilityData<?, ?> data : this.capabilityTypes.get(providerClazz)) {
+        Class<?> holderType = (Class<?>) evt.getGenericType();
+        for (CapabilityData<?, ?> data : this.capabilityData.get(holderType)) {
             if (data.test(evt.getObject())) {
-                evt.addCapability(data.getKey(), ((CapabilityData<T, ?>) data).make((T) evt.getObject()));
+                evt.addCapability(data.identifier(), ((CapabilityData<T, ?>) data).apply((T) evt.getObject()));
             }
         }
     }
 
-    private static final class CapabilityData<T, C extends CapabilityComponent> {
-        private final ResourceLocation key;
+    private static final class CapabilityData<T, C extends CapabilityComponent<T>> {
+        private final ResourceLocation identifier;
         private final Class<C> type;
         private final Predicate<Object> filter;
         @Nullable
-        private Function<T, CapabilityHolder<C>> factory;
+        private Function<T, CapabilityAdapter<T, C>> factory;
 
-        private CapabilityData(ResourceLocation key, Class<C> type, Predicate<Object> filter) {
-            this.key = key;
+        private CapabilityData(ResourceLocation identifier, Class<C> type, Predicate<Object> filter) {
+            this.identifier = identifier;
             this.type = type;
             this.filter = filter;
         }
 
-        public ResourceLocation getKey() {
-            return this.key;
+        public ResourceLocation identifier() {
+            return this.identifier;
         }
 
-        public Class<C> getType() {
+        public Class<C> type() {
             return this.type;
         }
 
-        public void setFactory(Function<T, CapabilityHolder<C>> factory) {
-            Preconditions.checkState(this.factory == null, "Capability factory for %s already set".formatted(this.key));
+        public void setFactory(Function<T, CapabilityAdapter<T, C>> factory) {
             this.factory = factory;
         }
 
-        public CapabilityHolder<C> make(T t) {
-            Objects.requireNonNull(this.factory, "Found no capability factory for " + this.key);
+        public CapabilityAdapter<T, C> apply(T t) {
+            Objects.requireNonNull(this.factory, "factory is null");
             return this.factory.apply(t);
         }
 
-        public boolean test(Object o) {
-            return this.filter.test(o);
+        public boolean test(@Nullable Object o) {
+            return o != null && this.filter.test(o);
         }
     }
 }

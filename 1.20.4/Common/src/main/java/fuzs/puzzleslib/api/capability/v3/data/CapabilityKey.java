@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,5 +45,11 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      */
     void setChanged(C capabilityComponent);
 
+    /**
+     * Writes a component to a packet for sending to remotes.
+     *
+     * @param capabilityComponent the component for serialization
+     * @return the packet
+     */
     ClientboundMessage<?> toPacket(C capabilityComponent);
 }

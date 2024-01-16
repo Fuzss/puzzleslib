@@ -32,6 +32,7 @@
     "LootItemRandomChanceWithLootingConditionFabricMixin",
     "MagmaCubeFabricMixin",
     "MobFabricMixin",
+    "MushroomCowFabricMixin",
     "NaturalSpawnerFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",

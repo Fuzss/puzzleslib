@@ -20,22 +20,7 @@ public enum SyncStrategy {
         }
     },
     /**
-     * Syncing is done automatically with just the capability holder if it is a {@link ServerPlayer}.
-     *
-     * <p>Useful for capabilities that control an ability, like the amount of midair jumps left.
-     */
-    SELF {
-
-        @Override
-        public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
-            if (entity instanceof ServerPlayer player) {
-                PuzzlesLibMod.NETWORK.sendTo(player, message);
-            }
-        }
-    },
-    /**
      * Syncing is done automatically with the capability holder and every {@link ServerPlayer} tracking them.
-     *
      * <p>Useful for capabilities that affect rendering (e.g. a glider is equipped for gliding).
      */
     TRACKING {
@@ -43,6 +28,19 @@ public enum SyncStrategy {
         @Override
         public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
             PuzzlesLibMod.NETWORK.sendToAllTracking(entity, message, true);
+        }
+    },
+    /**
+     * Syncing is done automatically with just the capability holder if it is a {@link ServerPlayer}.
+     * <p>Useful for capabilities that control an ability, like the amount of midair jumps left.
+     */
+    PLAYER {
+
+        @Override
+        public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
+            if (entity instanceof ServerPlayer player) {
+                PuzzlesLibMod.NETWORK.sendTo(player, message);
+            }
         }
     };
 

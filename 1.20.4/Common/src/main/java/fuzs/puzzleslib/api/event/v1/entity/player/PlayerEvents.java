@@ -47,11 +47,11 @@ public final class PlayerEvents {
         /**
          * Called when player data is copied to a new player.
          *
-         * @param oldPlayer the old player
-         * @param newPlayer the new player
-         * @param alive     whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         * @param originalPlayer     the old player
+         * @param newPlayer          the new player
+         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
          */
-        void onCopy(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive);
+        void onCopy(ServerPlayer originalPlayer, ServerPlayer newPlayer, boolean originalStillAlive);
     }
 
     @FunctionalInterface
@@ -60,10 +60,10 @@ public final class PlayerEvents {
         /**
          * Called after player a has been respawned.
          *
-         * @param player the player
-         * @param alive  whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         * @param player             the new player
+         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
          */
-        void onRespawn(ServerPlayer player, boolean alive);
+        void onRespawn(ServerPlayer player, boolean originalStillAlive);
     }
 
     @FunctionalInterface

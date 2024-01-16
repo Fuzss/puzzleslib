@@ -18,6 +18,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -53,30 +54,33 @@ public final class NeoForgeCapabilityController implements CapabilityController 
         return this.registerCapability(holderType, identifier, capabilityFactory, holderType::isInstance, capabilityKeyFactory);
     }
 
-    private <T, C1 extends CapabilityComponent<T>, C2 extends CapabilityKey<T, C1>> C2 registerCapability(Class<? extends IAttachmentHolder> holderType, String identifier, Supplier<C1> capabilityFactory, Predicate<Object> filter, NeoForgeCapabilityKey.Factory<T, C1, C2> capabilityKeyFactory) {
+    @SuppressWarnings("unchecked")
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends IAttachmentHolder> holderType, String identifier, Supplier<C> capabilityFactory, Predicate<Object> filter, NeoForgeCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
-        C2[] capabilityKey = (C2[]) new Object[1];
-        DeferredHolder<AttachmentType<?>, AttachmentType<C1>> holder = this.registrar.register(identifier, () -> {
-            return AttachmentType.builder(attachmentHolder -> {
-                C1 capabilityComponent = capabilityFactory.get();
+        Object[] capabilityKey = new Object[1];
+        DeferredHolder<AttachmentType<?>, AttachmentType<C>> holder = this.registrar.register(identifier, () -> {
+            return AttachmentType.builder((IAttachmentHolder attachmentHolder) -> {
+                C capabilityComponent = capabilityFactory.get();
+                Objects.requireNonNull(capabilityComponent, "capability component is null");
                 capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], (T) attachmentHolder);
                 return capabilityComponent;
             }).serialize(new IAttachmentSerializer<>() {
 
                 @Override
-                public C1 read(IAttachmentHolder holder, Tag tag) {
-                    C1 capabilityComponent = capabilityFactory.get();
-                    capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], (T) holder);
+                public C read(IAttachmentHolder attachmentHolder, Tag tag) {
+                    C capabilityComponent = capabilityFactory.get();
+                    Objects.requireNonNull(capabilityComponent, "capability component is null");
+                    capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], (T) attachmentHolder);
                     capabilityComponent.read((CompoundTag) tag);
                     return capabilityComponent;
                 }
 
                 @Override
-                public Tag write(C1 object) {
+                public Tag write(C object) {
                     return object.toCompoundTag();
                 }
             }).build();
         });
-        return capabilityKey[0] = capabilityKeyFactory.apply(holder, filter);
+        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(holder, filter));
     }
 }

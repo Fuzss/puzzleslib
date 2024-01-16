@@ -24,7 +24,7 @@ public final class ForgeCapabilityHelper {
      * @param token the token, created with an anonymous class
      * @param <C>   capability type
      */
-    public static <C extends CapabilityComponent> void setCapabilityToken(CapabilityKey<C> key, CapabilityToken<C> token) {
-        ((ForgeCapabilityKey<C>) key).createCapability(token);
+    public static <T, C extends CapabilityComponent<T>> void setCapabilityToken(CapabilityKey<T, C> key, CapabilityToken<C> token) {
+        ((ForgeCapabilityKey<T, C>) key).createCapability(token);
     }
 }
