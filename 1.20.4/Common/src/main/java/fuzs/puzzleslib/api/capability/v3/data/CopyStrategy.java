@@ -16,7 +16,7 @@ public enum CopyStrategy {
     ALWAYS {
 
         @Override
-        public <T1 extends Entity, T2 extends Entity> void copy(T1 oldEntity, CapabilityComponent<T1> oldCapability, T2 newEntity, CapabilityComponent<T2> newCapability) {
+        public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability) {
             copy(oldCapability, newCapability);
         }
     },
@@ -26,7 +26,7 @@ public enum CopyStrategy {
     NEVER {
 
         @Override
-        public <T1 extends Entity, T2 extends Entity> void copy(T1 oldEntity, CapabilityComponent<T1> oldCapability, T2 newEntity, CapabilityComponent<T2> newCapability) {
+        public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability) {
 
         }
     },
@@ -36,7 +36,7 @@ public enum CopyStrategy {
     KEEP_PLAYER_INVENTORY {
 
         @Override
-        public <T1 extends Entity, T2 extends Entity> void copy(T1 oldEntity, CapabilityComponent<T1> oldCapability, T2 newEntity, CapabilityComponent<T2> newCapability) {
+        public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability) {
             if (newEntity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
                 if (oldEntity instanceof Player && newEntity instanceof Player) {
                     copy(oldCapability, newCapability);
@@ -55,7 +55,7 @@ public enum CopyStrategy {
      * @param <T1>             source entity type
      * @param <T2>             target entity type
      */
-    public abstract <T1 extends Entity, T2 extends Entity> void copy(T1 oldEntity, CapabilityComponent<T1> oldCapability, T2 newEntity, CapabilityComponent<T2> newCapability);
+    public abstract void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability);
 
     static void copy(CapabilityComponent<?> oldCapability, CapabilityComponent<?> newCapability) {
         newCapability.read(oldCapability.toCompoundTag());

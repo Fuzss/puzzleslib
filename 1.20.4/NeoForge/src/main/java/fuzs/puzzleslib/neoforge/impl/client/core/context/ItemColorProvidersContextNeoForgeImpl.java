@@ -7,7 +7,6 @@ import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.color.item.ItemColors;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -29,6 +28,6 @@ public record ItemColorProvidersContextNeoForgeImpl(BiConsumer<ItemColor, ItemLi
 
     @Override
     public @Nullable ItemColor getProvider(Item item) {
-        return ((ItemColorsNeoForgeAccessor) this.itemColors).puzzleslib$getItemColors().get(ForgeRegistries.ITEMS.getDelegateOrThrow(item));
+        return ((ItemColorsNeoForgeAccessor) this.itemColors).puzzleslib$getItemColors().get(item);
     }
 }

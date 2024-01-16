@@ -7,6 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -27,18 +29,19 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
     }
 
     @Override
-    public C get(T holder) {
-        if (holder instanceof IAttachmentHolder attachmentHolder && this.filter.test(holder)) {
+    public C get(@NotNull T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        if (holder instanceof IAttachmentHolder attachmentHolder && this.isProvidedBy(holder)) {
             C capabilityComponent = attachmentHolder.getData(this.holder.value());
             Objects.requireNonNull(capabilityComponent, "data is null");
             return capabilityComponent;
         } else {
-            throw new IllegalArgumentException("invalid capability holder: %s".formatted(holder));
+            throw new IllegalArgumentException("Invalid capability holder: %s".formatted(holder));
         }
     }
 
     @Override
-    public boolean isProvidedBy(Object holder) {
+    public boolean isProvidedBy(@Nullable Object holder) {
         return this.filter.test(holder);
     }
 

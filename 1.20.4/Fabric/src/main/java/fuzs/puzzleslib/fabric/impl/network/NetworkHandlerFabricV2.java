@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.network;
 
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
@@ -45,7 +47,7 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     }
 
     private ResourceLocation registerMessageType(Class<? extends MessageV2<?>> clazz, PacketFlow packetFlow) {
-        ResourceLocation messageName = new ResourceLocation(this.channelName.getNamespace(), this.channelName.getPath() + "/" + this.discriminator.getAndIncrement());
+        ResourceLocation messageName = new ResourceLocation(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
         this.messageNames.put(clazz, Map.entry(messageName, packetFlow));
         return messageName;
     }
@@ -53,7 +55,8 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     @Override
     public Packet<ClientCommonPacketListener> toClientboundPacket(MessageV2<?> message) {
         if (this.messageNames.get(message.getClass()).getValue() == PacketFlow.SERVERBOUND) {
-            throw new IllegalStateException("Attempted sending clientbound message to server side");
+            String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+            throw new IllegalStateException("Sending %s from %s on wrong side!".formatted(message.getClass().getSimpleName(), modName));
         } else {
             return this.toPacket(ServerPlayNetworking::createS2CPacket, message);
         }
@@ -62,7 +65,8 @@ public class NetworkHandlerFabricV2 implements NetworkHandlerV2 {
     @Override
     public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
         if (this.messageNames.get(message.getClass()).getValue() == PacketFlow.CLIENTBOUND) {
-            throw new IllegalStateException("Attempted sending serverbound message to client side");
+            String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+            throw new IllegalStateException("Sending %s from %s on wrong side!".formatted(message.getClass().getSimpleName(), modName));
         } else {
             return this.toPacket(ClientPlayNetworking::createC2SPacket, message);
         }

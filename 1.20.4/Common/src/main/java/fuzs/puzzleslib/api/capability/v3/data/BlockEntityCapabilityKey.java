@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -15,5 +16,10 @@ public interface BlockEntityCapabilityKey<T extends BlockEntity, C extends Capab
     @Override
     default void setChanged(C capabilityComponent) {
         capabilityComponent.getHolder().setChanged();
+    }
+
+    @Override
+    default ClientboundMessage<?> toPacket(C capabilityComponent) {
+        throw new UnsupportedOperationException();
     }
 }

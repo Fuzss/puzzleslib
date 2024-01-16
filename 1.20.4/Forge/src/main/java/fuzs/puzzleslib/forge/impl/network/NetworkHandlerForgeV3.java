@@ -73,7 +73,7 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
         super.build();
     }
 
-    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
+    static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
         int protocolVersion = getProtocolVersion(resourceLocation.getNamespace());
         return ChannelBuilder
                 .named(resourceLocation)

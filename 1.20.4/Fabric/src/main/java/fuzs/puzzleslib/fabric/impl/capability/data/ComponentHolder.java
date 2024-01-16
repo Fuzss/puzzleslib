@@ -11,7 +11,7 @@ import net.minecraft.nbt.CompoundTag;
  * but this is unfortunately not possible due to the way {@link ComponentKey} is created using the factory
  * therefore we need to perform a manual cast when retrieving the wrapped {@link #component}
  */
-public record ComponentHolder(CapabilityComponent component) implements ComponentV3 {
+public record ComponentHolder(CapabilityComponent<?> component) implements ComponentV3 {
 
     @Override
     public void readFromNbt(CompoundTag tag) {

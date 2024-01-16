@@ -5,8 +5,8 @@ import fuzs.puzzleslib.api.core.v1.context.FuelBurnTimesContext;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 
 import java.util.Objects;
 
@@ -19,7 +19,9 @@ public final class FuelBurnTimesContextNeoForgeImpl implements FuelBurnTimesCont
         Preconditions.checkArgument(burnTime <= 32767, "burn time is too high");
         Objects.requireNonNull(items, "items is null");
         Preconditions.checkPositionIndex(1, items.length, "items is empty");
-        if (this.fuelBurnTimes.isEmpty()) MinecraftForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);
+        if (this.fuelBurnTimes.isEmpty()) {
+            NeoForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);
+        }
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             this.fuelBurnTimes.put(item.asItem(), burnTime);

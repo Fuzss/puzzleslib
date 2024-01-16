@@ -2,6 +2,9 @@ package fuzs.puzzleslib.neoforge.impl.network;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
@@ -72,27 +75,36 @@ public class NetworkHandlerNeoForgeV2 implements NetworkHandlerV2 {
 
     private <T extends MessageV2<T>> void register(Class<T> clazz, Function<FriendlyByteBuf, T> factory, LogicalSide receptionSide, NetworkHandlerNeoForgeV3.GenericPayloadHandler<T> receiverHandler, NetworkHandlerNeoForgeV3.GenericPayloadHandler<T> senderHandler) {
         this.messageRegisters.offer((IPayloadRegistrar registrar) -> {
-            registrar.play(this.registerMessageType(clazz), (FriendlyByteBuf friendlyByteBuf) -> {
-                return new NetworkHandlerNeoForgeV3.MessageHolder<>(factory.apply(friendlyByteBuf));
-            }, (IDirectionAwarePayloadHandlerBuilder<NetworkHandlerNeoForgeV3.MessageHolder<T>, IPlayPayloadHandler<NetworkHandlerNeoForgeV3.MessageHolder<T>>> builder) -> {
-                receiverHandler.accept(builder, (NetworkHandlerNeoForgeV3.MessageHolder<T> payload, PlayPayloadContext context) -> {
+            ResourceLocation messageName = this.registerMessageType(clazz);
+            registrar.play(messageName, (FriendlyByteBuf friendlyByteBuf) -> {
+                return new NetworkHandlerNeoForgeV3.CustomPacketPayloadAdapter<>(factory.apply(friendlyByteBuf), messageName);
+            }, (IDirectionAwarePayloadHandlerBuilder<NetworkHandlerNeoForgeV3.CustomPacketPayloadAdapter<T>, IPlayPayloadHandler<NetworkHandlerNeoForgeV3.CustomPacketPayloadAdapter<T>>> builder) -> {
+                receiverHandler.accept(builder, (NetworkHandlerNeoForgeV3.CustomPacketPayloadAdapter<T> payload, PlayPayloadContext context) -> {
                     context.workHandler().submitAsync(() -> {
-                        Player player = context.player().orElseThrow(() -> new NullPointerException("player is null"));
+                        Player player;
+                        if (receptionSide.isClient()) {
+                            player = Proxy.INSTANCE.getClientPlayer();
+                            Objects.requireNonNull(player, "player is null");
+                        } else {
+                            player = context.player().orElseThrow(() -> new NullPointerException("player is null"));
+                        }
                         payload.message().makeHandler().handle(payload.message(), player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
                     }).exceptionally(throwable -> {
-                        context.packetHandler().disconnect(Component.literal("Receiving %s from %s failed: %s".formatted(clazz.getSimpleName(), this.channelName.getNamespace(), throwable.getMessage())));
+                        String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+                        context.packetHandler().disconnect(Component.literal("Receiving %s from %s failed: %s".formatted(clazz.getSimpleName(), modName, throwable.getMessage())));
                         return null;
                     });
                 });
-                senderHandler.accept(builder, (NetworkHandlerNeoForgeV3.MessageHolder<T> payload, PlayPayloadContext context) -> {
-                    context.packetHandler().disconnect(Component.literal("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), this.channelName.getNamespace())));
+                senderHandler.accept(builder, (NetworkHandlerNeoForgeV3.CustomPacketPayloadAdapter<T> payload, PlayPayloadContext context) -> {
+                    String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+                    context.packetHandler().disconnect(Component.literal("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), modName)));
                 });
             });
         });
     }
 
     protected ResourceLocation registerMessageType(Class<?> clazz) {
-        ResourceLocation messageName = new ResourceLocation(this.channelName.getNamespace(), this.channelName.getPath() + "/" + this.discriminator.getAndIncrement());
+        ResourceLocation messageName = new ResourceLocation(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
         if (this.messageNames.put(clazz, messageName) != null) {
             throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
         }
@@ -113,18 +125,7 @@ public class NetworkHandlerNeoForgeV2 implements NetworkHandlerV2 {
 
     private <S extends PacketListener> Packet<S> toPacket(Function<CustomPacketPayload, Packet<S>> packetFactory, MessageV2<?> message) {
         return this.toPacket(message, (ResourceLocation resourceLocation, Consumer<FriendlyByteBuf> consumer) -> {
-            return packetFactory.apply(new CustomPacketPayload() {
-
-                @Override
-                public void write(FriendlyByteBuf buffer) {
-                    consumer.accept(buffer);
-                }
-
-                @Override
-                public ResourceLocation id() {
-                    return resourceLocation;
-                }
-            });
+            return packetFactory.apply(new NetworkHandlerNeoForgeV3.CustomPacketPayloadAdapter<>(message, resourceLocation, consumer));
         });
     }
 

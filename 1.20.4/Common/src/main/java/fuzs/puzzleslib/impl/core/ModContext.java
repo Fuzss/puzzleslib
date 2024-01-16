@@ -48,10 +48,12 @@ public abstract class ModContext {
     public static void registerHandlers() {
         LoadCompleteCallback.EVENT.register(() -> {
             for (ModContext context : MOD_CONTEXTS.values()) {
-                if (!context.buildables.isEmpty())
+                if (!context.buildables.isEmpty()) {
                     throw new IllegalStateException("mod context for %s has un-built buildables: %s".formatted(context.modId, context.buildables));
-                if (!context.clientModConstructors.isEmpty())
+                }
+                if (!context.clientModConstructors.isEmpty()) {
                     throw new IllegalStateException("mod context for %s has un-built client mod constructors: %s".formatted(context.modId, context.clientModConstructors));
+                }
             }
         });
         PlayerEvents.LOGGED_IN.register((ServerPlayer player) -> {

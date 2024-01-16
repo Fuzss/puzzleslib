@@ -7,9 +7,10 @@ import com.google.common.collect.Multimaps;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
-import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.fabric.api.capability.v2.initializer.BlockComponentInitializerImpl;
 import fuzs.puzzleslib.fabric.api.capability.v2.initializer.ChunkComponentInitializerImpl;
 import fuzs.puzzleslib.fabric.api.capability.v2.initializer.EntityComponentInitializerImpl;
@@ -73,12 +74,10 @@ public final class FabricCapabilityController implements CapabilityController {
         return this.registerCapability(objectType, capabilityKey, capabilityType, capabilityFactory, capabilityRegistry, FabricCapabilityKey<C>::new);
     }
 
-    private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<?> objectType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, ComponentFactoryRegistry<T> capabilityRegistry, FabricCapabilityKey.FabricCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
-        if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(objectType)) {
-            throw new IllegalArgumentException(objectType + " is an invalid type");
-        }
+    private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<?> holderType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, ComponentFactoryRegistry<T> capabilityRegistry, FabricCapabilityKey.FabricCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
+        GlobalCapabilityRegister.testHolderType(holderType);
         final ComponentKey<ComponentHolder> componentKey = ComponentRegistryV3.INSTANCE.getOrCreate(new ResourceLocation(this.namespace, capabilityKey), ComponentHolder.class);
-        this.capabilityTypes.put(objectType, o -> capabilityRegistry.accept(o, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1))));
+        this.capabilityTypes.put(holderType, o -> capabilityRegistry.accept(o, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1))));
         return capabilityKeyFactory.apply(componentKey, capabilityType);
     }
 
