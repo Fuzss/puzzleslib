@@ -1,9 +1,10 @@
 package fuzs.puzzleslib.forge.impl.network;
 
+import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
@@ -13,11 +14,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.network.Channel;
-import net.minecraftforge.network.ChannelBuilder;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.SimpleChannel;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -29,7 +29,7 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
 
     public NetworkHandlerForgeV2(ResourceLocation channelName, boolean optional) {
         this.channelName = channelName;
-        this.channel = buildSimpleChannel(channelName, optional);
+        this.channel = NetworkHandlerForgeV3.buildSimpleChannel(channelName, optional);
     }
 
     @Override
@@ -48,7 +48,8 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
         BiConsumer<T, CustomPayloadEvent.Context> handle = (T message, CustomPayloadEvent.Context context) -> {
             LogicalSide expectedReceptionSide = context.getDirection().getReceptionSide();
             if (expectedReceptionSide != receptionSide) {
-                throw new IllegalStateException("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), this.channelName.getNamespace()));
+                String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+                throw new IllegalStateException("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), modName));
             }
             // this needs to happen in here, otherwise Minecraft#player might still be null for events fired on login/entity creation
             Player player;
@@ -57,6 +58,7 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
             } else {
                 player = context.getSender();
             }
+            Objects.requireNonNull(player, "player is null");
             message.makeHandler().handle(message, player, LogicalSidedProvider.WORKQUEUE.get(receptionSide));
         };
         NetworkDirection networkDirection = receptionSide.isClient() ? NetworkDirection.PLAY_TO_CLIENT : NetworkDirection.PLAY_TO_SERVER;
@@ -73,15 +75,5 @@ public class NetworkHandlerForgeV2 implements NetworkHandlerV2 {
     @Override
     public Packet<ServerCommonPacketListener> toServerboundPacket(MessageV2<?> message) {
         return (Packet<ServerCommonPacketListener>) NetworkDirection.PLAY_TO_SERVER.buildPacket(this.channel.toBuffer(message), this.channel.getName()).getThis();
-    }
-
-    private static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
-        int protocolVersion = NetworkHandlerRegistryImpl.getProtocolVersion(resourceLocation.getNamespace());
-        return ChannelBuilder
-                .named(resourceLocation)
-                .networkProtocolVersion(protocolVersion)
-                .clientAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
-                .serverAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
-                .simpleChannel();
     }
 }

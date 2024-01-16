@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Set;
 
 public final class GlobalCapabilityRegister {
-    public static final Map<ResourceLocation, CapabilityKey<?, ?>> REGISTER = Maps.newConcurrentMap();
-    public static final Set<Class<?>> VALID_CAPABILITY_TYPES = Set.of(Entity.class, BlockEntity.class, LevelChunk.class, Level.class);
+    private static final Map<ResourceLocation, CapabilityKey<?, ?>> REGISTER = Maps.newConcurrentMap();
+    private static final Set<Class<?>> VALID_CAPABILITY_TYPES = Set.of(Entity.class, BlockEntity.class, LevelChunk.class, Level.class);
 
     private GlobalCapabilityRegister() {
 
@@ -32,6 +32,12 @@ public final class GlobalCapabilityRegister {
             return capabilityKey;
         } else {
             throw new IllegalStateException("No capability registered for id %s".formatted(id));
+        }
+    }
+
+    public static void testHolderType(Class<?> holderType) {
+        if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(holderType)) {
+            throw new IllegalArgumentException("%s is an invalid type".formatted(holderType.getName()));
         }
     }
 }

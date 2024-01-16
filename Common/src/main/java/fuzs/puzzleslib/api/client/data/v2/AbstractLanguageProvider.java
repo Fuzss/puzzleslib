@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import fuzs.puzzleslib.api.init.v2.RegistryReference;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
@@ -97,16 +96,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(identifier.toLanguageKey(), additionalKey, value);
         }
 
-        default void add(String registry, RegistryReference<?> holder, String value) {
+        default void add(String registry, Holder<?> holder, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(holder, "holder is null");
-            this.add(registry, holder.getResourceKey(), value);
-        }
-
-        default void add(String registry, Holder.Reference<?> holder, String value) {
-            Objects.requireNonNull(registry, "registry is null");
-            Objects.requireNonNull(holder, "holder is null");
-            this.add(registry, holder.key(), value);
+            this.add(registry, holder.unwrapKey().orElseThrow(), value);
         }
 
         default void add(String registry, ResourceKey<?> resourceKey, String value) {

@@ -7,10 +7,10 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.event.level.BlockEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.ToolAction;
+import net.neoforged.neoforge.common.ToolActions;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -90,7 +90,9 @@ public final class BlockInteractionsContextNeoForgeImpl implements BlockInteract
     }
 
     private Map<Block, BlockInteraction> getToolActionMap(ToolAction toolAction) {
-        if (this.blockInteractions.isEmpty()) MinecraftForge.EVENT_BUS.addListener(this::onBlockToolModification);
+        if (this.blockInteractions.isEmpty()) {
+            NeoForge.EVENT_BUS.addListener(this::onBlockToolModification);
+        }
         return this.blockInteractions.computeIfAbsent(toolAction, $ -> Maps.newIdentityHashMap());
     }
 
@@ -116,6 +118,7 @@ public final class BlockInteractionsContextNeoForgeImpl implements BlockInteract
 
         public BlockInteraction(UnaryOperator<BlockState> operator) {
             this($ -> true, $ -> {
+                // NO-OP
             }, operator);
         }
     }

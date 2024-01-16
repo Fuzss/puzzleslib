@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.network;
 
+import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
@@ -55,17 +57,20 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
     private <T> void register(Class<T> clazz, BiFunction<T, PlayPayloadContext, CompletableFuture<Void>> handle, GenericPayloadHandler<T> receiverHandler, GenericPayloadHandler<T> senderHandler) {
         Objects.requireNonNull(this.channel, "channel is null");
         Function<FriendlyByteBuf, T> factory = MessageSerializers.findByType(clazz)::read;
-        this.channel.play(this.registerMessageType(clazz), (FriendlyByteBuf friendlyByteBuf) -> {
-            return new MessageHolder<>(factory.apply(friendlyByteBuf));
-        }, (IDirectionAwarePayloadHandlerBuilder<MessageHolder<T>, IPlayPayloadHandler<MessageHolder<T>>> builder) -> {
-            receiverHandler.accept(builder, (MessageHolder<T> payload, PlayPayloadContext context) -> {
+        ResourceLocation messageName = this.registerMessageType(clazz);
+        this.channel.play(messageName, (FriendlyByteBuf friendlyByteBuf) -> {
+            return new CustomPacketPayloadAdapter<>(factory.apply(friendlyByteBuf), messageName);
+        }, (IDirectionAwarePayloadHandlerBuilder<CustomPacketPayloadAdapter<T>, IPlayPayloadHandler<CustomPacketPayloadAdapter<T>>> builder) -> {
+            receiverHandler.accept(builder, (CustomPacketPayloadAdapter<T> payload, PlayPayloadContext context) -> {
                 handle.apply(payload.message(), context).exceptionally(throwable -> {
-                    context.packetHandler().disconnect(Component.literal("Receiving %s from %s failed: %s".formatted(clazz.getSimpleName(), this.channelName.getNamespace(), throwable.getMessage())));
+                    String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+                    context.packetHandler().disconnect(Component.literal("Receiving %s from %s failed: %s".formatted(clazz.getSimpleName(), modName, throwable.getMessage())));
                     return null;
                 });
             });
-            senderHandler.accept(builder, (MessageHolder<T> payload, PlayPayloadContext context) -> {
-                context.packetHandler().disconnect(Component.literal("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), this.channelName.getNamespace())));
+            senderHandler.accept(builder, (CustomPacketPayloadAdapter<T> payload, PlayPayloadContext context) -> {
+                String modName = ModLoaderEnvironment.INSTANCE.getModContainer(this.channelName.getNamespace()).map(ModContainer::getDisplayName).orElse(this.channelName.getNamespace());
+                context.packetHandler().disconnect(Component.literal("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), modName)));
             });
         });
     }
@@ -84,18 +89,7 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
 
     private <T extends Record, S extends PacketListener> Packet<S> toPacket(Function<CustomPacketPayload, Packet<S>> packetFactory, T message) {
         return this.toPacket(message, (ResourceLocation resourceLocation, Consumer<FriendlyByteBuf> consumer) -> {
-            return packetFactory.apply(new CustomPacketPayload() {
-
-                @Override
-                public void write(FriendlyByteBuf buffer) {
-                    consumer.accept(buffer);
-                }
-
-                @Override
-                public ResourceLocation id() {
-                    return resourceLocation;
-                }
-            });
+            return packetFactory.apply(new CustomPacketPayloadAdapter<>(message, resourceLocation, consumer));
         });
     }
 
@@ -117,24 +111,26 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
         });
     }
 
-    record MessageHolder<T>(T message) implements CustomPacketPayload {
+    record CustomPacketPayloadAdapter<T>(T message, ResourceLocation messageName, Consumer<FriendlyByteBuf> writer) implements CustomPacketPayload {
+
+        CustomPacketPayloadAdapter(T message, ResourceLocation messageName) {
+            this(message, messageName, (FriendlyByteBuf friendlyByteBuf) -> {
+                throw new UnsupportedOperationException();
+            });
+        }
 
         @Override
         public void write(FriendlyByteBuf buffer) {
-            // this is only used for the read message on the receiving side being passed on to being handled
-            // since we do not support sending a response directly this method can never be called in that scenario
-            throw new RuntimeException();
+            this.writer.accept(buffer);
         }
 
         @Override
         public ResourceLocation id() {
-            // this is only used for the read message on the receiving side being passed on to being handled
-            // since we do not support sending a response directly this method can never be called in that scenario
-            throw new RuntimeException();
+            return this.messageName;
         }
     }
 
-    interface GenericPayloadHandler<T> extends BiConsumer<IDirectionAwarePayloadHandlerBuilder<MessageHolder<T>, IPlayPayloadHandler<MessageHolder<T>>>, IPlayPayloadHandler<MessageHolder<T>>> {
+    interface GenericPayloadHandler<T> extends BiConsumer<IDirectionAwarePayloadHandlerBuilder<CustomPacketPayloadAdapter<T>, IPlayPayloadHandler<CustomPacketPayloadAdapter<T>>>, IPlayPayloadHandler<CustomPacketPayloadAdapter<T>>> {
 
     }
 }

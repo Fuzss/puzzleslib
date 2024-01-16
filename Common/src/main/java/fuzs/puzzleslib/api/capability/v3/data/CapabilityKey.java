@@ -1,6 +1,10 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Common wrapper for Fabric's Component / NeoForge's AttachmentType / Forge's Capability.
@@ -23,7 +27,7 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      * @param holder provider to get capability from
      * @return capability implementation for given holder
      */
-    C get(T holder);
+    C get(@NotNull T holder);
 
     /**
      * Checks if a capability is compatible with a holder.
@@ -31,7 +35,7 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      * @param holder provider to test
      * @return is this holder compatible
      */
-    boolean isProvidedBy(Object holder);
+    boolean isProvidedBy(@Nullable Object holder);
 
     /**
      * Called from {@link CapabilityComponent#setChanged()} to notify that the component has changed and needs to be serialized / synchronized.
@@ -41,4 +45,6 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      * @param capabilityComponent the component that has changed
      */
     void setChanged(C capabilityComponent);
+
+    ClientboundMessage<?> toPacket(C capabilityComponent);
 }

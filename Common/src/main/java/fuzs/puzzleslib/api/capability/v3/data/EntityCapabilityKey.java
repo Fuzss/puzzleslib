@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -28,7 +29,12 @@ public interface EntityCapabilityKey<T extends Entity, C extends CapabilityCompo
 
     @Override
     default void setChanged(C capabilityComponent) {
-        this.getSyncStrategy().send(this.identifier(), capabilityComponent);
+        this.getSyncStrategy().send(capabilityComponent.getHolder(), this.toPacket(capabilityComponent));
+    }
+
+    @Override
+    default ClientboundEntityCapabilityMessage toPacket(C capabilityComponent) {
+        return new ClientboundEntityCapabilityMessage(this.identifier(), capabilityComponent.getHolder().getId(), capabilityComponent.toCompoundTag());
     }
 
     /**

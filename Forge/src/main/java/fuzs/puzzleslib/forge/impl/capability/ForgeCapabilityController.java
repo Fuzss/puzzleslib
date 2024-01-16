@@ -6,13 +6,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
-import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
+import fuzs.puzzleslib.forge.impl.capability.data.CapabilityHolder;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgeCapabilityKey;
 import fuzs.puzzleslib.forge.impl.capability.data.ForgePlayerCapabilityKey;
-import fuzs.puzzleslib.forge.impl.capability.data.CapabilityHolder;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
@@ -83,13 +84,11 @@ public final class ForgeCapabilityController implements CapabilityController {
         return this.registerCapability(providerType, capabilityKey, capabilityType, capabilityFactory, filter, ForgeCapabilityKey<C>::new);
     }
 
-    private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<? extends ICapabilityProvider> providerType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
-        if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(providerType)) {
-            throw new IllegalArgumentException(providerType + " is an invalid type");
-        }
+    private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<? extends ICapabilityProvider> holderType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
+        GlobalCapabilityRegister.testHolderType(holderType);
         ResourceLocation key = new ResourceLocation(this.namespace, capabilityKey);
         CapabilityData<T, C1> capabilityData = new CapabilityData<>(key, capabilityType, filter);
-        this.capabilityTypes.put(providerType, capabilityData);
+        this.capabilityTypes.put(holderType, capabilityData);
         return capabilityKeyFactory.apply(key, capabilityType, token -> {
             final Capability<C1> capability = CapabilityManager.get(token);
             capabilityData.setFactory(o -> new CapabilityHolder<>(capability, capabilityFactory.apply(o)));

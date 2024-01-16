@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -14,5 +15,10 @@ public interface LevelCapabilityKey<C extends CapabilityComponent<Level>> extend
     @Override
     default void setChanged(C capabilityComponent) {
         // NO-OP
+    }
+
+    @Override
+    default ClientboundMessage<?> toPacket(C capabilityComponent) {
+        throw new UnsupportedOperationException();
     }
 }

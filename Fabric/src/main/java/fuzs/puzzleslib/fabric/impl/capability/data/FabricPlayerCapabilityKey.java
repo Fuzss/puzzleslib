@@ -28,7 +28,7 @@ public class FabricPlayerCapabilityKey<C extends CapabilityComponent> extends Fa
      * @param componentClass capability type class for setting type parameter
      */
     public FabricPlayerCapabilityKey(ComponentKey<ComponentHolder> capability, Class<C> componentClass) {
-        super(capability, componentClass);
+        super(capability);
     }
 
     /**
