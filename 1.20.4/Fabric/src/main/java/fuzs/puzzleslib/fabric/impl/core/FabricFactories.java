@@ -50,8 +50,13 @@ public final class FabricFactories implements CommonFactories {
     }
 
     @Override
-    public void registerEventInvokers() {
-        FabricEventInvokerRegistryImpl.register();
+    public void registerLoadingHandlers() {
+        FabricEventInvokerRegistryImpl.registerLoadingHandlers();
+    }
+
+    @Override
+    public void registerEventHandlers() {
+        FabricEventInvokerRegistryImpl.registerEventHandlers();
     }
 
     @Override

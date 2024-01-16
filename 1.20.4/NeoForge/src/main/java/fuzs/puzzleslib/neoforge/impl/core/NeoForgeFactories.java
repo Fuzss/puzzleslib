@@ -50,8 +50,13 @@ public final class NeoForgeFactories implements CommonFactories {
     }
 
     @Override
-    public void registerEventInvokers() {
-        NeoForgeEventInvokerRegistryImpl.register();
+    public void registerLoadingHandlers() {
+        NeoForgeEventInvokerRegistryImpl.registerLoadingHandlers();
+    }
+
+    @Override
+    public void registerEventHandlers() {
+        NeoForgeEventInvokerRegistryImpl.registerEventHandlers();
     }
 
     @Override

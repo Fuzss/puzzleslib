@@ -50,8 +50,13 @@ public final class ForgeFactories implements CommonFactories {
     }
 
     @Override
-    public void registerEventInvokers() {
-        ForgeEventInvokerRegistryImpl.register();
+    public void registerLoadingHandlers() {
+        ForgeEventInvokerRegistryImpl.registerLoadingHandlers();
+    }
+
+    @Override
+    public void registerEventHandlers() {
+        ForgeEventInvokerRegistryImpl.registerEventHandlers();
     }
 
     @Override
