@@ -1,11 +1,12 @@
-package fuzs.puzzleslib.fabric.api.capability.v2.initializer;
+package fuzs.puzzleslib.fabric.api.capability.v3.initializer;
 
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistry;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistrar;
 import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentHolder;
+import fuzs.puzzleslib.fabric.impl.capability.data.ComponentAdapter;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -20,7 +21,7 @@ import java.util.function.Function;
  * <pre><code>
  *   "entrypoints": {
  *     "cardinal-components": [
- *       "fuzs.puzzleslib.api.capability.v2.initializer.BlockComponentInitializerImpl"
+ *       "fuzs.puzzleslib.fabric.api.capability.v3.initializer.BlockComponentInitializerImpl"
  *     ]
  *   }
  * </code></pre>
@@ -41,9 +42,9 @@ public final class BlockComponentInitializerImpl implements BlockComponentInitia
         FabricCapabilityController.registerComponentFactories(BlockEntity.class, registry);
     }
 
-    public static <T extends BlockEntity> ComponentFactoryRegistry<T> getBlockEntityFactory(Class<T> blockEntityType) {
+    public static <T extends BlockEntity, C extends CapabilityComponent<T>> ComponentFactoryRegistrar<T, C> getBlockEntityFactory(Class<T> blockEntityType) {
         Objects.requireNonNull(blockEntityType, "block entity type is null");
-        return (Object o, ComponentKey<ComponentHolder> componentKey, Function<T, ComponentHolder> factory) -> {
+        return (Object o, ComponentKey<ComponentAdapter<T, C>> componentKey, Function<T, ComponentAdapter<T, C>> factory) -> {
             ((BlockComponentFactoryRegistry) o).registerFor(blockEntityType, componentKey, factory::apply);
         };
     }

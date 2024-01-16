@@ -1,21 +1,18 @@
-package fuzs.puzzleslib.neoforge.impl.capability.data;
+package fuzs.puzzleslib.fabric.impl.capability.data;
 
+import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.impl.capability.EntityCapabilityKeyImpl;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.function.Predicate;
-
-public class NeoForgeEntityCapabilityKey<T extends Entity, C extends CapabilityComponent<T>> extends NeoForgeCapabilityKey<T, C> implements EntityCapabilityKeyImpl<T, C> {
+public class FabricEntityCapabilityKey<T extends Entity, C extends CapabilityComponent<T>> extends FabricCapabilityKey<T, C> implements EntityCapabilityKeyImpl<T, C> {
     private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
     private CopyStrategy copyStrategy = CopyStrategy.NEVER;
 
-    public NeoForgeEntityCapabilityKey(DeferredHolder<AttachmentType<?>, AttachmentType<C>> holder, Predicate<Object> filter) {
-        super(holder, filter);
+    public FabricEntityCapabilityKey(ComponentKey<ComponentAdapter<T, C>> capability) {
+        super(capability);
         this.initialize();
     }
 

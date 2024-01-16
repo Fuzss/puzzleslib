@@ -7,127 +7,57 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.Optional;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-/**
- * implementation of {@link CapabilityKey} for the Forge mod loader
- *
- * @param <C> capability type
- */
-public class ForgeCapabilityKey<C extends CapabilityComponent> implements CapabilityKey<C> {
-    /**
-     * id just like ComponentKey on Fabric has it stored directly in the key
-     */
-    private final ResourceLocation id;
-    /**
-     * capability type class just like ComponentKey on Fabric has it stored directly in the key
-     */
-    private final Class<C> componentClass;
-    /**
-     * factory for creating capability on Forge, necessary to do this here as we cannot wrap {@link CapabilityToken} for the common project
-     */
-    private final CapabilityTokenFactory<C> factory;
-    /**
-     * the wrapped {@link Capability}
-     */
+public abstract class ForgeCapabilityKey<T, C extends CapabilityComponent<T>> implements CapabilityKey<T, C> {
+    private final ResourceLocation identifier;
+    private final CapabilityTokenFactory<T, C> tokenFactory;
     private Capability<C> capability;
 
-    /**
-     * @param id                capability id
-     * @param componentClass    capability type class
-     * @param factory           factory for creating the actual capability, needs to wait until we have the {@link CapabilityToken}
-     */
-    public ForgeCapabilityKey(ResourceLocation id, Class<C> componentClass, CapabilityTokenFactory<C> factory) {
-        this.id = id;
-        this.componentClass = componentClass;
-        this.factory = factory;
+    public ForgeCapabilityKey(ResourceLocation identifier, CapabilityTokenFactory<T, C> tokenFactory) {
+        this.identifier = identifier;
+        this.tokenFactory = tokenFactory;
         GlobalCapabilityRegister.register(this);
     }
 
-    /**
-     * creates the capability
-     *
-     * @param token     the token
-     */
     public void createCapability(CapabilityToken<C> token) {
-        this.capability = this.factory.apply(token);
+        this.capability = this.tokenFactory.apply(token);
     }
 
     @Override
     public ResourceLocation identifier() {
-        return this.id;
+        return this.identifier;
     }
 
     @Override
-    public Class<C> getComponentClass() {
-        return this.componentClass;
-    }
-
-    @Nullable
-    @Override
-    public <V> C get(@Nullable V provider) {
-        this.validateCapability();
-        if (provider instanceof ICapabilityProvider capabilityProvider) {
-            LazyOptional<C> optional = capabilityProvider.getCapability(this.capability);
-            if (optional.isPresent()) {
-                return optional.orElseThrow(IllegalStateException::new);
-            }
+    public C get(@NotNull T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        if (holder instanceof ICapabilityProvider capabilityProvider && this.isProvidedBy(holder)) {
+            C capabilityComponent = capabilityProvider.getCapability(this.capability).resolve().orElse(null);
+            Objects.requireNonNull(capabilityComponent, "data is null");
+            return capabilityComponent;
+        } else {
+            throw new IllegalArgumentException("Invalid capability holder: %s".formatted(holder));
         }
-        return null;
     }
 
     @Override
-    public <V> Optional<C> maybeGet(@Nullable V provider) {
-        this.validateCapability();
-        if (provider instanceof ICapabilityProvider capabilityProvider) {
-            return capabilityProvider.getCapability(this.capability).resolve();
-        }
-        return Optional.empty();
+    public boolean isProvidedBy(@Nullable Object holder) {
+        return holder instanceof ICapabilityProvider capabilityProvider && capabilityProvider.getCapability(this.capability).isPresent();
     }
 
-    /**
-     * check if a token has been supplied and the capability has been created
-     */
-    void validateCapability() {
-        Objects.requireNonNull(this.capability, "No valid capability implementation registered for %s".formatted(this.id));
+    @FunctionalInterface
+    public interface CapabilityTokenFactory<T, C extends CapabilityComponent<T>> extends Function<CapabilityToken<C>, Capability<C>> {
+
     }
 
-    /**
-     * create the capability
-     *
-     * @param <C> capability type
-     */
-    public interface CapabilityTokenFactory<C extends CapabilityComponent> {
+    @FunctionalInterface
+    public interface ForgeCapabilityKeyFactory<T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> extends BiFunction<ResourceLocation, CapabilityTokenFactory<T, C>, K> {
 
-        /**
-         * create the capability
-         *
-         * @param token     the token
-         * @return          capability for token
-         */
-        Capability<C> apply(CapabilityToken<C> token);
-    }
-
-    /**
-     * a factory for capability keys on Forge, required to support unique implementation for players
-     *
-     * @param <C> capability type
-     * @param <T> capability key type
-     */
-    public interface ForgeCapabilityKeyFactory<C extends CapabilityComponent, T extends CapabilityKey<C>> {
-
-        /**
-         * factory method
-         *
-         * @param id                capability id
-         * @param componentClass    capability type class
-         * @param factory           factory for creating the actual capability, needs to wait until we have the {@link CapabilityToken}
-         * @return                  the constructed capability key
-         */
-        T apply(ResourceLocation id, Class<C> componentClass, CapabilityTokenFactory<C> factory);
     }
 }

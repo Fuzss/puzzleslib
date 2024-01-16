@@ -2,92 +2,83 @@ package fuzs.puzzleslib.fabric.impl.capability;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
+import dev.onyxstudios.cca.api.v3.component.ComponentAccess;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentRegistryV3;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
-import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
-import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
-import fuzs.puzzleslib.fabric.api.capability.v2.initializer.BlockComponentInitializerImpl;
-import fuzs.puzzleslib.fabric.api.capability.v2.initializer.ChunkComponentInitializerImpl;
-import fuzs.puzzleslib.fabric.api.capability.v2.initializer.EntityComponentInitializerImpl;
-import fuzs.puzzleslib.fabric.api.capability.v2.initializer.WorldComponentInitializerImpl;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentHolder;
-import fuzs.puzzleslib.fabric.impl.capability.data.FabricCapabilityKey;
-import fuzs.puzzleslib.fabric.impl.capability.data.FabricPlayerCapabilityKey;
+import fuzs.puzzleslib.api.capability.v3.data.*;
+import fuzs.puzzleslib.fabric.api.capability.v3.initializer.BlockComponentInitializerImpl;
+import fuzs.puzzleslib.fabric.api.capability.v3.initializer.ChunkComponentInitializerImpl;
+import fuzs.puzzleslib.fabric.api.capability.v3.initializer.EntityComponentInitializerImpl;
+import fuzs.puzzleslib.fabric.api.capability.v3.initializer.WorldComponentInitializerImpl;
+import fuzs.puzzleslib.fabric.impl.capability.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.util.Collection;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Queue;
 import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.function.Supplier;
 
 public final class FabricCapabilityController implements CapabilityController {
-    private final String namespace;
-    private final Multimap<Class<?>, Consumer<Object>> capabilityTypes = Multimaps.newListMultimap(Maps.newIdentityHashMap(), Lists::newArrayList);
+    private final Map<Class<? extends ComponentAccess>, Queue<Consumer<Object>>> componentRegistrars = Maps.newIdentityHashMap();
+    private final String modId;
 
-    public FabricCapabilityController(String namespace) {
-        this.namespace = namespace;
+    public FabricCapabilityController(String modId) {
+        this.modId = modId;
     }
 
     @Override
-    public <T extends Entity, C extends CapabilityComponent> CapabilityKey<C> registerEntityCapability(String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Class<T> entityType) {
-        return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, EntityComponentInitializerImpl.getEntityFactory(entityType));
+    public <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType) {
+        return this.registerCapability(Entity.class, identifier, capabilityFactory, EntityComponentInitializerImpl.getEntityFactory(entityType), (FabricCapabilityKey.Factory<T, C, FabricEntityCapabilityKey<T, C>>) FabricEntityCapabilityKey::new);
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy) {
-        return this.registerCapability(Entity.class, capabilityKey, capabilityType, capabilityFactory, EntityComponentInitializerImpl.getPlayerFactory(respawnStrategy), FabricPlayerCapabilityKey<C>::new);
+    public <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> blockEntityType) {
+        return this.registerCapability(BlockEntity.class, identifier, capabilityFactory, BlockComponentInitializerImpl.getBlockEntityFactory(blockEntityType), (FabricCapabilityKey.Factory<T, C, FabricBlockEntityCapabilityKey<T, C>>) FabricBlockEntityCapabilityKey::new);
     }
 
     @Override
-    public <C extends CapabilityComponent> PlayerCapabilityKey<C> registerPlayerCapability(String capabilityKey, Class<C> capabilityType, Function<Player, C> capabilityFactory, CopyStrategy respawnStrategy, SyncStrategy syncStrategy) {
-        return ((FabricPlayerCapabilityKey<C>) this.registerPlayerCapability(capabilityKey, capabilityType, capabilityFactory, respawnStrategy)).setSyncStrategy(syncStrategy);
+    public <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
+        return this.registerCapability(LevelChunk.class, identifier, capabilityFactory, ChunkComponentInitializerImpl.getLevelChunkFactory(), (FabricCapabilityKey.Factory<LevelChunk, C, FabricLevelChunkCapabilityKey<C>>) FabricLevelChunkCapabilityKey::new);
     }
 
     @Override
-    public <T extends BlockEntity, C extends CapabilityComponent> CapabilityKey<C> registerBlockEntityCapability(String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, Class<T> blockEntityType) {
-        return this.registerCapability(BlockEntity.class, capabilityKey, capabilityType, capabilityFactory, BlockComponentInitializerImpl.getBlockEntityFactory(blockEntityType));
+    public <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
+        return this.registerCapability(Level.class, identifier, capabilityFactory, WorldComponentInitializerImpl.getLevelFactory(), (FabricCapabilityKey.Factory<Level, C, FabricLevelCapabilityKey<C>>) FabricLevelCapabilityKey::new);
     }
 
-    @Override
-    public <C extends CapabilityComponent> CapabilityKey<C> registerLevelChunkCapability(String capabilityKey, Class<C> capabilityType, Function<ChunkAccess, C> capabilityFactory) {
-        return this.registerCapability(LevelChunk.class, capabilityKey, capabilityType, capabilityFactory, ChunkComponentInitializerImpl.getLevelChunkFactory());
-    }
-
-    @Override
-    public <C extends CapabilityComponent> CapabilityKey<C> registerLevelCapability(String capabilityKey, Class<C> capabilityType, Function<Level, C> capabilityFactory) {
-        return this.registerCapability(Level.class, capabilityKey, capabilityType, capabilityFactory, WorldComponentInitializerImpl.getLevelFactory());
-    }
-
-    private <T, C extends CapabilityComponent> CapabilityKey<C> registerCapability(Class<?> objectType, String capabilityKey, Class<C> capabilityType, Function<T, C> capabilityFactory, ComponentFactoryRegistry<T> capabilityRegistry) {
-        return this.registerCapability(objectType, capabilityKey, capabilityType, capabilityFactory, capabilityRegistry, FabricCapabilityKey<C>::new);
-    }
-
-    private <T, C1 extends CapabilityComponent, C2 extends CapabilityKey<C1>> C2 registerCapability(Class<?> holderType, String capabilityKey, Class<C1> capabilityType, Function<T, C1> capabilityFactory, ComponentFactoryRegistry<T> capabilityRegistry, FabricCapabilityKey.FabricCapabilityKeyFactory<C1, C2> capabilityKeyFactory) {
+    @SuppressWarnings("unchecked")
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ComponentAccess> holderType, String identifier, Supplier<C> capabilityFactory, ComponentFactoryRegistrar<T, C> capabilityRegistrar, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
-        final ComponentKey<ComponentHolder> componentKey = ComponentRegistryV3.INSTANCE.getOrCreate(new ResourceLocation(this.namespace, capabilityKey), ComponentHolder.class);
-        this.capabilityTypes.put(holderType, o -> capabilityRegistry.accept(o, componentKey, o1 -> new ComponentHolder(capabilityFactory.apply(o1))));
-        return capabilityKeyFactory.apply(componentKey, capabilityType);
+        ResourceLocation capabilityName = new ResourceLocation(this.modId, identifier);
+        ComponentKey<ComponentAdapter<T, C>> componentKey = (ComponentKey<ComponentAdapter<T, C>>) (ComponentKey<?>) ComponentRegistryV3.INSTANCE.getOrCreate(capabilityName, ComponentAdapter.class);
+        Object[] capabilityKey = new Object[1];
+        this.componentRegistrars.computeIfAbsent(holderType, $ -> Lists.newLinkedList()).offer((Object o) -> {
+            capabilityRegistrar.accept(o, componentKey, (T t) -> {
+                C capabilityComponent = capabilityFactory.get();
+                Objects.requireNonNull(capabilityComponent, "capability component is null");
+                capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], t);
+                return new ComponentAdapter<>(capabilityComponent);
+            });
+        });
+        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(componentKey));
     }
 
-    public static <T> void registerComponentFactories(Class<?> baseType, T registry) {
+    public static <T> void registerComponentFactories(Class<? extends ComponentAccess> holderType, T registry) {
         Collection<FabricCapabilityController> controllers = ModContext.getCapabilityControllers().map(FabricCapabilityController.class::cast).toList();
         for (FabricCapabilityController controller : controllers) {
-            for (Consumer<Object> factoryRegistration : controller.capabilityTypes.get(baseType)) {
-                factoryRegistration.accept(registry);
+            Queue<Consumer<Object>> queue = controller.componentRegistrars.get(holderType);
+            while (queue != null && !queue.isEmpty()) {
+                queue.poll().accept(registry);
             }
-            controller.capabilityTypes.get(baseType).clear();
         }
     }
 }

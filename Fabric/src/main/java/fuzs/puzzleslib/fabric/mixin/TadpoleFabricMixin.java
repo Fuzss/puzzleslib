@@ -19,7 +19,7 @@ abstract class TadpoleFabricMixin extends AbstractFish {
         super(entityType, level);
     }
 
-    @Inject(method = "ageUp", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
+    @Inject(method = "ageUp()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntityWithPassengers(Lnet/minecraft/world/entity/Entity;)V"))
     public void ageUp(CallbackInfo callback, @Local Frog frog) {
         FabricLivingEvents.LIVING_CONVERSION.invoker().onLivingConversion(this, frog);
     }

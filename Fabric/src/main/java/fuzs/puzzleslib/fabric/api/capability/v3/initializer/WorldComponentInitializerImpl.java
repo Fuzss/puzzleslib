@@ -1,11 +1,12 @@
-package fuzs.puzzleslib.fabric.api.capability.v2.initializer;
+package fuzs.puzzleslib.fabric.api.capability.v3.initializer;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistry;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistrar;
 import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentHolder;
+import fuzs.puzzleslib.fabric.impl.capability.data.ComponentAdapter;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -19,7 +20,7 @@ import java.util.function.Function;
  * <pre><code>
  *   "entrypoints": {
  *     "cardinal-components": [
- *       "fuzs.puzzleslib.api.capability.v2.initializer.WorldComponentInitializerImpl"
+ *       "fuzs.puzzleslib.fabric.api.capability.v3.initializer.WorldComponentInitializerImpl"
  *     ]
  *   }
  * </code></pre>
@@ -40,8 +41,8 @@ public final class WorldComponentInitializerImpl implements WorldComponentInitia
         FabricCapabilityController.registerComponentFactories(Level.class, registry);
     }
 
-    public static ComponentFactoryRegistry<Level> getLevelFactory() {
-        return (Object o, ComponentKey<ComponentHolder> componentKey, Function<Level, ComponentHolder> factory) -> {
+    public static <C extends CapabilityComponent<Level>> ComponentFactoryRegistrar<Level, C> getLevelFactory() {
+        return (Object o, ComponentKey<ComponentAdapter<Level, C>> componentKey, Function<Level, ComponentAdapter<Level, C>> factory) -> {
             ((WorldComponentFactoryRegistry) o).register(componentKey, factory::apply);
         };
     }

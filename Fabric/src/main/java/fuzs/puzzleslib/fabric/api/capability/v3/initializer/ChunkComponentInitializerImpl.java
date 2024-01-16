@@ -1,11 +1,12 @@
-package fuzs.puzzleslib.fabric.api.capability.v2.initializer;
+package fuzs.puzzleslib.fabric.api.capability.v3.initializer;
 
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistry;
+import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistrar;
 import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentHolder;
+import fuzs.puzzleslib.fabric.impl.capability.data.ComponentAdapter;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.ApiStatus;
@@ -20,7 +21,7 @@ import java.util.function.Function;
  * <pre><code>
  *   "entrypoints": {
  *     "cardinal-components": [
- *       "fuzs.puzzleslib.api.capability.v2.initializer.ChunkComponentInitializerImpl"
+ *       "fuzs.puzzleslib.fabric.api.capability.v3.initializer.ChunkComponentInitializerImpl"
  *     ]
  *   }
  * </code></pre>
@@ -41,9 +42,14 @@ public final class ChunkComponentInitializerImpl implements ChunkComponentInitia
         FabricCapabilityController.registerComponentFactories(LevelChunk.class, registry);
     }
 
-    public static ComponentFactoryRegistry<ChunkAccess> getLevelChunkFactory() {
-        return (Object o, ComponentKey<ComponentHolder> componentKey, Function<ChunkAccess, ComponentHolder> factory) -> {
-            ((ChunkComponentFactoryRegistry) o).register(componentKey, factory::apply);
+    public static <C extends CapabilityComponent<LevelChunk>> ComponentFactoryRegistrar<LevelChunk, C> getLevelChunkFactory() {
+        return (Object o, ComponentKey<ComponentAdapter<LevelChunk, C>> componentKey, Function<LevelChunk, ComponentAdapter<LevelChunk, C>> factory) -> {
+            ((ChunkComponentFactoryRegistry) o).register(componentKey, (ChunkAccess chunkAccess) -> {
+                // we do not want any of the world-gen chunk types, only the final serializable LevelChunk
+                // relies on an additional check in FabricLevelChunkCapabilityKey::isProvidedBy
+                // idea from https://github.com/Ladysnake/Cardinal-Components-API/issues/80#issuecomment-802053808
+                return chunkAccess instanceof LevelChunk levelChunk ? factory.apply(levelChunk) : ComponentAdapter.empty();
+            });
         };
     }
 }

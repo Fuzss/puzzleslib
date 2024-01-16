@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
 public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>> implements CapabilityKey<T, C> {
@@ -46,8 +47,7 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
     }
 
     @FunctionalInterface
-    public interface Factory<T, C1 extends CapabilityComponent<T>, C2 extends CapabilityKey<T, C1>> {
+    public interface Factory<T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> extends BiFunction<DeferredHolder<AttachmentType<?>, AttachmentType<C>>, Predicate<Object>, K> {
 
-        C2 apply(DeferredHolder<AttachmentType<?>, AttachmentType<C1>> holder, Predicate<Object> filter);
     }
 }
