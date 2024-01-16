@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
-import com.google.common.base.Suppliers;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Supplier;
 
 /**
  * Main event class for common events.
@@ -37,9 +34,7 @@ public interface EventInvoker<T> {
      * @return mod loader-specific invoker, will throw an exception is none is present
      */
     static <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
-        // due to static initializers the invoker might not be present in the lookup just yet, so use memoization instead
-        Supplier<EventInvoker<T>> invoker = Suppliers.memoize(() -> EventInvokerImpl.lookup(clazz, context));
-        return (EventPhase phase, T callback) -> invoker.get().register(phase, callback);
+        return EventInvokerImpl.softLookup(clazz, context);
     }
 
     /**
@@ -56,7 +51,7 @@ public interface EventInvoker<T> {
     /**
      * Registers an event.
      * <p>On Forge the correct event bus is automatically chosen, the mod event bus is retrieved from the active <code>FMLJavaModLoadingContext</code>.
-     * <p>If <code>IModbusEvent</code>s are registered too late an exception is thrown.
+     * <p>If events of type <code>IModbusEvent</code> are registered too late an exception is thrown.
      *
      * @param phase    the order in relation to other events
      * @param callback the event callback
