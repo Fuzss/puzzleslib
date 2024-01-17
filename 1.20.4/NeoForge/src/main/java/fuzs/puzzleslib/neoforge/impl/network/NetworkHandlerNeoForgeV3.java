@@ -98,12 +98,9 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
         NeoForgeModContainerHelper.getOptionalModEventBus(this.channelName.getNamespace()).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final RegisterPayloadHandlerEvent evt) -> {
                 if (this.channel != null) throw new IllegalStateException("channel is already built");
-                IPayloadRegistrar registrar = evt.registrar(this.channelName.toLanguageKey());
+                this.channel = evt.registrar(this.channelName.toLanguageKey());
                 if (this.optional) {
-                    this.channel = registrar.optional();
-                } else {
-                    int protocolVersion = getProtocolVersion(this.channelName.getNamespace());
-                    this.channel = registrar.versioned(String.valueOf(protocolVersion));
+                    this.channel = this.channel.optional();
                 }
                 super.build();
                 this.channel = null;

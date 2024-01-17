@@ -5,6 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 /**
  * Common wrapper for Fabric's Component / NeoForge's AttachmentType / Forge's Capability.
  *
@@ -35,6 +37,17 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      * @return is this holder compatible
      */
     boolean isProvidedBy(@Nullable Object holder);
+
+    /**
+     * Get capability implementation from a holder if present.
+     * <p>Utility method to avoid having to cast the holder to the generic type.
+     *
+     * @param holder provider to get capability from
+     * @return optional capability implementation for given holder
+     */
+    default Optional<C> getIfProvided(@Nullable Object holder) {
+        return this.isProvidedBy(holder) ? Optional.of(this.get((T) holder)) : Optional.empty();
+    }
 
     /**
      * Called from {@link CapabilityComponent#setChanged()} to notify that the component has changed and needs to be serialized / synchronized.

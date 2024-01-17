@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class ModMixinConfigPlugin implements IMixinConfigPlugin {
+public class MixinConfigPluginImpl implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {

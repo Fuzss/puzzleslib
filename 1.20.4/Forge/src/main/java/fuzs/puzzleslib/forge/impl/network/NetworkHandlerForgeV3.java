@@ -74,12 +74,10 @@ public class NetworkHandlerForgeV3 extends NetworkHandlerRegistryImpl {
     }
 
     static SimpleChannel buildSimpleChannel(ResourceLocation resourceLocation, boolean optional) {
-        int protocolVersion = getProtocolVersion(resourceLocation.getNamespace());
         return ChannelBuilder
                 .named(resourceLocation)
-                .networkProtocolVersion(protocolVersion)
-                .clientAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
-                .serverAcceptedVersions(optional ? Channel.VersionTest.ACCEPT_VANILLA : Channel.VersionTest.exact(protocolVersion))
+                .clientAcceptedVersions((status, remoteVersion) -> optional || status == Channel.VersionTest.Status.PRESENT)
+                .serverAcceptedVersions((status, remoteVersion) -> optional || status == Channel.VersionTest.Status.PRESENT)
                 .simpleChannel();
     }
 }

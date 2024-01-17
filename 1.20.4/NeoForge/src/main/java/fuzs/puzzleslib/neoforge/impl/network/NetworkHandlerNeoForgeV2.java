@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
-import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
@@ -50,9 +49,6 @@ public class NetworkHandlerNeoForgeV2 implements NetworkHandlerV2 {
                 IPayloadRegistrar registrar = evt.registrar(this.channelName.toLanguageKey());
                 if (optional) {
                     registrar = registrar.optional();
-                } else {
-                    int protocolVersion = NetworkHandlerRegistryImpl.getProtocolVersion(this.channelName.getNamespace());
-                    registrar = registrar.versioned(String.valueOf(protocolVersion));
                 }
                 while (!this.messageRegisters.isEmpty()) {
                     this.messageRegisters.poll().accept(registrar);
