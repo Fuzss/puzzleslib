@@ -5,19 +5,8 @@ dependencies {
     modApi libs.forgeconfigapiport.forge
 
     // Mixin Extras
-    compileOnly(annotationProcessor(libs.mixinextras.common.get()))
-    api(include(libs.mixinextras.forge.get()))
+    include libs.mixinextras.forge
 
     // Puzzles Lib
 //    modApi libs.puzzleslib.forge
-
-    var versionCatalog = rootProject.extensions.getByType(VersionCatalogsExtension).named("libs")
-
-    // Quality of Life Mods
-    versionCatalog.findLibrary("bettermodsbutton.forge").ifPresent {
-        modLocalRuntime it
-    }
-    versionCatalog.findLibrary("forgeconfigscreens.forge").ifPresent {
-        modLocalRuntime it
-    }
 }
