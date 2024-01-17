@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,12 +23,12 @@ abstract class PlayerRendererFabricMixin extends LivingEntityRenderer<AbstractCl
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/player/PlayerRenderer;setModelProperties(Lnet/minecraft/client/player/AbstractClientPlayer;)V", shift = At.Shift.AFTER), cancellable = true)
     public void render$0(AbstractClientPlayer entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        EventResult result = FabricClientEvents.BEFORE_RENDER_PLAYER.invoker().onBeforeRenderPlayer(entity, PlayerRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        EventResult result = FabricRendererEvents.BEFORE_RENDER_PLAYER.invoker().onBeforeRenderPlayer(entity, PlayerRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
         if (result.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     public void render$1(AbstractClientPlayer entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        FabricClientEvents.AFTER_RENDER_PLAYER.invoker().onAfterRenderPlayer(entity, PlayerRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        FabricRendererEvents.AFTER_RENDER_PLAYER.invoker().onAfterRenderPlayer(entity, PlayerRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
     }
 }

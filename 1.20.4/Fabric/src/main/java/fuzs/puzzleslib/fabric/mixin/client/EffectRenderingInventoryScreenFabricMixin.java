@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricScreenEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedBoolean;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
@@ -48,7 +48,7 @@ abstract class EffectRenderingInventoryScreenFabricMixin<T extends AbstractConta
         int j = this.width - i;
         Objects.requireNonNull(this.puzzleslib$smallWidgets, "full size rendering is null");
         Objects.requireNonNull(this.puzzleslib$horizontalOffset, "horizontal offset is null");
-        EventResult result = FabricScreenEvents.INVENTORY_MOB_EFFECTS.invoker().onInventoryMobEffects(this, j, this.puzzleslib$smallWidgets, this.puzzleslib$horizontalOffset);
+        EventResult result = FabricGuiEvents.INVENTORY_MOB_EFFECTS.invoker().onInventoryMobEffects(this, j, this.puzzleslib$smallWidgets, this.puzzleslib$horizontalOffset);
         if (result.isInterrupt()) {
             this.puzzleslib$smallWidgets = null;
             this.puzzleslib$horizontalOffset = null;

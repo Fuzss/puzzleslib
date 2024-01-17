@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.network.chat.Component;
@@ -20,7 +20,7 @@ abstract class EntityRendererFabricMixin<T extends Entity> {
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render(T entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
         DefaultedValue<Component> content = DefaultedValue.fromValue(entity.getDisplayName());
-        EventResult result = FabricClientEvents.RENDER_NAME_TAG.invoker().onRenderNameTag(entity, content, EntityRenderer.class.cast(this), poseStack, buffer, packedLight, partialTick);
+        EventResult result = FabricRendererEvents.RENDER_NAME_TAG.invoker().onRenderNameTag(entity, content, EntityRenderer.class.cast(this), poseStack, buffer, packedLight, partialTick);
         if (result.isInterrupt()) {
             callback.cancel();
             if (!result.getAsBoolean()) return;

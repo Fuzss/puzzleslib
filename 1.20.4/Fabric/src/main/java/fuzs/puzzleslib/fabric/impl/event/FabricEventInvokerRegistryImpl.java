@@ -193,7 +193,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
             };
         });
-        INSTANCE.register(PlayerXpEvents.PickupXp.class, FabricPlayerEvents.PICKUP_XP);
+        INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, callback -> {
@@ -238,13 +238,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 });
             };
         });
-        INSTANCE.register(AnvilRepairCallback.class, FabricPlayerEvents.ANVIL_REPAIR);
-        INSTANCE.register(ItemTouchCallback.class, FabricPlayerEvents.ITEM_TOUCH);
-        INSTANCE.register(PlayerEvents.ItemPickup.class, FabricPlayerEvents.ITEM_PICKUP);
+        INSTANCE.register(AnvilEvents.Use.class, FabricPlayerEvents.ANVIL_USE);
+        INSTANCE.register(ItemEntityEvents.Touch.class, FabricPlayerEvents.ITEM_TOUCH);
+        INSTANCE.register(ItemEntityEvents.Pickup.class, FabricPlayerEvents.ITEM_PICKUP);
         INSTANCE.register(LootingLevelCallback.class, FabricLivingEvents.LOOTING_LEVEL);
-        INSTANCE.register(AnvilUpdateCallback.class, FabricPlayerEvents.ANVIL_UPDATE);
+        INSTANCE.register(AnvilEvents.Update.class, FabricPlayerEvents.ANVIL_UPDATE);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
-        INSTANCE.register(LivingEvents.Tick.class, FabricLivingEvents.LIVING_TICK);
+        INSTANCE.register(LivingTickCallback.class, FabricLivingEvents.LIVING_TICK);
         INSTANCE.register(ArrowLooseCallback.class, FabricPlayerEvents.ARROW_LOOSE);
         INSTANCE.register(LivingHurtCallback.class, FabricLivingEvents.LIVING_HURT);
         INSTANCE.register(UseItemEvents.Start.class, FabricLivingEvents.USE_ITEM_START);
@@ -281,32 +281,32 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         // do not use ServerLivingEntityEvents#ALLOW_DEATH from Fabric Api as it only runs server-side
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
-        INSTANCE.register(PlayerEvents.StartTracking.class, EntityTrackingEvents.START_TRACKING, callback -> {
+        INSTANCE.register(PlayerTrackingEvents.Start.class, EntityTrackingEvents.START_TRACKING, callback -> {
             return callback::onStartTracking;
         });
-        INSTANCE.register(PlayerEvents.StopTracking.class, EntityTrackingEvents.STOP_TRACKING, callback -> {
+        INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, callback -> {
             return callback::onStopTracking;
         });
-        INSTANCE.register(PlayerEvents.LoggedIn.class, ServerPlayConnectionEvents.JOIN, callback -> {
+        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, ServerPlayConnectionEvents.JOIN, callback -> {
             return (ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) -> {
                 callback.onLoggedIn(handler.getPlayer());
             };
         });
-        INSTANCE.register(PlayerEvents.LoggedOut.class, ServerPlayConnectionEvents.DISCONNECT, callback -> {
+        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, ServerPlayConnectionEvents.DISCONNECT, callback -> {
             return (ServerGamePacketListenerImpl handler, MinecraftServer server) -> {
                 callback.onLoggedOut(handler.getPlayer());
             };
         });
-        INSTANCE.register(PlayerEvents.AfterChangeDimension.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, callback -> {
+        INSTANCE.register(AfterChangeDimensionCallback.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, callback -> {
             return callback::onAfterChangeDimension;
         });
         INSTANCE.register(BabyEntitySpawnCallback.class, FabricLivingEvents.BABY_ENTITY_SPAWN);
         INSTANCE.register(AnimalTameCallback.class, FabricLivingEvents.ANIMAL_TAME);
         INSTANCE.register(LivingAttackCallback.class, FabricLivingEvents.LIVING_ATTACK);
-        INSTANCE.register(PlayerEvents.Copy.class, ServerPlayerEvents.COPY_FROM, callback -> {
+        INSTANCE.register(PlayerCopyEvents.Copy.class, ServerPlayerEvents.COPY_FROM, callback -> {
             return callback::onCopy;
         });
-        INSTANCE.register(PlayerEvents.Respawn.class, ServerPlayerEvents.AFTER_RESPAWN, callback -> {
+        INSTANCE.register(PlayerCopyEvents.Respawn.class, ServerPlayerEvents.AFTER_RESPAWN, callback -> {
             return (ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) -> {
                 callback.onRespawn(newPlayer, alive);
             };
@@ -339,19 +339,19 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, callback -> {
             return callback::onChunkUnload;
         });
-        INSTANCE.register(ItemTossCallback.class, FabricPlayerEvents.ITEM_TOSS);
+        INSTANCE.register(ItemEntityEvents.Toss.class, FabricPlayerEvents.ITEM_TOSS);
         INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
         INSTANCE.register(ItemAttributeModifiersCallback.class, ModifyItemAttributeModifiersCallback.EVENT, callback -> {
             return callback::onItemAttributeModifiers;
         });
         INSTANCE.register(ProjectileImpactCallback.class, FabricEntityEvents.PROJECTILE_IMPACT);
-        INSTANCE.register(PlayerEvents.BreakSpeed.class, FabricPlayerEvents.BREAK_SPEED);
+        INSTANCE.register(BreakSpeedCallback.class, FabricPlayerEvents.BREAK_SPEED);
         INSTANCE.register(MobEffectEvents.Affects.class, FabricLivingEvents.MOB_EFFECT_AFFECTS);
         INSTANCE.register(MobEffectEvents.Apply.class, FabricLivingEvents.MOB_EFFECT_APPLY);
         INSTANCE.register(MobEffectEvents.Remove.class, FabricLivingEvents.MOB_EFFECT_REMOVE);
         INSTANCE.register(MobEffectEvents.Expire.class, FabricLivingEvents.MOB_EFFECT_EXPIRE);
-        INSTANCE.register(LivingEvents.Jump.class, FabricLivingEvents.LIVING_JUMP);
-        INSTANCE.register(LivingEvents.Visibility.class, FabricLivingEvents.LIVING_VISIBILITY);
+        INSTANCE.register(LivingJumpCallback.class, FabricLivingEvents.LIVING_JUMP);
+        INSTANCE.register(LivingVisibilityCallback.class, FabricLivingEvents.LIVING_VISIBILITY);
         INSTANCE.register(LivingChangeTargetCallback.class, FabricLivingEvents.LIVING_CHANGE_TARGET);
         INSTANCE.register(CheckMobDespawnCallback.class, FabricLivingEvents.CHECK_MOB_DESPAWN);
         INSTANCE.register(GatherPotentialSpawnsCallback.class, FabricLevelEvents.GATHER_POTENTIAL_SPAWNS);
@@ -359,8 +359,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(EntityRidingEvents.Stop.class, FabricEntityEvents.ENTITY_STOP_RIDING);
         INSTANCE.register(GrindstoneEvents.Update.class, FabricPlayerEvents.GRINDSTONE_UPDATE);
         INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
-        INSTANCE.register(LivingEvents.Breathe.class, FabricLivingEvents.LIVING_BREATHE);
-        INSTANCE.register(LivingEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
+        INSTANCE.register(LivingBreathEvents.Breathe.class, FabricLivingEvents.LIVING_BREATHE);
+        INSTANCE.register(LivingBreathEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);

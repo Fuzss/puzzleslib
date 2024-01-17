@@ -38,7 +38,7 @@ public final class FabricLivingEvents {
     /**
      * Called at the beginning of {@link LivingEntity#tick()}, allows cancelling ticking the entity.
      */
-    public static final Event<LivingEvents.Tick> LIVING_TICK = FabricEventFactory.createResult(LivingEvents.Tick.class);
+    public static final Event<LivingTickCallback> LIVING_TICK = FabricEventFactory.createResult(LivingTickCallback.class);
     /**
      * Called right before any reduction on damage due to e.g. armor are done, cancelling prevents any damage / armor durability being taken.
      */
@@ -102,11 +102,11 @@ public final class FabricLivingEvents {
     /**
      * Called when an entity is jumping, allows for modifying the jump height as well as preventing the jump.
      */
-    public static final Event<LivingEvents.Jump> LIVING_JUMP = FabricEventFactory.createResult(LivingEvents.Jump.class);
+    public static final Event<LivingJumpCallback> LIVING_JUMP = FabricEventFactory.createResult(LivingJumpCallback.class);
     /**
      * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another entity for applying a given percentage to the looking entity's original visibility range.
      */
-    public static final Event<LivingEvents.Visibility> LIVING_VISIBILITY = FabricEventFactory.create(LivingEvents.Visibility.class);
+    public static final Event<LivingVisibilityCallback> LIVING_VISIBILITY = FabricEventFactory.create(LivingVisibilityCallback.class);
     /**
      * Called when a {@link Mob} sets a new target.
      */
@@ -118,11 +118,11 @@ public final class FabricLivingEvents {
     /**
      * Runs when the game updates an entity's air supply depending on if the entity can currently breathe or not.
      */
-    public static final Event<LivingEvents.Breathe> LIVING_BREATHE = FabricEventFactory.createResult(LivingEvents.Breathe.class);
+    public static final Event<LivingBreathEvents.Breathe> LIVING_BREATHE = FabricEventFactory.createResult(LivingBreathEvents.Breathe.class);
     /**
      * Runs before the game checks if an entity that is submerged should be damaged from drowning.
      */
-    public static final Event<LivingEvents.Drown> LIVING_DROWN = FabricEventFactory.createResult(LivingEvents.Drown.class);
+    public static final Event<LivingBreathEvents.Drown> LIVING_DROWN = FabricEventFactory.createResult(LivingBreathEvents.Drown.class);
     /**
      * Fires whenever equipment changes are detected on an entity in {@link LivingEntity#collectEquipmentChanges()} from {@link LivingEntity#tick()}.
      */

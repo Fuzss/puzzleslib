@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
-import fuzs.puzzleslib.fabric.api.client.event.v1.ResourcePackFinderRegistry;
+import fuzs.puzzleslib.fabric.api.client.event.v1.registry.ResourcePackFinderRegistry;
 import fuzs.puzzleslib.fabric.impl.event.DataPackFinderRegistryImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.repository.PackRepository;

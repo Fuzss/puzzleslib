@@ -51,7 +51,7 @@ abstract class PlayerFabricMixin extends LivingEntity {
     @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("TAIL"), cancellable = true)
     public void drop(ItemStack itemStack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> callback) {
         ItemEntity itemEntity = callback.getReturnValue();
-        if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(itemEntity, Player.class.cast(this)).isInterrupt()) {
+        if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(Player.class.cast(this), itemEntity).isInterrupt()) {
             callback.setReturnValue(null);
         }
     }

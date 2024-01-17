@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricScreenEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.impl.client.event.ItemDecoratorRegistryImpl;
 import net.minecraft.client.gui.Font;
@@ -28,7 +28,7 @@ abstract class GuiGraphicsFabricMixin {
     @Inject(method = "renderTooltipInternal", at = @At("HEAD"), cancellable = true)
     private void renderTooltipInternal(Font font, List<ClientTooltipComponent> components, int mouseX, int mouseY, ClientTooltipPositioner clientTooltipPositioner, CallbackInfo callback) {
         if (components.isEmpty()) return;
-        EventResult result = FabricScreenEvents.RENDER_TOOLTIP.invoker().onRenderTooltip(GuiGraphics.class.cast(this), mouseX, mouseY, this.guiWidth(), this.guiHeight(), font, components, clientTooltipPositioner);
+        EventResult result = FabricGuiEvents.RENDER_TOOLTIP.invoker().onRenderTooltip(GuiGraphics.class.cast(this), mouseX, mouseY, this.guiWidth(), this.guiHeight(), font, components, clientTooltipPositioner);
         if (result.isInterrupt()) callback.cancel();
     }
 

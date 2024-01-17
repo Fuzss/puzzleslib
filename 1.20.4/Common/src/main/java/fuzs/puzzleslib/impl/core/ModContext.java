@@ -5,14 +5,14 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
-import fuzs.puzzleslib.api.client.event.v1.ClientPlayerEvents;
+import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.core.v1.Buildable;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.init.v3.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
@@ -56,11 +56,11 @@ public abstract class ModContext {
                 }
             }
         });
-        PlayerEvents.LOGGED_IN.register((ServerPlayer player) -> {
+        PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer player) -> {
             PuzzlesLibMod.NETWORK.sendTo(player, new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ClientPlayerEvents.LOGGED_IN.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
+            ClientPlayerNetworkEvents.LOGGED_IN.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
                 for (ModContext context : MOD_CONTEXTS.values()) {
                     context.presentServerside = false;
                 }

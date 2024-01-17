@@ -2,9 +2,9 @@ package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -32,7 +32,7 @@ abstract class FogRendererFabricMixin {
         MutableFloat red = MutableFloat.fromEvent(t -> fogRed = t, () -> fogRed);
         MutableFloat green = MutableFloat.fromEvent(t -> fogGreen = t, () -> fogGreen);
         MutableFloat blue = MutableFloat.fromEvent(t -> fogBlue = t, () -> fogBlue);
-        FabricClientEvents.COMPUTE_FOG_COLOR.invoker().onComputeFogColor(minecraft.gameRenderer, activeRenderInfo, partialTicks, red, green, blue);
+        FabricRendererEvents.COMPUTE_FOG_COLOR.invoker().onComputeFogColor(minecraft.gameRenderer, activeRenderInfo, partialTicks, red, green, blue);
     }
 
     @Inject(method = "setupFog", at = @At("TAIL"), locals = LocalCapture.CAPTURE_FAILHARD)
@@ -41,6 +41,6 @@ abstract class FogRendererFabricMixin {
         MutableFloat fogStart = MutableFloat.fromEvent(RenderSystem::setShaderFogStart, RenderSystem::getShaderFogStart);
         MutableFloat fogEnd = MutableFloat.fromEvent(RenderSystem::setShaderFogEnd, RenderSystem::getShaderFogEnd);
         MutableValue<FogShape> fogShape = MutableValue.fromEvent(RenderSystem::setShaderFogShape, RenderSystem::getShaderFogShape);
-        FabricClientEvents.RENDER_FOG.invoker().onRenderFog(minecraft.gameRenderer, camera, f, fogMode, fogType, fogStart, fogEnd, fogShape);
+        FabricRendererEvents.RENDER_FOG.invoker().onRenderFog(minecraft.gameRenderer, camera, f, fogMode, fogType, fogStart, fogEnd, fogShape);
     }
 }

@@ -43,7 +43,7 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
     @Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Container;setItem(ILnet/minecraft/world/item/ItemStack;)V"), slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getCount()I")))
     protected void onTake$0(Player player, ItemStack itemStack, CallbackInfo callback) {
         this.puzzleslib$breakChance = MutableFloat.fromValue(0.12F);
-        FabricPlayerEvents.ANVIL_REPAIR.invoker().onAnvilRepair(player, this.inputSlots.getItem(0), this.inputSlots.getItem(1), itemStack, this.puzzleslib$breakChance);
+        FabricPlayerEvents.ANVIL_USE.invoker().onAnvilUse(player, this.inputSlots.getItem(0), this.inputSlots.getItem(1), itemStack, this.puzzleslib$breakChance);
     }
 
     @Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/DataSlot;set(I)V", shift = At.Shift.AFTER), cancellable = true)

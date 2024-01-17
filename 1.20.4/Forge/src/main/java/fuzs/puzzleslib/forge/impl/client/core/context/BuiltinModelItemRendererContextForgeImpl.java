@@ -3,7 +3,8 @@ package fuzs.puzzleslib.forge.impl.client.core.context;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
-import fuzs.puzzleslib.api.client.init.v1.DynamicBuiltinItemRenderer;
+import fuzs.puzzleslib.api.client.init.v1.BuiltinItemRenderer;
+import fuzs.puzzleslib.api.client.init.v1.ReloadingBuiltInItemRenderer;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.forge.impl.client.core.ForgeClientItemExtensionsImpl;
 import fuzs.puzzleslib.forge.mixin.client.accessor.ItemForgeAccessor;
@@ -28,8 +29,8 @@ public record BuiltinModelItemRendererContextForgeImpl(String modId,
         List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
-    public void registerItemRenderer(DynamicBuiltinItemRenderer renderer, ItemLike... items) {
-        // copied from Forge, seems to break data gen otherwise
+    public void registerItemRenderer(BuiltinItemRenderer renderer, ItemLike... items) {
+        // copied from Forge, supposed to break data gen otherwise
         if (FMLLoader.getLaunchHandler().isData()) return;
         // do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set as not every built-in item renderer needs to reload
         Objects.requireNonNull(renderer, "renderer is null");
@@ -51,6 +52,11 @@ public record BuiltinModelItemRendererContextForgeImpl(String modId,
             Objects.requireNonNull(item, "item is null");
             setClientItemExtensions(item.asItem(), itemExtensions);
         }
+    }
+
+    @Override
+    public void registerItemRenderer(ReloadingBuiltInItemRenderer renderer, ItemLike... items) {
+        this.registerItemRenderer((BuiltinItemRenderer) renderer, items);
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
         ResourceLocation identifier = new ResourceLocation(this.modId, itemName + "_built_in_model_renderer");
@@ -71,9 +77,9 @@ public record BuiltinModelItemRendererContextForgeImpl(String modId,
     }
 
     private static class ForwardingBlockEntityWithoutLevelRenderer extends BlockEntityWithoutLevelRenderer {
-        private final DynamicBuiltinItemRenderer renderer;
+        private final BuiltinItemRenderer renderer;
 
-        public ForwardingBlockEntityWithoutLevelRenderer(Minecraft minecraft, DynamicBuiltinItemRenderer renderer) {
+        public ForwardingBlockEntityWithoutLevelRenderer(Minecraft minecraft, BuiltinItemRenderer renderer) {
             super(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels());
             this.renderer = renderer;
         }

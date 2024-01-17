@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -23,12 +23,12 @@ abstract class LivingEntityRendererFabricMixin<T extends LivingEntity, M extends
 
     @Inject(method = "render", at = @At("HEAD"), cancellable = true)
     public void render$0(T entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        EventResult result = FabricClientEvents.BEFORE_RENDER_LIVING.invoker().onBeforeRenderEntity(entity, LivingEntityRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        EventResult result = FabricRendererEvents.BEFORE_RENDER_LIVING.invoker().onBeforeRenderEntity(entity, LivingEntityRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
         if (result.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "render", at = @At("TAIL"))
     public void render$1(T entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource buffer, int packedLight, CallbackInfo callback) {
-        FabricClientEvents.AFTER_RENDER_LIVING.invoker().onAfterRenderEntity(entity, LivingEntityRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
+        FabricRendererEvents.AFTER_RENDER_LIVING.invoker().onAfterRenderEntity(entity, LivingEntityRenderer.class.cast(this), partialTicks, matrixStack, buffer, packedLight);
     }
 }

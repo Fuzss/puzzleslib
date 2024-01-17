@@ -212,8 +212,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayerXpEvents.PickupXp.class, PlayerXpEvent.PickupXp.class, (PlayerXpEvents.PickupXp callback, PlayerXpEvent.PickupXp evt) -> {
-            if (callback.onPickupXp(evt.getEntity(), evt.getOrb()).isInterrupt()) {
+        INSTANCE.register(PickupExperienceCallback.class, PlayerXpEvent.PickupXp.class, (PickupExperienceCallback callback, PlayerXpEvent.PickupXp evt) -> {
+            if (callback.onPickupExperience(evt.getEntity(), evt.getOrb()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -283,11 +283,11 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(LootTableLoadEvents.Modify.class, ForgeLootTableModifyEvent.class, (LootTableLoadEvents.Modify callback, ForgeLootTableModifyEvent evt) -> {
             callback.onModifyLootTable(evt.getLootDataManager(), evt.getIdentifier(), evt::addPool, evt::removePool);
         });
-        INSTANCE.register(AnvilRepairCallback.class, AnvilRepairEvent.class, (AnvilRepairCallback callback, AnvilRepairEvent evt) -> {
+        INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
             MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
-            callback.onAnvilRepair(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
+            callback.onAnvilUse(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
         });
-        INSTANCE.register(ItemTouchCallback.class, EntityItemPickupEvent.class, (ItemTouchCallback callback, EntityItemPickupEvent evt) -> {
+        INSTANCE.register(ItemEntityEvents.Touch.class, EntityItemPickupEvent.class, (ItemEntityEvents.Touch callback, EntityItemPickupEvent evt) -> {
             EventResult result = callback.onItemTouch(evt.getEntity(), evt.getItem());
             if (result.isInterrupt()) {
                 if (result.getAsBoolean()) {
@@ -297,14 +297,14 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(PlayerEvents.ItemPickup.class, PlayerEvent.ItemPickupEvent.class, (PlayerEvents.ItemPickup callback, PlayerEvent.ItemPickupEvent evt) -> {
+        INSTANCE.register(ItemEntityEvents.Pickup.class, PlayerEvent.ItemPickupEvent.class, (ItemEntityEvents.Pickup callback, PlayerEvent.ItemPickupEvent evt) -> {
             callback.onItemPickup(evt.getEntity(), evt.getOriginalEntity(), evt.getStack());
         });
         INSTANCE.register(LootingLevelCallback.class, LootingLevelEvent.class, (LootingLevelCallback callback, LootingLevelEvent evt) -> {
             MutableInt lootingLevel = MutableInt.fromEvent(evt::setLootingLevel, evt::getLootingLevel);
             callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), lootingLevel);
         });
-        INSTANCE.register(AnvilUpdateCallback.class, AnvilUpdateEvent.class, (AnvilUpdateCallback callback, AnvilUpdateEvent evt) -> {
+        INSTANCE.register(AnvilEvents.Update.class, AnvilUpdateEvent.class, (AnvilEvents.Update callback, AnvilUpdateEvent evt) -> {
             ItemStack originalOutput = evt.getOutput();
             int originalEnchantmentCost = evt.getCost();
             int originalMaterialCost = evt.getMaterialCost();
@@ -329,7 +329,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(LivingEvents.Tick.class, LivingEvent.LivingTickEvent.class, (LivingEvents.Tick callback, LivingEvent.LivingTickEvent evt) -> {
+        INSTANCE.register(LivingTickCallback.class, LivingEvent.LivingTickEvent.class, (LivingTickCallback callback, LivingEvent.LivingTickEvent evt) -> {
             if (callback.onLivingTick(evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }
@@ -455,19 +455,19 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(PlayerEvents.StartTracking.class, PlayerEvent.StartTracking.class, (PlayerEvents.StartTracking callback, PlayerEvent.StartTracking evt) -> {
+        INSTANCE.register(PlayerTrackingEvents.Start.class, PlayerEvent.StartTracking.class, (PlayerTrackingEvents.Start callback, PlayerEvent.StartTracking evt) -> {
             callback.onStartTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
         });
-        INSTANCE.register(PlayerEvents.StopTracking.class, PlayerEvent.StopTracking.class, (PlayerEvents.StopTracking callback, PlayerEvent.StopTracking evt) -> {
+        INSTANCE.register(PlayerTrackingEvents.Stop.class, PlayerEvent.StopTracking.class, (PlayerTrackingEvents.Stop callback, PlayerEvent.StopTracking evt) -> {
             callback.onStopTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
         });
-        INSTANCE.register(PlayerEvents.LoggedIn.class, PlayerEvent.PlayerLoggedInEvent.class, (PlayerEvents.LoggedIn callback, PlayerEvent.PlayerLoggedInEvent evt) -> {
+        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, PlayerEvent.PlayerLoggedInEvent.class, (PlayerNetworkEvents.LoggedIn callback, PlayerEvent.PlayerLoggedInEvent evt) -> {
             callback.onLoggedIn((ServerPlayer) evt.getEntity());
         });
-        INSTANCE.register(PlayerEvents.LoggedOut.class, PlayerEvent.PlayerLoggedOutEvent.class, (PlayerEvents.LoggedOut callback, PlayerEvent.PlayerLoggedOutEvent evt) -> {
+        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, PlayerEvent.PlayerLoggedOutEvent.class, (PlayerNetworkEvents.LoggedOut callback, PlayerEvent.PlayerLoggedOutEvent evt) -> {
             callback.onLoggedOut((ServerPlayer) evt.getEntity());
         });
-        INSTANCE.register(PlayerEvents.AfterChangeDimension.class, PlayerEvent.PlayerChangedDimensionEvent.class, (PlayerEvents.AfterChangeDimension callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
+        INSTANCE.register(AfterChangeDimensionCallback.class, PlayerEvent.PlayerChangedDimensionEvent.class, (AfterChangeDimensionCallback callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
             MinecraftServer server = CommonAbstractions.INSTANCE.getMinecraftServer();
             ServerLevel from = server.getLevel(evt.getFrom());
             ServerLevel to = server.getLevel(evt.getTo());
@@ -491,12 +491,12 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayerEvents.Copy.class, PlayerEvent.Clone.class, (PlayerEvents.Copy callback, PlayerEvent.Clone evt) -> {
+        INSTANCE.register(PlayerCopyEvents.Copy.class, PlayerEvent.Clone.class, (PlayerCopyEvents.Copy callback, PlayerEvent.Clone evt) -> {
             evt.getOriginal().reviveCaps();
             callback.onCopy((ServerPlayer) evt.getOriginal(), (ServerPlayer) evt.getEntity(), !evt.isWasDeath());
             evt.getOriginal().invalidateCaps();
         });
-        INSTANCE.register(PlayerEvents.Respawn.class, PlayerEvent.PlayerRespawnEvent.class, (PlayerEvents.Respawn callback, PlayerEvent.PlayerRespawnEvent evt) -> {
+        INSTANCE.register(PlayerCopyEvents.Respawn.class, PlayerEvent.PlayerRespawnEvent.class, (PlayerCopyEvents.Respawn callback, PlayerEvent.PlayerRespawnEvent evt) -> {
             callback.onRespawn((ServerPlayer) evt.getEntity(), evt.isEndConquered());
         });
         INSTANCE.register(ServerTickEvents.Start.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.Start callback, TickEvent.ServerTickEvent evt) -> {
@@ -531,8 +531,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             if (!(evt.getLevel() instanceof ServerLevel level)) return;
             callback.onChunkUnload(level, (LevelChunk) evt.getChunk());
         });
-        INSTANCE.register(ItemTossCallback.class, ItemTossEvent.class, (ItemTossCallback callback, ItemTossEvent evt) -> {
-            if (callback.onItemToss(evt.getEntity(), evt.getPlayer()).isInterrupt()) {
+        INSTANCE.register(ItemEntityEvents.Toss.class, ItemTossEvent.class, (ItemEntityEvents.Toss callback, ItemTossEvent evt) -> {
+            if (callback.onItemToss(evt.getPlayer(), evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -553,7 +553,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setImpactResult(ProjectileImpactEvent.ImpactResult.SKIP_ENTITY);
             }
         });
-        INSTANCE.register(PlayerEvents.BreakSpeed.class, PlayerEvent.BreakSpeed.class, (PlayerEvents.BreakSpeed callback, PlayerEvent.BreakSpeed evt) -> {
+        INSTANCE.register(BreakSpeedCallback.class, PlayerEvent.BreakSpeed.class, (BreakSpeedCallback callback, PlayerEvent.BreakSpeed evt) -> {
             DefaultedFloat breakSpeed = DefaultedFloat.fromEvent(evt::setNewSpeed, evt::getNewSpeed, evt::getOriginalSpeed);
             if (callback.onBreakSpeed(evt.getEntity(), evt.getState(), breakSpeed).isInterrupt()) {
                 evt.setCanceled(true);
@@ -576,10 +576,10 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         INSTANCE.register(MobEffectEvents.Expire.class, MobEffectEvent.Expired.class, (MobEffectEvents.Expire callback, MobEffectEvent.Expired evt) -> {
             callback.onMobEffectExpire(evt.getEntity(), evt.getEffectInstance());
         });
-        INSTANCE.register(LivingEvents.Jump.class, LivingEvent.LivingJumpEvent.class, (LivingEvents.Jump callback, LivingEvent.LivingJumpEvent evt) -> {
+        INSTANCE.register(LivingJumpCallback.class, LivingEvent.LivingJumpEvent.class, (LivingJumpCallback callback, LivingEvent.LivingJumpEvent evt) -> {
             EventImplHelper.onLivingJump(callback, evt.getEntity());
         });
-        INSTANCE.register(LivingEvents.Visibility.class, LivingEvent.LivingVisibilityEvent.class, (LivingEvents.Visibility callback, LivingEvent.LivingVisibilityEvent evt) -> {
+        INSTANCE.register(LivingVisibilityCallback.class, LivingEvent.LivingVisibilityEvent.class, (LivingVisibilityCallback callback, LivingEvent.LivingVisibilityEvent evt) -> {
             callback.onLivingVisibility(evt.getEntity(), evt.getLookingEntity(), MutableDouble.fromEvent(visibilityModifier -> {
                 evt.modifyVisibility(visibilityModifier / evt.getVisibilityModifier());
             }, evt::getVisibilityModifier));
@@ -646,7 +646,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             topInput.getAsOptional().ifPresent(evt::setNewTopItem);
             bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
         });
-        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
+        INSTANCE.register(LivingBreathEvents.Breathe.class, LivingBreatheEvent.class, (LivingBreathEvents.Breathe callback, LivingBreatheEvent evt) -> {
             final int airAmountValue;
             if (!evt.canBreathe()) {
                 airAmountValue = -evt.getConsumeAirAmount();
@@ -678,7 +678,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 }
             }
         });
-        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
+        INSTANCE.register(LivingBreathEvents.Drown.class, LivingDrownEvent.class, (LivingBreathEvents.Drown callback, LivingDrownEvent evt) -> {
             EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
             if (result.isInterrupt()) {
                 if (result.getAsBoolean()) {

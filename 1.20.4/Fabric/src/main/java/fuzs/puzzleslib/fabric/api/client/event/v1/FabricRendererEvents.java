@@ -1,0 +1,62 @@
+package fuzs.puzzleslib.fabric.api.client.event.v1;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import fuzs.puzzleslib.api.client.event.v1.renderer.*;
+import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
+import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.renderer.GameRenderer;
+
+public final class FabricRendererEvents {
+    /**
+     * Fires before the name tag of an entity is tried to be rendered, in addition to preventing the name tag from rendering, rendering can also be forced.
+     */
+    public static final Event<RenderNameTagCallback> RENDER_NAME_TAG = FabricEventFactory.createResult(RenderNameTagCallback.class);
+    /**
+     * Called before a living entity model is rendered, allows for applying transformations to the {@link PoseStack}, or for completely taking over rendering as a whole.
+     */
+    public static final Event<RenderLivingEvents.Before> BEFORE_RENDER_LIVING = FabricEventFactory.createResult(RenderLivingEvents.Before.class);
+    /**
+     * Called after a living entity model is rendered, allows for cleaning up transformations applied to the {@link PoseStack}.
+     */
+    public static final Event<RenderLivingEvents.After> AFTER_RENDER_LIVING = FabricEventFactory.create(RenderLivingEvents.After.class);
+    /**
+     * Called before the player model is rendered, allows for applying transformations to the {@link PoseStack}, or for completely taking over rendering as a whole.
+     */
+    public static final Event<RenderPlayerEvents.Before> BEFORE_RENDER_PLAYER = FabricEventFactory.createResult(RenderPlayerEvents.Before.class);
+    /**
+     * Called after the player model is rendered, allows for cleaning up transformations applied to the {@link PoseStack}.
+     */
+    public static final Event<RenderPlayerEvents.After> AFTER_RENDER_PLAYER = FabricEventFactory.create(RenderPlayerEvents.After.class);
+    /**
+     * Called before one of the player's hands is rendered in first-person mode.
+     */
+    public static final Event<RenderHandCallback> RENDER_HAND = FabricEventFactory.createResult(RenderHandCallback.class);
+    /**
+     * Runs before camera angle setup is done, allows for additional control over roll (which vanilla itself does not support) in addition to pitch and yaw.
+     */
+    public static final Event<ComputeCameraAnglesCallback> COMPUTE_CAMERA_ANGLES = FabricEventFactory.create(ComputeCameraAnglesCallback.class);
+    /**
+     * Called before a block overlay is rendered on the screen.
+     */
+    public static final Event<RenderBlockOverlayCallback> RENDER_BLOCK_OVERLAY = FabricEventFactory.createResult(RenderBlockOverlayCallback.class);
+    /**
+     * Called before fog is rendered, allows for controlling fog start and end distance.
+     */
+    public static final Event<FogEvents.Render> RENDER_FOG = FabricEventFactory.create(FogEvents.Render.class);
+    /**
+     * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the color.
+     */
+    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.create(FogEvents.ComputeColor.class);
+    /**
+     * Fires before the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+     */
+    public static final Event<GameRenderEvents.Before> BEFORE_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.Before.class);
+    /**
+     * Fires after the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+     */
+    public static final Event<GameRenderEvents.After> AFTER_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.After.class);
+
+    private FabricRendererEvents() {
+
+    }
+}

@@ -18,7 +18,7 @@ public final class FabricPlayerEvents {
     /**
      * Called when a {@link Player} collides with an {@link ExperienceOrb} entity, just before it is added to the player.
      */
-    public static final Event<PlayerXpEvents.PickupXp> PICKUP_XP = FabricEventFactory.createResult(PlayerXpEvents.PickupXp.class);
+    public static final Event<PickupExperienceCallback> PICKUP_XP = FabricEventFactory.createResult(PickupExperienceCallback.class);
     /**
      * Called when a bone meal is used on a block by the player, a dispenser, or a farmer villager.
      * <p>Useful for adding custom bone meal behavior to blocks, or for cancelling vanilla interactions.
@@ -27,20 +27,20 @@ public final class FabricPlayerEvents {
     /**
      * Called before a result item is generated from the two input slots in an anvil in {@link AnvilMenu#createResult()}.
      */
-    public static final Event<AnvilUpdateCallback> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilUpdateCallback.class);
+    public static final Event<AnvilEvents.Update> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilEvents.Update.class);
     /**
      * Called when the player takes the output item from an anvil, used to determine the chance by which the anvil will break down one stage.
      */
-    public static final Event<AnvilRepairCallback> ANVIL_REPAIR = FabricEventFactory.create(AnvilRepairCallback.class);
+    public static final Event<AnvilEvents.Use> ANVIL_USE = FabricEventFactory.create(AnvilEvents.Use.class);
     /**
      * Called when a player touches an {@link ItemEntity} laying on the ground.
      */
-    public static final Event<ItemTouchCallback> ITEM_TOUCH = FabricEventFactory.createResult(ItemTouchCallback.class);
+    public static final Event<ItemEntityEvents.Touch> ITEM_TOUCH = FabricEventFactory.createResult(ItemEntityEvents.Touch.class);
     /**
      * Called when the player picks up an {@link ItemEntity} from the ground after the {@link ItemStack} has been added to the player inventory.
      * <p>This events main purpose is to notify that the item pickup has happened.
      */
-    public static final Event<PlayerEvents.ItemPickup> ITEM_PICKUP = FabricEventFactory.create(PlayerEvents.ItemPickup.class);
+    public static final Event<ItemEntityEvents.Pickup> ITEM_PICKUP = FabricEventFactory.create(ItemEntityEvents.Pickup.class);
     /**
      * Called when the player stops using a bow, just before the arrow is fired.
      */
@@ -56,11 +56,11 @@ public final class FabricPlayerEvents {
     /**
      * Called when an item is tossed from the player inventory, either by pressing 'Q' or by clicking an item stack outside a container screen.
      */
-    public static final Event<ItemTossCallback> ITEM_TOSS = FabricEventFactory.createResult(ItemTossCallback.class);
+    public static final Event<ItemEntityEvents.Toss> ITEM_TOSS = FabricEventFactory.createResult(ItemEntityEvents.Toss.class);
     /**
      * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
      */
-    public static final Event<PlayerEvents.BreakSpeed> BREAK_SPEED = FabricEventFactory.createResult(PlayerEvents.BreakSpeed.class);
+    public static final Event<BreakSpeedCallback> BREAK_SPEED = FabricEventFactory.createResult(BreakSpeedCallback.class);
     /**
      * Called when the grindstone output slot is populated in {@link GrindstoneMenu#createResult()}.
      */

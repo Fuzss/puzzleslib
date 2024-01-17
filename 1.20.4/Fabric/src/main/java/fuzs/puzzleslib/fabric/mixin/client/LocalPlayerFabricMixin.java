@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -44,7 +44,7 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
 
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(ZF)V", shift = At.Shift.AFTER))
     public void aiStep(CallbackInfo callback) {
-        FabricClientEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this), this.input);
+        FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this), this.input);
     }
 
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
