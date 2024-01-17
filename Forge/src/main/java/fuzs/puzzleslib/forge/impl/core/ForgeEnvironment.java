@@ -22,20 +22,23 @@ import java.util.function.Supplier;
 
 public final class ForgeEnvironment implements ModLoaderEnvironment {
     private final Supplier<Map<String, ModContainer>> modList = Suppliers.memoize(() -> {
-        List<? extends IModInfo> modList;
-        if (ModList.get() != null) {
-            modList = ModList.get().getMods();
-        } else if (FMLLoader.getLoadingModList() != null) {
-            modList = FMLLoader.getLoadingModList().getMods();
-        } else {
-            throw new NullPointerException("mod list is null");
-        }
+        List<? extends IModInfo> modList = getForgeModList();
         return modList.stream()
                 .map(ForgeModContainer::new)
                 .sorted(Comparator.comparing(ModContainer::getModId))
                 // compiler cannot infer type arguments here
                 .collect(ImmutableMap.<ForgeModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId, Function.identity()));
     });
+
+    private static List<? extends IModInfo> getForgeModList() {
+        if (ModList.get() != null) {
+            return ModList.get().getMods();
+        } else if (FMLLoader.getLoadingModList() != null) {
+            return FMLLoader.getLoadingModList().getMods();
+        } else {
+            throw new NullPointerException("mod list is null");
+        }
+    }
 
     @Override
     public ModLoader getModLoader() {

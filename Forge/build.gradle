@@ -4,6 +4,10 @@ dependencies {
     // Forge Config Api Port
     modApi libs.forgeconfigapiport.forge
 
+    // Mixin Extras
+    compileOnly(annotationProcessor(libs.mixinextras.common.get()))
+    api(include(libs.mixinextras.forge.get()))
+
     // Puzzles Lib
 //    modApi libs.puzzleslib.forge
 

@@ -84,6 +84,7 @@ public final class EventInvokerImpl {
         };
     }
 
+    @FunctionalInterface
     public interface EventInvokerLike<T> {
 
         EventInvoker<T> asEventInvoker(@Nullable Object context);

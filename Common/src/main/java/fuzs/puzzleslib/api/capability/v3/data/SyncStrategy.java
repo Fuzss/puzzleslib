@@ -13,7 +13,6 @@ public enum SyncStrategy {
      * Default state, no syncing is done automatically.
      */
     MANUAL {
-
         @Override
         public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
 
@@ -24,7 +23,6 @@ public enum SyncStrategy {
      * <p>Useful for capabilities that affect rendering (e.g. a glider is equipped for gliding).
      */
     TRACKING {
-
         @Override
         public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
             PuzzlesLibMod.NETWORK.sendToAllTracking(entity, message, true);
@@ -35,7 +33,6 @@ public enum SyncStrategy {
      * <p>Useful for capabilities that control an ability, like the amount of midair jumps left.
      */
     PLAYER {
-
         @Override
         public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
             if (entity instanceof ServerPlayer player) {
