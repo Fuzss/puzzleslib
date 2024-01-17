@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.fabric.api.event.v1.DataPackFinderRegistry;
+import fuzs.puzzleslib.fabric.api.event.v1.registry.DataPackFinderRegistry;
 import fuzs.puzzleslib.fabric.mixin.accessor.PackRepositoryFabricAccessor;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;

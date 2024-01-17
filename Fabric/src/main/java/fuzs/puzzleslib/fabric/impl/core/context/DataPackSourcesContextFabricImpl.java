@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
-import fuzs.puzzleslib.fabric.api.event.v1.DataPackFinderRegistry;
+import fuzs.puzzleslib.fabric.api.event.v1.registry.DataPackFinderRegistry;
 import net.minecraft.server.packs.repository.RepositorySource;
 
 import java.util.Objects;

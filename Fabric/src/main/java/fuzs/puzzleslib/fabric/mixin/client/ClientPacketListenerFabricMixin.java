@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -24,12 +24,12 @@ abstract class ClientPacketListenerFabricMixin extends ClientCommonPacketListene
 
     @Inject(method = "handleLogin", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetPos()V", shift = At.Shift.AFTER))
     public void handleLogin(ClientboundLoginPacket packet, CallbackInfo callback) {
-        FabricClientEvents.PLAYER_LOGGED_IN.invoker().onLoggedIn(this.minecraft.player, this.minecraft.gameMode, this.minecraft.getConnection().getConnection());
+        FabricClientPlayerEvents.PLAYER_LOGGED_IN.invoker().onLoggedIn(this.minecraft.player, this.minecraft.gameMode, this.minecraft.getConnection().getConnection());
     }
 
     @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetPos()V", shift = At.Shift.AFTER))
     public LocalPlayer handleRespawn(ClientboundRespawnPacket packet, CallbackInfo callback, @Local(ordinal = 0) LocalPlayer oldPlayer) {
-        FabricClientEvents.PLAYER_COPY.invoker().onCopy(oldPlayer, this.minecraft.player, this.minecraft.gameMode, this.minecraft.player.connection.getConnection());
+        FabricClientPlayerEvents.PLAYER_COPY.invoker().onCopy(oldPlayer, this.minecraft.player, this.minecraft.gameMode, this.minecraft.player.connection.getConnection());
         return oldPlayer;
     }
 }

@@ -11,6 +11,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
@@ -24,15 +25,15 @@ public record FabricReloadListener(ResourceLocation identifier,
                                    PreparableReloadListener reloadListener, Collection<ResourceLocation> dependencies) implements NamedReloadListener, IdentifiableResourceReloadListener {
 
     public FabricReloadListener(ResourceLocation identifier, PreparableReloadListener reloadListener) {
-        this(identifier, reloadListener, new ResourceLocation[0]);
+        this(identifier, reloadListener, Collections.emptySet());
     }
 
     public FabricReloadListener(ResourceLocation identifier, ResourceManagerReloadListener reloadListener) {
-        this(identifier, reloadListener, new ResourceLocation[0]);
+        this(identifier, reloadListener, Collections.emptySet());
     }
 
     public <T> FabricReloadListener(ResourceLocation identifier, SimplePreparableReloadListener<T> reloadListener) {
-        this(identifier, reloadListener, new ResourceLocation[0]);
+        this(identifier, reloadListener, Collections.emptySet());
     }
 
     public FabricReloadListener(NamedReloadListener reloadListener) {

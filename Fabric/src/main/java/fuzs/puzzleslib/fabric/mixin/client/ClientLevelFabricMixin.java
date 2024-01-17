@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEntityEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientLevelEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
@@ -49,12 +50,12 @@ abstract class ClientLevelFabricMixin extends Level {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(ClientPacketListener clientPacketListener, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> resourceKey, Holder<DimensionType> holder, int i, int j, Supplier<ProfilerFiller> supplier, LevelRenderer levelRenderer, boolean bl, long l, CallbackInfo callback) {
-        FabricClientEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
+        FabricClientLevelEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
     }
 
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)
     private void addEntity(Entity entityToSpawn, CallbackInfo callback) {
-        if (FabricClientEvents.ENTITY_LOAD.invoker().onEntityLoad(entityToSpawn, ClientLevel.class.cast(this)).isInterrupt()) {
+        if (FabricClientEntityEvents.ENTITY_LOAD.invoker().onEntityLoad(entityToSpawn, ClientLevel.class.cast(this)).isInterrupt()) {
             if (entityToSpawn instanceof Player) {
                 // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
                 throw new UnsupportedOperationException("Cannot prevent player from spawning in!");

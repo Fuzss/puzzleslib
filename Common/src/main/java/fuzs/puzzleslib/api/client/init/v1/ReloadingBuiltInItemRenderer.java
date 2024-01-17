@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.api.client.init.v1;
 
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
-public abstract class ReloadingBuiltInItemRenderer implements DynamicBuiltinItemRenderer, ResourceManagerReloadListener {
+/**
+ * {@link BuiltinItemRenderer} that additionally implements {@link ResourceManagerReloadListener} allowing for listening to resource reloads.
+ */
+public interface ReloadingBuiltInItemRenderer extends BuiltinItemRenderer, ResourceManagerReloadListener {
 
-    @Override
-    public abstract void onResourceManagerReload(ResourceManager resourceManager);
 }

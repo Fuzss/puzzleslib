@@ -5,7 +5,10 @@ import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.EntityCapabilityKey;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingConversionCallback;
-import fuzs.puzzleslib.api.event.v1.entity.player.PlayerEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.AfterChangeDimensionCallback;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerTrackingEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -22,23 +25,23 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
             throw new IllegalStateException("Sync strategy has already been set!");
         } else {
             if (syncStrategy != SyncStrategy.MANUAL) {
-                PlayerEvents.LOGGED_IN.register((ServerPlayer player) -> {
+                PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer player) -> {
                     this.getIfProvided(player).ifPresent(capabilityComponent -> {
                         PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
                     });
                 });
-                PlayerEvents.AFTER_CHANGE_DIMENSION.register((ServerPlayer player, ServerLevel from, ServerLevel to) -> {
+                AfterChangeDimensionCallback.EVENT.register((ServerPlayer player, ServerLevel from, ServerLevel to) -> {
                     this.getIfProvided(player).ifPresent(capabilityComponent -> {
                         PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
                     });
                 });
-                PlayerEvents.RESPAWN.register((ServerPlayer player, boolean originalStillAlive) -> {
+                PlayerCopyEvents.RESPAWN.register((ServerPlayer player, boolean originalStillAlive) -> {
                     this.getIfProvided(player).ifPresent(capabilityComponent -> {
                         PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
                     });
                 });
                 if (syncStrategy == SyncStrategy.TRACKING) {
-                    PlayerEvents.START_TRACKING.register((Entity trackedEntity, ServerPlayer player) -> {
+                    PlayerTrackingEvents.START.register((Entity trackedEntity, ServerPlayer player) -> {
                         this.getIfProvided(trackedEntity).ifPresent(capabilityComponent -> {
                             PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
                         });
@@ -66,7 +69,7 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
     }
 
     default void initialize() {
-        PlayerEvents.COPY.register((ServerPlayer originalPlayer, ServerPlayer newPlayer, boolean originalStillAlive) -> {
+        PlayerCopyEvents.COPY.register((ServerPlayer originalPlayer, ServerPlayer newPlayer, boolean originalStillAlive) -> {
             Optional<C> originalCapability = this.getIfProvided(originalPlayer);
             Optional<C> newCapability = this.getIfProvided(newPlayer);
             if (originalCapability.isPresent() && newCapability.isPresent()) {

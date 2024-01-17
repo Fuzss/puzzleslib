@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
@@ -29,7 +29,7 @@ abstract class AbstractClientPlayerFabricMixin extends Player {
             // reverse fovEffectScale calculations applied by vanilla in return statement,
             // we could capture the original value previous to return, but this approach only needs one mixin
             DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue((value - 1.0F) / fovEffectScale + 1.0F);
-            FabricClientEvents.COMPUTE_FOV_MODIFIER.invoker().onComputeFovModifier(this, fieldOfViewModifier);
+            FabricClientPlayerEvents.COMPUTE_FOV_MODIFIER.invoker().onComputeFovModifier(this, fieldOfViewModifier);
             return fieldOfViewModifier.getAsOptionalFloat().map(t -> Mth.lerp(fovEffectScale, 1.0F, t)).orElse(value);
         }
         return value;

@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricScreenEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import net.minecraft.client.Minecraft;
@@ -56,12 +55,12 @@ public abstract class MinecraftFabricMixin {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.BEFORE))
     private void runTick$0(boolean renderLevel, CallbackInfo callback) {
-        FabricClientEvents.BEFORE_GAME_RENDER.invoker().onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
+        FabricRendererEvents.BEFORE_GAME_RENDER.invoker().onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
     private void runTick$1(boolean renderLevel, CallbackInfo callback) {
-        FabricClientEvents.AFTER_GAME_RENDER.invoker().onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
+        FabricRendererEvents.AFTER_GAME_RENDER.invoker().onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
@@ -69,7 +68,7 @@ public abstract class MinecraftFabricMixin {
         // we handle this callback at head to avoid having to block Screen#remove
         newScreen = this.puzzleslib$handleEmptyScreen(newScreen);
         this.puzzleslib$newScreen = DefaultedValue.fromValue(newScreen);
-        EventResult result = FabricScreenEvents.SCREEN_OPENING.invoker().onScreenOpening(this.screen, this.puzzleslib$newScreen);
+        EventResult result = FabricGuiEvents.SCREEN_OPENING.invoker().onScreenOpening(this.screen, this.puzzleslib$newScreen);
         if (result.isInterrupt() || this.puzzleslib$newScreen.getAsOptional().filter(screen -> screen == this.screen).isPresent()) callback.cancel();
     }
 
@@ -102,7 +101,7 @@ public abstract class MinecraftFabricMixin {
     @Inject(method = "setLevel", at = @At("HEAD"))
     public void setLevel(ClientLevel clientLevel, CallbackInfo callback) {
         if (this.level != null) {
-            FabricClientEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
+            FabricClientLevelEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
         }
     }
 
@@ -111,10 +110,10 @@ public abstract class MinecraftFabricMixin {
         if (this.player != null && this.gameMode != null) {
             Connection connection = this.player.connection.getConnection();
             Objects.requireNonNull(connection, "connection is null");
-            FabricClientEvents.PLAYER_LOGGED_OUT.invoker().onLoggedOut(this.player, this.gameMode, connection);
+            FabricClientPlayerEvents.PLAYER_LOGGED_OUT.invoker().onLoggedOut(this.player, this.gameMode, connection);
         }
         if (this.level != null) {
-            FabricClientEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
+            FabricClientLevelEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
         }
     }
 }

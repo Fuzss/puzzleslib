@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.api.client.event.v1;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import fuzs.puzzleslib.api.client.event.v1.gui.ScreenKeyboardEvents;
+import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 

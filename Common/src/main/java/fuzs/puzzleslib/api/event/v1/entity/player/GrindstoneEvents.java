@@ -17,6 +17,7 @@ public final class GrindstoneEvents {
 
     }
 
+    @FunctionalInterface
     public interface Update {
 
         /**
@@ -34,6 +35,7 @@ public final class GrindstoneEvents {
         EventResult onGrindstoneUpdate(ItemStack topInput, ItemStack bottomInput, MutableValue<ItemStack> output, MutableInt experienceReward, Player player);
     }
 
+    @FunctionalInterface
     public interface Use {
 
         /**

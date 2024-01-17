@@ -3,13 +3,18 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.client.event.v1.entity.*;
+import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
+import fuzs.puzzleslib.api.client.event.v1.gui.*;
+import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
+import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
+import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.fabric.api.client.event.v1.ExtraScreenMouseEvents;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricScreenEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
@@ -162,12 +167,12 @@ public final class FabricClientEventInvokers {
                 callback.onItemTooltip(stack, Minecraft.getInstance().player, lines, context);
             };
         });
-        INSTANCE.register(RenderNameTagCallback.class, FabricClientEvents.RENDER_NAME_TAG);
-        INSTANCE.register(ContainerScreenEvents.Background.class, FabricScreenEvents.CONTAINER_SCREEN_BACKGROUND);
-        INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricScreenEvents.CONTAINER_SCREEN_FOREGROUND);
-        INSTANCE.register(InventoryMobEffectsCallback.class, FabricScreenEvents.INVENTORY_MOB_EFFECTS);
-        INSTANCE.register(ScreenOpeningCallback.class, FabricScreenEvents.SCREEN_OPENING);
-        INSTANCE.register(ComputeFovModifierCallback.class, FabricClientEvents.COMPUTE_FOV_MODIFIER);
+        INSTANCE.register(RenderNameTagCallback.class, FabricRendererEvents.RENDER_NAME_TAG);
+        INSTANCE.register(ContainerScreenEvents.Background.class, FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND);
+        INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricGuiEvents.CONTAINER_SCREEN_FOREGROUND);
+        INSTANCE.register(InventoryMobEffectsCallback.class, FabricGuiEvents.INVENTORY_MOB_EFFECTS);
+        INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
+        INSTANCE.register(ComputeFovModifierCallback.class, FabricClientPlayerEvents.COMPUTE_FOV_MODIFIER);
         INSTANCE.register(ScreenEvents.BeforeInit.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.BEFORE_INIT, (callback, context) -> {
             Objects.requireNonNull(context, "context is null");
             return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
@@ -244,14 +249,14 @@ public final class FabricClientEventInvokers {
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
         INSTANCE.register(RenderGuiElementEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            applyToInvoker.accept(FabricClientEvents.beforeRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
+            applyToInvoker.accept(FabricGuiEvents.beforeRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
         });
         INSTANCE.register(RenderGuiElementEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            applyToInvoker.accept(FabricClientEvents.afterRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
+            applyToInvoker.accept(FabricGuiEvents.afterRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
         });
-        INSTANCE.register(CustomizeChatPanelCallback.class, FabricClientEvents.CUSTOMIZE_CHAT_PANEL);
-        INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEvents.ENTITY_LOAD);
+        INSTANCE.register(CustomizeChatPanelCallback.class, FabricGuiEvents.CUSTOMIZE_CHAT_PANEL);
+        INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
             return callback::onEntityUnload;
         });
@@ -261,12 +266,12 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InputEvents.AfterMouseScroll.class, FabricClientEvents.AFTER_MOUSE_SCROLL);
         INSTANCE.register(InputEvents.BeforeKeyAction.class, FabricClientEvents.BEFORE_KEY_ACTION);
         INSTANCE.register(InputEvents.AfterKeyAction.class, FabricClientEvents.AFTER_KEY_ACTION);
-        INSTANCE.register(RenderLivingEvents.Before.class, FabricClientEvents.BEFORE_RENDER_LIVING);
-        INSTANCE.register(RenderLivingEvents.After.class, FabricClientEvents.AFTER_RENDER_LIVING);
-        INSTANCE.register(RenderPlayerEvents.Before.class, FabricClientEvents.BEFORE_RENDER_PLAYER);
-        INSTANCE.register(RenderPlayerEvents.After.class, FabricClientEvents.AFTER_RENDER_PLAYER);
-        INSTANCE.register(RenderHandCallback.class, FabricClientEvents.RENDER_HAND);
-        INSTANCE.register(ComputeCameraAnglesCallback.class, FabricClientEvents.COMPUTE_CAMERA_ANGLES);
+        INSTANCE.register(RenderLivingEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING);
+        INSTANCE.register(RenderLivingEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING);
+        INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_PLAYER);
+        INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_PLAYER);
+        INSTANCE.register(RenderHandCallback.class, FabricRendererEvents.RENDER_HAND);
+        INSTANCE.register(ComputeCameraAnglesCallback.class, FabricRendererEvents.COMPUTE_CAMERA_ANGLES);
         INSTANCE.register(ClientLevelTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK, callback -> {
             return (ClientLevel world) -> {
                 callback.onStartLevelTick(Minecraft.getInstance(), world);
@@ -283,9 +288,9 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientChunkEvents.Unload.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD, callback -> {
             return callback::onChunkUnload;
         });
-        INSTANCE.register(ClientPlayerEvents.LoggedIn.class, FabricClientEvents.PLAYER_LOGGED_IN);
-        INSTANCE.register(ClientPlayerEvents.LoggedOut.class, FabricClientEvents.PLAYER_LOGGED_OUT);
-        INSTANCE.register(ClientPlayerEvents.Copy.class, FabricClientEvents.PLAYER_COPY);
+        INSTANCE.register(ClientPlayerNetworkEvents.LoggedIn.class, FabricClientPlayerEvents.PLAYER_LOGGED_IN);
+        INSTANCE.register(ClientPlayerNetworkEvents.LoggedOut.class, FabricClientPlayerEvents.PLAYER_LOGGED_OUT);
+        INSTANCE.register(ClientPlayerCopyCallback.class, FabricClientPlayerEvents.PLAYER_COPY);
         INSTANCE.register(InteractionInputEvents.Attack.class, ClientPreAttackCallback.EVENT, callback -> {
             return (Minecraft minecraft, LocalPlayer player, int clickCount) -> {
                 if (minecraft.missTime <= 0 && minecraft.hitResult != null) {
@@ -353,13 +358,13 @@ public final class FabricClientEventInvokers {
                 return ItemStack.EMPTY;
             };
         });
-        INSTANCE.register(ClientLevelEvents.Load.class, FabricClientEvents.LOAD_LEVEL);
-        INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientEvents.UNLOAD_LEVEL);
-        INSTANCE.register(MovementInputUpdateCallback.class, FabricClientEvents.MOVEMENT_INPUT_UPDATE);
-        INSTANCE.register(RenderBlockOverlayCallback.class, FabricClientEvents.RENDER_BLOCK_OVERLAY);
-        INSTANCE.register(FogEvents.Render.class, FabricClientEvents.RENDER_FOG);
-        INSTANCE.register(FogEvents.ComputeColor.class, FabricClientEvents.COMPUTE_FOG_COLOR);
-        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricScreenEvents.RENDER_TOOLTIP);
+        INSTANCE.register(ClientLevelEvents.Load.class, FabricClientLevelEvents.LOAD_LEVEL);
+        INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientLevelEvents.UNLOAD_LEVEL);
+        INSTANCE.register(MovementInputUpdateCallback.class, FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE);
+        INSTANCE.register(RenderBlockOverlayCallback.class, FabricRendererEvents.RENDER_BLOCK_OVERLAY);
+        INSTANCE.register(FogEvents.Render.class, FabricRendererEvents.RENDER_FOG);
+        INSTANCE.register(FogEvents.ComputeColor.class, FabricRendererEvents.COMPUTE_FOG_COLOR);
+        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricGuiEvents.RENDER_TOOLTIP);
         INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, callback -> {
             return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
                 if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) return true;
@@ -389,11 +394,11 @@ public final class FabricClientEventInvokers {
                 callback.onRenderLevelAfterLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
-        INSTANCE.register(GameRenderEvents.Before.class, FabricClientEvents.BEFORE_GAME_RENDER);
-        INSTANCE.register(GameRenderEvents.After.class, FabricClientEvents.AFTER_GAME_RENDER);
-        INSTANCE.register(AddToastCallback.class, FabricClientEvents.ADD_TOAST);
-        INSTANCE.register(GatherDebugTextEvents.Left.class, FabricClientEvents.GATHER_LEFT_DEBUG_TEXT);
-        INSTANCE.register(GatherDebugTextEvents.Right.class, FabricClientEvents.GATHER_RIGHT_DEBUG_TEXT);
+        INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
+        INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
+        INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
+        INSTANCE.register(GatherDebugTextEvents.Left.class, FabricGuiEvents.GATHER_LEFT_DEBUG_TEXT);
+        INSTANCE.register(GatherDebugTextEvents.Right.class, FabricGuiEvents.GATHER_RIGHT_DEBUG_TEXT);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

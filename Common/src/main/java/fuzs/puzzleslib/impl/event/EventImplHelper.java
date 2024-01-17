@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.event;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
-import fuzs.puzzleslib.api.event.v1.entity.living.LivingEvents;
+import fuzs.puzzleslib.api.event.v1.entity.living.LivingJumpCallback;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,7 +23,7 @@ public final class EventImplHelper {
 
     }
 
-    public static void onLivingJump(LivingEvents.Jump callback, LivingEntity entity) {
+    public static void onLivingJump(LivingJumpCallback callback, LivingEntity entity) {
         Vec3 deltaMovement = entity.getDeltaMovement();
         DefaultedDouble jumpPower = DefaultedDouble.fromValue(deltaMovement.y);
         OptionalDouble newJumpPower;

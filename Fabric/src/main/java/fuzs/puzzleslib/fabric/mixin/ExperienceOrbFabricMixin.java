@@ -20,7 +20,7 @@ abstract class ExperienceOrbFabricMixin extends Entity {
 
     @Inject(method = "playerTouch", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/player/Player;takeXpDelay:I", ordinal = 1), cancellable = true)
     public void playerTouch(Player player, CallbackInfo callback) {
-        if (FabricPlayerEvents.PICKUP_XP.invoker().onPickupXp(player, ExperienceOrb.class.cast(this)).isInterrupt()) {
+        if (FabricPlayerEvents.PICKUP_XP.invoker().onPickupExperience(player, ExperienceOrb.class.cast(this)).isInterrupt()) {
             callback.cancel();
         }
     }

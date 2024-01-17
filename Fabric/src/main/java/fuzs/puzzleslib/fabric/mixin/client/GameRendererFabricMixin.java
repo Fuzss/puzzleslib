@@ -2,9 +2,9 @@ package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.CameraFabricAccessor;
 import fuzs.puzzleslib.fabric.impl.client.event.EntitySpectatorShaderRegistryImpl;
 import net.minecraft.client.Camera;
@@ -46,7 +46,7 @@ abstract class GameRendererFabricMixin {
         MutableFloat pitch = MutableFloat.fromEvent(((CameraFabricAccessor) this.mainCamera)::puzzleslib$setXRot, this.mainCamera::getXRot);
         MutableFloat yaw = MutableFloat.fromEvent(((CameraFabricAccessor) this.mainCamera)::puzzleslib$setYRot, this.mainCamera::getYRot);
         DefaultedFloat roll = DefaultedFloat.fromValue(0.0F);
-        FabricClientEvents.COMPUTE_CAMERA_ANGLES.invoker().onComputeCameraAngles(GameRenderer.class.cast(this), this.mainCamera, partialTicks, pitch, yaw, roll);
+        FabricRendererEvents.COMPUTE_CAMERA_ANGLES.invoker().onComputeCameraAngles(GameRenderer.class.cast(this), this.mainCamera, partialTicks, pitch, yaw, roll);
         roll.getAsOptionalFloat().ifPresent(f -> matrixStack.mulPose(Axis.ZP.rotationDegrees(f)));
     }
 }

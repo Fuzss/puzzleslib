@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.fabric.api.client.event.v1.SkullRendererRegistry;
+import fuzs.puzzleslib.fabric.api.client.event.v1.registry.SkullRendererRegistry;
 import fuzs.puzzleslib.api.client.init.v1.SkullRenderersFactory;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;

@@ -8,6 +8,13 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.client.event.v1.entity.*;
+import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
+import fuzs.puzzleslib.api.client.event.v1.gui.*;
+import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
+import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
+import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -385,15 +392,15 @@ public final class ForgeClientEventInvokers {
             if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onChunkUnload(level, (LevelChunk) evt.getChunk());
         });
-        INSTANCE.register(ClientPlayerEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggingIn.class, (ClientPlayerEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggingIn evt) -> {
+        INSTANCE.register(ClientPlayerNetworkEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggingIn.class, (ClientPlayerNetworkEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggingIn evt) -> {
             callback.onLoggedIn(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
         });
-        INSTANCE.register(ClientPlayerEvents.LoggedOut.class, ClientPlayerNetworkEvent.LoggingOut.class, (ClientPlayerEvents.LoggedOut callback, ClientPlayerNetworkEvent.LoggingOut evt) -> {
+        INSTANCE.register(ClientPlayerNetworkEvents.LoggedOut.class, ClientPlayerNetworkEvent.LoggingOut.class, (ClientPlayerNetworkEvents.LoggedOut callback, ClientPlayerNetworkEvent.LoggingOut evt) -> {
             if (evt.getPlayer() == null || evt.getMultiPlayerGameMode() == null) return;
             Objects.requireNonNull(evt.getConnection(), "connection is null");
             callback.onLoggedOut(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
         });
-        INSTANCE.register(ClientPlayerEvents.Copy.class, ClientPlayerNetworkEvent.Clone.class, (ClientPlayerEvents.Copy callback, ClientPlayerNetworkEvent.Clone evt) -> {
+        INSTANCE.register(ClientPlayerCopyCallback.class, ClientPlayerNetworkEvent.Clone.class, (ClientPlayerCopyCallback callback, ClientPlayerNetworkEvent.Clone evt) -> {
             callback.onCopy(evt.getOldPlayer(), evt.getNewPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
         });
         INSTANCE.register(InteractionInputEvents.Attack.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Attack callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
