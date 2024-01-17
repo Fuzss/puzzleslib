@@ -62,7 +62,7 @@ public final class NeoForgeModContainerHelper {
 
     /**
      * Find the {@link ModContainer} for a specific <code>modId</code>.
-     * <p>This bypasses having to rely on {@link ModLoadingContext#get()}.
+     * <p>This bypasses having to rely on {@link net.neoforged.fml.ModLoadingContext#get()}.
      *
      * @param modId id for mod container
      * @return the mod container
@@ -73,7 +73,7 @@ public final class NeoForgeModContainerHelper {
 
     /**
      * Find the {@link ModContainer} for a specific <code>modId</code>.
-     * <p>This bypasses having to rely on {@link ModLoadingContext#get()}.
+     * <p>This bypasses having to rely on {@link net.neoforged.fml.ModLoadingContext#get()}.
      *
      * @param modId id for mod container
      * @return the mod container

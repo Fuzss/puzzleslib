@@ -53,7 +53,7 @@ public interface CapabilityController {
     /**
      * Register capability to {@link LevelChunk} objects.
      *
-     * @param capabilityKey     path for internal name of this capability, will be used for serialization
+     * @param identifier        path for internal identifier, used for serialization
      * @param capabilityType    interface for this capability
      * @param capabilityFactory capability factory called when attaching to an object
      * @param <C>               capability component type

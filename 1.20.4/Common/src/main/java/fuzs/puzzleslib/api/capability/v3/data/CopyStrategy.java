@@ -14,7 +14,6 @@ public enum CopyStrategy {
      * Always copy capability data when copying other entity data, independently of the cause.
      */
     ALWAYS {
-
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
             this.copy(oldCapability, newCapability);
@@ -24,7 +23,6 @@ public enum CopyStrategy {
      * Do not copy entity data, allows for manual handling if desired. Data is still copied for players returning from the End dimension.
      */
     NEVER {
-
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
             if (originalStillAlive) this.copy(oldCapability, newCapability);
@@ -34,7 +32,6 @@ public enum CopyStrategy {
      * Copy entity data when inventory contents of a player are copied, which is the case after dying when the <code>keepInventory</code> game rule is active.
      */
     KEEP_PLAYER_INVENTORY {
-
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
             if (originalStillAlive) {
@@ -50,8 +47,6 @@ public enum CopyStrategy {
     /**
      * Determines whether capability data should be copied.
      *
-     * @param <T1>               source entity type
-     * @param <T2>               target entity type
      * @param oldEntity          source entity
      * @param oldCapability      source capability component
      * @param newEntity          target entity

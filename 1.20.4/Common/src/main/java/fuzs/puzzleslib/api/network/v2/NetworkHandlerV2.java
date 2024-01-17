@@ -28,7 +28,7 @@ public interface NetworkHandlerV2 {
      * Creates a new network handler.
      *
      * @param modId    id for channel name
-     * @param optional are client & servers without this mod or vanilla compatible
+     * @param optional are client &amp; servers without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
     static NetworkHandlerV2 build(String modId, boolean optional) {
@@ -39,7 +39,7 @@ public interface NetworkHandlerV2 {
      * Creates a new network handler.
      *
      * @param channelName the channel name
-     * @param optional    are client & servers without this mod or vanilla compatible
+     * @param optional    are client &amp; servers without this mod or vanilla compatible
      * @return mod specific network handler with configured channel
      */
     static NetworkHandlerV2 build(ResourceLocation channelName, boolean optional) {

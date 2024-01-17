@@ -6,7 +6,6 @@ import fuzs.puzzleslib.api.client.event.v1.entity.player.ComputeFovModifierCallb
 import fuzs.puzzleslib.api.client.event.v1.entity.player.MovementInputUpdateCallback;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -22,8 +21,7 @@ public final class FabricClientPlayerEvents {
      */
     public static final Event<ClientPlayerNetworkEvents.LoggedIn> PLAYER_LOGGED_IN = FabricEventFactory.create(ClientPlayerNetworkEvents.LoggedIn.class);
     /**
-     * Called whenever {@link Minecraft#clearLevel()} is called, which is the case when a player disconnects from a server,
-     * but also occurs before joining a new single player level or server.
+     * Called when a player disconnects from the server, but also occurs before joining a new single player level or server.
      */
     public static final Event<ClientPlayerNetworkEvents.LoggedOut> PLAYER_LOGGED_OUT = FabricEventFactory.create(ClientPlayerNetworkEvents.LoggedOut.class);
     /**

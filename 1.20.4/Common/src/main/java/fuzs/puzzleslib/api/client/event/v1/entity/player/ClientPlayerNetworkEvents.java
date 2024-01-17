@@ -30,7 +30,7 @@ public final class ClientPlayerNetworkEvents {
     public interface LoggedOut {
 
         /**
-         * Called when a player disconnects from the server.
+         * Called when a player disconnects from the server, but also occurs before joining a new single player level or server.
          *
          * @param player              the player logging out
          * @param multiPlayerGameMode the multiplayer game mode controller for the player

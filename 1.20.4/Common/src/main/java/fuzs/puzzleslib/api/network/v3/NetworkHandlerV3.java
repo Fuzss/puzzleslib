@@ -40,7 +40,7 @@ public interface NetworkHandlerV3 {
     /**
      * Creates a new network handler builder.
      *
-     * @param modId id for channel name
+     * @param modId mod id for default channel name
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
@@ -50,8 +50,7 @@ public interface NetworkHandlerV3 {
     /**
      * Creates a new network handler builder.
      *
-     * @param modId   id for channel name
-     * @param context an internal id for this channel in case multiple are registered using the same mod id
+     * @param channelName id for channel name
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(ResourceLocation channelName) {
@@ -312,7 +311,7 @@ public interface NetworkHandlerV3 {
         <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz);
 
         /**
-         * Are clients & servers without this mod or vanilla clients & servers compatible.
+         * Are clients &amp; servers without this mod or vanilla clients &amp; servers compatible.
          *
          * <p>Not supported on Fabric-like environments.
          *

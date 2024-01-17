@@ -10,7 +10,7 @@ import net.neoforged.bus.api.Event;
 import java.util.List;
 
 /**
- * A custom event very similar to Forge's {@link net.minecraftforge.event.LootTableLoadEvent}.
+ * A custom event very similar to Forge's {@link net.neoforged.neoforge.event.LootTableLoadEvent}.
  * <p>Opposed to the Forge event, as this event is fired directly within {@link LootDataManager} it is able to include the relevant instance.
  * <p>The event also makes additions and removals in regard to the current {@link LootTable} more convenient, as Forge has removed the built-in methods in 1.20.
  * <p>And finally this event purposefully fires for all loot tables, even when loaded from a data pack, to allow for their modification.
