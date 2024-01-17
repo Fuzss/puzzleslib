@@ -41,7 +41,7 @@ public abstract class FabricCapabilityKey<T, C extends CapabilityComponent<T>> i
 
     @Override
     public boolean isProvidedBy(@Nullable Object holder) {
-        return holder != null && this.componentKey.isProvidedBy(holder);
+        return holder instanceof ComponentAccess && this.componentKey.isProvidedBy(holder);
     }
 
     @FunctionalInterface

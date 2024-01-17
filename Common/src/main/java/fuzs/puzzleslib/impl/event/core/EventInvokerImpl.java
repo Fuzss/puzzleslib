@@ -21,6 +21,7 @@ public final class EventInvokerImpl {
     private static boolean initialized;
 
     static {
+        // initialize events required during start-up early, all other events are initialized when loading has completed
         CommonFactories.INSTANCE.registerLoadingHandlers();
     }
 

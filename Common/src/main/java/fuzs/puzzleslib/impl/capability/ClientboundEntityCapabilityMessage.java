@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.capability;
 
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.api.network.v3.ClientMessageListener;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
@@ -23,14 +22,8 @@ public record ClientboundEntityCapabilityMessage(ResourceLocation identifier, in
                 Entity entity = level.getEntity(message.entityId);
                 if (entity != null) {
                     CapabilityKey<?, ?> capabilityKey = GlobalCapabilityRegister.retrieve(message.identifier);
-                    if (capabilityKey.isProvidedBy(entity)) {
-                        this.getCapabilityComponent(capabilityKey, entity).read(message.tag);
-                    }
+                    capabilityKey.getIfProvided(entity).ifPresent(capabilityComponent -> capabilityComponent.read(message.tag));
                 }
-            }
-
-            private <T extends Entity> CapabilityComponent<T> getCapabilityComponent(CapabilityKey<?, ?> capabilityKey, Entity entity) {
-                return ((CapabilityKey<T, ?>) capabilityKey).get((T) entity);
             }
         };
     }

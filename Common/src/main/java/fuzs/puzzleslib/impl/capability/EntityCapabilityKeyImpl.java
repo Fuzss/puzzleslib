@@ -12,6 +12,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 
+import java.util.Optional;
+
 public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityComponent<T>> extends EntityCapabilityKey.Mutable<T, C> {
 
     @Override
@@ -21,25 +23,25 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
         } else {
             if (syncStrategy != SyncStrategy.MANUAL) {
                 PlayerEvents.LOGGED_IN.register((ServerPlayer player) -> {
-                    if (this.isProvidedBy(player)) {
-                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(this.get((T) player)));
-                    }
+                    this.getIfProvided(player).ifPresent(capabilityComponent -> {
+                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                    });
                 });
                 PlayerEvents.AFTER_CHANGE_DIMENSION.register((ServerPlayer player, ServerLevel from, ServerLevel to) -> {
-                    if (this.isProvidedBy(player)) {
-                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(this.get((T) player)));
-                    }
+                    this.getIfProvided(player).ifPresent(capabilityComponent -> {
+                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                    });
                 });
                 PlayerEvents.RESPAWN.register((ServerPlayer player, boolean originalStillAlive) -> {
-                    if (this.isProvidedBy(player)) {
-                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(this.get((T) player)));
-                    }
+                    this.getIfProvided(player).ifPresent(capabilityComponent -> {
+                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                    });
                 });
                 if (syncStrategy == SyncStrategy.TRACKING) {
                     PlayerEvents.START_TRACKING.register((Entity trackedEntity, ServerPlayer player) -> {
-                        if (this.isProvidedBy(trackedEntity)) {
-                            PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(this.get((T) trackedEntity)));
-                        }
+                        this.getIfProvided(trackedEntity).ifPresent(capabilityComponent -> {
+                            PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                        });
                     });
                 }
             }
@@ -53,8 +55,10 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
             throw new IllegalStateException("Copy strategy has already been set!");
         } else if (copyStrategy == CopyStrategy.ALWAYS) {
             LivingConversionCallback.EVENT.register((LivingEntity originalEntity, LivingEntity newEntity) -> {
-                if (this.isProvidedBy(originalEntity) && this.isProvidedBy(newEntity)) {
-                    this.getCopyStrategy().copy(originalEntity, this.get((T) originalEntity), newEntity, this.get((T) newEntity), false);
+                Optional<C> originalCapability = this.getIfProvided(originalEntity);
+                Optional<C> newCapability = this.getIfProvided(newEntity);
+                if (originalCapability.isPresent() && newCapability.isPresent()) {
+                    this.getCopyStrategy().copy(originalEntity, originalCapability.get(), newEntity, newCapability.get(), false);
                 }
             });
         }
@@ -63,8 +67,10 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
 
     default void initialize() {
         PlayerEvents.COPY.register((ServerPlayer originalPlayer, ServerPlayer newPlayer, boolean originalStillAlive) -> {
-            if (this.isProvidedBy(originalPlayer) && this.isProvidedBy(newPlayer)) {
-                this.getCopyStrategy().copy(originalPlayer, this.get((T) originalPlayer), newPlayer, this.get((T) newPlayer), originalStillAlive);
+            Optional<C> originalCapability = this.getIfProvided(originalPlayer);
+            Optional<C> newCapability = this.getIfProvided(newPlayer);
+            if (originalCapability.isPresent() && newCapability.isPresent()) {
+                this.getCopyStrategy().copy(originalPlayer, originalCapability.get(), newPlayer, newCapability.get(), originalStillAlive);
             }
         });
     }
