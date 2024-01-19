@@ -1,7 +1,7 @@
 name: Leave A Suggestion
 description: >-
-  Use this template when you want to leave a suggestion. Please do not ask for mod updates or ports, they will come when they are ready.
-title: '[Suggestion]: '
+  Please do not ask for mod updates or ports, they will come when they are ready.
+title: "[Suggestion]: "
 labels: ["enhancement"]
 assignees:
   - Fuzss
@@ -9,7 +9,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this template!
+        Thanks for taking the time to fill out this issue report!
   - type: dropdown
     id: loader
     attributes:
@@ -17,10 +17,13 @@ body:
       description: What mod loader are you using to play the mod?
       multiple: false
       options:
-        - Fabric
-        - NeoForge
-        - Forge
-        - Quilt
+        - "⸺"
+        - "Fabric"
+        - "NeoForge"
+        - "Forge"
+        - "Quilt"
+    validations:
+      required: true
   - type: input
     id: minecraft
     attributes:
