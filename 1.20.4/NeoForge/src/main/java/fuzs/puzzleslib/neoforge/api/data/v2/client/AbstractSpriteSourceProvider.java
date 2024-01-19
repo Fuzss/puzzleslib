@@ -20,10 +20,10 @@ public abstract class AbstractSpriteSourceProvider extends SpriteSourceProvider 
 
     @Override
     protected final void gather() {
-        this.addSources();
+        this.addSpriteSources();
     }
 
-    protected abstract void addSources();
+    public abstract void addSpriteSources();
 
     @Override
     public String getName() {

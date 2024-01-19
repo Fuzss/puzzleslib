@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.init.v2.builder.ExtendedMenuSupplier;
+import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
+import fuzs.puzzleslib.impl.init.LazyHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.Holder;
@@ -38,39 +39,39 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T> Holder<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        return DeferredHolder.create(this.makeResourceKey(registryKey, path));
+    public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
+        return new LazyHolder<>(registryKey, DeferredHolder.create(this.makeResourceKey(registryKey, path)));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T> Holder<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+    protected <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.modId);
             Objects.requireNonNull(this.eventBus, "mod event bus for %s is null".formatted(this.modId));
             deferredRegister.register(this.eventBus);
             return deferredRegister;
         });
-        return registrar.register(path, () -> {
+        return new LazyHolder<>(registryKey, registrar.register(path, () -> {
             T value = supplier.get();
             Objects.requireNonNull(value, "value is null");
             return value;
-        });
+        }));
     }
 
     @Override
-    public Holder<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
+    public Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
         return this.registerItem(entityTypeReference.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg", () -> new DeferredSpawnEggItem(entityTypeReference::value, backgroundColor, highlightColor, itemProperties));
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends AbstractContainerMenu> Holder<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
+    public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> IMenuTypeExtension.create(entry.get()::create));
     }
 
     @Override
-    public Holder<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange) {
+    public Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange) {
         return this.register(Registries.POINT_OF_INTEREST_TYPE, path, () -> new PoiType(matchingStates.get(), maxTickets, validRange));
     }
 }

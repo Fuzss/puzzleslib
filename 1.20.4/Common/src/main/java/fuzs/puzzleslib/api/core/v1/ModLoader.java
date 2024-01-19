@@ -1,25 +1,41 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import java.util.stream.Stream;
+
 /**
- * types of mod loaders mods are built for
+ * Types of supported mod loaders.
  */
 public enum ModLoader {
     /**
-     * the Fabric loader
+     * The Fabric loader.
      */
     FABRIC,
     /**
-     * the NeoForge loader
+     * The NeoForge loader.
      */
     NEOFORGE,
     /**
-     * the Forge loader
+     * The Forge loader.
      */
     FORGE,
     /**
-     * the Quilt loader
+     * The Quilt loader.
      */
     QUILT;
+
+    /**
+     * @return array containing Fabric and Quilt
+     */
+    public static ModLoader[] getFabricLike() {
+        return Stream.of(ModLoader.values()).filter(ModLoader::isFabricLike).toArray(ModLoader[]::new);
+    }
+
+    /**
+     * @return array containing NeoForge and Forge
+     */
+    public static ModLoader[] getForgeLike() {
+        return Stream.of(ModLoader.values()).filter(ModLoader::isForgeLike).toArray(ModLoader[]::new);
+    }
 
     /**
      * @return is this Fabric

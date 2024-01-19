@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -49,13 +48,4 @@ public interface Proxy {
      * @return is the alt key pressed
      */
     boolean hasAltDown();
-
-    /**
-     * Retrieves the name of the currently set key for a <code>net.minecraft.client.KeyMapping</code>.
-     * <p>Returns an empty component on the server-side.
-     *
-     * @param identifier the key identifier from <code>net.minecraft.client.KeyMapping#getName</code>
-     * @return the component or an empty component
-     */
-    Component getKeyMappingComponent(String identifier);
 }

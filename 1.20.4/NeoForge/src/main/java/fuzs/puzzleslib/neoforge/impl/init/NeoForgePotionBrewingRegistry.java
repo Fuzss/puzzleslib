@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
-import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
+import fuzs.puzzleslib.api.init.v3.PotionBrewingRegistry;
 import fuzs.puzzleslib.neoforge.mixin.accessor.PotionBrewingNeoForgeAccessor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PotionItem;

@@ -1,10 +1,8 @@
 package fuzs.puzzleslib.impl.core;
 
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -42,10 +40,5 @@ public interface ClientProxyImpl extends ProxyImpl {
     @Override
     default boolean hasAltDown() {
         return Screen.hasAltDown();
-    }
-
-    @Override
-    default Component getKeyMappingComponent(String identifier) {
-        return KeyMapping.createNameSupplier(identifier).get();
     }
 }

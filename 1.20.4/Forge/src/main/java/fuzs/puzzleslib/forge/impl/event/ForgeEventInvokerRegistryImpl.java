@@ -18,7 +18,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
-import fuzs.puzzleslib.api.init.v3.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.api.event.v1.core.ForgeEventInvokerRegistry;
 import fuzs.puzzleslib.forge.impl.client.event.ForgeClientEventInvokers;

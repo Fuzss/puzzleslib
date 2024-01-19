@@ -2,7 +2,8 @@ package fuzs.puzzleslib.impl.init;
 
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.init.v3.RegistryManager;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -37,18 +38,33 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     }
 
     @Override
-    public final <T> Holder<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+    public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
+        ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
+        return new LazyHolder<>(registryKey, resourceKey, () -> {
+            Holder.Reference<T> holder = registry.getHolderOrThrow(resourceKey);
+            if (!holder.isBound()) {
+                T value = registry.get(resourceKey);
+                Objects.requireNonNull(value, "value is null");
+                holder.bindValue(value);
+            }
+            return holder;
+        });
+    }
+
+    @Override
+    public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(supplier, "supplier is null");
-        Holder<T> holder;
+        Holder.Reference<T> holder;
         if (!this.allowedModLoaders.contains(ModLoaderEnvironment.INSTANCE.getModLoader())) {
-            holder = this.getHolderReference(registryKey, path);
+            holder = this.registerLazily(registryKey, path);
         } else {
-            holder = this.register$Internal(registryKey, path, supplier);
+            holder = this.getHolderReference(registryKey, path, supplier);
         }
         this.allowedModLoaders = EnumSet.allOf(ModLoader.class);
         return holder;
     }
 
-    protected abstract <T> Holder<T> register$Internal(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
+    protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 }

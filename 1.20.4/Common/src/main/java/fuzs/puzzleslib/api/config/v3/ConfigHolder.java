@@ -1,8 +1,7 @@
 package fuzs.puzzleslib.api.config.v3;
 
-import fuzs.puzzleslib.api.core.v1.Buildable;
+import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.impl.config.ConfigHolderRegistry;
-import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 
 import java.nio.file.Paths;
@@ -23,7 +22,7 @@ public interface ConfigHolder {
      * @return new builder instance
      */
     static Builder builder(String modId) {
-        return ModContext.get(modId).getConfigHolder$Builder();
+        return ModContext.get(modId).getConfigHolder();
     }
 
     /**

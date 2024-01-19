@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.core.v1;
+package fuzs.puzzleslib.api.core.v1.utility;
 
 import com.google.common.base.Defaults;
 import com.google.common.collect.Maps;

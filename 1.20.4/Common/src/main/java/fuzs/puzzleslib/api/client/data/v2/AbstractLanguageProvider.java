@@ -54,7 +54,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         this.pathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang");
     }
 
-    protected abstract void addTranslations(TranslationBuilder builder);
+    public abstract void addTranslations(TranslationBuilder builder);
 
     @Override
     public CompletableFuture<?> run(CachedOutput writer) {

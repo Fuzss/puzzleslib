@@ -3,8 +3,8 @@ package fuzs.puzzleslib.impl.core;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
-import fuzs.puzzleslib.api.init.v2.GameRulesFactory;
-import fuzs.puzzleslib.api.init.v2.PotionBrewingRegistry;
+import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v3.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 

@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.init.v2;
+package fuzs.puzzleslib.api.init.v3;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.world.item.Item;
@@ -8,8 +8,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 
 /**
  * A registry for adding new recipes valid for the brewing stand.
- * Vanilla methods are exposed on Fabric, require {@link Item} instead of {@link Ingredient} though, while the implementation supports {@link Ingredient}.
- * Forge uses a whole different system based on {@link Ingredient}, which does not allow specifying {@link Potion}s as vanilla does.
+ * <p>Vanilla methods are exposed on Fabric, require {@link Item} instead of {@link Ingredient} though, while the implementation supports {@link Ingredient}.
  */
 public interface PotionBrewingRegistry {
     PotionBrewingRegistry INSTANCE = CommonFactories.INSTANCE.getPotionBrewingRegistry();
@@ -26,7 +25,7 @@ public interface PotionBrewingRegistry {
      * Register a brewing stand recipe that converts a potion item container to another form, the potion inside will stay the same.
      * E.g. in vanilla convert a normal potion to a splash potion by adding gunpowder.
      *
-     * @param from the base potion container item
+     * @param from       the base potion container item
      * @param ingredient ingredient used for the conversion
      * @param to         the output potion container item
      */
@@ -38,7 +37,7 @@ public interface PotionBrewingRegistry {
      * Register a brewing stand recipe that converts a potion item container to another form, the potion inside will stay the same.
      * E.g. in vanilla convert a normal potion to a splash potion by adding gunpowder.
      *
-     * @param from the base potion container item
+     * @param from       the base potion container item
      * @param ingredient ingredient used for the conversion
      * @param to         the output potion container item
      */
@@ -48,7 +47,7 @@ public interface PotionBrewingRegistry {
      * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay the same.
      * E.g. in vanilla convert a night vision potion to an invisibility potion by adding fermented spider eye.
      *
-     * @param from the base potion container item
+     * @param from       the base potion container item
      * @param ingredient ingredient used for the conversion
      * @param to         the output potion container item
      */
@@ -60,7 +59,7 @@ public interface PotionBrewingRegistry {
      * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay the same.
      * E.g. in vanilla convert a night vision potion to an invisibility potion by adding fermented spider eye.
      *
-     * @param from the base potion container item
+     * @param from       the base potion container item
      * @param ingredient ingredient used for the conversion
      * @param to         the output potion container item
      */
