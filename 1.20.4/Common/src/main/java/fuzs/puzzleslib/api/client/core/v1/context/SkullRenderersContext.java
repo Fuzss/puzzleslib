@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.client.init.v1.SkullRenderersFactory;
 /**
  * register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations
  */
+@FunctionalInterface
 public interface SkullRenderersContext {
 
     /**

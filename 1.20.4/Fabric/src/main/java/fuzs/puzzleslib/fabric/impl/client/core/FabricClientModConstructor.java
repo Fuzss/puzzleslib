@@ -40,6 +40,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextFabricImpl());
         constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());
         registerClientParticleTypesManager(modId, constructor::onRegisterParticleProviders, flagsToHandle);
+        constructor.onRegisterMenuScreens(new MenuScreensContextFabricImpl());
         constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         constructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());

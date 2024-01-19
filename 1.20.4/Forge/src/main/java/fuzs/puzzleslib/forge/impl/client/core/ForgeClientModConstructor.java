@@ -43,6 +43,7 @@ public final class ForgeClientModConstructor {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
                 constructor.onClientSetup();
+                constructor.onRegisterMenuScreens(new MenuScreensContextForgeImpl());
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextForgeImpl());
                 constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
