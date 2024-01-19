@@ -16,10 +16,10 @@ public final class EnumProvider<T extends Enum<T>> implements KeyedValueProvider
     private final Class<T> clazz;
     private final BiMap<ResourceLocation, T> values;
 
-    public EnumProvider(Class<T> enumClazz) {
+    public EnumProvider(Class<T> enumClazz, String modId) {
         this.clazz = enumClazz;
         this.values = Stream.of(enumClazz.getEnumConstants()).collect(ImmutableBiMap.toImmutableBiMap((T t) -> {
-            return new ResourceLocation(Util.sanitizeName(t.name(), ResourceLocation::validPathChar));
+            return new ResourceLocation(modId, Util.sanitizeName(t.name(), ResourceLocation::validPathChar));
         }, Function.identity()));
     }
 

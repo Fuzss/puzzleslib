@@ -39,7 +39,19 @@ public interface KeyedValueProvider<T> {
      * @return the provider
      */
     static <T extends Enum<T>> KeyedValueProvider<T> enumConstants(Class<T> enumClazz) {
-        return new EnumProvider<>(enumClazz);
+        return enumConstants(enumClazz, "minecraft");
+    }
+
+    /**
+     * Create a new provider backed by a registry.
+     *
+     * @param enumClazz class for retrieving enum constants
+     * @param modId     namespace for resource locations
+     * @param <T>       the type of value
+     * @return the provider
+     */
+    static <T extends Enum<T>> KeyedValueProvider<T> enumConstants(Class<T> enumClazz, String modId) {
+        return new EnumProvider<>(enumClazz, modId);
     }
 
     /**
@@ -65,7 +77,21 @@ public interface KeyedValueProvider<T> {
      */
     @SafeVarargs
     static <T extends Enum<T>> List<String> toString(Class<T> enumClazz, T... entries) {
-        return toString(KeyedValueProvider.enumConstants(enumClazz), entries);
+        return toString(enumClazz, "minecraft", entries);
+    }
+
+    /**
+     * Converts a bunch of enum constants to their respective key as string.
+     *
+     * @param enumClazz class for retrieving enum constants
+     * @param modId     namespace for resource locations
+     * @param entries   entries to convert to string
+     * @param <T>       type of value
+     * @return entries as string list
+     */
+    @SafeVarargs
+    static <T extends Enum<T>> List<String> toString(Class<T> enumClazz, String modId, T... entries) {
+        return toString(KeyedValueProvider.enumConstants(enumClazz, modId), entries);
     }
 
     /**
