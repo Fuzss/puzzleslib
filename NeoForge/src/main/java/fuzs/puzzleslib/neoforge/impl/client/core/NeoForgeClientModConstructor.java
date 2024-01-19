@@ -43,6 +43,7 @@ public final class NeoForgeClientModConstructor {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
                 constructor.onClientSetup();
+                constructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl());
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextNeoForgeImpl());
                 constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextNeoForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
