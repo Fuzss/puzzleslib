@@ -18,7 +18,6 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -118,9 +117,9 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     }
 
     @Override
-    public final void buildRecipes(RecipeOutput exporter) {
-        this.addRecipes(exporter);
+    public final void buildRecipes(RecipeOutput recipeOutput) {
+        this.addRecipes(recipeOutput);
     }
 
-    public abstract void addRecipes(RecipeOutput exporter);
+    public abstract void addRecipes(RecipeOutput recipeOutput);
 }

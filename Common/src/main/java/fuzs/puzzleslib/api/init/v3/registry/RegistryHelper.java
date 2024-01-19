@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.init.v3;
+package fuzs.puzzleslib.api.init.v3.registry;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Holder;

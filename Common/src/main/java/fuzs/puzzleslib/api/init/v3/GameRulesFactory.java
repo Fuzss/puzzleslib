@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.init.v2;
+package fuzs.puzzleslib.api.init.v3;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.server.MinecraftServer;
@@ -56,7 +56,8 @@ public interface GameRulesFactory {
      * @return the game rule
      */
     default GameRules.Type<GameRules.BooleanValue> createBooleanRule(boolean defaultValue) {
-        return this.createBooleanRule(defaultValue, (server, booleanValue) -> {
+        return this.createBooleanRule(defaultValue, (MinecraftServer server, GameRules.BooleanValue booleanValue) -> {
+            // NO-OP
         });
     }
 
@@ -101,7 +102,8 @@ public interface GameRulesFactory {
      * @return the game rule
      */
     default GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, int minimumValue, int maximumValue) {
-        return this.createIntRule(defaultValue, minimumValue, maximumValue, (server, integerValue) -> {
+        return this.createIntRule(defaultValue, minimumValue, maximumValue, (MinecraftServer server, GameRules.IntegerValue integerValue) -> {
+            // NO-OP
         });
     }
 

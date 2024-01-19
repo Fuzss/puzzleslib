@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.data.v2;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import fuzs.puzzleslib.api.init.v3.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
@@ -30,7 +30,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Override
         public ResourceKey<? extends Registry<Block>> registryKey() {
@@ -54,7 +54,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Override
         public ResourceKey<? extends Registry<Fluid>> registryKey() {
@@ -86,7 +86,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Deprecated
         @Override
@@ -116,7 +116,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Override
         public ResourceKey<? extends Registry<EntityType<?>>> registryKey() {
@@ -140,7 +140,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Override
         public ResourceKey<? extends Registry<GameEvent>> registryKey() {
@@ -164,7 +164,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Override
         public ResourceKey<? extends Registry<T>> registryKey() {
@@ -190,7 +190,7 @@ public final class AbstractTagProvider {
         }
 
         @Override
-        protected abstract void addTags(HolderLookup.Provider provider);
+        public abstract void addTags(HolderLookup.Provider provider);
 
         @Override
         public ResourceKey<? extends Registry<T>> registryKey() {

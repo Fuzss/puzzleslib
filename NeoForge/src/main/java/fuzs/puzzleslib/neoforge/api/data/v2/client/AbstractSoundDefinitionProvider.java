@@ -25,7 +25,11 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
     }
 
     @Override
-    public abstract void registerSounds();
+    public final void registerSounds() {
+        this.addSoundDefinitions();
+    }
+
+    public abstract void addSoundDefinitions();
 
     protected void add(final SoundEvent soundEvent, final SoundDefinition.Sound... sounds) {
         this.add(soundEvent.getLocation(), definition().with(sounds));

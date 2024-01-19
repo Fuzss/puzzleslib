@@ -8,12 +8,12 @@ import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
-import fuzs.puzzleslib.api.core.v1.Buildable;
+import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
-import fuzs.puzzleslib.api.init.v3.RegistryManager;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
@@ -91,9 +91,9 @@ public abstract class ModContext {
 
     public abstract NetworkHandlerV2 getNetworkHandlerV2(ResourceLocation channelName, boolean optional);
 
-    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(ResourceLocation channelName);
+    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName);
 
-    public abstract ConfigHolder.Builder getConfigHolder$Builder();
+    public abstract ConfigHolder.Builder getConfigHolder();
 
     public abstract RegistryManager getRegistryManager();
 

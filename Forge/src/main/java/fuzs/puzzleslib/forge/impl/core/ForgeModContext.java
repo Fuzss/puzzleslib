@@ -2,7 +2,7 @@ package fuzs.puzzleslib.forge.impl.core;
 
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.init.v3.RegistryManager;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.forge.impl.capability.ForgeCapabilityController;
@@ -25,12 +25,12 @@ public final class ForgeModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandlerV3.Builder getNetworkHandlerV3$Builder(ResourceLocation channelName) {
+    public NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName) {
         return this.addBuildable(new NetworkHandlerForgeV3(channelName));
     }
 
     @Override
-    public ConfigHolder.Builder getConfigHolder$Builder() {
+    public ConfigHolder.Builder getConfigHolder() {
         return this.addBuildable(new ForgeConfigHolderImpl(this.modId));
     }
 

@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.core.v1;
+package fuzs.puzzleslib.api.core.v1.utility;
 
 /**
  * A utility interface for completing builders that might have been created before they can be safely applied.

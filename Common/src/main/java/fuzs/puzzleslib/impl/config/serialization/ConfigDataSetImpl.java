@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
+import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
 import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
@@ -36,7 +37,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     /**
      * registry to work with
      */
-    private final Registry<T> activeRegistry;
+    private final KeyedValueProvider<T> valueProvider;
     /**
      * internal entry holder storage, will be dissolved when {@link #toMap()} is called for the first time
      */
@@ -52,13 +53,13 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     private Map<T, Object[]> dissolved;
 
     /**
-     * @param registry registry entries the to be created collections contain
-     * @param values   string values to build this set from
-     * @param filter   filter for verifying <code>values</code>
-     * @param types    additional data types, comma-separated as part of <code>values</code>
+     * @param valueProvider registry entries the to be created collections contain
+     * @param values        string values to build this set from
+     * @param filter        filter for verifying <code>values</code>
+     * @param types         additional data types, comma-separated as part of <code>values</code>
      */
-    public ConfigDataSetImpl(Registry<T> registry, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
-        this.activeRegistry = registry;
+    public ConfigDataSetImpl(KeyedValueProvider<T> valueProvider, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
+        this.valueProvider = valueProvider;
         this.filter = filter;
         for (Class<?> clazz : types) {
             if (!SUPPORTED_DATA_TYPES.contains(clazz)) {
@@ -222,7 +223,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 }
             }
             if (entries.isEmpty() && !toRemove.isEmpty()) {
-                entries = this.activeRegistry.stream().collect(Collectors.toMap(Function.identity(), t -> EntryHolder.EMPTY_DATA, (o1, o2) -> o1, Maps::newIdentityHashMap));
+                entries = this.valueProvider.streamValues().collect(Collectors.toMap(Function.identity(), t -> EntryHolder.EMPTY_DATA, (o1, o2) -> o1, Maps::newIdentityHashMap));
             }
             entries.keySet().removeIf(t -> !this.filter.test(0, t) || toRemove.contains(t));
             this.dissolved = dissolved = Collections.unmodifiableMap(entries);
@@ -274,9 +275,13 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         // this is necessary when applying regex matching later on, since existing resource locations are converted to string, and they will contain "minecraft"
         if (!source.contains(":")) source = "minecraft:" + source;
         if (tagHolder) {
-            return new TagEntryHolder<>(this.activeRegistry, source, inverted);
+            if (this.valueProvider instanceof RegistryProvider<T> registryProvider) {
+                return new TagEntryHolder<>(registryProvider, source, inverted);
+            } else {
+                throw new IllegalArgumentException("Value provider %s does not support tags!".formatted(this.valueProvider.name()));
+            }
         } else {
-            return new RegistryEntryHolder<>(this.activeRegistry, source, inverted);
+            return new RegistryEntryHolder<>(this.valueProvider, source, inverted);
         }
     }
 
@@ -289,18 +294,16 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      */
     private static abstract class EntryHolder<D, E> {
         public static final Object[] EMPTY_DATA = new Object[0];
-        /**
-         * the registry to compile values from
-         */
-        protected final Registry<E> activeRegistry;
-        /**
-         * the raw {@link ResourceLocation} to parse
-         */
-        private final String input;
+
+        private final String providerName;
         /**
          * Is this holder meant to exclude entries from being added to the set.
          */
         public final boolean inverted;
+        /**
+         * the raw {@link ResourceLocation} to parse
+         */
+        private final String input;
         /**
          * data to add to every single value constructed from this entry when dissolving in {@link #dissolve()}
          * <p>set a new value via {@link #withData}
@@ -308,12 +311,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private Object[] data = EMPTY_DATA;
 
         /**
-         * @param registry the registry to compile values from
          * @param input    input part of {@link ResourceLocation}
          * @param inverted is this holder meant to exclude entries from being added to the set
          */
-        protected EntryHolder(Registry<E> registry, String input, boolean inverted) {
-            this.activeRegistry = registry;
+        protected EntryHolder(String providerName, String input, boolean inverted) {
+            this.providerName = providerName;
             this.input = input;
             this.inverted = inverted;
         }
@@ -347,8 +349,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(Map.Entry::getValue).forEach(matches::add);
             }
             // test if this is a valid entry first
-            if (this.activeRegistry != null && matches.isEmpty()) {
-                PuzzlesLib.LOGGER.warn("Unable to parse entry {}: No matches found in registry {}", source, this.activeRegistry.key().location());
+            if (matches.isEmpty()) {
+                PuzzlesLib.LOGGER.warn("Unable to parse entry {}: No matches found in {}", source, this.providerName);
             }
             return matches;
         }
@@ -376,66 +378,74 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      *
      * @param <E> registry type
      */
-    private static class RegistryEntryHolder<E> extends EntryHolder<E, E> {
+    private static class RegistryEntryHolder<T> extends EntryHolder<T, T> {
+        /**
+         * the registry to compile values from
+         */
+        private final KeyedValueProvider<T> valueProvider;
 
         /**
          * @param registry the registry to compile values from
          * @param source   the raw {@link ResourceLocation} to parse
          * @param inverted is this holder meant to exclude entries from being added to the set
          */
-        RegistryEntryHolder(Registry<E> registry, String source, boolean inverted) {
-            super(registry, source, inverted);
+        RegistryEntryHolder(KeyedValueProvider<T> valueProvider, String source, boolean inverted) {
+            super(valueProvider.name(), source, inverted);
+            this.valueProvider = valueProvider;
         }
 
         @Override
-        protected Stream<E> dissolveValue(E entry) {
+        protected Stream<T> dissolveValue(T entry) {
             return Stream.of(entry);
         }
 
-        @SuppressWarnings("DataFlowIssue")
         @Override
-        protected Optional<E> toValue(ResourceLocation identifier) {
-            if (!this.activeRegistry.containsKey(identifier)) return Optional.empty();
-            return Optional.of(this.activeRegistry.get(identifier));
+        protected Optional<T> toValue(ResourceLocation identifier) {
+            return this.valueProvider.getValue(identifier);
         }
 
         @Override
-        protected Stream<Map.Entry<ResourceLocation, E>> allValues() {
-            return this.activeRegistry.entrySet().stream().map(entry -> Map.entry(entry.getKey().location(), entry.getValue()));
+        protected Stream<Map.Entry<ResourceLocation, T>> allValues() {
+            return this.valueProvider.stream();
         }
     }
 
     /**
      * implementation for a registry tag value
      *
-     * @param <E> registry type
+     * @param <T> registry type
      */
-    private static class TagEntryHolder<E> extends EntryHolder<TagKey<E>, E> {
+    private static class TagEntryHolder<T> extends EntryHolder<TagKey<T>, T> {
+        /**
+         * the registry to compile values from
+         */
+        private final Registry<T> registry;
 
         /**
          * @param registry the registry to compile values from
          * @param source   the raw {@link ResourceLocation} to parse
          * @param inverted is this holder meant to exclude entries from being added to the set
          */
-        TagEntryHolder(Registry<E> registry, String source, boolean inverted) {
-            super(registry, source, inverted);
+        TagEntryHolder(RegistryProvider<T> registryProvider, String source, boolean inverted) {
+            super(registryProvider.name(), source, inverted);
+            this.registry = registryProvider.registry();
         }
 
         @Override
-        public Stream<E> dissolveValue(TagKey<E> entry) {
-            return StreamSupport.stream(this.activeRegistry.getTagOrEmpty(entry).spliterator(), false).map(Holder::value);
+        public Stream<T> dissolveValue(TagKey<T> entry) {
+            return StreamSupport.stream(this.registry.getTagOrEmpty(entry).spliterator(), false).map(Holder::value);
         }
 
         @Override
-        protected Optional<TagKey<E>> toValue(ResourceLocation identifier) {
-            TagKey<E> tag = TagKey.create(this.activeRegistry.key(), identifier);
-            if (this.activeRegistry.getTag(tag).isEmpty()) return Optional.empty();
+        protected Optional<TagKey<T>> toValue(ResourceLocation identifier) {
+            TagKey<T> tag = TagKey.create(this.registry.key(), identifier);
+            if (this.registry.getTag(tag).isEmpty()) return Optional.empty();
             return Optional.of(tag);
         }
 
         @Override
-        protected Stream<Map.Entry<ResourceLocation, TagKey<E>>> allValues() {
-            return this.activeRegistry.getTagNames().map(tagKey -> Map.entry(tagKey.location(), tagKey));
+        protected Stream<Map.Entry<ResourceLocation, TagKey<T>>> allValues() {
+            return this.registry.getTagNames().map(tagKey -> Map.entry(tagKey.location(), tagKey));
         }
     }
 }
