@@ -1,7 +1,7 @@
 name: Report A Bug
 description: >-
-  Use this template for reporting a bug. Please note that only Minecraft versions listed on the 'main' branch are supported. Support may additionally vary based on the severity of an issue.
-title: '[Bug]: '
+  Only Minecraft versions listed on the main branch are supported. Support may additionally vary based on the severity of an issue.
+title: "[Bug]: "
 labels: ["bug"]
 assignees:
   - Fuzss
@@ -9,7 +9,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this template!
+        Thanks for taking the time to fill out this issue report!
   - type: dropdown
     id: loader
     attributes:
@@ -17,10 +17,11 @@ body:
       description: What mod loader are you using to play the mod?
       multiple: false
       options:
-        - Fabric
-        - NeoForge
-        - Forge
-        - Quilt
+        - "⸺"
+        - "Fabric"
+        - "NeoForge"
+        - "Forge"
+        - "Quilt"
     validations:
       required: true
   - type: input
@@ -39,11 +40,23 @@ body:
       placeholder: ex. v8.0.0
     validations:
       required: true
+  - type: dropdown
+    id: mods
+    attributes:
+      label: Other Mods Involved (Required)
+      description: Can your issue be reproduced with a minimal set of mods (only this mod + dependencies)?
+      multiple: false
+      options:
+        - "⸺"
+        - "Yes"
+        - "No"
+    validations:
+      required: true
   - type: textarea
     id: notes
     attributes:
       label: Notes (Required)
-      description: Please explain what happens because of the bug (including all the steps required to cause the bug), and what behavior you would expect if the bug were fixed.
+      description: Please explain what happens because of the issue (including all the steps required to cause it), and what behavior you would expect if the issue were fixed.
       placeholder: >-
         ex.  
         
