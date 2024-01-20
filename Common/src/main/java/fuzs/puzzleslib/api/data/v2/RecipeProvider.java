@@ -32,7 +32,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 /**
- * Copied from vanilla as NeoForge patches in an additional constructor argument making it impossible to invoke this class from the Common subproject.
+ * Copied from vanilla as NeoForge patches in an additional constructor argument making it impossible to invoke the vanilla class from the Common subproject.
  */
 @Deprecated
 public abstract class RecipeProvider implements DataProvider {
