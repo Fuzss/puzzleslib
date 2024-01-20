@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.fabric.impl.client.screen;
+package fuzs.puzzleslib.fabric.impl.client.key;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -6,8 +6,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
-import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
-import fuzs.puzzleslib.api.client.screen.v2.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;

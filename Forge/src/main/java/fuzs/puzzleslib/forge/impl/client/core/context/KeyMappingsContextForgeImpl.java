@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.forge.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
-import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
-import fuzs.puzzleslib.forge.impl.client.screen.ForgeKeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.forge.impl.client.key.ForgeKeyMappingActivationHelper;
 import net.minecraft.client.KeyMapping;
 
 import java.util.Objects;

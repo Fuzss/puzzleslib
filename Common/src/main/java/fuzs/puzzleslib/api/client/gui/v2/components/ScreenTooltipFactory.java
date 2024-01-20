@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.screen.v2;
+package fuzs.puzzleslib.api.client.gui.v2.components;
 
 import fuzs.puzzleslib.mixin.client.accessor.TooltipAccessor;
 import net.minecraft.client.Minecraft;

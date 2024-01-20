@@ -1,6 +1,6 @@
-package fuzs.puzzleslib.forge.impl.client.screen;
+package fuzs.puzzleslib.neoforge.impl.client.gui;
 
-import fuzs.puzzleslib.api.client.screen.v2.ScreenHelper;
+import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -18,7 +18,7 @@ import java.util.Objects;
  * on Forge add buttons during init event with appropriate helper methods
  * on Fabric adding is done via custom ButtonList
  */
-public final class ForgeScreenHelper implements ScreenHelper {
+public final class NeoForgeScreenHelper implements ScreenHelper {
 
     @Override
     public Minecraft getMinecraft(Screen screen) {

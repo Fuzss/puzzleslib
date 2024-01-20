@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -11,7 +12,7 @@ import java.util.Objects;
  *
  * @param <T> capability provider type
  */
-public abstract class CapabilityComponent<T> {
+public abstract class CapabilityComponent<T> implements NbtSerializable {
     private boolean initialized;
     private CapabilityKey<T, CapabilityComponent<T>> capabilityKey;
     private T holder;
@@ -40,38 +41,6 @@ public abstract class CapabilityComponent<T> {
     }
 
     /**
-     * Serialize the component to a {@link CompoundTag}.
-     *
-     * @param tag tag to write to
-     */
-    @ApiStatus.OverrideOnly
-    public void write(CompoundTag tag) {
-
-    }
-
-    /**
-     * Deserialize the component from a {@link CompoundTag}.
-     *
-     * @param tag tag to read from
-     */
-    @ApiStatus.OverrideOnly
-    public void read(CompoundTag tag) {
-        
-    }
-
-    /**
-     * Serialize the component to a {@link CompoundTag}.
-     *
-     * @return the capability serialized to {@link CompoundTag}
-     */
-    @ApiStatus.NonExtendable
-    public CompoundTag toCompoundTag() {
-        CompoundTag tag = new CompoundTag();
-        this.write(tag);
-        return tag;
-    }
-
-    /**
      * To be called when capability data changed and requires serializing and / or syncing.
      *
      * <p>Should basically be called in all setters after the new value has been set.
@@ -79,5 +48,15 @@ public abstract class CapabilityComponent<T> {
     @MustBeInvokedByOverriders
     public void setChanged() {
         this.capabilityKey.setChanged(this);
+    }
+
+    @Override
+    public void write(CompoundTag tag) {
+
+    }
+
+    @Override
+    public void read(CompoundTag tag) {
+
     }
 }

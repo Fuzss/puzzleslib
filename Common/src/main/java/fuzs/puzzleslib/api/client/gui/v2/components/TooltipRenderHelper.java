@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.screen.v2;
+package fuzs.puzzleslib.api.client.gui.v2.components;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.systems.RenderSystem;

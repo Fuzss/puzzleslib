@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.screen.v2;
+package fuzs.puzzleslib.api.client.gui.v2.screen;
 
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.Minecraft;
@@ -12,7 +12,6 @@ import java.util.Objects;
 
 /**
  * A helper class for accessing encapsulated fields on a screen.
- * On Forge those are all exposed via added getter methods, but Fabric requires mixin accessors.
  */
 public interface ScreenHelper {
     ScreenHelper INSTANCE = ClientFactories.INSTANCE.getScreenHelper();

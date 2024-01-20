@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.screen.v2;
+package fuzs.puzzleslib.api.client.gui.v2.components;
 
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.events.GuiEventListener;

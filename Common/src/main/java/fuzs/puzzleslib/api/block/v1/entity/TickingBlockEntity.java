@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.block.v1;
+package fuzs.puzzleslib.api.block.v1.entity;
 
 import net.minecraft.world.level.Level;
 

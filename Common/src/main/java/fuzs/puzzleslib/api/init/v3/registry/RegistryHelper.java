@@ -7,11 +7,16 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -84,7 +89,7 @@ public final class RegistryHelper {
      * @return the resource key for this game object
      */
     public static <T> Optional<ResourceKey<T>> getResourceKey(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
-        return findRegistry(registryKey).getResourceKey(object);
+        return getHolder(registryKey, object).map(Holder.Reference::key);
     }
 
     /**
@@ -110,8 +115,10 @@ public final class RegistryHelper {
      * @return the holder reference for this game object
      */
     public static <T> Optional<Holder.Reference<T>> getHolder(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
-        Registry<T> registry = findRegistry(registryKey);
-        return registry.getResourceKey(object).flatMap(registry::getHolder);
+        return Optional.ofNullable(getBuiltInRegistryHolder(object)).or(() -> {
+            Registry<T> registry = findRegistry(registryKey);
+            return registry.getResourceKey(object).flatMap(registry::getHolder);
+        });
     }
 
     /**
@@ -142,27 +149,52 @@ public final class RegistryHelper {
 
     /**
      * Checks if a certain tag contains a given value.
-     * <p>Some game objects such as blocks, items and entity types do not require this approach as they hold a reference to their registry holder.
      *
      * @param tagKey the tag key
      * @param object the game object to check the tag key for
      * @param <T>    tag and game object type
      * @return is the game object contained in the tag
      */
-    @SuppressWarnings({"unchecked", "deprecation"})
     public static <T> boolean is(TagKey<T> tagKey, T object) {
-        if (object instanceof Block block) {
-            return block.builtInRegistryHolder().is((TagKey<Block>) tagKey);
-        } else if (object instanceof Item item) {
-            return item.builtInRegistryHolder().is((TagKey<Item>) tagKey);
-        } else if (object instanceof EntityType<?> entityType) {
-            return entityType.builtInRegistryHolder().is((TagKey<EntityType<?>>) tagKey);
-        } else if (object instanceof GameEvent gameEvent) {
-            return gameEvent.builtInRegistryHolder().is((TagKey<GameEvent>) tagKey);
-        } else if (object instanceof Fluid fluid) {
-            return fluid.builtInRegistryHolder().is((TagKey<Fluid>) tagKey);
+        Holder.Reference<T> holder = getBuiltInRegistryHolder(object);
+        if (holder != null) {
+            return holder.is(tagKey);
+        } else {
+            Registry<T> registry = findRegistry(tagKey.registry());
+            return tagKey.isFor(registry.key()) && registry.wrapAsHolder(object).is(tagKey);
         }
-        Registry<T> registry = findRegistry(tagKey.registry());
-        return tagKey.isFor(registry.key()) && registry.wrapAsHolder(object).is(tagKey);
+    }
+
+    /**
+     * Get the built-in registry holder from a game object if available.
+     *
+     * @param object the game object to get the built-in registry holder from
+     * @param <T>    game object type
+     * @return the built-in holder for this game object if available
+     */
+    @SuppressWarnings({"deprecation", "unchecked"})
+    @Nullable
+    public static <T> Holder.Reference<T> getBuiltInRegistryHolder(T object) {
+        Holder.Reference<?> holder = null;
+        if (object instanceof Block block) {
+            holder = block.builtInRegistryHolder();
+        } else if (object instanceof Item item) {
+            holder = item.builtInRegistryHolder();
+        } else if (object instanceof EntityType<?> entityType) {
+            holder = entityType.builtInRegistryHolder();
+        } else if (object instanceof GameEvent gameEvent) {
+            holder = gameEvent.builtInRegistryHolder();
+        } else if (object instanceof Fluid fluid) {
+            holder = fluid.builtInRegistryHolder();
+        } else if (object instanceof Enchantment enchantment) {
+            holder = enchantment.builtInRegistryHolder();
+        } else if (object instanceof MobEffect mobEffect) {
+            holder = mobEffect.builtInRegistryHolder();
+        } else if (object instanceof Potion potion) {
+            holder = potion.builtInRegistryHolder();
+        } else if (object instanceof BlockEntityType<?> blockEntityType) {
+            holder = blockEntityType.builtInRegistryHolder();
+        }
+        return (Holder.Reference<T>) holder;
     }
 }

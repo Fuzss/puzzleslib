@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
-import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
-import fuzs.puzzleslib.fabric.impl.client.screen.FabricKeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingActivationHelper;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.KeyMapping;
 
