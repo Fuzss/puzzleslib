@@ -47,9 +47,13 @@ public abstract class AbstractModelProvider implements DataProvider {
         this.modelPathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models");
     }
 
-    public abstract void addBlockModels(BlockModelGenerators builder);
+    public void addBlockModels(BlockModelGenerators builder) {
 
-    public abstract void addItemModels(ItemModelGenerators builder);
+    }
+
+    public void addItemModels(ItemModelGenerators builder) {
+
+    }
 
     protected boolean throwForMissingBlocks() {
         return true;
@@ -204,6 +208,7 @@ public abstract class AbstractModelProvider implements DataProvider {
             return jsonObject;
         }
 
+        @FunctionalInterface
         public interface Factory extends Function<ResourceLocation, ItemOverride> {
 
         }

@@ -1,4 +1,4 @@
 @ApiStatus.Internal
-package fuzs.puzzleslib.fabric.impl.client.screen;
+package fuzs.puzzleslib.neoforge.impl.client.key;
 
 import org.jetbrains.annotations.ApiStatus;

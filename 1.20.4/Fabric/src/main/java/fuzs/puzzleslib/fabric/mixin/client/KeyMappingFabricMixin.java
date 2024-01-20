@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.api.client.screen.v2.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
 import net.minecraft.client.KeyMapping;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;

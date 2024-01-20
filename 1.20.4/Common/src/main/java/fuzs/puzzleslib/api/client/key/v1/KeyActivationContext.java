@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.screen.v2;
+package fuzs.puzzleslib.api.client.key.v1;
 
 import net.minecraft.client.Minecraft;
 

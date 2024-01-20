@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import fuzs.puzzleslib.api.client.screen.v2.KeyActivationContext;
+import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
 import net.minecraft.client.KeyMapping;
 
 import java.util.Objects;
