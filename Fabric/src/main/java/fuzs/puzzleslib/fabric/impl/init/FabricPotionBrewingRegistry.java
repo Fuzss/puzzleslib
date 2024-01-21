@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.init;
 
-import fuzs.puzzleslib.api.init.v3.PotionBrewingRegistry;
+import fuzs.puzzleslib.api.init.v3.alchemy.PotionBrewingRegistry;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistry;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.Potion;

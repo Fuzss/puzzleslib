@@ -7,13 +7,23 @@ import fuzs.puzzleslib.impl.capability.EntityCapabilityKeyImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
 public class ForgeEntityCapabilityKey<T extends Entity, C extends CapabilityComponent<T>> extends ForgeCapabilityKey<T, C> implements EntityCapabilityKeyImpl<T, C> {
     private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
     private CopyStrategy copyStrategy = CopyStrategy.NEVER;
 
-    public ForgeEntityCapabilityKey(ResourceLocation identifier, CapabilityTokenFactory<T, C> tokenFactory) {
-        super(identifier, tokenFactory);
+    public ForgeEntityCapabilityKey(ResourceLocation identifier, CapabilityTokenFactory<T, C> tokenFactory, Predicate<Object> filter, Supplier<C> capabilityFactory) {
+        super(identifier, tokenFactory, filter, capabilityFactory);
         this.initialize();
+    }
+
+    @Override
+    public void setChanged(C capabilityComponent) {
+        if (this.fallback != capabilityComponent) {
+            EntityCapabilityKeyImpl.super.setChanged(capabilityComponent);
+        }
     }
 
     @Override
