@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.forge.impl.init;
 
-import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v3.gamerule.GameRulesFactory;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 

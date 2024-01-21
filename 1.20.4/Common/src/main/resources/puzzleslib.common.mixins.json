@@ -5,11 +5,8 @@
   "package": "${modGroup}.mixin",
   "plugin": "${modGroup}.mixin.MixinConfigPluginImpl",
   "mixins": [
-    "accessor.BlockAccessor",
-    "accessor.BlockItemAccessor"
   ],
   "client": [
-    "client.accessor.TooltipAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -83,7 +83,7 @@ public final class ForgeCapabilityController implements CapabilityController {
             });
             return capability;
         };
-        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(capabilityName, tokenFactory));
+        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(capabilityName, tokenFactory, filter, capabilityFactory));
     }
 
     private void onRegisterCapabilities(final RegisterCapabilitiesEvent evt) {

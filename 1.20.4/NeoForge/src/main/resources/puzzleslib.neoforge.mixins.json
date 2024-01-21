@@ -4,6 +4,8 @@
   "compatibilityLevel": "JAVA_17",
   "package": "${modGroup}.neoforge.mixin",
   "mixins": [
+    "AbstractPackResourcesNeoForgeMixin",
+    "DatagenModLoaderNeoForgeMixin",
     "LootDataManagerNeoForgeMixin",
     "TagsProviderNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",

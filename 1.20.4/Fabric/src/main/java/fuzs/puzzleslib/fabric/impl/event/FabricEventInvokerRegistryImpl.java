@@ -88,8 +88,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerLoadingHandlers();
         } else {
-            // this runs for integrated servers, too, but this is fine as it is manually limited to dedicated servers via the if check
-            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTED, callback -> {
+            // the Fabric callback runs for integrated servers, too, but this is manually limited to dedicated servers via the wrapping condition
+            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
                 return (MinecraftServer server) -> {
                     callback.onLoadComplete();
                 };

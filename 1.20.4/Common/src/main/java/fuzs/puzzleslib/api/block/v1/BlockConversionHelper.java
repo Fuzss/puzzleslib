@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.api.block.v1;
 
 import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
-import fuzs.puzzleslib.mixin.accessor.BlockAccessor;
-import fuzs.puzzleslib.mixin.accessor.BlockItemAccessor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.BlockItem;
@@ -43,7 +41,7 @@ public final class BlockConversionHelper {
         Objects.requireNonNull(block, "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "") + "is null");
         Objects.requireNonNull(item, "item for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' is null");
         Item.BY_BLOCK.put(block, item);
-        ((BlockAccessor) block).puzzleslib$setItem(item);
+        block.item = item;
     }
 
     /**
@@ -58,8 +56,8 @@ public final class BlockConversionHelper {
         Objects.requireNonNull(block, "block for item '" + BuiltInRegistries.ITEM.getKey(item) + "' is null");
         Block oldBlock = item.getBlock();
         // block can somehow be null on Forge apparently
-        if (oldBlock != null) ((BlockAccessor) oldBlock).puzzleslib$setItem(item);
-        ((BlockItemAccessor) item).puzzleslib$setBlock(block);
+        if (oldBlock != null) oldBlock.item = item;
+        item.block = block;
     }
 
     /**

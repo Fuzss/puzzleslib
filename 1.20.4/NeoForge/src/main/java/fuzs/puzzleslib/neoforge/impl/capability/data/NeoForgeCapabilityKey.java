@@ -43,7 +43,7 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
 
     @Override
     public boolean isProvidedBy(@Nullable Object holder) {
-        return this.filter.test(holder);
+        return holder instanceof IAttachmentHolder && this.filter.test(holder);
     }
 
     @FunctionalInterface
