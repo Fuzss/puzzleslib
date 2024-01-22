@@ -4,7 +4,9 @@ import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.init.v3.gamerule.GameRuleValueOverrides;
+import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
+import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
+import fuzs.puzzleslib.api.init.v3.override.GameRuleValueOverrides;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
@@ -15,6 +17,9 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
 
 /**
@@ -34,10 +39,26 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
         ModContext.registerHandlers();
         EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
+        setupDevelopmentEnvironment();
+    }
+
+    private static void setupDevelopmentEnvironment() {
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        SharedConstants.IS_RUNNING_IN_IDE = true;
+        ServerLifecycleEvents.STARTING.register((MinecraftServer server) -> {
+            if (server instanceof DedicatedServer) {
+                server.setUsesAuthentication(false);
+            }
+        });
+        CommandOverrides.registerHandlers();
         initializeGameRules();
-        if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) {
-            SharedConstants.IS_RUNNING_IN_IDE = true;
-        }
+        initializeCommands();
+    }
+
+    private static void initializeCommands() {
+        CommandOverrides.registerServerCommand("time set 4000", false);
+        CommandOverrides.registerPlayerCommand("op %s", true);
+        CommandOverrides.registerEffectCommand(MobEffects.NIGHT_VISION, MobEffects.DAMAGE_RESISTANCE, MobEffects.FIRE_RESISTANCE, MobEffects.SATURATION, MobEffects.DAMAGE_BOOST, MobEffects.WATER_BREATHING);
     }
 
     private static void initializeGameRules() {

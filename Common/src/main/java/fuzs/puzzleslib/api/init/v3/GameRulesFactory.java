@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.init.v3.gamerule;
+package fuzs.puzzleslib.api.init.v3;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.server.MinecraftServer;
