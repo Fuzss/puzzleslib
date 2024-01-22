@@ -38,7 +38,7 @@ public final class DamageSourcesHelper {
      * @return new {@link DamageSource} instance
      */
     public static DamageSource source(LevelReader level, ResourceKey<DamageType> damageType, @Nullable Entity directEntity) {
-        return source(level, damageType, directEntity, null);
+        return source(level, damageType, directEntity, directEntity);
     }
 
     /**
