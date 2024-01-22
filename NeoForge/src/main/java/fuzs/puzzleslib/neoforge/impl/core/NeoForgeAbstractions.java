@@ -89,4 +89,9 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     public boolean isAllowedOnBooks(Enchantment enchantment) {
         return enchantment.isAllowedOnBooks();
     }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack) {
+        return inputStack.isBookEnchantable(bookStack);
+    }
 }

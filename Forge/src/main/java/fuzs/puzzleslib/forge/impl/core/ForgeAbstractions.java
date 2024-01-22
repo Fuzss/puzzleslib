@@ -90,4 +90,9 @@ public final class ForgeAbstractions implements CommonAbstractions {
     public boolean isAllowedOnBooks(Enchantment enchantment) {
         return enchantment.isAllowedOnBooks();
     }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack) {
+        return inputStack.isBookEnchantable(bookStack);
+    }
 }

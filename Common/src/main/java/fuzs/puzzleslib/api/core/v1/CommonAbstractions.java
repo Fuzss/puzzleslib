@@ -156,4 +156,13 @@ public interface CommonAbstractions {
      * @return is the application allowed
      */
     boolean isAllowedOnBooks(Enchantment enchantment);
+
+    /**
+     * Tests if an enchanted book can be put onto an item stack.
+     *
+     * @param inputStack the item stack to enchant
+     * @param bookStack  the book stack to enchant the item with
+     * @return is combining both stacks allowed
+     */
+    boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack);
 }
