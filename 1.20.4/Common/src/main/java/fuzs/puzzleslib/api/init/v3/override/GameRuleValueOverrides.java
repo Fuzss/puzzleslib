@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.init.v3.gamerule;
+package fuzs.puzzleslib.api.init.v3.override;
 
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.world.level.GameRules;

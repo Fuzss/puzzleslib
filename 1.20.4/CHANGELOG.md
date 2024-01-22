@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v20.4.5-1.20.4] - 2024-01-22
 ### Added
 - Add `NeoForgeCapabilityHelper`
+- Add `CommandOverrides`
 
 ## [v20.4.4-1.20.4] - 2024-01-21
 ### Added

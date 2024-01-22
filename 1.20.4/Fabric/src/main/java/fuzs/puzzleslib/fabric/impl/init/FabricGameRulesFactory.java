@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.init;
 
-import fuzs.puzzleslib.api.init.v3.gamerule.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleFactory;
 import net.fabricmc.fabric.api.gamerule.v1.GameRuleRegistry;
 import net.minecraft.server.MinecraftServer;
