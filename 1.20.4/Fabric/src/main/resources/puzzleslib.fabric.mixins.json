@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "compatibilityLevel": "JAVA_17",
   "package": "${modGroup}.fabric.mixin",
+  "plugin": "${modGroup}.fabric.mixin.MixinConfigPluginFabricImpl",
   "mixins": [
     "AbstractArrowFabricMixin",
     "AbstractHorseFabricMixin",
@@ -80,6 +81,7 @@
     "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.ToastComponentFabricMixin",
+    "client.WindowFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
     "client.accessor.MinecraftFabricAccessor",

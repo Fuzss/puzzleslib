@@ -1,6 +1,5 @@
-package fuzs.puzzleslib.forge.mixin;
+package fuzs.puzzleslib.neoforge.mixin;
 
-import com.llamalad7.mixinextras.MixinExtrasBootstrap;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -10,12 +9,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-public class MixinConfigPluginForgeImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of();
+public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
+    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("AbstractPackResourcesNeoForgeMixin", "DatagenModLoaderNeoForgeMixin");
 
     @Override
     public void onLoad(String mixinPackage) {
-        MixinExtrasBootstrap.init();
+
     }
 
     @Override

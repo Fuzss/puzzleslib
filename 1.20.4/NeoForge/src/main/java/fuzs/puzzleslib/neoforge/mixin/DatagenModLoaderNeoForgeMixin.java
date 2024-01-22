@@ -10,10 +10,10 @@ import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-@Mixin(value = DatagenModLoader.class, priority = 2000, remap = false)
+@Mixin(value = DatagenModLoader.class, remap = false)
 abstract class DatagenModLoaderNeoForgeMixin {
 
-    @WrapOperation(method = "begin", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/data/event/GatherDataEvent$DataGeneratorConfig;runAll()V"), require = 0)
+    @WrapOperation(method = "begin", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/data/event/GatherDataEvent$DataGeneratorConfig;runAll()V"))
     private static void begin(GatherDataEvent.DataGeneratorConfig dataGeneratorConfig, Operation<Void> operation) {
         // architectury loom does not exit the data run configuration, this will allow it to do so
         if (!FMLEnvironment.production && FMLLoader.getLaunchHandler().isData()) {
