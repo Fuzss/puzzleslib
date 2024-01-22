@@ -15,9 +15,8 @@ transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$Spr
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
-transitive-accessible   method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
-transitive-accessible   method  net/minecraft/core/Holder$Reference bindKey (Lnet/minecraft/resources/ResourceKey;)V
-transitive-accessible   method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
+accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
+accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
 accessible	field	net/minecraft/data/recipes/RecipeProvider	advancementPathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
 accessible	field   net/minecraft/world/item/crafting/ShapedRecipe  pattern Lnet/minecraft/world/item/crafting/ShapedRecipePattern;

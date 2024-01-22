@@ -130,4 +130,9 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     public boolean isAllowedOnBooks(Enchantment enchantment) {
         return true;
     }
+
+    @Override
+    public boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack) {
+        return true;
+    }
 }
