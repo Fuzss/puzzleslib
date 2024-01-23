@@ -15,12 +15,12 @@ transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$Spr
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
+transitive-extendable	method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
 accessible	field	net/minecraft/data/recipes/RecipeProvider	advancementPathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
 accessible	field   net/minecraft/world/item/crafting/ShapedRecipe  pattern Lnet/minecraft/world/item/crafting/ShapedRecipePattern;
-accessible	field   net/minecraft/client/gui/components/Tooltip cachedTooltip   Ljava/util/List;
 accessible	field   net/minecraft/world/level/block/Block   item    Lnet/minecraft/world/item/Item;
 accessible	field   net/minecraft/world/item/BlockItem  block   Lnet/minecraft/world/level/block/Block;
 mutable field   net/minecraft/world/item/BlockItem  block   Lnet/minecraft/world/level/block/Block;
