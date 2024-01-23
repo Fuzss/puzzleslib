@@ -10,8 +10,10 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
@@ -75,7 +77,7 @@ public final class CommandOverrides {
                 executeCommandOverrides(server, CommandEnvironment.SERVER, CommandEnvironment.DEDICATED_SERVER, UnaryOperator.identity());
             }
         });
-        ServerEntityLevelEvents.LOAD.register((entity, level) -> {
+        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel level) -> {
             if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags().contains(KEY_PLAYER_SEEN_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
                 String playerName = serverPlayer.getGameProfile().getName();
