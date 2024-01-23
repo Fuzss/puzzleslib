@@ -64,7 +64,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     private static void initializeGameRules() {
         GameRuleValueOverrides.setValue(GameRules.RULE_DAYLIGHT, false);
         GameRuleValueOverrides.setValue(GameRules.RULE_WEATHER_CYCLE, false);
-        GameRuleValueOverrides.setValue(GameRules.RULE_KEEPINVENTORY, false);
+        GameRuleValueOverrides.setValue(GameRules.RULE_KEEPINVENTORY, true);
         GameRuleValueOverrides.setValue(GameRules.RULE_DOFIRETICK, false);
         GameRuleValueOverrides.setValue(GameRules.RULE_MOBGRIEFING, false);
         GameRuleValueOverrides.setValue(GameRules.RULE_DOINSOMNIA, false);
