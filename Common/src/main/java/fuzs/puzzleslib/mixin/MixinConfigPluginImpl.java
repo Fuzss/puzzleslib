@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginImpl implements IMixinConfigPlugin {
+    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of();
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -60,7 +61,7 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return true;
+        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() || !DEVELOPMENT_MIXINS.contains(mixinClassName.replaceAll(".+\\.mixin\\.", ""));
     }
 
     @Override
