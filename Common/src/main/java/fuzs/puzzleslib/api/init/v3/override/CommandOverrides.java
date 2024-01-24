@@ -53,7 +53,7 @@ public final class CommandOverrides {
     public static void registerEffectCommand(MobEffect... mobEffects) {
         for (MobEffect mobEffect : mobEffects) {
             String s = BuiltInRegistries.MOB_EFFECT.getKey(mobEffect).toString();
-            registerPlayerCommand("effect give %s " + s + " infinite 127 true", false);
+            registerPlayerCommand("effect give @s " + s + " infinite 127 true", false);
         }
     }
 
@@ -81,7 +81,7 @@ public final class CommandOverrides {
             if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags().contains(KEY_PLAYER_SEEN_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
                 String playerName = serverPlayer.getGameProfile().getName();
-                executeCommandOverrides(serverPlayer.server, CommandEnvironment.PLAYER, CommandEnvironment.DEDICATED_PLAYER, s -> s.formatted(playerName));
+                executeCommandOverrides(serverPlayer.server, CommandEnvironment.PLAYER, CommandEnvironment.DEDICATED_PLAYER, s -> s.replaceAll("@[sp]", playerName));
             }
             return EventResult.PASS;
         });
