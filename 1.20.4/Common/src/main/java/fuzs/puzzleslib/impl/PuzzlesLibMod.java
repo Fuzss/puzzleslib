@@ -57,7 +57,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     private static void initializeCommands() {
         CommandOverrides.registerServerCommand("time set 4000", false);
-        CommandOverrides.registerPlayerCommand("op %s", true);
+        CommandOverrides.registerPlayerCommand("op @s", true);
         CommandOverrides.registerEffectCommand(MobEffects.NIGHT_VISION, MobEffects.DAMAGE_RESISTANCE, MobEffects.FIRE_RESISTANCE, MobEffects.SATURATION, MobEffects.DAMAGE_BOOST, MobEffects.WATER_BREATHING);
     }
 
