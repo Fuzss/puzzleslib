@@ -81,6 +81,7 @@
     "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.ToastComponentFabricMixin",
+    "client.WindowFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
     "client.accessor.MinecraftFabricAccessor",

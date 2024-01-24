@@ -17,6 +17,7 @@
   ],
   "client": [
     "client.ModelManagerNeoForgeMixin",
+    "client.MouseHandlerNeoForgeMixin",
     "client.accessor.BlockColorsNeoForgeAccessor",
     "client.accessor.ItemColorsNeoForgeAccessor",
     "client.accessor.ItemNeoForgeAccessor",

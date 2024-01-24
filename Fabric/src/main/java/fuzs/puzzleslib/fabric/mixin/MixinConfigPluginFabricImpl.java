@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginFabricImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of();
+    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("client.WindowFabricMixin");
 
     @Override
     public void onLoad(String mixinPackage) {

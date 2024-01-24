@@ -48,6 +48,9 @@ abstract class OptionsMixin {
     @Final
     private OptionInstance<Boolean> showSubtitles;
     @Shadow
+    @Final
+    private OptionInstance<Integer> guiScale;
+    @Shadow
     public boolean onboardAccessibility;
 
     @Inject(method = "load", at = @At("HEAD"))
@@ -64,6 +67,7 @@ abstract class OptionsMixin {
         this.entityShadows.set(false);
         this.realmsNotifications.set(false);
         this.showSubtitles.set(true);
+        this.guiScale.set(5);
         this.onboardAccessibility = false;
     }
 }

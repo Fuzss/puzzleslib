@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.client.event.v1.ExtraScreenMouseEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.screens.Screen;
