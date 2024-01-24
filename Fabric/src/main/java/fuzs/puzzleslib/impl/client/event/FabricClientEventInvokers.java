@@ -74,12 +74,73 @@ public final class FabricClientEventInvokers {
         });
     }
 
-    public static void register() {
+    public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
             return (Minecraft minecraft) -> {
                 callback.onLoadComplete();
             };
         });
+        INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register(pluginContext -> {
+                Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
+                pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
+                    // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), () -> model, context.loader()::getModel, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
+                        // the Fabric callback for adding additional models does not work with model resource locations
+                        if (resourceLocation instanceof ModelResourceLocation) {
+                            throw new IllegalArgumentException("model resource location is not supported");
+                        } else {
+                            additionalModels.put(resourceLocation, unbakedModel);
+                        }
+                    });
+                    return result.getInterrupt().orElse(model);
+                });
+                pluginContext.resolveModel().register((ModelResolver.Context context) -> {
+                    return additionalModels.get(context.id());
+                });
+            });
+        });
+        INSTANCE.register(ModelEvents.ModifyBakedModel.class, (ModelEvents.ModifyBakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register(pluginContext -> {
+                pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
+                    if (model != null) {
+                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                        EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.id(), () -> model, context::baker, (ResourceLocation resourceLocation) -> {
+                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                        }, models::putIfAbsent);
+                        return result.getInterrupt().orElse(model);
+                    } else {
+                        return null;
+                    }
+                });
+            });
+        });
+        INSTANCE.register(ModelEvents.AdditionalBakedModel.class, (ModelEvents.AdditionalBakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register(pluginContext -> {
+                pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
+                    // all we want is access to the top level baked models map to be able to insert our own models
+                    // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
+                    if (context.id().equals(ModelBakery.MISSING_MODEL_LOCATION)) {
+                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                        // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
+                        callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
+                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                        }, context::baker);
+                    }
+                    return model;
+                });
+            });
+        });
+        INSTANCE.register(ModelEvents.AfterModelLoading.class, (ModelEvents.AfterModelLoading callback, @Nullable Object o) -> {
+            ResourceLocation resourceLocation = PuzzlesLib.id("after_model_loading/" + MODEL_LOADING_LISTENERS.incrementAndGet());
+            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(resourceLocation, resourceManager -> {
+                Minecraft minecraft = Minecraft.getInstance();
+                callback.onAfterModelLoading(minecraft::getModelManager);
+            }, ResourceReloadListenerKeys.MODELS));
+        });
+    }
+
+    public static void registerEventHandlers() {
         INSTANCE.register(ClientTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK, callback -> {
             return callback::onStartClientTick;
         });
@@ -364,64 +425,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(AddToastCallback.class, FabricClientEvents.ADD_TOAST);
         INSTANCE.register(GatherDebugTextEvents.Left.class, FabricClientEvents.GATHER_LEFT_DEBUG_TEXT);
         INSTANCE.register(GatherDebugTextEvents.Right.class, FabricClientEvents.GATHER_RIGHT_DEBUG_TEXT);
-        INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
-            ModelLoadingPlugin.register(pluginContext -> {
-                Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
-                pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
-                    // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), () -> model, context.loader()::getModel, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                        // the Fabric callback for adding additional models does not work with model resource locations
-                        if (resourceLocation instanceof ModelResourceLocation) {
-                            throw new IllegalArgumentException("model resource location is not supported");
-                        } else {
-                            additionalModels.put(resourceLocation, unbakedModel);
-                        }
-                    });
-                    return result.getInterrupt().orElse(model);
-                });
-                pluginContext.resolveModel().register((ModelResolver.Context context) -> {
-                    return additionalModels.get(context.id());
-                });
-            });
-        });
-        INSTANCE.register(ModelEvents.ModifyBakedModel.class, (ModelEvents.ModifyBakedModel callback, @Nullable Object o) -> {
-            ModelLoadingPlugin.register(pluginContext -> {
-                pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
-                    if (model != null) {
-                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
-                        EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.id(), () -> model, context::baker, (ResourceLocation resourceLocation) -> {
-                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
-                        }, models::putIfAbsent);
-                        return result.getInterrupt().orElse(model);
-                    } else {
-                        return null;
-                    }
-                });
-            });
-        });
-        INSTANCE.register(ModelEvents.AdditionalBakedModel.class, (ModelEvents.AdditionalBakedModel callback, @Nullable Object o) -> {
-            ModelLoadingPlugin.register(pluginContext -> {
-                pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
-                    // all we want is access to the top level baked models map to be able to insert our own models
-                    // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
-                    if (context.id().equals(ModelBakery.MISSING_MODEL_LOCATION)) {
-                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
-                        // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
-                        callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
-                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
-                        }, context::baker);
-                    }
-                    return model;
-                });
-            });
-        });
-        INSTANCE.register(ModelEvents.AfterModelLoading.class, (ModelEvents.AfterModelLoading callback, @Nullable Object o) -> {
-            ResourceLocation resourceLocation = PuzzlesLib.id("after_model_loading/" + MODEL_LOADING_LISTENERS.incrementAndGet());
-            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(resourceLocation, resourceManager -> {
-                Minecraft minecraft = Minecraft.getInstance();
-                callback.onAfterModelLoading(minecraft::getModelManager);
-            }, ResourceReloadListenerKeys.MODELS));
-        });
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

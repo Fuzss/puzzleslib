@@ -79,7 +79,79 @@ import java.util.function.Supplier;
 
 public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerRegistry {
 
-    public static void register() {
+    public static void registerLoadingHandlers() {
+        INSTANCE.register(LoadCompleteCallback.class, FMLLoadCompleteEvent.class, (LoadCompleteCallback callback, FMLLoadCompleteEvent evt) -> {
+            callback.onLoadComplete();
+        });
+        INSTANCE.register(RegistryEntryAddedCallback.class, ForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ForgeClientEventInvokers.registerLoadingHandlers();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
+        Objects.requireNonNull(context, "context is null");
+        ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
+        IForgeRegistry<T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(resourceKey);
+        boolean[] loadComplete = new boolean[1];
+        // synchronize on the Forge registry to allow other mods requiring synchronization here to do so as well
+        synchronized (forgeRegistry) {
+            final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
+            final IForgeRegistry.AddCallback<T> newAddCallback = (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
+                // we probably don't want to handle replacements...
+                if (loadComplete[0] || oldObj != null) return;
+                try {
+                    callback.onRegistryEntryAdded(registry, key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+                        try {
+                            T t = supplier.get();
+                            Objects.requireNonNull(t, "entry is null");
+                            owner.register(resourceLocation, t);
+                        } catch (Exception exception) {
+                            PuzzlesLib.LOGGER.error("Failed to register new entry", exception);
+                        }
+                    });
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
+                }
+            };
+            ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
+                originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
+                newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
+            } : newAddCallback);
+        }
+        IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
+        // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
+        // but that doesn't allow for adding content
+        // do not simply revert to the original add callback above as other events might have run in the meantime
+        eventBus.addListener((final FMLLoadCompleteEvent evt) -> {
+            loadComplete[0] = true;
+        });
+        // store all event invocations for vanilla game content already registered before the registration event runs
+        // the add callback above won't trigger for those as they are already registered when mods are constructed
+        Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> callbacks = Sets.newLinkedHashSet();
+        for (Map.Entry<ResourceKey<T>, T> entry : forgeRegistry.getEntries()) {
+            callbacks.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
+                try {
+                    callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
+                }
+            });
+        }
+        eventBus.addListener((final RegisterEvent evt) -> {
+            if (evt.getRegistryKey() != resourceKey) return;
+            callbacks.forEach((Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer) -> {
+                consumer.accept((ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+                    evt.register(resourceKey, resourceLocation, supplier);
+                });
+            });
+            callbacks.clear();
+        });
+    }
+
+    public static void registerEventHandlers() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
             EventResultHolder<InteractionResult> result = callback.onUseBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getHitVec());
             // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
@@ -539,9 +611,6 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(LoadCompleteCallback.class, FMLLoadCompleteEvent.class, (LoadCompleteCallback callback, FMLLoadCompleteEvent evt) -> {
-            callback.onLoadComplete();
-        });
         INSTANCE.register(CheckMobDespawnCallback.class, MobSpawnEvent.AllowDespawn.class, (CheckMobDespawnCallback callback, MobSpawnEvent.AllowDespawn evt) -> {
             EventResult result = callback.onCheckMobDespawn(evt.getEntity(), (ServerLevel) evt.getLevel());
             if (result.isInterrupt()) {
@@ -598,48 +667,6 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             topInput.getAsOptional().ifPresent(evt::setNewTopItem);
             bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
         });
-//        INSTANCE.register(LivingEvents.Breathe.class, LivingBreatheEvent.class, (LivingEvents.Breathe callback, LivingBreatheEvent evt) -> {
-//            final int airAmountValue;
-//            if (!evt.canBreathe()) {
-//                airAmountValue = -evt.getConsumeAirAmount();
-//            } else if (evt.canRefillAir()) {
-//                airAmountValue = evt.getRefillAirAmount();
-//            } else {
-//                airAmountValue = 0;
-//            }
-//            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
-//            LivingEntity entity = evt.getEntity();
-//            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
-//            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
-//            EventResult result = callback.onLivingBreathe(entity, airAmount, evt.canRefillAir(), canLoseAir);
-//            if (result.isInterrupt()) {
-//                evt.setCanBreathe(true);
-//                evt.setCanRefillAir(false);
-//            } else {
-//                OptionalInt optional = airAmount.getAsOptionalInt();
-//                if (optional.isPresent()) {
-//                    if (optional.getAsInt() < 0) {
-//                        evt.setCanBreathe(false);
-//                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
-//                    } else {
-//                        evt.setCanBreathe(true);
-//                        evt.setCanRefillAir(true);
-//                        evt.setRefillAirAmount(optional.getAsInt());
-//                    }
-//                }
-//            }
-//        });
-//        INSTANCE.register(LivingEvents.Drown.class, LivingDrownEvent.class, (LivingEvents.Drown callback, LivingDrownEvent evt) -> {
-//            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
-//            if (result.isInterrupt()) {
-//                if (result.getAsBoolean()) {
-//                    evt.setDrowning(true);
-//                } else {
-//                    evt.setCanceled(true);
-//                }
-//            }
-//        });
-        INSTANCE.register(RegistryEntryAddedCallback.class, ForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(ServerChunkEvents.Watch.class, ChunkWatchEvent.Watch.class, (ServerChunkEvents.Watch callback, ChunkWatchEvent.Watch evt) -> {
             callback.onChunkWatch(evt.getPlayer(), evt.getChunk(), evt.getLevel());
         });
@@ -652,68 +679,6 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ForgeClientEventInvokers.register();
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
-        Objects.requireNonNull(context, "context is null");
-        ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
-        IForgeRegistry<T> forgeRegistry = RegistryManager.ACTIVE.getRegistry(resourceKey);
-        boolean[] loadComplete = new boolean[1];
-        // synchronize on the Forge registry to allow other mods requiring synchronization here to do so as well
-        synchronized (forgeRegistry) {
-            final IForgeRegistry.AddCallback<T> originalAddCallback = ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$getAdd();
-            final IForgeRegistry.AddCallback<T> newAddCallback = (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
-                // we probably don't want to handle replacements...
-                if (loadComplete[0] || oldObj != null) return;
-                try {
-                    callback.onRegistryEntryAdded(registry, key.location(), obj, (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
-                        try {
-                            T t = supplier.get();
-                            Objects.requireNonNull(t, "entry is null");
-                            owner.register(resourceLocation, t);
-                        } catch (Exception exception) {
-                            PuzzlesLib.LOGGER.error("Failed to register new entry", exception);
-                        }
-                    });
-                } catch (Exception exception) {
-                    PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
-                }
-            };
-            ((ForgeRegistryForgeAccessor<T>) forgeRegistry).puzzleslib$setAdd(originalAddCallback != null ? (IForgeRegistryInternal<T> owner, RegistryManager stage, int id, ResourceKey<T> key, T obj, @Nullable T oldObj) -> {
-                originalAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
-                newAddCallback.onAdd(owner, stage, id, key, obj, oldObj);
-            } : newAddCallback);
-        }
-        IEventBus eventBus = ModContainerHelper.getActiveModEventBus();
-        // prevent add callback from running after loading has completed, Forge still fires the callback when syncing registries,
-        // but that doesn't allow for adding content
-        // do not simply revert to the original add callback above as other events might have run in the meantime
-        eventBus.addListener((final FMLLoadCompleteEvent evt) -> {
-            loadComplete[0] = true;
-        });
-        // store all event invocations for vanilla game content already registered before the registration event runs
-        // the add callback above won't trigger for those as they are already registered when mods are constructed
-        Set<Consumer<BiConsumer<ResourceLocation, Supplier<T>>>> callbacks = Sets.newLinkedHashSet();
-        for (Map.Entry<ResourceKey<T>, T> entry : forgeRegistry.getEntries()) {
-            callbacks.add((BiConsumer<ResourceLocation, Supplier<T>> consumer) -> {
-                try {
-                    callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), consumer);
-                } catch (Exception exception) {
-                    PuzzlesLib.LOGGER.error("Failed to run registry entry added callback", exception);
-                }
-            });
-        }
-        eventBus.addListener((final RegisterEvent evt) -> {
-            if (evt.getRegistryKey() != resourceKey) return;
-            callbacks.forEach((Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer) -> {
-                consumer.accept((ResourceLocation resourceLocation, Supplier<T> supplier) -> {
-                    evt.register(resourceKey, resourceLocation, supplier);
-                });
-            });
-            callbacks.clear();
-        });
     }
 
     @Override

@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.14-1.20.1] - 2024-01-24
+### Changed
+- Delay event initialization to avoid being blamed for class loading errors
+### Fixed
+- Fix killing entities with custom damage sources not yielding any experience
+- Fix compatibility with Hephaestus by moving problematic code to the relevant mod, so only that one mod is incompatible until the issues is properly resolved on Hephaestus' end
+
 ## [v8.1.13-1.20.1] - 2024-01-11
 ### Fixed
 - Fixed unloading of a server config placed in a world's `serverconfig` directory failing and causing some processes to hang
