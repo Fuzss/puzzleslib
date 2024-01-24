@@ -89,6 +89,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             FabricClientEventInvokers.registerLoadingHandlers();
         } else {
             // the Fabric callback runs for integrated servers, too, but this is manually limited to dedicated servers via the wrapping condition
+            // this is also really late compared to Forge, so possibly move it to net.minecraft.server.Main::main,
+            // somewhere after calling Util::startTimerHackThread where server mod loading has just completed and where the Forge hook is placed
             INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
                 return (MinecraftServer server) -> {
                     callback.onLoadComplete();
