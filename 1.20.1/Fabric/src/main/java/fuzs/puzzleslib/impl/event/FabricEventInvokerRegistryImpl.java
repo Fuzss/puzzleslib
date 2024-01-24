@@ -76,7 +76,42 @@ import java.util.function.UnaryOperator;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
 
-    public static void register() {
+    public static void registerLoadingHandlers() {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            FabricClientEventInvokers.registerLoadingHandlers();
+        } else {
+            // the Fabric callback runs for integrated servers, too, but this is manually limited to dedicated servers via the wrapping condition
+            // this is also really late compared to Forge, so possibly move it to net.minecraft.server.Main::main,
+            // somewhere after calling Util::startTimerHackThread where server mod loading has just completed and where the Forge hook is placed
+            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
+                return (MinecraftServer server) -> {
+                    callback.onLoadComplete();
+                };
+            });
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> void onRegistryEntryAdded(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
+        Objects.requireNonNull(context, "context is null");
+        ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
+        BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
+            Registry.register(registry, resourceLocation, supplier.get());
+        };
+        RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
+            callback.onRegistryEntryAdded(registry, id, object, registrar);
+        });
+        // do not register directly to prevent ConcurrentModificationException
+        Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
+        for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
+            callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), toRegister::put);
+        }
+        toRegister.forEach(registrar);
+    }
+
+    public static void registerEventHandlers() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                 InteractionResult result = callback.onUseBlock(player, level, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
@@ -354,41 +389,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(EntityRidingEvents.Stop.class, FabricEntityEvents.ENTITY_STOP_RIDING);
         INSTANCE.register(GrindstoneEvents.Update.class, FabricPlayerEvents.GRINDSTONE_UPDATE);
         INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
+        // both are currently disabled due to a mod incompatibility, they are implemented in Thin Air only, where they are needed
         INSTANCE.register(LivingEvents.Breathe.class, FabricLivingEvents.LIVING_BREATHE);
         INSTANCE.register(LivingEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            FabricClientEventInvokers.register();
-        } else {
-            // this runs for integrated servers, too, but this is fine as it is manually limited to dedicated servers via the if check
-            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTED, callback -> {
-                return (MinecraftServer server) -> {
-                    callback.onLoadComplete();
-                };
-            });
+            FabricClientEventInvokers.registerEventHandlers();
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> void onRegistryEntryAdded(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
-        Objects.requireNonNull(context, "context is null");
-        ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
-        BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
-            Registry.register(registry, resourceLocation, supplier.get());
-        };
-        RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
-            callback.onRegistryEntryAdded(registry, id, object, registrar);
-        });
-        // do not register directly to prevent ConcurrentModificationException
-        Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
-        for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
-            callback.onRegistryEntryAdded(registry, entry.getKey().location(), entry.getValue(), toRegister::put);
-        }
-        toRegister.forEach(registrar);
     }
 
     @Override

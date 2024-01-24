@@ -25,7 +25,9 @@ public interface CommonFactories {
 
     GameRulesFactory getGameRulesFactory();
 
-    void registerEventInvokers();
+    void registerLoadingHandlers();
+
+    void registerEventHandlers();
 
     ToolTypeHelper getToolTypeHelper();
 
