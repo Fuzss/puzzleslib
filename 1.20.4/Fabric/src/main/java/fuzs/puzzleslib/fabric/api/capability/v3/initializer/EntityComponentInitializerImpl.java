@@ -1,17 +1,8 @@
 package fuzs.puzzleslib.fabric.api.capability.v3.initializer;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.entity.EntityComponentInitializer;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
-import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistrar;
-import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentAdapter;
-import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.Objects;
-import java.util.function.Function;
 
 /**
  * A simple implementation of {@link EntityComponentInitializer} to allow for decentralized usage of Cardinal Components modules.
@@ -34,18 +25,12 @@ import java.util.function.Function;
  *   }
  * </code></pre>
  */
+@Deprecated(forRemoval = true)
 @ApiStatus.Internal
 public final class EntityComponentInitializerImpl implements EntityComponentInitializer {
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        FabricCapabilityController.registerComponentFactories(Entity.class, registry);
-    }
-
-    public static <T extends Entity, C extends CapabilityComponent<T>> ComponentFactoryRegistrar<T, C> getEntityFactory(Class<T> entityType) {
-        Objects.requireNonNull(entityType, "entity type is null");
-        return (Object o, ComponentKey<ComponentAdapter<T, C>> componentKey, Function<T, ComponentAdapter<T, C>> factory) -> {
-            ((EntityComponentFactoryRegistry) o).registerFor(entityType, componentKey, factory::apply);
-        };
+        // NO-OP
     }
 }

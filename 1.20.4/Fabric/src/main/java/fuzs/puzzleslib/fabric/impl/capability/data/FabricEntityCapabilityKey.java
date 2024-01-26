@@ -1,18 +1,21 @@
 package fuzs.puzzleslib.fabric.impl.capability.data;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.impl.capability.EntityCapabilityKeyImpl;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.world.entity.Entity;
+
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class FabricEntityCapabilityKey<T extends Entity, C extends CapabilityComponent<T>> extends FabricCapabilityKey<T, C> implements EntityCapabilityKeyImpl<T, C> {
     private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
     private CopyStrategy copyStrategy = CopyStrategy.NEVER;
 
-    public FabricEntityCapabilityKey(ComponentKey<ComponentAdapter<T, C>> capability) {
-        super(capability);
+    public FabricEntityCapabilityKey(AttachmentType<C> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
+        super(attachmentType, filter, factory);
         this.initialize();
     }
 

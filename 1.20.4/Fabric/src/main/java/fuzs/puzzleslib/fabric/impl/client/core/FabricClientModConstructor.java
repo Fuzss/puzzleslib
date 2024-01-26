@@ -45,6 +45,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
         constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
+        constructor.onRegisterRenderBuffers(new RenderBuffersContextFabricImpl());
         registerBuiltinModelItemRenderers(modId, constructor::onRegisterBuiltinModelItemRenderers, availableFlags);
         constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.CLIENT_RESOURCES, modId));
         constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());

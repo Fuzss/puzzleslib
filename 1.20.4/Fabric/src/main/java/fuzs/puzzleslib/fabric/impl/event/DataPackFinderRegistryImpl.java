@@ -11,7 +11,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public final class DataPackFinderRegistryImpl implements DataPackFinderRegistry {
-    private static final Set<RepositorySource> SOURCES = Sets.newHashSet();
+    private static final Set<RepositorySource> SOURCES = Sets.newLinkedHashSet();
 
     public static void addAllRepositorySources(PackRepository packRepository) {
         SOURCES.forEach(repositorySource -> addRepositorySource(packRepository, repositorySource));

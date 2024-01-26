@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
 import fuzs.puzzleslib.api.init.v3.override.GameRuleValueOverrides;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
@@ -14,11 +13,8 @@ import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
-import net.minecraft.SharedConstants;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
 
@@ -44,12 +40,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     private static void setupDevelopmentEnvironment() {
         if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
-        SharedConstants.IS_RUNNING_IN_IDE = true;
-        ServerLifecycleEvents.STARTING.register((MinecraftServer server) -> {
-            if (server instanceof DedicatedServer) {
-                server.setUsesAuthentication(false);
-            }
-        });
         CommandOverrides.registerHandlers();
         initializeGameRules();
         initializeCommands();
@@ -71,5 +61,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
         GameRuleValueOverrides.setValue(GameRules.RULE_DO_PATROL_SPAWNING, false);
         GameRuleValueOverrides.setValue(GameRules.RULE_DO_TRADER_SPAWNING, false);
         GameRuleValueOverrides.setValue(GameRules.RULE_DO_VINES_SPREAD, false);
+        GameRuleValueOverrides.setValue(GameRules.RULE_MAX_ENTITY_CRAMMING, 0);
+        GameRuleValueOverrides.setValue(GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY, 1);
     }
 }

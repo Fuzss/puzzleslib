@@ -2,8 +2,6 @@ package fuzs.puzzleslib.api.capability.v3.data;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
 
 /**
  * Controls how capability data should be handled when entity data is copied.
@@ -30,17 +28,14 @@ public enum CopyStrategy {
     },
     /**
      * Copy entity data when inventory contents of a player are copied, which is the case after dying when the <code>keepInventory</code> game rule is active.
+     *
+     * @deprecated will no longer be supported in upcoming versions to allow migrating to Fabric Api's / NeoForge's native implementation
      */
+    @Deprecated(forRemoval = true)
     KEEP_PLAYER_INVENTORY {
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
-            if (originalStillAlive) {
-                this.copy(oldCapability, newCapability);
-            } else if (oldEntity instanceof Player && newEntity instanceof Player) {
-                if (newEntity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY)) {
-                    this.copy(oldCapability, newCapability);
-                }
-            }
+            NEVER.copy(oldEntity, oldCapability, newEntity, newCapability, originalStillAlive);
         }
     };
 

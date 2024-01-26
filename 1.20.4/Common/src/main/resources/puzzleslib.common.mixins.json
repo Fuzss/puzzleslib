@@ -7,7 +7,10 @@
   "mixins": [
   ],
   "client": [
-    "client.OptionsMixin"
+  ],
+  "server": [
+    "server.DedicatedServerSettingsMixin",
+    "server.EulaMixin"
   ],
   "injectors": {
     "defaultRequire": 1

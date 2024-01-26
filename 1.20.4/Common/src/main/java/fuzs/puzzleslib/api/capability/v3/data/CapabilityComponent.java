@@ -35,8 +35,6 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
             this.capabilityKey = capabilityKey;
             Objects.requireNonNull(holder, "capability holder is null");
             this.holder = holder;
-        } else {
-            throw new IllegalStateException("Capability component '%s' already initialized".formatted(capabilityKey.identifier()));
         }
     }
 

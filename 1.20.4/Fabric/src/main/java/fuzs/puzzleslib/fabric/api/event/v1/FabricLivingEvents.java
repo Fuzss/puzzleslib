@@ -127,10 +127,6 @@ public final class FabricLivingEvents {
      * Fires whenever equipment changes are detected on an entity in {@link LivingEntity#collectEquipmentChanges()} from {@link LivingEntity#tick()}.
      */
     public static final Event<LivingEquipmentChangeCallback> LIVING_EQUIPMENT_CHANGE = FabricEventFactory.create(LivingEquipmentChangeCallback.class);
-    /**
-     * Called after an entity is replaced by another through some in-world action like lightning striking a villager turning it into a witch.
-     */
-    public static final Event<LivingConversionCallback> LIVING_CONVERSION = FabricEventFactory.create(LivingConversionCallback.class);
 
     private FabricLivingEvents() {
 

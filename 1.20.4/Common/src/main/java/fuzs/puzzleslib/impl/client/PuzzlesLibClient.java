@@ -1,7 +1,64 @@
 package fuzs.puzzleslib.impl.client;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
+import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.tutorial.TutorialSteps;
+import org.jetbrains.annotations.Nullable;
 
 public class PuzzlesLibClient implements ClientModConstructor {
 
+    @Override
+    public void onConstructMod() {
+        setupDevelopmentEnvironment();
+    }
+
+    private static void setupDevelopmentEnvironment() {
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        if (ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
+            setupGameOptions();
+        }
+        ScreenOpeningCallback.EVENT.register((@Nullable Screen oldScreen, DefaultedValue<Screen> newScreen) -> {
+            if (newScreen.get() instanceof CreateWorldScreen screen) {
+                screen.getUiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
+                screen.getUiState().setAllowCheats(true);
+            }
+            return EventResult.PASS;
+        });
+    }
+
+    private static void setupGameOptions() {
+        Minecraft minecraft = Minecraft.getInstance();
+        // necessary to disable to prevent some options from accessing fields that have not yet been initialized
+        boolean running = minecraft.running;
+        minecraft.running = false;
+        initializeGameOptions(minecraft.options);
+        minecraft.running = running;
+        // no need to save preemptively, we will just apply our settings again if necessary
+    }
+
+    public static void initializeGameOptions(Options options) {
+        if (options.getFile().exists()) return;
+        options.renderDistance().set(16);
+        options.framerateLimit().set(60);
+        options.narratorHotkey().set(false);
+        options.advancedItemTooltips = true;
+        options.tutorialStep = TutorialSteps.NONE;
+        options.joinedFirstServer = true;
+        options.hideBundleTutorial = true;
+        options.operatorItemsTab().set(true);
+        options.entityShadows().set(false);
+        options.realmsNotifications().set(false);
+        options.showSubtitles().set(true);
+        options.guiScale().set(5);
+        options.onboardAccessibility = false;
+        options.skipMultiplayerWarning = true;
+    }
 }
