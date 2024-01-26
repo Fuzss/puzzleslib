@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
@@ -84,11 +83,5 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
                 compound.remove(key);
             }
         }
-    }
-
-    @Nullable
-    @Inject(method = "convertTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    public <T extends Mob> void convertTo(EntityType<T> entityType, boolean transferInventory, CallbackInfoReturnable<T> callback, @Local T mob) {
-        FabricLivingEvents.LIVING_CONVERSION.invoker().onLivingConversion(this, mob);
     }
 }

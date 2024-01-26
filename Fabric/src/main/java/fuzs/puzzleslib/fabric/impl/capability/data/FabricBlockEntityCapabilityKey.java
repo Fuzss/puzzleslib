@@ -1,13 +1,16 @@
 package fuzs.puzzleslib.fabric.impl.capability.data;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import fuzs.puzzleslib.api.capability.v3.data.BlockEntityCapabilityKey;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.world.level.block.entity.BlockEntity;
+
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class FabricBlockEntityCapabilityKey<T extends BlockEntity, C extends CapabilityComponent<T>> extends FabricCapabilityKey<T, C> implements BlockEntityCapabilityKey<T, C> {
 
-    public FabricBlockEntityCapabilityKey(ComponentKey<ComponentAdapter<T, C>> capability) {
-        super(capability);
+    public FabricBlockEntityCapabilityKey(AttachmentType<C> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
+        super(attachmentType, filter, factory);
     }
 }

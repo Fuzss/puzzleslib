@@ -43,12 +43,14 @@ public final class NeoForgeClientModConstructor {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
                 constructor.onClientSetup();
-                constructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl());
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextNeoForgeImpl());
                 constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextNeoForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
                 constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
             });
+        });
+        eventBus.addListener((final RegisterMenuScreensEvent evt) -> {
+            constructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl(evt));
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(evt::registerEntityRenderer));
@@ -104,6 +106,9 @@ public final class NeoForgeClientModConstructor {
         });
         eventBus.addListener((final RegisterShadersEvent evt) -> {
             constructor.onRegisterCoreShaders(new CoreShadersContextNeoForgeImpl(evt::registerShader, evt.getResourceProvider()));
+        });
+        eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
+            constructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));
         });
     }
 }

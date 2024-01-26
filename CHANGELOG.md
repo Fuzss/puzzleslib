@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v20.4.8-1.20.4] - 2024-01-26
+### Added
+- Add `ClientModConstructor::onRegisterRenderBuffers`
+- A lot more small utilities for development environments
+### Changed
+- Reimplement capability system on Fabric on top of Fabric Api's attachment api in favor of the Cardinal Components library
+- Implement `LivingConversionCallback` using Fabric Api's new native event
+- Implement `MenuScreensContext` using NeoForge's new native event
+
 ## [v20.4.7-1.20.4] - 2024-01-24
 ### Changed
 - Revert reverted reduced retina resolution

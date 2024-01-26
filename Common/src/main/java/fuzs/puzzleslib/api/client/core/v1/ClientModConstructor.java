@@ -209,4 +209,11 @@ public interface ClientModConstructor extends BaseModConstructor {
     default void onRegisterCoreShaders(final CoreShadersContext context) {
 
     }
+
+    /**
+     * @param context register new render buffers to {@link net.minecraft.client.renderer.RenderBuffers}
+     */
+    default void onRegisterRenderBuffers(final RenderBuffersContext context) {
+
+    }
 }

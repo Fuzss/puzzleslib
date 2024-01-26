@@ -1,16 +1,8 @@
 package fuzs.puzzleslib.fabric.api.capability.v3.initializer;
 
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.world.WorldComponentInitializer;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
-import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistrar;
-import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentAdapter;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.function.Function;
 
 /**
  * A simple implementation of {@link WorldComponentInitializer} to allow for decentralized usage of Cardinal Components modules.
@@ -33,17 +25,12 @@ import java.util.function.Function;
  *   }
  * </code></pre>
  */
+@Deprecated(forRemoval = true)
 @ApiStatus.Internal
 public final class WorldComponentInitializerImpl implements WorldComponentInitializer {
 
     @Override
     public void registerWorldComponentFactories(WorldComponentFactoryRegistry registry) {
-        FabricCapabilityController.registerComponentFactories(Level.class, registry);
-    }
-
-    public static <C extends CapabilityComponent<Level>> ComponentFactoryRegistrar<Level, C> getLevelFactory() {
-        return (Object o, ComponentKey<ComponentAdapter<Level, C>> componentKey, Function<Level, ComponentAdapter<Level, C>> factory) -> {
-            ((WorldComponentFactoryRegistry) o).register(componentKey, factory::apply);
-        };
+        // NO-OP
     }
 }

@@ -2,16 +2,7 @@ package fuzs.puzzleslib.fabric.api.capability.v3.initializer;
 
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.chunk.ChunkComponentInitializer;
-import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
-import fuzs.puzzleslib.fabric.impl.capability.ComponentFactoryRegistrar;
-import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.fabric.impl.capability.data.ComponentAdapter;
-import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.function.Function;
 
 /**
  * A simple implementation of {@link ChunkComponentInitializer} to allow for decentralized usage of Cardinal Components modules.
@@ -34,22 +25,12 @@ import java.util.function.Function;
  *   }
  * </code></pre>
  */
+@Deprecated(forRemoval = true)
 @ApiStatus.Internal
 public final class ChunkComponentInitializerImpl implements ChunkComponentInitializer {
 
     @Override
     public void registerChunkComponentFactories(ChunkComponentFactoryRegistry registry) {
-        FabricCapabilityController.registerComponentFactories(LevelChunk.class, registry);
-    }
-
-    public static <C extends CapabilityComponent<LevelChunk>> ComponentFactoryRegistrar<LevelChunk, C> getLevelChunkFactory() {
-        return (Object o, ComponentKey<ComponentAdapter<LevelChunk, C>> componentKey, Function<LevelChunk, ComponentAdapter<LevelChunk, C>> factory) -> {
-            ((ChunkComponentFactoryRegistry) o).register(componentKey, (ChunkAccess chunkAccess) -> {
-                // we do not want any of the world-gen chunk types, only the final serializable LevelChunk
-                // relies on an additional check in FabricLevelChunkCapabilityKey::isProvidedBy
-                // idea from https://github.com/Ladysnake/Cardinal-Components-API/issues/80#issuecomment-802053808
-                return chunkAccess instanceof LevelChunk levelChunk ? factory.apply(levelChunk) : ComponentAdapter.empty();
-            });
-        };
+        // NO-OP
     }
 }

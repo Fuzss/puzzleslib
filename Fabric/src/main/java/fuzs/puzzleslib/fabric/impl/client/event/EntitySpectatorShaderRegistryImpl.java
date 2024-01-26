@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 public final class EntitySpectatorShaderRegistryImpl implements EntitySpectatorShaderRegistry {
-    private static final Map<EntityType<?>, ResourceLocation> SHADER_LOCATIONS = Maps.newHashMap();
+    private static final Map<EntityType<?>, ResourceLocation> SHADER_LOCATIONS = Maps.newLinkedHashMap();
 
     @Override
     public void register(EntityType<?> entityType, ResourceLocation shaderLocation) {

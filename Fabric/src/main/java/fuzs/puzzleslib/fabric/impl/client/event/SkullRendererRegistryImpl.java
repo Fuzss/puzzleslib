@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public final class SkullRendererRegistryImpl implements SkullRendererRegistry {
-    private static final Set<SkullRenderersFactory> FACTORIES = Sets.newHashSet();
+    private static final Set<SkullRenderersFactory> FACTORIES = Sets.newLinkedHashSet();
 
     @Override
     public void register(SkullRenderersFactory factory) {

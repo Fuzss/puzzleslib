@@ -15,6 +15,7 @@
   ],
   "client": [
     "client.ModelManagerForgeMixin",
+    "client.RenderBuffersForgeMixin",
     "client.accessor.BlockColorsForgeAccessor",
     "client.accessor.ItemColorsForgeAccessor",
     "client.accessor.ItemForgeAccessor",

@@ -28,6 +28,7 @@ import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
@@ -60,12 +61,14 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootDataManager;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.BlockHitResult;
@@ -91,7 +94,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             // the Fabric callback runs for integrated servers, too, but this is manually limited to dedicated servers via the wrapping condition
             // this is also really late compared to Forge, so possibly move it to net.minecraft.server.Main::main,
             // somewhere after calling Util::startTimerHackThread where server mod loading has just completed and where the Forge hook is placed
-            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
+            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTING, (LoadCompleteCallback callback) -> {
                 return (MinecraftServer server) -> {
                     callback.onLoadComplete();
                 };
@@ -119,17 +122,17 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     public static void registerEventHandlers() {
-        INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, callback -> {
+        INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, (PlayerInteractEvents.UseBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                 InteractionResult result = callback.onUseBlock(player, level, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
                 // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
                 if (level.isClientSide && result != InteractionResult.SUCCESS && result != InteractionResult.PASS) {
-                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemOnPacket(hand, hitResult, id));
+                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, (int id) -> new ServerboundUseItemOnPacket(hand, hitResult, id));
                 }
                 return result;
             };
         });
-        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, callback -> {
+        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, (PlayerInteractEvents.AttackBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
                 InteractionResult interactionResult;
                 if (!level.isClientSide || !player.isCreative() && ((FabricProxy) Proxy.INSTANCE).shouldStartDestroyBlock(pos)) {
@@ -143,7 +146,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return interactionResult;
             };
         });
-        INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, callback -> {
+        INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, (PlayerInteractEvents.UseItem callback) -> {
             return (Player player, Level level, InteractionHand hand) -> {
                 // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
                 if (player.isSpectator()) {
@@ -158,12 +161,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     // send the move packet like vanilla to ensure the position+view vectors are accurate
                     Proxy.INSTANCE.getClientPacketListener().send(new ServerboundMovePlayerPacket.PosRot(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.onGround()));
                     // send interaction packet to the server with a new sequentially assigned id
-                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, id -> new ServerboundUseItemPacket(hand, id));
+                    ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, (int id) -> new ServerboundUseItemPacket(hand, id));
                 }
                 return new InteractionResultHolder<>(result, ItemStack.EMPTY);
             };
         });
-        INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, callback -> {
+        INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, (PlayerInteractEvents.UseEntity callback) -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult != null) return InteractionResult.PASS;
@@ -175,7 +178,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return result;
             };
         });
-        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, callback -> {
+        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, (PlayerInteractEvents.UseEntityAt callback) -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult == null) return InteractionResult.PASS;
@@ -187,7 +190,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return result;
             };
         });
-        INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, callback -> {
+        INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, (PlayerInteractEvents.AttackEntity callback) -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 EventResult result = callback.onAttackEntity(player, level, hand, entity);
                 // this isn't a proper item use callback (seen with the server-side and Forge implementations), so the return looks a little odd
@@ -198,7 +201,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_XP);
         INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
-        INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, callback -> {
+        INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
                 EventResult result = callback.onBreakBlock((ServerLevel) level, pos, state, player, player.getMainHandItem());
                 return result.isPass();
@@ -209,10 +212,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTickEvents.Start.class, FabricPlayerEvents.PLAYER_TICK_START);
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
-        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, callback -> {
+        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, (RegisterCommandsCallback callback) -> {
             return callback::onRegisterCommands;
         });
-        INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, callback -> {
+        INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, (LootTableLoadEvents.Replace callback) -> {
             return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
                 // keep this the same as Forge where editing data pack specified loot tables is not supported
                 if (source == LootTableSource.DATA_PACK) return null;
@@ -222,13 +225,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return lootTable.getAsOptional().orElse(null);
             };
         });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, callback -> {
+        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, (LootTableLoadEvents.Modify callback) -> {
             return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
                 // don't filter on source, with our custom event on Forge we can also support non-built-in loot tables
-                callback.onModifyLootTable(lootManager, id, tableBuilder::pool, index -> {
+                callback.onModifyLootTable(lootManager, id, tableBuilder::pool, (int index) -> {
                     MutableInt currentIndex = new MutableInt();
                     MutableBoolean result = new MutableBoolean();
-                    tableBuilder.modifyPools(builder -> {
+                    tableBuilder.modifyPools((LootPool.Builder builder) -> {
                         if (index == currentIndex.getAndIncrement()) {
                             // there is no way in Fabric Api to remove loot pools, but this seems to work for disabling at least
                             builder.setRolls(ConstantValue.exactly(0.0F));
@@ -254,96 +257,96 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(UseItemEvents.Stop.class, FabricLivingEvents.USE_ITEM_STOP);
         INSTANCE.register(UseItemEvents.Finish.class, FabricLivingEvents.USE_ITEM_FINISH);
         INSTANCE.register(ShieldBlockCallback.class, FabricLivingEvents.SHIELD_BLOCK);
-        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, callback -> {
+        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
             return callback::onTagsUpdated;
         });
         INSTANCE.register(ExplosionEvents.Start.class, FabricLevelEvents.EXPLOSION_START);
         INSTANCE.register(ExplosionEvents.Detonate.class, FabricLevelEvents.EXPLOSION_DETONATE);
-        INSTANCE.register(SyncDataPackContentsCallback.class, ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS, callback -> {
+        INSTANCE.register(SyncDataPackContentsCallback.class, ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS, (SyncDataPackContentsCallback callback) -> {
             return callback::onSyncDataPackContents;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting.class, ServerLifecycleEvents.SERVER_STARTING, callback -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting.class, ServerLifecycleEvents.SERVER_STARTING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting callback) -> {
             return callback::onServerStarting;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted.class, ServerLifecycleEvents.SERVER_STARTED, callback -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted.class, ServerLifecycleEvents.SERVER_STARTED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted callback) -> {
             return callback::onServerStarted;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping.class, ServerLifecycleEvents.SERVER_STOPPING, callback -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping.class, ServerLifecycleEvents.SERVER_STOPPING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping callback) -> {
             return callback::onServerStopping;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped.class, ServerLifecycleEvents.SERVER_STOPPED, callback -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped.class, ServerLifecycleEvents.SERVER_STOPPED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped callback) -> {
             return callback::onServerStopped;
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ServerEntityLevelEvents.Spawn.class, FabricEntityEvents.ENTITY_SPAWN);
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, callback -> {
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, (ServerEntityLevelEvents.Unload callback) -> {
             return callback::onEntityUnload;
         });
         // do not use ServerLivingEntityEvents#ALLOW_DEATH from Fabric Api as it only runs server-side
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
-        INSTANCE.register(PlayerTrackingEvents.Start.class, EntityTrackingEvents.START_TRACKING, callback -> {
+        INSTANCE.register(PlayerTrackingEvents.Start.class, EntityTrackingEvents.START_TRACKING, (PlayerTrackingEvents.Start callback) -> {
             return callback::onStartTracking;
         });
-        INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, callback -> {
+        INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, (PlayerTrackingEvents.Stop callback) -> {
             return callback::onStopTracking;
         });
-        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, ServerPlayConnectionEvents.JOIN, callback -> {
+        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, ServerPlayConnectionEvents.JOIN, (PlayerNetworkEvents.LoggedIn callback) -> {
             return (ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) -> {
                 callback.onLoggedIn(handler.getPlayer());
             };
         });
-        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, ServerPlayConnectionEvents.DISCONNECT, callback -> {
+        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, ServerPlayConnectionEvents.DISCONNECT, (PlayerNetworkEvents.LoggedOut callback) -> {
             return (ServerGamePacketListenerImpl handler, MinecraftServer server) -> {
                 callback.onLoggedOut(handler.getPlayer());
             };
         });
-        INSTANCE.register(AfterChangeDimensionCallback.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, callback -> {
+        INSTANCE.register(AfterChangeDimensionCallback.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, (AfterChangeDimensionCallback callback) -> {
             return callback::onAfterChangeDimension;
         });
         INSTANCE.register(BabyEntitySpawnCallback.class, FabricLivingEvents.BABY_ENTITY_SPAWN);
         INSTANCE.register(AnimalTameCallback.class, FabricLivingEvents.ANIMAL_TAME);
         INSTANCE.register(LivingAttackCallback.class, FabricLivingEvents.LIVING_ATTACK);
-        INSTANCE.register(PlayerCopyEvents.Copy.class, ServerPlayerEvents.COPY_FROM, callback -> {
+        INSTANCE.register(PlayerCopyEvents.Copy.class, ServerPlayerEvents.COPY_FROM, (PlayerCopyEvents.Copy callback) -> {
             return callback::onCopy;
         });
-        INSTANCE.register(PlayerCopyEvents.Respawn.class, ServerPlayerEvents.AFTER_RESPAWN, callback -> {
+        INSTANCE.register(PlayerCopyEvents.Respawn.class, ServerPlayerEvents.AFTER_RESPAWN, (PlayerCopyEvents.Respawn callback) -> {
             return (ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) -> {
                 callback.onRespawn(newPlayer, alive);
             };
         });
-        INSTANCE.register(ServerTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_SERVER_TICK, callback -> {
+        INSTANCE.register(ServerTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_SERVER_TICK, (ServerTickEvents.Start callback) -> {
             return callback::onStartServerTick;
         });
-        INSTANCE.register(ServerTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK, callback -> {
+        INSTANCE.register(ServerTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK, (ServerTickEvents.End callback) -> {
             return callback::onEndServerTick;
         });
-        INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, callback -> {
+        INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, (ServerLevelTickEvents.Start callback) -> {
             return (ServerLevel level) -> {
                 callback.onStartLevelTick(level.getServer(), level);
             };
         });
-        INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, callback -> {
+        INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, (ServerLevelTickEvents.End callback) -> {
             return (ServerLevel level) -> {
                 callback.onEndLevelTick(level.getServer(), level);
             };
         });
-        INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, callback -> {
+        INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, (ServerLevelEvents.Load callback) -> {
             return callback::onLevelLoad;
         });
-        INSTANCE.register(ServerLevelEvents.Unload.class, ServerWorldEvents.UNLOAD, callback -> {
+        INSTANCE.register(ServerLevelEvents.Unload.class, ServerWorldEvents.UNLOAD, (ServerLevelEvents.Unload callback) -> {
             return callback::onLevelUnload;
         });
-        INSTANCE.register(ServerChunkEvents.Load.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD, callback -> {
+        INSTANCE.register(ServerChunkEvents.Load.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD, (ServerChunkEvents.Load callback) -> {
             return callback::onChunkLoad;
         });
-        INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, callback -> {
+        INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, (ServerChunkEvents.Unload callback) -> {
             return callback::onChunkUnload;
         });
         INSTANCE.register(ItemEntityEvents.Toss.class, FabricPlayerEvents.ITEM_TOSS);
         INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
-        INSTANCE.register(ItemAttributeModifiersCallback.class, ModifyItemAttributeModifiersCallback.EVENT, callback -> {
+        INSTANCE.register(ItemAttributeModifiersCallback.class, ModifyItemAttributeModifiersCallback.EVENT, (ItemAttributeModifiersCallback callback) -> {
             return callback::onItemAttributeModifiers;
         });
         INSTANCE.register(ProjectileImpactCallback.class, FabricEntityEvents.PROJECTILE_IMPACT);
@@ -366,7 +369,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
-        INSTANCE.register(LivingConversionCallback.class, FabricLivingEvents.LIVING_CONVERSION);
+        INSTANCE.register(LivingConversionCallback.class, ServerLivingEntityEvents.MOB_CONVERSION, (LivingConversionCallback callback) -> {
+            return (Mob previous, Mob converted, boolean keepEquipment) -> {
+                callback.onLivingConversion(previous, converted);
+            };
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }
@@ -440,7 +447,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricForwardingEventInvoker(FabricEventContextConverter<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter) {
-            this(event -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().concurrencyLevel(1).makeMap());
+            this((Event<E> event) -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().concurrencyLevel(1).makeMap());
         }
 
         @Override
@@ -449,7 +456,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             // keeping track of events and corresponding invoker is not so important since there is only ever one event per context anyway which is guaranteed by the underlying implementation
             // but for managing event phases it becomes necessary to use our FabricEventInvoker to keep track
             return (EventPhase phase, T callback) -> {
-                this.consumer.accept(context, event -> {
+                this.consumer.accept(context, (Event<E> event) -> {
                     this.events.computeIfAbsent(event, this.factory).register(phase, callback);
                 }, this.events::remove);
             };
