@@ -78,6 +78,7 @@ public abstract class RecipeProvider implements DataProvider {
                 }
             }
 
+            @SuppressWarnings("removal")
             @Override
             public Advancement.Builder advancement() {
                 return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);

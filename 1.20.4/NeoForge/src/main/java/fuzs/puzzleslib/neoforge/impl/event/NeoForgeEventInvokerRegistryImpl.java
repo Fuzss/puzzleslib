@@ -690,6 +690,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         }
     }
 
+    @SuppressWarnings("removal")
     @Override
     public <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
