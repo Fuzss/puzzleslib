@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(RenderBuffers.class)
 abstract class RenderBuffersForgeMixin {
 
+    @SuppressWarnings("target")
     @Inject(method = "method_54639(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
     private void method_54639(Object2ObjectLinkedOpenHashMap<RenderType, BufferBuilder> buffers, CallbackInfo callback) {
         RenderBuffersContextForgeImpl.addAll(buffers);

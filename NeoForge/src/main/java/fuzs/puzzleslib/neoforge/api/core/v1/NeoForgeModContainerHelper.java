@@ -32,6 +32,7 @@ public final class NeoForgeModContainerHelper {
      *
      * @return the active mod event bus
      */
+    @SuppressWarnings("removal")
     public static Optional<IEventBus> getOptionalActiveModEventBus() {
         return Optional.ofNullable(FMLJavaModLoadingContext.get()).map(FMLJavaModLoadingContext::getModEventBus);
     }
