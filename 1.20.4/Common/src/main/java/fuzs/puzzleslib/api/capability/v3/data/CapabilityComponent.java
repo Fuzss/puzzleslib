@@ -50,11 +50,11 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
 
     @Override
     public void write(CompoundTag tag) {
-
+        // NO-OP
     }
 
     @Override
     public void read(CompoundTag tag) {
-
+        // NO-OP
     }
 }

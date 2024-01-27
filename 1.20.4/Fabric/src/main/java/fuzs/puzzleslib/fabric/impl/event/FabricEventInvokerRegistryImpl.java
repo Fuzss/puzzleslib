@@ -88,6 +88,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
+        // this runs before server starting on dedicated servers
+        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
+            return callback::onTagsUpdated;
+        });
+        // run this early as we also use it for load complete when other events are registered and
+        // this would be missed as it's registered while the callback is being invoked on dedicated servers
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting.class, ServerLifecycleEvents.SERVER_STARTING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
+            return callback::onServerStarting;
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerLoadingHandlers();
         } else {
@@ -257,24 +266,18 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(UseItemEvents.Stop.class, FabricLivingEvents.USE_ITEM_STOP);
         INSTANCE.register(UseItemEvents.Finish.class, FabricLivingEvents.USE_ITEM_FINISH);
         INSTANCE.register(ShieldBlockCallback.class, FabricLivingEvents.SHIELD_BLOCK);
-        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
-            return callback::onTagsUpdated;
-        });
         INSTANCE.register(ExplosionEvents.Start.class, FabricLevelEvents.EXPLOSION_START);
         INSTANCE.register(ExplosionEvents.Detonate.class, FabricLevelEvents.EXPLOSION_DETONATE);
         INSTANCE.register(SyncDataPackContentsCallback.class, ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS, (SyncDataPackContentsCallback callback) -> {
             return callback::onSyncDataPackContents;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting.class, ServerLifecycleEvents.SERVER_STARTING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarting callback) -> {
-            return callback::onServerStarting;
-        });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted.class, ServerLifecycleEvents.SERVER_STARTED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStarted callback) -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started.class, ServerLifecycleEvents.SERVER_STARTED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started callback) -> {
             return callback::onServerStarted;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping.class, ServerLifecycleEvents.SERVER_STOPPING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopping callback) -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping.class, ServerLifecycleEvents.SERVER_STOPPING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping callback) -> {
             return callback::onServerStopping;
         });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped.class, ServerLifecycleEvents.SERVER_STOPPED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.ServerStopped callback) -> {
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped.class, ServerLifecycleEvents.SERVER_STOPPED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped callback) -> {
             return callback::onServerStopped;
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);

@@ -395,16 +395,16 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 callback.onSyncDataPackContents(player, false);
             }
         });
-        INSTANCE.register(ServerLifecycleEvents.ServerStarting.class, ServerAboutToStartEvent.class, (ServerLifecycleEvents.ServerStarting callback, ServerAboutToStartEvent evt) -> {
+        INSTANCE.register(ServerLifecycleEvents.Starting.class, ServerAboutToStartEvent.class, (ServerLifecycleEvents.Starting callback, ServerAboutToStartEvent evt) -> {
             callback.onServerStarting(evt.getServer());
         });
-        INSTANCE.register(ServerLifecycleEvents.ServerStarted.class, ServerStartedEvent.class, (ServerLifecycleEvents.ServerStarted callback, ServerStartedEvent evt) -> {
+        INSTANCE.register(ServerLifecycleEvents.Started.class, ServerStartedEvent.class, (ServerLifecycleEvents.Started callback, ServerStartedEvent evt) -> {
             callback.onServerStarted(evt.getServer());
         });
-        INSTANCE.register(ServerLifecycleEvents.ServerStopping.class, ServerStoppingEvent.class, (ServerLifecycleEvents.ServerStopping callback, ServerStoppingEvent evt) -> {
+        INSTANCE.register(ServerLifecycleEvents.Stopping.class, ServerStoppingEvent.class, (ServerLifecycleEvents.Stopping callback, ServerStoppingEvent evt) -> {
             callback.onServerStopping(evt.getServer());
         });
-        INSTANCE.register(ServerLifecycleEvents.ServerStopped.class, ServerStoppedEvent.class, (ServerLifecycleEvents.ServerStopped callback, ServerStoppedEvent evt) -> {
+        INSTANCE.register(ServerLifecycleEvents.Stopped.class, ServerStoppedEvent.class, (ServerLifecycleEvents.Stopped callback, ServerStoppedEvent evt) -> {
             callback.onServerStopped(evt.getServer());
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, PlayLevelSoundEvent.AtPosition.class, (PlayLevelSoundEvents.AtPosition callback, PlayLevelSoundEvent.AtPosition evt) -> {

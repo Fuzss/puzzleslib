@@ -4,20 +4,20 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.server.MinecraftServer;
 
 public final class ServerLifecycleEvents {
-    public static final EventInvoker<ServerStarting> STARTING = EventInvoker.lookup(ServerStarting.class);
-    public static final EventInvoker<ServerStarted> STARTED = EventInvoker.lookup(ServerStarted.class);
-    public static final EventInvoker<ServerStopping> STOPPING = EventInvoker.lookup(ServerStopping.class);
-    public static final EventInvoker<ServerStopped> STOPPED = EventInvoker.lookup(ServerStopped.class);
+    public static final EventInvoker<Starting> STARTING = EventInvoker.lookup(Starting.class);
+    public static final EventInvoker<Started> STARTED = EventInvoker.lookup(Started.class);
+    public static final EventInvoker<Stopping> STOPPING = EventInvoker.lookup(Stopping.class);
+    public static final EventInvoker<Stopped> STOPPED = EventInvoker.lookup(Stopped.class);
 
     private ServerLifecycleEvents() {
 
     }
 
     @FunctionalInterface
-    public interface ServerStarting {
+    public interface Starting {
 
         /**
-         * Called before {@link ServerStarted}, allows for customization of the server.
+         * Called before {@link Started}, allows for customization of the server.
          *
          * @param server the current server instance
          */
@@ -25,10 +25,10 @@ public final class ServerLifecycleEvents {
     }
 
     @FunctionalInterface
-    public interface ServerStarted {
+    public interface Started {
 
         /**
-         * Called after {@link ServerStarting} when the server is available and ready to play.
+         * Called after {@link Starting} when the server is available and ready to play.
          *
          * @param server the current server instance
          */
@@ -36,10 +36,10 @@ public final class ServerLifecycleEvents {
     }
 
     @FunctionalInterface
-    public interface ServerStopping {
+    public interface Stopping {
 
         /**
-         * Called before {@link ServerStarted} when the server is about to begin a shutdown.
+         * Called before {@link Started} when the server is about to begin a shutdown.
          *
          * @param server the current server instance
          */
@@ -47,10 +47,10 @@ public final class ServerLifecycleEvents {
     }
 
     @FunctionalInterface
-    public interface ServerStopped {
+    public interface Stopped {
 
         /**
-         * Called after {@link ServerStopping} when the server has completely shut down.
+         * Called after {@link Stopping} when the server has completely shut down.
          * On the client this happens immediately before returning to the main menu.
          *
          * @param server the current server instance

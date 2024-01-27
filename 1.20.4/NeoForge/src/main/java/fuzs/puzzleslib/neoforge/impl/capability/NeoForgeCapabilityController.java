@@ -50,7 +50,7 @@ public final class NeoForgeCapabilityController implements CapabilityController 
         return this.registerCapability(Level.class, identifier, capabilityFactory, (NeoForgeCapabilityKey.Factory<Level, C, NeoForgeLevelCapabilityKey<C>>) NeoForgeLevelCapabilityKey::new);
     }
 
-    private <T, C1 extends CapabilityComponent<T>, C2 extends CapabilityKey<T, C1>> C2 registerCapability(Class<? extends IAttachmentHolder> holderType, String identifier, Supplier<C1> capabilityFactory, NeoForgeCapabilityKey.Factory<T, C1, C2> capabilityKeyFactory) {
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends IAttachmentHolder> holderType, String identifier, Supplier<C> capabilityFactory, NeoForgeCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         return this.registerCapability(holderType, identifier, capabilityFactory, holderType::isInstance, capabilityKeyFactory);
     }
 
