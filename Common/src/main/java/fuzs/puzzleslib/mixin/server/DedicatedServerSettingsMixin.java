@@ -25,6 +25,7 @@ abstract class DedicatedServerSettingsMixin {
     public void init(Path path, CallbackInfo callback) {
         if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() || !this.properties.serverIp.isEmpty()) return;
         Logger logger = LogUtils.getLogger();
+        // will print the FileNotFoundException twice, but ¯\_(ツ)_/¯
         this.properties = new DedicatedServerProperties(Settings.loadFromFile(path)) {
 
             DedicatedServerProperties setProperties() {
