@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.15-1.20.1] - 2024-01-28
+### Fixed
+- Fix `TagsUpdatedCallback` & `ServerLifecycleEvents.Starting` not running on dedicated servers
+
 ## [v8.1.14-1.20.1] - 2024-01-24
 ### Changed
 - Delay event initialization to avoid being blamed for class loading errors
