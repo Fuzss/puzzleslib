@@ -48,6 +48,11 @@ public interface ModLoaderEnvironment {
     boolean isDevelopmentEnvironment();
 
     /**
+     * @return is this running from a data generation configuration
+     */
+    boolean isDataGeneration();
+
+    /**
      * @return a wrapped mod list
      */
     Map<String, ModContainer> getModList();
@@ -65,7 +70,7 @@ public interface ModLoaderEnvironment {
      * @return the corresponding mod container if found
      */
     default Optional<ModContainer> getModContainer(String modId) {
-        return this.isModLoaded(modId) ? Optional.of(this.getModList().get(modId)) : Optional.empty();
+        return Optional.ofNullable(this.getModList().get(modId));
     }
 
     /**

@@ -72,7 +72,12 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLEnvironment.production;
+        return !FMLEnvironment.production && !FMLLoader.getLaunchHandler().isData();
+    }
+
+    @Override
+    public boolean isDataGeneration() {
+        return FMLLoader.getLaunchHandler().isData();
     }
 
     @Override
