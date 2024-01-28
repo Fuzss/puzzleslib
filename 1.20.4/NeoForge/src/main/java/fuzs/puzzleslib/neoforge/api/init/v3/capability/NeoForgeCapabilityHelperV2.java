@@ -1,11 +1,8 @@
 package fuzs.puzzleslib.neoforge.api.init.v3.capability;
 
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
@@ -26,13 +23,10 @@ import java.util.function.BiConsumer;
 
 /**
  * A utility class for conveniently registering handlers for {@link Capabilities}.
- *
- * @deprecated replace with {@link NeoForgeCapabilityHelperV2}
  */
-@Deprecated(forRemoval = true)
-public final class NeoForgeCapabilityHelper {
+public final class NeoForgeCapabilityHelperV2 {
 
-    private NeoForgeCapabilityHelper() {
+    private NeoForgeCapabilityHelperV2() {
 
     }
 
@@ -41,8 +35,8 @@ public final class NeoForgeCapabilityHelper {
      *
      * @param chestBlocks chest blocks to register
      */
-    public static void registerChestBlock(ChestBlock... chestBlocks) {
-        register(Registries.BLOCK, (RegisterCapabilitiesEvent registerCapabilitiesEvent, ChestBlock chestBlock) -> {
+    public static void registerChestBlock(Holder<? extends ChestBlock>... chestBlocks) {
+        register((RegisterCapabilitiesEvent registerCapabilitiesEvent, ChestBlock chestBlock) -> {
             registerCapabilitiesEvent.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
                 Container container = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, pos, true);
                 return new InvWrapper(container);
@@ -58,7 +52,7 @@ public final class NeoForgeCapabilityHelper {
      * @param <T>              block entity super type
      */
     @SafeVarargs
-    public static <T extends BlockEntity & Container> void registerBlockEntityContainer(BlockEntityType<? extends T>... blockEntityTypes) {
+    public static <T extends BlockEntity & Container> void registerBlockEntityContainer(Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         registerBlockEntity((T blockEntity, @Nullable Direction direction) -> {
             return new InvWrapper(blockEntity);
         }, blockEntityTypes);
@@ -72,7 +66,7 @@ public final class NeoForgeCapabilityHelper {
      * @param <T>              block entity super type
      */
     @SafeVarargs
-    public static <T extends BlockEntity & WorldlyContainer> void registerWorldlyBlockEntityContainer(BlockEntityType<? extends T>... blockEntityTypes) {
+    public static <T extends BlockEntity & WorldlyContainer> void registerWorldlyBlockEntityContainer(Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         registerBlockEntity((T blockEntity, @Nullable Direction direction) -> {
             return direction != null ? new SidedInvWrapper(blockEntity, direction) : new InvWrapper(blockEntity);
         }, blockEntityTypes);
@@ -87,7 +81,7 @@ public final class NeoForgeCapabilityHelper {
      * @param <T>              block entity super type
      */
     @SafeVarargs
-    public static <T extends BlockEntity & WorldlyContainer> void registerShulkerBoxLikeBlockEntity(BlockEntityType<? extends T>... blockEntityTypes) {
+    public static <T extends BlockEntity & WorldlyContainer> void registerRestrictedBlockEntityContainer(Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         registerBlockEntity((T blockEntity, @Nullable Direction direction) -> {
             return new SidedInvWrapper(blockEntity, null);
         }, blockEntityTypes);
@@ -101,8 +95,8 @@ public final class NeoForgeCapabilityHelper {
      * @param <T>                block entity super type
      */
     @SafeVarargs
-    public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, IItemHandler> capabilityProvider, BlockEntityType<? extends T>... blockEntityTypes) {
-        register(Registries.BLOCK_ENTITY_TYPE, (RegisterCapabilitiesEvent registerCapabilitiesEvent, BlockEntityType<? extends T> blockEntityType) -> {
+    public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, IItemHandler> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
+        register((RegisterCapabilitiesEvent registerCapabilitiesEvent, BlockEntityType<? extends T> blockEntityType) -> {
             registerCapabilitiesEvent.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, capabilityProvider);
         }, blockEntityTypes);
     }
@@ -110,19 +104,17 @@ public final class NeoForgeCapabilityHelper {
     /**
      * Helper method for registering types to {@link RegisterCapabilitiesEvent}.
      *
-     * @param registryKey registry associated with type values
      * @param consumer    capability registration context
      * @param types       capability provider values
      * @param <T>         capability provider type
      */
     @SafeVarargs
-    public static <T> void register(ResourceKey<? extends Registry<? super T>> registryKey, BiConsumer<RegisterCapabilitiesEvent, T> consumer, T... types) {
+    public static <T> void register(BiConsumer<RegisterCapabilitiesEvent, T> consumer, Holder<? extends T>... types) {
         Objects.checkIndex(0, types.length);
-        ResourceLocation resourceLocation = RegistryHelper.findBuiltInRegistry(registryKey).getKey(types[0]);
-        Objects.requireNonNull(resourceLocation, "resource location is null");
+        ResourceLocation resourceLocation = types[0].unwrapKey().orElseThrow().location();
         NeoForgeModContainerHelper.getModEventBus(resourceLocation.getNamespace()).addListener((final RegisterCapabilitiesEvent evt) -> {
-            for (T blockEntityType : types) {
-                consumer.accept(evt, blockEntityType);
+            for (Holder<? extends T> holder : types) {
+                consumer.accept(evt, holder.value());
             }
         });
     }
