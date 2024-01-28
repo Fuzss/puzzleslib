@@ -72,7 +72,7 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLEnvironment.production && !FMLLoader.getLaunchHandler().isData();
+        return !FMLEnvironment.production;
     }
 
     @Override

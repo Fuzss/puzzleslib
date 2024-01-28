@@ -13,7 +13,7 @@ abstract class OptionsFabricMixin {
 
     @Inject(method = "load", at = @At("HEAD"))
     public void load(CallbackInfo callback) {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() || ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
         PuzzlesLibClient.initializeGameOptions(Options.class.cast(this));
     }
 }

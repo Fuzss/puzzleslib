@@ -56,7 +56,7 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return FabricLoader.getInstance().isDevelopmentEnvironment() && System.getProperty("fabric-api.datagen") == null;
+        return FabricLoader.getInstance().isDevelopmentEnvironment();
     }
 
     @Override
