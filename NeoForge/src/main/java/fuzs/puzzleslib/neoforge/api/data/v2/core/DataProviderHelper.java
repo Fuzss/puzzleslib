@@ -26,7 +26,7 @@ public final class DataProviderHelper {
      * @param factories all data provider factories to run
      */
     public static void registerDataProviders(String modId, ForgeDataProviderContext.Factory... factories) {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
         Objects.checkIndex(0, factories.length);
         registerDataProviders(modId, Stream.of(factories).map(factory -> {
             return (ForgeDataProviderContext.LegacyFactory) (GatherDataEvent evt, String $) -> {
@@ -42,7 +42,7 @@ public final class DataProviderHelper {
      * @param factories all data provider factories to run
      */
     public static void registerDataProviders(String modId, ForgeDataProviderContext.LegacyFactory... factories) {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
         Objects.checkIndex(0, factories.length);
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             eventBus.addListener((final GatherDataEvent evt) -> {

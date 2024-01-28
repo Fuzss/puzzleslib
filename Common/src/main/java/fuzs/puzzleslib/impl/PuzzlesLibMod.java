@@ -39,7 +39,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() || ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
         CommandOverrides.registerHandlers();
         initializeGameRules();
         initializeCommands();
@@ -63,5 +63,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
         GameRuleValueOverrides.setValue(GameRules.RULE_DO_VINES_SPREAD, false);
         GameRuleValueOverrides.setValue(GameRules.RULE_MAX_ENTITY_CRAMMING, 0);
         GameRuleValueOverrides.setValue(GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY, 1);
+        GameRuleValueOverrides.setValue(GameRules.RULE_COMMANDBLOCKOUTPUT, false);
     }
 }
