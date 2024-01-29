@@ -1,5 +1,6 @@
-package fuzs.puzzleslib.neoforge.api.data.v2.recipes;
+package fuzs.puzzleslib.api.data.v2.recipes;
 
+import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
 import fuzs.puzzleslib.impl.item.CopyTagRecipe;
 import fuzs.puzzleslib.impl.item.CopyTagShapelessRecipe;
 import net.minecraft.advancements.Advancement;
@@ -16,7 +17,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.conditions.ICondition;
 import org.jetbrains.annotations.Nullable;
 
 public class CopyTagShapelessRecipeBuilder extends ShapelessRecipeBuilder {
@@ -86,7 +86,7 @@ public class CopyTagShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     @Override
-    public void save(RecipeOutput recipeOutput, ResourceLocation resourceLocation) {
+    public void save(RecipeOutput recipeOutput, ResourceLocation id) {
         super.save(new RecipeOutput() {
 
             @Override
@@ -95,11 +95,13 @@ public class CopyTagShapelessRecipeBuilder extends ShapelessRecipeBuilder {
             }
 
             @Override
-            public void accept(ResourceLocation id, Recipe<?> recipe, @Nullable AdvancementHolder advancement, ICondition... conditions) {
-                RecipeSerializer<?> recipeSerializer = CopyTagRecipe.getModSerializer(resourceLocation.getNamespace(), CopyTagRecipe.SHAPELESS_RECIPE_SERIALIZER_ID);
+            public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+                // some weird hack to get the proper mod id for the serializer
+                String modId = recipeOutput instanceof AbstractRecipeProvider.IdentifiableRecipeOutput identifiableRecipeOutput ? identifiableRecipeOutput.getModId() : id.getNamespace();
+                RecipeSerializer<?> recipeSerializer = CopyTagRecipe.getModSerializer(modId, CopyTagRecipe.SHAPELESS_RECIPE_SERIALIZER_ID);
                 recipe = new CopyTagShapelessRecipe(recipeSerializer, (ShapelessRecipe) recipe, CopyTagShapelessRecipeBuilder.this.copyFrom);
-                recipeOutput.accept(id, recipe, advancement, conditions);
+                recipeOutput.accept(location, recipe, advancement);
             }
-        }, resourceLocation);
+        }, id);
     }
 }
