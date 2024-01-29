@@ -16,6 +16,11 @@ transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRende
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
 transitive-extendable	method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
+transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  ([Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
+transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
+transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  createItem  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
+transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  (Ljava/lang/String;Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
+transitive-accessible   field   net/minecraft/data/loot/EntityLootSubProvider   map Ljava/util/Map;
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
