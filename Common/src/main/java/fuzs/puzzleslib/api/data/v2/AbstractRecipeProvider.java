@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider {
-    private final String modId;
+    protected final String modId;
 
     public AbstractRecipeProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput());
@@ -86,34 +86,9 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
 
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
-        Set<ResourceLocation> set = Sets.newHashSet();
-        List<CompletableFuture<?>> list = new ArrayList<>();
-        this.buildRecipes(new RecipeOutput() {
-
-            @Override
-            public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
-                final ResourceLocation oldLocation = location;
-                location = new ResourceLocation(AbstractRecipeProvider.this.modId, location.getPath());
-                if (!set.add(location)) {
-                    throw new IllegalStateException("Duplicate recipe " + location);
-                } else {
-                    list.add(DataProvider.saveStable(output, Recipe.CODEC, recipe, AbstractRecipeProvider.this.recipePathProvider.json(location)));
-                    if (advancement != null) {
-                        JsonElement jsonElement = Util.getOrThrow(Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()), IllegalStateException::new);
-                        jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
-                        ResourceLocation advancementLocation = new ResourceLocation(AbstractRecipeProvider.this.modId, advancement.id().getPath());
-                        list.add(DataProvider.saveStable(output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
-                    }
-                }
-            }
-
-            @SuppressWarnings("removal")
-            @Override
-            public Advancement.Builder advancement() {
-                return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
-            }
-        });
-        return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
+        List<CompletableFuture<?>> futures = new ArrayList<>();
+        this.buildRecipes(new IdentifiableRecipeOutput(output, futures));
+        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
 
     @Override
@@ -122,4 +97,44 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     }
 
     public abstract void addRecipes(RecipeOutput recipeOutput);
+
+    public class IdentifiableRecipeOutput implements RecipeOutput {
+        private final CachedOutput output;
+        private final List<CompletableFuture<?>> list;
+        private final Set<ResourceLocation> set = Sets.newHashSet();
+
+        public IdentifiableRecipeOutput(CachedOutput output, List<CompletableFuture<?>> list) {
+            this.output = output;
+            this.list = list;
+        }
+
+        public String getModId() {
+            return AbstractRecipeProvider.this.modId;
+        }
+
+        @Override
+        public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
+            final ResourceLocation oldLocation = location;
+            // relocate all recipes to the mod id, so they do not depend on the item namespace which would
+            // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
+            location = new ResourceLocation(AbstractRecipeProvider.this.modId, location.getPath());
+            if (!this.set.add(location)) {
+                throw new IllegalStateException("Duplicate recipe " + location);
+            } else {
+                this.list.add(DataProvider.saveStable(this.output, Recipe.CODEC, recipe, AbstractRecipeProvider.this.recipePathProvider.json(location)));
+                if (advancement != null) {
+                    JsonElement jsonElement = Util.getOrThrow(Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()), IllegalStateException::new);
+                    jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
+                    ResourceLocation advancementLocation = new ResourceLocation(AbstractRecipeProvider.this.modId, advancement.id().getPath());
+                    this.list.add(DataProvider.saveStable(this.output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
+                }
+            }
+        }
+
+        @SuppressWarnings("removal")
+        @Override
+        public Advancement.Builder advancement() {
+            return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
+        }
+    }
 }
