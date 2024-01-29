@@ -97,7 +97,6 @@ public final class AbstractLootProvider {
     public static abstract class EntityTypes extends EntityLootSubProvider implements DataProvider {
         private final LootTableProvider provider;
         protected final String modId;
-        protected final Map<EntityType<?>, Map<ResourceLocation, LootTable.Builder>> map = Maps.newHashMap();
 
         public EntityTypes(DataProviderContext context) {
             this(context.getModId(), context.getPackOutput());
@@ -133,7 +132,7 @@ public final class AbstractLootProvider {
             for (Map.Entry<ResourceKey<EntityType<?>>, EntityType<?>> entry : BuiltInRegistries.ENTITY_TYPE.entrySet()) {
                 ResourceKey<EntityType<?>> resourceKey = entry.getKey();
                 EntityType<?> entityType = entry.getValue();
-                if (resourceKey.location().getNamespace().equals(this.modId) && entityType.isEnabled(FeatureFlags.REGISTRY.allFlags())) {
+                if (resourceKey.location().getNamespace().equals(this.modId)) {
                     Map<ResourceLocation, LootTable.Builder> map = this.map.remove(entityType);
                     if (this.canHaveLootTable(entityType)) {
                         ResourceLocation resourceLocation = entityType.getDefaultLootTable();
@@ -166,7 +165,7 @@ public final class AbstractLootProvider {
 
     public static abstract class Simple implements LootTableSubProvider, DataProvider {
         private final LootTableProvider provider;
-        protected final Map<ResourceLocation, LootTable.Builder> values = Maps.newHashMap();
+        protected final Map<ResourceLocation, LootTable.Builder> map = Maps.newHashMap();
 
         public Simple(LootContextParamSet paramSet, DataProviderContext context) {
             this(paramSet, context.getPackOutput());
@@ -190,11 +189,11 @@ public final class AbstractLootProvider {
         @Override
         public void generate(BiConsumer<ResourceLocation, LootTable.Builder> exporter) {
             this.addLootTables();
-            this.values.forEach(exporter);
+            this.map.forEach(exporter);
         }
 
         protected void add(ResourceLocation table, LootTable.Builder builder) {
-            this.values.put(table, builder);
+            this.map.put(table, builder);
         }
 
         public abstract void addLootTables();

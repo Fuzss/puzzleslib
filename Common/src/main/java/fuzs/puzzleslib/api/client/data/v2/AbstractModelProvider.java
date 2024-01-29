@@ -32,6 +32,7 @@ import java.util.function.Supplier;
 public abstract class AbstractModelProvider implements DataProvider {
     public static final String BLOCK_PATH = "block";
     public static final String ITEM_PATH = "item";
+    public static final ModelTemplate SPAWN_EGG = ModelTemplates.createItem("template_spawn_egg");
 
     private final String modId;
     private final PackOutput.PathProvider blockStatePathProvider;
