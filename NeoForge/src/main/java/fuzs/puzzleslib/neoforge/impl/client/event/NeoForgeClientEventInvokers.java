@@ -68,7 +68,6 @@ public final class NeoForgeClientEventInvokers {
             Map<ResourceLocation, BakedModel> models = evt.getModels();
             // just like bakedCache in ModelBakery
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
-            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
             Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
@@ -101,7 +100,7 @@ public final class NeoForgeClientEventInvokers {
                         UnbakedModel unbakedModel = result.getInterrupt().get();
                         additionalModels.put(modelLocation, unbakedModel);
                         BakedModel bakedModel = unbakedCache.computeIfAbsent(unbakedModel, $ -> {
-                            NeoForgeModelBakerImpl modelBaker = new NeoForgeModelBakerImpl(modelLocation, bakedCache, modelGetter, missingTextures::put, missingModel);
+                            NeoForgeModelBakerImpl modelBaker = new NeoForgeModelBakerImpl(bakedCache, modelGetter, evt.getTextureGetter(), missingModel);
                             return modelBaker.bake(unbakedModel, modelLocation);
                         });
                         models.put(modelLocation, bakedModel);
@@ -110,11 +109,6 @@ public final class NeoForgeClientEventInvokers {
                     PuzzlesLib.LOGGER.error("Failed to modify unbaked model", exception);
                 }
             }
-            missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
-                PuzzlesLib.LOGGER.warn("Missing textures in model {}:\n{}", resourceLocation, materials.stream().sorted(Material.COMPARATOR).map((material) -> {
-                    return "    " + material.atlasLocation() + ":" + material.texture();
-                }).collect(Collectors.joining("\n")));
-            });
             PuzzlesLib.LOGGER.info("Modifying unbaked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
@@ -122,17 +116,18 @@ public final class NeoForgeClientEventInvokers {
             Map<ResourceLocation, BakedModel> models = evt.getModels();
             // just like bakedCache in ModelBakery
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
-            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
-            Function<ResourceLocation, ModelBaker> modelBaker = resourceLocation -> {
-                return new NeoForgeModelBakerImpl(resourceLocation, bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
-            };
             Function<ResourceLocation, BakedModel> modelGetter = (ResourceLocation resourceLocation) -> {
                 if (models.containsKey(resourceLocation)) {
                     return models.get(resourceLocation);
                 } else {
-                    return modelBaker.apply(resourceLocation).bake(resourceLocation, BlockModelRotation.X0_Y0);
+                    ModelBaker modelBaker = new NeoForgeModelBakerImpl(bakedCache,
+                            evt.getModelBakery()::getModel,
+                            evt.getTextureGetter(),
+                            missingModel
+                    );
+                    return modelBaker.bake(resourceLocation, BlockModelRotation.X0_Y0, evt.getTextureGetter());
                 }
             };
             // Forge has no event firing for every baked model like Fabric,
@@ -143,7 +138,11 @@ public final class NeoForgeClientEventInvokers {
                     EventResultHolder<BakedModel> result = callback.onModifyBakedModel(modelLocation, () -> {
                         return modelGetter.apply(modelLocation);
                     }, () -> {
-                        return modelBaker.apply(modelLocation);
+                        return new NeoForgeModelBakerImpl(bakedCache,
+                                evt.getModelBakery()::getModel,
+                                evt.getTextureGetter(),
+                                missingModel
+                        );
                     }, modelGetter, models::putIfAbsent);
                     result.getInterrupt().ifPresent(bakedModel -> {
                         models.put(modelLocation, bakedModel);
@@ -152,17 +151,11 @@ public final class NeoForgeClientEventInvokers {
                     PuzzlesLib.LOGGER.error("Failed to modify baked model", exception);
                 }
             }
-            missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
-                PuzzlesLib.LOGGER.warn("Missing textures in model {}:\n{}", resourceLocation, materials.stream().sorted(Material.COMPARATOR).map((material) -> {
-                    return "    " + material.atlasLocation() + ":" + material.texture();
-                }).collect(Collectors.joining("\n")));
-            });
             PuzzlesLib.LOGGER.info("Modifying baked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
         INSTANCE.register(ModelEvents.AdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ResourceLocation, BakedModel> models = evt.getModels();
-            Multimap<ResourceLocation, Material> missingTextures = HashMultimap.create();
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
             Objects.requireNonNull(missingModel, "missing model is null");
@@ -171,16 +164,11 @@ public final class NeoForgeClientEventInvokers {
                     return models.getOrDefault(resourceLocation, missingModel);
                 }, () -> {
                     // just use a dummy model, we cut this out when printing missing textures to the log
-                    return new NeoForgeModelBakerImpl(ModelBakery.MISSING_MODEL_LOCATION, bakedCache, evt.getModelBakery()::getModel, missingTextures::put, missingModel);
+                    return new NeoForgeModelBakerImpl(bakedCache, evt.getModelBakery()::getModel, evt.getTextureGetter(), missingModel);
                 });
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.error("Failed to add additional baked models", exception);
             }
-            missingTextures.asMap().forEach((ResourceLocation resourceLocation, Collection<Material> materials) -> {
-                PuzzlesLib.LOGGER.warn("Missing textures:\n{}", materials.stream().sorted(Material.COMPARATOR).map((material) -> {
-                    return "    " + material.atlasLocation() + ":" + material.texture();
-                }).collect(Collectors.joining("\n")));
-            });
             PuzzlesLib.LOGGER.info("Adding additional baked models took {}ms", stopwatch.stop().elapsed().toMillis());
         });
         INSTANCE.register(ModelEvents.AfterModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.AfterModelLoading callback, ModelEvent.BakingCompleted evt) -> {
@@ -274,11 +262,11 @@ public final class NeoForgeClientEventInvokers {
         registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class, ScreenEvent.MouseScrolled.Post.class, (callback, evt) -> {
             callback.onAfterMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDeltaX(), evt.getScrollDeltaY());
         });
-        registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, NeoForgeMouseDraggedEvents.Pre.class, (callback, evt) -> {
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ScreenEvent.MouseDragged.Pre.class, (callback, evt) -> {
             EventResult result = callback.onBeforeMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, NeoForgeMouseDraggedEvents.Post.class, (callback, evt) -> {
+        registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, ScreenEvent.MouseDragged.Post.class, (callback, evt) -> {
             callback.onAfterMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
         });
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class, ScreenEvent.KeyPressed.Pre.class, (callback, evt) -> {

@@ -14,8 +14,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class RenderBuffersForgeMixin {
 
     @SuppressWarnings("target")
-    @Inject(method = "method_54639(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
-    private void method_54639(Object2ObjectLinkedOpenHashMap<RenderType, BufferBuilder> buffers, CallbackInfo callback) {
+    @Inject(method = "lambda$new$1(Lit/unimi/dsi/fastutil/objects/Object2ObjectLinkedOpenHashMap;)V", at = @At("TAIL"))
+    private void lambda$new$1(Object2ObjectLinkedOpenHashMap<RenderType, BufferBuilder> buffers, CallbackInfo callback) {
         RenderBuffersContextForgeImpl.addAll(buffers);
     }
 }

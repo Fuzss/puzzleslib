@@ -274,11 +274,11 @@ public final class ForgeClientEventInvokers {
         registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class, ScreenEvent.MouseScrolled.Post.class, (callback, evt) -> {
             callback.onAfterMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getDeltaX(), evt.getDeltaY());
         });
-        registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ForgeMouseDraggedEvents.Pre.class, (callback, evt) -> {
+        registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ScreenEvent.MouseDragged.Pre.class, (callback, evt) -> {
             EventResult result = callback.onBeforeMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, ForgeMouseDraggedEvents.Post.class, (callback, evt) -> {
+        registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, ScreenEvent.MouseDragged.Post.class, (callback, evt) -> {
             callback.onAfterMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
         });
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class, ScreenEvent.KeyPressed.Pre.class, (callback, evt) -> {

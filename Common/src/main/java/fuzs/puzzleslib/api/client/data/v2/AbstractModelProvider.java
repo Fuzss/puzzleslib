@@ -19,10 +19,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -167,6 +164,22 @@ public abstract class AbstractModelProvider implements DataProvider {
         } else {
             return resourceLocation;
         }
+    }
+
+    public static ModelTemplate createBlockModelTemplate(ResourceLocation blockModelLocation, TextureSlot... requiredSlots) {
+        return createItemModelTemplate(blockModelLocation, "", requiredSlots);
+    }
+
+    public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, TextureSlot... requiredSlots) {
+        return createItemModelTemplate(itemModelLocation, "", requiredSlots);
+    }
+
+    public static ModelTemplate createBlockModelTemplate(ResourceLocation blockModelLocation, String suffix, TextureSlot... requiredSlots) {
+        return new ModelTemplate(Optional.of(decorateBlockModelLocation(blockModelLocation)), Optional.of(suffix), requiredSlots);
+    }
+
+    public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, String suffix, TextureSlot... requiredSlots) {
+        return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)), Optional.of(suffix), requiredSlots);
     }
 
     /**

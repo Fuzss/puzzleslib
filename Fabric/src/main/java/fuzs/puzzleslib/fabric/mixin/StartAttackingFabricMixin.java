@@ -26,15 +26,15 @@ abstract class StartAttackingFabricMixin {
     @Unique
     private static boolean puzzleslib$cancelLivingChangeTarget;
 
-    @ModifyVariable(method = "method_47123", at = @At(value = "LOAD", ordinal = 1), ordinal = 0)
-    private static <E extends Mob> LivingEntity create$0(LivingEntity entity, Predicate<E> canAttack, Function<E, Optional<? extends LivingEntity>> targetFinder, MemoryAccessor<Const.Mu<Unit>, LivingEntity> memoryAccessor, MemoryAccessor<OptionalBox.Mu, Long> memoryAccessor2, ServerLevel level, Mob mob, long l) {
+    @ModifyVariable(method = "lambda$create$1", at = @At(value = "LOAD", ordinal = 1), ordinal = 0)
+    private static <E extends Mob> LivingEntity lambda$create$1$0(LivingEntity entity, Predicate<E> canAttack, Function<E, Optional<? extends LivingEntity>> targetFinder, MemoryAccessor<Const.Mu<Unit>, LivingEntity> memoryAccessor, MemoryAccessor<OptionalBox.Mu, Long> memoryAccessor2, ServerLevel level, Mob mob, long l) {
         DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(entity);
         puzzleslib$cancelLivingChangeTarget = FabricLivingEvents.LIVING_CHANGE_TARGET.invoker().onLivingChangeTarget(mob, target).isInterrupt();
         return target.getAsOptional().orElse(entity);
     }
 
-    @Inject(method = "method_47123", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/declarative/MemoryAccessor;set(Ljava/lang/Object;)V"), cancellable = true)
-    private static <E extends Mob> void create$1(Predicate<E> canAttack, Function<E, Optional<? extends LivingEntity>> targetFinder, MemoryAccessor<Const.Mu<Unit>, LivingEntity> memoryAccessor, MemoryAccessor<OptionalBox.Mu, Long> memoryAccessor2, ServerLevel level, Mob mob, long l, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "lambda$create$1", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ai/behavior/declarative/MemoryAccessor;set(Ljava/lang/Object;)V"), cancellable = true)
+    private static <E extends Mob> void lambda$create$1$1(Predicate<E> canAttack, Function<E, Optional<? extends LivingEntity>> targetFinder, MemoryAccessor<Const.Mu<Unit>, LivingEntity> memoryAccessor, MemoryAccessor<OptionalBox.Mu, Long> memoryAccessor2, ServerLevel level, Mob mob, long l, CallbackInfoReturnable<Boolean> callback) {
         if (puzzleslib$cancelLivingChangeTarget) {
             puzzleslib$cancelLivingChangeTarget = false;
             callback.setReturnValue(false);
