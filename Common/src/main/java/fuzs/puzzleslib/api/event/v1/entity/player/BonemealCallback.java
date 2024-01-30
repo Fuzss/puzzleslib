@@ -22,8 +22,8 @@ public interface BonemealCallback {
      * @param itemStack  the bone meal stack
      *
      * @return {@link EventResult#PASS} to continue with vanilla,
-     * {@link EventResult#ALLOW} to set as handled and let vanilla show particles + arm swing animation,
-     * {@link EventResult#DENY} to not do anything
+     *         {@link EventResult#ALLOW} to set as handled and let vanilla show particles + arm swing animation,
+     *         {@link EventResult#DENY} to not do anything
      */
     EventResult onBonemeal(Level level, BlockPos blockPos, BlockState blockState, ItemStack itemStack);
 }
