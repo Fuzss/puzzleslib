@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.item;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -10,7 +11,6 @@ import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -34,12 +34,14 @@ public interface CopyTagRecipe {
      */
     static RecipeSerializer<?> getModSerializer(String modId, String recipeSerializerId) {
         RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.get(new ResourceLocation(modId, recipeSerializerId));
-        Objects.requireNonNull(recipeSerializer, "%s serializer for %s is null".formatted(recipeSerializerId, modId));
+        if (recipeSerializer == null) ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.COPY_TAG_RECIPES);
         return recipeSerializer;
     }
 
     static void registerSerializers(BiConsumer<String, Supplier<RecipeSerializer<?>>> registrar) {
-        registrar.accept(SHAPED_RECIPE_SERIALIZER_ID, () -> new Serializer<ShapedRecipe, CopyTagShapedRecipe>(new ShapedRecipe.Serializer(), CopyTagShapedRecipe::new));
+        registrar.accept(SHAPED_RECIPE_SERIALIZER_ID, () -> new Serializer<>(new ShapedRecipe.Serializer(),
+                CopyTagShapedRecipe::new
+        ));
         registrar.accept(SHAPELESS_RECIPE_SERIALIZER_ID, () -> new Serializer<>(new ShapelessRecipe.Serializer(), CopyTagShapelessRecipe::new));
     }
 
