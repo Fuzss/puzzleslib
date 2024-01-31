@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.resources.v1;
 
+import fuzs.puzzleslib.api.core.v1.ModContainer;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -25,10 +27,18 @@ public final class PackResourcesHelper {
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
      * @param hidden  controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
+     *
      * @return the {@link RepositorySource} to be added to the {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean hidden) {
-        return buildClientPack(id, factory, Component.literal("Generated Resource Pack"), Component.literal("Dynamic Resources (" + id.getNamespace() + ")"), true, hidden, hidden);
+        return buildClientPack(id,
+                factory,
+                Component.literal("Generated Resource Pack"),
+                getPackDescription(id.getNamespace()),
+                true,
+                hidden,
+                hidden
+        );
     }
 
     /**
@@ -42,12 +52,35 @@ public final class PackResourcesHelper {
      * @param required      a required pack cannot be disabled, like in the pack selection screen the pack cannot be moved to the left side; this is used for the vanilla resource pack
      * @param fixedPosition a fixed pack cannot be moved up or down, like a server or world resource pack
      * @param hidden        controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
+     *
      * @return the {@link RepositorySource} to be added to the {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, boolean fixedPosition, boolean hidden) {
         return consumer -> {
-            consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES, id, factory, title, description, required, fixedPosition, hidden, FeatureFlagSet.of()));
+            consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES,
+                    id,
+                    factory,
+                    title,
+                    description,
+                    required,
+                    fixedPosition,
+                    hidden,
+                    FeatureFlagSet.of()
+            ));
         };
+    }
+
+    /**
+     * Create a fancy pack description for dynamic resources from a mod.
+     *
+     * @param modId the source mod for the dynamic pack
+     *
+     * @return description component
+     */
+    private static Component getPackDescription(String modId) {
+        return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).map(name -> {
+            return Component.literal(name + " Dynamic Resources");
+        }).orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
     }
 
     /**
@@ -57,10 +90,18 @@ public final class PackResourcesHelper {
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
      * @param hidden  controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
+     *
      * @return the {@link RepositorySource} to be added to the {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean hidden) {
-        return buildServerPack(id, factory, Component.literal("Generated Data Pack"), Component.literal("Dynamic Resources (" + id.getNamespace() + ")"), true, hidden, hidden);
+        return buildServerPack(id,
+                factory,
+                Component.literal("Generated Data Pack"),
+                getPackDescription(id.getNamespace()),
+                true,
+                hidden,
+                hidden
+        );
     }
 
     /**
@@ -74,11 +115,21 @@ public final class PackResourcesHelper {
      * @param required      a required pack cannot be disabled, like in the pack selection screen the pack cannot be moved to the left side; this is used for the vanilla resource pack
      * @param fixedPosition a fixed pack cannot be moved up or down, like a server or world resource pack
      * @param hidden        controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens, only available on Forge
+     *
      * @return the {@link RepositorySource} to be added to the {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, boolean fixedPosition, boolean hidden) {
         return consumer -> {
-            consumer.accept(AbstractModPackResources.buildPack(PackType.SERVER_DATA, id, factory, title, description, required, fixedPosition, hidden, FeatureFlagSet.of()));
+            consumer.accept(AbstractModPackResources.buildPack(PackType.SERVER_DATA,
+                    id,
+                    factory,
+                    title,
+                    description,
+                    required,
+                    fixedPosition,
+                    hidden,
+                    FeatureFlagSet.of()
+            ));
         };
     }
 }
