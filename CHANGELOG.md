@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.16-1.20.1] - 2024-02-01
+### Fixed
+- Fix crash when breaking crops with Farmer's Delight's sickle
+
 ## [v8.1.15-1.20.1] - 2024-01-28
 ### Fixed
 - Fix `TagsUpdatedCallback` & `ServerLifecycleEvents.Starting` not running on dedicated servers
