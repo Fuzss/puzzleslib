@@ -84,8 +84,8 @@ abstract class MouseHandlerFabricMixin {
     public abstract boolean isRightPressed();
 
     @SuppressWarnings("target")
-    @Inject(method = "method_1602(Lnet/minecraft/client/gui/screens/Screen;DDDD)V", at = @At("HEAD"), cancellable = true)
-    private void onMove$0(Screen screen, double mouseX, double mouseY, double dragX, double dragY, CallbackInfo callback) {
+    @Inject(method = "lambda$onMove$11(Lnet/minecraft/client/gui/screens/Screen;DDDD)V", at = @At("HEAD"), cancellable = true)
+    private void lambda$onMove$11$0(Screen screen, double mouseX, double mouseY, double dragX, double dragY, CallbackInfo callback) {
 
         // Store the screen in a variable in case someone tries to change the screen during this before event.
         // If someone changes the screen, the after event will likely have class cast exceptions or throw a NPE.
@@ -103,8 +103,8 @@ abstract class MouseHandlerFabricMixin {
     }
 
     @SuppressWarnings("target")
-    @Inject(method = "method_1602(Lnet/minecraft/client/gui/screens/Screen;DDDD)V", at = @At("TAIL"))
-    private void onMove$1(Screen screen, double mouseX, double mouseY, double dragX, double dragY, CallbackInfo callback) {
+    @Inject(method = "lambda$onMove$11(Lnet/minecraft/client/gui/screens/Screen;DDDD)V", at = @At("TAIL"))
+    private void lambda$onMove$11$1(Screen screen, double mouseX, double mouseY, double dragX, double dragY, CallbackInfo callback) {
 
         if (this.puzzleslib$currentScreen == null) return;
 
