@@ -2,8 +2,13 @@ package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 /**
  * proxy base class for client and server implementations
@@ -48,4 +53,15 @@ public interface Proxy {
      * @return is the alt key pressed
      */
     boolean hasAltDown();
+
+    /**
+     * Split a text component into multiple parts depending on a predefined max width.
+     * <p>Most useful for constructing item tooltips in {@link net.minecraft.world.item.Item#appendHoverText(ItemStack, Level, List, TooltipFlag)}.
+     * <p>Always returns the unmodified component on the server side.
+     *
+     * @param component the component to split
+     *
+     * @return the split component
+     */
+    List<Component> splitTooltipLines(Component component);
 }

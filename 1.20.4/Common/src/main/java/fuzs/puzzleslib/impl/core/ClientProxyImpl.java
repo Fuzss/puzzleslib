@@ -1,11 +1,15 @@
 package fuzs.puzzleslib.impl.core;
 
+import fuzs.puzzleslib.api.chat.v1.ComponentHelper;
+import fuzs.puzzleslib.api.client.gui.v2.components.ScreenTooltipFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
+import java.util.List;
 import java.util.Objects;
 
 public interface ClientProxyImpl extends ProxyImpl {
@@ -40,5 +44,10 @@ public interface ClientProxyImpl extends ProxyImpl {
     @Override
     default boolean hasAltDown() {
         return Screen.hasAltDown();
+    }
+
+    @Override
+    default List<Component> splitTooltipLines(Component component) {
+        return ScreenTooltipFactory.splitTooltipLines(component).map(ComponentHelper::toComponent).toList();
     }
 }
