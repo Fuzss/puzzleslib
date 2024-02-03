@@ -25,6 +25,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public abstract class AbstractModelProvider implements DataProvider {
     public static final String BLOCK_PATH = "block";
@@ -180,6 +181,33 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, String suffix, TextureSlot... requiredSlots) {
         return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)), Optional.of(suffix), requiredSlots);
+    }
+    
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+        return modelTemplate.create(decorateItemModelLocation(resourceLocation),
+                TextureMapping.layer0(decorateItemModelLocation(resourceLocation)),
+                modelOutput
+        );
+    }
+
+    public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ItemOverride... itemOverrides) {
+        return generateFlatItem(item,
+                modelTemplate,
+                modelOutput,
+                overrides(modelTemplate,
+                        Stream.of(itemOverrides)
+                                .map(override -> (ItemOverride.Factory) (ResourceLocation resourceLocation) -> override)
+                                .toArray(ItemOverride.Factory[]::new)
+                )
+        );
+    }
+
+    public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
+        return modelTemplate.create(ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(item),
+                modelOutput,
+                factory
+        );
     }
 
     /**
