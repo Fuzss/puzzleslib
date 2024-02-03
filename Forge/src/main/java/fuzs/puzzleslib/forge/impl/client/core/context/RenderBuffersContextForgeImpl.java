@@ -12,7 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class RenderBuffersContextForgeImpl implements RenderBuffersContext {
-    private static final Set<Consumer<BiConsumer<RenderType, BufferBuilder>>> CONSUMERS = Sets.newLinkedHashSet();
+    private static final Set<Consumer<BiConsumer<RenderType, BufferBuilder>>> CONSUMERS = Sets.newConcurrentHashSet();
 
     @Override
     public void registerRenderBuffer(RenderType renderType, BufferBuilder renderBuffer) {
