@@ -212,7 +212,10 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     /**
      * Use in conjunction with {@link ModelTemplate#create(ResourceLocation, TextureMapping, BiConsumer, ModelTemplate.JsonFactory)}.
+     *
+     * @deprecated replaced with {@link ItemModelProperties#overridesFactory(ModelTemplate, ItemModelProperties...)}
      */
+    @Deprecated(forRemoval = true)
     public static ModelTemplate.JsonFactory overrides(ModelTemplate modelTemplate, ItemOverride.Factory... factories) {
         return (ResourceLocation resourceLocation, Map<TextureSlot, ResourceLocation> map) -> {
             JsonObject jsonObject = modelTemplate.createBaseTemplate(resourceLocation, map);
@@ -225,6 +228,10 @@ public abstract class AbstractModelProvider implements DataProvider {
         };
     }
 
+    /**
+     * @deprecated replaced with {@link ItemModelProperties}
+     */
+    @Deprecated(forRemoval = true)
     public record ItemOverride(ResourceLocation model, Map<ResourceLocation, Float> predicates) {
 
         public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1) {
@@ -250,6 +257,7 @@ public abstract class AbstractModelProvider implements DataProvider {
             return jsonObject;
         }
 
+        @Deprecated(forRemoval = true)
         @FunctionalInterface
         public interface Factory extends Function<ResourceLocation, ItemOverride> {
 
