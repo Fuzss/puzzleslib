@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 public final class TooltipRenderHelper {
 
     private TooltipRenderHelper() {
-
+        // NO-OP
     }
 
     /**
