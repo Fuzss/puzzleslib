@@ -1,12 +1,15 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import fuzs.puzzleslib.fabric.api.client.event.v1.ExtraScreenMouseEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import fuzs.puzzleslib.fabric.impl.client.event.ExtraScreenExtensions;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -49,5 +52,12 @@ abstract class ScreenFabricMixin extends AbstractContainerEventHandler implement
     public Event<ExtraScreenMouseEvents.AfterMouseDrag> puzzleslib$getAfterMouseDragEvent() {
         Objects.requireNonNull(this.puzzleslib$afterMouseDragEvent, "after mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$afterMouseDragEvent;
+    }
+
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderBackground(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo callback) {
+        if (AbstractContainerScreen.class.isInstance(this)) {
+            FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND.invoker().onDrawBackground(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
+        }
     }
 }

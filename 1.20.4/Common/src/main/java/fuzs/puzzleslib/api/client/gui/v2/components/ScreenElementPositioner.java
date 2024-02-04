@@ -21,7 +21,7 @@ import java.util.List;
 public final class ScreenElementPositioner {
 
     private ScreenElementPositioner() {
-
+        // NO-OP
     }
 
     /**

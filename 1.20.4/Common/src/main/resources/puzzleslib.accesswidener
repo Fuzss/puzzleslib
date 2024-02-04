@@ -21,6 +21,7 @@ transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  createItem  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  (Ljava/lang/String;Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   field   net/minecraft/data/loot/EntityLootSubProvider   map Ljava/util/Map;
+transitive-accessible   method  net/minecraft/client/gui/GuiGraphics    blitNineSlicedSprite    (Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/resources/metadata/gui/GuiSpriteScaling$NineSlice;IIIII)V
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
