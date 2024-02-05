@@ -10,6 +10,7 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
  * A helper class for providing the non-wrappable {@link CapabilityToken} for creating an actual {@link Capability}.
  * <p>Similar setup for capabilities is necessary on Fabric, but that is all done in <code>fabric.mod.json</code>.
  */
+@Deprecated(forRemoval = true)
 public final class ForgeCapabilityHelper {
 
     private ForgeCapabilityHelper() {
@@ -25,6 +26,6 @@ public final class ForgeCapabilityHelper {
      * @param <C>   capability type
      */
     public static <T, C extends CapabilityComponent<T>> void setCapabilityToken(CapabilityKey<T, C> key, CapabilityToken<C> token) {
-        ((ForgeCapabilityKey<T, C>) key).createCapability(token);
+        // NO-OP
     }
 }

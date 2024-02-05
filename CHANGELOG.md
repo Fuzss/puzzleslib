@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `GuiGraphicsHelper`
 ### Changed
 - Allow `SpritelessImageButton` to support drawing the vanilla button background
+- `CapabilityToken` no longer needs to be set for a capability on Forge
 ### Fixed
 - Fix `ContainerScreenEvents$Background` running too late on Fabric (Forge & NeoForge are unfortunately still broken, waiting to be fixed by the respective loader)
 

@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.Set;
@@ -26,12 +27,13 @@ public final class GlobalCapabilityRegister {
         }
     }
 
-    public static CapabilityKey<?, ?> retrieve(ResourceLocation id) {
-        CapabilityKey<?, ?> capabilityKey = REGISTER.get(id);
+    @NotNull
+    public static CapabilityKey<?, ?> get(ResourceLocation identifier) {
+        CapabilityKey<?, ?> capabilityKey = REGISTER.get(identifier);
         if (capabilityKey != null) {
             return capabilityKey;
         } else {
-            throw new IllegalStateException("No capability registered for id %s".formatted(id));
+            throw new IllegalStateException("No capability registered for identifier %s".formatted(identifier));
         }
     }
 
