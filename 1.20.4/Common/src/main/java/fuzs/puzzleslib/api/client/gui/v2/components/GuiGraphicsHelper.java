@@ -18,6 +18,75 @@ public final class GuiGraphicsHelper {
         // NO-OP
     }
 
+    /**
+     * Draws a rectangular border frame, the inside of the shape is left untouched.
+     *
+     * @param guiGraphics gui graphics instance
+     * @param posX        start x
+     * @param posY        start y
+     * @param width       rectangle width
+     * @param height      rectangle height
+     * @param borderSize  width of the border on all sides, goes inwards
+     * @param color       color to fill with
+     */
+    public static void fillFrame(GuiGraphics guiGraphics, int posX, int posY, int width, int height, int borderSize, int color) {
+        fillFrame(guiGraphics, posX, posY, width, height, borderSize, 0, color);
+    }
+
+    /**
+     * Draws a rectangular border frame, the inside of the shape is left untouched.
+     *
+     * @param guiGraphics gui graphics instance
+     * @param posX        start x
+     * @param posY        start y
+     * @param width       rectangle width
+     * @param height      rectangle height
+     * @param borderSize  width of the border on all sides, goes inwards
+     * @param z           z offset
+     * @param color       color to fill with
+     */
+    public static void fillFrame(GuiGraphics guiGraphics, int posX, int posY, int width, int height, int borderSize, int z, int color) {
+        fillFrameArea(guiGraphics, posX, posY, posX + width, posY + height, borderSize, z, color);
+    }
+
+    /**
+     * Draws a rectangular border frame, the inside of the shape is left untouched.
+     *
+     * @param guiGraphics gui graphics instance
+     * @param minX        start x
+     * @param minY        start y
+     * @param maxX        end x
+     * @param maxY        end y
+     * @param borderSize  width of the border on all sides, goes inwards
+     * @param z           z offset
+     * @param color       color to fill with
+     */
+    public static void fillFrameArea(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, int borderSize, int z, int color) {
+        // top
+        guiGraphics.fill(minX, minY, maxX, minY + borderSize, z, color);
+        // bottom
+        guiGraphics.fill(minX, maxY - borderSize, maxX, maxY, z, color);
+        // left
+        guiGraphics.fill(minX, minY + borderSize, minX + borderSize, maxY - borderSize, z, color);
+        // right
+        guiGraphics.fill(maxX - borderSize, minY + borderSize, maxX, maxY - borderSize, z, color);
+    }
+
+    /**
+     * Draws a rectangular border frame, the inside of the shape is left untouched.
+     *
+     * @param guiGraphics gui graphics instance
+     * @param minX        start x
+     * @param minY        start y
+     * @param maxX        end x
+     * @param maxY        end y
+     * @param borderSize  width of the border on all sides, goes inwards
+     * @param color       color to fill with
+     */
+    public static void fillFrameArea(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, int borderSize, int color) {
+        fillFrameArea(guiGraphics, minX, minY, maxX, maxY, borderSize, 0, color);
+    }
+
     public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int border, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         blitNineSliced(guiGraphics,
                 resourceLocation,
