@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v20.4.18-1.20.4] - 2024-02-04
 ### Added
 - Add `GuiGraphicsHelper`
+- Add `DynamicallyCopiedPackResources`
 ### Changed
 - Allow `SpritelessImageButton` to support drawing the vanilla button background
 - `CapabilityToken` no longer needs to be set for a capability on Forge
