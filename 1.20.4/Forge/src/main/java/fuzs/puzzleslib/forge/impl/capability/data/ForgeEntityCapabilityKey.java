@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
 import fuzs.puzzleslib.impl.capability.EntityCapabilityKeyImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraftforge.common.capabilities.Capability;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -14,8 +15,8 @@ public class ForgeEntityCapabilityKey<T extends Entity, C extends CapabilityComp
     private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
     private CopyStrategy copyStrategy = CopyStrategy.NEVER;
 
-    public ForgeEntityCapabilityKey(ResourceLocation identifier, CapabilityTokenFactory<T, C> tokenFactory, Predicate<Object> filter, Supplier<C> capabilityFactory) {
-        super(identifier, tokenFactory, filter, capabilityFactory);
+    public ForgeEntityCapabilityKey(ResourceLocation identifier, Capability<C> capability, Predicate<Object> filter, Supplier<C> capabilityFactory) {
+        super(identifier, capability, filter, capabilityFactory);
         this.initialize();
     }
 

@@ -4,14 +4,15 @@ import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.LevelCapabilityKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.Capability;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public class ForgeLevelCapabilityKey<C extends CapabilityComponent<Level>> extends ForgeCapabilityKey<Level, C> implements LevelCapabilityKey<C> {
 
-    public ForgeLevelCapabilityKey(ResourceLocation identifier, CapabilityTokenFactory<Level, C> tokenFactory, Predicate<Object> filter, Supplier<C> capabilityFactory) {
-        super(identifier, tokenFactory, filter, capabilityFactory);
+    public ForgeLevelCapabilityKey(ResourceLocation identifier, Capability<C> capability, Predicate<Object> filter, Supplier<C> capabilityFactory) {
+        super(identifier, capability, filter, capabilityFactory);
     }
 
     @Override

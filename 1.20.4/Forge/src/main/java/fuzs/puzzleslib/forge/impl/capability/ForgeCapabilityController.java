@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.*;
+import fuzs.puzzleslib.api.core.v1.utility.ReflectionHelper;
 import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.impl.capability.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
@@ -19,7 +20,10 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Type;
 
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -70,20 +74,30 @@ public final class ForgeCapabilityController implements CapabilityController {
     private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ICapabilityProvider> holderType, String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Predicate<Object> filter, ForgeCapabilityKey.ForgeCapabilityKeyFactory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
         ResourceLocation capabilityName = new ResourceLocation(this.modId, identifier);
-        CapabilityData<T, C> capabilityData = new CapabilityData<>(capabilityName, capabilityType, filter);
-        this.capabilityData.put(holderType, capabilityData);
-        Object[] capabilityKey = new Object[1];
-        ForgeCapabilityKey.CapabilityTokenFactory<T, C> tokenFactory = (CapabilityToken<C> token) -> {
-            Capability<C> capability = CapabilityManager.get(token);
-            capabilityData.setFactory((T t) -> {
-                C capabilityComponent = capabilityFactory.get();
-                Objects.requireNonNull(capabilityComponent, "capability component is null");
-                capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], t);
-                return new CapabilityAdapter<>(capability, capabilityComponent);
-            });
-            return capability;
+        Capability<C> capability = this.getCapability(capabilityType);
+        Objects.requireNonNull(capability, "capability is null");
+        K capabilityKey = capabilityKeyFactory.apply(capabilityName, capability, filter, capabilityFactory);
+        Function<T, CapabilityAdapter<T, C>> capabilityAdapterFactory = (T t) -> {
+            C capabilityComponent = capabilityFactory.get();
+            Objects.requireNonNull(capabilityComponent, "capability component is null");
+            capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey, t);
+            return new CapabilityAdapter<>(capability, capabilityComponent);
         };
-        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(capabilityName, tokenFactory, filter, capabilityFactory));
+        CapabilityData<T, C> capabilityData = new CapabilityData<>(capabilityName, capabilityType, filter, capabilityAdapterFactory);
+        this.capabilityData.put(holderType, capabilityData);
+        return capabilityKey;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T, C extends CapabilityComponent<T>> Capability<C> getCapability(Class<C> capabilityType) {
+        try {
+            Method method = ReflectionHelper.findMethod(CapabilityManager.class, "get", String.class, boolean.class);
+            Objects.requireNonNull(method, "CapabilityManager::get is null");
+            String internalName = Type.getInternalName(capabilityType);
+            return (Capability<C>) MethodHandles.lookup().unreflect(method).invoke(CapabilityManager.INSTANCE, internalName, false);
+        } catch (Throwable throwable) {
+            throw new RuntimeException(throwable);
+        }
     }
 
     private void onRegisterCapabilities(final RegisterCapabilitiesEvent evt) {
@@ -103,33 +117,12 @@ public final class ForgeCapabilityController implements CapabilityController {
         }
     }
 
-    private static final class CapabilityData<T, C extends CapabilityComponent<T>> {
-        private final ResourceLocation identifier;
-        private final Class<C> type;
-        private final Predicate<Object> filter;
-        @Nullable
-        private Function<T, CapabilityAdapter<T, C>> factory;
-
-        private CapabilityData(ResourceLocation identifier, Class<C> type, Predicate<Object> filter) {
-            this.identifier = identifier;
-            this.type = type;
-            this.filter = filter;
-        }
-
-        public ResourceLocation identifier() {
-            return this.identifier;
-        }
-
-        public Class<C> type() {
-            return this.type;
-        }
-
-        public void setFactory(Function<T, CapabilityAdapter<T, C>> factory) {
-            this.factory = factory;
-        }
+    private record CapabilityData<T, C extends CapabilityComponent<T>>(ResourceLocation identifier,
+                                                                       Class<C> type,
+                                                                       Predicate<Object> filter,
+                                                                       Function<T, CapabilityAdapter<T, C>> factory) {
 
         public CapabilityAdapter<T, C> apply(T t) {
-            Objects.requireNonNull(this.factory, "factory is null");
             return this.factory.apply(t);
         }
 

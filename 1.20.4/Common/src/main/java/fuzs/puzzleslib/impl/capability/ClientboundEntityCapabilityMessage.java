@@ -21,7 +21,7 @@ public record ClientboundEntityCapabilityMessage(ResourceLocation identifier, in
             public void handle(ClientboundEntityCapabilityMessage message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
                 Entity entity = level.getEntity(message.entityId);
                 if (entity != null) {
-                    CapabilityKey<?, ?> capabilityKey = GlobalCapabilityRegister.retrieve(message.identifier);
+                    CapabilityKey<?, ?> capabilityKey = GlobalCapabilityRegister.get(message.identifier);
                     capabilityKey.getIfProvided(entity).ifPresent(capabilityComponent -> capabilityComponent.read(message.tag));
                 }
             }
