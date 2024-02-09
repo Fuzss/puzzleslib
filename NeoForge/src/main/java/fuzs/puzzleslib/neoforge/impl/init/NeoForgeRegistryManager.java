@@ -19,7 +19,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -79,7 +78,7 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public Holder.Reference<EntityDataSerializer<?>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<?>> entry) {
+    public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
         return this.register(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS.key(), path, entry);
     }
 }
