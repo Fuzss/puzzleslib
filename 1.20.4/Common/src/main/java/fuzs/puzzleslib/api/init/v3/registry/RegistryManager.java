@@ -349,13 +349,13 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
 
     /**
      * Register an entity data serializer.
-     * <p>Registration to a game registry is only requried on NeoForge, therefore a direct holder is returned on other mod loaders.
+     * <p>Registration to a game registry is only required on NeoForge, therefore a direct holder is returned on other mod loaders.
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @return holder reference
      */
-    default Holder.Reference<EntityDataSerializer<?>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<?>> entry) {
+    default <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
         ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(
                 new ResourceLocation("entity_data_serializers"));
         return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), entry.get());
