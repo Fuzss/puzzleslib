@@ -10,6 +10,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -358,7 +359,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
         ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(
                 new ResourceLocation("entity_data_serializers"));
-        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), entry.get());
+        EntityDataSerializer<T> serializer = entry.get();
+        EntityDataSerializers.registerSerializer(serializer);
+        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), serializer);
     }
 
     /**
