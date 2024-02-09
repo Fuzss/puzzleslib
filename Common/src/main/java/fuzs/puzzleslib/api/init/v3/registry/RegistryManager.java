@@ -3,11 +3,13 @@ package fuzs.puzzleslib.api.init.v3.registry;
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.item.RecipeTypeImpl;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -343,6 +345,20 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
         return this.register(Registries.PARTICLE_TYPE, path, () -> {
             return new SimpleParticleType(false);
         });
+    }
+
+    /**
+     * Register an entity data serializer.
+     * <p>Registration to a game registry is only requried on NeoForge, therefore a direct holder is returned on other mod loaders.
+     *
+     * @param path  path for new entry
+     * @param entry supplier for entry to register
+     * @return holder reference
+     */
+    default Holder.Reference<EntityDataSerializer<?>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<?>> entry) {
+        ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(
+                new ResourceLocation("entity_data_serializers"));
+        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), entry.get());
     }
 
     /**

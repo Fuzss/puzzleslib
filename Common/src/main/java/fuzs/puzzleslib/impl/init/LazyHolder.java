@@ -13,7 +13,8 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * A {@link Holder} implementation similar to DeferredHolder on NeoForge, but extending {@link net.minecraft.core.Holder.Reference} to allow for using {@link Reference#key()}.
+ * A {@link Holder} implementation similar to DeferredHolder on NeoForge, but extending
+ * {@link net.minecraft.core.Holder.Reference} to allow for using {@link Reference#key()}.
  * <p>Also supports lazy initialization on Fabric &amp; Forge.
  */
 public final class LazyHolder<T> extends Holder.Reference<T> {
