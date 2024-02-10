@@ -22,12 +22,14 @@ public record ForwardingResourceManagerReloadListener(ResourceLocation identifie
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
         Collection<ResourceManagerReloadListener> reloadListeners = this.reloadListeners.get();
-        Objects.checkIndex(0, reloadListeners.size());
+        if (reloadListeners.isEmpty()) {
+            throw new IllegalStateException("Reload listeners in %s are empty".formatted(this.identifier));
+        }
         for (ResourceManagerReloadListener reloadListener : reloadListeners) {
             try {
                 reloadListener.onResourceManagerReload(resourceManager);
-            } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to reload listener {}", reloadListener.getName(), e);
+            } catch (Exception exception) {
+                PuzzlesLib.LOGGER.error("Unable to reload listener {}", reloadListener.getName(), exception);
             }
         }
     }
