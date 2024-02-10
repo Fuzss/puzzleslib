@@ -10,7 +10,6 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Collection;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
@@ -26,12 +25,14 @@ public record ForwardingReloadListener(ResourceLocation identifier, Supplier<Col
     public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
         return CompletableFuture.completedFuture(null).thenCompose($ -> {
             Collection<PreparableReloadListener> reloadListeners = this.reloadListeners.get();
-            Objects.checkIndex(0, reloadListeners.size());
+            if (reloadListeners.isEmpty()) {
+                throw new IllegalStateException("Reload listeners in %s are empty".formatted(this.identifier));
+            }
             return CompletableFuture.allOf(reloadListeners.stream().map(reloadListener -> {
                 try {
                     return reloadListener.reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
-                } catch (Exception e) {
-                    PuzzlesLib.LOGGER.error("Unable to reload listener {}", reloadListener.getName(), e);
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Unable to reload listener {}", reloadListener.getName(), exception);
                 }
                 return CompletableFuture.completedFuture(null).thenCompose(preparationBarrier::wait);
             }).toArray(CompletableFuture[]::new));
