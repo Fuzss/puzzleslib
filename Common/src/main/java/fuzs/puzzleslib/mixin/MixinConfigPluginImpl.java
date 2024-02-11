@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -20,17 +21,16 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
         // see here for more information: https://github.com/Fuzss/puzzleslib/issues/41
         try {
             Class.forName("fuzs.puzzleslib.api.core.v1.ServiceProviderHelper");
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
+        } catch (ClassNotFoundException exception) {
+            throw new RuntimeException(exception);
         }
-        // we print the mod list to the log as early as possible (would be even better as language provider,
-        // but not sure how to include that in Puzzles Lib) just like Fabric Loader does
+        // we print the mod list to the log as early as possible
         // this greatly helps with diagnosing issues where only a log has been provided and should otherwise be unobtrusive
         printModList();
     }
 
     private static void printModList() {
-        if (!ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) return;
+        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) return;
         Collection<ModContainer> mods = ModLoaderEnvironment.INSTANCE.getModList().values();
         PuzzlesLib.LOGGER.info(dumpModList(mods));
     }
@@ -43,15 +43,26 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
         if (mods.size() != 1) builder.append("s");
         builder.append(":");
         for (ModContainer mod : mods) {
-            builder.append('\n');
-            builder.append("\t");
-            builder.append("-");
-            builder.append(' ');
-            builder.append(mod.getModId());
-            builder.append(' ');
-            builder.append(mod.getVersion());
+            if (mod.getParent() == null) {
+                printMod(builder, mod, 0, false);
+            }
         }
         return builder.toString();
+    }
+
+    private static void printMod(StringBuilder builder, ModContainer mod, int depth, boolean lastChild) {
+        builder.append('\n');
+        builder.append("\t".repeat(depth + 1));
+        builder.append(depth == 0 ? "-" : (lastChild ? "\\" : "|") + "--");
+        builder.append(' ');
+        builder.append(mod.getModId());
+        builder.append(' ');
+        builder.append(mod.getVersion());
+        Iterator<ModContainer> iterator = mod.getChildren().iterator();
+        while (iterator.hasNext()) {
+            ModContainer childMod = iterator.next();
+            printMod(builder, childMod, depth + 1, !iterator.hasNext());
+        }
     }
 
     @Override
@@ -66,7 +77,7 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
 
     @Override
     public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-
+        // NO-OP
     }
 
     @Override
@@ -76,11 +87,11 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
 
     @Override
     public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // NO-OP
     }
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // NO-OP
     }
 }
