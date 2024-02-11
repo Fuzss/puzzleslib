@@ -1,9 +1,16 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import com.google.common.collect.ImmutableMap;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 /**
  * Access to mod data.
@@ -57,4 +64,28 @@ public interface ModContainer {
      * @return path to the resource if it exists, otherwise empty
      */
     Optional<Path> findResource(String... path);
+
+    /**
+     * @return other mods provided via jar-in-jar systems
+     */
+    Collection<ModContainer> getChildren();
+
+    /**
+     * @return all mods including self and mods provided via jar-in-jar systems
+     */
+    default Stream<ModContainer> getAllChildren() {
+        return Stream.concat(Stream.of(this), this.getChildren().stream().flatMap(ModContainer::getAllChildren));
+    }
+
+    /**
+     * @return parent mod when provided via jar-in-jar systems
+     */
+    @Nullable
+    ModContainer getParent();
+
+    @ApiStatus.Internal
+    static Map<String, ModContainer> toModList(Stream<? extends ModContainer> stream) {
+        return stream.sorted(Comparator.comparing(ModContainer::getModId))
+                .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId, Function.identity()));
+    }
 }
