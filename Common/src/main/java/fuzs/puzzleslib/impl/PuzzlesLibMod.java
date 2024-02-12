@@ -11,10 +11,7 @@ import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.entity.ClientboundAddEntityDataMessage;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
 
@@ -23,11 +20,7 @@ import net.minecraft.world.level.GameRules;
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     public static final NetworkHandlerV3 NETWORK = NetworkHandlerV3.builder(MOD_ID).optional()
-            .registerSerializer(ClientboundAddEntityPacket.class, (FriendlyByteBuf friendlyByteBuf, ClientboundAddEntityPacket clientboundAddEntityPacket) -> {
-                clientboundAddEntityPacket.write(friendlyByteBuf);
-            }, ClientboundAddEntityPacket::new)
             .registerClientbound(ClientboundEntityCapabilityMessage.class)
-            .registerClientbound(ClientboundAddEntityDataMessage.class)
             .registerClientbound(ClientboundModListMessage.class);
 
     @Override
