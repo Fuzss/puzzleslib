@@ -31,6 +31,30 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
 
     public abstract void addSoundDefinitions();
 
+    protected void add(SoundEvent soundEvent, String... sounds) {
+        SoundDefinition definition = definition();
+        for (String sound : sounds) {
+            definition.with(sound(sound));
+        }
+        this.add(soundEvent, definition);
+    }
+
+    protected void add(SoundEvent soundEvent, ResourceLocation... sounds) {
+        SoundDefinition definition = definition();
+        for (ResourceLocation sound : sounds) {
+            definition.with(sound(sound));
+        }
+        this.add(soundEvent, definition);
+    }
+
+    protected void add(SoundEvent soundEvent, SoundEvent... soundEvents) {
+        SoundDefinition definition = definition();
+        for (SoundEvent vanillaSoundEvent : soundEvents) {
+            definition.with(sound(vanillaSoundEvent));
+        }
+        this.add(soundEvent, definition);
+    }
+
     protected void add(final SoundEvent soundEvent, final SoundDefinition.Sound... sounds) {
         this.add(soundEvent.getLocation(), definition().with(sounds));
     }

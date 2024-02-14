@@ -22,6 +22,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameRules;
@@ -123,6 +124,14 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(block.getDescriptionId(), additionalKey, value);
         }
 
+        default void addSpawnEgg(Item item, String value) {
+            if (item instanceof SpawnEggItem) {
+                this.add(item, value + " Spawn Egg");
+            } else {
+                throw new IllegalArgumentException("Unsupported item: " + item);
+            }
+        }
+
         default void add(Item item, String value) {
             this.add(item, "", value);
         }
@@ -178,7 +187,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             if (statType.getDisplayName().getContents() instanceof TranslatableContents contents) {
                 this.add(contents.getKey(), value);
             } else {
-                throw new UnsupportedOperationException("Unsupported component: " + statType.getDisplayName());
+                throw new IllegalArgumentException("Unsupported component: " + statType.getDisplayName());
             }
         }
 
@@ -244,7 +253,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             if (component.getContents() instanceof TranslatableContents contents) {
                 this.add(contents.getKey(), value);
             } else {
-                throw new UnsupportedOperationException("Unsupported component: " + component);
+                throw new IllegalArgumentException("Unsupported component: " + component);
             }
         }
 

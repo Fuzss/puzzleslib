@@ -46,10 +46,11 @@ public final class ScreenEvents {
     public interface BeforeInit<T extends Screen> {
 
         /**
-         * Called before widgets on a {@link Screen} are cleared and rebuilt by calling {@link Screen#init()},
-         * usually triggered by the screen opening or being resized.
-         * <p>As opposed to Forge, this callback cannot be cancelled, and therefore also does not allow for manipulating widgets,
-         * as those will be cleared anyway.
+         * Called before widgets on a {@link Screen} are cleared and rebuilt by calling {@link Screen#init()}, usually
+         * triggered by the screen opening or being resized.
+         * <p>As opposed to Forge, this callback cannot be cancelled, and therefore also does not allow for
+         * manipulating
+         * widgets, as those will be cleared anyway.
          *
          * @param minecraft    the minecraft singleton instance
          * @param screen       the screen that is rebuilding widgets
@@ -75,7 +76,8 @@ public final class ScreenEvents {
          * @param screenHeight height of the window
          * @param widgets      all widgets on the screen provided as a read-only list
          * @param addWidget    a consumer for adding a new widget
-         * @param removeWidget a consumer for removing an existing widget, obtain the widget instance from <code>widgets</code>
+         * @param removeWidget a consumer for removing an existing widget, obtain the widget instance from
+         *                     <code>widgets</code>
          */
         void onAfterInit(Minecraft minecraft, T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, ConsumingOperator<AbstractWidget> addWidget, ConsumingOperator<AbstractWidget> removeWidget);
     }
@@ -101,9 +103,9 @@ public final class ScreenEvents {
          * @param guiGraphics the gui graphics component
          * @param mouseX      the x-position of the mouse
          * @param mouseY      the y-position of the mouse
-         * @param tickDelta   the partial tick time
+         * @param partialTick the partial tick time
          */
-        void onBeforeRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float tickDelta);
+        void onBeforeRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface
@@ -116,17 +118,20 @@ public final class ScreenEvents {
          * @param guiGraphics the gui graphics component
          * @param mouseX      the x-position of the mouse
          * @param mouseY      the y-position of the mouse
-         * @param tickDelta   the partial tick time
+         * @param partialTick the partial tick time
          */
-        void onAfterRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float tickDelta);
+        void onAfterRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     /**
      * A simple helper class for returning the instance passed into a consumer.
      * <p>Similar to {@link net.minecraft.Util#make(Object, Consumer)}.
+     * <p>
+     * TODO replace this with a normal consumer again
      *
      * @param <T> the handled type
      */
+    @Deprecated(forRemoval = true)
     public static final class ConsumingOperator<T> {
         private final Consumer<T> consumer;
 

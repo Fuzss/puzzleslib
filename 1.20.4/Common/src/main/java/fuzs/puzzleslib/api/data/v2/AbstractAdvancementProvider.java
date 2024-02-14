@@ -102,6 +102,13 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
             return Component.translatable(this.id.toLanguageKey("advancements", "description"));
         }
 
+        public AdvancementHolder asParent() {
+            // workaround for getting the proper parent id,
+            // the advancement holder from saving the builder always has the `minecraft` namespace set
+            // (which we replace when running the data generator which happens later though)
+            return new AdvancementHolder(this.id, null);
+        }
+
         public String name() {
             return this.id.getPath();
         }

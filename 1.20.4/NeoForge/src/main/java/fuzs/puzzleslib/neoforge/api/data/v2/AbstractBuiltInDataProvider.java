@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.api.data.v2;
 
 import com.google.common.base.CaseFormat;
-import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.ForgeDataProviderContext;
 import net.minecraft.Util;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -14,17 +14,18 @@ import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
@@ -33,31 +34,36 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
     private final CompletableFuture<HolderLookup.Provider> lookupProvider;
 
     private final ResourceKey<? extends Registry<T>> registryKey;
-    private BootstapContext<T> bootstapContext;
+    private final ExistingFileHelper fileHelper;
+    private final ExistingFileHelper.ResourceType resourceType;
+    private BootstapContext<T> bootstrapContext;
 
-    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, DataProviderContext context) {
-        this(registryKey, context.getModId(), context.getPackOutput(), context.getLookupProvider());
+    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, ForgeDataProviderContext context) {
+        this(registryKey, context.getModId(), context.getPackOutput(), context.getLookupProvider(), context.getFileHelper());
     }
 
-    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
         this.registryKey = registryKey;
         this.output = output;
         this.modId = modId;
         this.lookupProvider = lookupProvider;
+        this.fileHelper = fileHelper;
+        this.resourceType = new ExistingFileHelper.ResourceType(PackType.SERVER_DATA, ".json", registryKey.location().getPath());
     }
 
     protected final void add(ResourceKey<T> key, T value) {
-        this.bootstapContext.register(key, value);
+        this.fileHelper.trackGenerated(key.location(), this.resourceType);
+        this.bootstrapContext.register(key, value);
     }
 
-    protected abstract void addBootstrap(BootstapContext<T> bootstapContext);
+    protected abstract void addBootstrap(BootstapContext<T> bootstrapContext);
 
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
         return new DatapackBuiltinEntriesProvider(this.output, this.lookupProvider, new RegistrySetBuilder().add(this.registryKey, context -> {
-            this.bootstapContext = context;
+            this.bootstrapContext = context;
             this.addBootstrap(context);
-        }), Set.of(this.modId)).run(output);
+        }), Collections.singleton(this.modId)).run(output);
     }
 
     @Override
@@ -70,12 +76,12 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
 
     public static abstract class DamageTypes extends AbstractBuiltInDataProvider<DamageType> {
 
-        public DamageTypes(DataProviderContext context) {
+        public DamageTypes(ForgeDataProviderContext context) {
             super(Registries.DAMAGE_TYPE, context);
         }
 
-        public DamageTypes(String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-            super(Registries.DAMAGE_TYPE, modId, output, lookupProvider);
+        public DamageTypes(String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
+            super(Registries.DAMAGE_TYPE, modId, output, lookupProvider, fileHelper);
         }
 
         protected void add(ResourceKey<DamageType> resourceKey) {
@@ -89,12 +95,12 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
 
     public static abstract class TrimMaterials extends AbstractBuiltInDataProvider<TrimMaterial> {
 
-        public TrimMaterials(DataProviderContext context) {
+        public TrimMaterials(ForgeDataProviderContext context) {
             super(Registries.TRIM_MATERIAL, context);
         }
 
-        public TrimMaterials(String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-            super(Registries.TRIM_MATERIAL, modId, output, lookupProvider);
+        public TrimMaterials(String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
+            super(Registries.TRIM_MATERIAL, modId, output, lookupProvider, fileHelper);
         }
 
         protected void add(ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {

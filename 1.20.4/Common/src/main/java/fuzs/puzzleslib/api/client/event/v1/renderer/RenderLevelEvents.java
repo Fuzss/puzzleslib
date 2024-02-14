@@ -24,18 +24,19 @@ public final class RenderLevelEvents {
     public interface AfterTerrain {
 
         /**
-         * Fires after all three solid block render types ({@link RenderType#solid()}, {@link RenderType#cutoutMipped()}, and {@link RenderType#cutout()}) have been rendered in a level.
+         * Fires after all three solid block render types ({@link RenderType#solid()},
+         * {@link RenderType#cutoutMipped()}, and {@link RenderType#cutout()}) have been rendered in a level.
          *
-         * @param levelRenderer     the level renderer instance
-         * @param camera            the camera instance
-         * @param gameRenderer      the game renderer instance
-         * @param tickDelta         partial tick time
-         * @param poseStack         current pose stack
-         * @param projectionMatrix  the projection matrix from the pose stack
-         * @param frustum           frustum instance
-         * @param level             the current client level
+         * @param levelRenderer    the level renderer instance
+         * @param camera           the camera instance
+         * @param gameRenderer     the game renderer instance
+         * @param partialTick      partial tick time
+         * @param poseStack        current pose stack
+         * @param projectionMatrix the projection matrix from the pose stack
+         * @param frustum          frustum instance
+         * @param level            the current client level
          */
-        void onRenderLevelAfterTerrain(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float tickDelta, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterTerrain(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -44,34 +45,35 @@ public final class RenderLevelEvents {
         /**
          * Fires after entities have been rendered in a level.
          *
-         * @param levelRenderer     the level renderer instance
-         * @param camera            the camera instance
-         * @param gameRenderer      the game renderer instance
-         * @param tickDelta         partial tick time
-         * @param poseStack         current pose stack
-         * @param projectionMatrix  the projection matrix from the pose stack
-         * @param frustum           frustum instance
-         * @param level             the current client level
+         * @param levelRenderer    the level renderer instance
+         * @param camera           the camera instance
+         * @param gameRenderer     the game renderer instance
+         * @param partialTick      partial tick time
+         * @param poseStack        current pose stack
+         * @param projectionMatrix the projection matrix from the pose stack
+         * @param frustum          frustum instance
+         * @param level            the current client level
          */
-        void onRenderLevelAfterEntities(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float tickDelta, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterEntities(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 
     @FunctionalInterface
     public interface AfterTranslucent {
 
         /**
-         * Fires after translucent objects ({@link RenderType#translucent()}, {@link RenderType#tripwire()}, and particles) have been rendered in a level.
+         * Fires after translucent objects ({@link RenderType#translucent()}, {@link RenderType#tripwire()}, and
+         * particles) have been rendered in a level.
          *
-         * @param levelRenderer     the level renderer instance
-         * @param camera            the camera instance
-         * @param gameRenderer      the game renderer instance
-         * @param tickDelta         partial tick time
-         * @param poseStack         current pose stack
-         * @param projectionMatrix  the projection matrix from the pose stack
-         * @param frustum           frustum instance
-         * @param level             the current client level
+         * @param levelRenderer    the level renderer instance
+         * @param camera           the camera instance
+         * @param gameRenderer     the game renderer instance
+         * @param partialTick      partial tick time
+         * @param poseStack        current pose stack
+         * @param projectionMatrix the projection matrix from the pose stack
+         * @param frustum          frustum instance
+         * @param level            the current client level
          */
-        void onRenderLevelAfterTranslucent(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float tickDelta, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterTranslucent(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -80,15 +82,15 @@ public final class RenderLevelEvents {
         /**
          * Fires after a level has been fully rendered.
          *
-         * @param levelRenderer     the level renderer instance
-         * @param camera            the camera instance
-         * @param gameRenderer      the game renderer instance
-         * @param tickDelta         partial tick time
-         * @param poseStack         current pose stack
-         * @param projectionMatrix  the projection matrix from the pose stack
-         * @param frustum           frustum instance
-         * @param level             the current client level
+         * @param levelRenderer    the level renderer instance
+         * @param camera           the camera instance
+         * @param gameRenderer     the game renderer instance
+         * @param partialTick      partial tick time
+         * @param poseStack        current pose stack
+         * @param projectionMatrix the projection matrix from the pose stack
+         * @param frustum          frustum instance
+         * @param level            the current client level
          */
-        void onRenderLevelAfterLevel(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float tickDelta, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterLevel(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 }
