@@ -108,7 +108,7 @@ public final class AbstractLootProviderV2 {
         }
 
         public void skipValidation(Block block) {
-            this.skipValidation(BuiltInRegistries.BLOCK.getKey(block));
+            this.skipValidation(block.getLootTable());
         }
 
         @Override
@@ -210,7 +210,7 @@ public final class AbstractLootProviderV2 {
         }
 
         public void skipValidation(EntityType<?> entityType) {
-            this.skipValidation(BuiltInRegistries.ENTITY_TYPE.getKey(entityType));
+            this.skipValidation(entityType.getDefaultLootTable());
         }
     }
 
