@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v20.4.22-1.20.4] - 2024-02-14
+### Added
+- Add `GenericExplosionHelper`
+- Add `AbstractLootProviderV2`
+- Add additional helper methods to `AbstractSoundDefinitionProvider`
+- Add `AbstractLanguageProvider::addSpawnEgg`
+### Changed
+- Validate item models in `AbstractModelProvider`
+### Fixed
+- Fix `AbstractBuiltInDataProvider` not registering generated resources with the file helper
+- Fix `ItemDisplayOverrides` crashing on Forge & NeoForge
+
 ## [v20.4.21-1.20.4] - 2024-02-10
 ### Fixed
 - Fix `RegistryManager::registerEntityDataSerializer` not actually registering the serializer on Fabric & Forge

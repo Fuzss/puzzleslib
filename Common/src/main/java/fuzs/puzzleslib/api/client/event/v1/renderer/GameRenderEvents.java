@@ -20,9 +20,9 @@ public final class GameRenderEvents {
          *
          * @param minecraft    minecraft singleton instance
          * @param gameRenderer game renderer instance
-         * @param tickDelta    partial tick time, different when the game is paused
+         * @param partialTick  partial tick time, different when the game is paused
          */
-        void onBeforeGameRender(Minecraft minecraft, GameRenderer gameRenderer, float tickDelta);
+        void onBeforeGameRender(Minecraft minecraft, GameRenderer gameRenderer, float partialTick);
     }
 
     @FunctionalInterface
@@ -33,8 +33,8 @@ public final class GameRenderEvents {
          *
          * @param minecraft    minecraft singleton instance
          * @param gameRenderer game renderer instance
-         * @param tickDelta    partial tick time, different when the game is paused
+         * @param partialTick  partial tick time, different when the game is paused
          */
-        void onAfterGameRender(Minecraft minecraft, GameRenderer gameRenderer, float tickDelta);
+        void onAfterGameRender(Minecraft minecraft, GameRenderer gameRenderer, float partialTick);
     }
 }

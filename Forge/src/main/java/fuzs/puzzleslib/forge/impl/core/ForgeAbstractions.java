@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
@@ -94,5 +95,10 @@ public final class ForgeAbstractions implements CommonAbstractions {
     @Override
     public boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack) {
         return inputStack.isBookEnchantable(bookStack);
+    }
+
+    @Override
+    public boolean onExplosionStart(Level level, Explosion explosion) {
+        return ForgeEventFactory.onExplosionStart(level, explosion);
     }
 }

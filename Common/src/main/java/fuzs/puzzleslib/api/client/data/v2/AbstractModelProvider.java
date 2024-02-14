@@ -21,10 +21,7 @@ import net.minecraft.world.level.block.Block;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 public abstract class AbstractModelProvider implements DataProvider {
@@ -35,6 +32,7 @@ public abstract class AbstractModelProvider implements DataProvider {
     private final String modId;
     private final PackOutput.PathProvider blockStatePathProvider;
     private final PackOutput.PathProvider modelPathProvider;
+    private final Set<Object> skipped = Sets.newHashSet();
 
     public AbstractModelProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput());
@@ -54,8 +52,21 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     }
 
+    @Deprecated(forRemoval = true)
     protected boolean throwForMissingBlocks() {
         return true;
+    }
+
+    protected boolean skipValidation() {
+        return !this.throwForMissingBlocks();
+    }
+
+    protected void skipBlock(Block block) {
+        this.skipped.add(block);
+    }
+
+    protected void skipItem(Item item) {
+        this.skipped.add(item);
     }
 
     @Override
@@ -78,10 +89,10 @@ public abstract class AbstractModelProvider implements DataProvider {
         this.addBlockModels(new BlockModelGenerators(blockStateOutput, modelOutput, skippedAutoModels::add));
         this.addItemModels(new ItemModelGenerators(modelOutput));
         List<Block> missingBlocks;
-        if (this.throwForMissingBlocks()) {
+        if (!this.skipValidation()) {
             missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {
                 return entry.getKey().location().getNamespace().equals(this.modId) && !generators.containsKey(entry.getValue());
-            }).map(Map.Entry::getValue).toList();
+            }).map(Map.Entry::getValue).filter(Predicate.not(this.skipped::contains)).toList();
         } else {
             missingBlocks = Collections.emptyList();
         }
@@ -100,11 +111,22 @@ public abstract class AbstractModelProvider implements DataProvider {
                         models.put(resourcelocation, new DelegatedModel(ModelLocationUtils.getModelLocation(entry.getValue())));
                     }
                 }
-
             });
-            return CompletableFuture.allOf(saveCollection(output, generators, block -> {
-                return this.blockStatePathProvider.json(block.builtInRegistryHolder().key().location());
-            }), saveCollection(output, models, this.modelPathProvider::json));
+            List<Item> missingItems;
+            if (!this.skipValidation()) {
+                missingItems = BuiltInRegistries.ITEM.entrySet().stream().filter(entry -> {
+                    return entry.getKey().location().getNamespace().equals(this.modId) && !models.containsKey(decorateItemModelLocation(entry.getKey().location()));
+                }).map(Map.Entry::getValue).filter(Predicate.not(this.skipped::contains)).toList();
+            } else {
+                missingItems = Collections.emptyList();
+            }
+            if (!missingItems.isEmpty()) {
+                throw new IllegalStateException("Missing item models for " + missingItems);
+            } else {
+                return CompletableFuture.allOf(saveCollection(output, generators, block -> {
+                    return this.blockStatePathProvider.json(block.builtInRegistryHolder().key().location());
+                }), saveCollection(output, models, this.modelPathProvider::json));
+            }
         }
     }
 

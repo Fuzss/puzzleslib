@@ -36,7 +36,7 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
         this.addParticleDescriptions();
     }
 
-    protected abstract void addParticleDescriptions();
+    public abstract void addParticleDescriptions();
 
     protected void add(ParticleType<?> particleType) {
         this.add(particleType, -1);

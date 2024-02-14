@@ -19,6 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
@@ -60,8 +61,10 @@ public interface CommonAbstractions {
     void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter);
 
     /**
-     * Is <code>entityType</code> considered a boss mob like {@link EntityType#ENDER_DRAGON} and {@link EntityType#WITHER} in vanilla.
-     * <p>A common property of such entities usually is {@link LivingEntity#canChangeDimensions()} returns <code>false</code>.
+     * Is <code>entityType</code> considered a boss mob like {@link EntityType#ENDER_DRAGON} and
+     * {@link EntityType#WITHER} in vanilla.
+     * <p>A common property of such entities usually is {@link LivingEntity#canChangeDimensions()} returns
+     * <code>false</code>.
      *
      * @param type the entity type
      * @return is it a boss mob
@@ -90,7 +93,8 @@ public interface CommonAbstractions {
     boolean canEquip(ItemStack stack, EquipmentSlot slot, Entity entity);
 
     /**
-     * Called before an entity drops loot for determining the level of {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} to apply when generating drops.
+     * Called before an entity drops loot for determining the level of
+     * {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} to apply when generating drops.
      *
      * @param entity       the entity that has been killed
      * @param killerEntity another entity responsible for killing <code>entity</code>
@@ -100,8 +104,9 @@ public interface CommonAbstractions {
     int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource);
 
     /**
-     * Called when a <code>mobGriefing</code> game rule check is required instead of vanilla's <code>level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)</code>,
-     * allowing for a dedicated Forge event to run.
+     * Called when a <code>mobGriefing</code> game rule check is required instead of vanilla's
+     * <code>level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)</code>, allowing for a dedicated Forge event to
+     * run.
      *
      * @param level  the level mob griefing is happening in
      * @param entity the entity responsible for triggering the game rule check
@@ -111,7 +116,8 @@ public interface CommonAbstractions {
 
     /**
      * A trigger for running a Forge event for destroying an item.
-     * <p>Ideally this should be migrated to the event api, to also allow for firing the event on Fabric. Until that happens this functions as a workaround.
+     * <p>Ideally this should be migrated to the event api, to also allow for firing the event on Fabric. Until that
+     * happens this functions as a workaround.
      *
      * @param player          the player destroying the item
      * @param itemStack       the item stack before being destroyed
@@ -120,7 +126,8 @@ public interface CommonAbstractions {
     void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand);
 
     /**
-     * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)}.
+     * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during
+     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)}.
      * <p>Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
      *
      * @param mob the mob
@@ -133,9 +140,11 @@ public interface CommonAbstractions {
      *
      * @param id                the pack identifier
      * @param description       the pack description component
-     * @param packCompatibility the pack version, ideally retrieved from {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
+     * @param packCompatibility the pack version, ideally retrieved from
+     *                          {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
      * @param features          the feature flags provided by this pack
-     * @param hidden            controls whether the pack is hidden from user-facing screens like the resource pack and data pack selection screens
+     * @param hidden            controls whether the pack is hidden from user-facing screens like the resource pack and
+     *                          data pack selection screens
      * @return the created pack info instance
      */
     Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden);
@@ -165,4 +174,13 @@ public interface CommonAbstractions {
      * @return is combining both stacks allowed
      */
     boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack);
+
+    /**
+     * Called just before an {@link Explosion} is about to be executed for a level.
+     *
+     * @param level     the level the explosion is happening in
+     * @param explosion the explosion that is about to start
+     * @return true to mark the explosion as handled, {@link Explosion#explode()} is not called
+     */
+    boolean onExplosionStart(Level level, Explosion explosion);
 }

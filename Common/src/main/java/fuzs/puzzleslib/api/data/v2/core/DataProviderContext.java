@@ -77,6 +77,6 @@ public class DataProviderContext {
      */
     @FunctionalInterface
     public interface Factory extends Function<DataProviderContext, DataProvider> {
-
+        // NO-OP
     }
 }

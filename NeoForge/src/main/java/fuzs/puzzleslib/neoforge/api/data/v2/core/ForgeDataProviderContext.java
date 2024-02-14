@@ -54,7 +54,7 @@ public class ForgeDataProviderContext extends DataProviderContext {
      */
     @FunctionalInterface
     public interface Factory extends Function<ForgeDataProviderContext, DataProvider> {
-
+        // NO-OP
     }
 
     /**
@@ -62,6 +62,6 @@ public class ForgeDataProviderContext extends DataProviderContext {
      */
     @FunctionalInterface
     public interface LegacyFactory extends BiFunction<GatherDataEvent, String, DataProvider> {
-
+        // NO-OP
     }
 }

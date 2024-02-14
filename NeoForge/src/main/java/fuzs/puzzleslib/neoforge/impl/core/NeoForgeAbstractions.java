@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.CommonHooks;
@@ -93,5 +94,10 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     @Override
     public boolean isBookEnchantable(ItemStack inputStack, ItemStack bookStack) {
         return inputStack.isBookEnchantable(bookStack);
+    }
+
+    @Override
+    public boolean onExplosionStart(Level level, Explosion explosion) {
+        return EventHooks.onExplosionStart(level, explosion);
     }
 }

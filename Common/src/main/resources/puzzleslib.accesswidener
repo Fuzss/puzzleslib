@@ -24,6 +24,8 @@ transitive-accessible   field   net/minecraft/data/loot/EntityLootSubProvider   
 transitive-accessible   method  net/minecraft/client/gui/GuiGraphics    blitNineSlicedSprite    (Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/resources/metadata/gui/GuiSpriteScaling$NineSlice;IIIII)V
 transitive-accessible   field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
 transitive-mutable  field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
+transitive-accessible   field   net/minecraft/world/level/Explosion damageSource    Lnet/minecraft/world/damagesource/DamageSource;
+transitive-accessible   field   net/minecraft/world/level/Explosion damageCalculator    Lnet/minecraft/world/level/ExplosionDamageCalculator;
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
