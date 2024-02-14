@@ -19,6 +19,10 @@ import java.util.concurrent.CompletableFuture;
 
 public final class AbstractTagProvider {
 
+    private AbstractTagProvider() {
+        // NO-OP
+    }
+
     public abstract static class Blocks extends VanillaBlockTagsProvider implements TagProviderExtension<Block, IntrinsicHolderTagsProvider.IntrinsicTagAppender<Block>> {
 
         public Blocks(DataProviderContext context) {
