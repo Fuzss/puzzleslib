@@ -30,6 +30,10 @@ import java.util.stream.Collectors;
 
 public final class AbstractLootProvider {
 
+    private AbstractLootProvider() {
+        // NO-OP
+    }
+
     public static LootTableProvider createProvider(PackOutput packOutput, LootTableSubProvider provider, LootContextParamSet paramSet) {
         return new LootTableProvider(packOutput, Set.of(), List.of(new LootTableProvider.SubProviderEntry(() -> provider, paramSet)));
     }

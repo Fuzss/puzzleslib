@@ -11,7 +11,6 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.EntityLootSubProvider;
-import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -26,7 +25,6 @@ import net.minecraft.world.level.storage.loot.*;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
@@ -37,12 +35,12 @@ import java.util.stream.Collectors;
 
 public final class AbstractLootProviderV2 {
 
-    public static LootTableProvider createProvider(PackOutput packOutput, LootTableSubProvider provider, LootContextParamSet paramSet) {
-        return new LootTableProvider(packOutput, Set.of(), List.of(new LootTableProvider.SubProviderEntry(() -> provider, paramSet)));
+    private AbstractLootProviderV2() {
+        // NO-OP
     }
 
     public static abstract class Blocks extends BlockLootSubProvider implements LootTableDataProvider {
-        private final Set<ResourceLocation> skipped = Sets.newHashSet();
+        private final Set<ResourceLocation> skipValidation = Sets.newHashSet();
         private final PackOutput.PathProvider pathProvider;
         private final String modId;
 
@@ -103,19 +101,16 @@ public final class AbstractLootProviderV2 {
         }
 
         @Override
+        public boolean skipValidationFor(ResourceLocation resourceLocation) {
+            return this.skipValidation.contains(resourceLocation);
+        }
+
         public void skipValidation(ResourceLocation resourceLocation) {
-            this.skipped.add(resourceLocation);
+            this.skipValidation.add(resourceLocation);
         }
 
         public void skipValidation(Block block) {
             this.skipValidation(block.getLootTable());
-        }
-
-        @Override
-        public void validate(ResourceLocation resourceLocation, LootTable lootTable, ValidationContext validationContext) {
-            if (!this.skipped.contains(resourceLocation)) {
-                LootTableDataProvider.super.validate(resourceLocation, lootTable, validationContext);
-            }
         }
 
         protected void dropNothing(Block block) {
@@ -124,7 +119,7 @@ public final class AbstractLootProviderV2 {
     }
 
     public abstract static class EntityTypes extends EntityLootSubProvider implements LootTableDataProvider {
-        private final Set<ResourceLocation> skipped = Sets.newHashSet();
+        private final Set<ResourceLocation> skipValidation = Sets.newHashSet();
         private final PackOutput.PathProvider pathProvider;
         private final String modId;
 
@@ -184,18 +179,6 @@ public final class AbstractLootProviderV2 {
         }
 
         @Override
-        public void skipValidation(ResourceLocation resourceLocation) {
-            this.skipped.add(resourceLocation);
-        }
-
-        @Override
-        public void validate(ResourceLocation resourceLocation, LootTable lootTable, ValidationContext validationContext) {
-            if (!this.skipped.contains(resourceLocation)) {
-                LootTableDataProvider.super.validate(resourceLocation, lootTable, validationContext);
-            }
-        }
-
-        @Override
         public PackOutput.PathProvider pathProvider() {
             return this.pathProvider;
         }
@@ -205,18 +188,27 @@ public final class AbstractLootProviderV2 {
             return LootContextParamSets.ENTITY;
         }
 
-        protected boolean canHaveLootTable(EntityType<?> entityType) {
-            return entityType.getCategory() != MobCategory.MISC;
+        @Override
+        public boolean skipValidationFor(ResourceLocation resourceLocation) {
+            return this.skipValidation.contains(resourceLocation);
+        }
+
+        public void skipValidation(ResourceLocation resourceLocation) {
+            this.skipValidation.add(resourceLocation);
         }
 
         public void skipValidation(EntityType<?> entityType) {
             this.skipValidation(entityType.getDefaultLootTable());
         }
+
+        protected boolean canHaveLootTable(EntityType<?> entityType) {
+            return entityType.getCategory() != MobCategory.MISC;
+        }
     }
 
     public static abstract class Simple implements LootTableSubProvider, LootTableDataProvider {
         private final Map<ResourceLocation, LootTable.Builder> tables = Maps.newHashMap();
-        private final Set<ResourceLocation> skipped = Sets.newHashSet();
+        private final Set<ResourceLocation> skipValidation = Sets.newHashSet();
         private final LootContextParamSet paramSet;
         private final PackOutput.PathProvider pathProvider;
 
@@ -252,8 +244,12 @@ public final class AbstractLootProviderV2 {
         }
 
         @Override
+        public boolean skipValidationFor(ResourceLocation resourceLocation) {
+            return this.skipValidation.contains(resourceLocation);
+        }
+
         public void skipValidation(ResourceLocation resourceLocation) {
-            this.skipped.add(resourceLocation);
+            this.skipValidation.add(resourceLocation);
         }
 
         protected void add(ResourceLocation table, LootTable.Builder builder) {
@@ -261,13 +257,6 @@ public final class AbstractLootProviderV2 {
         }
 
         public abstract void addLootTables();
-
-        @Override
-        public void validate(ResourceLocation resourceLocation, LootTable lootTable, ValidationContext validationContext) {
-            if (!this.skipped.contains(resourceLocation)) {
-                LootTableDataProvider.super.validate(resourceLocation, lootTable, validationContext);
-            }
-        }
     }
 
     public interface LootTableDataProvider extends DataProvider {
@@ -278,7 +267,7 @@ public final class AbstractLootProviderV2 {
 
         LootContextParamSet paramSet();
 
-        void skipValidation(ResourceLocation resourceLocation);
+        boolean skipValidationFor(ResourceLocation resourceLocation);
 
         default CompletableFuture<?> run(CachedOutput output) {
             final Map<ResourceLocation, LootTable> tables = Maps.newHashMap();
@@ -303,12 +292,23 @@ public final class AbstractLootProviderV2 {
             }).toArray(CompletableFuture[]::new));
         }
 
-        private void validate(Map<ResourceLocation, LootTable> tables) {
+        default void validate(Map<ResourceLocation, LootTable> tables) {
             ProblemReporter.Collector collector = new ProblemReporter.Collector();
             ValidationContext validationContext = new ValidationContext(collector, LootContextParamSets.ALL_PARAMS, new LootDataResolver() {
                 @Nullable
                 public <T> T getElement(LootDataId<T> lootDataId) {
-                    return lootDataId.type() == LootDataType.TABLE ? (T) tables.get(lootDataId.location()) : null;
+                    if (lootDataId.type() == LootDataType.TABLE) {
+                        LootTable lootTable;
+                        // allows for referencing vanilla loot tables
+                        if (LootTableDataProvider.this.skipValidationFor(lootDataId.location())) {
+                            lootTable = LootTable.lootTable().build();
+                        } else {
+                            lootTable = tables.get(lootDataId.location());
+                        }
+                        return (T) lootTable;
+                    } else {
+                        return null;
+                    }
                 }
             });
 
@@ -324,10 +324,11 @@ public final class AbstractLootProviderV2 {
             }
         }
 
-        @MustBeInvokedByOverriders
         default void validate(ResourceLocation resourceLocation, LootTable lootTable, ValidationContext validationContext) {
-            lootTable.validate(validationContext.setParams(lootTable.getParamSet()).enterElement("{" +
-                    resourceLocation + "}", new LootDataId<>(LootDataType.TABLE, resourceLocation)));
+            if (!this.skipValidationFor(resourceLocation)) {
+                lootTable.validate(validationContext.setParams(lootTable.getParamSet()).enterElement("{" +
+                        resourceLocation + "}", new LootDataId<>(LootDataType.TABLE, resourceLocation)));
+            }
         }
     }
 }

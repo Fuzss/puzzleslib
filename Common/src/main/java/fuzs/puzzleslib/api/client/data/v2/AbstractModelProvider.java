@@ -32,7 +32,7 @@ public abstract class AbstractModelProvider implements DataProvider {
     private final String modId;
     private final PackOutput.PathProvider blockStatePathProvider;
     private final PackOutput.PathProvider modelPathProvider;
-    private final Set<Object> skipped = Sets.newHashSet();
+    private final Set<Object> skipValidation = Sets.newHashSet();
 
     public AbstractModelProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput());
@@ -45,11 +45,11 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     public void addBlockModels(BlockModelGenerators builder) {
-
+        // NO-OP
     }
 
     public void addItemModels(ItemModelGenerators builder) {
-
+        // NO-OP
     }
 
     @Deprecated(forRemoval = true)
@@ -62,11 +62,11 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     protected void skipBlock(Block block) {
-        this.skipped.add(block);
+        this.skipValidation.add(block);
     }
 
     protected void skipItem(Item item) {
-        this.skipped.add(item);
+        this.skipValidation.add(item);
     }
 
     @Override
@@ -92,7 +92,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         if (!this.skipValidation()) {
             missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {
                 return entry.getKey().location().getNamespace().equals(this.modId) && !generators.containsKey(entry.getValue());
-            }).map(Map.Entry::getValue).filter(Predicate.not(this.skipped::contains)).toList();
+            }).map(Map.Entry::getValue).filter(Predicate.not(this.skipValidation::contains)).toList();
         } else {
             missingBlocks = Collections.emptyList();
         }
@@ -116,7 +116,7 @@ public abstract class AbstractModelProvider implements DataProvider {
             if (!this.skipValidation()) {
                 missingItems = BuiltInRegistries.ITEM.entrySet().stream().filter(entry -> {
                     return entry.getKey().location().getNamespace().equals(this.modId) && !models.containsKey(decorateItemModelLocation(entry.getKey().location()));
-                }).map(Map.Entry::getValue).filter(Predicate.not(this.skipped::contains)).toList();
+                }).map(Map.Entry::getValue).filter(Predicate.not(this.skipValidation::contains)).toList();
             } else {
                 missingItems = Collections.emptyList();
             }
