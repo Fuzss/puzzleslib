@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
+import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
