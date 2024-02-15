@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.forge.impl.core;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import net.minecraftforge.common.util.MavenVersionStringHelper;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
-import org.apache.commons.compress.utils.Lists;
 import org.jetbrains.annotations.Nullable;
 
 import java.net.URI;
