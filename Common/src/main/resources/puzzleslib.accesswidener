@@ -40,6 +40,9 @@ transitive-accessible	method	net/minecraft/world/level/block/Blocks	ocelotOrParr
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	never	(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	never	(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntityType;)Ljava/lang/Boolean;
+transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  findSlot    (DD)Lnet/minecraft/world/inventory/Slot;
+transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  isHovering  (Lnet/minecraft/world/inventory/Slot;DD)Z
+transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  isHovering  (IIIIDD)Z
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
