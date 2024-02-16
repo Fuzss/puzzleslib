@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.17-1.20.1] - 2024-02-16
+### Fixed
+- Fix item model overrides not applying on Forge
+
 ## [v8.1.16-1.20.1] - 2024-02-01
 ### Fixed
 - Fix crash when breaking crops with Farmer's Delight's sickle
