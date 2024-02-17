@@ -45,6 +45,11 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         return this.puzzleslib$spawnType;
     }
 
+    @Override
+    public void puzzleslib$setSpawnType(@Nullable MobSpawnType mobSpawnType) {
+        this.puzzleslib$spawnType = mobSpawnType;
+    }
+
     @ModifyVariable(method = "setTarget", at = @At("HEAD"), ordinal = 0)
     public LivingEntity setTarget(@Nullable LivingEntity entity) {
         DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(entity);
@@ -52,7 +57,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         return result.isInterrupt() ? this.target : target.getAsOptional().orElse(entity);
     }
 
-    @Inject(method = "checkDespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;", shift = At.Shift.BEFORE), cancellable = true)
+    @Inject(method = "checkDespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"), cancellable = true)
     public void checkDespawn(CallbackInfo callback) {
         EventResult result = FabricLivingEvents.CHECK_MOB_DESPAWN.invoker().onCheckMobDespawn(Mob.class.cast(this), (ServerLevel) this.level());
         if (result.isInterrupt()) {
@@ -79,7 +84,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         if (compound.contains(key)) {
             try {
                 this.puzzleslib$spawnType = MobSpawnType.valueOf(compound.getString(key));
-            } catch (Exception ex) {
+            } catch (Exception exception) {
                 compound.remove(key);
             }
         }

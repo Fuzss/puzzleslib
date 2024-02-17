@@ -1,17 +1,18 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -48,11 +49,12 @@ abstract class PlayerFabricMixin extends LivingEntity {
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
-    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("TAIL"), cancellable = true)
-    public void drop(ItemStack itemStack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> callback) {
-        ItemEntity itemEntity = callback.getReturnValue();
+    @ModifyReturnValue(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("TAIL"))
+    public ItemEntity drop(@Nullable ItemEntity itemEntity) {
         if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(Player.class.cast(this), itemEntity).isInterrupt()) {
-            callback.setReturnValue(null);
+            return null;
+        } else {
+            return itemEntity;
         }
     }
 

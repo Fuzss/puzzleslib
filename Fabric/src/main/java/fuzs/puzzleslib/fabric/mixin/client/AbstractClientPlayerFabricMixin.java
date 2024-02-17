@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
@@ -20,18 +22,18 @@ abstract class AbstractClientPlayerFabricMixin extends Player {
         super(level, blockPos, f, gameProfile);
     }
 
-    // weird shift offset, otherwise the injection fails to set the local variable
-    @ModifyVariable(method = "getFieldOfViewModifier", at = @At(value = "TAIL", shift = At.Shift.BY, by = -2), ordinal = 0)
-    public float getFieldOfViewModifier(float value) {
-        final float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
-        // if fov effects don't apply due to the option being set to 0 no need to fire the event
+    @ModifyReturnValue(method = "getFieldOfViewModifier", at = @At("TAIL"))
+    public float getFieldOfViewModifier(float scaledFieldOfView, @Local(ordinal = 0) float fieldOfView) {
+        float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
+        // if fov effects don't apply due to the option being set to 0, so no need to fire the event
         if (fovEffectScale != 0.0F) {
             // reverse fovEffectScale calculations applied by vanilla in return statement,
             // we could capture the original value previous to return, but this approach only needs one mixin
-            DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue((value - 1.0F) / fovEffectScale + 1.0F);
+            DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue(fieldOfView);
             FabricClientPlayerEvents.COMPUTE_FOV_MODIFIER.invoker().onComputeFovModifier(this, fieldOfViewModifier);
-            return fieldOfViewModifier.getAsOptionalFloat().map(t -> Mth.lerp(fovEffectScale, 1.0F, t)).orElse(value);
+            return fieldOfViewModifier.getAsOptionalFloat().map(value -> Mth.lerp(fovEffectScale, 1.0F, value)).orElse(fieldOfView);
+        } else {
+            return scaledFieldOfView;
         }
-        return value;
     }
 }

@@ -47,8 +47,7 @@
     "ThrowableProjectileFabricMixin",
     "WolfFabricMixin",
     "accessor.GrindstoneMenuFabricAccessor",
-    "accessor.PackRepositoryFabricAccessor",
-    "accessor.WeightedRandomListFabricAccessor"
+    "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [
     "client.AbstractClientPlayerFabricMixin",

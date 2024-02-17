@@ -24,12 +24,13 @@ public final class ServerEntityLevelEvents {
     public interface Load {
 
         /**
-         * Fired when an entity is added to the level on the server, either when being loaded from chunk storage or when just having been spawned in.
+         * Fired when an entity is added to the level on the server, either when being loaded from chunk storage or when
+         * just having been spawned in.
          *
-         * @param entity         the entity that is being loaded
-         * @param level          the level the entity is loaded in
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively discarding it,
-         * {@link EventResult#PASS} for the entity to be added normally
+         * @param entity the entity that is being loaded
+         * @param level  the level the entity is loaded in
+         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
+         *         discarding it, {@link EventResult#PASS} for the entity to be added normally
          */
         EventResult onEntityLoad(Entity entity, ServerLevel level);
     }
@@ -40,13 +41,16 @@ public final class ServerEntityLevelEvents {
         /**
          * Fired when an entity is added to the level on the server when it has just been spawned in.
          *
-         * @param entity         the entity that is being spawned
-         * @param level          the level the entity is spawned in
-         * @param spawnType      this provides the spawn type which has been captured in {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)} if it has been called, otherwise <code>null</code>
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively discarding it,
-         * {@link EventResult#PASS} for the entity to be added normally
+         * @param entity       the entity that is being spawned
+         * @param level        the level the entity is spawned in
+         * @param mobSpawnType this provides the spawn type which has been captured in
+         *                     {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor,
+         *                     DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)} if it has been called,
+         *                     otherwise <code>null</code>
+         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
+         *         discarding it, {@link EventResult#PASS} for the entity to be added normally
          */
-        EventResult onEntitySpawn(Entity entity, ServerLevel level, @Nullable MobSpawnType spawnType);
+        EventResult onEntitySpawn(Entity entity, ServerLevel level, @Nullable MobSpawnType mobSpawnType);
     }
 
     @FunctionalInterface
