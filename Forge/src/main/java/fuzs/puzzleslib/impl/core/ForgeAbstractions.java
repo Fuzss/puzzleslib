@@ -15,7 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +30,9 @@ public final class ForgeAbstractions implements CommonAbstractions {
 
     @Override
     public boolean isBossMob(EntityType<?> type) {
-        return type.is(Tags.EntityTypes.BOSSES);
+        // this should ideally check Entity::canChangeDimensions, but we only have access to entity type
+        // in newer versions this is replaced with the Forge tag
+        return type == EntityType.ENDER_DRAGON || type == EntityType.WITHER;
     }
 
     @Override

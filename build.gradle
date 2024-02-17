@@ -8,5 +8,5 @@ plugins {
     alias libs.plugins.minotaur apply false
 }
 
-apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/main.gradle'
-apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/tasks.gradle'
+apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v1/main.gradle'
+apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v1/tasks.gradle'

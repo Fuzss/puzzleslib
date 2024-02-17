@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.client.core.context;
 
 import com.mojang.blaze3d.vertex.VertexFormat;
 import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
-import fuzs.puzzleslib.impl.client.core.CoreShaderRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 
