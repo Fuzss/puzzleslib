@@ -21,10 +21,11 @@ public interface GatherPotentialSpawnsCallback {
      *
      * @param level            the current level instance
      * @param structureManager the structure manager, used for applying {@link Structure#spawnOverrides()}
-     * @param generator        the chunk generator for calling {@link ChunkGenerator#getMobsAt(Holder, StructureManager, MobCategory, BlockPos)}
-     * @param category         the mob category to retrieve potential spawns for
-     * @param pos              the block position the spawn attempt is made at
-     * @param mobsAt           the vanilla list of mobs available for the given position
+     * @param chunkGenerator   the chunk generator for calling
+     *                         {@link ChunkGenerator#getMobsAt(Holder, StructureManager, MobCategory, BlockPos)}
+     * @param mobCategory      the mob category to retrieve potential spawns for
+     * @param blockPos         the block position the spawn attempt is made at
+     * @param mobs             the vanilla list of mobs available for the given position
      */
-    void onGatherPotentialSpawns(ServerLevel level, StructureManager structureManager, ChunkGenerator generator, MobCategory category, BlockPos pos, List<MobSpawnSettings.SpawnerData> mobsAt);
+    void onGatherPotentialSpawns(ServerLevel level, StructureManager structureManager, ChunkGenerator chunkGenerator, MobCategory mobCategory, BlockPos blockPos, List<MobSpawnSettings.SpawnerData> mobs);
 }

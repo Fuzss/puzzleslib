@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.9-1.18.2] - 2024-02-17
+### Changed
+- Downgrade Forge to latest stable release
+- Update to latest Fabric Api
+
 ## [v3.5.8-1.18.2] - 2023-08-16
 ### Added
 - Added `CommonAbstractions::getMobSpawnType`

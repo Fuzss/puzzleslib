@@ -53,6 +53,13 @@ public interface ModContainer {
     Collection<String> getCredits();
 
     /**
+     * The following keys are universally supported: <code>homepage</code>, <code>issues</code>
+     * <p>
+     * Additionally, Fabric defines these keys: <code>source</code>, <code>email</code>, <code>irc</code>
+     * <p>
+     * Furthermore, non-standard keys such as the following are possible: <code>discord</code>, <code>slack</code>,
+     * <code>twitter</code>
+     *
      * @return various contact information like social profiles and urls for mod downloads and issue reports
      */
     Map<String, String> getContactTypes();
@@ -80,12 +87,13 @@ public interface ModContainer {
     /**
      * @return parent mod when provided via jar-in-jar systems
      */
-    @Nullable
-    ModContainer getParent();
+    @Nullable ModContainer getParent();
 
     @ApiStatus.Internal
     static Map<String, ModContainer> toModList(Stream<? extends ModContainer> stream) {
         return stream.sorted(Comparator.comparing(ModContainer::getModId))
-                .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId, Function.identity()));
+                .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId,
+                        Function.identity()
+                ));
     }
 }
