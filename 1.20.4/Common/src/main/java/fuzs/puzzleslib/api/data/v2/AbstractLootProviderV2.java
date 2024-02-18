@@ -113,8 +113,12 @@ public final class AbstractLootProviderV2 {
             this.skipValidation(block.getLootTable());
         }
 
-        protected void dropNothing(Block block) {
+        public void dropNothing(Block block) {
             this.add(block, noDrop());
+        }
+
+        public void dropNameable(Block block) {
+            this.add(block, this::createNameableBlockEntityTable);
         }
     }
 

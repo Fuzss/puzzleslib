@@ -24,7 +24,8 @@ public final class EntitySpectatorShaderRegistryImpl implements EntitySpectatorS
     public static Optional<ResourceLocation> getEntityShader(@Nullable Entity entity) {
         if (entity != null && SHADER_LOCATIONS.containsKey(entity.getType())) {
             return Optional.of(SHADER_LOCATIONS.get(entity.getType()));
+        } else {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }

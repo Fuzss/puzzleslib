@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v20.4.24-1.20.4] - 2024-02-18
+### Added
+- Add `MinecartTypeRegistry`
+- Add `ContainerMenuHelper`
+- Add `NeoForgeCapabilityHelperV2#registerEntityContainer`
+
 ## [v20.4.23-1.20.4] - 2024-02-15
 ### Fixed
 - Fix dedicated server crash due to faulty import
