@@ -6,6 +6,8 @@ import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -96,9 +98,28 @@ public final class NeoForgeCapabilityHelperV2 {
      */
     @SafeVarargs
     public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, IItemHandler> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
-        register((RegisterCapabilitiesEvent registerCapabilitiesEvent, BlockEntityType<? extends T> blockEntityType) -> {
-            registerCapabilitiesEvent.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, capabilityProvider);
+        register((RegisterCapabilitiesEvent evt, BlockEntityType<? extends T> blockEntityType) -> {
+            evt.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, capabilityProvider);
         }, blockEntityTypes);
+    }
+
+    /**
+     * Register a {@link ICapabilityProvider} for {@link EntityType}s.
+     * <p>An example is {@link net.minecraft.world.entity.vehicle.ChestBoat} and {@link net.minecraft.world.entity.vehicle.MinecartHopper}.
+     *
+     * @param entityTypes entity types to register
+     * @param <T>         entity super type
+     */
+    @SafeVarargs
+    public static <T extends Entity & Container> void registerEntityContainer(Holder<? extends EntityType<? extends T>>... entityTypes) {
+        NeoForgeCapabilityHelperV2.register((RegisterCapabilitiesEvent evt, EntityType<? extends T> entityType) -> {
+            evt.registerEntity(Capabilities.ItemHandler.ENTITY, entityType, (T entity, Void aVoid) -> {
+                return new InvWrapper(entity);
+            });
+            evt.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION, entityType, (T entity, @Nullable Direction direction) -> {
+                return new InvWrapper(entity);
+            });
+        }, entityTypes);
     }
 
     /**

@@ -27,11 +27,12 @@ public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
 
     public static void render(GuiGraphics guiGraphics, Font font, ItemStack stack, int itemPosX, int itemPosY) {
         Collection<DynamicItemDecorator> dynamicItemDecorators = DECORATORS.get(stack.getItem());
-        if (dynamicItemDecorators.isEmpty()) return;
-        resetRenderState();
-        for (DynamicItemDecorator itemDecorator : dynamicItemDecorators) {
-            if (itemDecorator.renderItemDecorations(guiGraphics, font, stack, itemPosX, itemPosY)) {
-                resetRenderState();
+        if (!dynamicItemDecorators.isEmpty()) {
+            resetRenderState();
+            for (DynamicItemDecorator itemDecorator : dynamicItemDecorators) {
+                if (itemDecorator.renderItemDecorations(guiGraphics, font, stack, itemPosX, itemPosY)) {
+                    resetRenderState();
+                }
             }
         }
     }
