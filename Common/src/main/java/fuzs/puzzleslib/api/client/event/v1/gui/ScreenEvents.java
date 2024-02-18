@@ -127,7 +127,7 @@ public final class ScreenEvents {
      * A simple helper class for returning the instance passed into a consumer.
      * <p>Similar to {@link net.minecraft.Util#make(Object, Consumer)}.
      * <p>
-     * TODO replace this with a normal consumer again
+     * TODO replace this with a normal consumer or unary operator
      *
      * @param <T> the handled type
      */
