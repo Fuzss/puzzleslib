@@ -67,6 +67,7 @@ public final class ContainerMenuHelper {
      */
     public static SimpleContainer createListBackedContainer(NonNullList<ItemStack> items, @Nullable ContainerListener listener) {
         SimpleContainer simpleContainer = new SimpleContainer();
+        simpleContainer.size = items.size();
         simpleContainer.items = items;
         if (listener != null) {
             simpleContainer.addListener(listener);
