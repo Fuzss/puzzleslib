@@ -37,7 +37,6 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
         }));
     }
 
-    @Override
     public BakedModel getItemModelDisplayOverride(BakedModel itemModel, ItemDisplayContext itemDisplayContext) {
         // if this class was only loaded by the item renderer mixin because no overrides have been registered by any mod this will still be null
         if (this.overrideModels == null) return itemModel;

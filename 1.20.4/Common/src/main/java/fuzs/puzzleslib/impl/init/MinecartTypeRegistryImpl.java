@@ -6,12 +6,13 @@ import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 public final class MinecartTypeRegistryImpl implements MinecartTypeRegistry {
-    private static final Map<AbstractMinecart.Type, Factory> MINECART_FACTORIES = Maps.newEnumMap(AbstractMinecart.Type.class);
+    private static final Map<AbstractMinecart.Type, Factory> MINECART_FACTORIES = Collections.synchronizedMap(Maps.newIdentityHashMap());
 
     @Override
     public void register(AbstractMinecart.Type type, Factory factory) {
