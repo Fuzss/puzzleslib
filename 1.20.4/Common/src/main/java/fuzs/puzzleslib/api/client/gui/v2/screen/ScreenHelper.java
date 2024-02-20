@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.client.gui.v2.screen;
 
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
@@ -12,46 +11,79 @@ import java.util.Objects;
 
 /**
  * A helper class for accessing encapsulated fields on a screen.
+ *
+ * @deprecated replaced with {@link ScreenHelperV2}
  */
+@Deprecated(forRemoval = true)
 public interface ScreenHelper {
-    ScreenHelper INSTANCE = ClientFactories.INSTANCE.getScreenHelper();
+    ScreenHelper INSTANCE = new ScreenHelper() {
+        // NO-OP
+    };
+
+    /**
+     * @param screen screen instance
+     * @return minecraft singleton
+     */
+    default Minecraft getMinecraft(Screen screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.minecraft;
+    }
 
     /**
      * @param screen screen instance
      * @return font renderer
      */
-    Font getFont(Screen screen);
+    default Font getFont(Screen screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.font;
+    }
 
     /**
      * @param screen container screen instance
      * @return width of container interface
      */
-    int getImageWidth(AbstractContainerScreen<?> screen);
+    default int getImageWidth(AbstractContainerScreen<?> screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.imageWidth;
+    }
 
     /**
      * @param screen container screen instance
      * @return height of container interface
      */
-    int getImageHeight(AbstractContainerScreen<?> screen);
+    default int getImageHeight(AbstractContainerScreen<?> screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.imageHeight;
+    }
 
     /**
      * @param screen container screen instance
      * @return left position of container interface
      */
-    int getLeftPos(AbstractContainerScreen<?> screen);
+    default int getLeftPos(AbstractContainerScreen<?> screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.leftPos;
+    }
 
     /**
      * @param screen container screen instance
      * @return top position of container interface
      */
-    int getTopPos(AbstractContainerScreen<?> screen);
+    default int getTopPos(AbstractContainerScreen<?> screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.topPos;
+    }
 
     /**
      * @param screen container screen instance
      * @return the slot the mouse is currently hovering (which an item tooltip is shown for and where the hovered slot
      *         overlay is drawn)
      */
-    @Nullable Slot getHoveredSlot(AbstractContainerScreen<?> screen);
+    @Nullable
+    default Slot getHoveredSlot(AbstractContainerScreen<?> screen) {
+        Objects.requireNonNull(screen, "screen is null");
+        return screen.hoveredSlot;
+    }
 
     /**
      * @param screen screen instance
@@ -71,12 +103,6 @@ public interface ScreenHelper {
         return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() /
                 minecraft.getWindow().getScreenWidth());
     }
-
-    /**
-     * @param screen screen instance
-     * @return minecraft singleton
-     */
-    Minecraft getMinecraft(Screen screen);
 
     /**
      * @param screen screen instance
@@ -108,7 +134,6 @@ public interface ScreenHelper {
      * @deprecated replace with {@link AbstractContainerScreen#findSlot(double, double)}
      */
     @Nullable
-    @Deprecated(forRemoval = true)
     default Slot findSlot(AbstractContainerScreen<?> screen, double mouseX, double mouseY) {
         return screen.findSlot(mouseX, mouseY);
     }
@@ -124,7 +149,6 @@ public interface ScreenHelper {
      *
      * @deprecated replace with {@link AbstractContainerScreen#isHovering(Slot, double, double)}
      */
-    @Deprecated(forRemoval = true)
     default boolean isHovering(AbstractContainerScreen<?> screen, Slot slot, double mouseX, double mouseY) {
         return screen.isHovering(slot, mouseX, mouseY);
     }

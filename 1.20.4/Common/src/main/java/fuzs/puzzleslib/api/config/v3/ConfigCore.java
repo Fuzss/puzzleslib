@@ -16,7 +16,7 @@ public interface ConfigCore {
      * @param callback register save callback
      */
     default void addToBuilder(ModConfigSpec.Builder builder, ValueCallback callback) {
-
+        // NO-OP
     }
 
     /**
@@ -25,6 +25,6 @@ public interface ConfigCore {
      * @see fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet
      */
     default void afterConfigReload() {
-
+        // NO-OP
     }
 }

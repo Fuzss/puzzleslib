@@ -14,8 +14,6 @@ public interface ClientFactories {
 
     void constructClientMod(String modId, ClientModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle);
 
-    ScreenHelper getScreenHelper();
-
     ItemDisplayOverridesImpl getItemModelDisplayOverrides();
 
     KeyMappingActivationHelper getKeyMappingActivationHelper();
