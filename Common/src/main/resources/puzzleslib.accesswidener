@@ -45,6 +45,13 @@ transitive-accessible	method	net/minecraft/world/level/block/Blocks	never	(Lnet/
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  findSlot    (DD)Lnet/minecraft/world/inventory/Slot;
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  isHovering  (Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  isHovering  (IIIIDD)Z
+transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  hoveredSlot Lnet/minecraft/world/inventory/Slot;
+transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  imageWidth  I
+transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  imageHeight I
+transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  leftPos I
+transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  topPos  I
+transitive-accessible   field   net/minecraft/client/gui/screens/Screen minecraft   Lnet/minecraft/client/Minecraft;
+transitive-accessible   field   net/minecraft/client/gui/screens/Screen font    Lnet/minecraft/client/gui/Font;
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
