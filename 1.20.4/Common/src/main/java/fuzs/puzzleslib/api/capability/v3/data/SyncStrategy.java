@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -14,8 +13,8 @@ public enum SyncStrategy {
      */
     MANUAL {
         @Override
-        public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
-
+        public PlayerSet getPlayerSet(Entity entity) {
+            return PlayerSet.ofNone();
         }
     },
     /**
@@ -24,8 +23,8 @@ public enum SyncStrategy {
      */
     TRACKING {
         @Override
-        public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
-            PuzzlesLibMod.NETWORK.sendToAllTracking(entity, message, true);
+        public PlayerSet getPlayerSet(Entity entity) {
+            return PlayerSet.nearEntity(entity);
         }
     },
     /**
@@ -34,10 +33,8 @@ public enum SyncStrategy {
      */
     PLAYER {
         @Override
-        public void send(Entity entity, ClientboundEntityCapabilityMessage message) {
-            if (entity instanceof ServerPlayer player) {
-                PuzzlesLibMod.NETWORK.sendTo(player, message);
-            }
+        public PlayerSet getPlayerSet(Entity entity) {
+            return PlayerSet.ofEntity(entity);
         }
     };
 
@@ -47,5 +44,5 @@ public enum SyncStrategy {
      * @param entity  the capability component holder
      * @param message the message to send
      */
-    public abstract void send(Entity entity, ClientboundEntityCapabilityMessage message);
+    public abstract PlayerSet getPlayerSet(Entity entity);
 }

@@ -9,6 +9,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.AfterChangeDimensionCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerTrackingEvents;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,25 +26,33 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
             throw new IllegalStateException("Sync strategy has already been set!");
         } else {
             if (syncStrategy != SyncStrategy.MANUAL) {
-                PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer player) -> {
-                    this.getIfProvided(player).ifPresent(capabilityComponent -> {
-                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
+                    this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
+                        PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
+                                this.toPacket(capabilityComponent)
+                        );
                     });
                 });
-                AfterChangeDimensionCallback.EVENT.register((ServerPlayer player, ServerLevel from, ServerLevel to) -> {
-                    this.getIfProvided(player).ifPresent(capabilityComponent -> {
-                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                AfterChangeDimensionCallback.EVENT.register((ServerPlayer serverPlayer, ServerLevel from, ServerLevel to) -> {
+                    this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
+                        PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
+                                this.toPacket(capabilityComponent)
+                        );
                     });
                 });
-                PlayerCopyEvents.RESPAWN.register((ServerPlayer player, boolean originalStillAlive) -> {
-                    this.getIfProvided(player).ifPresent(capabilityComponent -> {
-                        PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                PlayerCopyEvents.RESPAWN.register((ServerPlayer serverPlayer, boolean originalStillAlive) -> {
+                    this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
+                        PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
+                                this.toPacket(capabilityComponent)
+                        );
                     });
                 });
                 if (syncStrategy == SyncStrategy.TRACKING) {
-                    PlayerTrackingEvents.START.register((Entity trackedEntity, ServerPlayer player) -> {
+                    PlayerTrackingEvents.START.register((Entity trackedEntity, ServerPlayer serverPlayer) -> {
                         this.getIfProvided(trackedEntity).ifPresent(capabilityComponent -> {
-                            PuzzlesLibMod.NETWORK.sendTo(player, this.toPacket(capabilityComponent));
+                            PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
+                                    this.toPacket(capabilityComponent)
+                            );
                         });
                     });
                 }
@@ -61,7 +70,8 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
                 Optional<C> originalCapability = this.getIfProvided(originalEntity);
                 Optional<C> newCapability = this.getIfProvided(newEntity);
                 if (originalCapability.isPresent() && newCapability.isPresent()) {
-                    this.getCopyStrategy().copy(originalEntity, originalCapability.get(), newEntity, newCapability.get(), false);
+                    this.getCopyStrategy()
+                            .copy(originalEntity, originalCapability.get(), newEntity, newCapability.get(), false);
                 }
             });
         }
@@ -73,7 +83,13 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
             Optional<C> originalCapability = this.getIfProvided(originalPlayer);
             Optional<C> newCapability = this.getIfProvided(newPlayer);
             if (originalCapability.isPresent() && newCapability.isPresent()) {
-                this.getCopyStrategy().copy(originalPlayer, originalCapability.get(), newPlayer, newCapability.get(), originalStillAlive);
+                this.getCopyStrategy()
+                        .copy(originalPlayer,
+                                originalCapability.get(),
+                                newPlayer,
+                                newCapability.get(),
+                                originalStillAlive
+                        );
             }
         });
     }

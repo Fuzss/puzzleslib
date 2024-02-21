@@ -8,14 +8,15 @@ import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
-import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
@@ -56,8 +57,8 @@ public abstract class ModContext {
                 }
             }
         });
-        PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer player) -> {
-            PuzzlesLibMod.NETWORK.sendTo(player, new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
+        PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
+            PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer), new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ClientPlayerNetworkEvents.LOGGED_IN.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
