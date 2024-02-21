@@ -223,6 +223,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(keyMapping.getName(), value);
         }
 
+        default void addKeyCategory(String modId, String value) {
+            this.add("key.categories." + modId, value);
+        }
+
         default void addCreativeModeTab(String modId, String value) {
             this.addCreativeModeTab(modId, "main", value);
         }

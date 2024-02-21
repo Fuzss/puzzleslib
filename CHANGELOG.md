@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add `KeyActivationHandler`
 - Add `KeyMappingHelper::registerKeyMapping`
+- Add `PlayerSet`
 
 ## [v20.4.26-1.20.4] - 2024-02-19
 ### Changed
