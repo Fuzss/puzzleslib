@@ -3,12 +3,12 @@ package fuzs.puzzleslib.neoforge.impl.client.key;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.neoforged.neoforge.client.settings.IKeyConflictContext;
 import net.neoforged.neoforge.client.settings.KeyConflictContext;
 
-public final class NeoForgeKeyMappingActivationHelper implements KeyMappingActivationHelper {
+public final class NeoForgeKeyMappingHelper implements KeyMappingHelper {
     public static final BiMap<KeyActivationContext, IKeyConflictContext> KEY_CONTEXTS = ImmutableBiMap.of(
             KeyActivationContext.UNIVERSAL, KeyConflictContext.UNIVERSAL,
             KeyActivationContext.GAME, KeyConflictContext.IN_GAME,

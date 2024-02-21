@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.fabric.impl.client.init.FabricItemDisplayOverrides;
-import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingActivationHelper;
+import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 
@@ -23,7 +23,7 @@ public final class FabricClientFactories implements ClientFactories {
     }
 
     @Override
-    public KeyMappingActivationHelper getKeyMappingActivationHelper() {
-        return new FabricKeyMappingActivationHelper();
+    public KeyMappingHelper getKeyMappingActivationHelper() {
+        return new FabricKeyMappingHelper();
     }
 }

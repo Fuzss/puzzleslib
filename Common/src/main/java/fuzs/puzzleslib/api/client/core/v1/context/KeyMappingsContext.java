@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
+import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
 import net.minecraft.client.KeyMapping;
 
 import java.util.Objects;
@@ -24,8 +25,18 @@ public interface KeyMappingsContext {
     /**
      * Register a key mapping together with an activation context.
      *
-     * @param keyMapping the key mapping
-     * @param keyActivationContext an activation context for key mappings
+     * @param keyMapping        the key mapping
+     * @param activationContext an activation context for key mappings
      */
-    void registerKeyMapping(KeyMapping keyMapping, KeyActivationContext keyActivationContext);
+    default void registerKeyMapping(KeyMapping keyMapping, KeyActivationContext activationContext) {
+        this.registerKeyMapping(keyMapping, KeyActivationHandler.direct(activationContext));
+    }
+
+    /**
+     * Register a key mapping together with an activation handler.
+     *
+     * @param keyMapping        the key mapping
+     * @param activationHandler an activation handler for key mappings
+     */
+    void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler);
 }

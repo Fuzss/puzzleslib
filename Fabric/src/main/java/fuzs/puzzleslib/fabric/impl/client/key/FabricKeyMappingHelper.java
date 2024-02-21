@@ -7,13 +7,12 @@ import com.google.common.collect.Multimaps;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
-import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.controls.KeyBindsScreen;
 
@@ -21,29 +20,28 @@ import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public final class FabricKeyMappingActivationHelper implements KeyMappingActivationHelper {
+public final class FabricKeyMappingHelper implements KeyMappingHelper {
     private static final Multimap<KeyActivationContext, KeyMapping> KEY_MAPPINGS_BY_ACTIVATION = Multimaps.newListMultimap(Maps.newEnumMap(KeyActivationContext.class), Lists::newArrayList);
     private static final Map<KeyMapping, KeyActivationContext> KEY_MAPPINGS_TO_ACTIVATION = Maps.newIdentityHashMap();
 
     {
-        LoadCompleteCallback.EVENT.register(() -> {
+        ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
             // copied from Forge, all this does is stop the key bindings screen from yelling at you for setting incompatible keys,
             // this does not invoke any of our other behaviors for actually implementing activation contexts
             // this implementation relies on careful consideration when setting activation contexts for our own keys
-            Options options = Minecraft.getInstance().options;
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyUp, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyLeft, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyDown, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyRight, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyJump, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyShift, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keySprint, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyAttack, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyChat, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyPlayerList, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyCommand, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keyTogglePerspective, KeyActivationContext.GAME);
-            KEY_MAPPINGS_TO_ACTIVATION.put(options.keySmoothCamera, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyUp, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyLeft, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyDown, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyRight, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyJump, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyShift, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keySprint, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyAttack, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyChat, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyPlayerList, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyCommand, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keyTogglePerspective, KeyActivationContext.GAME);
+            KEY_MAPPINGS_TO_ACTIVATION.put(minecraft.options.keySmoothCamera, KeyActivationContext.GAME);
         });
         // this would probably be much safer as a mixin on KeyMapping, but this is the way it is for now...
         Map<KeyMapping, InputConstants.Key> keys = Maps.newLinkedHashMap();
@@ -95,7 +93,9 @@ public final class FabricKeyMappingActivationHelper implements KeyMappingActivat
         keys.keySet().forEach(keyMapping -> {
             // disable key states for mapping instances processed by client tick methods
             keyMapping.setDown(false);
-            while (keyMapping.consumeClick()) {}
+            while (keyMapping.consumeClick()) {
+                // NO-OP
+            }
         });
         keys.clear();
     }

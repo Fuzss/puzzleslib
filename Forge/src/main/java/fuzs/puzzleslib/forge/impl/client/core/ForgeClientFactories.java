@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.forge.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.forge.impl.client.init.ForgeItemDisplayOverrides;
-import fuzs.puzzleslib.forge.impl.client.key.ForgeKeyMappingActivationHelper;
+import fuzs.puzzleslib.forge.impl.client.key.ForgeKeyMappingHelper;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 
@@ -23,7 +23,7 @@ public final class ForgeClientFactories implements ClientFactories {
     }
 
     @Override
-    public KeyMappingActivationHelper getKeyMappingActivationHelper() {
-        return new ForgeKeyMappingActivationHelper();
+    public KeyMappingHelper getKeyMappingActivationHelper() {
+        return new ForgeKeyMappingHelper();
     }
 }
