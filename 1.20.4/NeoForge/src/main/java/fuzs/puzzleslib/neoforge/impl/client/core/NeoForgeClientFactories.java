@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingActivationHelper;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 import fuzs.puzzleslib.neoforge.impl.client.init.NeoForgeItemDisplayOverrides;
-import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingActivationHelper;
+import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 
 import java.util.Set;
 
@@ -23,7 +23,7 @@ public final class NeoForgeClientFactories implements ClientFactories {
     }
 
     @Override
-    public KeyMappingActivationHelper getKeyMappingActivationHelper() {
-        return new NeoForgeKeyMappingActivationHelper();
+    public KeyMappingHelper getKeyMappingActivationHelper() {
+        return new NeoForgeKeyMappingHelper();
     }
 }

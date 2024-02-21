@@ -11,13 +11,15 @@ public enum KeyActivationContext {
      */
     UNIVERSAL,
     /**
-     * A key mapping that is processed when the game is running without a screen being open in {@link net.minecraft.client.Minecraft#screen}.
+     * A key mapping that is processed when the game is running without a screen being open in
+     * {@link net.minecraft.client.Minecraft#screen}.
      * <p>These keys are usually processed in {@link Minecraft#tick()} and corresponding events.
      */
     GAME,
     /**
      * A key mapping that is processed when a screen is open in {@link Minecraft#screen}
-     * <p>These keys are usually processed in {@link net.minecraft.client.gui.screens.Screen#keyPressed(int, int, int)} and {@link net.minecraft.client.gui.screens.Screen#mouseClicked(double, double, int)}.
+     * <p>These keys are usually processed in {@link net.minecraft.client.gui.screens.Screen#keyPressed(int, int, int)}
+     * and {@link net.minecraft.client.gui.screens.Screen#mouseClicked(double, double, int)}.
      */
     SCREEN;
 
@@ -27,7 +29,7 @@ public enum KeyActivationContext {
      * @param other the other activation context
      * @return is the given activation context incompatible with this one
      */
-    public boolean hasConflictWith(KeyActivationContext other) {
+    public boolean conflictsWith(KeyActivationContext other) {
         return this == UNIVERSAL || other == UNIVERSAL || this == other;
     }
 }
