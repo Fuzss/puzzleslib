@@ -3,10 +3,12 @@ package fuzs.puzzleslib.forge.impl.capability.data;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.capability.EntityCapabilityKeyImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.capabilities.Capability;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -21,9 +23,9 @@ public class ForgeEntityCapabilityKey<T extends Entity, C extends CapabilityComp
     }
 
     @Override
-    public void setChanged(C capabilityComponent) {
+    public void setChanged(C capabilityComponent, @Nullable PlayerSet playerSet) {
         if (this.fallback != capabilityComponent) {
-            EntityCapabilityKeyImpl.super.setChanged(capabilityComponent);
+            EntityCapabilityKeyImpl.super.setChanged(capabilityComponent, playerSet);
         }
     }
 

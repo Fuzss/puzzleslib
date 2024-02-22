@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
 import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
@@ -45,16 +47,28 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
      */
     @MustBeInvokedByOverriders
     public void setChanged() {
-        this.capabilityKey.setChanged(this);
+        this.setChanged(null);
+    }
+
+    /**
+     * To be called when capability data changed and requires serializing and / or syncing.
+     *
+     * <p>Should basically be called in all setters after the new value has been set.
+     *
+     * @param playerSet clients to synchronize to
+     */
+    @MustBeInvokedByOverriders
+    public void setChanged(@Nullable PlayerSet playerSet) {
+        this.capabilityKey.setChanged(this, playerSet);
     }
 
     @Override
-    public void write(CompoundTag tag) {
+    public void write(CompoundTag compoundTag) {
         // NO-OP
     }
 
     @Override
-    public void read(CompoundTag tag) {
+    public void read(CompoundTag compoundTag) {
         // NO-OP
     }
 }
