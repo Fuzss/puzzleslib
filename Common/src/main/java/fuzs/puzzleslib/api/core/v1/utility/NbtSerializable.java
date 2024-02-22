@@ -13,16 +13,16 @@ public interface NbtSerializable {
     /**
      * Serialize the component to a {@link CompoundTag}.
      *
-     * @param tag tag to write to
+     * @param compoundTag tag to write to
      */
-    void write(CompoundTag tag);
+    void write(CompoundTag compoundTag);
 
     /**
      * Deserialize the component from a {@link CompoundTag}.
      *
-     * @param tag tag to read from
+     * @param compoundTag tag to read from
      */
-    void read(CompoundTag tag);
+    void read(CompoundTag compoundTag);
 
     /**
      * Encode the serializable instance to a {@link CompoundTag}.
@@ -43,9 +43,9 @@ public interface NbtSerializable {
      * @return a tag containing the serialized instance
      */
     static <T extends NbtSerializable> Function<CompoundTag, T> fromCompoundTag(Supplier<T> factory) {
-        return (CompoundTag tag) -> {
+        return (CompoundTag compoundTag) -> {
             T nbtSerializable = factory.get();
-            nbtSerializable.read(tag);
+            nbtSerializable.read(compoundTag);
             return nbtSerializable;
         };
     }

@@ -5,6 +5,7 @@ import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Convenient {@link CapabilityKey} implementation for {@link Entity}.
@@ -30,8 +31,11 @@ public interface EntityCapabilityKey<T extends Entity, C extends CapabilityCompo
     CopyStrategy getCopyStrategy();
 
     @Override
-    default void setChanged(C capabilityComponent) {
-        PlayerSet playerSet = this.getSyncStrategy().getPlayerSet(capabilityComponent.getHolder());
+    default void setChanged(C capabilityComponent, @Nullable PlayerSet playerSet) {
+        if (playerSet == null) {
+            playerSet = this.getSyncStrategy().getPlayerSet(capabilityComponent.getHolder());
+        }
+
         PuzzlesLibMod.NETWORK.sendMessage(playerSet, this.toPacket(capabilityComponent));
     }
 

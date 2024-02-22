@@ -2,9 +2,11 @@ package fuzs.puzzleslib.forge.impl.capability.data;
 
 import fuzs.puzzleslib.api.capability.v3.data.BlockEntityCapabilityKey;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -16,9 +18,9 @@ public class ForgeBlockEntityCapabilityKey<T extends BlockEntity, C extends Capa
     }
 
     @Override
-    public void setChanged(C capabilityComponent) {
+    public void setChanged(C capabilityComponent, @Nullable PlayerSet playerSet) {
         if (this.fallback != capabilityComponent) {
-            BlockEntityCapabilityKey.super.setChanged(capabilityComponent);
+            BlockEntityCapabilityKey.super.setChanged(capabilityComponent, playerSet);
         }
     }
 }
