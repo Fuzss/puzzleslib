@@ -28,8 +28,10 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
     private static void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         if (activationHandler.gameHandler() != null) {
             ClientTickEvents.START_CLIENT_TICK.register((Minecraft minecraft) -> {
-                while (keyMapping.consumeClick()) {
-                    activationHandler.gameHandler().accept(minecraft);
+                if (minecraft.player != null) {
+                    while (keyMapping.consumeClick()) {
+                        activationHandler.gameHandler().accept(minecraft);
+                    }
                 }
             });
         }

@@ -28,8 +28,11 @@ public record KeyMappingsContextForgeImpl(Consumer<KeyMapping> consumer) impleme
         if (activationHandler.gameHandler() != null) {
             MinecraftForge.EVENT_BUS.addListener((final TickEvent.ClientTickEvent evt) -> {
                 if (evt.phase != TickEvent.Phase.START) return;
-                while (keyMapping.consumeClick()) {
-                    activationHandler.gameHandler().accept(Minecraft.getInstance());
+                Minecraft minecraft = Minecraft.getInstance();
+                if (minecraft.player != null) {
+                    while (keyMapping.consumeClick()) {
+                        activationHandler.gameHandler().accept(minecraft);
+                    }
                 }
             });
         }
