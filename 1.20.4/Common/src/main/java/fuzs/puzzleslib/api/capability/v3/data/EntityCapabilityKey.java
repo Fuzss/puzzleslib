@@ -33,9 +33,12 @@ public interface EntityCapabilityKey<T extends Entity, C extends CapabilityCompo
     @Override
     default void setChanged(C capabilityComponent, @Nullable PlayerSet playerSet) {
         if (playerSet == null) {
-            playerSet = this.getSyncStrategy().getPlayerSet(capabilityComponent.getHolder());
+            if (!capabilityComponent.getHolder().level().isClientSide) {
+                playerSet = this.getSyncStrategy().getPlayerSet(capabilityComponent.getHolder());
+            } else {
+                playerSet = PlayerSet.ofNone();
+            }
         }
-
         PuzzlesLibMod.NETWORK.sendMessage(playerSet, this.toPacket(capabilityComponent));
     }
 
