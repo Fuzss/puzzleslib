@@ -41,8 +41,8 @@ public enum SyncStrategy {
     /**
      * Send a {@link CapabilityComponent} to remotes.
      *
-     * @param entity  the capability component holder
-     * @param message the message to send
+     * @param entity the capability component holder
+     * @return player set implementation for synchronization targets
      */
     public abstract PlayerSet getPlayerSet(Entity entity);
 }

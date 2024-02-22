@@ -100,8 +100,8 @@ public interface ScreenHelper {
      */
     default int getMouseX(Minecraft minecraft) {
         Objects.requireNonNull(minecraft, "minecraft is null");
-        return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() /
-                minecraft.getWindow().getScreenWidth());
+        return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow()
+                .getScreenWidth());
     }
 
     /**
@@ -119,8 +119,8 @@ public interface ScreenHelper {
      */
     default int getMouseY(Minecraft minecraft) {
         Objects.requireNonNull(minecraft, "minecraft is null");
-        return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() /
-                minecraft.getWindow().getScreenHeight());
+        return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow()
+                .getScreenHeight());
     }
 
     /**
@@ -130,8 +130,6 @@ public interface ScreenHelper {
      * @param mouseX mouse x position
      * @param mouseY mouse y position
      * @return the active slot or null
-     *
-     * @deprecated replace with {@link AbstractContainerScreen#findSlot(double, double)}
      */
     @Nullable
     default Slot findSlot(AbstractContainerScreen<?> screen, double mouseX, double mouseY) {
@@ -146,8 +144,6 @@ public interface ScreenHelper {
      * @param mouseX mouse x position
      * @param mouseY mouse y position
      * @return is the mouse cursor hovering the slot
-     *
-     * @deprecated replace with {@link AbstractContainerScreen#isHovering(Slot, double, double)}
      */
     default boolean isHovering(AbstractContainerScreen<?> screen, Slot slot, double mouseX, double mouseY) {
         return screen.isHovering(slot, mouseX, mouseY);

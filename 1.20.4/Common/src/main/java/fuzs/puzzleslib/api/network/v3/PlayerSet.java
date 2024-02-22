@@ -74,7 +74,7 @@ public interface PlayerSet {
     /**
      * Send message from server to all players on the server.
      *
-     * @param server server for retrieving the player list
+     * @param minecraftServer server for retrieving the player list
      */
     static PlayerSet ofAll(MinecraftServer minecraftServer) {
         return (Packet<?> packet) -> {
@@ -183,7 +183,7 @@ public interface PlayerSet {
     /**
      * Send message from server to all players tracking a given entity.
      * <p>
-     * When the entity is a player it will receive the message as well, otherwise use {@link #nearSelf(ServerPlayer)}.
+     * When the entity is a player it will receive the message as well, otherwise use {@link #nearPlayer(ServerPlayer)}.
      *
      * @param entity the tracked entity
      */
