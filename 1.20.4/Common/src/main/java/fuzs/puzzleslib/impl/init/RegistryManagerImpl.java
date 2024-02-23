@@ -54,17 +54,21 @@ public abstract class RegistryManagerImpl implements RegistryManager {
 
     @Override
     public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        return this.register(registryKey, path, supplier, false);
+    }
+
+    public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration) {
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(supplier, "supplier is null");
         Holder.Reference<T> holder;
         if (!this.allowedModLoaders.contains(ModLoaderEnvironment.INSTANCE.getModLoader())) {
             holder = this.registerLazily(registryKey, path);
         } else {
-            holder = this.getHolderReference(registryKey, path, supplier);
+            holder = this.getHolderReference(registryKey, path, supplier, skipRegistration);
         }
         this.allowedModLoaders = EnumSet.allOf(ModLoader.class);
         return holder;
     }
 
-    protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
+    protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration);
 }

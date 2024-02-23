@@ -30,7 +30,16 @@ public final class FabricRendererEvents {
     /**
      * Called before one of the player's hands is rendered in first-person mode.
      */
+    @Deprecated(forRemoval = true)
     public static final Event<RenderHandCallback> RENDER_HAND = FabricEventFactory.createResult(RenderHandCallback.class);
+    /**
+     * Called before the player's main hand is rendered in first-person mode.
+     */
+    public static final Event<RenderHandEvents.MainHand> RENDER_MAIN_HAND = FabricEventFactory.createResult(RenderHandEvents.MainHand.class);
+    /**
+     * Called before the player's off-hand is rendered in first-person mode.
+     */
+    public static final Event<RenderHandEvents.OffHand> RENDER_OFF_HAND = FabricEventFactory.createResult(RenderHandEvents.OffHand.class);
     /**
      * Runs before camera angle setup is done, allows for additional control over roll (which vanilla itself does not support) in addition to pitch and yaw.
      */

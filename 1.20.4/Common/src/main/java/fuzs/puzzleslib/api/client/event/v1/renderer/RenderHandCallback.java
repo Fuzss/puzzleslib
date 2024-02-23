@@ -8,6 +8,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
+/**
+ * @deprecated see {@link RenderHandEvents}
+ */
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface RenderHandCallback {
     EventInvoker<RenderHandCallback> EVENT = EventInvoker.lookup(RenderHandCallback.class);
@@ -18,17 +22,21 @@ public interface RenderHandCallback {
      * <p>Allows for cancelling rendering of the hand.
      *
      * @param player            the local player instance used for first-person rendering
-     * @param hand              the {@link InteractionHand} that is being rendered as part of this event
-     * @param stack             the {@link ItemStack} held in the hand
+     * @param interactionHand   the {@link InteractionHand} that is being rendered as part of this event
+     * @param itemStack         the {@link ItemStack} held in the hand
      * @param poseStack         the current {@link PoseStack}
      * @param multiBufferSource the current {@link MultiBufferSource}
-     * @param packedLight       packet light the hand is rendered with
+     * @param combinedLight     packet light the hand is rendered with
      * @param partialTick       current partial tick time
      * @param interpolatedPitch the pitch interpolated for current tick delta from {@link Player#getXRot()}
-     * @param swingProgress     the forward swing state of the hand from attacking / mining, originally retrieved from {@link Player#getAttackAnim(float)}
-     * @param equipProgress     the height the hand is rendered at, changes when switching between hotbar items and after triggering the attack cool-down, originally retrieved from {@link Player#getAttackStrengthScale(float)}
+     * @param swingProgress     the forward swing state of the hand from attacking / mining, originally retrieved from
+     *                          {@link Player#getAttackAnim(float)}
+     * @param equipProgress     the height the hand is rendered at, changes when switching between hotbar items and
+     *                          after triggering the attack cool-down, originally retrieved from
+     *                          {@link Player#getAttackStrengthScale(float)}
      * @return {@link EventResult#INTERRUPT} to prevent the specific hand from rendering,
-     * {@link EventResult#PASS} to allow the hand to render normally
+     *         <p>
+     *         {@link EventResult#PASS} to allow the hand to render normally
      */
-    EventResult onRenderHand(Player player, InteractionHand hand, ItemStack stack, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
+    EventResult onRenderHand(Player player, InteractionHand interactionHand, ItemStack itemStack, PoseStack poseStack, MultiBufferSource multiBufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
 }

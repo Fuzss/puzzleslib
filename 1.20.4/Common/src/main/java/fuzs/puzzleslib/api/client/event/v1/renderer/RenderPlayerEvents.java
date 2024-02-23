@@ -19,16 +19,22 @@ public final class RenderPlayerEvents {
     public interface Before {
 
         /**
-         * Called before the player model is rendered, allows for applying transformations to the {@link PoseStack}, or for completely taking over rendering as a whole.
+         * Called before the player model is rendered, allows for applying transformations to the {@link PoseStack}, or
+         * for completely taking over rendering as a whole.
+         * <p>
+         * TODO change player to abstract client player
          *
-         * @param player            the player that is rendering, either {@link net.minecraft.client.player.LocalPlayer} or {@link net.minecraft.client.player.RemotePlayer}
+         * @param player            the player that is rendering, either {@link net.minecraft.client.player.LocalPlayer}
+         *                          or {@link net.minecraft.client.player.RemotePlayer}
          * @param renderer          the used {@link PlayerRenderer} instance
+         * @param partialTick       current partial tick time
          * @param poseStack         the current {@link PoseStack}
          * @param multiBufferSource the current {@link MultiBufferSource}
          * @param packedLight       packet light the entity is rendered with
-         * @param partialTick       current partial tick time
-         * @return {@link EventResult#INTERRUPT} to prevent the player model from rendering, this allows for taking over complete player rendering,
-         * {@link EventResult#PASS} to allow the player model to render
+         * @return {@link EventResult#INTERRUPT} to prevent the player model from rendering, this allows for taking over
+         *         complete player rendering,
+         *         <p>
+         *         {@link EventResult#PASS} to allow the player model to render
          */
         EventResult onBeforeRenderPlayer(Player player, PlayerRenderer renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
     }
@@ -37,14 +43,18 @@ public final class RenderPlayerEvents {
     public interface After {
 
         /**
-         * Called after the player model is rendered, allows for cleaning up transformations applied to the {@link PoseStack}.
+         * Called after the player model is rendered, allows for cleaning up transformations applied to the
+         * {@link PoseStack}.
+         * <p>
+         * TODO change player to abstract client player
          *
-         * @param player            the player that is rendering, either {@link net.minecraft.client.player.LocalPlayer} or {@link net.minecraft.client.player.RemotePlayer}
+         * @param player            the player that is rendering, either {@link net.minecraft.client.player.LocalPlayer}
+         *                          or {@link net.minecraft.client.player.RemotePlayer}
          * @param renderer          the used {@link PlayerRenderer} instance
+         * @param partialTick       current partial tick time
          * @param poseStack         the current {@link PoseStack}
          * @param multiBufferSource the current {@link MultiBufferSource}
          * @param packedLight       packet light the entity is rendered with
-         * @param partialTick       current partial tick time
          */
         void onAfterRenderPlayer(Player player, PlayerRenderer renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
     }

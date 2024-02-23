@@ -1,10 +1,13 @@
 package fuzs.puzzleslib.api.init.v3.registry;
 
 import com.google.common.collect.ImmutableSet;
+import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.item.RecipeTypeImpl;
+import net.minecraft.commands.synchronization.ArgumentTypeInfo;
+import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
@@ -230,9 +233,12 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     @SuppressWarnings("unchecked")
     default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
-        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE, path, () -> {
-            return entry.get().build(path);
-        });
+        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE,
+                path,
+                () -> {
+                    return entry.get().build(path);
+                }
+        );
     }
 
     /**
@@ -245,9 +251,12 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     @SuppressWarnings("unchecked")
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
-        return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE, path, () -> {
-            return entry.get().build(null);
-        });
+        return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
+                path,
+                () -> {
+                    return entry.get().build(null);
+                }
+        );
     }
 
     /**
@@ -311,6 +320,31 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange);
 
     /**
+     * Register an argument type.
+     *
+     * @param path          path for new entry
+     * @param argumentClass argument type class
+     * @param argumentType  argument type factory
+     * @param <A>           argument type
+     * @return holder reference
+     */
+    default <A extends ArgumentType<?>> Holder.Reference<ArgumentTypeInfo<?, ?>> registerArgumentType(String path, Class<? extends A> argumentClass, Supplier<A> argumentType) {
+        return this.registerArgumentType(path, argumentClass, SingletonArgumentInfo.contextFree(argumentType));
+    }
+
+    /**
+     * Register an argument type.
+     *
+     * @param path             path for new entry
+     * @param argumentClass    argument type class
+     * @param argumentTypeInfo argument type info
+     * @param <A>              argument type
+     * @param <T>              argument type info
+     * @return holder reference
+     */
+    <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>> Holder.Reference<ArgumentTypeInfo<?, ?>> registerArgumentType(String path, Class<? extends A> argumentClass, ArgumentTypeInfo<A, T> argumentTypeInfo);
+
+    /**
      * Register a type of recipe.
      *
      * @param path path for new entry
@@ -350,15 +384,16 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
 
     /**
      * Register an entity data serializer.
-     * <p>Registration to a game registry is only required on NeoForge, therefore a direct holder is returned on other mod loaders.
+     * <p>Registration to a game registry is only required on NeoForge, therefore a direct holder is returned on other
+     * mod loaders.
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @return holder reference
      */
     default <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
-        ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(
-                new ResourceLocation("entity_data_serializers"));
+        ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(new ResourceLocation(
+                "entity_data_serializers"));
         EntityDataSerializer<T> serializer = entry.get();
         EntityDataSerializers.registerSerializer(serializer);
         return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), serializer);
