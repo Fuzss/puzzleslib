@@ -88,9 +88,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
-        // this runs before server starting on dedicated servers
+        // these run before server starting on dedicated servers
         INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
             return callback::onTagsUpdated;
+        });
+        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, (RegisterCommandsCallback callback) -> {
+            return callback::onRegisterCommands;
         });
         // run this early as we also use it for load complete when other events are registered and
         // this would be missed as it's registered while the callback is being invoked on dedicated servers
@@ -221,9 +224,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTickEvents.Start.class, FabricPlayerEvents.PLAYER_TICK_START);
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
-        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, (RegisterCommandsCallback callback) -> {
-            return callback::onRegisterCommands;
-        });
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, (LootTableLoadEvents.Replace callback) -> {
             return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
                 // keep this the same as Forge where editing data pack specified loot tables is not supported
