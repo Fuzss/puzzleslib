@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 
 public final class RenderHandEvents {
     public static final EventInvoker<MainHand> MAIN_HAND = EventInvoker.lookup(MainHand.class);
-    public static final EventInvoker<MainHand> OFF_HAND = EventInvoker.lookup(MainHand.class);
+    public static final EventInvoker<OffHand> OFF_HAND = EventInvoker.lookup(OffHand.class);
 
     private RenderHandEvents() {
         // NO-OP
