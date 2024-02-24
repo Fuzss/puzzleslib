@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.item;
 
-import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import net.minecraft.core.Holder;
@@ -31,7 +30,7 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     @Nullable
     private Supplier<ItemStack[]> icons;
     private CreativeModeTab.DisplayItemsGenerator displayItemsGenerator = (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
-
+        // NO-OP
     };
     private boolean hasSearchBar;
     private boolean appendEnchantmentsAndPotions;
@@ -90,10 +89,10 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
         } else {
             Objects.requireNonNull(this.icons, "both icon suppliers are null");
             // since no single icon is set and multiple icons are only processed on Forge, this would otherwise be an empty icon for Fabric / Quilt
-            if (!ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
+            if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
                 builder.icon(() -> {
                     ItemStack[] icons = this.icons.get();
-                    Preconditions.checkPositionIndex(1, icons.length, "icons is empty");
+                    Objects.checkIndex(0, icons.length);
                     return icons[0];
                 });
             }

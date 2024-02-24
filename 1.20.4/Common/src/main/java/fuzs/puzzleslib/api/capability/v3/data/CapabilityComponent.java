@@ -31,7 +31,12 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
 
     @ApiStatus.Internal
     public final void initialize(CapabilityKey<T, CapabilityComponent<T>> capabilityKey, T holder) {
-        if (!this.initialized) {
+        this.initialize(capabilityKey, holder, false);
+    }
+
+    @ApiStatus.Internal
+    public final void initialize(CapabilityKey<T, CapabilityComponent<T>> capabilityKey, T holder, boolean forceOverride) {
+        if (forceOverride || !this.initialized) {
             this.initialized = true;
             Objects.requireNonNull(capabilityKey, "capability key is null");
             this.capabilityKey = capabilityKey;

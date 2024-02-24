@@ -8,13 +8,14 @@ import net.minecraft.world.item.ItemStack;
 import java.util.function.Supplier;
 
 /**
- * a builder for {@link CreativeModeTab}, most features are only available on Forge, on Fabric they'll simply do nothing
+ * a builder for {@link CreativeModeTab}, most features are only available on Forge, on Fabric they'll simply do
+ * nothing
  */
 public interface CreativeModeTabConfigurator {
 
     /**
-     * creates a new creative mode tab, handles adding to the creative screen
-     * use this when one tab is enough for the mod, <code>tabId</code> defaults to "main"
+     * creates a new creative mode tab, handles adding to the creative screen use this when one tab is enough for the
+     * mod, <code>tabId</code> defaults to "main"
      *
      * @param modId the mod this tab is used by
      * @param icon  the display stack
@@ -57,7 +58,9 @@ public interface CreativeModeTabConfigurator {
     }
 
     /**
-     * set an item stack to display as tab icon
+     * Set an item stack to display as tab icon.
+     * <p>
+     * On Forge &amp; NeoForge this property is overridden by additionally setting {@link #icons(Supplier)}.
      *
      * @param icon the item stack displayed as tab icon
      * @return builder instance
@@ -65,8 +68,9 @@ public interface CreativeModeTabConfigurator {
     CreativeModeTabConfigurator icon(Supplier<ItemStack> icon);
 
     /**
-     * Makes icons cycle every two seconds.
-     * <p>Only supported on Forge!
+     * Set multiple item stacks to display as tab icon that cycle every two seconds.
+     * <p>Only supported on Forge &amp; NeoForge. On Fabric the item stack at index zero in the supplied array is used.
+     * Additionally, set an icon in {@link #icon(Supplier)} to override this behavior.
      *
      * @param icons multiple item stacks displayed as tab icon, they are cycled through
      * @return builder instance
@@ -90,8 +94,10 @@ public interface CreativeModeTabConfigurator {
 
     /**
      * Add all highest level enchantments in the form of enchanted books to this tab.
-     * <p>Also add all potions in the form of drinkable potions, splash potions, lingering potions and tipped arrows to this tab.
-     * <p>Vanilla will still add the books to search and the dedicated enchantment category tab, also potions to search and the dedicated potions tab (combat tab for tipped arrows).
+     * <p>Also add all potions in the form of drinkable potions, splash potions, lingering potions and tipped arrows to
+     * this tab.
+     * <p>Vanilla will still add the books to search and the dedicated enchantment category tab, also potions to search
+     * and the dedicated potions tab (combat tab for tipped arrows).
      *
      * @return builder instance
      */
