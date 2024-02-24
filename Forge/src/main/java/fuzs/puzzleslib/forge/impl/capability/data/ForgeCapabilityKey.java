@@ -44,12 +44,11 @@ public abstract class ForgeCapabilityKey<T, C extends CapabilityComponent<T>> im
                 // Our implementation always expects a value to be present though, so return a dummy value that is not serialized nor synchronized
                 if (this.fallback == null) {
                     PuzzlesLib.LOGGER.warn("Requesting invalid capability {} for type {} from holder {}", this.identifier, this.capability.getName(), holder);
-                    return this.fallback = this.capabilityFactory.get();
-                } else {
-                    // just initialize this with the requested holder, so that it is properly valid
-                    this.fallback.initialize((CapabilityKey<T, CapabilityComponent<T>>) this, holder, true);
-                    return this.fallback;
+                    this.fallback = this.capabilityFactory.get();
                 }
+                // just initialize this with the requested holder, so that it is properly valid
+                this.fallback.initialize((CapabilityKey<T, CapabilityComponent<T>>) this, holder, true);
+                return this.fallback;
             });
             Objects.requireNonNull(capabilityComponent, "data is null");
             return capabilityComponent;
