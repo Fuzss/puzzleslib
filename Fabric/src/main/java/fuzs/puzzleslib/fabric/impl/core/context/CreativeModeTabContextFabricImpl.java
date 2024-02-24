@@ -14,6 +14,9 @@ public final class CreativeModeTabContextFabricImpl implements CreativeModeTabCo
     public void registerCreativeModeTab(CreativeModeTabConfigurator configurator) {
         CreativeModeTab.Builder builder = FabricItemGroup.builder();
         ((CreativeModeTabConfiguratorImpl) configurator).configure(builder);
-        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, ((CreativeModeTabConfiguratorImpl) configurator).getIdentifier(), builder.build());
+        Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB,
+                ((CreativeModeTabConfiguratorImpl) configurator).getIdentifier(),
+                builder.build()
+        );
     }
 }

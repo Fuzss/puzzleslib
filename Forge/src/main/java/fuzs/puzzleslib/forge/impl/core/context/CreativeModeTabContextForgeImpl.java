@@ -11,13 +11,16 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
-public record CreativeModeTabContextForgeImpl(
-        IEventBus modEventBus) implements CreativeModeTabContext {
+import java.util.Objects;
+
+public record CreativeModeTabContextForgeImpl(IEventBus modEventBus) implements CreativeModeTabContext {
 
     @Override
     public void registerCreativeModeTab(CreativeModeTabConfigurator configurator) {
         CreativeModeTabConfiguratorImpl configuratorImpl = (CreativeModeTabConfiguratorImpl) configurator;
-        DeferredRegister<CreativeModeTab> deferredRegister = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, configuratorImpl.getIdentifier().getNamespace());
+        DeferredRegister<CreativeModeTab> deferredRegister = DeferredRegister.create(Registries.CREATIVE_MODE_TAB,
+                configuratorImpl.getIdentifier().getNamespace()
+        );
         deferredRegister.register(this.modEventBus);
         CreativeModeTab.Builder builder = CreativeModeTab.builder();
         this.finalizeCreativeModeTabBuilder(builder, configuratorImpl);
@@ -39,7 +42,7 @@ public record CreativeModeTabContextForgeImpl(
                     // stolen from XFactHD, thanks :)
                     if (this.icons == null) {
                         this.icons = configuratorImpl.getIcons().get();
-                        Preconditions.checkPositionIndex(1, this.icons.length, "icons is empty");
+                        Objects.checkIndex(0, this.icons.length);
                     }
                     int index = (int) (System.currentTimeMillis() / 2000) % this.icons.length;
                     return this.icons[index];

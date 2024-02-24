@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.NotNull;
@@ -47,6 +46,8 @@ public abstract class ForgeCapabilityKey<T, C extends CapabilityComponent<T>> im
                     PuzzlesLib.LOGGER.warn("Requesting invalid capability {} for type {} from holder {}", this.identifier, this.capability.getName(), holder);
                     return this.fallback = this.capabilityFactory.get();
                 } else {
+                    // just initialize this with the requested holder, so that it is properly valid
+                    this.fallback.initialize((CapabilityKey<T, CapabilityComponent<T>>) this, holder, true);
                     return this.fallback;
                 }
             });
