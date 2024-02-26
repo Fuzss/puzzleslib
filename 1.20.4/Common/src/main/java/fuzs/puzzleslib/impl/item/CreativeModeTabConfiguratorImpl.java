@@ -4,11 +4,9 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionUtils;
@@ -121,20 +119,12 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     }
 
     private static void appendAllPotions(String namespace, HolderLookup.Provider holders, Consumer<ItemStack> itemStacks) {
-        Comparator<Potion> comparator = Comparator.<Potion, String>comparing(potion -> {
-            if (potion.getEffects().isEmpty()) throw new IllegalArgumentException("Cannot compare potions with empty effects!");
-            MobEffect effect = potion.getEffects().get(0).getEffect();
-            ResourceLocation key = BuiltInRegistries.MOB_EFFECT.getKey(effect);
-            Objects.requireNonNull(key, "Mob effect key for class %s is null".formatted(effect.getClass()));
-            return key.getPath();
-        }).thenComparingInt(potion -> potion.getEffects().get(0).getAmplifier())
-                .thenComparingInt(potion -> potion.getEffects().get(0).getDuration());
         Potion[] potions = holders.lookup(Registries.POTION).stream()
                 .flatMap(HolderLookup::listElements)
                 .filter(entry -> entry.key().location().getNamespace().equals(namespace))
                 .map(Holder.Reference::value)
                 .filter(potion -> !potion.getEffects().isEmpty())
-                .sorted(comparator)
+                .sorted(Comparator.comparing(potion -> potion.getEffects().get(0)))
                 .toArray(Potion[]::new);
         for (Item item : POTION_ITEMS) {
             for (Potion potion : potions) {
