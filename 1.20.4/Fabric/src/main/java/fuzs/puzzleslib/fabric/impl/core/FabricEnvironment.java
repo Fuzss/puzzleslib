@@ -65,6 +65,11 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
+    public String getCurrentMappingsNamespace() {
+        return FabricLoader.getInstance().getMappingResolver().getCurrentRuntimeNamespace();
+    }
+
+    @Override
     public boolean isDevelopmentEnvironment() {
         return FabricLoader.getInstance().isDevelopmentEnvironment();
     }

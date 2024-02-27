@@ -43,6 +43,16 @@ public interface ModLoaderEnvironment {
     Path getConfigDirectory();
 
     /**
+     * The following mapping namespaces are used in the certain situations:
+     * <li><code>named</code> in a development environment and in production using NeoForge</li>
+     * <li><code>intermediary</code> in production using Fabric</li>
+     * <li><code>srg</code> in production using Forge</li>
+     *
+     * @return runtime mappings namespace
+     */
+    String getCurrentMappingsNamespace();
+
+    /**
      * @return is this running in a development environment
      */
     boolean isDevelopmentEnvironment();

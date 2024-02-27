@@ -38,17 +38,17 @@ public abstract class AbstractModPackResources implements PackResources {
     protected final String modLogoPath;
     /**
      * Id of this pack.
-     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, boolean, boolean, FeatureFlagSet)}.
+     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean, boolean, FeatureFlagSet)}.
      */
     private ResourceLocation id;
     /**
      * The metadata for the <code>pack.mcmeta</code> section.
-     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, boolean, boolean, FeatureFlagSet)}.
+     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean, boolean, FeatureFlagSet)}.
      */
     private BuiltInMetadata metadata;
     /**
      * The pack type for this pack.
-     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, boolean, boolean, FeatureFlagSet)}.
+     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean, boolean, FeatureFlagSet)}.
      */
     private PackType packType;
 
@@ -137,7 +137,7 @@ public abstract class AbstractModPackResources implements PackResources {
     }
 
     @ApiStatus.Internal
-    static Pack buildPack(PackType packType, ResourceLocation identifier, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
+    static Pack buildPack(PackType packType, ResourceLocation identifier, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
         PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType), Optional.empty());
         BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
         Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(identifier, description, PackCompatibility.COMPATIBLE, features, hidden);
@@ -156,6 +156,6 @@ public abstract class AbstractModPackResources implements PackResources {
             public PackResources openFull(String id, Pack.Info info) {
                 return this.openPrimary(id);
             }
-        }, info, Pack.Position.TOP, fixedPosition, PackSource.BUILT_IN);
+        }, info, position, fixedPosition, PackSource.BUILT_IN);
     }
 }
