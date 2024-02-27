@@ -38,7 +38,7 @@ public final class PackResourcesHelper {
     public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean hidden) {
         return buildClientPack(id,
                 factory,
-                Component.literal("Generated Resource Pack"),
+                getPackTitle(PackType.CLIENT_RESOURCES),
                 getPackDescription(id.getNamespace()),
                 true,
                 Pack.Position.TOP,
@@ -106,12 +106,23 @@ public final class PackResourcesHelper {
     }
 
     /**
+     * Create a simple pack title for a {@link PackType}.
+     *
+     * @param packType pack type for title
+     * @return title component
+     */
+    public static Component getPackTitle(PackType packType) {
+        return Component.literal(
+                "Generated " + (packType == PackType.CLIENT_RESOURCES ? "Resource" : "Data") + " Pack");
+    }
+
+    /**
      * Create a fancy pack description for dynamic resources from a mod.
      *
      * @param modId the source mod for the dynamic pack
      * @return description component
      */
-    private static Component getPackDescription(String modId) {
+    public static Component getPackDescription(String modId) {
         return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).map(name -> {
             return Component.literal(name + " Dynamic Resources");
         }).orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
@@ -132,7 +143,7 @@ public final class PackResourcesHelper {
     public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean hidden) {
         return buildServerPack(id,
                 factory,
-                Component.literal("Generated Data Pack"),
+                getPackTitle(PackType.SERVER_DATA),
                 getPackDescription(id.getNamespace()),
                 true,
                 Pack.Position.TOP,
