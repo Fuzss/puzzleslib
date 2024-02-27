@@ -89,6 +89,11 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
+    public String getCurrentMappingsNamespace() {
+        return "named";
+    }
+
+    @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.production;
     }

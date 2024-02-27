@@ -25,6 +25,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     @Override
     public void onConstructMod() {
+        LOGGER.info("Mppaings {}", ModLoaderEnvironment.INSTANCE.getCurrentMappingsNamespace());
         ModContext.registerHandlers();
         EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);

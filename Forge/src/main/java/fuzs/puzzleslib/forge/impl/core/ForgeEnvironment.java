@@ -91,6 +91,11 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
     }
 
     @Override
+    public String getCurrentMappingsNamespace() {
+        return FMLEnvironment.naming.equalsIgnoreCase("mcp") ? "named" : FMLEnvironment.naming;
+    }
+
+    @Override
     public boolean isDevelopmentEnvironment() {
         return !FMLEnvironment.production;
     }
