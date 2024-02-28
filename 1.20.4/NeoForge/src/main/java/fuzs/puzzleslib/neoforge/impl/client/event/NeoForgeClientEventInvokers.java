@@ -65,6 +65,14 @@ public final class NeoForgeClientEventInvokers {
     private static final Supplier<Set<ResourceLocation>> TOP_LEVEL_MODEL_LOCATIONS = Suppliers.memoize(NeoForgeClientEventInvokers::getTopLevelModelLocations);
 
     public static void registerLoadingHandlers() {
+        INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
+            DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setNewScreen, evt::getNewScreen, evt::getScreen);
+            EventResult result = callback.onScreenOpening(evt.getCurrentScreen(), newScreen);
+            // setting current screen again already prevents Screen#remove from running as implemented by Forge, but Screen#init still runs again,
+            // we just manually fully cancel the event to deal in a more 'proper' way with this, the same is implemented on Fabric
+            if (result.isInterrupt() || newScreen.getAsOptional().filter(screen -> screen == evt.getCurrentScreen()).isPresent())
+                evt.setCanceled(true);
+        });
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ResourceLocation, BakedModel> models = evt.getModels();
@@ -207,14 +215,6 @@ public final class NeoForgeClientEventInvokers {
             MutableInt horizontalOffset = MutableInt.fromEvent(evt::setHorizontalOffset, evt::getHorizontalOffset);
             EventResult result = callback.onInventoryMobEffects(evt.getScreen(), evt.getAvailableSpace(), fullSizeRendering, horizontalOffset);
             if (result.isInterrupt()) evt.setCanceled(true);
-        });
-        INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
-            DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setNewScreen, evt::getNewScreen, evt::getScreen);
-            EventResult result = callback.onScreenOpening(evt.getCurrentScreen(), newScreen);
-            // setting current screen again already prevents Screen#remove from running as implemented by Forge, but Screen#init still runs again,
-            // we just manually fully cancel the event to deal in a more 'proper' way with this, the same is implemented on Fabric
-            if (result.isInterrupt() || newScreen.getAsOptional().filter(screen -> screen == evt.getCurrentScreen()).isPresent())
-                evt.setCanceled(true);
         });
         INSTANCE.register(ComputeFovModifierCallback.class, ComputeFovModifierEvent.class, (ComputeFovModifierCallback callback, ComputeFovModifierEvent evt) -> {
             final float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
