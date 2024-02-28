@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.client.init;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
@@ -22,7 +22,8 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
     private Map<BakedModel, Map<ItemDisplayContext, BakedModel>> overrideModels;
 
     {
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(PuzzlesLib.id("item_display_overrides"), (ResourceManager resourceManager) -> {
+        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(
+                PuzzlesLibMod.id("item_display_overrides"), (ResourceManager resourceManager) -> {
             ModelManager modelManager = Minecraft.getInstance().getModelManager();
             this.overrideModels = Maps.newIdentityHashMap();
             for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : this.overrideLocations.entrySet()) {

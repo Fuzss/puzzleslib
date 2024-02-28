@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -26,7 +26,7 @@ import java.util.function.UnaryOperator;
  * <p>Will not apply any changes in a production environment.
  */
 public final class CommandOverrides {
-    private static final String KEY_PLAYER_SEEN_WORLD = PuzzlesLib.id("has_seen_world").toLanguageKey();
+    private static final String KEY_PLAYER_SEEN_WORLD = PuzzlesLibMod.id("has_seen_world").toLanguageKey();
     private static final Map<CommandEnvironment, Collection<String>> COMMAND_OVERRIDES = Maps.newEnumMap(CommandEnvironment.class);
 
     private CommandOverrides() {
@@ -78,6 +78,7 @@ public final class CommandOverrides {
             }
         });
         ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel level) -> {
+            // idea from Serilum's Starter Kit mod
             if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags().contains(KEY_PLAYER_SEEN_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
                 String playerName = serverPlayer.getGameProfile().getName();

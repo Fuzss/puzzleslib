@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.core.EventPhaseImpl;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
@@ -19,19 +19,19 @@ public interface EventPhase {
     /**
      * A phase to be used directly before the default phase, equivalent to EventPriority#HIGH on Forge.
      */
-    EventPhase BEFORE = new EventPhaseImpl(PuzzlesLib.id("before"), DEFAULT, EventPhaseImpl.Ordering.BEFORE);
+    EventPhase BEFORE = new EventPhaseImpl(PuzzlesLibMod.id("before"), DEFAULT, EventPhaseImpl.Ordering.BEFORE);
     /**
      * A phase to be used directly after the default phase, equivalent to EventPriority#LOW on Forge.
      */
-    EventPhase AFTER = new EventPhaseImpl(PuzzlesLib.id("after"), DEFAULT, EventPhaseImpl.Ordering.AFTER);
+    EventPhase AFTER = new EventPhaseImpl(PuzzlesLibMod.id("after"), DEFAULT, EventPhaseImpl.Ordering.AFTER);
     /**
      * A phase to be used as the very first phase, equivalent to EventPriority#HIGHEST on Forge.
      */
-    EventPhase FIRST = new EventPhaseImpl(PuzzlesLib.id("first"), BEFORE, EventPhaseImpl.Ordering.BEFORE);
+    EventPhase FIRST = new EventPhaseImpl(PuzzlesLibMod.id("first"), BEFORE, EventPhaseImpl.Ordering.BEFORE);
     /**
      * A phase to be used as the very last phase, equivalent to EventPriority#LOWEST on Forge.
      */
-    EventPhase LAST = new EventPhaseImpl(PuzzlesLib.id("last"), AFTER, EventPhaseImpl.Ordering.AFTER);
+    EventPhase LAST = new EventPhaseImpl(PuzzlesLibMod.id("last"), AFTER, EventPhaseImpl.Ordering.AFTER);
 
     /**
      * @return the identifier used for registering this phase on Fabric
@@ -57,7 +57,7 @@ public interface EventPhase {
      * @return the custom event phase
      */
     static EventPhase early(EventPhase eventPhase) {
-        return new EventPhaseImpl(PuzzlesLib.id("early_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.BEFORE);
+        return new EventPhaseImpl(PuzzlesLibMod.id("early_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.BEFORE);
     }
 
     /**
@@ -67,6 +67,6 @@ public interface EventPhase {
      * @return the custom event phase
      */
     static EventPhase late(EventPhase eventPhase) {
-        return new EventPhaseImpl(PuzzlesLib.id("late_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.AFTER);
+        return new EventPhaseImpl(PuzzlesLibMod.id("late_" + eventPhase.identifier().getPath()), eventPhase, EventPhaseImpl.Ordering.AFTER);
     }
 }

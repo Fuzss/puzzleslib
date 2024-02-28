@@ -33,7 +33,7 @@ public final class FabricModConstructor {
     private static void registerHandlers(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags) {
         constructor.onConstructMod();
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextFabricImpl());
-        constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextFabricImpl());
+        constructor.onBuildCreativeModeTabContents(new CreativeTabContentsContextFabricImpl());
         constructor.onCommonSetup();
         constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
         constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());

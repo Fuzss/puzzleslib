@@ -16,7 +16,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -140,7 +140,7 @@ public final class FabricClientEventInvokers {
             });
         });
         INSTANCE.register(ModelEvents.AfterModelLoading.class, (ModelEvents.AfterModelLoading callback, @Nullable Object o) -> {
-            ResourceLocation resourceLocation = PuzzlesLib.id("after_model_loading/" + MODEL_LOADING_LISTENERS.incrementAndGet());
+            ResourceLocation resourceLocation = PuzzlesLibMod.id("after_model_loading/" + MODEL_LOADING_LISTENERS.incrementAndGet());
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(resourceLocation, resourceManager -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 callback.onAfterModelLoading(minecraft::getModelManager);
