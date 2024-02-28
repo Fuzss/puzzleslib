@@ -42,13 +42,31 @@ public class DataProviderContext {
     }
 
     /**
-     * Creates a dummy-like context instance useful for runtime generation in conjunction with {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
+     * Creates a dummy-like context instance useful for runtime generation in conjunction with
+     * {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
      *
      * @param modId the generating mod id
      * @return new context instance
      */
     public static DataProviderContext fromModId(String modId) {
-        return new DataProviderContext(modId, new PackOutput(Path.of("")), Suppliers.memoize(() -> CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor())));
+        return fromModId(modId, Path.of(""));
+    }
+
+    /**
+     * Creates a dummy-like context instance useful for runtime generation in conjunction with
+     * {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
+     *
+     * @param modId the generating mod id
+     * @param path  output path
+     * @return new context instance
+     */
+    public static DataProviderContext fromModId(String modId, Path path) {
+        return new DataProviderContext(modId,
+                new PackOutput(path),
+                Suppliers.memoize(() -> CompletableFuture.supplyAsync(VanillaRegistries::createLookup,
+                        Util.backgroundExecutor()
+                ))
+        );
     }
 
     /**
@@ -73,7 +91,8 @@ public class DataProviderContext {
     }
 
     /**
-     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about parametrized varargs.
+     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about
+     * parametrized varargs.
      */
     @FunctionalInterface
     public interface Factory extends Function<DataProviderContext, DataProvider> {
