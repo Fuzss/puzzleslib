@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
@@ -73,14 +73,14 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(CompoundTag compound, CallbackInfo callback) {
         if (this.puzzleslib$spawnType != null) {
-            String key = PuzzlesLib.id("spawn_type").toString();
+            String key = PuzzlesLibMod.id("spawn_type").toString();
             compound.putString(key, this.puzzleslib$spawnType.name());
         }
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(CompoundTag compound, CallbackInfo callback) {
-        String key = PuzzlesLib.id("spawn_type").toString();
+        String key = PuzzlesLibMod.id("spawn_type").toString();
         if (compound.contains(key)) {
             try {
                 this.puzzleslib$spawnType = MobSpawnType.valueOf(compound.getString(key));

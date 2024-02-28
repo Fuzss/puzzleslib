@@ -72,7 +72,7 @@ public final class NeoForgeModConstructor {
             constructor.onEntityAttributeModification(new EntityAttributesModifyContextNeoForgeImpl(evt::add));
         });
         eventBus.addListener((final BuildCreativeModeTabContentsEvent evt) -> {
-            constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextNeoForgeImpl(evt.getTabKey(), evt.getParameters(), evt));
+            constructor.onBuildCreativeModeTabContents(new CreativeTabContentsContextNeoForgeImpl(evt));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.SERVER_DATA) {

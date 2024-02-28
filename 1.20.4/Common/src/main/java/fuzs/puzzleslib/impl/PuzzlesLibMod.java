@@ -12,6 +12,7 @@ import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
 
@@ -25,7 +26,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     @Override
     public void onConstructMod() {
-        LOGGER.info("Mppaings {}", ModLoaderEnvironment.INSTANCE.getCurrentMappingsNamespace());
         ModContext.registerHandlers();
         EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
@@ -58,5 +58,9 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
         GameRuleValueOverrides.setValue(GameRules.RULE_MAX_ENTITY_CRAMMING, 0);
         GameRuleValueOverrides.setValue(GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY, 1);
         GameRuleValueOverrides.setValue(GameRules.RULE_COMMANDBLOCKOUTPUT, false);
+    }
+
+    public static ResourceLocation id(String path) {
+        return new ResourceLocation(MOD_ID, path);
     }
 }

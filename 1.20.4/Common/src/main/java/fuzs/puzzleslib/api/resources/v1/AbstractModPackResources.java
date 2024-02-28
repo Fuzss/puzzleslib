@@ -27,7 +27,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 /**
- * A basic implementation of {@link PackResources} fit to be used for a built-in pack providing runtime generated assets.
+ * A basic implementation of {@link PackResources} fit to be used for a built-in pack providing runtime generated
+ * assets.
  * <p>This pack automatically uses the mod's mod logo for the pack icon.
  */
 public abstract class AbstractModPackResources implements PackResources {
@@ -38,17 +39,23 @@ public abstract class AbstractModPackResources implements PackResources {
     protected final String modLogoPath;
     /**
      * Id of this pack.
-     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean, boolean, FeatureFlagSet)}.
+     * <p>Set internally using
+     * {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean,
+     * boolean, FeatureFlagSet)}.
      */
     private ResourceLocation id;
     /**
      * The metadata for the <code>pack.mcmeta</code> section.
-     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean, boolean, FeatureFlagSet)}.
+     * <p>Set internally using
+     * {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean,
+     * boolean, FeatureFlagSet)}.
      */
     private BuiltInMetadata metadata;
     /**
      * The pack type for this pack.
-     * <p>Set internally using {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean, boolean, FeatureFlagSet)}.
+     * <p>Set internally using
+     * {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean,
+     * boolean, FeatureFlagSet)}.
      */
     private PackType packType;
 
@@ -76,7 +83,8 @@ public abstract class AbstractModPackResources implements PackResources {
                     .flatMap(container -> container.findResource(this.modLogoPath))
                     .<IoSupplier<InputStream>>map(modResource -> {
                         return () -> Files.newInputStream(modResource);
-                    }).orElse(null);
+                    })
+                    .orElse(null);
         }
         return null;
     }
@@ -123,24 +131,33 @@ public abstract class AbstractModPackResources implements PackResources {
     /**
      * @return the namespace from the internal id
      */
-    protected final String getNamespace() {
+    public final String getNamespace() {
         Objects.requireNonNull(this.id, "id is null");
         return this.id.getNamespace();
     }
 
     /**
-     * An internal setup helper intended for setting up {@link DynamicPackResources} after the id has been set.
+     * A helper method intended for setting up a pack with e.g. dynamically generated resources.
+     * <p>
+     * Runs after the id has been set.
      */
-    @ApiStatus.Internal
-    void setup() {
-
+    protected void setup() {
+        // NO-OP
     }
 
     @ApiStatus.Internal
     static Pack buildPack(PackType packType, ResourceLocation identifier, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
-        PackMetadataSection metadataSection = new PackMetadataSection(description, SharedConstants.getCurrentVersion().getPackVersion(packType), Optional.empty());
+        PackMetadataSection metadataSection = new PackMetadataSection(description,
+                SharedConstants.getCurrentVersion().getPackVersion(packType),
+                Optional.empty()
+        );
         BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
-        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(identifier, description, PackCompatibility.COMPATIBLE, features, hidden);
+        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(identifier,
+                description,
+                PackCompatibility.COMPATIBLE,
+                features,
+                hidden
+        );
         return Pack.create(identifier.toString(), title, required, new Pack.ResourcesSupplier() {
             @Override
             public PackResources openPrimary(String id) {

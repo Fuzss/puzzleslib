@@ -72,7 +72,7 @@ public final class ForgeModConstructor {
             constructor.onEntityAttributeModification(new EntityAttributesModifyContextForgeImpl(evt::add));
         });
         eventBus.addListener((final BuildCreativeModeTabContentsEvent evt) -> {
-            constructor.onBuildCreativeModeTabContents(new BuildCreativeModeTabContentsContextForgeImpl(evt.getTabKey(), evt.getParameters(), evt));
+            constructor.onBuildCreativeModeTabContents(new CreativeTabContentsContextForgeImpl(evt));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.SERVER_DATA) {
