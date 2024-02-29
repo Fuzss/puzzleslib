@@ -84,6 +84,9 @@
     "client.accessor.MinecraftFabricAccessor",
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
+  "server": [
+    "server.MainFabricMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

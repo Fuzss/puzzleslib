@@ -18,10 +18,7 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
+import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
@@ -88,29 +85,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
-        // these run before server starting on dedicated servers
-        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
-            return callback::onTagsUpdated;
-        });
-        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, (RegisterCommandsCallback callback) -> {
-            return callback::onRegisterCommands;
-        });
-        // run this early as we also use it for load complete when other events are registered and
-        // this would be missed as it's registered while the callback is being invoked on dedicated servers
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting.class, ServerLifecycleEvents.SERVER_STARTING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
-            return callback::onServerStarting;
-        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerLoadingHandlers();
         } else {
-            // the Fabric callback runs for integrated servers, too, but this is manually limited to dedicated servers via the wrapping condition
-            // this is also really late compared to Forge, so possibly move it to net.minecraft.server.Main::main,
-            // somewhere after calling Util::startTimerHackThread where server mod loading has just completed and where the Forge hook is placed
-            INSTANCE.register(LoadCompleteCallback.class, ServerLifecycleEvents.SERVER_STARTING, (LoadCompleteCallback callback) -> {
-                return (MinecraftServer server) -> {
-                    callback.onLoadComplete();
-                };
-            });
+            INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.SERVER_LOAD_COMPLETE);
         }
     }
 
@@ -134,6 +112,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     public static void registerEventHandlers() {
+        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
+            return callback::onTagsUpdated;
+        });
+        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, (RegisterCommandsCallback callback) -> {
+            return callback::onRegisterCommands;
+        });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting.class, ServerLifecycleEvents.SERVER_STARTING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
+            return callback::onServerStarting;
+        });
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, (PlayerInteractEvents.UseBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                 InteractionResult result = callback.onUseBlock(player, level, hand, hitResult).getInterrupt().orElse(InteractionResult.PASS);
