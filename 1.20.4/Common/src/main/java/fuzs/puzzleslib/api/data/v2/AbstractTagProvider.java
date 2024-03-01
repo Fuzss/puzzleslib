@@ -17,6 +17,10 @@ import net.minecraft.world.level.material.Fluid;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @deprecated use {@link fuzs.puzzleslib.api.data.v2.tags.AbstractTagProvider} instead
+ */
+@Deprecated(forRemoval = true)
 public final class AbstractTagProvider {
 
     private AbstractTagProvider() {
