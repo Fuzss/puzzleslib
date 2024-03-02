@@ -2,7 +2,7 @@ package fuzs.puzzleslib.impl.init;
 
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -39,7 +39,7 @@ public abstract class RegistryManagerImpl implements RegistryManager {
 
     @Override
     public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
+        Registry<T> registry = RegistryHelperV2.findBuiltInRegistry(registryKey);
         ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
         return new LazyHolder<>(registryKey, resourceKey, () -> {
             Holder.Reference<T> holder = registry.getHolderOrThrow(resourceKey);

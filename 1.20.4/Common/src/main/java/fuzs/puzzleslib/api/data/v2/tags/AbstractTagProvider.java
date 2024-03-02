@@ -1,11 +1,10 @@
 package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
@@ -21,6 +20,8 @@ import java.util.function.Function;
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     private final String modId;
     @Nullable
+    private final Registry<T> registry;
+    @Nullable
     private final Function<T, ResourceKey<T>> keyExtractor;
 
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, DataProviderContext context) {
@@ -30,13 +31,8 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
         super(packOutput, registryKey, lookupProvider);
         this.modId = modId;
-        this.keyExtractor = ((Registry<Registry<T>>) BuiltInRegistries.REGISTRY).getOptional((ResourceKey<Registry<T>>) registryKey)
-                .map(registry -> {
-                    return (Function<T, ResourceKey<T>>) (T t) -> {
-                        return RegistryHelper.getResourceKeyOrThrow(registryKey, t);
-                    };
-                })
-                .orElse(null);
+        this.registry = RegistryHelperV2.findNullableBuiltInRegistry(registryKey);
+        this.keyExtractor = this.registry != null ? (T t) -> RegistryHelperV2.getResourceKeyOrThrow(this.registry, t) : null;
     }
 
     @Override
@@ -63,6 +59,11 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
                 this.modId,
                 this.keyExtractor
         );
+    }
+
+    protected Registry<T> registry() {
+        Objects.requireNonNull(this.registry, "registry is null");
+        return this.registry;
     }
 
     protected Function<T, ResourceKey<T>> keyExtractor() {

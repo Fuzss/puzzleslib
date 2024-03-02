@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.config.serialization;
 
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public record RegistryProvider<T>(Registry<T> registry) implements KeyedValueProvider<T> {
 
     public RegistryProvider(ResourceKey<? extends Registry<? super T>> registryKey) {
-        this(RegistryHelper.findBuiltInRegistry(registryKey));
+        this(RegistryHelperV2.findBuiltInRegistry(registryKey));
     }
 
     @Override

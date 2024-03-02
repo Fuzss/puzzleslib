@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.api.init.v3.capability;
 
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -118,7 +118,7 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static <T> void register(ResourceKey<? extends Registry<? super T>> registryKey, BiConsumer<RegisterCapabilitiesEvent, T> consumer, T... types) {
         Objects.checkIndex(0, types.length);
-        ResourceLocation resourceLocation = RegistryHelper.findBuiltInRegistry(registryKey).getKey(types[0]);
+        ResourceLocation resourceLocation = RegistryHelperV2.findBuiltInRegistry(registryKey).getKey(types[0]);
         Objects.requireNonNull(resourceLocation, "resource location is null");
         NeoForgeModContainerHelper.getModEventBus(resourceLocation.getNamespace()).addListener((final RegisterCapabilitiesEvent evt) -> {
             for (T blockEntityType : types) {
