@@ -18,7 +18,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.AttributeModifiersMultimap;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
@@ -97,7 +97,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
     private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
+        Registry<T> registry = RegistryHelperV2.findBuiltInRegistry(resourceKey);
         boolean[] loadComplete = new boolean[1];
         // synchronize on the registry to allow other mods requiring synchronization here to do so as well
         synchronized (registry) {

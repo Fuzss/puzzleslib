@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.data.v2;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
@@ -18,7 +18,7 @@ import net.minecraft.world.level.material.Fluid;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * @deprecated use {@link fuzs.puzzleslib.api.data.v2.tags.AbstractTagProvider} instead
+ * @deprecated use {@link fuzs.puzzleslib.api.data.v2.tags.AbstractTagProvider}
  */
 @Deprecated(forRemoval = true)
 public final class AbstractTagProvider {
@@ -193,7 +193,7 @@ public final class AbstractTagProvider {
 
         public Intrinsic(ResourceKey<? extends Registry<T>> registryKey, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
             super(packOutput, registryKey, lookupProvider, object -> {
-                return RegistryHelper.getResourceKeyOrThrow(registryKey, object);
+                return RegistryHelperV2.getResourceKeyOrThrow(registryKey, object);
             });
         }
 
