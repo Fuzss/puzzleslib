@@ -14,6 +14,7 @@ import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
@@ -62,5 +63,10 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
                 this.modId,
                 this.keyExtractor
         );
+    }
+
+    protected Function<T, ResourceKey<T>> keyExtractor() {
+        Objects.requireNonNull(this.keyExtractor, "key extractor is null");
+        return this.keyExtractor;
     }
 }
