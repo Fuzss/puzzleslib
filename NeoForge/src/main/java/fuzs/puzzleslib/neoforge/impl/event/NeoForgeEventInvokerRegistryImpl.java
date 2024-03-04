@@ -379,10 +379,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(SyncDataPackContentsCallback.class, OnDatapackSyncEvent.class, (SyncDataPackContentsCallback callback, OnDatapackSyncEvent evt) -> {
             if (evt.getPlayer() != null) {
                 callback.onSyncDataPackContents(evt.getPlayer(), true);
-                return;
-            }
-            for (ServerPlayer player : evt.getPlayerList().getPlayers()) {
-                callback.onSyncDataPackContents(player, false);
+            } else {
+                for (ServerPlayer player : evt.getPlayerList().getPlayers()) {
+                    callback.onSyncDataPackContents(player, false);
+                }
             }
         });
         INSTANCE.register(ServerLifecycleEvents.Starting.class, ServerAboutToStartEvent.class, (ServerLifecycleEvents.Starting callback, ServerAboutToStartEvent evt) -> {
