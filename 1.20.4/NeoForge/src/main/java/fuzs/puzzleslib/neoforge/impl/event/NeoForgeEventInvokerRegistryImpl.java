@@ -274,6 +274,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onModifyLootTable(evt.getLootDataManager(), evt.getIdentifier(), evt::addPool, evt::removePool);
         });
         INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
+            if (evt.getEntity().level().isClientSide) return;
             MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
             callback.onAnvilUse(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
         });
