@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
@@ -14,11 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -26,8 +26,6 @@ import java.util.Objects;
 
 @Mixin(Player.class)
 abstract class PlayerFabricMixin extends LivingEntity {
-    @Unique
-    private DefaultedFloat puzzleslib$damageAmount;
 
     protected PlayerFabricMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -49,41 +47,51 @@ abstract class PlayerFabricMixin extends LivingEntity {
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
-    @ModifyReturnValue(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("TAIL"))
+    @ModifyReturnValue(
+            method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("TAIL")
+    )
     public ItemEntity drop(@Nullable ItemEntity itemEntity) {
-        if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(Player.class.cast(this), itemEntity).isInterrupt()) {
+        if (itemEntity != null &&
+                FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(Player.class.cast(this), itemEntity).isInterrupt()) {
             return null;
         } else {
             return itemEntity;
         }
     }
 
-    @ModifyVariable(method = "getDestroySpeed", at = @At(value = "LOAD", ordinal = 1), ordinal = 0, slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z")))
-    public float getDestroySpeed(float destroySpeed, BlockState state) {
-        // don't use inject and capture callback return value, it is likely for another mod to inject here and only one will be able to override the return value
-        DefaultedFloat breakSpeed = DefaultedFloat.fromValue(destroySpeed);
-        if (FabricPlayerEvents.BREAK_SPEED.invoker().onBreakSpeed(Player.class.cast(this), state, breakSpeed).isInterrupt()) {
-            breakSpeed.accept(-1.0F);
+    @ModifyReturnValue(method = "getDestroySpeed", at = @At("TAIL"), require = 0)
+    public float getDestroySpeed(float destroySpeed, BlockState blockState) {
+        // TODO remove require = 0 when ViaFabricPlus removes their @Overwrite
+        DefaultedFloat defaultedFloat = DefaultedFloat.fromValue(destroySpeed);
+        if (FabricPlayerEvents.BREAK_SPEED.invoker()
+                .onBreakSpeed(Player.class.cast(this), blockState, defaultedFloat)
+                .isInterrupt()) {
+            defaultedFloat.accept(-1.0F);
         }
-        return breakSpeed.getAsOptionalFloat().orElse(destroySpeed);
+
+        return defaultedFloat.getAsOptionalFloat().orElse(destroySpeed);
     }
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
-    protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback) {
+    protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback, @Share(
+            "damageAmount"
+    ) LocalRef<DefaultedFloat> damageAmountRef) {
         if (!this.isInvulnerableTo(damageSource)) {
-            this.puzzleslib$damageAmount = DefaultedFloat.fromValue(damageAmount);
-            if (FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(LivingEntity.class.cast(this), damageSource, this.puzzleslib$damageAmount).isInterrupt()) {
+            damageAmountRef.set(DefaultedFloat.fromValue(damageAmount));
+            if (FabricLivingEvents.LIVING_HURT.invoker()
+                    .onLivingHurt(LivingEntity.class.cast(this), damageSource, damageAmountRef.get())
+                    .isInterrupt()) {
                 callback.cancel();
             }
         }
     }
 
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    protected float actuallyHurt(float damageAmount, DamageSource damageSource) {
+    protected float actuallyHurt(float damageAmount, DamageSource damageSource, @Share("damageAmount") LocalRef<DefaultedFloat> damageAmountRef) {
         if (!this.isInvulnerableTo(damageSource)) {
-            Objects.requireNonNull(this.puzzleslib$damageAmount, "damage amount is null");
-            damageAmount = this.puzzleslib$damageAmount.getAsOptionalFloat().orElse(damageAmount);
-            this.puzzleslib$damageAmount = null;
+            Objects.requireNonNull(damageAmountRef.get(), "damage amount is null");
+            damageAmount = damageAmountRef.get().getAsOptionalFloat().orElse(damageAmount);
         }
         return damageAmount;
     }
