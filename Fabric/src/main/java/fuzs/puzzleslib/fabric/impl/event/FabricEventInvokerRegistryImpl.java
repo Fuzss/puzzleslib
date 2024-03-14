@@ -364,6 +364,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 callback.onLivingConversion(previous, converted);
             };
         });
+        INSTANCE.register(ContainerEvents.Open.class, FabricPlayerEvents.CONTAINER_OPEN);
+        INSTANCE.register(ContainerEvents.Close.class, FabricPlayerEvents.CONTAINER_CLOSE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }

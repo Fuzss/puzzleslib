@@ -42,13 +42,28 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
             this.capabilityKey = capabilityKey;
             Objects.requireNonNull(holder, "capability holder is null");
             this.holder = holder;
+            this.initialize();
         }
     }
 
     /**
+     * Called after a component has been constructed and the {@link #getHolder()} has been set.
+     * <p>
+     * Must be careful with this on Forge, as capabilities are attached in the base
+     * {@link net.minecraft.world.entity.Entity} constructor, so a lot of fields are still <code>null</code> and no nbt
+     * data has been deserialized. A viable alternative for entity based capabilities is using
+     * {@link #setChanged(PlayerSet)} for non-null {@link PlayerSet} instances when using {@link SyncStrategy#PLAYER}.
+     */
+    protected void initialize() {
+        // NO-OP
+    }
+
+    /**
      * To be called when capability data changed and requires serializing and / or syncing.
-     *
-     * <p>Should basically be called in all setters after the new value has been set.
+     * <p>
+     * Should basically be called in all setters after the new value has been set.
+     * <p>
+     * TODO make this final, only {@link #setChanged(PlayerSet)} should be overridden
      */
     @MustBeInvokedByOverriders
     public void setChanged() {

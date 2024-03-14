@@ -69,6 +69,14 @@ public final class FabricPlayerEvents {
      * Called when the result item is taken from the output slot of a grindstone. This callback allows for handling input items present in the corresponding slots.
      */
     public static final Event<GrindstoneEvents.Use> GRINDSTONE_USE = FabricEventFactory.create(GrindstoneEvents.Use.class);
+    /**
+     * Called after the player has opened a container.
+     */
+    public static final Event<ContainerEvents.Open> CONTAINER_OPEN = FabricEventFactory.create(ContainerEvents.Open.class);
+    /**
+     * Called when the player is closing an open container.
+     */
+    public static final Event<ContainerEvents.Close> CONTAINER_CLOSE = FabricEventFactory.create(ContainerEvents.Close.class);
 
     private FabricPlayerEvents() {
 

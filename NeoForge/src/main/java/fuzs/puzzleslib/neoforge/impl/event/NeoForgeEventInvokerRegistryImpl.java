@@ -686,6 +686,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(LivingConversionCallback.class, LivingConversionEvent.Post.class, (LivingConversionCallback callback, LivingConversionEvent.Post evt) -> {
             callback.onLivingConversion(evt.getEntity(), evt.getOutcome());
         });
+        INSTANCE.register(ContainerEvents.Open.class, PlayerContainerEvent.Open.class, (ContainerEvents.Open callback, PlayerContainerEvent.Open evt) -> {
+            callback.onContainerOpen((ServerPlayer) evt.getEntity(), evt.getContainer());
+        });
+        INSTANCE.register(ContainerEvents.Close.class, PlayerContainerEvent.Close.class, (ContainerEvents.Close callback, PlayerContainerEvent.Close evt) -> {
+            callback.onContainerClose((ServerPlayer) evt.getEntity(), evt.getContainer());
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();
         }

@@ -10,7 +10,6 @@ import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerTrackingEvents;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -28,31 +27,23 @@ public interface EntityCapabilityKeyImpl<T extends Entity, C extends CapabilityC
             if (syncStrategy != SyncStrategy.MANUAL) {
                 PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
                     this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
-                        PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
-                                this.toPacket(capabilityComponent)
-                        );
+                        capabilityComponent.setChanged(PlayerSet.ofPlayer(serverPlayer));
                     });
                 });
                 AfterChangeDimensionCallback.EVENT.register((ServerPlayer serverPlayer, ServerLevel from, ServerLevel to) -> {
                     this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
-                        PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
-                                this.toPacket(capabilityComponent)
-                        );
+                        capabilityComponent.setChanged(PlayerSet.ofPlayer(serverPlayer));
                     });
                 });
                 PlayerCopyEvents.RESPAWN.register((ServerPlayer serverPlayer, boolean originalStillAlive) -> {
                     this.getIfProvided(serverPlayer).ifPresent(capabilityComponent -> {
-                        PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
-                                this.toPacket(capabilityComponent)
-                        );
+                        capabilityComponent.setChanged(PlayerSet.ofPlayer(serverPlayer));
                     });
                 });
                 if (syncStrategy == SyncStrategy.TRACKING) {
                     PlayerTrackingEvents.START.register((Entity trackedEntity, ServerPlayer serverPlayer) -> {
                         this.getIfProvided(trackedEntity).ifPresent(capabilityComponent -> {
-                            PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
-                                    this.toPacket(capabilityComponent)
-                            );
+                            capabilityComponent.setChanged(PlayerSet.ofPlayer(serverPlayer));
                         });
                     });
                 }

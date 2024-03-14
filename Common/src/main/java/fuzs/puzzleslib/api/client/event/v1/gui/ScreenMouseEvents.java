@@ -62,14 +62,15 @@ public final class ScreenMouseEvents {
         /**
          * Called before a mouse button is pressed in a screen.
          *
-         * @param screen the currently displayed screen
-         * @param mouseX the x-position of the mouse
-         * @param mouseY the y-position of the mouse
-         * @param button the button input code, see {@link org.lwjgl.glfw.GLFW}
-         * @return {@link EventResult#INTERRUPT} for marking the click event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @param screen      the currently displayed screen
+         * @param mouseX      the x-position of the mouse
+         * @param mouseY      the y-position of the mouse
+         * @param mouseButton the button input code, see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @return {@link EventResult#INTERRUPT} for marking the click event as handled, it will not be passed to other
+         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
+         *         well as vanilla process this event
          */
-        EventResult onBeforeMouseClick(T screen, double mouseX, double mouseY, int button);
+        EventResult onBeforeMouseClick(T screen, double mouseX, double mouseY, int mouseButton);
     }
 
     @FunctionalInterface
@@ -78,12 +79,12 @@ public final class ScreenMouseEvents {
         /**
          * Called after a mouse button is pressed in a screen.
          *
-         * @param screen the currently displayed screen
-         * @param mouseX the x-position of the mouse
-         * @param mouseY the y-position of the mouse
-         * @param button the button input code, see {@link org.lwjgl.glfw.GLFW}
+         * @param screen      the currently displayed screen
+         * @param mouseX      the x-position of the mouse
+         * @param mouseY      the y-position of the mouse
+         * @param mouseButton the button input code, see {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterMouseClick(T screen, double mouseX, double mouseY, int button);
+        void onAfterMouseClick(T screen, double mouseX, double mouseY, int mouseButton);
     }
 
     @FunctionalInterface
@@ -92,14 +93,15 @@ public final class ScreenMouseEvents {
         /**
          * Called before a mouse click has released in a screen.
          *
-         * @param screen the currently displayed screen
-         * @param mouseX the x-position of the mouse
-         * @param mouseY the y-position of the mouse
-         * @param button the button input code, see {@link org.lwjgl.glfw.GLFW}
-         * @return {@link EventResult#INTERRUPT} for marking the release event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @param screen      the currently displayed screen
+         * @param mouseX      the x-position of the mouse
+         * @param mouseY      the y-position of the mouse
+         * @param mouseButton the button input code, see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @return {@link EventResult#INTERRUPT} for marking the release event as handled, it will not be passed to
+         *         other listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other
+         *         listeners as well as vanilla process this event
          */
-        EventResult onBeforeMouseRelease(T screen, double mouseX, double mouseY, int button);
+        EventResult onBeforeMouseRelease(T screen, double mouseX, double mouseY, int mouseButton);
     }
 
     @FunctionalInterface
@@ -108,12 +110,12 @@ public final class ScreenMouseEvents {
         /**
          * Called after a mouse click has released in a screen.
          *
-         * @param screen the currently displayed screen
-         * @param mouseX the x-position of the mouse
-         * @param mouseY the y-position of the mouse
-         * @param button the button input code, see {@link org.lwjgl.glfw.GLFW}
+         * @param screen      the currently displayed screen
+         * @param mouseX      the x-position of the mouse
+         * @param mouseY      the y-position of the mouse
+         * @param mouseButton the button input code, see {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterMouseRelease(T screen, double mouseX, double mouseY, int button);
+        void onAfterMouseRelease(T screen, double mouseX, double mouseY, int mouseButton);
     }
 
     @FunctionalInterface
@@ -127,8 +129,9 @@ public final class ScreenMouseEvents {
          * @param mouseY           y-position of the mouse cursor
          * @param horizontalAmount horizontal scroll amount
          * @param verticalAmount   vertical scroll amount
-         * @return {@link EventResult#INTERRUPT} for marking the scroll event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @return {@link EventResult#INTERRUPT} for marking the scroll event as handled, it will not be passed to other
+         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
+         *         well as vanilla process this event
          */
         EventResult onBeforeMouseScroll(T screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount);
     }
@@ -154,16 +157,17 @@ public final class ScreenMouseEvents {
         /**
          * Called before a mouse is dragged on screen.
          *
-         * @param screen the currently displayed screen
-         * @param mouseX mouse x-position
-         * @param mouseY mouse y-position
-         * @param button mouse button that was clicked
-         * @param dragX  how far the cursor has been dragged since last calling this on x
-         * @param dragY  how far the cursor has been dragged since last calling this on y
-         * @return {@link EventResult#INTERRUPT} for marking the drag event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @param screen      the currently displayed screen
+         * @param mouseX      mouse x-position
+         * @param mouseY      mouse y-position
+         * @param mouseButton mouse button that was clicked
+         * @param dragX       how far the cursor has been dragged since last calling this on x
+         * @param dragY       how far the cursor has been dragged since last calling this on y
+         * @return {@link EventResult#INTERRUPT} for marking the drag event as handled, it will not be passed to other
+         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
+         *         well as vanilla process this event
          */
-        EventResult onBeforeMouseDrag(T screen, double mouseX, double mouseY, int button, double dragX, double dragY);
+        EventResult onBeforeMouseDrag(T screen, double mouseX, double mouseY, int mouseButton, double dragX, double dragY);
     }
 
     @FunctionalInterface
@@ -172,13 +176,13 @@ public final class ScreenMouseEvents {
         /**
          * Called after a mouse is dragged on screen.
          *
-         * @param screen the currently displayed screen
-         * @param mouseX mouse x-position
-         * @param mouseY mouse y-position
-         * @param button mouse button that was clicked
-         * @param dragX  how far the cursor has been dragged since last calling this on x
-         * @param dragY  how far the cursor has been dragged since last calling this on y
+         * @param screen      the currently displayed screen
+         * @param mouseX      mouse x-position
+         * @param mouseY      mouse y-position
+         * @param mouseButton mouse button that was clicked
+         * @param dragX       how far the cursor has been dragged since last calling this on x
+         * @param dragY       how far the cursor has been dragged since last calling this on y
          */
-        void onAfterMouseDrag(T screen, double mouseX, double mouseY, int button, double dragX, double dragY);
+        void onAfterMouseDrag(T screen, double mouseX, double mouseY, int mouseButton, double dragX, double dragY);
     }
 }
