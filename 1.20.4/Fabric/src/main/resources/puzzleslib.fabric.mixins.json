@@ -42,6 +42,7 @@
     "PlayerFabricMixin",
     "RunAroundLikeCrazyGoalFabricMixin",
     "ServerLevelFabricMixin",
+    "ServerPlayerFabricMixin",
     "ShulkerBulletFabricMixin",
     "StartAttackingFabricMixin",
     "ThrowableProjectileFabricMixin",

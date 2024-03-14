@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.capability;
 
+import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityKey;
 import fuzs.puzzleslib.api.network.v3.ClientMessageListener;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
@@ -21,7 +22,7 @@ public record ClientboundEntityCapabilityMessage(ResourceLocation identifier, in
             public void handle(ClientboundEntityCapabilityMessage message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
                 Entity entity = level.getEntity(message.entityId);
                 if (entity != null) {
-                    CapabilityKey<?, ?> capabilityKey = GlobalCapabilityRegister.get(message.identifier);
+                    CapabilityKey<?, ?> capabilityKey = CapabilityController.get(message.identifier);
                     capabilityKey.getIfProvided(entity).ifPresent(capabilityComponent -> capabilityComponent.read(message.tag));
                 }
             }
