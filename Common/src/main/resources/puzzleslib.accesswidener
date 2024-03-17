@@ -23,9 +23,9 @@ transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  
 transitive-accessible   field   net/minecraft/data/loot/EntityLootSubProvider   map Ljava/util/Map;
 transitive-accessible   method  net/minecraft/client/gui/GuiGraphics    blitNineSlicedSprite    (Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/resources/metadata/gui/GuiSpriteScaling$NineSlice;IIIII)V
 transitive-accessible   field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
-transitive-mutable  field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
-transitive-accessible   field   net/minecraft/world/SimpleContainer size    I
-transitive-mutable  field   net/minecraft/world/SimpleContainer size    I
+mutable field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
+accessible  field   net/minecraft/world/SimpleContainer size    I
+mutable field   net/minecraft/world/SimpleContainer size    I
 transitive-accessible   field   net/minecraft/world/level/Explosion damageSource    Lnet/minecraft/world/damagesource/DamageSource;
 transitive-accessible   field   net/minecraft/world/level/Explosion damageCalculator    Lnet/minecraft/world/level/ExplosionDamageCalculator;
 transitive-accessible	field	net/minecraft/client/Minecraft	missTime	I
@@ -42,6 +42,7 @@ transitive-accessible	method	net/minecraft/world/level/block/Blocks	ocelotOrParr
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	never	(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;)Z
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	never	(Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/entity/EntityType;)Ljava/lang/Boolean;
+transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  findSlot    (DD)Lnet/minecraft/world/inventory/Slot;
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  isHovering  (Lnet/minecraft/world/inventory/Slot;DD)Z
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  isHovering  (IIIIDD)Z
