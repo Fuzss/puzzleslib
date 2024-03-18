@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.key.v1;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.ResourceLocation;
@@ -28,6 +29,16 @@ public interface KeyMappingHelper {
      */
     default boolean conflictsWith(KeyMapping keyMapping, KeyMapping otherKeyMapping) {
         return this.getKeyActivationContext(keyMapping).conflictsWith(this.getKeyActivationContext(otherKeyMapping));
+    }
+
+    /**
+     * Register an unbound modded key mapping with a custom category.
+     *
+     * @param resourceLocation key mapping identifier for defining name and category keys
+     * @return key mapping instance
+     */
+    static KeyMapping registerUnboundKeyMapping(ResourceLocation resourceLocation) {
+        return registerKeyMapping(resourceLocation, InputConstants.UNKNOWN.getValue());
     }
 
     /**

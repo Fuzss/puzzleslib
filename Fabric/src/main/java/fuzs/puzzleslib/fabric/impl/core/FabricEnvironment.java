@@ -17,15 +17,25 @@ import java.util.stream.Stream;
 
 public final class FabricEnvironment implements ModLoaderEnvironment {
     private final Supplier<Map<String, ModContainer>> modList = Suppliers.memoize(() -> {
-        return ModContainer.toModList(this.getFabricModContainers());
+        return ModContainer.toModList(this::getFabricModContainers);
     });
 
     private Stream<? extends ModContainer> getFabricModContainers() {
-        Map<net.fabricmc.loader.api.ModContainer, FabricModContainer> allMods = FabricLoader.getInstance().getAllMods().stream()
+        Map<net.fabricmc.loader.api.ModContainer, FabricModContainer> allMods = FabricLoader.getInstance()
+                .getAllMods()
+                .stream()
                 .map(FabricModContainer::new)
-                .collect(Collectors.toMap(FabricModContainer::getFabricModContainer, Function.identity()));
+                .collect(Collectors.toMap(FabricModContainer::getFabricModContainer,
+                        Function.identity(),
+                        (FabricModContainer o1, FabricModContainer o2) -> {
+                            o2.setParent(o1);
+                            return o1;
+                        }
+                ));
         for (FabricModContainer modContainer : allMods.values()) {
-            modContainer.getFabricModContainer().getContainedMods().stream()
+            modContainer.getFabricModContainer()
+                    .getContainedMods()
+                    .stream()
                     .map(allMods::get)
                     .forEach(childModContainer -> {
                         childModContainer.setParent(modContainer);
