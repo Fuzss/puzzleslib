@@ -1,15 +1,14 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import com.google.common.collect.ImmutableMap;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -90,10 +89,16 @@ public interface ModContainer {
     @Nullable ModContainer getParent();
 
     @ApiStatus.Internal
-    static Map<String, ModContainer> toModList(Stream<? extends ModContainer> stream) {
-        return stream.sorted(Comparator.comparing(ModContainer::getModId))
-                .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId,
-                        Function.identity()
-                ));
+    static Map<String, ModContainer> toModList(Supplier<Stream<? extends ModContainer>> modContainers) {
+        try {
+            return modContainers.get()
+                    .sorted(Comparator.comparing(ModContainer::getModId))
+                    .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId,
+                            Function.identity()
+                    ));
+        } catch (Throwable throwable) {
+            PuzzlesLib.LOGGER.warn("Failed to generate mod list", throwable);
+            return Collections.emptyMap();
+        }
     }
 }

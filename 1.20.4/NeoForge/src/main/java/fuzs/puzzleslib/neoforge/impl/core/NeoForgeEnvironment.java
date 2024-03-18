@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 public final class NeoForgeEnvironment implements ModLoaderEnvironment {
     private final Supplier<Map<String, ModContainer>> modList = Suppliers.memoize(() -> {
-        return ModContainer.toModList(this.getNeoForgeModContainers());
+        return ModContainer.toModList(this::getNeoForgeModContainers);
     });
 
     private Stream<? extends ModContainer> getNeoForgeModContainers() {
@@ -31,7 +31,10 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
                 .collect(Collectors.toMap(modContainer -> {
                     // alternatively use raw variant for escaped octets
                     return modContainer.getURI().getSchemeSpecificPart();
-                }, Function.identity()));
+                }, Function.identity(), (NeoForgeModContainer o1, NeoForgeModContainer o2) -> {
+                    o2.setParent(o1);
+                    return o1;
+                }));
         for (NeoForgeModContainer modContainer : allMods.values()) {
             if (modContainer.getURI().getScheme().equals("union")) {
                 // alternatively use raw variant for escaped octets

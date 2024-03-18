@@ -2,8 +2,6 @@ package fuzs.puzzleslib.impl.network;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.core.v1.ModContainer;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
@@ -30,11 +28,6 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
 
     protected NetworkHandlerRegistryImpl(ResourceLocation channelName) {
         this.channelName = channelName;
-    }
-
-    public static int getProtocolVersion(String modId) {
-        String modVersion = ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getVersion).orElse(String.valueOf(1));
-        return Integer.parseInt(modVersion.replaceAll("\\D", ""));
     }
 
     @Override

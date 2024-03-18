@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 
 public final class ForgeEnvironment implements ModLoaderEnvironment {
     private final Supplier<Map<String, ModContainer>> modList = Suppliers.memoize(() -> {
-        return ModContainer.toModList(this.getForgeModContainers());
+        return ModContainer.toModList(this::getForgeModContainers);
     });
 
     private Stream<? extends ModContainer> getForgeModContainers() {
@@ -32,7 +32,10 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
                     // non-raw variant provides an unescaped uri
                     // raw variant is escaped once ('space' is replaced with %20)
                     return modContainer.getURI().getRawSchemeSpecificPart();
-                }, Function.identity()));
+                }, Function.identity(), (ForgeModContainer o1, ForgeModContainer o2) -> {
+                    o2.setParent(o1);
+                    return o1;
+                }));
         for (ForgeModContainer modContainer : allMods.values()) {
             if (modContainer.getURI().getScheme().equals("union")) {
                 // raw variant provides an uri which has been escaped twice (%20, originally a 'space', is replaced with %2520)

@@ -86,6 +86,7 @@ public abstract class AbstractModPackResources implements PackResources {
                     })
                     .orElse(null);
         }
+
         return null;
     }
 
@@ -97,7 +98,7 @@ public abstract class AbstractModPackResources implements PackResources {
 
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-
+        // NO-OP
     }
 
     @Override
