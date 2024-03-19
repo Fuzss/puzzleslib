@@ -5,13 +5,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
@@ -22,9 +21,12 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * A helper class for rendering tooltips without a screen, additionally allows for rendering multiple image components whereas vanilla only supports one.
- * <p>Note that the implementation is directly copied from vanilla, all caveats apply. This is done to circumvent other mods that interfere with tooltip rendering (such as Adaptive Tooltips and ToolTipFix),
- * since they otherwise cause an implementation such as this one without a proper valid screen to fail or even crash.
+ * A helper class for rendering tooltips without a screen, additionally allows for rendering multiple image components
+ * whereas vanilla only supports one.
+ * <p>
+ * Note that the implementation is directly copied from vanilla, all caveats apply. This is done to circumvent other
+ * mods that interfere with tooltip rendering (such as Adaptive Tooltips and ToolTipFix), since they otherwise cause an
+ * implementation such as this one without a proper valid screen to fail or even crash.
  */
 public final class TooltipRenderHelper {
 
@@ -35,18 +37,24 @@ public final class TooltipRenderHelper {
     /**
      * Creates individual tooltip lines from an item stack.
      * <p>{@link TooltipFlag} defaults to the value set in <code>options.txt</code>.
-     * <p>This only includes text tooltip components, for the image component an item may provide see {@link #getTooltip}.
+     * <p>This only includes text tooltip components, for the image component an item may provide see
+     * {@link #getTooltip}.
      *
      * @param itemStack the item stack to retrieve the tooltip from
      * @return the tooltip lines as list
      */
     public static List<Component> getTooltipLines(ItemStack itemStack) {
-        return getTooltipLines(itemStack, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+        return getTooltipLines(itemStack,
+                Minecraft.getInstance().options.advancedItemTooltips ?
+                        TooltipFlag.Default.ADVANCED :
+                        TooltipFlag.Default.NORMAL
+        );
     }
 
     /**
      * Creates individual tooltip lines from an item stack.
-     * <p>This only includes text tooltip components, for the image component an item may provide see {@link #getTooltip}.
+     * <p>This only includes text tooltip components, for the image component an item may provide see
+     * {@link #getTooltip}.
      *
      * @param itemStack   the item stack to retrieve the tooltip from
      * @param tooltipFlag the tooltip flag to use
@@ -66,7 +74,11 @@ public final class TooltipRenderHelper {
      * @return client tooltip components
      */
     public static List<ClientTooltipComponent> getTooltip(ItemStack itemStack) {
-        return getTooltip(itemStack, Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED : TooltipFlag.Default.NORMAL);
+        return getTooltip(itemStack,
+                Minecraft.getInstance().options.advancedItemTooltips ?
+                        TooltipFlag.Default.ADVANCED :
+                        TooltipFlag.Default.NORMAL
+        );
     }
 
     /**
@@ -94,7 +106,7 @@ public final class TooltipRenderHelper {
      */
     public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, ItemStack itemStack) {
         Objects.requireNonNull(itemStack, "item stack is null");
-        renderTooltipInternal(guiGraphics, posX, posY, getTooltip(itemStack));
+        renderTooltipComponents(guiGraphics, posX, posY, getTooltip(itemStack));
     }
 
     /**
@@ -148,12 +160,13 @@ public final class TooltipRenderHelper {
      * @param imageComponents image components to render in the tooltip
      */
     public static void renderTooltip(GuiGraphics guiGraphics, int posX, int posY, List<Component> components, List<TooltipComponent> imageComponents) {
-        renderTooltipInternal(guiGraphics, posX, posY, createClientComponents(components, imageComponents));
+        renderTooltipComponents(guiGraphics, posX, posY, createClientComponents(components, imageComponents));
     }
 
     /**
      * Creates a list of {@link ClientTooltipComponent}s from text and image components to be rendered on a tooltip.
-     * <p><code>imageComponents</code> are inserted into <code>components</code> at index <code>1</code>, just like vanilla.
+     * <p><code>imageComponents</code> are inserted into <code>components</code> at index <code>1</code>, just like
+     * vanilla.
      *
      * @param components      components to render on the tooltip
      * @param imageComponents image components to render on the tooltip
@@ -168,12 +181,18 @@ public final class TooltipRenderHelper {
      *
      * @param components      components to render on the tooltip
      * @param imageComponents image components to render on the tooltip
-     * @param insertAt        index to insert <code>imageComponents</code> into <code>components</code>, set to <code>-1</code> to insert at the end
+     * @param insertAt        index to insert <code>imageComponents</code> into <code>components</code>, set to
+     *                        <code>-1</code> to insert at the end
      * @return the client tooltip components
      */
     public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents, int insertAt) {
-        List<ClientTooltipComponent> clientComponents = components.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create).collect(Collectors.toList());
-        List<ClientTooltipComponent> clientImageComponents = imageComponents.stream().map(ClientAbstractions.INSTANCE::createImageComponent).toList();
+        List<ClientTooltipComponent> clientComponents = components.stream()
+                .map(Component::getVisualOrderText)
+                .map(ClientTooltipComponent::create)
+                .collect(Collectors.toList());
+        List<ClientTooltipComponent> clientImageComponents = imageComponents.stream()
+                .map(ClientAbstractions.INSTANCE::createImageComponent)
+                .toList();
         if (insertAt == -1) {
             clientComponents.addAll(clientImageComponents);
         } else {
@@ -184,25 +203,61 @@ public final class TooltipRenderHelper {
 
     /**
      * Finally renders the tooltip, simply copied from the vanilla implementation.
-     * <p>Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
-     * <p>Also the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning to avoid running offscreen are made.
+     * <p>
+     * Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
+     * <p>
+     * Also, the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning
+     * to avoid running offscreen are made.
+     * <p>
+     * The behavior is like using {@link DefaultTooltipPositioner#INSTANCE}.
+     *
+     * @param guiGraphics the gui graphics component
+     * @param posX        position on x-axis, would be mouse cursor x for vanilla
+     * @param posY        position on y-axis, would be mouse cursor y for vanilla
+     * @param components  components to render in the tooltip
+     *
+     * @deprecated use {@link #renderTooltipComponents(GuiGraphics, int, int, List)}
+     */
+    @Deprecated(forRemoval = true)
+    public static void renderTooltipInternal(GuiGraphics guiGraphics, int posX, int posY, List<ClientTooltipComponent> components) {
+        renderTooltipComponents(guiGraphics, posX, posY, components);
+    }
+
+    /**
+     * Finally renders the tooltip, simply copied from the vanilla implementation.
+     * <p>
+     * Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
+     * <p>
+     * Also, the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning
+     * to avoid running offscreen are made.
+     * <p>
+     * The behavior is like using {@link DefaultTooltipPositioner#INSTANCE}.
      *
      * @param guiGraphics the gui graphics component
      * @param posX        position on x-axis, would be mouse cursor x for vanilla
      * @param posY        position on y-axis, would be mouse cursor y for vanilla
      * @param components  components to render in the tooltip
      */
-    public static void renderTooltipInternal(GuiGraphics guiGraphics, int posX, int posY, List<ClientTooltipComponent> components) {
+    public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> components) {
 
         if (components.isEmpty()) return;
+
+        Minecraft minecraft = Minecraft.getInstance();
+        boolean result = ClientAbstractions.INSTANCE.onRenderTooltip(guiGraphics,
+                minecraft.font,
+                posX,
+                posY,
+                (List<ClientTooltipComponent>) components,
+                DefaultTooltipPositioner.INSTANCE
+        );
+
+        if (result) return;
 
         int i = 0;
         int j = components.size() == 1 ? -2 : 0;
 
-        Minecraft minecraft = Minecraft.getInstance();
-        Font font = minecraft.font;
         for (ClientTooltipComponent component : components) {
-            int k = component.getWidth(font);
+            int k = component.getWidth(minecraft.font);
             if (k > i) {
                 i = k;
             }
@@ -221,7 +276,8 @@ public final class TooltipRenderHelper {
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         BufferUploader.drawWithShader(bufferBuilder.end());
-        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance()
+                .getBuilder());
         guiGraphics.pose().translate(0.0F, 0.0F, 400.0F);
         int p = m;
 
@@ -229,17 +285,16 @@ public final class TooltipRenderHelper {
         ClientTooltipComponent clientTooltipComponent2;
         for (q = 0; q < components.size(); ++q) {
             clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderText(font, l, p, guiGraphics.pose().last().pose(), bufferSource);
+            clientTooltipComponent2.renderText(minecraft.font, l, p, guiGraphics.pose().last().pose(), bufferSource);
             p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
         }
 
         bufferSource.endBatch();
         p = m;
 
-        ItemRenderer itemRenderer = minecraft.getItemRenderer();
         for (q = 0; q < components.size(); ++q) {
             clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderImage(font, l, p, guiGraphics);
+            clientTooltipComponent2.renderImage(minecraft.font, l, p, guiGraphics);
             p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
         }
 

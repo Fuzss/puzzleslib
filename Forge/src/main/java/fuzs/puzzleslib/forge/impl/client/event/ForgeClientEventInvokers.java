@@ -498,6 +498,10 @@ public final class ForgeClientEventInvokers {
             EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getX(), evt.getY(), evt.getScreenWidth(), evt.getScreenHeight(), evt.getFont(), evt.getComponents(), evt.getTooltipPositioner());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
+        INSTANCE.register(RenderTooltipCallback.class, RenderTooltipEvent.Pre.class, (RenderTooltipCallback callback, RenderTooltipEvent.Pre evt) -> {
+            EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getFont(), evt.getX(), evt.getY(), evt.getComponents(), evt.getTooltipPositioner());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
         INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.class, (RenderHighlightCallback callback, RenderHighlightEvent evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
