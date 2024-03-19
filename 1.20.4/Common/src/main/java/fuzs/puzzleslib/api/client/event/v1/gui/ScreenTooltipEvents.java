@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 
 import java.util.List;
 
+@Deprecated(forRemoval = true)
 public final class ScreenTooltipEvents {
     public static final EventInvoker<Render> RENDER = EventInvoker.lookup(Render.class);
 

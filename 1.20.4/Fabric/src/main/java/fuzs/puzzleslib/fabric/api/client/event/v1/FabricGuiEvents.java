@@ -32,7 +32,12 @@ public final class FabricGuiEvents {
     /**
      * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
      */
-    public static final Event<ScreenTooltipEvents.Render> RENDER_TOOLTIP = FabricEventFactory.createResult(ScreenTooltipEvents.Render.class);
+    @Deprecated(forRemoval = true)
+    public static final Event<ScreenTooltipEvents.Render> RENDER_SCREEN_TOOLTIP = FabricEventFactory.createResult(ScreenTooltipEvents.Render.class);
+    /**
+     * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
+     */
+    public static final Event<RenderTooltipCallback> RENDER_TOOLTIP = FabricEventFactory.createResult(RenderTooltipCallback.class);
     /**
      * Called before the chat panel is drawn, allows for changing x- and y-position.
      */

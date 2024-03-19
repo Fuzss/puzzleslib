@@ -4,16 +4,23 @@ import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
+import net.neoforged.neoforge.client.ClientHooks;
+
+import java.util.List;
 
 public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
@@ -57,5 +64,19 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
     @Override
     public SearchRegistry getSearchRegistry() {
         return Minecraft.getInstance().getSearchTreeManager();
+    }
+
+    @Override
+    public boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
+        return ClientHooks.onRenderTooltipPre(ItemStack.EMPTY,
+                guiGraphics,
+                mouseX,
+                mouseY,
+                guiGraphics.guiWidth(),
+                guiGraphics.guiHeight(),
+                components,
+                font,
+                positioner
+        ).isCanceled();
     }
 }

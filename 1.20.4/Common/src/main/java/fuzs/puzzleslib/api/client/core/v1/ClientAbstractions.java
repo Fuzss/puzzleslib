@@ -2,9 +2,13 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
@@ -16,17 +20,17 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.List;
+
 /**
- * useful methods for client related things that require mod loader specific abstractions
+ * Useful methods for client related things that require mod loader specific abstractions.
  */
 public interface ClientAbstractions {
-    /**
-     * instance of the client factories SPI
-     */
     ClientAbstractions INSTANCE = ServiceProviderHelper.load(ClientAbstractions.class);
 
     /**
-     * checks if a <code>keyMapping</code> is active (=pressed), Forge replaces this everywhere, so we need an abstraction
+     * checks if a <code>keyMapping</code> is active (=pressed), Forge replaces this everywhere, so we need an
+     * abstraction
      *
      * @param keyMapping the key mapping to check if pressed
      * @param keyCode    current key code
@@ -37,9 +41,11 @@ public interface ClientAbstractions {
 
     /**
      * Converts an image {@link TooltipComponent} into the appropriate client-side component.
-     * <p>{@link ClientTooltipComponent}s must first be registered in {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)},
+     * <p>{@link ClientTooltipComponent}s must first be registered in
+     * {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)},
      * otherwise {@link IllegalArgumentException} will be thrown.
-     * <p>For simple text based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)} instead.
+     * <p>For simple text based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)}
+     * instead.
      *
      * @param imageComponent the un-sided {@link TooltipComponent} to convert
      * @return the client tooltip components representation
@@ -47,7 +53,8 @@ public interface ClientAbstractions {
     ClientTooltipComponent createImageComponent(TooltipComponent imageComponent);
 
     /**
-     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of {@link net.minecraft.client.resources.model.ModelResourceLocation}.
+     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
+     * {@link net.minecraft.client.resources.model.ModelResourceLocation}.
      *
      * @param identifier model identifier
      * @return the model, possibly the missing model
@@ -94,16 +101,31 @@ public interface ClientAbstractions {
 
     /**
      * Get the current partial tick time.
-     * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is paused in {@link Minecraft#isPaused()}.
+     * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is
+     * paused in {@link Minecraft#isPaused()}.
      *
      * @return current partial tick time
      */
     float getPartialTick();
 
     /**
-     * Get the search registry for registering a new search tree via {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
+     * Get the search registry for registering a new search tree via
+     * {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
      *
      * @return the search registry
      */
     SearchRegistry getSearchRegistry();
+
+    /**
+     * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
+     *
+     * @param guiGraphics the gui graphics instance
+     * @param font        the font instance
+     * @param mouseX      x position of the mouse cursor
+     * @param mouseY      y position of the mouse cursor
+     * @param components  components to render in the tooltip
+     * @param positioner  positioner for placing the tooltip in relation to provided mouse coordinates
+     * @return <code>true</code> to prevent the tooltip from rendering, allows for fully taking over rendering
+     */
+    boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner);
 }

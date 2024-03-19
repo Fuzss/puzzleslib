@@ -2,8 +2,10 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.platform.Window;
-import fuzs.puzzleslib.api.client.event.v1.*;
-import fuzs.puzzleslib.api.client.event.v1.entity.*;
+import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.InputEvents;
+import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
+import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
@@ -366,7 +368,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderBlockOverlayCallback.class, FabricRendererEvents.RENDER_BLOCK_OVERLAY);
         INSTANCE.register(FogEvents.Render.class, FabricRendererEvents.RENDER_FOG);
         INSTANCE.register(FogEvents.ComputeColor.class, FabricRendererEvents.COMPUTE_FOG_COLOR);
-        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricGuiEvents.RENDER_TOOLTIP);
+        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricGuiEvents.RENDER_SCREEN_TOOLTIP);
+        INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
         INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, callback -> {
             return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
                 if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) return true;

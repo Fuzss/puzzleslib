@@ -180,7 +180,7 @@ public interface CommonAbstractions {
      *
      * @param level     the level the explosion is happening in
      * @param explosion the explosion that is about to start
-     * @return true to mark the explosion as handled, {@link Explosion#explode()} is not called
+     * @return <code>true</code> to mark the explosion as handled, {@link Explosion#explode()} is not called
      */
     boolean onExplosionStart(Level level, Explosion explosion);
 }
