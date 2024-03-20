@@ -83,7 +83,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
-    public void die$0(DamageSource damageSource, CallbackInfo callback) {
+    public void die(DamageSource damageSource, CallbackInfo callback) {
         EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(LivingEntity.class.cast(this), damageSource);
         if (result.isInterrupt()) callback.cancel();
     }

@@ -1,11 +1,14 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.mojang.authlib.GameProfile;
+import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -25,6 +28,18 @@ abstract class ServerPlayerFabricMixin extends Player {
         super(level, pos, yRot, gameProfile);
     }
 
+    @Inject(
+            method = "die", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/server/level/ServerPlayer;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;)V",
+            shift = At.Shift.AFTER
+    ), cancellable = true
+    )
+    public void die(DamageSource damageSource, CallbackInfo callback) {
+        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
+        if (result.isInterrupt()) callback.cancel();
+    }
+
     @Inject(method = "openMenu", at = @At("TAIL"))
     public void openMenu(@Nullable MenuProvider menu, CallbackInfoReturnable<OptionalInt> callback) {
         FabricPlayerEvents.CONTAINER_OPEN.invoker().onContainerOpen(ServerPlayer.class.cast(this), this.containerMenu);
@@ -36,12 +51,11 @@ abstract class ServerPlayerFabricMixin extends Player {
     }
 
     @Inject(
-            method = "doCloseContainer",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
-                    shift = At.Shift.AFTER
-            )
+            method = "doCloseContainer", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
+            shift = At.Shift.AFTER
+    )
     )
     public void doCloseContainer(CallbackInfo callback) {
         FabricPlayerEvents.CONTAINER_CLOSE.invoker()

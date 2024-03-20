@@ -73,6 +73,19 @@ abstract class PlayerFabricMixin extends LivingEntity {
         return defaultedFloat.getAsOptionalFloat().orElse(destroySpeed);
     }
 
+    @Inject(
+            method = "die", at = @At(
+            "HEAD"
+    ), cancellable = true
+    )
+    public void die(DamageSource damageSource, CallbackInfo callback) {
+        // this will fire twice for players, since the die method calls super on LivingEntity, where this is hooked in again
+        // Forge has it implemented like this, so let's leave it for now for parity
+        // can't easily filter out the second call on Forge unfortunately
+        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
+        if (result.isInterrupt()) callback.cancel();
+    }
+
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback, @Share(
             "damageAmount"

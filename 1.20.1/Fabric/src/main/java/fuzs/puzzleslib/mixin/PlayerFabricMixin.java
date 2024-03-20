@@ -48,29 +48,61 @@ abstract class PlayerFabricMixin extends LivingEntity {
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
-    @Inject(method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At("TAIL"), cancellable = true)
+    @Inject(
+            method = "drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At("TAIL"),
+            cancellable = true
+    )
     public void drop(ItemStack itemStack, boolean throwRandomly, boolean retainOwnership, CallbackInfoReturnable<ItemEntity> callback) {
         ItemEntity itemEntity = callback.getReturnValue();
-        if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(itemEntity, Player.class.cast(this)).isInterrupt()) {
+        if (itemEntity != null &&
+                FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(itemEntity, Player.class.cast(this)).isInterrupt()) {
             callback.setReturnValue(null);
         }
     }
 
-    @ModifyVariable(method = "getDestroySpeed", at = @At(value = "LOAD", ordinal = 1), ordinal = 0, slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;onGround()Z")))
+    @ModifyVariable(
+            method = "getDestroySpeed",
+            at = @At(value = "LOAD", ordinal = 1),
+            ordinal = 0,
+            slice = @Slice(
+                    from = @At(
+                            value = "INVOKE",
+                            target = "Lnet/minecraft/world/entity/player/Player;onGround()Z"
+                    )
+            )
+    )
     public float getDestroySpeed(float destroySpeed, BlockState state) {
         // don't use inject and capture callback return value, it is likely for another mod to inject here and only one will be able to override the return value
         DefaultedFloat breakSpeed = DefaultedFloat.fromValue(destroySpeed);
-        if (FabricPlayerEvents.BREAK_SPEED.invoker().onBreakSpeed(Player.class.cast(this), state, breakSpeed).isInterrupt()) {
+        if (FabricPlayerEvents.BREAK_SPEED.invoker()
+                .onBreakSpeed(Player.class.cast(this), state, breakSpeed)
+                .isInterrupt()) {
             breakSpeed.accept(-1.0F);
         }
         return breakSpeed.getAsOptionalFloat().orElse(destroySpeed);
+    }
+
+    @Inject(
+            method = "die", at = @At(
+            "HEAD"
+    ), cancellable = true
+    )
+    public void die(DamageSource damageSource, CallbackInfo callback) {
+        // this will fire twice for players, since the die method calls super on LivingEntity, where this is hooked in again
+        // Forge has it implemented like this, so let's leave it for now for parity
+        // can't easily filter out the second call on Forge unfortunately
+        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
+        if (result.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback) {
         if (!this.isInvulnerableTo(damageSource)) {
             this.puzzleslib$damageAmount = DefaultedFloat.fromValue(damageAmount);
-            if (FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(LivingEntity.class.cast(this), damageSource, this.puzzleslib$damageAmount).isInterrupt()) {
+            if (FabricLivingEvents.LIVING_HURT.invoker()
+                    .onLivingHurt(LivingEntity.class.cast(this), damageSource, this.puzzleslib$damageAmount)
+                    .isInterrupt()) {
                 callback.cancel();
             }
         }
