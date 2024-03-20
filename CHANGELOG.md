@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.18-1.20.1] - 2024-03-20
+### Fixed
+- Fix `LivingDeathCallback` not running for players on Fabric
+
 ## [v8.1.17-1.20.1] - 2024-02-16
 ### Fixed
 - Fix item model overrides not applying on Forge
