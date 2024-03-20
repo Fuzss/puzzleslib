@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v20.4.41-1.20.4] - 2024-03-19
 ### Added
 - Add `RenderTooltipCallback` in favor of `ScreenTooltipEvents$Render`
+### Fixed
+- Fix `LivingDeathCallback` not running for players on Fabric
 
 ## [v20.4.40-1.20.4] - 2024-03-18
 ### Fixed
