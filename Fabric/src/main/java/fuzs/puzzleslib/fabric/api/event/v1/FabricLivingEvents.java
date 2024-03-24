@@ -10,6 +10,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 /**
@@ -127,6 +129,10 @@ public final class FabricLivingEvents {
      * Fires whenever equipment changes are detected on an entity in {@link LivingEntity#collectEquipmentChanges()} from {@link LivingEntity#tick()}.
      */
     public static final Event<LivingEquipmentChangeCallback> LIVING_EQUIPMENT_CHANGE = FabricEventFactory.create(LivingEquipmentChangeCallback.class);
+    /**
+     * Called in {@link EnderMan#isLookingAtMe(Player)}, to allow for custom behavior when looking at an enderman.
+     */
+    public static final Event<LookingAtEndermanCallback> LOOKING_AT_ENDERMAN = FabricEventFactory.createResult(LookingAtEndermanCallback.class);
 
     private FabricLivingEvents() {
 

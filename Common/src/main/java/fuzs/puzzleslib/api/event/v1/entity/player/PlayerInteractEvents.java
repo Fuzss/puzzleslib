@@ -32,14 +32,17 @@ public final class PlayerInteractEvents {
     public interface UseBlock {
 
         /**
-         * This event is fired on both sides before the player triggers {@link net.minecraft.world.level.block.Block#use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)} by right-clicking.
+         * This event is fired on both sides before the player triggers
+         * {@link net.minecraft.world.level.block.Block#use(BlockState, Level, BlockPos, Player, InteractionHand,
+         * BlockHitResult)} by right-clicking.
          *
          * @param player          the player interacting with the block
          * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is using to interact
+         * @param interactionHand the hand the player is using to interact
          * @param hitResult       the targeted block
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
-         * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
+         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
+         *         this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseBlock(Player player, Level level, InteractionHand interactionHand, BlockHitResult hitResult);
     }
@@ -48,15 +51,16 @@ public final class PlayerInteractEvents {
     public interface AttackBlock {
 
         /**
-         * This event is fired on both sides before the player triggers {@link net.minecraft.world.level.block.Block#attack(BlockState, Level, BlockPos, Player)} by left-clicking.
+         * This event is fired on both sides before the player triggers
+         * {@link net.minecraft.world.level.block.Block#attack(BlockState, Level, BlockPos, Player)} by left-clicking.
          *
          * @param player          the player interacting with the block
          * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is using to interact
+         * @param interactionHand the hand the player is using to interact
          * @param pos             the position of the block in the <code>level</code>
          * @param direction       the direction the block is clicked at
          * @return {@link EventResult#INTERRUPT} to prevent the player from beginning to mine the block,
-         * {@link EventResult#PASS} to allow the vanilla behavior for this interaction to proceed
+         *         {@link EventResult#PASS} to allow the vanilla behavior for this interaction to proceed
          */
         EventResult onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction);
     }
@@ -65,13 +69,15 @@ public final class PlayerInteractEvents {
     public interface UseItem {
 
         /**
-         * This event is fired on both sides before the player triggers {@link Item#use(Level, Player, InteractionHand)} by right-clicking an item.
+         * This event is fired on both sides before the player triggers {@link Item#use(Level, Player, InteractionHand)}
+         * by right-clicking an item.
          *
          * @param player          the player using the item
          * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is holding the item
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
-         * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
+         * @param interactionHand the hand the player is holding the item
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
+         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
+         *         this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseItem(Player player, Level level, InteractionHand interactionHand);
     }
@@ -80,15 +86,17 @@ public final class PlayerInteractEvents {
     public interface UseEntity {
 
         /**
-         * Called when the player clicks an entity, runs on the player first, then proceeds to calling {@link Entity#interact(Player, InteractionHand)}.
+         * Called when the player clicks an entity, runs on the player first, then proceeds to calling
+         * {@link Entity#interact(Player, InteractionHand)}.
          * <p>This type of interaction also allows for opening menus via an entity implementing {@link MenuProvider}.
          *
          * @param player          the player interacting with the entity
          * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is using to interact
+         * @param interactionHand the hand the player is using to interact
          * @param entity          the entity this interaction is happening on
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
-         * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
+         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
+         *         this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseEntity(Player player, Level level, InteractionHand interactionHand, Entity entity);
     }
@@ -97,16 +105,19 @@ public final class PlayerInteractEvents {
     public interface UseEntityAt {
 
         /**
-         * Called when the player clicks an entity, this interaction includes the exact position where the player clicked on the entity's bounding box.
-         * <p>For this interaction {@link Entity#interactAt(Player, Vec3, InteractionHand)} is called, if it returns {@link InteractionResult#PASS} more interactions are tried.
+         * Called when the player clicks an entity, this interaction includes the exact position where the player
+         * clicked on the entity's bounding box.
+         * <p>For this interaction {@link Entity#interactAt(Player, Vec3, InteractionHand)} is called, if it returns
+         * {@link InteractionResult#PASS} more interactions are tried.
          *
          * @param player          the player interacting with the entity
          * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is using to interact
+         * @param interactionHand the hand the player is using to interact
          * @param entity          the entity this interaction is happening on
          * @param hitVector       the exact position where the player has clicked on the entity's bounding box
-         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance supplier to the holder instead,
-         * {@link EventResultHolder#pass()} to allow the vanilla behavior for this interaction to proceed
+         * @return {@link EventResultHolder#interrupt(Object)} to cancel vanilla interaction, returning the instance
+         *         supplier to the holder instead, {@link EventResultHolder#pass()} to allow the vanilla behavior for
+         *         this interaction to proceed
          */
         EventResultHolder<InteractionResult> onUseEntityAt(Player player, Level level, InteractionHand interactionHand, Entity entity, Vec3 hitVector);
     }
@@ -115,14 +126,15 @@ public final class PlayerInteractEvents {
     public interface AttackEntity {
 
         /**
-         * Called before a player attack another entity in {@link Player#attack(Entity)}. Allows for preventing the attack.
+         * Called before a player attack another entity in {@link Player#attack(Entity)}. Allows for preventing the
+         * attack.
          *
          * @param player          the player that is attacking
          * @param level           the level the interaction is happening in
-         * @param interactionHand the hand <code>player</code> is using to interact
+         * @param interactionHand the hand the player is using to interact
          * @param entity          the entity under attack
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being attacked, allows for processing different actions on hitting an entity,
-         * {@link EventResult#PASS} to allow the entity to be attack
+         * @return {@link EventResult#INTERRUPT} to prevent the entity from being attacked, allows for processing
+         *         different actions on hitting an entity, {@link EventResult#PASS} to allow the entity to be attack
          */
         EventResult onAttackEntity(Player player, Level level, InteractionHand interactionHand, Entity entity);
     }

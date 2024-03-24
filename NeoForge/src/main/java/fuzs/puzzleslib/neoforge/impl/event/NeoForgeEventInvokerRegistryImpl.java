@@ -9,7 +9,6 @@ import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
 import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
@@ -37,7 +36,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
@@ -150,52 +148,36 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
 
     public static void registerEventHandlers() {
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, PlayerInteractEvent.RightClickBlock.class, (PlayerInteractEvents.UseBlock callback, PlayerInteractEvent.RightClickBlock evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getHitVec());
-            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            Optional<InteractionResult> optional = result.getInterrupt().filter(t -> t != InteractionResult.PASS);
-            if (optional.isPresent()) {
-                evt.setCancellationResult(optional.get());
+            callback.onUseBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getHitVec())
+                    .ifInterrupt(interactionResult -> {
+                evt.setCancellationResult(interactionResult);
                 evt.setCanceled(true);
-            }
+            });
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, PlayerInteractEvent.LeftClickBlock.class, (PlayerInteractEvents.AttackBlock callback, PlayerInteractEvent.LeftClickBlock evt) -> {
-            EventResult result = callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace());
-            if (result.isInterrupt()) {
+            if (callback.onAttackBlock(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getPos(), evt.getFace()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, PlayerInteractEvent.RightClickItem.class, (PlayerInteractEvents.UseItem callback, PlayerInteractEvent.RightClickItem evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand());
-            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            if (result.isInterrupt()) {
-                InteractionResult interactionResult = result.getInterrupt().get();
-                if (interactionResult != InteractionResult.PASS) {
-                    evt.setCancellationResult(interactionResult);
-                    evt.setCanceled(true);
-                }
-            }
+            callback.onUseItem(evt.getEntity(), evt.getLevel(), evt.getHand()).ifInterrupt(interactionResult -> {
+                evt.setCancellationResult(interactionResult);
+                evt.setCanceled(true);
+            });
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, PlayerInteractEvent.EntityInteract.class, (PlayerInteractEvents.UseEntity callback, PlayerInteractEvent.EntityInteract evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseEntity(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget());
-            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            if (result.isInterrupt()) {
-                InteractionResult interactionResult = result.getInterrupt().get();
-                if (interactionResult != InteractionResult.PASS) {
-                    evt.setCancellationResult(interactionResult);
-                    evt.setCanceled(true);
-                }
-            }
+            callback.onUseEntity(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget())
+                    .ifInterrupt(interactionResult -> {
+                evt.setCancellationResult(interactionResult);
+                evt.setCanceled(true);
+            });
         });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, PlayerInteractEvent.EntityInteractSpecific.class, (PlayerInteractEvents.UseEntityAt callback, PlayerInteractEvent.EntityInteractSpecific evt) -> {
-            EventResultHolder<InteractionResult> result = callback.onUseEntityAt(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget(), evt.getLocalPos());
-            // this is done for parity with Fabric where InteractionResult#PASS cannot be cancelled
-            if (result.isInterrupt()) {
-                InteractionResult interactionResult = result.getInterrupt().get();
-                if (interactionResult != InteractionResult.PASS) {
-                    evt.setCancellationResult(interactionResult);
-                    evt.setCanceled(true);
-                }
-            }
+            callback.onUseEntityAt(evt.getEntity(), evt.getLevel(), evt.getHand(), evt.getTarget(), evt.getLocalPos())
+                    .ifInterrupt(interactionResult -> {
+                evt.setCancellationResult(interactionResult);
+                evt.setCanceled(true);
+            });
         });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityEvent.class, (PlayerInteractEvents.AttackEntity callback, AttackEntityEvent evt) -> {
             if (callback.onAttackEntity(evt.getEntity(), evt.getEntity().level(), InteractionHand.MAIN_HAND, evt.getTarget()).isInterrupt()) {
@@ -237,7 +219,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 return;
             }
             EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            if (result.isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         INSTANCE.register(BlockEvents.DropExperience.class, BlockEvent.BreakEvent.class, (BlockEvents.DropExperience callback, BlockEvent.BreakEvent evt) -> {
             MutableInt experienceToDrop = MutableInt.fromEvent(evt::setExpToDrop, evt::getExpToDrop);
@@ -443,8 +427,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
-            EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            if (callback.onLivingDeath(evt.getEntity(), evt.getSource()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         INSTANCE.register(PlayerTrackingEvents.Start.class, PlayerEvent.StartTracking.class, (PlayerTrackingEvents.Start callback, PlayerEvent.StartTracking evt) -> {
             callback.onStartTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
@@ -691,6 +676,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(ContainerEvents.Close.class, PlayerContainerEvent.Close.class, (ContainerEvents.Close callback, PlayerContainerEvent.Close evt) -> {
             callback.onContainerClose((ServerPlayer) evt.getEntity(), evt.getContainer());
+        });
+        INSTANCE.register(LookingAtEndermanCallback.class, EnderManAngerEvent.class, (callback, evt) -> {
+            if (callback.onLookingAtEnderManCallback(evt.getEntity(), evt.getPlayer()).isInterrupt()) {
+                evt.setCanceled(true);
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();
