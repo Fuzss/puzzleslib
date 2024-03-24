@@ -88,7 +88,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, FMLLoadCompleteEvent.class, (LoadCompleteCallback callback, FMLLoadCompleteEvent evt) -> {
-            callback.onLoadComplete();
+            evt.enqueueWork(callback::onLoadComplete);
         });
         INSTANCE.register(RegistryEntryAddedCallback.class, ForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
