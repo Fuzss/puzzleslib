@@ -8,6 +8,9 @@ public interface LoadCompleteCallback {
 
     /**
      * Fires when mod loading is complete.
+     * <p>
+     * The event runs sequentially as opposed to the rest of mod loading on Forge &amp; NeoForge which is executed in
+     * parallel.
      */
     void onLoadComplete();
 }

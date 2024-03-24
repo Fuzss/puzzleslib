@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.impl.init;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
+import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
@@ -11,7 +12,10 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -70,5 +74,14 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
             ArgumentTypeRegistry.registerArgumentType(this.makeKey(path), argumentClass, argumentTypeInfo);
             return argumentTypeInfo;
         }, true);
+    }
+
+    @Override
+    public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
+        ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(new ResourceLocation(
+                "entity_data_serializers"));
+        EntityDataSerializer<T> serializer = entry.get();
+        EntityDataSerializers.registerSerializer(serializer);
+        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), serializer);
     }
 }

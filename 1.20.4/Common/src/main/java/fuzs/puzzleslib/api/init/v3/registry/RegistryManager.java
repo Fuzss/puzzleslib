@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.item.RecipeTypeImpl;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -13,7 +12,6 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -384,20 +382,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
 
     /**
      * Register an entity data serializer.
-     * <p>Registration to a game registry is only required on NeoForge, therefore a direct holder is returned on other
-     * mod loaders.
+     * <p>
+     * Registration to a game registry is only required on NeoForge, therefore a direct holder is returned on other mod
+     * loaders.
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @return holder reference
      */
-    default <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
-        ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(new ResourceLocation(
-                "entity_data_serializers"));
-        EntityDataSerializer<T> serializer = entry.get();
-        EntityDataSerializers.registerSerializer(serializer);
-        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), serializer);
-    }
+    <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry);
 
     /**
      * Creates a new {@link ResourceKey} for a {@link DamageType}.

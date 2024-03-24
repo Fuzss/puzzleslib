@@ -92,6 +92,6 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
 
     @Override
     public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
-        return this.register(NeoForgeRegistries.ENTITY_DATA_SERIALIZERS.key(), path, entry);
+        return this.register(NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, path, entry);
     }
 }
