@@ -8,9 +8,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 /**
- * Run before Fabric Data Generation Api just because.
+ * Run after Fabric Data Generation Api for same behavior as Forge where load complete does not run during data
+ * generation (in case we ever decide to use Fabric's data generation api).
  */
-@Mixin(value = Main.class, priority = 800)
+@Mixin(value = Main.class, priority = 1200)
 abstract class MainFabricMixin {
 
     @Inject(
