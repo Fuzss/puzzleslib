@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.core.resources;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.core.v1.resources.NamedReloadListener;
@@ -16,14 +17,16 @@ public record ForwardingResourceManagerReloadListener(ResourceLocation identifie
 
     public ForwardingResourceManagerReloadListener(ResourceLocation identifier, Supplier<Collection<ResourceManagerReloadListener>> reloadListeners) {
         this.identifier = identifier;
-        this.reloadListeners = Suppliers.memoize(() -> ImmutableList.copyOf(reloadListeners.get()));
+        this.reloadListeners = Suppliers.memoize(() -> {
+            Collection<ResourceManagerReloadListener> collection = reloadListeners.get();
+            Preconditions.checkState(!collection.isEmpty(), identifier.toString() + " is empty");
+            return ImmutableList.copyOf(collection);
+        });
     }
 
     @Override
     public void onResourceManagerReload(ResourceManager resourceManager) {
-        Collection<ResourceManagerReloadListener> reloadListeners = this.reloadListeners.get();
-        Objects.checkIndex(0, reloadListeners.size());
-        for (ResourceManagerReloadListener reloadListener : reloadListeners) {
+        for (ResourceManagerReloadListener reloadListener : this.reloadListeners.get()) {
             try {
                 reloadListener.onResourceManagerReload(resourceManager);
             } catch (Exception e) {

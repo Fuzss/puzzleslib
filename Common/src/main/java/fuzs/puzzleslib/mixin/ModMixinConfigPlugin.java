@@ -8,6 +8,7 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,7 +30,7 @@ public class ModMixinConfigPlugin implements IMixinConfigPlugin {
     }
 
     private static void printModList() {
-        if (!ModLoaderEnvironment.INSTANCE.isForge()) return;
+        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) return;
         Collection<ModContainer> mods = ModLoaderEnvironment.INSTANCE.getModList().values();
         PuzzlesLib.LOGGER.info(dumpModList(mods));
     }
@@ -42,15 +43,26 @@ public class ModMixinConfigPlugin implements IMixinConfigPlugin {
         if (mods.size() != 1) builder.append("s");
         builder.append(":");
         for (ModContainer mod : mods) {
-            builder.append('\n');
-            builder.append("\t");
-            builder.append("-");
-            builder.append(' ');
-            builder.append(mod.getModId());
-            builder.append(' ');
-            builder.append(mod.getVersion());
+            if (mod.getParent() == null) {
+                printMod(builder, mod, 0, false);
+            }
         }
         return builder.toString();
+    }
+
+    private static void printMod(StringBuilder builder, ModContainer mod, int depth, boolean lastChild) {
+        builder.append('\n');
+        builder.append("\t".repeat(depth + 1));
+        builder.append(depth == 0 ? "-" : (lastChild ? "\\" : "|") + "--");
+        builder.append(' ');
+        builder.append(mod.getModId());
+        builder.append(' ');
+        builder.append(mod.getVersion());
+        Iterator<ModContainer> iterator = mod.getChildren().iterator();
+        while (iterator.hasNext()) {
+            ModContainer childMod = iterator.next();
+            printMod(builder, childMod, depth + 1, !iterator.hasNext());
+        }
     }
 
     @Override

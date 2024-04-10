@@ -51,7 +51,7 @@ public final class PotentialSpawnsList<E> extends AbstractList<E> {
         if (this.remove(e)) {
             return e;
         } else {
-            throw new IllegalStateException();
+            throw new IllegalStateException("%s is missing from %s".formatted(e, this));
         }
     }
 
