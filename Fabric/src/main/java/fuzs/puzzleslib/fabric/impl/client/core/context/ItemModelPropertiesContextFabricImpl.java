@@ -23,7 +23,7 @@ public final class ItemModelPropertiesContextFabricImpl implements ItemModelProp
         Objects.requireNonNull(identifier, "property name is null");
         Objects.requireNonNull(function, "property function is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(1, items.length, "items is empty");
+        Preconditions.checkState(items.length > 0, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "items is null");
             ItemProperties.register(item.asItem(), identifier, function);

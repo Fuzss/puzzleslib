@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.api.core.v1.utility;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.Objects;
 
 /**
  * A builder template that can be configured based on the current mod loader environment.
@@ -39,14 +39,16 @@ public interface EnvironmentAwareBuilder<T> {
      * @return this manager as a builder
      */
     default T whenNotOn(ModLoader... forbiddenModLoaders) {
-        Objects.checkIndex(0, forbiddenModLoaders.length);
-        return this.whenOn(EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(forbiddenModLoaders), ModLoader.class)).toArray(ModLoader[]::new));
+        Preconditions.checkState(forbiddenModLoaders.length > 0, "mod loaders is empty");
+        return this.whenOn(EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(forbiddenModLoaders), ModLoader.class))
+                .toArray(ModLoader[]::new));
     }
 
     /**
      * Allows for registering content in the common project for only a few mod loaders.
      *
-     * @param allowedModLoaders the mod loaders to register on, every mod loader not registered to should handle this in the loader specific subproject
+     * @param allowedModLoaders the mod loaders to register on, every mod loader not registered to should handle this in
+     *                          the loader specific subproject
      * @return this manager as a builder
      */
     T whenOn(ModLoader... allowedModLoaders);

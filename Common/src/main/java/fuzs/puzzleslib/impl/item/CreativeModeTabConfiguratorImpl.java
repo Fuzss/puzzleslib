@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.item;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 import net.minecraft.core.Holder;
@@ -90,7 +91,7 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
             if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
                 builder.icon(() -> {
                     ItemStack[] icons = this.icons.get();
-                    Objects.checkIndex(0, icons.length);
+                    Preconditions.checkState(icons.length > 0, "icons is empty");
                     return icons[0];
                 });
             }

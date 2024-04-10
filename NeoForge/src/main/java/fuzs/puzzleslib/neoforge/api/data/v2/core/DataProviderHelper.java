@@ -1,13 +1,13 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.core;
 
-import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.data.ExistingFileHelperHolder;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -27,7 +27,7 @@ public final class DataProviderHelper {
      */
     public static void registerDataProviders(String modId, ForgeDataProviderContext.Factory... factories) {
         if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
-        Objects.checkIndex(0, factories.length);
+        Preconditions.checkState(factories.length > 0, "data provider factories is empty");
         registerDataProviders(modId, Stream.of(factories).map(factory -> {
             return (ForgeDataProviderContext.LegacyFactory) (GatherDataEvent evt, String $) -> {
                 return factory.apply(ForgeDataProviderContext.fromEvent(modId, evt));
@@ -43,7 +43,7 @@ public final class DataProviderHelper {
      */
     public static void registerDataProviders(String modId, ForgeDataProviderContext.LegacyFactory... factories) {
         if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
-        Objects.checkIndex(0, factories.length);
+        Preconditions.checkState(factories.length > 0, "data provider factories is empty");
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(eventBus -> {
             eventBus.addListener((final GatherDataEvent evt) -> {
                 onGatherData(evt, modId, factories);
@@ -59,7 +59,7 @@ public final class DataProviderHelper {
      * @param factories all data provider factories to run
      */
     static void onGatherData(GatherDataEvent evt, String modId, ForgeDataProviderContext.LegacyFactory... factories) {
-        Objects.checkIndex(0, factories.length);
+        Preconditions.checkState(factories.length > 0, "data provider factories is empty");
         DataGenerator dataGenerator = evt.getGenerator();
         for (ForgeDataProviderContext.LegacyFactory factory : factories) {
             DataProvider dataProvider = factory.apply(evt, modId);

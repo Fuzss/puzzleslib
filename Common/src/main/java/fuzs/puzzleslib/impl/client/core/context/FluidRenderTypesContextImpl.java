@@ -14,7 +14,7 @@ public final class FluidRenderTypesContextImpl implements RenderTypesContext<Flu
     public void registerRenderType(RenderType renderType, Fluid... fluids) {
         Objects.requireNonNull(renderType, "render type is null");
         Objects.requireNonNull(fluids, "fluids is null");
-        Preconditions.checkPositionIndex(1, fluids.length, "fluids is empty");
+        Preconditions.checkState(fluids.length > 0, "fluids is empty");
         for (Fluid fluid : fluids) {
             Objects.requireNonNull(fluid, "fluid is null");
             ClientAbstractions.INSTANCE.registerRenderType(fluid, renderType);

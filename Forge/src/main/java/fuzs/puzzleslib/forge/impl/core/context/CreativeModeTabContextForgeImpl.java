@@ -42,7 +42,7 @@ public record CreativeModeTabContextForgeImpl(IEventBus modEventBus) implements 
                     // stolen from XFactHD, thanks :)
                     if (this.icons == null) {
                         this.icons = configuratorImpl.getIcons().get();
-                        Objects.checkIndex(0, this.icons.length);
+                        Preconditions.checkState(this.icons.length > 0, "icons is empty");
                     }
                     int index = (int) (System.currentTimeMillis() / 2000) % this.icons.length;
                     return this.icons[index];

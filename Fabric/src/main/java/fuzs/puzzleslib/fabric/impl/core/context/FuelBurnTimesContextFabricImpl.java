@@ -14,7 +14,7 @@ public final class FuelBurnTimesContextFabricImpl implements FuelBurnTimesContex
         Preconditions.checkArgument(burnTime >= 0, "burn time is negative");
         Preconditions.checkArgument(burnTime <= 32767, "burn time is too high");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(1, items.length, "items is empty");
+        Preconditions.checkState(items.length > 0, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             FuelRegistry.INSTANCE.add(item.asItem(), burnTime);

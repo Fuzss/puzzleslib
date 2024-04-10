@@ -18,7 +18,7 @@ public final class FuelBurnTimesContextNeoForgeImpl implements FuelBurnTimesCont
         Preconditions.checkArgument(burnTime >= 0, "burn time is negative");
         Preconditions.checkArgument(burnTime <= 32767, "burn time is too high");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(1, items.length, "items is empty");
+        Preconditions.checkState(items.length > 0, "items is empty");
         if (this.fuelBurnTimes.isEmpty()) {
             NeoForge.EVENT_BUS.addListener(this::onFurnaceFuelBurnTime);
         }

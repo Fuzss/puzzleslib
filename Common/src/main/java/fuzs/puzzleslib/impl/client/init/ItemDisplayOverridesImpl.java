@@ -19,7 +19,7 @@ public abstract class ItemDisplayOverridesImpl implements ItemModelDisplayOverri
     public final void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts) {
         Objects.requireNonNull(itemModel, "item model is null");
         Objects.requireNonNull(itemModelOverride, "item model override is null");
-        Preconditions.checkPositionIndex(0, defaultContexts.length - 1, "item display contexts is empty");
+        Preconditions.checkState(defaultContexts.length > 0, "item display contexts is empty");
         Map<ItemDisplayContext, ModelResourceLocation> overrides = this.overrideLocations.computeIfAbsent(itemModel, $ -> Maps.newEnumMap(ItemDisplayContext.class));
         EnumSet<ItemDisplayContext> contextsToOverride = EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(defaultContexts), ItemDisplayContext.class));
         for (ItemDisplayContext context : contextsToOverride) {

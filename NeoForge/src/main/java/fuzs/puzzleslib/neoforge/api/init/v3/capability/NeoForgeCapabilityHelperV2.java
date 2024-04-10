@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.api.init.v3.capability;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -20,7 +21,6 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**
@@ -131,7 +131,7 @@ public final class NeoForgeCapabilityHelperV2 {
      */
     @SafeVarargs
     public static <T> void register(BiConsumer<RegisterCapabilitiesEvent, T> consumer, Holder<? extends T>... types) {
-        Objects.checkIndex(0, types.length);
+        Preconditions.checkState(types.length > 0, "capability provider types is empty");
         ResourceLocation resourceLocation = types[0].unwrapKey().orElseThrow().location();
         NeoForgeModContainerHelper.getModEventBus(resourceLocation.getNamespace()).addListener((final RegisterCapabilitiesEvent evt) -> {
             for (Holder<? extends T> holder : types) {
