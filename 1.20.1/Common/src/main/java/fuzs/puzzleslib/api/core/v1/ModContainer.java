@@ -1,9 +1,15 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import com.google.common.collect.ImmutableMap;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
+
 import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * Access to mod data.
@@ -46,6 +52,13 @@ public interface ModContainer {
     Collection<String> getCredits();
 
     /**
+     * The following keys are universally supported: <code>homepage</code>, <code>issues</code>
+     * <p>
+     * Additionally, Fabric defines these keys: <code>source</code>, <code>email</code>, <code>irc</code>
+     * <p>
+     * Furthermore, non-standard keys such as the following are possible: <code>discord</code>, <code>slack</code>,
+     * <code>twitter</code>
+     *
      * @return various contact information like social profiles and urls for mod downloads and issue reports
      */
     Map<String, String> getContactTypes();
@@ -57,4 +70,35 @@ public interface ModContainer {
      * @return path to the resource if it exists, otherwise empty
      */
     Optional<Path> findResource(String... path);
+
+    /**
+     * @return other mods provided via jar-in-jar systems
+     */
+    Collection<ModContainer> getChildren();
+
+    /**
+     * @return all mods including self and mods provided via jar-in-jar systems
+     */
+    default Stream<ModContainer> getAllChildren() {
+        return Stream.concat(Stream.of(this), this.getChildren().stream().flatMap(ModContainer::getAllChildren));
+    }
+
+    /**
+     * @return parent mod when provided via jar-in-jar systems
+     */
+    @Nullable ModContainer getParent();
+
+    @ApiStatus.Internal
+    static Map<String, ModContainer> toModList(Supplier<Stream<? extends ModContainer>> modContainers) {
+        try {
+            return modContainers.get()
+                    .sorted(Comparator.comparing(ModContainer::getModId))
+                    .collect(ImmutableMap.<ModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId,
+                            Function.identity()
+                    ));
+        } catch (Throwable throwable) {
+            PuzzlesLib.LOGGER.warn("Failed to generate mod list", throwable);
+            return Collections.emptyMap();
+        }
+    }
 }

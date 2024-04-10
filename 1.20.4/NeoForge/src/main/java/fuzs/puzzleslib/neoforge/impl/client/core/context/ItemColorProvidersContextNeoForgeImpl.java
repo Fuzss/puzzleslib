@@ -19,7 +19,7 @@ public record ItemColorProvidersContextNeoForgeImpl(BiConsumer<ItemColor, ItemLi
     public void registerColorProvider(ItemColor provider, Item... items) {
         Objects.requireNonNull(provider, "provider is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(1, items.length, "items is empty");
+        Preconditions.checkState(items.length > 0, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             this.consumer.accept(provider, item);

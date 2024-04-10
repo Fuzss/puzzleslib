@@ -11,8 +11,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 public record CreativeModeTabContextNeoForgeImpl(IEventBus modEventBus) implements CreativeModeTabContext {
 
     @Override
@@ -42,7 +40,7 @@ public record CreativeModeTabContextNeoForgeImpl(IEventBus modEventBus) implemen
                     // stolen from XFactHD, thanks :)
                     if (this.icons == null) {
                         this.icons = configuratorImpl.getIcons().get();
-                        Objects.checkIndex(0, this.icons.length);
+                        Preconditions.checkState(this.icons.length > 0, "icons is empty");
                     }
                     int index = (int) (System.currentTimeMillis() / 2000) % this.icons.length;
                     return this.icons[index];

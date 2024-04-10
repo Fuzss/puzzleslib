@@ -14,7 +14,7 @@ public final class ItemDecorationContextFabricImpl implements ItemDecorationCont
     public void registerItemDecorator(DynamicItemDecorator decorator, ItemLike... items) {
         Objects.requireNonNull(decorator, "decorator is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(1, items.length, "items is empty");
+        Preconditions.checkState(items.length > 0, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             ItemDecoratorRegistry.INSTANCE.register(item, decorator);

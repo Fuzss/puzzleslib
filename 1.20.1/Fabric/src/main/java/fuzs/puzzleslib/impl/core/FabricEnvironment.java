@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
 import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
@@ -10,19 +9,40 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.nio.file.Path;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class FabricEnvironment implements ModLoaderEnvironment {
     private final Supplier<Map<String, ModContainer>> modList = Suppliers.memoize(() -> {
-        return FabricLoader.getInstance().getAllMods().stream()
-                .map(FabricModContainer::new)
-                .sorted(Comparator.comparing(ModContainer::getModId))
-                // compiler cannot infer type arguments here
-                .collect(ImmutableMap.<FabricModContainer, String, ModContainer>toImmutableMap(ModContainer::getModId, Function.identity()));
+        return ModContainer.toModList(this::getFabricModContainers);
     });
+
+    private Stream<? extends ModContainer> getFabricModContainers() {
+        Map<net.fabricmc.loader.api.ModContainer, FabricModContainer> allMods = FabricLoader.getInstance()
+                .getAllMods()
+                .stream()
+                .map(FabricModContainer::new)
+                .collect(Collectors.toMap(FabricModContainer::getFabricModContainer,
+                        Function.identity(),
+                        (FabricModContainer o1, FabricModContainer o2) -> {
+                            o2.setParent(o1);
+                            return o1;
+                        }
+                ));
+        for (FabricModContainer modContainer : allMods.values()) {
+            modContainer.getFabricModContainer()
+                    .getContainedMods()
+                    .stream()
+                    .map(allMods::get)
+                    .forEach(childModContainer -> {
+                        childModContainer.setParent(modContainer);
+                    });
+        }
+        return allMods.values().stream();
+    }
 
     @Override
     public ModLoader getModLoader() {

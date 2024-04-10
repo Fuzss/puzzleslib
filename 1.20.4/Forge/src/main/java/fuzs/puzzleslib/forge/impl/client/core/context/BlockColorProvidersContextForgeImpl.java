@@ -19,7 +19,7 @@ public record BlockColorProvidersContextForgeImpl(BiConsumer<BlockColor, Block> 
     public void registerColorProvider(BlockColor provider, Block... blocks) {
         Objects.requireNonNull(provider, "provider is null");
         Objects.requireNonNull(blocks, "blocks is null");
-        Preconditions.checkPositionIndex(1, blocks.length, "blocks is empty");
+        Preconditions.checkState(blocks.length > 0, "blocks is empty");
         for (Block block : blocks) {
             Objects.requireNonNull(block, "block is null");
             this.consumer.accept(provider, block);

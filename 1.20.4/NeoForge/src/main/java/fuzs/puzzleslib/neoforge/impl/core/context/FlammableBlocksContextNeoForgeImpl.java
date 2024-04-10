@@ -15,7 +15,7 @@ public final class FlammableBlocksContextNeoForgeImpl implements FlammableBlocks
         Preconditions.checkArgument(encouragement > 0, "encouragement is negative");
         Preconditions.checkArgument(flammability > 0, "flammability is negative");
         Objects.requireNonNull(blocks, "blocks is null");
-        Preconditions.checkPositionIndex(1, blocks.length, "blocks is empty");
+        Preconditions.checkState(blocks.length > 0, "blocks is empty");
         for (Block block : blocks) {
             Objects.requireNonNull(block, "block is null");
             ((FireBlockNeoForgeAccessor) Blocks.FIRE).puzzleslib$setFlammable(block, encouragement, flammability);

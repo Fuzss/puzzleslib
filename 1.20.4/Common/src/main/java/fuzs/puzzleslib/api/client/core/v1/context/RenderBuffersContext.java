@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
+import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import net.minecraft.client.renderer.RenderType;
 
@@ -17,7 +18,7 @@ public interface RenderBuffersContext {
      */
     default void registerRenderBuffer(RenderType... renderTypes) {
         Objects.requireNonNull(renderTypes, "render types is null");
-        Objects.checkIndex(0, renderTypes.length);
+        Preconditions.checkState(renderTypes.length > 0, "render types is empty");
         for (RenderType renderType : renderTypes) {
             Objects.requireNonNull(renderType, "render type is null");
             this.registerRenderBuffer(renderType, new BufferBuilder(renderType.bufferSize()));

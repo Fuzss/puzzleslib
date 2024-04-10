@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.core.context;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.BlockInteractionsContext;
 import net.fabricmc.fabric.api.registry.FlattenableBlockRegistry;
 import net.fabricmc.fabric.api.registry.OxidizableBlocksRegistry;
@@ -22,7 +23,7 @@ public final class BlockInteractionsContextFabricImpl implements BlockInteractio
     public void registerStrippable(Block strippedBlock, Block... unstrippedBlocks) {
         Objects.requireNonNull(strippedBlock, "stripped block is null");
         Objects.requireNonNull(unstrippedBlocks, "unstripped blocks is null");
-        Objects.checkIndex(0, unstrippedBlocks.length);
+        Preconditions.checkState(unstrippedBlocks.length > 0, "unstripped blocks is empty");
         for (Block unstrippedBlock : unstrippedBlocks) {
             Objects.requireNonNull(unstrippedBlock, "unstripped block is null");
             StrippableBlockRegistry.register(unstrippedBlock, strippedBlock);
@@ -33,7 +34,7 @@ public final class BlockInteractionsContextFabricImpl implements BlockInteractio
     public void registerScrapeable(Block scrapedBlock, Block... unscrapedBlocks) {
         Objects.requireNonNull(scrapedBlock, "scraped block is null");
         Objects.requireNonNull(unscrapedBlocks, "unscraped blocks is null");
-        Objects.checkIndex(0, unscrapedBlocks.length);
+        Preconditions.checkState(unscrapedBlocks.length > 0, "unscraped blocks is empty");
         for (Block unscrapedBlock : unscrapedBlocks) {
             Objects.requireNonNull(unscrapedBlock, "unscraped block is null");
             OxidizableBlocksRegistry.registerOxidizableBlockPair(scrapedBlock, unscrapedBlock);
@@ -44,7 +45,7 @@ public final class BlockInteractionsContextFabricImpl implements BlockInteractio
     public void registerWaxable(Block unwaxedBlock, Block... waxedBlocks) {
         Objects.requireNonNull(unwaxedBlock, "unwaxed block is null");
         Objects.requireNonNull(waxedBlocks, "waxed blocks is null");
-        Objects.checkIndex(0, waxedBlocks.length);
+        Preconditions.checkState(waxedBlocks.length > 0, "waxed blocks is empty");
         for (Block waxedBlock : waxedBlocks) {
             Objects.requireNonNull(waxedBlock, "waxed block is null");
             OxidizableBlocksRegistry.registerWaxableBlockPair(unwaxedBlock, waxedBlock);
@@ -55,7 +56,7 @@ public final class BlockInteractionsContextFabricImpl implements BlockInteractio
     public void registerFlattenable(BlockState flattenedBlock, Block... unflattenedBlocks) {
         Objects.requireNonNull(flattenedBlock, "flattened block is null");
         Objects.requireNonNull(unflattenedBlocks, "unflattened blocks is null");
-        Objects.checkIndex(0, unflattenedBlocks.length);
+        Preconditions.checkState(unflattenedBlocks.length > 0, "unflattened blocks is empty");
         for (Block unflattenedBlock : unflattenedBlocks) {
             Objects.requireNonNull(unflattenedBlock, "unflattened block is null");
             FlattenableBlockRegistry.register(unflattenedBlock, flattenedBlock);
@@ -66,7 +67,7 @@ public final class BlockInteractionsContextFabricImpl implements BlockInteractio
     public void registerTillable(BlockState tilledBlock, @Nullable ItemLike droppedItem, boolean onlyIfAirAbove, Block... untilledBlocks) {
         Objects.requireNonNull(tilledBlock, "tilled block is null");
         Objects.requireNonNull(untilledBlocks, "untilled blocks is null");
-        Objects.checkIndex(0, untilledBlocks.length);
+        Preconditions.checkState(untilledBlocks.length > 0, "untilled blocks is empty");
         Predicate<UseOnContext> usagePredicate = onlyIfAirAbove ? HoeItem::onlyIfAirAbove : $ -> true;
         Consumer<UseOnContext> tillingAction = droppedItem != null ? HoeItem.changeIntoStateAndDropItem(tilledBlock, droppedItem) : HoeItem.changeIntoState(tilledBlock);
         for (Block untilledBlock : untilledBlocks) {

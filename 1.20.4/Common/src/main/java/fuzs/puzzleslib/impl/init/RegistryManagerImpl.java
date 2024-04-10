@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.init;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
@@ -32,7 +33,7 @@ public abstract class RegistryManagerImpl implements RegistryManager {
 
     @Override
     public RegistryManager whenOn(ModLoader... allowedModLoaders) {
-        Objects.checkIndex(0, allowedModLoaders.length);
+        Preconditions.checkState(allowedModLoaders.length > 0, "mod loaders is empty");
         this.allowedModLoaders = EnumSet.copyOf(Arrays.asList(allowedModLoaders));
         return this;
     }

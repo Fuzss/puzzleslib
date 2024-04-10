@@ -12,7 +12,7 @@ public record AdditionalModelsContextForgeImpl(Consumer<ResourceLocation> consum
     @Override
     public void registerAdditionalModel(ResourceLocation... models) {
         Objects.requireNonNull(models, "models is null");
-        Preconditions.checkPositionIndex(1, models.length, "models is empty");
+        Preconditions.checkState(models.length > 0, "models is empty");
         for (ResourceLocation model : models) {
             Objects.requireNonNull(model, "model is null");
             this.consumer.accept(model);

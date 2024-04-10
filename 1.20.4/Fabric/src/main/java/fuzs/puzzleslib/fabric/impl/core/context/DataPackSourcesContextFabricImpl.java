@@ -12,7 +12,7 @@ public final class DataPackSourcesContextFabricImpl implements PackRepositorySou
     @Override
     public void addRepositorySource(RepositorySource... repositorySources) {
         Objects.requireNonNull(repositorySources, "repository sources is null");
-        Preconditions.checkPositionIndex(1, repositorySources.length, "repository sources is empty");
+        Preconditions.checkState(repositorySources.length > 0, "repository sources is empty");
         for (RepositorySource repositorySource : repositorySources) {
             Objects.requireNonNull(repositorySource, "repository source is null");
             DataPackFinderRegistry.INSTANCE.register(repositorySource);

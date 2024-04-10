@@ -14,7 +14,7 @@ public final class BlockRenderTypesContextImpl implements RenderTypesContext<Blo
     public void registerRenderType(RenderType renderType, Block... blocks) {
         Objects.requireNonNull(renderType, "render type is null");
         Objects.requireNonNull(blocks, "blocks is null");
-        Preconditions.checkPositionIndex(1, blocks.length, "blocks is empty");
+        Preconditions.checkState(blocks.length > 0, "blocks is empty");
         for (Block block : blocks) {
             Objects.requireNonNull(block, "block is null");
             ClientAbstractions.INSTANCE.registerRenderType(block, renderType);

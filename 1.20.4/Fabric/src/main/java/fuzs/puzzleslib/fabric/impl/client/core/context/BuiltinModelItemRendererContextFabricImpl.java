@@ -20,7 +20,7 @@ public record BuiltinModelItemRendererContextFabricImpl(String modId, List<Resou
     public void registerItemRenderer(BuiltinItemRenderer renderer, ItemLike... items) {
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
-        Preconditions.checkPositionIndex(1, items.length, "items is empty");
+        Preconditions.checkState(items.length > 0, "items is empty");
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
             BuiltinItemRendererRegistry.INSTANCE.register(item, renderer::renderByItem);
