@@ -23,7 +23,6 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.mixin.accessor.ForgeRegistryForgeAccessor;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -624,21 +623,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
                 evt.addSpawnerData(spawnerData);
                 return true;
             }, evt::removeSpawnerData);
-            try {
-                callback.onGatherPotentialSpawns(level, level.structureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
-            } catch (Throwable throwable) {
-                level.structureManager().getAllStructuresAt(evt.getPos()).keySet().forEach(structure -> {
-                    if (structure.spawnOverrides().containsKey(evt.getMobCategory())) {
-                        List<MobSpawnSettings.SpawnerData> spawnerData = structure.spawnOverrides()
-                                .get(evt.getMobCategory())
-                                .spawns()
-                                .unwrap();
-                        PuzzlesLib.LOGGER.error("Involved structure [{}]: {}", BuiltInRegistries.STRUCTURE_TYPE.getKey(structure.type()), spawnerData);
-                    }
-                });
-                PuzzlesLib.LOGGER.error("Involved biome [{}]: {}", level.getBiome(evt.getPos()).unwrapKey().map(ResourceKey::location).orElse(null), level.getBiome(evt.getPos()).value().getMobSettings().getMobs(evt.getMobCategory()).unwrap());
-                throw new RuntimeException(throwable);
-            }
+            callback.onGatherPotentialSpawns(level, level.structureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
         });
         INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
             if (evt.isDismounting()) return;
