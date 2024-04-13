@@ -43,7 +43,7 @@ public final class GenericExplosionHelper {
      * @param explosionInteraction should the explosion destroy terrain and should destroyed blocks be dropped
      * @return the already exploded explosion instance
      */
-    public static Explosion explode(ExplosionFactory factory, Level level, @Nullable Entity source, double x, double y, double z, float radius, Level.ExplosionInteraction explosionInteraction) {
+    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, double x, double y, double z, float radius, Level.ExplosionInteraction explosionInteraction) {
         return explode(factory, level, source, Explosion.getDefaultDamageSource(level, source), null, x, y, z, radius,
                 false, explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
@@ -73,8 +73,8 @@ public final class GenericExplosionHelper {
      * @param explosionSound          explosion particles, usually {@link SoundEvents#GENERIC_EXPLODE}
      * @return the already exploded explosion instance
      */
-    public static Explosion explode(ExplosionFactory factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound) {
-        Explosion explosion = explode(factory, level, source, damageSource, damageCalculator, x, y, z, radius, fire,
+    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound) {
+        T explosion = explode(factory, level, source, damageSource, damageCalculator, x, y, z, radius, fire,
                 explosionInteraction, level.isClientSide, smallExplosionParticles, largeExplosionParticles,
                 explosionSound
         );
@@ -99,8 +99,8 @@ public final class GenericExplosionHelper {
         return explosion;
     }
 
-    private static Explosion explode(ExplosionFactory factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, boolean spawnParticles, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound) {
-        Explosion explosion = factory.create(level, source, damageSource, damageCalculator, x, y, z, radius, fire,
+    private static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, boolean spawnParticles, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound) {
+        T explosion = factory.create(level, source, damageSource, damageCalculator, x, y, z, radius, fire,
                 getBlockInteraction(level, source, explosionInteraction), smallExplosionParticles,
                 largeExplosionParticles, explosionSound
         );
@@ -147,7 +147,7 @@ public final class GenericExplosionHelper {
      * @param explosionInteraction should the explosion destroy terrain and should destroyed blocks be dropped
      * @return the already exploded explosion instance
      */
-    public static Explosion explode(ExplosionFactory factory, Level level, @Nullable Entity source, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
+    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
         return explode(factory, level, source, Explosion.getDefaultDamageSource(level, source), null, x, y, z, radius,
                 fire, explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
@@ -172,7 +172,7 @@ public final class GenericExplosionHelper {
      * @param explosionInteraction should the explosion destroy terrain and should destroyed blocks be dropped
      * @return the already exploded explosion instance
      */
-    public static Explosion explode(ExplosionFactory factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, Vec3 pos, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
+    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, Vec3 pos, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
         return explode(factory, level, source, damageSource, damageCalculator, pos.x(), pos.y(), pos.z(), radius, fire,
                 explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
@@ -199,7 +199,7 @@ public final class GenericExplosionHelper {
      * @param explosionInteraction should the explosion destroy terrain and should destroyed blocks be dropped
      * @return the already exploded explosion instance
      */
-    public static Explosion explode(ExplosionFactory factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
+    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
         return explode(factory, level, source, damageSource, damageCalculator, x, y, z, radius, fire,
                 explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
@@ -210,7 +210,7 @@ public final class GenericExplosionHelper {
      * A simple reference for an {@link Explosion} constructor.
      */
     @FunctionalInterface
-    public interface ExplosionFactory {
+    public interface ExplosionFactory<T extends Explosion> {
 
         /**
          * Creates a custom {@link Explosion} implementation.
@@ -234,6 +234,6 @@ public final class GenericExplosionHelper {
          * @param explosionSound          explosion particles, usually {@link SoundEvents#GENERIC_EXPLODE}
          * @return the created explosion instance
          */
-        Explosion create(Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Explosion.BlockInteraction blockInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound);
+        T create(Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Explosion.BlockInteraction blockInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound);
     }
 }
