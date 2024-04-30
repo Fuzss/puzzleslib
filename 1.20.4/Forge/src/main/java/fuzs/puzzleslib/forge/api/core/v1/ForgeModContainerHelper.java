@@ -4,7 +4,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 
 import java.util.Objects;
@@ -16,65 +15,75 @@ import java.util.Optional;
 public final class ForgeModContainerHelper {
 
     private ForgeModContainerHelper() {
-
+        // NO-OP
     }
 
     /**
-     * Find the active {@link IEventBus} supplied via {@link FMLJavaModLoadingContext#get()}.
+     * Find the active {@link IEventBus} based on {@link net.neoforged.fml.ModLoadingContext#get()}.
      *
      * @return the active mod event bus
      */
     public static IEventBus getActiveModEventBus() {
-        return getOptionalActiveModEventBus().orElseThrow(() -> new NullPointerException("active event bus is null"));
+        return getOptionalActiveModEventBus().orElseThrow(() -> new NullPointerException("mod event bus is null"));
     }
 
     /**
-     * Find the active {@link IEventBus} supplied via {@link FMLJavaModLoadingContext#get()}.
+     * Find the active {@link IEventBus} based on {@link net.neoforged.fml.ModLoadingContext#get()}.
      *
      * @return the active mod event bus
      */
     public static Optional<IEventBus> getOptionalActiveModEventBus() {
-        return Optional.ofNullable(FMLJavaModLoadingContext.get()).map(FMLJavaModLoadingContext::getModEventBus);
+        String activeNamespace = ModLoadingContext.get().getActiveNamespace();
+        // filter out minecraft, which is the default mod container returned when none is currently set as active
+        if (activeNamespace.equals("minecraft")) {
+            return Optional.empty();
+        } else {
+            return getOptionalModEventBus(activeNamespace);
+        }
     }
 
     /**
-     * Find the {@link IEventBus} for a specific <code>modId</code>.
-     * <p>This bypasses having to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}.
-     * <p>Be careful with this, the mod event bus is not available e.g. when mod loading has failed due to unmet mod dependencies,
-     * so we don't want to crash then so Forge can show the proper screen informing the user.
+     * Find the {@link IEventBus} for a specified <code>modId</code>.
+     * <p>
+     * Be careful with this, the mod event bus is not available e.g. when mod loading has failed due to unmet mod
+     * dependencies, so we don't want to crash then so Forge can show the proper screen informing the user.
      *
      * @param modId id for mod container
      * @return the mod event bus
      */
     public static IEventBus getModEventBus(String modId) {
-        return getOptionalModEventBus(modId).orElseThrow(() -> new NullPointerException("event bus for %s is null".formatted(modId)));
+        return getOptionalModEventBus(modId).orElseThrow(() -> new NullPointerException("mod event bus for %s is null".formatted(
+                modId)));
     }
 
     /**
-     * Find the {@link IEventBus} for a specific <code>modId</code>.
-     * <p>This bypasses having to rely on {@link FMLJavaModLoadingContext#getModEventBus()} from {@link FMLJavaModLoadingContext#get()}.
+     * Find the {@link IEventBus} for a specified <code>modId</code>.
      *
      * @param modId id for mod container
      * @return the mod event bus
      */
     public static Optional<IEventBus> getOptionalModEventBus(String modId) {
-        return getOptionalModContainer(modId).filter(FMLModContainer.class::isInstance).map(FMLModContainer.class::cast).map(FMLModContainer::getEventBus);
+        return getOptionalModContainer(modId).filter(FMLModContainer.class::isInstance)
+                .map(FMLModContainer.class::cast)
+                .map(FMLModContainer::getEventBus);
     }
 
     /**
-     * Find the {@link ModContainer} for a specific <code>modId</code>.
-     * <p>This bypasses having to rely on {@link ModLoadingContext#get()}.
+     * Find the {@link ModContainer} for a specified <code>modId</code>.
+     * <p>
+     * Be careful with this, the mod container will not be found when this is called too early and the mod list has not
+     * been initialized.
      *
      * @param modId id for mod container
      * @return the mod container
      */
     public static ModContainer getModContainer(String modId) {
-        return getOptionalModContainer(modId).orElseThrow(() -> new NullPointerException("mod container for %s is null".formatted(modId)));
+        return getOptionalModContainer(modId).orElseThrow(() -> new NullPointerException("mod container for %s is null".formatted(
+                modId)));
     }
 
     /**
      * Find the {@link ModContainer} for a specific <code>modId</code>.
-     * <p>This bypasses having to rely on {@link ModLoadingContext#get()}.
      *
      * @param modId id for mod container
      * @return the mod container

@@ -133,10 +133,12 @@ public final class NeoForgeCapabilityHelperV2 {
     public static <T> void register(BiConsumer<RegisterCapabilitiesEvent, T> consumer, Holder<? extends T>... types) {
         Preconditions.checkState(types.length > 0, "capability provider types is empty");
         ResourceLocation resourceLocation = types[0].unwrapKey().orElseThrow().location();
-        NeoForgeModContainerHelper.getModEventBus(resourceLocation.getNamespace()).addListener((final RegisterCapabilitiesEvent evt) -> {
-            for (Holder<? extends T> holder : types) {
-                consumer.accept(evt, holder.value());
-            }
+        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(eventBus -> {
+            eventBus.addListener((final RegisterCapabilitiesEvent evt) -> {
+                for (Holder<? extends T> holder : types) {
+                    consumer.accept(evt, holder.value());
+                }
+            });
         });
     }
 }
