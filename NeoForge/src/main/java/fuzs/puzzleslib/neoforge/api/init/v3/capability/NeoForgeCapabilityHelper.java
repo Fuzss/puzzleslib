@@ -121,10 +121,12 @@ public final class NeoForgeCapabilityHelper {
         Preconditions.checkState(types.length > 0, "capability provider types is empty");
         ResourceLocation resourceLocation = RegistryHelperV2.findBuiltInRegistry(registryKey).getKey(types[0]);
         Objects.requireNonNull(resourceLocation, "resource location is null");
-        NeoForgeModContainerHelper.getModEventBus(resourceLocation.getNamespace()).addListener((final RegisterCapabilitiesEvent evt) -> {
-            for (T blockEntityType : types) {
-                consumer.accept(evt, blockEntityType);
-            }
+        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(eventBus -> {
+            eventBus.addListener((final RegisterCapabilitiesEvent evt) -> {
+                for (T blockEntityType : types) {
+                    consumer.accept(evt, blockEntityType);
+                }
+            });
         });
     }
 }
