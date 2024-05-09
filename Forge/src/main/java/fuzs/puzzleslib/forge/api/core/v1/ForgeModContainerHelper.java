@@ -19,7 +19,7 @@ public final class ForgeModContainerHelper {
     }
 
     /**
-     * Find the active {@link IEventBus} based on {@link net.neoforged.fml.ModLoadingContext#get()}.
+     * Find the active {@link IEventBus} based on {@link net.minecraftforge.fml.ModLoadingContext#get()}.
      *
      * @return the active mod event bus
      */
@@ -28,7 +28,7 @@ public final class ForgeModContainerHelper {
     }
 
     /**
-     * Find the active {@link IEventBus} based on {@link net.neoforged.fml.ModLoadingContext#get()}.
+     * Find the active {@link IEventBus} based on {@link net.minecraftforge.fml.ModLoadingContext#get()}.
      *
      * @return the active mod event bus
      */
