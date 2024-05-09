@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import com.google.common.collect.Lists;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import net.minecraft.core.BlockPos;
@@ -19,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 @Mixin(NaturalSpawner.class)
@@ -27,17 +25,23 @@ abstract class NaturalSpawnerFabricMixin {
 
     @ModifyReturnValue(method = "mobsAt", at = @At("TAIL"))
     private static WeightedRandomList<MobSpawnSettings.SpawnerData> mobsAt(WeightedRandomList<MobSpawnSettings.SpawnerData> weightedList, ServerLevel level, StructureManager structureManager, ChunkGenerator chunkGenerator, MobCategory mobCategory, BlockPos blockPos, @Nullable Holder<Biome> biome) {
-        MutableBoolean mutableBoolean = MutableBoolean.fromValue(false);
-        // implementation similar to Forge where only a view of the full list is provided
-        List<MobSpawnSettings.SpawnerData> list = Lists.newArrayList(weightedList.unwrap());
-        List<MobSpawnSettings.SpawnerData> mobs = new PotentialSpawnsList<>(Collections.unmodifiableList(list), spawnerData -> {
-            mutableBoolean.accept(true);
-            return list.add(spawnerData);
+        Object[] holder = new Object[1];
+        List<MobSpawnSettings.SpawnerData> mobs = new PotentialSpawnsList<>(() -> {
+            return holder[0] != null ? (List<MobSpawnSettings.SpawnerData>) holder[0] : weightedList.unwrap();
         }, spawnerData -> {
-            mutableBoolean.accept(true);
-            return list.remove(spawnerData);
+            List<MobSpawnSettings.SpawnerData> spawnerDataList = (List<MobSpawnSettings.SpawnerData>) holder[0];
+            if (spawnerDataList == null) {
+                holder[0] = spawnerDataList = new ArrayList<>(weightedList.unwrap());
+            }
+            return spawnerDataList.add(spawnerData);
+        }, spawnerData -> {
+            List<MobSpawnSettings.SpawnerData> spawnerDataList = (List<MobSpawnSettings.SpawnerData>) holder[0];
+            if (spawnerDataList == null) {
+                holder[0] = spawnerDataList = new ArrayList<>(weightedList.unwrap());
+            }
+            return spawnerDataList.remove(spawnerData);
         });
         FabricLevelEvents.GATHER_POTENTIAL_SPAWNS.invoker().onGatherPotentialSpawns(level, structureManager, chunkGenerator, mobCategory, blockPos, mobs);
-        return mutableBoolean.getAsBoolean() ? WeightedRandomList.create(list) : weightedList;
+        return holder[0] != null ? WeightedRandomList.create((List<MobSpawnSettings.SpawnerData>) holder[0]) : weightedList;
     }
 }

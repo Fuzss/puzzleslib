@@ -5,13 +5,14 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public final class PotentialSpawnsList<E> extends AbstractList<E> {
-    private final List<E> list;
+    private final Supplier<List<E>> list;
     private final Predicate<E> add;
     private final Predicate<E> remove;
 
-    public PotentialSpawnsList(List<E> list, Predicate<E> add, Predicate<E> remove) {
+    public PotentialSpawnsList(Supplier<List<E>> list, Predicate<E> add, Predicate<E> remove) {
         this.list = list;
         this.add = add;
         this.remove = remove;
@@ -19,7 +20,7 @@ public final class PotentialSpawnsList<E> extends AbstractList<E> {
 
     @Override
     public E get(int index) {
-        return this.list.get(index);
+        return this.list.get().get(index);
     }
 
     @Override
@@ -57,7 +58,7 @@ public final class PotentialSpawnsList<E> extends AbstractList<E> {
 
     @Override
     public int size() {
-        return this.list.size();
+        return this.list.get().size();
     }
 
     @Override
