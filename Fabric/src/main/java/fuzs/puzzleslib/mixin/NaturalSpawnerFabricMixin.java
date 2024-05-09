@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
@@ -23,8 +23,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 
 @Mixin(NaturalSpawner.class)
 abstract class NaturalSpawnerFabricMixin {
@@ -33,19 +34,24 @@ abstract class NaturalSpawnerFabricMixin {
     private static void mobsAt(ServerLevel level, StructureManager structureManager, ChunkGenerator generator, MobCategory category, BlockPos pos, @Nullable Holder<Biome> biome, CallbackInfoReturnable<WeightedRandomList<MobSpawnSettings.SpawnerData>> callback) {
         MutableBoolean mutableBoolean = MutableBoolean.fromValue(false);
         WeightedRandomList<MobSpawnSettings.SpawnerData> weightedList = callback.getReturnValue();
-        List<MobSpawnSettings.SpawnerData> list = Lists.newArrayList(weightedList.unwrap());
-        List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(Collections.unmodifiableList(list), spawnerData -> {
-            mutableBoolean.accept(true);
-            return list.add(spawnerData);
+        Supplier<List<MobSpawnSettings.SpawnerData>> list = Suppliers.memoize(() -> {
+            return new ArrayList<>(weightedList.unwrap());
+        });
+        List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(() -> {
+            return mutableBoolean.getAsBoolean() ? list.get() : weightedList.unwrap();
         }, spawnerData -> {
             mutableBoolean.accept(true);
-            return list.remove(spawnerData);
+            return list.get().add(spawnerData);
+        }, spawnerData -> {
+            mutableBoolean.accept(true);
+            return list.get().remove(spawnerData);
         });
         FabricLevelEvents.GATHER_POTENTIAL_SPAWNS.invoker().onGatherPotentialSpawns(level, structureManager, generator, category, pos, mobsAt);
         // try not to replace the return value weighted list, instead change it in hopes of better compatibility with other mixins
+        // no longer necessary when using Mixin Extras
         if (mutableBoolean.getAsBoolean()) {
-            ((WeightedRandomListFabricAccessor<MobSpawnSettings.SpawnerData>) weightedList).puzzleslib$setTotalWeight(WeightedRandom.getTotalWeight(list));
-            ((WeightedRandomListFabricAccessor<MobSpawnSettings.SpawnerData>) weightedList).puzzleslib$setItems(ImmutableList.copyOf(list));
+            ((WeightedRandomListFabricAccessor<MobSpawnSettings.SpawnerData>) weightedList).puzzleslib$setTotalWeight(WeightedRandom.getTotalWeight(list.get()));
+            ((WeightedRandomListFabricAccessor<MobSpawnSettings.SpawnerData>) weightedList).puzzleslib$setItems(ImmutableList.copyOf(list.get()));
         }
     }
 }

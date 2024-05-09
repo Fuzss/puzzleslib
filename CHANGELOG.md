@@ -3,6 +3,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.20-1.20.1] - 2024-05-09
+### Changed
+- Update mod list printing to better reflect child mod relations (backport from 1.20.4)
+### Fixed
+- Fix crash involving `GatherPotentialSpawnsCallback` when the ModernFix mod is installed
+
 ## [v8.1.18-1.20.1] - 2024-03-20
 ### Fixed
 - Fix `LivingDeathCallback` not running for players on Fabric
