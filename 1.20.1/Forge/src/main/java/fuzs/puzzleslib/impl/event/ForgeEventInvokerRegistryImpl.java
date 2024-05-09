@@ -619,7 +619,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
         });
         INSTANCE.register(GatherPotentialSpawnsCallback.class, LevelEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, LevelEvent.PotentialSpawns evt) -> {
             ServerLevel level = (ServerLevel) evt.getLevel();
-            List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(evt.getSpawnerDataList(), spawnerData -> {
+            List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(evt::getSpawnerDataList, spawnerData -> {
                 evt.addSpawnerData(spawnerData);
                 return true;
             }, evt::removeSpawnerData);
