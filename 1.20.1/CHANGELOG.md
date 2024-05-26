@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.20-1.20.1] - 2024-05-26
+### Fixed
+- Attempt to improve handling for missing child reload listeners during resource reloading
+
 ## [v8.1.19-1.20.1] - 2024-05-09
 ### Changed
 - Update mod list printing to better reflect child mod relations (backport from 1.20.4)
