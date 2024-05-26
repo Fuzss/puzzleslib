@@ -7,7 +7,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.function.Supplier;
 
 /**
@@ -46,7 +46,7 @@ public final class ForwardingReloadListenerHelper {
      * @return new reload listener instance
      */
     public static <T extends PreparableReloadListener & NamedReloadListener> T fromReloadListener(ResourceLocation identifier, Supplier<PreparableReloadListener> supplier) {
-        return fromReloadListeners(identifier, () -> List.of(supplier.get()));
+        return fromReloadListeners(identifier, () -> Collections.singletonList(supplier.get()));
     }
 
     /**
@@ -74,7 +74,7 @@ public final class ForwardingReloadListenerHelper {
      * @return new reload listener instance
      */
     public static <T extends PreparableReloadListener & NamedReloadListener> T fromReloadListeners(ResourceLocation identifier, Supplier<Collection<PreparableReloadListener>> supplier) {
-        return (T) new ForwardingReloadListener(identifier, supplier);
+        return (T) new ForwardingReloadListener<>(identifier, supplier);
     }
 
     /**
@@ -110,7 +110,7 @@ public final class ForwardingReloadListenerHelper {
      * @return new reload listener instance
      */
     public static <T extends ResourceManagerReloadListener & NamedReloadListener> T fromResourceManagerReloadListener(ResourceLocation identifier, Supplier<ResourceManagerReloadListener> supplier) {
-        return fromResourceManagerReloadListeners(identifier, () -> List.of(supplier.get()));
+        return fromResourceManagerReloadListeners(identifier, () -> Collections.singletonList(supplier.get()));
     }
 
     /**

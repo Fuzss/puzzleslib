@@ -1,36 +1,45 @@
 package fuzs.puzzleslib.impl.core.resources;
 
-import com.google.common.base.Suppliers;
-import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.core.v1.resources.NamedReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.profiling.ProfilerFiller;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Supplier;
 
-public record ForwardingReloadListener(ResourceLocation identifier, Supplier<Collection<PreparableReloadListener>> reloadListeners) implements NamedReloadListener {
+public class ForwardingReloadListener<T extends PreparableReloadListener> implements NamedReloadListener {
+    private final ResourceLocation identifier;
+    private final Supplier<Collection<T>> supplier;
+    @Nullable
+    private Collection<T> reloadListeners;
 
-    public ForwardingReloadListener(ResourceLocation identifier, Supplier<Collection<PreparableReloadListener>> reloadListeners) {
+
+    public ForwardingReloadListener(ResourceLocation identifier, Supplier<Collection<T>> supplier) {
+        Objects.requireNonNull(identifier, "identifier is null");
+        Objects.requireNonNull(supplier, "supplier is null");
         this.identifier = identifier;
-        this.reloadListeners = Suppliers.memoize(() -> ImmutableList.copyOf(reloadListeners.get()));
+        this.supplier = supplier;
     }
 
     @Override
     public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
         return CompletableFuture.completedFuture(null).thenCompose($ -> {
-            Collection<PreparableReloadListener> reloadListeners = this.reloadListeners.get();
-            if (reloadListeners.isEmpty()) {
-                throw new IllegalStateException("Reload listeners in %s are empty".formatted(this.identifier));
-            }
-            return CompletableFuture.allOf(reloadListeners.stream().map(reloadListener -> {
+            return CompletableFuture.allOf(this.reloadListeners().stream().map(reloadListener -> {
                 try {
-                    return reloadListener.reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+                    return reloadListener.reload(preparationBarrier,
+                            resourceManager,
+                            preparationsProfiler,
+                            reloadProfiler,
+                            backgroundExecutor,
+                            gameExecutor
+                    );
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Unable to reload listener {}", reloadListener.getName(), exception);
                 }
@@ -40,7 +49,28 @@ public record ForwardingReloadListener(ResourceLocation identifier, Supplier<Col
     }
 
     @Override
-    public String toString() {
+    public final String toString() {
         return this.getName();
+    }
+
+    @Override
+    public ResourceLocation identifier() {
+        return this.identifier;
+    }
+
+    synchronized final Collection<T> reloadListeners() {
+        if (this.reloadListeners == null) {
+            Collection<T> collection = this.supplier.get();
+            Objects.requireNonNull(collection, "collection is null");
+            if (collection.isEmpty()) {
+                PuzzlesLib.LOGGER.error("{} is empty", this.identifier);
+                // don't throw for now, seems to happen occasionally, want to test if maybe a second reload is triggered allowing this to still work
+                return collection;
+            } else {
+                return this.reloadListeners = collection;
+            }
+        } else {
+            return this.reloadListeners;
+        }
     }
 }
