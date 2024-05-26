@@ -74,7 +74,7 @@ public final class ForwardingReloadListenerHelper {
      * @return new reload listener instance
      */
     public static <T extends PreparableReloadListener & NamedReloadListener> T fromReloadListeners(ResourceLocation identifier, Supplier<Collection<PreparableReloadListener>> supplier) {
-        return (T) new ForwardingReloadListener(identifier, supplier);
+        return (T) new ForwardingReloadListener<>(identifier, supplier);
     }
 
     /**
