@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.core.resources;
 
+import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.core.v1.resources.NamedReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.resources.ResourceLocation;
@@ -67,7 +68,7 @@ public class ForwardingReloadListener<T extends PreparableReloadListener> implem
                 // don't throw for now, seems to happen occasionally, want to test if maybe a second reload is triggered allowing this to still work
                 return collection;
             } else {
-                return this.reloadListeners = collection;
+                return this.reloadListeners = ImmutableList.copyOf(collection);
             }
         } else {
             return this.reloadListeners;
