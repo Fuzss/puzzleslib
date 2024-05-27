@@ -263,8 +263,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, (LootTableLoadEvents.Replace callback) -> {
             return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
-                // keep this the same as Forge where editing data pack specified loot tables is not supported
-                if (source == LootTableSource.DATA_PACK) return null;
                 DefaultedValue<LootTable> lootTable = DefaultedValue.fromValue(original);
                 callback.onReplaceLootTable(id, lootTable);
                 // returning null will prompt no change
@@ -273,7 +271,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, (LootTableLoadEvents.Modify callback) -> {
             return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
-                // don't filter on source, with our custom event on Forge we can also support non-built-in loot tables
                 callback.onModifyLootTable(lootManager, id, tableBuilder::pool, (int index) -> {
                     MutableInt currentIndex = new MutableInt();
                     MutableBoolean result = new MutableBoolean();

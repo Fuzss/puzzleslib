@@ -22,6 +22,7 @@ import fuzs.puzzleslib.forge.api.core.v1.ForgeModContainerHelper;
 import fuzs.puzzleslib.forge.api.event.v1.core.ForgeEventInvokerRegistry;
 import fuzs.puzzleslib.forge.impl.client.event.ForgeClientEventInvokers;
 import fuzs.puzzleslib.forge.mixin.accessor.ForgeRegistryForgeAccessor;
+import fuzs.puzzleslib.forge.mixin.accessor.LootTableForgeAccessor;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.AttributeModifiersMultimap;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
@@ -50,7 +51,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
@@ -264,8 +267,21 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
             callback.onReplaceLootTable(evt.getName(), table);
         });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, ForgeLootTableModifyEvent.class, (LootTableLoadEvents.Modify callback, ForgeLootTableModifyEvent evt) -> {
-            callback.onModifyLootTable(evt.getLootDataManager(), evt.getIdentifier(), evt::addPool, evt::removePool);
+        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
+            callback.onModifyLootTable(null, evt.getName(), evt.getTable()::addPool, (int index) -> {
+                // Forge has a dedicated method for removing pools, but it relies on all pools internally being named
+                // which is currently not implemented, making the method useless
+                // additionally to keep the indices consistent don't actually remove pools, instead just make them impossible to be selected as we do on Fabric
+                List<LootPool> pools = ((LootTableForgeAccessor) evt.getTable()).puzzleslib$getPools();
+                if (index >= 0 && index < pools.size()) {
+                    LootPool pool = pools.get(index);
+                    pool.setRolls(ConstantValue.exactly(0.0F));
+                    pool.setBonusRolls(ConstantValue.exactly(0.0F));
+                    return true;
+                } else {
+                    return false;
+                }
+            });
         });
         INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
             if (evt.getEntity().level().isClientSide) return;

@@ -7,11 +7,9 @@
   "mixins": [
     "AbstractPackResourcesNeoForgeMixin",
     "DatagenModLoaderNeoForgeMixin",
-    "LootDataManagerNeoForgeMixin",
     "TagsProviderNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
     "accessor.FireBlockNeoForgeAccessor",
-    "accessor.LootTableNeoForgeAccessor",
     "accessor.MobSpawnSettingsBuilderNeoForgeAccessor",
     "accessor.PotionBrewingNeoForgeAccessor"
   ],

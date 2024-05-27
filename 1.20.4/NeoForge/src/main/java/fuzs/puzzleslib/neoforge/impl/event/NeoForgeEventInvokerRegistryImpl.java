@@ -49,6 +49,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
@@ -254,8 +255,14 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
             callback.onReplaceLootTable(evt.getName(), table);
         });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, NeoForgeLootTableModifyEvent.class, (LootTableLoadEvents.Modify callback, NeoForgeLootTableModifyEvent evt) -> {
-            callback.onModifyLootTable(evt.getLootDataManager(), evt.getIdentifier(), evt::addPool, evt::removePool);
+        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
+            callback.onModifyLootTable(null, evt.getName(), evt.getTable()::addPool, (int index) -> {
+                if (index == 0 && evt.getTable().removePool("main") != null) {
+                    return true;
+                } else {
+                    return evt.getTable().removePool("pool" + index) != null;
+                }
+            });
         });
         INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
             if (evt.getEntity().level().isClientSide) return;

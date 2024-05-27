@@ -31,7 +31,7 @@ public enum CopyStrategy {
      *
      * @deprecated will no longer be supported in upcoming versions to allow migrating to Fabric Api's / NeoForge's native implementation
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     KEEP_PLAYER_INVENTORY {
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
