@@ -13,7 +13,7 @@ public interface TickingBlockEntity {
      * <p>Used in vanilla e.g. for animating the book in {@link net.minecraft.world.level.block.entity.EnchantmentTableBlockEntity}.
      */
     default void clientTick() {
-
+        // NO-OP
     }
 
     /**
@@ -21,6 +21,6 @@ public interface TickingBlockEntity {
      * <p>Used in vanilla e.g. for running cooking logic in {@link net.minecraft.world.level.block.entity.FurnaceBlockEntity}.
      */
     default void serverTick() {
-
+        // NO-OP
     }
 }

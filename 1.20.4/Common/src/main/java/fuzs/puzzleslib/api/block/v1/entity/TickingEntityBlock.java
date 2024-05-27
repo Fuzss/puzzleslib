@@ -40,6 +40,7 @@ public interface TickingEntityBlock<T extends BlockEntity & TickingBlockEntity> 
                 ticker.accept((TickingBlockEntity) blockEntity);
             };
         }
+
         return null;
     }
 }
