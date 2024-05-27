@@ -5,7 +5,6 @@ import java.util.ServiceLoader;
 /**
  * Small helper methods related to service provider interfaces.
  */
-@Deprecated
 public final class ServiceProviderHelper {
 
     /**
