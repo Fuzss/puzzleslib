@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -35,13 +34,11 @@ public final class ForgeEnvironment implements ModLoaderEnvironment {
                     o2.setParent(o1);
                     return o1;
                 }));
-        PuzzlesLib.LOGGER.info("All mods {}", allMods);
         for (ForgeModContainer modContainer : allMods.values()) {
             if (modContainer.getURI().getScheme().equals("union")) {
                 // raw variant provides an uri which has been escaped twice (%20, originally a 'space', is replaced with %2520)
                 // non-raw variant is escaped once ('space' is replaced with %20)
                 String schemePart = getParentSchemePart(modContainer.getURI().getSchemeSpecificPart());
-                PuzzlesLib.LOGGER.info("Scheme for {}: {}", modContainer.getModId(), schemePart);
                 modContainer.setParent(allMods.get(schemePart));
             }
         }
