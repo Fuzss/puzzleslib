@@ -17,7 +17,7 @@ public class FabricServerProxy implements FabricProxy {
 
     @Override
     public <T extends MessageV2<T>> void registerLegacyClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
-
+        // NO-OP
     }
 
     @Override
@@ -30,7 +30,7 @@ public class FabricServerProxy implements FabricProxy {
 
     @Override
     public <T extends Record & ClientboundMessage<T>> void registerClientReceiver(ResourceLocation channelName, Function<FriendlyByteBuf, T> factory) {
-
+        // NO-OP
     }
 
     @Override
