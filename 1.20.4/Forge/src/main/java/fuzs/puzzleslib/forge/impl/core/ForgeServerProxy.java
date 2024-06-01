@@ -12,7 +12,7 @@ public class ForgeServerProxy implements ForgeProxy {
 
     @Override
     public <T extends Record & ClientboundMessage<T>> void registerClientReceiverV2(T message, CustomPayloadEvent.Context context) {
-
+        // NO-OP
     }
 
     @Override

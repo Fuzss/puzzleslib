@@ -143,7 +143,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, (PlayerInteractEvents.AttackBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
-                if (!level.isClientSide || !player.isCreative() && ((FabricProxy) Proxy.INSTANCE).shouldStartDestroyBlock(pos)) {
+                if (!level.isClientSide || player.isCreative() || ((FabricProxy) Proxy.INSTANCE).shouldStartDestroyBlock(pos)) {
                     EventResult result = callback.onAttackBlock(player, level, hand, pos, direction);
                     // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
                     // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
