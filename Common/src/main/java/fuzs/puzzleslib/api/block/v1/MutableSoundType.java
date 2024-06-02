@@ -108,7 +108,7 @@ public class MutableSoundType extends HolderBackedSoundType {
      */
     public MutableSoundType setBreakSound(SoundEvent breakSound) {
         Objects.requireNonNull(breakSound, "break sound is null");
-        return this.setFallSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(breakSound));
+        return this.setBreakSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(breakSound));
     }
 
     /**
@@ -133,7 +133,7 @@ public class MutableSoundType extends HolderBackedSoundType {
      */
     public MutableSoundType setStepSound(SoundEvent stepSound) {
         Objects.requireNonNull(stepSound, "step sound is null");
-        return this.setFallSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(stepSound));
+        return this.setStepSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(stepSound));
     }
 
     /**
@@ -158,7 +158,7 @@ public class MutableSoundType extends HolderBackedSoundType {
      */
     public MutableSoundType setPlaceSound(SoundEvent placeSound) {
         Objects.requireNonNull(placeSound, "place sound is null");
-        return this.setFallSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(placeSound));
+        return this.setPlaceSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(placeSound));
     }
 
     /**
@@ -183,7 +183,7 @@ public class MutableSoundType extends HolderBackedSoundType {
      */
     public MutableSoundType setHitSound(SoundEvent hitSound) {
         Objects.requireNonNull(hitSound, "hit sound is null");
-        return this.setFallSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(hitSound));
+        return this.setHitSound(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(hitSound));
     }
 
     /**
