@@ -67,6 +67,8 @@ public final class FabricLivingEvents {
     public static final Event<ShieldBlockCallback> SHIELD_BLOCK = FabricEventFactory.createResult(ShieldBlockCallback.class);
     /**
      * Fires whenever a living entity dies, allows for preventing the death.
+     * <p>
+     * Fabric Api also has {@link net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents#ALLOW_DEATH}, but it only runs server-side.
      */
     public static final Event<LivingDeathCallback> LIVING_DEATH = FabricEventFactory.createResult(LivingDeathCallback.class);
     /**

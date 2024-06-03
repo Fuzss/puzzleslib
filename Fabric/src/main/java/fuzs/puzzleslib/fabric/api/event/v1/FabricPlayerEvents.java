@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.api.event.v1;
 
-import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
+import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -77,6 +77,13 @@ public final class FabricPlayerEvents {
      * Called when the player is closing an open container.
      */
     public static final Event<ContainerEvents.Close> CONTAINER_CLOSE = FabricEventFactory.create(ContainerEvents.Close.class);
+    /**
+     * Called before an entity starts being tracked by a player.
+     * <p>
+     * Fabric Api has this event as well via {@link net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents#START_TRACKING},
+     * but it fires too early before the client is notified about the entity.
+     */
+    public static final Event<PlayerTrackingEvents.Start> START_TRACKING = FabricEventFactory.create(PlayerTrackingEvents.Start.class);
 
     private FabricPlayerEvents() {
 

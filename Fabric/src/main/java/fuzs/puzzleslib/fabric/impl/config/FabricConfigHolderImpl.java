@@ -69,14 +69,15 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
         }
 
         public void onModConfig(ModConfig modConfig, boolean isLoading, String eventType) {
+            // null config must be permitted for config loading as the event is triggered during construction of ModConfig (before the field can even be set)
             if (modConfig.getType() == this.configType && (this.modConfig == null || modConfig == this.modConfig)) {
                 super.onModConfig(modConfig.getModId(), isLoading, eventType);
             }
         }
 
         public void register(String modId) {
-            Objects.requireNonNull(this.config, "Attempting to register invalid config of type %s".formatted(this.configType.extension()));
-            if (this.modConfig != null) throw new IllegalStateException(String.format("Config for type %s has already been registered!", this.configType.extension()));
+            Objects.requireNonNull(this.config, "Attempting to register invalid config of type %s".formatted(this.configTypeName));
+            if (this.modConfig != null) throw new IllegalStateException(String.format("Config for type %s has already been registered", this.configTypeName));
             this.modConfig = new ModConfig(this.configType, this.buildSpec(), modId, this.fileName.apply(modId));
         }
     }
