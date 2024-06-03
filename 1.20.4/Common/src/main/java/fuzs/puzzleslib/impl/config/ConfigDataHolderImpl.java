@@ -18,14 +18,10 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-/**
- * just a very basic template for implementing {@link ConfigDataHolder} in the common project
- * @param <T> config type
- */
 public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>, ValueCallback {
     protected final T config;
     private final Supplier<T> defaultConfigSupplier;
-    private final String configType;
+    protected final String configTypeName;
     @Nullable
     private T defaultConfig;
     protected UnaryOperator<String> fileName;
@@ -33,11 +29,11 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     private List<Runnable> configValueCallbacks = Lists.newArrayList();
     private boolean available;
 
-    protected ConfigDataHolderImpl(String configType, Supplier<T> supplier) {
-        this.configType = configType;
+    protected ConfigDataHolderImpl(String configTypeName, Supplier<T> supplier) {
+        this.configTypeName = configTypeName;
         this.config = supplier.get();
         this.defaultConfigSupplier = supplier;
-        this.fileName = modId -> ConfigHolder.defaultName(modId, configType);
+        this.fileName = modId -> ConfigHolder.defaultName(modId, configTypeName);
     }
 
     @Override
@@ -82,7 +78,12 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     private void testAvailable() {
         this.findErrorMessage().ifRight(message -> {
-            PuzzlesLib.LOGGER.error("Calling {} config when it is not yet available! This is a bug! Message: {}", this.configType, message, new Exception("Config not yet available"));
+            PuzzlesLib.LOGGER.error(
+                    "Calling {} config when it is not yet available. This is a harmless oversight, please report to the author. {}",
+                    this.configTypeName,
+                    message,
+                    new Exception("Config not yet available")
+            );
         });
     }
 
@@ -94,8 +95,9 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     }
 
     protected void onModConfig(String modId, boolean isLoading, String eventType) {
-        Objects.requireNonNull(this.config, "Attempting to register invalid config of type %s for mod id %s".formatted(this.configType, modId));
-        // null must be permitted for config loading as the event is triggered during construction of ModConfig (before the field can even be set)
+        Objects.requireNonNull(this.config,
+                "Attempting to register invalid %s config for mod %s".formatted(this.configTypeName, modId)
+        );
         if (isLoading) {
             this.configValueCallbacks.forEach(Runnable::run);
             // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
@@ -106,12 +108,12 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         } else {
             this.available = false;
         }
-        PuzzlesLib.LOGGER.info("{} {} config for {}", eventType, this.configType, modId);
+        PuzzlesLib.LOGGER.info("{} {} config for {}", eventType, this.configTypeName, modId);
     }
 
     protected ModConfigSpec buildSpec() {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-        AnnotatedConfigBuilder.serialize(builder,this, this.config);
+        AnnotatedConfigBuilder.serialize(builder, this, this.config);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }

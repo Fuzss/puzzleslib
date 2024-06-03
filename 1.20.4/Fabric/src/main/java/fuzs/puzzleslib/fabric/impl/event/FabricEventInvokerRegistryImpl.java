@@ -321,11 +321,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, (ServerEntityLevelEvents.Unload callback) -> {
             return callback::onEntityUnload;
         });
-        // do not use ServerLivingEntityEvents#ALLOW_DEATH from Fabric Api as it only runs server-side
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
-        INSTANCE.register(PlayerTrackingEvents.Start.class, EntityTrackingEvents.START_TRACKING, (PlayerTrackingEvents.Start callback) -> {
-            return callback::onStartTracking;
-        });
+        INSTANCE.register(PlayerTrackingEvents.Start.class, FabricPlayerEvents.START_TRACKING);
         INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, (PlayerTrackingEvents.Stop callback) -> {
             return callback::onStopTracking;
         });

@@ -42,6 +42,7 @@
     "PlayerChunkSenderFabricMixin",
     "PlayerFabricMixin",
     "RunAroundLikeCrazyGoalFabricMixin",
+    "ServerEntityFabricMixin",
     "ServerLevelFabricMixin",
     "ServerPlayerFabricMixin",
     "ShulkerBulletFabricMixin",
