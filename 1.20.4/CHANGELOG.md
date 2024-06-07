@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v20.4.47-1.20.4] - 2024-06-07
+### Added
+- Add `ComputeFieldOfViewCallback`
+### Changed
+- Add additional parameters for `GatherDebugTextEvents` and move injection point on Fabric 
+
 ## [v20.4.46-1.20.4] - 2024-06-03
 ### Changed
 - Load client and common configs immediately upon registration on Forge & NeoForge to prepare for startup configs on NeoForge in 1.20.6 and for parity with Fabric 

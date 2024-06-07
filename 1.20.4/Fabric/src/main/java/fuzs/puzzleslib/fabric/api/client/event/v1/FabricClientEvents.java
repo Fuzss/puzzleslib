@@ -8,7 +8,8 @@ public final class FabricClientEvents {
     /**
      * Called before a mouse button is clicked or released without a screen being open.
      */
-    public static final Event<InputEvents.BeforeMouseAction> BEFORE_MOUSE_ACTION = FabricEventFactory.createResult(InputEvents.BeforeMouseAction.class);
+    public static final Event<InputEvents.BeforeMouseAction> BEFORE_MOUSE_ACTION = FabricEventFactory.createResult(
+            InputEvents.BeforeMouseAction.class);
     /**
      * Called after a mouse button is clicked or released without a screen being open.
      */
@@ -16,7 +17,8 @@ public final class FabricClientEvents {
     /**
      * Called before a mouse has scrolled without a screen being open.
      */
-    public static final Event<InputEvents.BeforeMouseScroll> BEFORE_MOUSE_SCROLL = FabricEventFactory.createResult(InputEvents.BeforeMouseScroll.class);
+    public static final Event<InputEvents.BeforeMouseScroll> BEFORE_MOUSE_SCROLL = FabricEventFactory.createResult(
+            InputEvents.BeforeMouseScroll.class);
     /**
      * Called after a mouse has scrolled without a screen being open.
      */
@@ -24,7 +26,8 @@ public final class FabricClientEvents {
     /**
      * Called before a key press, release or repeat action is handled.
      */
-    public static final Event<InputEvents.BeforeKeyAction> BEFORE_KEY_ACTION = FabricEventFactory.createResult(InputEvents.BeforeKeyAction.class);
+    public static final Event<InputEvents.BeforeKeyAction> BEFORE_KEY_ACTION = FabricEventFactory.createResult(
+            InputEvents.BeforeKeyAction.class);
     /**
      * Called after a key press, release or repeat action is handled.
      */
