@@ -404,6 +404,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
         INSTANCE.register(GatherDebugTextEvents.Left.class, FabricGuiEvents.GATHER_LEFT_DEBUG_TEXT);
         INSTANCE.register(GatherDebugTextEvents.Right.class, FabricGuiEvents.GATHER_RIGHT_DEBUG_TEXT);
+        INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
