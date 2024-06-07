@@ -548,12 +548,16 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (!minecraft.getDebugOverlay().showDebugScreen()) return;
-            callback.onGatherLeftDebugText(evt.getLeft());
+            callback.onGatherLeftDebugText(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getLeft());
         });
         INSTANCE.register(GatherDebugTextEvents.Right.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Right callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (!minecraft.getDebugOverlay().showDebugScreen()) return;
-            callback.onGatherRightDebugText(evt.getRight());
+            callback.onGatherRightDebugText(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getRight());
+        });
+        INSTANCE.register(ComputeFieldOfViewCallback.class, ViewportEvent.ComputeFov.class, (ComputeFieldOfViewCallback callback, ViewportEvent.ComputeFov evt) -> {
+            MutableDouble fieldOfView = MutableDouble.fromEvent(evt::setFOV, evt::getFOV);
+            callback.onComputeFieldOfView(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), fieldOfView);
         });
     }
 
