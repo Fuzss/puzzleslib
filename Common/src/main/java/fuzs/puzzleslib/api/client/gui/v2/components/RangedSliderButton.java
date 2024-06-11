@@ -31,7 +31,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
         super(x, y, width, height, CommonComponents.EMPTY, 0.0);
         this.minValue = minValue;
         this.maxValue = maxValue;
-        this.setValue(value);
+        this.setScaledValue(value);
     }
 
     /**
@@ -73,12 +73,12 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
 
     @Override
     protected void updateMessage() {
-        this.setMessage(this.getMessageFromValue(this.getValue()));
+        this.setMessage(this.getMessageFromValue(this.getScaledValue()));
     }
 
     @Override
     protected void applyValue() {
-        this.applyValue(this.getValue());
+        this.applyValue(this.getScaledValue());
     }
 
     /**
