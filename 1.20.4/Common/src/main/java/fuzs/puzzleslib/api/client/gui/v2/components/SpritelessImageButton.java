@@ -39,6 +39,12 @@ public class SpritelessImageButton extends Button {
     public static final ToIntFunction<Button> LEGACY_TEXTURE_LAYOUT = (Button button) -> {
         return !button.isActive() ? 0 : button.isHoveredOrFocused() ? 2 : 1;
     };
+    /**
+     * A texture layout that always returns the same texture index.
+     */
+    public static final ToIntFunction<Button> SINGLE_TEXTURE_LAYOUT = (Button button) -> {
+        return 0;
+    };
 
     public ResourceLocation resourceLocation;
     public int xTexStart;
