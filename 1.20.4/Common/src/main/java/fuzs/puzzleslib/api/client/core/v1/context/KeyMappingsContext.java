@@ -4,8 +4,6 @@ import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
 import net.minecraft.client.KeyMapping;
 
-import java.util.Objects;
-
 /**
  * Register a {@link KeyMapping} so it can be saved to and loaded from game options.
  */
@@ -18,7 +16,6 @@ public interface KeyMappingsContext {
      * @param keyMapping the key mapping
      */
     default void registerKeyMapping(KeyMapping keyMapping) {
-        Objects.requireNonNull(keyMapping, "key mapping is null");
         this.registerKeyMapping(keyMapping, KeyActivationContext.UNIVERSAL);
     }
 
