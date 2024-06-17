@@ -7,8 +7,11 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 
 /**
- * Very similar to {@link ScreenMouseEvents} and {@link ScreenKeyboardEvents}, but fires when no screen is open to handle input events in the {@link net.minecraft.client.gui.Gui}.
- * Some events even fire before a screen has had a chance to handle the input, depends on the exact implementation which follows Forge.
+ * Very similar to {@link ScreenMouseEvents} and {@link ScreenKeyboardEvents}, but fires when no screen is open to
+ * handle input events in the {@link net.minecraft.client.gui.Gui}. Some events even fire before a screen has had a
+ * chance to handle the input, depends on the exact implementation which follows Forge.
+ * <p>
+ * TODO clean this up and remove events that do not exist on Forge, probably just have one event for each that is cancellable if possible
  */
 public final class InputEvents {
     public static final EventInvoker<BeforeMouseAction> BEFORE_MOUSE_ACTION = EventInvoker.lookup(BeforeMouseAction.class);
@@ -31,8 +34,9 @@ public final class InputEvents {
          * @param button    the button input code, see {@link org.lwjgl.glfw.GLFW}
          * @param action    the mouse button action, see {@link InputConstants}
          * @param modifiers a bit field representing the active modifier keys
-         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other
+         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
+         *         well as vanilla process this event
          */
         EventResult onBeforeMouseAction(int button, int action, int modifiers);
     }
@@ -61,8 +65,9 @@ public final class InputEvents {
          * @param rightDown        is the right mouse button pressed
          * @param horizontalAmount horizontal scroll amount
          * @param verticalAmount   vertical scroll amount
-         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other
+         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
+         *         well as vanilla process this event
          */
         EventResult onBeforeMouseScroll(boolean leftDown, boolean middleDown, boolean rightDown, double horizontalAmount, double verticalAmount);
     }
@@ -88,12 +93,14 @@ public final class InputEvents {
         /**
          * Called before a key press, release or repeat action is handled.
          *
-         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param key       the named key code which can be identified by the constants in
+         *                  {@link org.lwjgl.glfw.GLFW GLFW}
          * @param scanCode  the unique/platform-specific scan code of the keyboard input
          * @param action    the key action, see {@link InputConstants}
          * @param modifiers a GLFW bitfield describing the modifier keys that are held down
-         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run,
-         * {@link EventResult#PASS} for letting other listeners as well as vanilla process this event
+         * @return {@link EventResult#INTERRUPT} for marking the event as handled, it will not be passed to other
+         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
+         *         well as vanilla process this event
          */
         EventResult onBeforeKeyAction(int key, int scanCode, int action, int modifiers);
     }
@@ -104,7 +111,8 @@ public final class InputEvents {
         /**
          * Called after a key press, release or repeat action is handled.
          *
-         * @param key       the named key code which can be identified by the constants in {@link org.lwjgl.glfw.GLFW GLFW}
+         * @param key       the named key code which can be identified by the constants in
+         *                  {@link org.lwjgl.glfw.GLFW GLFW}
          * @param scanCode  the unique/platform-specific scan code of the keyboard input
          * @param action    the key action, see {@link InputConstants}
          * @param modifiers a GLFW bitfield describing the modifier keys that are held down
