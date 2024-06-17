@@ -18,7 +18,7 @@ public record KeyMappingsContextNeoForgeImpl(Consumer<KeyMapping> consumer) impl
     @Override
     public void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         Objects.requireNonNull(keyMapping, "key mapping is null");
-        Objects.requireNonNull(activationHandler, "activation handles is null");
+        Objects.requireNonNull(activationHandler, "activation handler is null");
         this.consumer.accept(keyMapping);
         keyMapping.setKeyConflictContext(NeoForgeKeyMappingHelper.KEY_CONTEXTS.get(activationHandler.getActivationContext()));
         registerKeyActivationHandles(keyMapping, activationHandler);
