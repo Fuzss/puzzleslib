@@ -71,18 +71,6 @@ public final class FabricGuiEvents {
      */
     public static final Event<GatherDebugTextEvents.Right> GATHER_RIGHT_DEBUG_TEXT = FabricEventFactory.create(
             GatherDebugTextEvents.Right.class);
-    /**
-     * Runs in {@link net.minecraft.client.multiplayer.chat.ChatListener} when a new system chat message is about to be
-     * added to the client chat.
-     */
-    public static final Event<ChatMessageReceivedEvents.System> SYSTEM_MESSAGE_RECEIVED = FabricEventFactory.createResult(
-            ChatMessageReceivedEvents.System.class);
-    /**
-     * Runs in {@link net.minecraft.client.multiplayer.chat.ChatListener} when a new player sent chat message is about
-     * to be added to the client chat.
-     */
-    public static final Event<ChatMessageReceivedEvents.Player> PLAYER_MESSAGE_RECEIVED = FabricEventFactory.createResult(
-            ChatMessageReceivedEvents.Player.class);
     private static final Map<String, Event<RenderGuiElementEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
     private static final Map<String, Event<RenderGuiElementEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
 
