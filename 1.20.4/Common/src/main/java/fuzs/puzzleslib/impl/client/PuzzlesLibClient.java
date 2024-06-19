@@ -32,10 +32,10 @@ public class PuzzlesLibClient implements ClientModConstructor {
         if (ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
             setupGameOptions();
         }
-        registerHandlers();
+        registerEventHandlers();
     }
 
-    private static void registerHandlers() {
+    private static void registerEventHandlers() {
         ScreenOpeningCallback.EVENT.register((@Nullable Screen oldScreen, DefaultedValue<Screen> newScreen) -> {
             if (newScreen.get() instanceof CreateWorldScreen screen) {
                 screen.getUiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
