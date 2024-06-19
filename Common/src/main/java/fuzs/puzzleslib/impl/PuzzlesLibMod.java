@@ -61,6 +61,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     public static ResourceLocation id(String path) {
-        return new ResourceLocation(MOD_ID, path);
+        return ModConstructor.id(MOD_ID, path);
     }
 }

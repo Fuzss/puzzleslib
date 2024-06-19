@@ -75,6 +75,10 @@ mutable field   net/minecraft/world/level/GameRules$Type    constructor Ljava/ut
 accessible	field   net/minecraft/client/Minecraft  running Z
 accessible	field   net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen  selectedTab Lnet/minecraft/world/item/CreativeModeTab;
 accessible  method  net/minecraft/world/inventory/AbstractContainerMenu addSlot (Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;
+accessible  field   net/minecraft/client/multiplayer/chat/ChatListener  previousMessageTime J
+accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  evaluateTrustLevel  (Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/network/chat/Component;Ljava/time/Instant;)Lnet/minecraft/client/multiplayer/chat/ChatTrustLevel;
+accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  logPlayerMessage    (Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/network/chat/ChatType$Bound;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/client/multiplayer/chat/ChatTrustLevel;)V
+accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  logSystemMessage    (Lnet/minecraft/network/chat/Component;Ljava/time/Instant;)V
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;

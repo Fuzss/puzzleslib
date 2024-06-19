@@ -559,6 +559,26 @@ public final class ForgeClientEventInvokers {
             MutableDouble fieldOfView = MutableDouble.fromEvent(evt::setFOV, evt::getFOV);
             callback.onComputeFieldOfView(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), fieldOfView);
         });
+        INSTANCE.register(ChatMessageReceivedEvents.System.class, ClientChatReceivedEvent.System.class, (ChatMessageReceivedEvents.System callback, ClientChatReceivedEvent.System evt) -> {
+            MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
+            // vanilla system messages have no chat type bound
+            EventResult result = callback.onSystemMessageReceived(message, evt.isOverlay());
+            if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(ChatMessageReceivedEvents.Player.class, ClientChatReceivedEvent.class, (ChatMessageReceivedEvents.Player callback, ClientChatReceivedEvent evt) -> {
+            // Forge also fires events for superclasses, so we need to make sure this doesn't happen here
+            if (evt.getClass() != ClientChatReceivedEvent.class) return;
+            MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
+            EventResult result = callback.onPlayerMessageReceived(evt.getBoundChatType(), message, null);
+            if (result.isInterrupt()) evt.setCanceled(true);
+        }, true);
+        INSTANCE.register(ChatMessageReceivedEvents.Player.class, ClientChatReceivedEvent.Player.class, (ChatMessageReceivedEvents.Player callback, ClientChatReceivedEvent.Player evt) -> {
+            MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
+            EventResult result = callback.onPlayerMessageReceived(evt.getBoundChatType(), message,
+                    evt.getPlayerChatMessage()
+            );
+            if (result.isInterrupt()) evt.setCanceled(true);
+        }, true);
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
