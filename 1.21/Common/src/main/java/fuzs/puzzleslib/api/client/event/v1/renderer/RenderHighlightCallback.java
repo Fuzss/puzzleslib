@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -16,7 +17,8 @@ public interface RenderHighlightCallback {
 
     /**
      * Fires before the highlight outline for the current hit result is attempted to be drawn.
-     * <p>Vanilla only handles this in case the hit result is {@link HitResult.Type#BLOCK}, but the callback also allows
+     * <p>Vanilla only handles this in case the hit result is {@link HitResult.Type#BLOCK}, but the callback also
+     * allows
      * for handling {@link HitResult.Type#ENTITY}.
      *
      * @param levelRenderer     the level renderer instance
@@ -24,12 +26,12 @@ public interface RenderHighlightCallback {
      * @param gameRenderer      the game renderer instance
      * @param hitResult         the hit result to render the highlight outline for, this can be either
      *                          {@link HitResult.Type#BLOCK} or {@link HitResult.Type#ENTITY}
-     * @param partialTick       partial tick time
+     * @param deltaTracker      partial tick time
      * @param poseStack         current pose stack
      * @param multiBufferSource the buffer source
      * @param level             the current client level
      * @return {@link EventResult#INTERRUPT} to prevent the highlight from rendering, allowing for custom rendering,
      *         {@link EventResult#PASS} to allow vanilla outline rendering to happen
      */
-    EventResult onRenderHighlight(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, HitResult hitResult, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, ClientLevel level);
+    EventResult onRenderHighlight(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, HitResult hitResult, DeltaTracker deltaTracker, PoseStack poseStack, MultiBufferSource multiBufferSource, ClientLevel level);
 }

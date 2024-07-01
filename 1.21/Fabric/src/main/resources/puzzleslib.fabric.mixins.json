@@ -84,7 +84,6 @@
     "client.WindowFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.CameraFabricAccessor",
-    "client.accessor.MinecraftFabricAccessor",
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "server": [

@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 public final class ClientParticleTypesManager implements PreparableReloadListener {
     private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
-    private static final ResourceLocation PARTICLES_ATLAS_INFO = new ResourceLocation("particles");
+    private static final ResourceLocation PARTICLES_ATLAS_INFO = ResourceLocation.withDefaultNamespace("particles");
 
     private final Map<ResourceLocation, ParticleProvider<?>> providers = Maps.newHashMap();
     private final Map<ResourceLocation, MutableSpriteSet> spriteSets = Maps.newHashMap();

@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.event.v1.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -30,13 +31,13 @@ public final class RenderLevelEvents {
          * @param levelRenderer    the level renderer instance
          * @param camera           the camera instance
          * @param gameRenderer     the game renderer instance
-         * @param partialTick      partial tick time
+         * @param deltaTracker     partial tick time
          * @param poseStack        current pose stack
          * @param projectionMatrix the projection matrix from the pose stack
          * @param frustum          frustum instance
          * @param level            the current client level
          */
-        void onRenderLevelAfterTerrain(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterTerrain(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, DeltaTracker deltaTracker, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -48,13 +49,13 @@ public final class RenderLevelEvents {
          * @param levelRenderer    the level renderer instance
          * @param camera           the camera instance
          * @param gameRenderer     the game renderer instance
-         * @param partialTick      partial tick time
+         * @param deltaTracker     partial tick time
          * @param poseStack        current pose stack
          * @param projectionMatrix the projection matrix from the pose stack
          * @param frustum          frustum instance
          * @param level            the current client level
          */
-        void onRenderLevelAfterEntities(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterEntities(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, DeltaTracker deltaTracker, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -67,13 +68,13 @@ public final class RenderLevelEvents {
          * @param levelRenderer    the level renderer instance
          * @param camera           the camera instance
          * @param gameRenderer     the game renderer instance
-         * @param partialTick      partial tick time
+         * @param deltaTracker     partial tick time
          * @param poseStack        current pose stack
          * @param projectionMatrix the projection matrix from the pose stack
          * @param frustum          frustum instance
          * @param level            the current client level
          */
-        void onRenderLevelAfterTranslucent(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterTranslucent(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, DeltaTracker deltaTracker, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 
     @FunctionalInterface
@@ -85,12 +86,12 @@ public final class RenderLevelEvents {
          * @param levelRenderer    the level renderer instance
          * @param camera           the camera instance
          * @param gameRenderer     the game renderer instance
-         * @param partialTick      partial tick time
+         * @param deltaTracker     partial tick time
          * @param poseStack        current pose stack
          * @param projectionMatrix the projection matrix from the pose stack
          * @param frustum          frustum instance
          * @param level            the current client level
          */
-        void onRenderLevelAfterLevel(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, float partialTick, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
+        void onRenderLevelAfterLevel(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, DeltaTracker deltaTracker, PoseStack poseStack, Matrix4f projectionMatrix, Frustum frustum, ClientLevel level);
     }
 }

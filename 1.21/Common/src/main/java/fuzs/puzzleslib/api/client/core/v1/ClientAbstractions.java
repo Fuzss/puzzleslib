@@ -2,18 +2,17 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.ClientTooltipComponentsContext;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
-import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.multiplayer.SessionSearchTrees;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.searchtree.SearchRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -100,13 +99,13 @@ public interface ClientAbstractions {
     void registerRenderType(Fluid fluid, RenderType renderType);
 
     /**
-     * Get the current partial tick time.
-     * <p>This is different from {@link Minecraft#getFrameTime()} in that the correct value is returned when the game is
-     * paused in {@link Minecraft#isPaused()}.
+     * Get the current partial tick time while taking into account whether the game is paused.
      *
      * @return current partial tick time
      */
-    float getPartialTick();
+    default float getPartialTick() {
+        return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+    }
 
     /**
      * Get the search registry for registering a new search tree via
@@ -114,7 +113,9 @@ public interface ClientAbstractions {
      *
      * @return the search registry
      */
-    SearchRegistry getSearchRegistry();
+    default SessionSearchTrees getSearchRegistry() {
+        return Minecraft.getInstance().getConnection().searchTrees();
+    }
 
     /**
      * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.

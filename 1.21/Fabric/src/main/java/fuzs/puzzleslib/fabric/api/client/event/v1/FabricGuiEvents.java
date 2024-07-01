@@ -41,12 +41,6 @@ public final class FabricGuiEvents {
     /**
      * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
      */
-    @Deprecated(forRemoval = true)
-    public static final Event<ScreenTooltipEvents.Render> RENDER_SCREEN_TOOLTIP = FabricEventFactory.createResult(
-            ScreenTooltipEvents.Render.class);
-    /**
-     * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
-     */
     public static final Event<RenderTooltipCallback> RENDER_TOOLTIP = FabricEventFactory.createResult(
             RenderTooltipCallback.class);
     /**
@@ -75,7 +69,7 @@ public final class FabricGuiEvents {
     private static final Map<String, Event<RenderGuiElementEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
 
     private FabricGuiEvents() {
-
+        // NO-OP
     }
 
     /**

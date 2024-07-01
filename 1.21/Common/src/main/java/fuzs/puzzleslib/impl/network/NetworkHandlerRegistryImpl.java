@@ -65,7 +65,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
     }
 
     protected ResourceLocation registerMessageType(Class<?> clazz) {
-        ResourceLocation messageName = new ResourceLocation(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
+        ResourceLocation messageName = ResourceLocation.fromNamespaceAndPath(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
         this.messageNames.put(clazz, messageName);
         return messageName;
     }

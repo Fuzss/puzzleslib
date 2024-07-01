@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.core.v1.context;
 
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.SpawnPlacementType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
 
@@ -20,5 +21,5 @@ public interface SpawnPlacementsContext {
      * @param spawnPredicate custom spawn predicate for mob
      * @param <T>            type of entity
      */
-    <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacements.Type location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
+    <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacementType location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
 }

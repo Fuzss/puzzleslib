@@ -49,14 +49,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.neoforged.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -71,6 +69,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.callback.AddCallback;
 import org.jetbrains.annotations.Nullable;
@@ -191,7 +190,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(BonemealCallback.class, BonemealEvent.class, (BonemealCallback callback, BonemealEvent evt) -> {
-            EventResult result = callback.onBonemeal(evt.getLevel(), evt.getPos(), evt.getBlock(), evt.getStack());
+            EventResult result = callback.onBonemeal(evt.getLevel(), evt.getPos(), evt.getState(), evt.getStack());
             // cancelling bone meal event is kinda weird...
             if (result.isInterrupt()) {
                 if (result.getAsBoolean()) {
@@ -233,13 +232,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayerTickEvents.Start.class, TickEvent.PlayerTickEvent.class, (PlayerTickEvents.Start callback, TickEvent.PlayerTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START) return;
-            callback.onStartPlayerTick(evt.player);
+        INSTANCE.register(PlayerTickEvents.Start.class, PlayerTickEvent.Pre.class, (PlayerTickEvents.Start callback, PlayerTickEvent.Pre evt) -> {
+            callback.onStartPlayerTick(evt.getEntity());
         });
-        INSTANCE.register(PlayerTickEvents.End.class, TickEvent.PlayerTickEvent.class, (PlayerTickEvents.End callback, TickEvent.PlayerTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END) return;
-            callback.onEndPlayerTick(evt.player);
+        INSTANCE.register(PlayerTickEvents.End.class, PlayerTickEvent.Post.class, (PlayerTickEvents.End callback, PlayerTickEvent.Post evt) -> {
+            callback.onEndPlayerTick(evt.getEntity());
         });
         INSTANCE.register(LivingFallCallback.class, LivingFallEvent.class, (LivingFallCallback callback, LivingFallEvent evt) -> {
             MutableFloat fallDistance = MutableFloat.fromEvent(evt::setDistance, evt::getDistance);
@@ -256,7 +253,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onReplaceLootTable(evt.getName(), table);
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
-            callback.onModifyLootTable(null, evt.getName(), evt.getTable()::addPool, (int index) -> {
+            callback.onModifyLootTable(evt.getName(), evt.getTable()::addPool, (int index) -> {
                 if (index == 0 && evt.getTable().removePool("main") != null) {
                     return true;
                 } else {
@@ -543,7 +540,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(MobEffectEvents.Affects.class, MobEffectEvent.Applicable.class, (MobEffectEvents.Affects callback, MobEffectEvent.Applicable evt) -> {
             EventResult result = callback.onMobEffectAffects(evt.getEntity(), evt.getEffectInstance());
             if (result.isInterrupt()) {
-                evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+                evt.setResult(result.getAsBoolean() ? MobEffectEvent.Applicable.Result.APPLY : MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
             }
         });
         INSTANCE.register(MobEffectEvents.Apply.class, MobEffectEvent.Added.class, (MobEffectEvents.Apply callback, MobEffectEvent.Added evt) -> {
@@ -571,10 +568,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(CheckMobDespawnCallback.class, MobSpawnEvent.AllowDespawn.class, (CheckMobDespawnCallback callback, MobSpawnEvent.AllowDespawn evt) -> {
+        INSTANCE.register(CheckMobDespawnCallback.class, MobDespawnEvent.class, (CheckMobDespawnCallback callback, MobDespawnEvent evt) -> {
             EventResult result = callback.onCheckMobDespawn(evt.getEntity(), (ServerLevel) evt.getLevel());
             if (result.isInterrupt()) {
-                evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+                evt.setResult(result.getAsBoolean() ? MobDespawnEvent.Result.ALLOW : MobDespawnEvent.Result.DENY);
             }
         });
         INSTANCE.register(GatherPotentialSpawnsCallback.class, LevelEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, LevelEvent.PotentialSpawns evt) -> {
@@ -694,7 +691,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         }
     }
 
-    @SuppressWarnings("removal")
     @Override
     public <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
@@ -702,8 +698,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         IEventBus eventBus;
         if (IModBusEvent.class.isAssignableFrom(event)) {
             // this will be null when an event is registered after the initial mod loading
-            FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
-            eventBus = context != null ? context.getModEventBus() : null;
+            eventBus = NeoForgeModContainerHelper.getOptionalActiveModEventBus().orElse(null);
         } else {
             eventBus = NeoForge.EVENT_BUS;
         }

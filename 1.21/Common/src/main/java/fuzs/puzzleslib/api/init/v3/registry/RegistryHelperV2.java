@@ -7,14 +7,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
@@ -252,16 +248,8 @@ public final class RegistryHelperV2 {
             holder = item.builtInRegistryHolder();
         } else if (object instanceof EntityType<?> entityType) {
             holder = entityType.builtInRegistryHolder();
-        } else if (object instanceof GameEvent gameEvent) {
-            holder = gameEvent.builtInRegistryHolder();
         } else if (object instanceof Fluid fluid) {
             holder = fluid.builtInRegistryHolder();
-        } else if (object instanceof Enchantment enchantment) {
-            holder = enchantment.builtInRegistryHolder();
-        } else if (object instanceof MobEffect mobEffect) {
-            holder = mobEffect.builtInRegistryHolder();
-        } else if (object instanceof Potion potion) {
-            holder = potion.builtInRegistryHolder();
         } else if (object instanceof BlockEntityType<?> blockEntityType) {
             holder = blockEntityType.builtInRegistryHolder();
         }

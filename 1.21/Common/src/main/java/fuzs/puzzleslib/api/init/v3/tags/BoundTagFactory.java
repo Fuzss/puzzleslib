@@ -72,7 +72,7 @@ public final class BoundTagFactory {
      * @return new tag key
      */
     public <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return TagKey.create(registryKey, new ResourceLocation(this.namespace, path));
+        return TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath(this.namespace, path));
     }
 
     /**
