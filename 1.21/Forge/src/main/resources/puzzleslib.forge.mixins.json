@@ -1,0 +1,26 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "${modGroup}.forge.mixin",
+  "plugin": "${modGroup}.forge.mixin.MixinConfigPluginForgeImpl",
+  "mixins": [
+    "accessor.BiomeSpecialEffectsBuilderForgeAccessor",
+    "accessor.FireBlockForgeAccessor",
+    "accessor.ForgeRegistryForgeAccessor",
+    "accessor.LootTableForgeAccessor",
+    "accessor.MobSpawnSettingsBuilderForgeAccessor",
+    "accessor.PotionBrewingForgeAccessor"
+  ],
+  "client": [
+    "client.ModelManagerForgeMixin",
+    "client.RenderBuffersForgeMixin",
+    "client.accessor.BlockColorsForgeAccessor",
+    "client.accessor.ItemColorsForgeAccessor",
+    "client.accessor.ItemForgeAccessor",
+    "client.accessor.ModelBakeryForgeAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
