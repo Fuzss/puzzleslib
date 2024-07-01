@@ -1,0 +1,12 @@
+apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v2/fabric.gradle"
+
+dependencies {
+    // Fabric Api
+    modApi libs.fabricapi.fabric
+
+    // Forge Config Api Port
+    modApi libs.forgeconfigapiport.fabric
+
+    // Puzzles Lib
+//    modApi libs.puzzleslib.fabric
+}
