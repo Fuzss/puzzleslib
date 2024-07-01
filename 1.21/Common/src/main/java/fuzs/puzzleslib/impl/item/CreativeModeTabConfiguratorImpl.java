@@ -10,12 +10,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.alchemy.PotionUtils;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -113,23 +114,21 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
                 .flatMap(HolderLookup::listElements)
                 .filter(entry -> entry.key().location().getNamespace().equals(namespace))
                 .sorted(comparator)
-                .map(Holder.Reference::value)
-                .forEach(enchantment -> {
-                    itemStacks.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(enchantment, enchantment.getMaxLevel())));
+                .forEach(holder -> {
+                    itemStacks.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(holder, holder.value().getMaxLevel())));
                 });
     }
 
     private static void appendAllPotions(String namespace, HolderLookup.Provider holders, Consumer<ItemStack> itemStacks) {
-        Potion[] potions = holders.lookup(Registries.POTION).stream()
+        List<Holder.Reference<Potion>> potions = holders.lookup(Registries.POTION).stream()
                 .flatMap(HolderLookup::listElements)
                 .filter(entry -> entry.key().location().getNamespace().equals(namespace))
-                .map(Holder.Reference::value)
-                .filter(potion -> !potion.getEffects().isEmpty())
-                .sorted(Comparator.comparing(potion -> potion.getEffects().get(0)))
-                .toArray(Potion[]::new);
+                .filter(holder -> !holder.value().getEffects().isEmpty())
+                .sorted(Comparator.comparing(holder -> holder.value().getEffects().get(0)))
+                .toList();
         for (Item item : POTION_ITEMS) {
-            for (Potion potion : potions) {
-                itemStacks.accept(PotionUtils.setPotion(new ItemStack(item), potion));
+            for (Holder.Reference<Potion> potion : potions) {
+                itemStacks.accept(PotionContents.createItemStack(item, potion));
             }
         }
     }

@@ -54,7 +54,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -65,7 +64,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
@@ -262,16 +260,16 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, (LootTableLoadEvents.Replace callback) -> {
-            return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable original, LootTableSource source) -> {
+            return (ResourceKey<LootTable> id, LootTable original, LootTableSource source) -> {
                 DefaultedValue<LootTable> lootTable = DefaultedValue.fromValue(original);
-                callback.onReplaceLootTable(id, lootTable);
+                callback.onReplaceLootTable(id.location(), lootTable);
                 // returning null will prompt no change
                 return lootTable.getAsOptional().orElse(null);
             };
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, (LootTableLoadEvents.Modify callback) -> {
-            return (ResourceManager resourceManager, LootDataManager lootManager, ResourceLocation id, LootTable.Builder tableBuilder, LootTableSource source) -> {
-                callback.onModifyLootTable(lootManager, id, tableBuilder::pool, (int index) -> {
+            return (ResourceKey<LootTable> id, LootTable.Builder tableBuilder, LootTableSource source) -> {
+                callback.onModifyLootTable(id.location(), tableBuilder::pool, (int index) -> {
                     MutableInt currentIndex = new MutableInt();
                     MutableBoolean result = new MutableBoolean();
                     tableBuilder.modifyPools((LootPool.Builder builder) -> {

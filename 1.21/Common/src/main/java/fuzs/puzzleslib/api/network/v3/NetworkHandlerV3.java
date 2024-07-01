@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
@@ -44,7 +45,7 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return NetworkHandlerV3.builder(new ResourceLocation(modId, "main"));
+        return NetworkHandlerV3.builder(ResourceLocation.fromNamespaceAndPath(modId, "main"));
     }
 
     /**
@@ -280,7 +281,7 @@ public interface NetworkHandlerV3 {
          * @param <T>    data type
          * @return this builder instance
          */
-        default <T> Builder registerSerializer(Class<T> type, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
+        default <T> Builder registerSerializer(Class<T> type, BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) {
             MessageSerializers.registerSerializer(type, writer, reader);
             return this;
         }

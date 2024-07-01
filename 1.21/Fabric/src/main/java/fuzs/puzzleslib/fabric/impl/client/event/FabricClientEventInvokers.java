@@ -42,6 +42,7 @@ import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.Util;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -63,6 +64,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
@@ -168,15 +170,15 @@ public final class FabricClientEventInvokers {
             return callback::onEndClientTick;
         });
         INSTANCE.register(RenderGuiCallback.class, HudRenderCallback.EVENT, callback -> {
-            return (GuiGraphics matrixStack, float tickDelta) -> {
+            return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 Window window = minecraft.getWindow();
-                callback.onRenderGui(minecraft, matrixStack, tickDelta, window.getGuiScaledWidth(), window.getGuiScaledHeight());
+                callback.onRenderGui(minecraft, drawContext, tickCounter, window.getGuiScaledWidth(), window.getGuiScaledHeight());
             };
         });
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, callback -> {
-            return (ItemStack stack, TooltipFlag context, List<Component> lines) -> {
-                callback.onItemTooltip(stack, Minecraft.getInstance().player, lines, context);
+            return (ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag context, List<Component> lines) -> {
+                callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
             };
         });
         INSTANCE.register(RenderNameTagCallback.class, FabricRendererEvents.RENDER_NAME_TAG);
@@ -281,7 +283,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderLivingEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING);
         INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_PLAYER);
         INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_PLAYER);
-        INSTANCE.register(RenderHandCallback.class, FabricRendererEvents.RENDER_HAND);
         INSTANCE.register(RenderHandEvents.MainHand.class, FabricRendererEvents.RENDER_MAIN_HAND);
         INSTANCE.register(RenderHandEvents.OffHand.class, FabricRendererEvents.RENDER_OFF_HAND);
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricRendererEvents.COMPUTE_CAMERA_ANGLES);
@@ -377,35 +378,34 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderBlockOverlayCallback.class, FabricRendererEvents.RENDER_BLOCK_OVERLAY);
         INSTANCE.register(FogEvents.Render.class, FabricRendererEvents.RENDER_FOG);
         INSTANCE.register(FogEvents.ComputeColor.class, FabricRendererEvents.COMPUTE_FOG_COLOR);
-        INSTANCE.register(ScreenTooltipEvents.Render.class, FabricGuiEvents.RENDER_SCREEN_TOOLTIP);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
         INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, callback -> {
             return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
                 if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) return true;
                 Minecraft minecraft = Minecraft.getInstance();
                 if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return true;
-                EventResult result = callback.onRenderHighlight(context.worldRenderer(), context.camera(), context.gameRenderer(), hitResult, context.tickDelta(), context.matrixStack(), context.consumers(), context.world());
+                EventResult result = callback.onRenderHighlight(context.worldRenderer(), context.camera(), context.gameRenderer(), hitResult, context.tickCounter(), context.matrixStack(), context.consumers(), context.world());
                 return result.isPass();
             };
         });
         INSTANCE.register(RenderLevelEvents.AfterTerrain.class, WorldRenderEvents.BEFORE_ENTITIES, callback -> {
             return (WorldRenderContext context) -> {
-                callback.onRenderLevelAfterTerrain(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+                callback.onRenderLevelAfterTerrain(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
         INSTANCE.register(RenderLevelEvents.AfterEntities.class, WorldRenderEvents.AFTER_ENTITIES, callback -> {
             return (WorldRenderContext context) -> {
-                callback.onRenderLevelAfterEntities(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+                callback.onRenderLevelAfterEntities(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
         INSTANCE.register(RenderLevelEvents.AfterTranslucent.class, WorldRenderEvents.AFTER_TRANSLUCENT, callback -> {
             return (WorldRenderContext context) -> {
-                callback.onRenderLevelAfterTranslucent(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+                callback.onRenderLevelAfterTranslucent(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
         INSTANCE.register(RenderLevelEvents.AfterLevel.class, WorldRenderEvents.END, callback -> {
             return (WorldRenderContext context) -> {
-                callback.onRenderLevelAfterLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickDelta(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
+                callback.onRenderLevelAfterLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);

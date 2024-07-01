@@ -4,9 +4,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
-import com.mojang.datafixers.util.Either;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.network.serialization.RecordSerializer;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -17,7 +17,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
@@ -51,6 +54,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
@@ -64,7 +68,7 @@ public final class MessageSerializers {
     private static final Map<Class<?>, Function<Type[], MessageSerializer<?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(Maps.newLinkedHashMap());
 
     private MessageSerializers() {
-
+        // NO-OP
     }
 
     /**
@@ -76,7 +80,7 @@ public final class MessageSerializers {
      * @param reader reader from byte buffer
      * @param <T> data type
      */
-    public static <T> void registerSerializer(Class<T> type, FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) {
+    public static <T> void registerSerializer(Class<T> type, BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) {
         registerSerializer(type, new MessageSerializerImpl<T>(writer, reader));
     }
 
@@ -110,7 +114,12 @@ public final class MessageSerializers {
     }
 
     private static <T> void registerSerializer(Class<T> type, EntityDataSerializer<T> entityDataSerializer) {
-        registerSerializer(type, entityDataSerializer::write, entityDataSerializer::read);
+        StreamCodec<? super RegistryFriendlyByteBuf, T> codec = entityDataSerializer.codec();
+        registerSerializer(type, (friendlyByteBuf, t) -> codec.encode(friendlyByteBuf, t), friendlyByteBuf -> codec.decode(friendlyByteBuf));
+    }
+
+    private static <T> void registerSerializer(Class<T> type, StreamCodec<ByteBuf, T> streamCodec) {
+        registerSerializer(type, streamCodec::encode, streamCodec::decode);
     }
 
     /**
@@ -217,17 +226,6 @@ public final class MessageSerializers {
     }
 
     @SuppressWarnings("unchecked")
-    private static <L, R> MessageSerializer<Either<L, R>> createEitherSerializer(Type[] typeArguments) {
-        MessageSerializer<L> leftSerializer = findByType((Class<L>) typeArguments[0]);
-        MessageSerializer<R> rightSerializer = findByType((Class<R>) typeArguments[1]);
-        return new MessageSerializerImpl<>((FriendlyByteBuf friendlyByteBuf, Either<L, R> o) -> {
-            friendlyByteBuf.writeEither(o, leftSerializer::write, rightSerializer::write);
-        }, (FriendlyByteBuf friendlyByteBuf) -> {
-            return friendlyByteBuf.readEither(leftSerializer::read, rightSerializer::read);
-        });
-    }
-
-    @SuppressWarnings("unchecked")
     private static MessageSerializer<?> createArraySerializer(Class<?> clazz) {
         MessageSerializer<Object> serializer = (MessageSerializer<Object>) findByType(clazz);
         return new MessageSerializerImpl<>((FriendlyByteBuf buf, Object t) -> {
@@ -250,7 +248,7 @@ public final class MessageSerializers {
         return new MessageSerializerImpl<>(FriendlyByteBuf::writeEnum, (FriendlyByteBuf buf) -> buf.readEnum(clazz));
     }
 
-    private record MessageSerializerImpl<T>(FriendlyByteBuf.Writer<T> writer, FriendlyByteBuf.Reader<T> reader) implements MessageSerializer<T> {
+    private record MessageSerializerImpl<T>(BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) implements MessageSerializer<T> {
 
         @Override
         public void write(FriendlyByteBuf buf, T instance) {
@@ -274,17 +272,19 @@ public final class MessageSerializers {
         registerSerializer(Float.class, FriendlyByteBuf::writeFloat, FriendlyByteBuf::readFloat);
         registerSerializer(double.class, FriendlyByteBuf::writeDouble, FriendlyByteBuf::readDouble);
         registerSerializer(Double.class, FriendlyByteBuf::writeDouble, FriendlyByteBuf::readDouble);
-        registerSerializer(byte.class, (FriendlyByteBuf.Writer<Byte>) FriendlyByteBuf::writeByte, FriendlyByteBuf::readByte);
-        registerSerializer(Byte.class, (FriendlyByteBuf.Writer<Byte>) FriendlyByteBuf::writeByte, FriendlyByteBuf::readByte);
-        registerSerializer(short.class, (FriendlyByteBuf.Writer<Short>) FriendlyByteBuf::writeShort, FriendlyByteBuf::readShort);
-        registerSerializer(Short.class, (FriendlyByteBuf.Writer<Short>) FriendlyByteBuf::writeShort, FriendlyByteBuf::readShort);
-        registerSerializer(char.class, (FriendlyByteBuf.Writer<Character>) FriendlyByteBuf::writeChar, FriendlyByteBuf::readChar);
-        registerSerializer(Character.class, (FriendlyByteBuf.Writer<Character>) FriendlyByteBuf::writeChar, FriendlyByteBuf::readChar);
+        registerSerializer(byte.class, (BiConsumer<FriendlyByteBuf, Byte>) FriendlyByteBuf::writeByte, FriendlyByteBuf::readByte);
+        registerSerializer(Byte.class, (BiConsumer<FriendlyByteBuf, Byte>) FriendlyByteBuf::writeByte, FriendlyByteBuf::readByte);
+        registerSerializer(short.class, (BiConsumer<FriendlyByteBuf, Short>) FriendlyByteBuf::writeShort, FriendlyByteBuf::readShort);
+        registerSerializer(Short.class, (BiConsumer<FriendlyByteBuf, Short>) FriendlyByteBuf::writeShort, FriendlyByteBuf::readShort);
+        registerSerializer(char.class, (BiConsumer<FriendlyByteBuf, Character>) FriendlyByteBuf::writeChar, FriendlyByteBuf::readChar);
+        registerSerializer(Character.class, (BiConsumer<FriendlyByteBuf, Character>) FriendlyByteBuf::writeChar, FriendlyByteBuf::readChar);
 
         registerSerializer(String.class, EntityDataSerializers.STRING);
         registerSerializer(Date.class, FriendlyByteBuf::writeDate, FriendlyByteBuf::readDate);
         registerSerializer(Instant.class, FriendlyByteBuf::writeInstant, FriendlyByteBuf::readInstant);
-        registerSerializer(UUID.class, FriendlyByteBuf::writeUUID, FriendlyByteBuf::readUUID);
+        registerSerializer(UUID.class, (FriendlyByteBuf friendlyByteBuf, UUID uuid) -> {
+            friendlyByteBuf.writeUUID(uuid);
+        }, (FriendlyByteBuf friendlyByteBuf) -> friendlyByteBuf.readUUID());
 
         registerSerializer(Component.class, EntityDataSerializers.COMPONENT);
         registerSerializer(ItemStack.class, EntityDataSerializers.ITEM_STACK);
@@ -299,7 +299,7 @@ public final class MessageSerializers {
         registerSerializer(ResourceLocation.class, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::readResourceLocation);
         registerSerializer(BlockHitResult.class, FriendlyByteBuf::writeBlockHitResult, FriendlyByteBuf::readBlockHitResult);
         registerSerializer(BitSet.class, FriendlyByteBuf::writeBitSet, FriendlyByteBuf::readBitSet);
-        registerSerializer(GameProfile.class, FriendlyByteBuf::writeGameProfile, FriendlyByteBuf::readGameProfile);
+        registerSerializer(GameProfile.class, ByteBufCodecs.GAME_PROFILE);
 
         registerSerializer(Vec3.class, (FriendlyByteBuf friendlyByteBuf, Vec3 vec3) -> {
             friendlyByteBuf.writeDouble(vec3.x());
@@ -341,6 +341,5 @@ public final class MessageSerializers {
         registerContainerProvider(Map.class, MessageSerializers::createMapSerializer);
         registerContainerProvider(List.class, (Type[] typeArguments) -> createCollectionSerializer(typeArguments, Lists::newArrayListWithExpectedSize));
         registerContainerProvider(Optional.class, MessageSerializers::createOptionalSerializer);
-        registerContainerProvider(Either.class, MessageSerializers::createEitherSerializer);
     }
 }

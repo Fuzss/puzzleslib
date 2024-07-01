@@ -86,7 +86,7 @@ public final class TypedTagFactory<T> {
     public TagKey<T> make(String namespace, String path) {
         Objects.requireNonNull(namespace, "namespace is null");
         Objects.requireNonNull(path, "path is null");
-        return this.make(new ResourceLocation(namespace, path));
+        return this.make(ResourceLocation.fromNamespaceAndPath(namespace, path));
     }
 
     /**

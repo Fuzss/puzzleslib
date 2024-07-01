@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -52,7 +53,7 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public boolean canEquip(ItemStack stack, EquipmentSlot slot, Entity entity) {
+    public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
         return stack.canEquip(slot, entity);
     }
 
@@ -63,7 +64,7 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
 
     @Override
     public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
-        return EventHooks.getMobGriefingEvent(level, entity);
+        return EventHooks.canEntityGrief(level, entity);
     }
 
     @Override
@@ -77,18 +78,13 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
-        return new Pack.Info(description, packCompatibility, features, Collections.emptyList(), hidden);
+    public Pack.Metadata createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
+        return new Pack.Metadata(description, packCompatibility, features, Collections.emptyList(), hidden);
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(Enchantment enchantment, ItemStack itemStack) {
-        return enchantment.canApplyAtEnchantingTable(itemStack);
-    }
-
-    @Override
-    public boolean isAllowedOnBooks(Enchantment enchantment) {
-        return enchantment.isAllowedOnBooks();
+    public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
+        return itemStack.isPrimaryItemFor(enchantment);
     }
 
     @Override

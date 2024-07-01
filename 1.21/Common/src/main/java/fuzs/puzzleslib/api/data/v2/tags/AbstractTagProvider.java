@@ -47,7 +47,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     }
 
     public AbstractTagAppender<T> add(String string) {
-        return this.add(new ResourceLocation(string));
+        return this.add(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> add(ResourceLocation resourceLocation) {

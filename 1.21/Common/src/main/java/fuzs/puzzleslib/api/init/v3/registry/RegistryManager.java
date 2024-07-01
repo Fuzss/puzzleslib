@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.init.v3.registry;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
+import fuzs.puzzleslib.api.item.v2.ItemEquipmentFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.item.RecipeTypeImpl;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -15,6 +16,7 @@ import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -24,9 +26,12 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -37,6 +42,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 
@@ -391,6 +398,69 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry);
+
+    /**
+     * Register an armor material with default values.
+     *
+     * @param path       path for new entry
+     * @param repairItem the repair material used in an anvil for restoring item durability
+     * @return holder reference
+     */
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Holder<Item> repairItem) {
+        return this.registerArmorMaterial(path, ItemEquipmentFactories.toArmorTypeMapWithFallback(1), 0, repairItem);
+    }
+
+    /**
+     * Register an armor material with default values.
+     *
+     * @param path             path for new entry
+     * @param defense          protection value for each slot type, use
+     *                         {@link ItemEquipmentFactories#toArmorTypeMap(int...)} for converting a legacy protection
+     *                         amount values array
+     * @param enchantmentValue enchantment value (leather: 15, gold: 25, chain: 12, iron: 9, diamond: 10, turtle: 9,
+     *                         netherite: 15)
+     * @param repairItem       the repair material used in an anvil for restoring item durability
+     * @return holder reference
+     */
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<Item> repairItem) {
+        return this.registerArmorMaterial(path,
+                defense,
+                enchantmentValue,
+                SoundEvents.ARMOR_EQUIP_GENERIC,
+                () -> Ingredient.of(repairItem.value()),
+                0.0F,
+                0.0F
+        );
+    }
+
+    /**
+     * Register an armor material.
+     *
+     * @param path                path for new entry
+     * @param defense             protection value for each slot type, use
+     *                            {@link ItemEquipmentFactories#toArmorTypeMap(int...)} for converting a legacy
+     *                            protection amount values array
+     * @param enchantmentValue    enchantment value (leather: 15, gold: 25, chain: 12, iron: 9, diamond: 10, turtle: 9,
+     *                            netherite: 15)
+     * @param equipSound          the sound played when putting a piece of armor into the dedicated equipment slot
+     * @param repairIngredient    the repair material used in an anvil for restoring item durability
+     * @param toughness           armor toughness value for all slot types of this armor set
+     * @param knockbackResistance knockback resistance value for all slot types of this armor set
+     * @return holder reference
+     */
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance) {
+        return this.register(Registries.ARMOR_MATERIAL,
+                path,
+                () -> new ArmorMaterial(defense,
+                        enchantmentValue,
+                        equipSound,
+                        repairIngredient,
+                        Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))),
+                        toughness,
+                        knockbackResistance
+                )
+        );
+    }
 
     /**
      * Creates a new {@link ResourceKey} for a {@link DamageType}.

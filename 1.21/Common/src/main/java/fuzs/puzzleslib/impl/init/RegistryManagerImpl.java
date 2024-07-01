@@ -28,7 +28,7 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     @Override
     public ResourceLocation makeKey(String path) {
         if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("path is invalid");
-        return new ResourceLocation(this.modId, path);
+        return ResourceLocation.fromNamespaceAndPath(this.modId, path);
     }
 
     @Override

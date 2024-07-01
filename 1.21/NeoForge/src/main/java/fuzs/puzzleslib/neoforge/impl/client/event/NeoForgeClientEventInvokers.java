@@ -4,6 +4,7 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
@@ -39,14 +40,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
@@ -75,7 +76,7 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<ResourceLocation, BakedModel> models = evt.getModels();
+            Map<ModelResourceLocation, BakedModel> models = evt.getModels();
             // just like bakedCache in ModelBakery
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
@@ -187,22 +188,24 @@ public final class NeoForgeClientEventInvokers {
     }
 
     public static void registerEventHandlers() {
-        INSTANCE.register(ClientTickEvents.Start.class, TickEvent.ClientTickEvent.class, (ClientTickEvents.Start callback, TickEvent.ClientTickEvent evt) -> {
-            if (evt.phase == TickEvent.Phase.START) callback.onStartClientTick(Minecraft.getInstance());
+        INSTANCE.register(ClientTickEvents.Start.class, ClientTickEvent.Pre.class, (ClientTickEvents.Start callback, ClientTickEvent.Pre evt) -> {
+            callback.onStartClientTick(Minecraft.getInstance());
         });
-        INSTANCE.register(ClientTickEvents.End.class, TickEvent.ClientTickEvent.class, (ClientTickEvents.End callback, TickEvent.ClientTickEvent evt) -> {
-            if (evt.phase == TickEvent.Phase.END) callback.onEndClientTick(Minecraft.getInstance());
+        INSTANCE.register(ClientTickEvents.End.class, ClientTickEvent.Post.class, (ClientTickEvents.End callback, ClientTickEvent.Post evt) -> {
+            callback.onEndClientTick(Minecraft.getInstance());
         });
         INSTANCE.register(RenderGuiCallback.class, RenderGuiEvent.Post.class, (RenderGuiCallback callback, RenderGuiEvent.Post evt) -> {
-            callback.onRenderGui(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            Minecraft minecraft = Minecraft.getInstance();
+            Window window = minecraft.getWindow();
+            callback.onRenderGui(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), window.getGuiScaledWidth(), window.getGuiScaledHeight());
         });
         INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
-            callback.onItemTooltip(evt.getItemStack(), evt.getEntity(), evt.getToolTip(), evt.getFlags());
+            callback.onItemTooltip(evt.getItemStack(), evt.getToolTip(), evt.getContext(), evt.getEntity(), evt.getFlags());
         });
         INSTANCE.register(RenderNameTagCallback.class, RenderNameTagEvent.class, (RenderNameTagCallback callback, RenderNameTagEvent evt) -> {
             DefaultedValue<Component> content = DefaultedValue.fromEvent(evt::setContent, evt::getContent, evt::getOriginalContent);
             EventResult result = callback.onRenderNameTag(evt.getEntity(), content, evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick());
-            if (result.isInterrupt()) evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
+            if (result.isInterrupt()) evt.setCanRender(result.getAsBoolean() ? TriState.TRUE : TriState.FALSE);
         });
         INSTANCE.register(ContainerScreenEvents.Background.class, ContainerScreenEvent.Render.Background.class, (ContainerScreenEvents.Background callback, ContainerScreenEvent.Render.Background evt) -> {
             callback.onDrawBackground(evt.getContainerScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
@@ -363,11 +366,6 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(RenderPlayerEvents.After.class, RenderPlayerEvent.Post.class, (RenderPlayerEvents.After callback, RenderPlayerEvent.Post evt) -> {
             callback.onAfterRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
-        INSTANCE.register(RenderHandCallback.class, RenderHandEvent.class, (RenderHandCallback callback, RenderHandEvent evt) -> {
-            Minecraft minecraft = Minecraft.getInstance();
-            EventResult result = callback.onRenderHand(minecraft.player, evt.getHand(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
-            if (result.isInterrupt()) evt.setCanceled(true);
-        });
         INSTANCE.register(RenderHandEvents.MainHand.class, RenderHandEvent.class, (RenderHandEvents.MainHand callback, RenderHandEvent evt) -> {
             if (evt.getHand() != InteractionHand.MAIN_HAND) return;
             Minecraft minecraft = Minecraft.getInstance();
@@ -382,12 +380,12 @@ public final class NeoForgeClientEventInvokers {
             EventResult result = callback.onRenderOffHand(itemInHandRenderer, minecraft.player, minecraft.player.getMainArm().getOpposite(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(ClientLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ClientLevel level)) return;
+        INSTANCE.register(ClientLevelTickEvents.Start.class, LevelTickEvent.Pre.class, (ClientLevelTickEvents.Start callback, LevelTickEvent.Pre evt) -> {
+            if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onStartLevelTick(Minecraft.getInstance(), level);
         });
-        INSTANCE.register(ClientLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ClientLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ClientLevel level)) return;
+        INSTANCE.register(ClientLevelTickEvents.End.class, LevelTickEvent.Post.class, (ClientLevelTickEvents.End callback, LevelTickEvent.Post evt) -> {
+            if (!(evt.getLevel() instanceof ClientLevel level)) return;
             callback.onEndLevelTick(Minecraft.getInstance(), level);
         });
         INSTANCE.register(ClientChunkEvents.Load.class, ChunkEvent.Load.class, (ClientChunkEvents.Load callback, ChunkEvent.Load evt) -> {
@@ -493,7 +491,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.class, (RenderHighlightCallback callback, RenderHighlightEvent evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
-            EventResult result = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
+            EventResult result = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getDeltaTracker(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
             if (result.isInterrupt() && evt instanceof RenderHighlightEvent.Block block) block.setCanceled(true);
         });
         INSTANCE.register(RenderLevelEvents.AfterTerrain.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterTerrain callback, RenderLevelStageEvent evt) -> {
@@ -518,15 +516,13 @@ public final class NeoForgeClientEventInvokers {
             Minecraft minecraft = Minecraft.getInstance();
             callback.onRenderLevelAfterLevel(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(), evt.getProjectionMatrix(), evt.getFrustum(), minecraft.level);
         });
-        INSTANCE.register(GameRenderEvents.Before.class, TickEvent.RenderTickEvent.class, (GameRenderEvents.Before callback, TickEvent.RenderTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START) return;
+        INSTANCE.register(GameRenderEvents.Before.class, RenderFrameEvent.Pre.class, (GameRenderEvents.Before callback, RenderFrameEvent.Pre evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            callback.onBeforeGameRender(minecraft, minecraft.gameRenderer, evt.renderTickTime);
+            callback.onBeforeGameRender(minecraft, minecraft.gameRenderer, evt.getPartialTick());
         });
-        INSTANCE.register(GameRenderEvents.After.class, TickEvent.RenderTickEvent.class, (GameRenderEvents.After callback, TickEvent.RenderTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END) return;
+        INSTANCE.register(GameRenderEvents.After.class, RenderFrameEvent.Post.class, (GameRenderEvents.After callback, RenderFrameEvent.Post evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            callback.onAfterGameRender(minecraft, minecraft.gameRenderer, evt.renderTickTime);
+            callback.onAfterGameRender(minecraft, minecraft.gameRenderer, evt.getPartialTick());
         });
         INSTANCE.register(AddToastCallback.class, ToastAddEvent.class, (AddToastCallback callback, ToastAddEvent evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
@@ -575,8 +571,8 @@ public final class NeoForgeClientEventInvokers {
         });
     }
 
-    private static Set<ResourceLocation> getTopLevelModelLocations() {
-        Set<ResourceLocation> modelLocations = Sets.newHashSet(ModelBakery.MISSING_MODEL_LOCATION);
+    private static Set<ModelResourceLocation> getTopLevelModelLocations() {
+        Set<ModelResourceLocation> modelLocations = Sets.newHashSet(ModelBakery.MISSING_MODEL_VARIANT);
         for (Block block : BuiltInRegistries.BLOCK) {
             block.getStateDefinition().getPossibleStates().forEach(blockState -> {
                 modelLocations.add(BlockModelShaper.stateToModelLocation(blockState));

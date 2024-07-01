@@ -1,5 +1,5 @@
 accessWidener	v2	named
-transitive-accessible   method  net/minecraft/core/particles/ParticleType   <init>  (ZLnet/minecraft/core/particles/ParticleOptions$Deserializer;)V
+# transitive-accessible   method  net/minecraft/core/particles/ParticleType   <init>  (ZLnet/minecraft/core/particles/ParticleOptions$Deserializer;)V
 transitive-accessible   method  net/minecraft/core/particles/SimpleParticleType     <init>  (Z)V
 transitive-accessible   field   net/minecraft/world/entity/Mob  goalSelector    Lnet/minecraft/world/entity/ai/goal/GoalSelector;
 transitive-accessible   field   net/minecraft/world/entity/Mob  targetSelector  Lnet/minecraft/world/entity/ai/goal/GoalSelector;
@@ -111,14 +111,14 @@ transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$TintS
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$WoodProvider
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$BlockEntityModelGenerator
-transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_NO_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS_OR_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_NO_SHEARS_OR_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_NO_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS_OR_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_NO_SHEARS_OR_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
 transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	NORMAL_LEAVES_SAPLING_CHANCES	[F
 transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	NORMAL_LEAVES_STICK_CHANCES	[F
-transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildAdvancement	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/advancements/AdvancementHolder;)Ljava/util/concurrent/CompletableFuture;
+# transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildAdvancement	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/advancements/AdvancementHolder;)Ljava/util/concurrent/CompletableFuture;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateForEnabledBlockFamilies	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	oneToOneConversionRecipe	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;)V
@@ -366,7 +366,7 @@ transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	gener
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateLayeredItem	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateLayeredItem	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	getItemModelForTrimMaterial	(Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
-transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateBaseArmorTrimTemplate	(Lnet/minecraft/resources/ResourceLocation;Ljava/util/Map;Lnet/minecraft/world/item/ArmorMaterial;)Lcom/google/gson/JsonObject;
+# transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateBaseArmorTrimTemplate	(Lnet/minecraft/resources/ResourceLocation;Ljava/util/Map;Lnet/minecraft/world/item/ArmorMaterial;)Lcom/google/gson/JsonObject;
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateArmorTrims	(Lnet/minecraft/world/item/ArmorItem;)V
 transitive-extendable	method	net/minecraft/data/metadata/PackMetadataGenerator	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/structures/SnbtToNbt	getName	()Ljava/lang/String;

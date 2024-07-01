@@ -1,10 +1,13 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientLevelEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.Timer;
 import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -32,12 +35,8 @@ public abstract class MinecraftFabricMixin {
     @Final
     public GameRenderer gameRenderer;
     @Shadow
-    private boolean pause;
-    @Shadow
-    private float pausePartialTick;
-    @Shadow
     @Final
-    private Timer timer;
+    private DeltaTracker.Timer timer;
     @Shadow
     @Nullable
     public ClientLevel level;
@@ -55,12 +54,12 @@ public abstract class MinecraftFabricMixin {
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.BEFORE))
     private void runTick$0(boolean renderLevel, CallbackInfo callback) {
-        FabricRendererEvents.BEFORE_GAME_RENDER.invoker().onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
+        FabricRendererEvents.BEFORE_GAME_RENDER.invoker().onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.timer);
     }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
     private void runTick$1(boolean renderLevel, CallbackInfo callback) {
-        FabricRendererEvents.AFTER_GAME_RENDER.invoker().onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.pause ? this.pausePartialTick : this.timer.partialTick);
+        FabricRendererEvents.AFTER_GAME_RENDER.invoker().onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.timer);
     }
 
     @Inject(method = "setScreen", at = @At("HEAD"), cancellable = true)
@@ -85,6 +84,7 @@ public abstract class MinecraftFabricMixin {
                 this.player.respawn();
             }
         }
+
         return newScreen;
     }
 

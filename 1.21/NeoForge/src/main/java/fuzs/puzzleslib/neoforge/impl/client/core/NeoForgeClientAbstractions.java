@@ -11,7 +11,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.searchtree.SearchRegistry;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
@@ -36,7 +36,7 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
     @Override
     public BakedModel getBakedModel(ResourceLocation identifier) {
-        return Minecraft.getInstance().getModelManager().getModel(identifier);
+        return Minecraft.getInstance().getModelManager().getModel(ModelResourceLocation.standalone(identifier));
     }
 
     @SuppressWarnings("deprecation")
@@ -54,16 +54,6 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
     @Override
     public void registerRenderType(Fluid fluid, RenderType renderType) {
         ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
-    }
-
-    @Override
-    public float getPartialTick() {
-        return Minecraft.getInstance().getPartialTick();
-    }
-
-    @Override
-    public SearchRegistry getSearchRegistry() {
-        return Minecraft.getInstance().getSearchTreeManager();
     }
 
     @Override

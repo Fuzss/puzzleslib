@@ -27,7 +27,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> add(String string) {
-        return this.add(new ResourceLocation(string));
+        return this.add(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> add(String... strings) {
@@ -72,7 +72,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> addOptional(String string) {
-        return this.addOptional(new ResourceLocation(string));
+        return this.addOptional(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> addOptional(String... strings) {
@@ -106,7 +106,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> addTag(String string) {
-        return this.addTag(new ResourceLocation(string));
+        return this.addTag(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> addTag(String... strings) {
@@ -140,7 +140,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> addOptionalTag(String string) {
-        return this.addOptionalTag(new ResourceLocation(string));
+        return this.addOptionalTag(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> addOptionalTag(String... strings) {
@@ -174,7 +174,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> remove(String string) {
-        return this.remove(new ResourceLocation(string));
+        return this.remove(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> remove(String... strings) {
@@ -216,7 +216,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> removeTag(String string) {
-        return this.removeTag(new ResourceLocation(string));
+        return this.removeTag(ResourceLocation.parse(string));
     }
 
     public AbstractTagAppender<T> removeTag(String... strings) {

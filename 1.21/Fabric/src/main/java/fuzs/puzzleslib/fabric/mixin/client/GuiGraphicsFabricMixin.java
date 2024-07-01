@@ -37,17 +37,6 @@ abstract class GuiGraphicsFabricMixin {
                             clientTooltipPositioner
                     );
             if (result.isInterrupt()) callback.cancel();
-            result = FabricGuiEvents.RENDER_SCREEN_TOOLTIP.invoker()
-                    .onRenderTooltip(GuiGraphics.class.cast(this),
-                            mouseX,
-                            mouseY,
-                            this.guiWidth(),
-                            this.guiHeight(),
-                            font,
-                            components,
-                            clientTooltipPositioner
-                    );
-            if (result.isInterrupt()) callback.cancel();
         }
     }
 

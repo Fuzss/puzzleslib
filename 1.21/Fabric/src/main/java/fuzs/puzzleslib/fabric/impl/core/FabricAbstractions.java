@@ -10,6 +10,7 @@ import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -89,8 +90,8 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public boolean canEquip(ItemStack stack, EquipmentSlot slot, Entity entity) {
-        return slot == Mob.getEquipmentSlotForItem(stack);
+    public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
+        return slot == entity.getEquipmentSlotForItem(stack);
     }
 
     @Override
@@ -114,9 +115,9 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
+    public Pack.Metadata createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden) {
         if (hidden) this.hiddenPacks.add(id.toString());
-        return new Pack.Info(description, packCompatibility, features, Collections.emptyList());
+        return new Pack.Metadata(description, packCompatibility, features, Collections.emptyList());
     }
 
     public boolean notHidden(String id) {
@@ -124,12 +125,12 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public boolean canApplyAtEnchantingTable(Enchantment enchantment, ItemStack itemStack) {
-        return enchantment.category.canEnchant(itemStack.getItem());
+    public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
+        return enchantment.value().isPrimaryItem(itemStack);
     }
 
     @Override
-    public boolean isAllowedOnBooks(Enchantment enchantment) {
+    public boolean isAllowedOnBooks(Holder<Enchantment> enchantment) {
         return true;
     }
 

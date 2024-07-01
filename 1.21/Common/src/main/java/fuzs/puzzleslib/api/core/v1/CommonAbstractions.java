@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -90,7 +91,7 @@ public interface CommonAbstractions {
      * @param entity the entity trying to equip
      * @return is equipping this <code>stack</code> to <code>slot</code> allowed for <code>entity</code>
      */
-    boolean canEquip(ItemStack stack, EquipmentSlot slot, Entity entity);
+    boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity);
 
     /**
      * Called before an entity drops loot for determining the level of
@@ -105,8 +106,8 @@ public interface CommonAbstractions {
 
     /**
      * Called when a <code>mobGriefing</code> game rule check is required instead of vanilla's
-     * <code>level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)</code>, allowing for a dedicated Forge event to
-     * run.
+     * <code>level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)</code>, allowing for a dedicated Forge event
+     * to run.
      *
      * @param level  the level mob griefing is happening in
      * @param entity the entity responsible for triggering the game rule check
@@ -133,7 +134,8 @@ public interface CommonAbstractions {
      * @param mob the mob
      * @return the spawn type or null if none has been set
      */
-    @Nullable MobSpawnType getMobSpawnType(Mob mob);
+    @Nullable
+    MobSpawnType getMobSpawnType(Mob mob);
 
     /**
      * Creates a new {@link Pack.Info} instance with additional parameters only supported on Forge.
@@ -147,7 +149,7 @@ public interface CommonAbstractions {
      *                          data pack selection screens
      * @return the created pack info instance
      */
-    Pack.Info createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden);
+    Pack.Metadata createPackInfo(ResourceLocation id, Component description, PackCompatibility packCompatibility, FeatureFlagSet features, boolean hidden);
 
     /**
      * Can the given enchanted be applied to an item stack via enchanting (in an enchanting table).
@@ -156,7 +158,7 @@ public interface CommonAbstractions {
      * @param itemStack   the item stack trying to receive the enchantment
      * @return is the application allowed
      */
-    boolean canApplyAtEnchantingTable(Enchantment enchantment, ItemStack itemStack);
+    boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack);
 
     /**
      * Can the given enchantment be applied to enchanted books.
@@ -164,7 +166,9 @@ public interface CommonAbstractions {
      * @param enchantment the enchantment to check
      * @return is the application allowed
      */
-    boolean isAllowedOnBooks(Enchantment enchantment);
+    default boolean isAllowedOnBooks(Holder<Enchantment> enchantment) {
+        return true;
+    }
 
     /**
      * Tests if an enchanted book can be put onto an item stack.
