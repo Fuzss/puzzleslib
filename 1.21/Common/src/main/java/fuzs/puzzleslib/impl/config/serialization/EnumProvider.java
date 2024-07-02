@@ -19,7 +19,7 @@ public final class EnumProvider<T extends Enum<T>> implements KeyedValueProvider
     public EnumProvider(Class<T> enumClazz, String modId) {
         this.clazz = enumClazz;
         this.values = Stream.of(enumClazz.getEnumConstants()).collect(ImmutableBiMap.toImmutableBiMap((T t) -> {
-            return new ResourceLocation(modId, Util.sanitizeName(t.name(), ResourceLocation::validPathChar));
+            return ResourceLocation.fromNamespaceAndPath(modId, Util.sanitizeName(t.name(), ResourceLocation::validPathChar));
         }, Function.identity()));
     }
 

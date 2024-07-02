@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.event.v1.renderer;
+package fuzs.puzzleslib.api.client.event.v1.gui;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.DeltaTracker;
@@ -21,8 +21,6 @@ public interface RenderGuiCallback {
      * @param minecraft    minecraft singleton instance
      * @param guiGraphics  the gui graphics component
      * @param deltaTracker partial tick time
-     * @param screenWidth  window width
-     * @param screenHeight window height
      */
-    void onRenderGui(Minecraft minecraft, GuiGraphics guiGraphics, DeltaTracker deltaTracker, int screenWidth, int screenHeight);
+    void onRenderGui(Minecraft minecraft, GuiGraphics guiGraphics, DeltaTracker deltaTracker);
 }

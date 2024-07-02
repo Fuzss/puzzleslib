@@ -2,12 +2,13 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.core.v1.context.AdditionalModelsContext;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public record AdditionalModelsContextNeoForgeImpl(Consumer<ResourceLocation> consumer) implements AdditionalModelsContext {
+public record AdditionalModelsContextNeoForgeImpl(Consumer<ModelResourceLocation> consumer) implements AdditionalModelsContext {
 
     @Override
     public void registerAdditionalModel(ResourceLocation... models) {
@@ -15,7 +16,7 @@ public record AdditionalModelsContextNeoForgeImpl(Consumer<ResourceLocation> con
         Preconditions.checkState(models.length > 0, "models is empty");
         for (ResourceLocation model : models) {
             Objects.requireNonNull(model, "model is null");
-            this.consumer.accept(model);
+            this.consumer.accept(ModelResourceLocation.standalone(model));
         }
     }
 }

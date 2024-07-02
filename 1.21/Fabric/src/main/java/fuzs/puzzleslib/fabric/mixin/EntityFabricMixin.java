@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -29,6 +31,14 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     @Unique
     @Nullable
     private Collection<ItemEntity> puzzleslib$capturedDrops;
+
+    @WrapOperation(method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
+    public void rideTick(Entity entity, Operation<Void> operation) {
+        if (FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity).isPass()) {
+            operation.call(entity);
+            FabricEntityEvents.ENTITY_TICK_END.invoker().onEndEntityTick(entity);
+        }
+    }
 
     @Override
     public Collection<ItemEntity> puzzleslib$acceptCapturedDrops(Collection<ItemEntity> capturedDrops) {

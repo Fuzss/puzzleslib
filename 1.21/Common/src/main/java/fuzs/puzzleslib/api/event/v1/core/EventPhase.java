@@ -15,7 +15,7 @@ public interface EventPhase {
     /**
      * Fabric's default event phase, equivalent to EventPriority#NORMAL on Forge.
      */
-    EventPhase DEFAULT = new EventPhaseImpl(new ResourceLocation("fabric", "default"), null, null);
+    EventPhase DEFAULT = new EventPhaseImpl(ResourceLocation.fromNamespaceAndPath("fabric", "default"), null, null);
     /**
      * A phase to be used directly before the default phase, equivalent to EventPriority#HIGH on Forge.
      */

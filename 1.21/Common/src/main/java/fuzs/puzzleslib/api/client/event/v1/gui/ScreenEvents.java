@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.Screen;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.UnaryOperator;
 
 @SuppressWarnings("unchecked")
 public final class ScreenEvents {
@@ -79,7 +80,7 @@ public final class ScreenEvents {
          * @param removeWidget a consumer for removing an existing widget, obtain the widget instance from
          *                     <code>widgets</code>
          */
-        void onAfterInit(Minecraft minecraft, T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, ConsumingOperator<AbstractWidget> addWidget, ConsumingOperator<AbstractWidget> removeWidget);
+        void onAfterInit(Minecraft minecraft, T screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, UnaryOperator<AbstractWidget> addWidget, Consumer<AbstractWidget> removeWidget);
     }
 
     @FunctionalInterface
@@ -121,34 +122,5 @@ public final class ScreenEvents {
          * @param partialTick the partial tick time
          */
         void onAfterRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
-    }
-
-    /**
-     * A simple helper class for returning the instance passed into a consumer.
-     * <p>Similar to {@link net.minecraft.Util#make(Object, Consumer)}.
-     * <p>
-     * TODO replace this with a normal consumer or unary operator
-     *
-     * @param <T> the handled type
-     */
-    @Deprecated(forRemoval = true)
-    public static final class ConsumingOperator<T> {
-        private final Consumer<T> consumer;
-
-        public ConsumingOperator(Consumer<T> consumer) {
-            this.consumer = consumer;
-        }
-
-        /**
-         * Apply the consumer and return the passed in instance.
-         *
-         * @param s   the instance passed to the consumer
-         * @param <S> instance type
-         * @return the passed in instance
-         */
-        public <S extends T> S apply(S s) {
-            this.consumer.accept(s);
-            return s;
-        }
     }
 }

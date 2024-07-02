@@ -80,11 +80,11 @@ public final class NeoForgeClientModConstructor {
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextNeoForgeImpl(modId, evt::registerReloadListener));
             if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
-                evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(new ResourceLocation(modId, "built_in_model_item_renderers"), dynamicRenderers));
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(ResourceLocation.fromNamespaceAndPath(modId, "built_in_model_item_renderers"), dynamicRenderers));
             }
             if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
                 ClientParticleTypesManager particleTypesManager = ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId);
-                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(new ResourceLocation(modId, "client_particle_types"), particleTypesManager));
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(ResourceLocation.fromNamespaceAndPath(modId, "client_particle_types"), particleTypesManager));
             }
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {

@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.entity.v1;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
+import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundExplodePacket;
@@ -44,8 +45,19 @@ public final class GenericExplosionHelper {
      * @return the already exploded explosion instance
      */
     public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, double x, double y, double z, float radius, Level.ExplosionInteraction explosionInteraction) {
-        return explode(factory, level, source, Explosion.getDefaultDamageSource(level, source), null, x, y, z, radius,
-                false, explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+        return explode(factory,
+                level,
+                source,
+                Explosion.getDefaultDamageSource(level, source),
+                null,
+                x,
+                y,
+                z,
+                radius,
+                false,
+                explosionInteraction,
+                ParticleTypes.EXPLOSION,
+                ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
         );
     }
@@ -73,9 +85,21 @@ public final class GenericExplosionHelper {
      * @param explosionSound          explosion particles, usually {@link SoundEvents#GENERIC_EXPLODE}
      * @return the already exploded explosion instance
      */
-    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound) {
-        T explosion = explode(factory, level, source, damageSource, damageCalculator, x, y, z, radius, fire,
-                explosionInteraction, level.isClientSide, smallExplosionParticles, largeExplosionParticles,
+    public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound) {
+        T explosion = explode(factory,
+                level,
+                source,
+                damageSource,
+                damageCalculator,
+                x,
+                y,
+                z,
+                radius,
+                fire,
+                explosionInteraction,
+                level.isClientSide,
+                smallExplosionParticles,
+                largeExplosionParticles,
                 explosionSound
         );
 
@@ -87,9 +111,15 @@ public final class GenericExplosionHelper {
 
             for (ServerPlayer serverplayer : ((ServerLevel) level).players()) {
                 if (serverplayer.distanceToSqr(x, y, z) < 4096.0) {
-                    serverplayer.connection.send(new ClientboundExplodePacket(x, y, z, radius, explosion.getToBlow(),
-                            explosion.getHitPlayers().get(serverplayer), explosion.getBlockInteraction(),
-                            explosion.getSmallExplosionParticles(), explosion.getLargeExplosionParticles(),
+                    serverplayer.connection.send(new ClientboundExplodePacket(x,
+                            y,
+                            z,
+                            radius,
+                            explosion.getToBlow(),
+                            explosion.getHitPlayers().get(serverplayer),
+                            explosion.getBlockInteraction(),
+                            explosion.getSmallExplosionParticles(),
+                            explosion.getLargeExplosionParticles(),
                             explosion.getExplosionSound()
                     ));
                 }
@@ -99,10 +129,20 @@ public final class GenericExplosionHelper {
         return explosion;
     }
 
-    private static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, boolean spawnParticles, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound) {
-        T explosion = factory.create(level, source, damageSource, damageCalculator, x, y, z, radius, fire,
-                getBlockInteraction(level, source, explosionInteraction), smallExplosionParticles,
-                largeExplosionParticles, explosionSound
+    private static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, boolean spawnParticles, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound) {
+        T explosion = factory.create(level,
+                source,
+                damageSource,
+                damageCalculator,
+                x,
+                y,
+                z,
+                radius,
+                fire,
+                getBlockInteraction(level, source, explosionInteraction),
+                smallExplosionParticles,
+                largeExplosionParticles,
+                explosionSound
         );
         if (CommonAbstractions.INSTANCE.onExplosionStart(level, explosion)) {
             return explosion;
@@ -121,7 +161,7 @@ public final class GenericExplosionHelper {
                     getDestroyType(level.getGameRules(), GameRules.RULE_MOB_EXPLOSION_DROP_DECAY) :
                     Explosion.BlockInteraction.KEEP;
             case TNT -> getDestroyType(level.getGameRules(), GameRules.RULE_TNT_EXPLOSION_DROP_DECAY);
-            case BLOW -> Explosion.BlockInteraction.TRIGGER_BLOCK;
+            case TRIGGER -> Explosion.BlockInteraction.TRIGGER_BLOCK;
         };
     }
 
@@ -148,8 +188,19 @@ public final class GenericExplosionHelper {
      * @return the already exploded explosion instance
      */
     public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
-        return explode(factory, level, source, Explosion.getDefaultDamageSource(level, source), null, x, y, z, radius,
-                fire, explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+        return explode(factory,
+                level,
+                source,
+                Explosion.getDefaultDamageSource(level, source),
+                null,
+                x,
+                y,
+                z,
+                radius,
+                fire,
+                explosionInteraction,
+                ParticleTypes.EXPLOSION,
+                ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
         );
     }
@@ -173,8 +224,19 @@ public final class GenericExplosionHelper {
      * @return the already exploded explosion instance
      */
     public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, Vec3 pos, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
-        return explode(factory, level, source, damageSource, damageCalculator, pos.x(), pos.y(), pos.z(), radius, fire,
-                explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+        return explode(factory,
+                level,
+                source,
+                damageSource,
+                damageCalculator,
+                pos.x(),
+                pos.y(),
+                pos.z(),
+                radius,
+                fire,
+                explosionInteraction,
+                ParticleTypes.EXPLOSION,
+                ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
         );
     }
@@ -200,8 +262,19 @@ public final class GenericExplosionHelper {
      * @return the already exploded explosion instance
      */
     public static <T extends Explosion> T explode(ExplosionFactory<T> factory, Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction) {
-        return explode(factory, level, source, damageSource, damageCalculator, x, y, z, radius, fire,
-                explosionInteraction, ParticleTypes.EXPLOSION, ParticleTypes.EXPLOSION_EMITTER,
+        return explode(factory,
+                level,
+                source,
+                damageSource,
+                damageCalculator,
+                x,
+                y,
+                z,
+                radius,
+                fire,
+                explosionInteraction,
+                ParticleTypes.EXPLOSION,
+                ParticleTypes.EXPLOSION_EMITTER,
                 SoundEvents.GENERIC_EXPLODE
         );
     }
@@ -234,6 +307,6 @@ public final class GenericExplosionHelper {
          * @param explosionSound          explosion particles, usually {@link SoundEvents#GENERIC_EXPLODE}
          * @return the created explosion instance
          */
-        T create(Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Explosion.BlockInteraction blockInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, SoundEvent explosionSound);
+        T create(Level level, @Nullable Entity source, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator damageCalculator, double x, double y, double z, float radius, boolean fire, Explosion.BlockInteraction blockInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound);
     }
 }

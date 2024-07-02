@@ -7,12 +7,12 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import net.minecraft.Util;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -33,16 +33,16 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     protected final String modId;
 
     public AbstractRecipeProvider(DataProviderContext context) {
-        this(context.getModId(), context.getPackOutput());
+        this(context.getModId(), context.getPackOutput(), context.getRegistries());
     }
 
-    public AbstractRecipeProvider(String modId, PackOutput packOutput) {
-        super(packOutput);
+    public AbstractRecipeProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(packOutput, lookupProvider);
         this.modId = modId;
     }
 
     @Nullable
-    private static <T> JsonElement searchAndReplaceValue(@Nullable JsonElement jsonElement, T searchFor, T replaceWith) {
+    protected static <T> JsonElement searchAndReplaceValue(@Nullable JsonElement jsonElement, T searchFor, T replaceWith) {
         Objects.requireNonNull(searchFor, "search for is null");
         Objects.requireNonNull(replaceWith, "replace with is null");
         if (jsonElement != null && !jsonElement.isJsonNull()) {
@@ -86,10 +86,10 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     }
 
     @Override
-    public CompletableFuture<?> run(CachedOutput output) {
-        List<CompletableFuture<?>> futures = new ArrayList<>();
-        this.buildRecipes(new IdentifiableRecipeOutput(output, futures));
-        return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
+    public CompletableFuture<?> run(CachedOutput output, HolderLookup.Provider registries) {
+        List<CompletableFuture<?>> completableFutures = new ArrayList<>();
+        this.buildRecipes(new IdentifiableRecipeOutput(output, registries, completableFutures));
+        return CompletableFuture.allOf(completableFutures.toArray(CompletableFuture[]::new));
     }
 
     @Override
@@ -101,12 +101,14 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
 
     public class IdentifiableRecipeOutput implements RecipeOutput {
         private final CachedOutput output;
-        private final List<CompletableFuture<?>> list;
-        private final Set<ResourceLocation> set = Sets.newHashSet();
+        private final HolderLookup.Provider registries;
+        private final List<CompletableFuture<?>> completableFutures;
+        private final Set<ResourceLocation> generatedRecipes = Sets.newHashSet();
 
-        public IdentifiableRecipeOutput(CachedOutput output, List<CompletableFuture<?>> list) {
+        public IdentifiableRecipeOutput(CachedOutput output, HolderLookup.Provider registries, List<CompletableFuture<?>> completableFutures) {
             this.output = output;
-            this.list = list;
+            this.registries = registries;
+            this.completableFutures = completableFutures;
         }
 
         public String getModId() {
@@ -118,16 +120,16 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
             final ResourceLocation oldLocation = location;
             // relocate all recipes to the mod id, so they do not depend on the item namespace which would
             // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
-            location = new ResourceLocation(AbstractRecipeProvider.this.modId, location.getPath());
-            if (!this.set.add(location)) {
+            location = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, location.getPath());
+            if (!this.generatedRecipes.add(location)) {
                 throw new IllegalStateException("Duplicate recipe " + location);
             } else {
-                this.list.add(DataProvider.saveStable(this.output, Recipe.CODEC, recipe, AbstractRecipeProvider.this.recipePathProvider.json(location)));
+                this.completableFutures.add(DataProvider.saveStable(this.output, this.registries, Recipe.CODEC, recipe, AbstractRecipeProvider.this.recipePathProvider.json(location)));
                 if (advancement != null) {
-                    JsonElement jsonElement = Util.getOrThrow(Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()), IllegalStateException::new);
+                    JsonElement jsonElement = Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()).getOrThrow(IllegalStateException::new);
                     jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
-                    ResourceLocation advancementLocation = new ResourceLocation(AbstractRecipeProvider.this.modId, advancement.id().getPath());
-                    this.list.add(DataProvider.saveStable(this.output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
+                    ResourceLocation advancementLocation = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, advancement.id().getPath());
+                    this.completableFutures.add(DataProvider.saveStable(this.output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
                 }
             }
         }

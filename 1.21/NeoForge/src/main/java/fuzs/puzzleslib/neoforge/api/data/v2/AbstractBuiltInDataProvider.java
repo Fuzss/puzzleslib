@@ -39,7 +39,7 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
     private BootstapContext<T> bootstrapContext;
 
     public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, ForgeDataProviderContext context) {
-        this(registryKey, context.getModId(), context.getPackOutput(), context.getLookupProvider(), context.getFileHelper());
+        this(registryKey, context.getModId(), context.getPackOutput(), context.getRegistries(), context.getFileHelper());
     }
 
     public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {

@@ -12,8 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Function;
 
-public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
-                                     Function<Material, TextureAtlasSprite> modelTextureGetter, BakedModel missingModel) implements ModelBaker {
+public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache,
+                                     Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
+                                     Function<Material, TextureAtlasSprite> modelTextureGetter,
+                                     BakedModel missingModel) implements ModelBaker {
 
     @Override
     public UnbakedModel getModel(ResourceLocation resourceLocation) {
@@ -27,8 +29,25 @@ public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, 
     }
 
     @Override
+    public @Nullable UnbakedModel getTopLevelModel(ModelResourceLocation resourceLocation) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public @Nullable BakedModel bake(ResourceLocation resourceLocation, ModelState modelState, Function<Material, TextureAtlasSprite> modelTextureGetter) {
         return this.bake(this.getModel(resourceLocation), resourceLocation, modelState, modelTextureGetter);
+    }
+
+    @Override
+    public @Nullable BakedModel bakeUncached(UnbakedModel unbakedModel, ModelState modelState, Function<Material, TextureAtlasSprite> modelTextureGetter) {
+        if (unbakedModel instanceof BlockModel blockModel &&
+                blockModel.getRootModel() == ModelBakery.GENERATION_MARKER) {
+            return ModelBakeryNeoForgeAccessor.puzzleslib$getItemModelGenerator()
+                    .generateBlockModel(modelTextureGetter, blockModel)
+                    .bake(this, blockModel, modelTextureGetter, modelState, false);
+        } else {
+            return unbakedModel.bake(this, modelTextureGetter, modelState);
+        }
     }
 
     public BakedModel bake(UnbakedModel unbakedModel, ResourceLocation resourceLocation) {
@@ -41,17 +60,15 @@ public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache, 
         BakedCacheKey key = new BakedCacheKey(resourceLocation, modelState.getRotation(), modelState.isUvLocked());
         BakedModel bakedModel = this.bakedCache.get(key);
         if (bakedModel == null) {
-            if (unbakedModel instanceof BlockModel blockModel && blockModel.getRootModel() == ModelBakery.GENERATION_MARKER) {
-                return ModelBakeryNeoForgeAccessor.puzzleslib$getItemModelGenerator().generateBlockModel(modelTextureGetter, blockModel).bake(this, blockModel, modelTextureGetter, modelState, resourceLocation, false);
-            }
             try {
-                bakedModel = unbakedModel.bake(this, modelTextureGetter, modelState, resourceLocation);
+                bakedModel = this.bakeUncached(unbakedModel, modelState, modelTextureGetter);
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.warn("Unable to bake model: '{}': {}", resourceLocation, exception);
                 bakedModel = this.missingModel;
             }
             this.bakedCache.put(key, bakedModel);
         }
+
         return bakedModel;
     }
 

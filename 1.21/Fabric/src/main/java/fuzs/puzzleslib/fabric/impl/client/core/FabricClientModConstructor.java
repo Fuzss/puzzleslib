@@ -60,7 +60,7 @@ public final class FabricClientModConstructor {
     private static void registerClientParticleTypesManager(String modId, Consumer<ParticleProvidersContext> consumer, Set<ContentRegistrationFlags> flagsToHandle) {
         consumer.accept(new ParticleProvidersContextFabricImpl());
         if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
-            ResourceLocation identifier = new ResourceLocation(modId, "client_particle_types");
+            ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath(modId, "client_particle_types");
             IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(identifier, ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId));
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         }
@@ -71,7 +71,7 @@ public final class FabricClientModConstructor {
         consumer.accept(new BuiltinModelItemRendererContextFabricImpl(modId, dynamicRenderers));
         // do not punish ContentRegistrationFlags#DYNAMIC_RENDERERS being absent as not every built-in item renderer needs to reload
         if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
-            ResourceLocation identifier = new ResourceLocation(modId, "built_in_model_item_renderers");
+            ResourceLocation identifier = ResourceLocation.fromNamespaceAndPath(modId, "built_in_model_item_renderers");
             IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(identifier, dynamicRenderers));
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         }

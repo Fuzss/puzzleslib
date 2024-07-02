@@ -13,7 +13,7 @@ public record ModelLayerFactoryImpl(String namespace) implements ModelLayerFacto
 
     @Override
     public ModelLayerLocation register(String path, String layer) {
-        return new ModelLayerLocation(new ResourceLocation(this.namespace, path), layer);
+        return new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(this.namespace, path), layer);
     }
 
     @Override

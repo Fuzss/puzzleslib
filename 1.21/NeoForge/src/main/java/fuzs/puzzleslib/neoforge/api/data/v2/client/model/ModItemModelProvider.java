@@ -41,7 +41,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     public ItemModelBuilder basicItem(ResourceLocation item, ResourceLocation texture) {
-        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/generated")).texture("layer0", new ResourceLocation(texture.getNamespace(), "item/" + texture.getPath()));
+        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/generated")).texture("layer0", ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), "item/" + texture.getPath()));
     }
 
     public ItemModelBuilder handheldItem(Item item) {
@@ -49,7 +49,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     public ItemModelBuilder handheldItem(ResourceLocation item) {
-        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/handheld")).texture("layer0", new ResourceLocation(item.getNamespace(), "item/" + item.getPath()));
+        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/handheld")).texture("layer0", ResourceLocation.fromNamespaceAndPath(item.getNamespace(), "item/" + item.getPath()));
     }
 
     public ItemModelBuilder spawnEgg(Item item) {

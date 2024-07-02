@@ -34,7 +34,7 @@ public final class ModelEvents {
          * @return {@link EventResultHolder#interrupt(Object)} to replace the unbaked model,
          * {@link EventResultHolder#pass()} to let the original unbaked model go ahead
          */
-        EventResultHolder<UnbakedModel> onModifyUnbakedModel(ResourceLocation modelLocation, Supplier<UnbakedModel> unbakedModel, Function<ResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, UnbakedModel> modelAdder);
+        EventResultHolder<UnbakedModel> onModifyUnbakedModel(ModelResourceLocation modelLocation, Supplier<UnbakedModel> unbakedModel, Function<ResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, UnbakedModel> modelAdder);
     }
 
     @FunctionalInterface
@@ -53,7 +53,7 @@ public final class ModelEvents {
          * @return {@link EventResultHolder#interrupt(Object)} to replace the baked model,
          * {@link EventResultHolder#pass()} to let the original baked model go ahead
          */
-        EventResultHolder<BakedModel> onModifyBakedModel(ResourceLocation modelLocation, Supplier<BakedModel> bakedModel, Supplier<ModelBaker> modelBaker, Function<ResourceLocation, BakedModel> modelGetter, BiConsumer<ResourceLocation, BakedModel> modelAdder);
+        EventResultHolder<BakedModel> onModifyBakedModel(ModelResourceLocation modelLocation, Supplier<BakedModel> bakedModel, Supplier<ModelBaker> modelBaker, Function<ModelResourceLocation, BakedModel> modelGetter, BiConsumer<ModelResourceLocation, BakedModel> modelAdder);
     }
 
     @FunctionalInterface
@@ -68,7 +68,7 @@ public final class ModelEvents {
          * @param modelGetter get baked models from the bakery, if only an unbaked model is present it will be baked automatically
          * @param modelBaker  the model baker used for baking the model, allows for retrieving and baking unbaked models
          */
-        void onAdditionalBakedModel(BiConsumer<ResourceLocation, BakedModel> modelAdder, Function<ResourceLocation, BakedModel> modelGetter, Supplier<ModelBaker> modelBaker);
+        void onAdditionalBakedModel(BiConsumer<ModelResourceLocation, BakedModel> modelAdder, Function<ModelResourceLocation, BakedModel> modelGetter, Supplier<ModelBaker> modelBaker);
     }
 
     @FunctionalInterface

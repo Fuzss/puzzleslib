@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 public abstract class AbstractSpriteSourceProvider extends SpriteSourceProvider {
 
     public AbstractSpriteSourceProvider(ForgeDataProviderContext context) {
-        this(context.getModId(), context.getPackOutput(), context.getLookupProvider(), context.getFileHelper());
+        this(context.getModId(), context.getPackOutput(), context.getRegistries(), context.getFileHelper());
     }
 
     public AbstractSpriteSourceProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {

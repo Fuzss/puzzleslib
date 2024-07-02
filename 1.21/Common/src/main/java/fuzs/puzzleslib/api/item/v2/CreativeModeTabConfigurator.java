@@ -44,7 +44,7 @@ public interface CreativeModeTabConfigurator {
      * @return builder instance
      */
     static CreativeModeTabConfigurator from(String modId, String tabId) {
-        return from(new ResourceLocation(modId, tabId));
+        return from(ResourceLocation.fromNamespaceAndPath(modId, tabId));
     }
 
     /**

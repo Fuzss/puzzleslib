@@ -169,6 +169,6 @@ public interface ToolTypeHelper {
      * @return is this stack a tool
      */
     default boolean isTool(ItemStack stack) {
-        return this.isMiningTool(stack) || this.isMeleeWeapon(stack) || stack.is(ItemTags.TOOLS);
+        return this.isMiningTool(stack) || this.isMeleeWeapon(stack);
     }
 }

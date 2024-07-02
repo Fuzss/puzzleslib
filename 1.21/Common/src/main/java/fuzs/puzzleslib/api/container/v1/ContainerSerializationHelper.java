@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.container.v1;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -23,7 +24,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     public static final String TAG_SLOT = "Slot";
 
     private ContainerSerializationHelper() {
-
+        // NO-OP
     }
 
     /**
@@ -35,8 +36,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param items item list to save
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(CompoundTag tag, NonNullList<ItemStack> items) {
-        return ContainerHelper.saveAllItems(tag, items);
+    public static CompoundTag saveAllItems(CompoundTag tag, NonNullList<ItemStack> items, HolderLookup.Provider lookupProvider) {
+        return ContainerHelper.saveAllItems(tag, items, lookupProvider);
     }
 
     /**
@@ -48,8 +49,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param container container to save
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(CompoundTag tag, Container container) {
-        return saveAllItems(tag, container, true);
+    public static CompoundTag saveAllItems(CompoundTag tag, Container container, HolderLookup.Provider lookupProvider) {
+        return saveAllItems(tag, container, true, lookupProvider);
     }
 
     /**
@@ -62,8 +63,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param items  item list to save
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(String tagKey, CompoundTag tag, NonNullList<ItemStack> items) {
-        return saveAllItems(tagKey, tag, items, true);
+    public static CompoundTag saveAllItems(String tagKey, CompoundTag tag, NonNullList<ItemStack> items, HolderLookup.Provider lookupProvider) {
+        return saveAllItems(tagKey, tag, items, true, lookupProvider);
     }
 
     /**
@@ -76,8 +77,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param saveEmpty save to tag if completely empty
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(CompoundTag tag, Container container, boolean saveEmpty) {
-        return saveAllItems(TAG_ITEMS, tag, container.getContainerSize(), container::getItem, saveEmpty);
+    public static CompoundTag saveAllItems(CompoundTag tag, Container container, boolean saveEmpty, HolderLookup.Provider lookupProvider) {
+        return saveAllItems(TAG_ITEMS, tag, container.getContainerSize(), container::getItem, saveEmpty, lookupProvider);
     }
 
     /**
@@ -90,8 +91,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param saveEmpty save to tag if completely empty
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(CompoundTag tag, NonNullList<ItemStack> items, boolean saveEmpty) {
-        return ContainerHelper.saveAllItems(tag, items, saveEmpty);
+    public static CompoundTag saveAllItems(CompoundTag tag, NonNullList<ItemStack> items, boolean saveEmpty, HolderLookup.Provider lookupProvider) {
+        return ContainerHelper.saveAllItems(tag, items, saveEmpty, lookupProvider);
     }
 
     /**
@@ -105,8 +106,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param saveEmpty save to tag if completely empty
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(String tagKey, CompoundTag tag, NonNullList<ItemStack> items, boolean saveEmpty) {
-        return saveAllItems(tagKey, tag, items.size(), items::get, saveEmpty);
+    public static CompoundTag saveAllItems(String tagKey, CompoundTag tag, NonNullList<ItemStack> items, boolean saveEmpty, HolderLookup.Provider lookupProvider) {
+        return saveAllItems(tagKey, tag, items.size(), items::get, saveEmpty, lookupProvider);
     }
 
     /**
@@ -121,8 +122,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param saveEmpty  save to tag if completely empty
      * @return the original tag
      */
-    public static CompoundTag saveAllItems(String tagKey, CompoundTag tag, int size, IntFunction<ItemStack> itemGetter, boolean saveEmpty) {
-        ListTag listTag = createTag(size, itemGetter);
+    public static CompoundTag saveAllItems(String tagKey, CompoundTag tag, int size, IntFunction<ItemStack> itemGetter, boolean saveEmpty, HolderLookup.Provider lookupProvider) {
+        ListTag listTag = createTag(size, itemGetter, lookupProvider);
         if (!listTag.isEmpty() || saveEmpty) {
             tag.put(tagKey, listTag);
         }
@@ -139,14 +140,14 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param itemGetter get items from the provider
      * @return the list tag
      */
-    public static ListTag createTag(int size, IntFunction<ItemStack> itemGetter) {
+    public static ListTag createTag(int size, IntFunction<ItemStack> itemGetter, HolderLookup.Provider lookupProvider) {
         ListTag listTag = new ListTag();
         for (int i = 0; i < size; ++i) {
             ItemStack itemStack = itemGetter.apply(i);
             if (!itemStack.isEmpty()) {
                 CompoundTag compoundTag = new CompoundTag();
                 compoundTag.putByte(TAG_SLOT, (byte) i);
-                itemStack.save(compoundTag);
+                itemStack.save(lookupProvider, compoundTag);
                 listTag.add(compoundTag);
             }
         }
@@ -161,8 +162,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param tag   tag to read from
      * @param items item list to fill
      */
-    public static void loadAllItems(CompoundTag tag, NonNullList<ItemStack> items) {
-        ContainerHelper.loadAllItems(tag, items);
+    public static void loadAllItems(CompoundTag tag, NonNullList<ItemStack> items, HolderLookup.Provider lookupProvider) {
+        ContainerHelper.loadAllItems(tag, items, lookupProvider);
     }
 
     /**
@@ -173,10 +174,10 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param tag       tag to read from
      * @param container container to fill
      */
-    public static void loadAllItems(CompoundTag tag, Container container) {
+    public static void loadAllItems(CompoundTag tag, Container container, HolderLookup.Provider lookupProvider) {
         loadAllItems(TAG_ITEMS, tag, container.getContainerSize(), (ItemStack stack, int value) -> {
             container.setItem(value, stack);
-        });
+        }, lookupProvider);
     }
 
     /**
@@ -188,10 +189,10 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param tag    tag to read from
      * @param items  item list to fill
      */
-    public static void loadAllItems(String tagKey, CompoundTag tag, NonNullList<ItemStack> items) {
+    public static void loadAllItems(String tagKey, CompoundTag tag, NonNullList<ItemStack> items, HolderLookup.Provider lookupProvider) {
         loadAllItems(tagKey, tag, items.size(), (ItemStack stack, int value) -> {
             items.set(value, stack);
-        });
+        }, lookupProvider);
     }
 
     /**
@@ -204,9 +205,9 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param size       item provider size
      * @param itemSetter set items to the provider
      */
-    public static void loadAllItems(String tagKey, CompoundTag tag, int size, ObjIntConsumer<ItemStack> itemSetter) {
+    public static void loadAllItems(String tagKey, CompoundTag tag, int size, ObjIntConsumer<ItemStack> itemSetter, HolderLookup.Provider lookupProvider) {
         ListTag listTag = tag.getList(tagKey, Tag.TAG_COMPOUND);
-        fromTag(listTag, size, itemSetter);
+        fromTag(listTag, size, itemSetter, lookupProvider);
     }
 
     /**
@@ -218,12 +219,12 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param size       item provider size
      * @param itemSetter set items to the provider
      */
-    public static void fromTag(ListTag listTag, int size, ObjIntConsumer<ItemStack> itemSetter) {
+    public static void fromTag(ListTag listTag, int size, ObjIntConsumer<ItemStack> itemSetter, HolderLookup.Provider lookupProvider) {
         for (int i = 0; i < listTag.size(); ++i) {
             CompoundTag compoundTag = listTag.getCompound(i);
             int slot = compoundTag.getByte(TAG_SLOT) & 255;
             if (slot < size) {
-                itemSetter.accept(ItemStack.of(compoundTag), slot);
+                itemSetter.accept(ItemStack.parse(lookupProvider, compoundTag).orElse(ItemStack.EMPTY), slot);
             }
         }
     }

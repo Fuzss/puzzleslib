@@ -15,6 +15,6 @@ public final class FabricLifecycleEvents {
             LoadCompleteCallback.class);
 
     private FabricLifecycleEvents() {
-
+        // NO-OP
     }
 }

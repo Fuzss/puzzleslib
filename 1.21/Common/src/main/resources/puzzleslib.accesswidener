@@ -61,6 +61,10 @@ transitive-accessible   field   net/minecraft/client/KeyMapping key Lcom/mojang/
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper  target  Lnet/minecraft/world/inventory/Slot;
 transitive-accessible   field   net/minecraft/client/multiplayer/MultiPlayerGameMode    destroyDelay    I
 transitive-extendable   method  net/minecraft/client/gui/components/AbstractSliderButton    setValue    (D)V
+transitive-accessible   field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
+transitive-mutable  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
+transitive-extendable   method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
+accessible  field   net/minecraft/client/gui/components/WidgetTooltipHolder delay   Ljava/time/Duration;
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible  field	net/minecraft/data/recipes/RecipeProvider	recipePathProvider	Lnet/minecraft/data/PackOutput$PathProvider;
@@ -79,6 +83,8 @@ accessible  field   net/minecraft/client/multiplayer/chat/ChatListener  previous
 accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  evaluateTrustLevel  (Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/network/chat/Component;Ljava/time/Instant;)Lnet/minecraft/client/multiplayer/chat/ChatTrustLevel;
 accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  logPlayerMessage    (Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/network/chat/ChatType$Bound;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/client/multiplayer/chat/ChatTrustLevel;)V
 accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  logSystemMessage    (Lnet/minecraft/network/chat/Component;Ljava/time/Instant;)V
+mutable field	net/minecraft/data/loot/BlockLootSubProvider	registries  Lnet/minecraft/core/HolderLookup$Provider;
+mutable field	net/minecraft/data/loot/EntityLootSubProvider   registries  Lnet/minecraft/core/HolderLookup$Provider;
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
@@ -111,14 +117,11 @@ transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$TintS
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$WoodProvider
 transitive-accessible	class	net/minecraft/data/models/BlockModelGenerators$BlockEntityModelGenerator
-# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_NO_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS_OR_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
-# transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_NO_SHEARS_OR_SILK_TOUCH	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	HAS_SHEARS	Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
 transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	NORMAL_LEAVES_SAPLING_CHANCES	[F
 transitive-accessible	field	net/minecraft/data/loot/BlockLootSubProvider	NORMAL_LEAVES_STICK_CHANCES	[F
-# transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildAdvancement	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/advancements/AdvancementHolder;)Ljava/util/concurrent/CompletableFuture;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	run	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/core/HolderLookup$Provider;)Ljava/util/concurrent/CompletableFuture;
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildAdvancement	(Lnet/minecraft/data/CachedOutput;Lnet/minecraft/core/HolderLookup$Provider;Lnet/minecraft/advancements/AdvancementHolder;)Ljava/util/concurrent/CompletableFuture;
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	buildRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	generateForEnabledBlockFamilies	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/flag/FeatureFlagSet;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	oneToOneConversionRecipe	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;)V
@@ -176,6 +179,7 @@ transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	nineBlock
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	nineBlockStorageRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	copySmithingTemplate	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/tags/TagKey;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	copySmithingTemplate	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;)V
+transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	copySmithingTemplate	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/item/crafting/Ingredient;)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	cookRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;Ljava/lang/String;Lnet/minecraft/world/item/crafting/RecipeSerializer;Lnet/minecraft/world/item/crafting/AbstractCookingRecipe$Factory;I)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	simpleCookingRecipe	(Lnet/minecraft/data/recipes/RecipeOutput;Ljava/lang/String;Lnet/minecraft/world/item/crafting/RecipeSerializer;Lnet/minecraft/world/item/crafting/AbstractCookingRecipe$Factory;ILnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/ItemLike;F)V
 transitive-accessible	method	net/minecraft/data/recipes/RecipeProvider	waxRecipes	(Lnet/minecraft/data/recipes/RecipeOutput;Lnet/minecraft/world/flag/FeatureFlagSet;)V
@@ -312,6 +316,10 @@ transitive-accessible	method	net/minecraft/data/models/BlockModelGenerators	crea
 transitive-accessible	method	net/minecraft/data/models/BlockModelGenerators	createNetherRoots	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible	method	net/minecraft/data/models/BlockModelGenerators	applyRotation	(Lnet/minecraft/core/FrontAndTop;Lnet/minecraft/data/models/blockstates/Variant;)Lnet/minecraft/data/models/blockstates/Variant;
 transitive-accessible	method	net/minecraft/data/models/BlockModelGenerators	createCandleAndCandleCake	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/block/Block;)V
+transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	hasSilkTouch	()Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	doesNotHaveSilkTouch	()Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	hasShearsOrSilkTouch	()Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
+transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	doesNotHaveShearsOrSilkTouch	()Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	applyExplosionDecay	(Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/storage/loot/functions/FunctionUserBuilder;)Lnet/minecraft/world/level/storage/loot/functions/FunctionUserBuilder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	applyExplosionCondition	(Lnet/minecraft/world/level/ItemLike;Lnet/minecraft/world/level/storage/loot/predicates/ConditionUserBuilder;)Lnet/minecraft/world/level/storage/loot/predicates/ConditionUserBuilder;
 transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	createSelfDropDispatchTable	(Lnet/minecraft/world/level/block/Block;Lnet/minecraft/world/level/storage/loot/predicates/LootItemCondition$Builder;Lnet/minecraft/world/level/storage/loot/entries/LootPoolEntryContainer$Builder;)Lnet/minecraft/world/level/storage/loot/LootTable$Builder;
@@ -361,12 +369,13 @@ transitive-accessible	method	net/minecraft/data/loot/BlockLootSubProvider	add	(L
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateFlatItem	(Lnet/minecraft/world/item/Item;Lnet/minecraft/data/models/model/ModelTemplate;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateFlatItem	(Lnet/minecraft/world/item/Item;Ljava/lang/String;Lnet/minecraft/data/models/model/ModelTemplate;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateFlatItem	(Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/Item;Lnet/minecraft/data/models/model/ModelTemplate;)V
+transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateItemWithOverlay	(Lnet/minecraft/world/item/Item;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateCompassItem	(Lnet/minecraft/world/item/Item;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateClockItem	(Lnet/minecraft/world/item/Item;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateLayeredItem	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateLayeredItem	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/resources/ResourceLocation;)V
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	getItemModelForTrimMaterial	(Lnet/minecraft/resources/ResourceLocation;Ljava/lang/String;)Lnet/minecraft/resources/ResourceLocation;
-# transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateBaseArmorTrimTemplate	(Lnet/minecraft/resources/ResourceLocation;Ljava/util/Map;Lnet/minecraft/world/item/ArmorMaterial;)Lcom/google/gson/JsonObject;
+transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateBaseArmorTrimTemplate	(Lnet/minecraft/resources/ResourceLocation;Ljava/util/Map;Lnet/minecraft/core/Holder;)Lcom/google/gson/JsonObject;
 transitive-accessible	method	net/minecraft/data/models/ItemModelGenerators	generateArmorTrims	(Lnet/minecraft/world/item/ArmorItem;)V
 transitive-extendable	method	net/minecraft/data/metadata/PackMetadataGenerator	getName	()Ljava/lang/String;
 transitive-extendable	method	net/minecraft/data/structures/SnbtToNbt	getName	()Ljava/lang/String;

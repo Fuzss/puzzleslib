@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -25,14 +25,14 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     private final Function<T, ResourceKey<T>> keyExtractor;
 
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, DataProviderContext context) {
-        this(registryKey, context.getModId(), context.getPackOutput(), context.getLookupProvider());
+        this(registryKey, context.getModId(), context.getPackOutput(), context.getRegistries());
     }
 
-    public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(packOutput, registryKey, lookupProvider);
+    public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        super(packOutput, registryKey, registries);
         this.modId = modId;
-        this.registry = RegistryHelperV2.findNullableBuiltInRegistry(registryKey);
-        this.keyExtractor = this.registry != null ? (T t) -> RegistryHelperV2.getResourceKeyOrThrow(this.registry, t) : null;
+        this.registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
+        this.keyExtractor = this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
     }
 
     @Override

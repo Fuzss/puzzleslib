@@ -26,7 +26,7 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
     protected final String modId;
 
     public AbstractAdvancementProvider(DataProviderContext context) {
-        this(context.getModId(), context.getPackOutput(), context.getLookupProvider());
+        this(context.getModId(), context.getPackOutput(), context.getRegistries());
     }
 
     public AbstractAdvancementProvider(String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
@@ -61,23 +61,27 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
     }
 
     @Override
-    public CompletableFuture<?> run(CachedOutput output) {
-        return this.registries.thenCompose((HolderLookup.Provider provider) -> {
-            Set<ResourceLocation> set = new HashSet<>();
-            List<CompletableFuture<?>> list = new ArrayList<>();
-            Consumer<AdvancementHolder> consumer = (AdvancementHolder advancementHolder) -> {
-                ResourceLocation resourceLocation = new ResourceLocation(this.modId, advancementHolder.id().getPath());
-                if (!set.add(resourceLocation)) {
-                    throw new IllegalStateException("Duplicate advancement " + resourceLocation);
-                } else {
-                    Path path = this.pathProvider.json(resourceLocation);
-                    list.add(DataProvider.saveStable(output, Advancement.CODEC, advancementHolder.value(), path));
-                }
-            };
-
-            this.generate(provider, consumer);
-            return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
+    public final CompletableFuture<?> run(CachedOutput output) {
+        return this.registries.thenCompose((HolderLookup.Provider registries) -> {
+            return this.run(output, registries);
         });
+    }
+
+    public CompletableFuture<?> run(CachedOutput output, HolderLookup.Provider registries) {
+        Set<ResourceLocation> set = new HashSet<>();
+        List<CompletableFuture<?>> list = new ArrayList<>();
+        Consumer<AdvancementHolder> consumer = (AdvancementHolder advancementHolder) -> {
+            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(this.modId, advancementHolder.id().getPath());
+            if (!set.add(resourceLocation)) {
+                throw new IllegalStateException("Duplicate advancement " + resourceLocation);
+            } else {
+                Path path = this.pathProvider.json(resourceLocation);
+                list.add(DataProvider.saveStable(output, registries, Advancement.CODEC, advancementHolder.value(), path));
+            }
+        };
+
+        this.generate(registries, consumer);
+        return CompletableFuture.allOf(list.toArray(CompletableFuture[]::new));
     }
 
     @Override

@@ -2,9 +2,7 @@ package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
@@ -22,7 +20,6 @@ import java.nio.file.Path;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.*;
-import java.util.stream.Stream;
 
 public abstract class AbstractModelProvider implements DataProvider {
     public static final String BLOCK_PATH = "block";
@@ -52,13 +49,8 @@ public abstract class AbstractModelProvider implements DataProvider {
         // NO-OP
     }
 
-    @Deprecated(forRemoval = true)
-    protected boolean throwForMissingBlocks() {
-        return true;
-    }
-
     protected boolean skipValidation() {
-        return !this.throwForMissingBlocks();
+        return false;
     }
 
     protected void skipBlock(Block block) {
@@ -183,7 +175,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         String path = resourceLocation.getPath();
         if (path.contains(s)) {
             path = path.substring(path.lastIndexOf(s) + 1);
-            return new ResourceLocation(resourceLocation.getNamespace(), path);
+            return ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(), path);
         } else {
             return resourceLocation;
         }
@@ -212,77 +204,11 @@ public abstract class AbstractModelProvider implements DataProvider {
         );
     }
 
-    public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ItemOverride... itemOverrides) {
-        return generateFlatItem(item,
-                modelTemplate,
-                modelOutput,
-                overrides(modelTemplate,
-                        Stream.of(itemOverrides)
-                                .map(override -> (ItemOverride.Factory) (ResourceLocation resourceLocation) -> override)
-                                .toArray(ItemOverride.Factory[]::new)
-                )
-        );
-    }
-
     public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
         return modelTemplate.create(ModelLocationUtils.getModelLocation(item),
                 TextureMapping.layer0(item),
                 modelOutput,
                 factory
         );
-    }
-
-    /**
-     * Use in conjunction with {@link ModelTemplate#create(ResourceLocation, TextureMapping, BiConsumer, ModelTemplate.JsonFactory)}.
-     *
-     * @deprecated replaced with {@link ItemModelProperties#overridesFactory(ModelTemplate, ItemModelProperties...)}
-     */
-    @Deprecated(forRemoval = true)
-    public static ModelTemplate.JsonFactory overrides(ModelTemplate modelTemplate, ItemOverride.Factory... factories) {
-        return (ResourceLocation resourceLocation, Map<TextureSlot, ResourceLocation> map) -> {
-            JsonObject jsonObject = modelTemplate.createBaseTemplate(resourceLocation, map);
-            JsonArray jsonArray = new JsonArray();
-            for (ItemOverride.Factory factory : factories) {
-                jsonArray.add(factory.apply(resourceLocation).toJson());
-            }
-            jsonObject.add("overrides", jsonArray);
-            return jsonObject;
-        };
-    }
-
-    /**
-     * @deprecated replaced with {@link ItemModelProperties}
-     */
-    @Deprecated(forRemoval = true)
-    public record ItemOverride(ResourceLocation model, Map<ResourceLocation, Float> predicates) {
-
-        public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1) {
-            return new ItemOverride(model, Map.of(p1, f1));
-        }
-
-        public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1, ResourceLocation p2, float f2) {
-            return new ItemOverride(model, Map.of(p1, f1, p2, f2));
-        }
-
-        public static ItemOverride of(ResourceLocation model, ResourceLocation p1, float f1, ResourceLocation p2, float f2, ResourceLocation p3, float f3) {
-            return new ItemOverride(model, Map.of(p1, f1, p2, f2, p3, f3));
-        }
-
-        JsonElement toJson() {
-            JsonObject jsonObject = new JsonObject();
-            JsonObject predicates = new JsonObject();
-            for (Map.Entry<ResourceLocation, Float> entry : this.predicates.entrySet()) {
-                predicates.addProperty(entry.getKey().toString(), entry.getValue());
-            }
-            jsonObject.add("predicate", predicates);
-            jsonObject.addProperty("model", this.model.toString());
-            return jsonObject;
-        }
-
-        @Deprecated(forRemoval = true)
-        @FunctionalInterface
-        public interface Factory extends Function<ResourceLocation, ItemOverride> {
-
-        }
     }
 }

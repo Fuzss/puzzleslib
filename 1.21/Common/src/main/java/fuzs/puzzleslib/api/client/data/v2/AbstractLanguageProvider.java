@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
@@ -69,7 +70,11 @@ public abstract class AbstractLanguageProvider implements DataProvider {
                 jsonObject.addProperty(key, value);
             }
         });
-        return DataProvider.saveStable(writer, jsonObject, this.pathProvider.json(new ResourceLocation(this.modId, this.languageCode)));
+
+        return DataProvider.saveStable(writer,
+                jsonObject,
+                this.pathProvider.json(ResourceLocation.fromNamespaceAndPath(this.modId, this.languageCode))
+        );
     }
 
     @Override
@@ -141,13 +146,18 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(item.getDescriptionId(), additionalKey, value);
         }
 
-        default void add(Enchantment enchantment, String value) {
-            this.add(enchantment, "", value);
+        default void addEnchantment(Holder<Enchantment> enchantment, String value) {
+            this.addEnchantment(enchantment, "", value);
         }
 
-        default void add(Enchantment enchantment, String additionalKey, String value) {
+        default void addEnchantment(Holder<Enchantment> enchantment, String additionalKey, String value) {
             Objects.requireNonNull(enchantment, "enchantment is null");
-            this.add(enchantment.getDescriptionId(), additionalKey, value);
+            String descriptionId = enchantment.unwrapKey()
+                    .map(resourceKey -> Util.makeDescriptionId(resourceKey.registry().getPath(),
+                            resourceKey.location()
+                    ))
+                    .orElse(null);
+            this.add(descriptionId, additionalKey, value);
         }
 
         default void add(MobEffect mobEffect, String value) {
@@ -204,9 +214,9 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(gameRule.getDescriptionId(), additionalKey, value);
         }
 
-        default void add(Potion potion, String value) {
+        default void addPotion(Holder<Potion> potion, String value) {
             Objects.requireNonNull(potion, "potion is null");
-            String potionName = potion.getName("");
+            String potionName = Potion.getName(Optional.of(potion), "");
             this.add("item.minecraft.tipped_arrow.effect." + potionName, "Arrow of " + value);
             this.add("item.minecraft.potion.effect." + potionName, "Potion of " + value);
             this.add("item.minecraft.splash_potion.effect." + potionName, "Splash Potion of " + value);
@@ -234,7 +244,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void addCreativeModeTab(String modId, String tabId, String value) {
             Objects.requireNonNull(modId, "mod id is null");
             Objects.requireNonNull(tabId, "tab id is null");
-            this.addCreativeModeTab(new ResourceLocation(modId, tabId), value);
+            this.addCreativeModeTab(ResourceLocation.fromNamespaceAndPath(modId, tabId), value);
         }
 
         default void addCreativeModeTab(ResourceLocation identifier, String value) {
