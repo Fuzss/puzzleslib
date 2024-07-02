@@ -1,13 +1,13 @@
 package fuzs.puzzleslib.fabric.impl.capability;
 
 import com.mojang.serialization.Codec;
-import dev.onyxstudios.cca.api.v3.component.ComponentAccess;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
 import fuzs.puzzleslib.fabric.impl.capability.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
+import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
@@ -43,17 +43,21 @@ public final class FabricCapabilityController implements CapabilityController {
 
     @Override
     public <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
-        return this.registerCapability(Level.class, identifier, capabilityFactory, (FabricCapabilityKey.Factory<Level, C, FabricLevelCapabilityKey<C>>) FabricLevelCapabilityKey::new);
+        // AttachmentTarget is not injected into Level, only ServerLevel, via interface injection
+        // But the mixin responsible for implementing the interface on all supported classes does in fact target Level, not just ServerLevel
+        // This also mirrors the attachment implementation on NeoForge
+        return this.registerCapability((Class<? extends AttachmentTarget>) Level.class, identifier, capabilityFactory, (FabricCapabilityKey.Factory<Level, C, FabricLevelCapabilityKey<C>>) FabricLevelCapabilityKey::new);
     }
 
-    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ComponentAccess> holderType, String identifier, Supplier<C> capabilityFactory, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
+    @SuppressWarnings("UnstableApiUsage")
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends AttachmentTarget> holderType, String identifier, Supplier<C> capabilityFactory, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         return this.registerCapability(holderType, identifier, capabilityFactory, holderType::isInstance, capabilityKeyFactory);
     }
 
     @SuppressWarnings("UnstableApiUsage")
-    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ComponentAccess> holderType, String identifier, Supplier<C> capabilityFactory, Predicate<Object> filter, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
+    private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends AttachmentTarget> holderType, String identifier, Supplier<C> capabilityFactory, Predicate<Object> filter, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
-        ResourceLocation capabilityName = new ResourceLocation(this.modId, identifier);
+        ResourceLocation capabilityName = ResourceLocation.fromNamespaceAndPath(this.modId, identifier);
         Codec<C> codec = TagParser.AS_CODEC.xmap(NbtSerializable.fromCompoundTag(capabilityFactory), NbtSerializable::toCompoundTag);
         AttachmentType<C> attachmentType = AttachmentRegistry.<C>builder().persistent(codec).buildAndRegister(capabilityName);
         return capabilityKeyFactory.apply(attachmentType, filter, capabilityFactory);

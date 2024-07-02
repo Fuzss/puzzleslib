@@ -1,13 +1,14 @@
 package fuzs.puzzleslib.api.client.gui.v2.components;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,32 +28,32 @@ public final class ScreenTooltipFactory {
     /**
      * Create a new tooltip instance from multiple lines of text.
      *
-     * @param components components to split and build the tooltip from
+     * @param text components to split and build the tooltip from
      * @return the tooltip instance
      */
-    public static Tooltip create(FormattedText... components) {
-        return create(Arrays.asList(components));
+    public static Tooltip createFromText(FormattedText... text) {
+        return createFromText(Arrays.asList(text));
     }
 
     /**
      * Create a new tooltip instance from multiple lines of text.
      *
-     * @param formattedTexts components to split and build the tooltip from
+     * @param text components to split and build the tooltip from
      * @return the tooltip instance
      */
-    public static Tooltip create(List<? extends FormattedText> formattedTexts) {
-        List<FormattedCharSequence> tooltipLines = formattedTexts.stream().flatMap(ScreenTooltipFactory::splitTooltipLines).toList();
-        return create(tooltipLines, null);
+    public static Tooltip createFromText(List<? extends FormattedText> text) {
+        List<FormattedCharSequence> tooltipLines = text.stream().flatMap(ScreenTooltipFactory::splitText).toList();
+        return createFromCharSequence(tooltipLines);
     }
 
     /**
      * Split a formatted text instance according to a max width.
      *
-     * @param formattedText component to split for building tooltip
+     * @param text component to split for building tooltip
      * @return stream of split char sequences
      */
-    public static Stream<FormattedCharSequence> splitTooltipLines(FormattedText formattedText) {
-        List<FormattedCharSequence> splitLines = Minecraft.getInstance().font.split(formattedText, 170);
+    public static Stream<FormattedCharSequence> splitText(FormattedText text) {
+        List<FormattedCharSequence> splitLines = Minecraft.getInstance().font.split(text, 170);
         if (splitLines.isEmpty()) {
             // empty components yield an empty list
             // since empty lines are desired on tooltips make sure they don't go missing
@@ -71,22 +72,46 @@ public final class ScreenTooltipFactory {
      *                          instead of {@link net.minecraft.client.gui.screens.inventory.tooltip.MenuTooltipPositioner}
      * @return the tooltip instance
      */
-    public static Tooltip create(List<FormattedCharSequence> tooltipLines, @Nullable BiFunction<ScreenRectangle, Boolean, ClientTooltipPositioner> positionerFactory) {
+    public static Tooltip createFromCharSequence(List<FormattedCharSequence> tooltipLines) {
         return new Tooltip(CommonComponents.EMPTY, null) {
 
             @Override
             public List<FormattedCharSequence> toCharSequence(Minecraft minecraft) {
                 return tooltipLines;
             }
+        };
+    }
+
+    /**
+     * Create a new tooltip instance from already split lines of text.
+     *
+     * @param tooltipLines      the split lines to build the tooltip from
+     * @param positionerFactory factory to replace {@link Tooltip#createTooltipPositioner(boolean, boolean, ScreenRectangle)},
+     *                          the boolean parameter for the factory defines where vanilla would return {@link net.minecraft.client.gui.screens.inventory.tooltip.BelowOrAboveWidgetTooltipPositioner}
+     *                          instead of {@link net.minecraft.client.gui.screens.inventory.tooltip.MenuTooltipPositioner}
+     * @return the tooltip instance
+     */
+    public static WidgetTooltipHolder create(List<FormattedCharSequence> tooltipLines, BiFunction<ScreenRectangle, Boolean, ClientTooltipPositioner> positionerFactory) {
+        WidgetTooltipHolder widgetTooltipHolder = new WidgetTooltipHolder() {
 
             @Override
-            protected ClientTooltipPositioner createTooltipPositioner(boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
+            protected ClientTooltipPositioner createTooltipPositioner(ScreenRectangle screenRectangle, boolean hovering, boolean focused) {
                 if (positionerFactory != null) {
-                    return positionerFactory.apply(screenRectangle, !hovering && focused && Minecraft.getInstance().getLastInputType().isKeyboard());
+                    return positionerFactory.apply(screenRectangle,
+                            !hovering && focused && Minecraft.getInstance().getLastInputType().isKeyboard()
+                    );
                 } else {
-                    return super.createTooltipPositioner(hovering, focused, screenRectangle);
+                    return super.createTooltipPositioner(screenRectangle, hovering, focused);
                 }
             }
         };
+        widgetTooltipHolder.set(createFromCharSequence(tooltipLines));
+        return widgetTooltipHolder;
+    }
+
+    public static void setWidgetTooltip(AbstractWidget abstractWidget, List<FormattedCharSequence> tooltipLines, BiFunction<ScreenRectangle, Boolean, ClientTooltipPositioner> positionerFactory) {
+        WidgetTooltipHolder tooltip = create(tooltipLines, positionerFactory);
+        tooltip.setDelay(abstractWidget.tooltip.delay);
+        abstractWidget.tooltip = tooltip;
     }
 }

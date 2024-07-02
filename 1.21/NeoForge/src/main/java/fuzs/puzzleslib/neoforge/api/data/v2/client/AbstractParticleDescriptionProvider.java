@@ -18,17 +18,30 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvider<List<ResourceLocation>> {
-    private static final Codec<List<ResourceLocation>> CODEC = ResourceLocation.CODEC.listOf().fieldOf("textures").codec();
+    private static final Codec<List<ResourceLocation>> CODEC = ResourceLocation.CODEC.listOf()
+            .fieldOf("textures")
+            .codec();
 
     private final ExistingFileHelper.ResourceType textureResourceType;
 
     public AbstractParticleDescriptionProvider(ForgeDataProviderContext context) {
-        this(context.getModId(), context.getPackOutput(), context.getLookupProvider(), context.getFileHelper());
+        this(context.getModId(), context.getPackOutput(), context.getRegistries(), context.getFileHelper());
     }
 
     public AbstractParticleDescriptionProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
-        super(packOutput, PackOutput.Target.RESOURCE_PACK, "particles", PackType.CLIENT_RESOURCES, CODEC, lookupProvider, modId, fileHelper);
-        this.textureResourceType = new ExistingFileHelper.ResourceType(PackType.CLIENT_RESOURCES, ".png", "textures/particle");
+        super(packOutput,
+                PackOutput.Target.RESOURCE_PACK,
+                "particles",
+                PackType.CLIENT_RESOURCES,
+                CODEC,
+                lookupProvider,
+                modId,
+                fileHelper
+        );
+        this.textureResourceType = new ExistingFileHelper.ResourceType(PackType.CLIENT_RESOURCES,
+                ".png",
+                "textures/particle"
+        );
     }
 
     @Override
@@ -66,7 +79,13 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
         if (indexEnd == -1) {
             this.unconditional(id, List.of(resourceLocation));
         } else {
-            List<ResourceLocation> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd), Math.max(indexStart, indexEnd)).mapToObj(t -> new ResourceLocation(resourceLocation.getNamespace(), resourceLocation.getPath() + "_" + t)).collect(Collectors.toList());
+            List<ResourceLocation> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd),
+                            Math.max(indexStart, indexEnd)
+                    )
+                    .mapToObj(index -> ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(),
+                            resourceLocation.getPath() + "_" + index
+                    ))
+                    .collect(Collectors.toList());
             if (indexEnd < indexStart) Collections.reverse(textures);
             this.unconditional(id, textures);
         }
@@ -79,7 +98,10 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
                 .map(ResourceLocation::toString)
                 .toList();
         if (!missing.isEmpty()) {
-            throw new IllegalArgumentException("Couldn't define particle description %s as it is missing following texture(s): %s".formatted(id, String.join(",", missing)));
+            throw new IllegalArgumentException(
+                    "Couldn't define particle description %s as it is missing following texture(s): %s".formatted(id,
+                            String.join(",", missing)
+                    ));
         }
         super.unconditional(id, value);
     }

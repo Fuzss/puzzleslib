@@ -79,7 +79,7 @@ public abstract class ModContext {
 
     public static ResourceLocation getPairingIdentifier(String modId, BaseModConstructor modConstructor) {
         ResourceLocation identifier = modConstructor.getPairingIdentifier();
-        return identifier != null ? identifier : new ResourceLocation(modId, "main");
+        return identifier != null ? identifier : ResourceLocation.fromNamespaceAndPath(modId, "main");
     }
 
     public static void acceptServersideMods(Collection<String> modList) {

@@ -17,8 +17,8 @@ public interface BuildCreativeModeTabContentsContext {
      * @param itemsGenerator context for adding items to the creative mode tab
      */
     default void registerBuildListener(String modId, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
-        ResourceLocation identifier = new ResourceLocation(modId, "main");
-        this.registerBuildListener(identifier, itemsGenerator);
+        ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(modId, "main");
+        this.registerBuildListener(resourceLocation, itemsGenerator);
     }
 
     /**

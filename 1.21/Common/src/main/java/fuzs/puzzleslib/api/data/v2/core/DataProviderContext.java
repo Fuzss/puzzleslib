@@ -28,17 +28,17 @@ public class DataProviderContext {
     /**
      * Registry lookup provider.
      */
-    private final Supplier<CompletableFuture<HolderLookup.Provider>> lookupProvider;
+    private final Supplier<CompletableFuture<HolderLookup.Provider>> registries;
 
     /**
      * @param modId          the generating mod id
      * @param packOutput     the pack output instance
-     * @param lookupProvider registry lookup provider
+     * @param registries registry lookup provider
      */
-    public DataProviderContext(String modId, PackOutput packOutput, Supplier<CompletableFuture<HolderLookup.Provider>> lookupProvider) {
+    public DataProviderContext(String modId, PackOutput packOutput, Supplier<CompletableFuture<HolderLookup.Provider>> registries) {
         this.modId = modId;
         this.packOutput = packOutput;
-        this.lookupProvider = lookupProvider;
+        this.registries = registries;
     }
 
     /**
@@ -86,8 +86,8 @@ public class DataProviderContext {
     /**
      * @return registry lookup provider
      */
-    public CompletableFuture<HolderLookup.Provider> getLookupProvider() {
-        return this.lookupProvider.get();
+    public CompletableFuture<HolderLookup.Provider> getRegistries() {
+        return this.registries.get();
     }
 
     /**

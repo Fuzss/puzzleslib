@@ -5,9 +5,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.SharedConstants;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.BuiltInMetadata;
-import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
@@ -38,25 +36,19 @@ public abstract class AbstractModPackResources implements PackResources {
      */
     protected final String modLogoPath;
     /**
-     * Id of this pack.
-     * <p>Set internally using
-     * {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean,
-     * boolean, FeatureFlagSet)}.
+     * Location info of this pack, set internally during construction.
      */
-    private ResourceLocation id;
+    @Nullable
+    private PackLocationInfo info;
     /**
-     * The metadata for the <code>pack.mcmeta</code> section.
-     * <p>Set internally using
-     * {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean,
-     * boolean, FeatureFlagSet)}.
+     * The metadata for the <code>pack.mcmeta</code> section, set internally during construction.
      */
+    @Nullable
     private BuiltInMetadata metadata;
     /**
-     * The pack type for this pack.
-     * <p>Set internally using
-     * {@link #buildPack(PackType, ResourceLocation, Supplier, Component, Component, boolean, Pack.Position, boolean,
-     * boolean, FeatureFlagSet)}.
+     * The pack type for this pack, set internally during construction.
      */
+    @Nullable
     private PackType packType;
 
     /**
@@ -115,26 +107,21 @@ public abstract class AbstractModPackResources implements PackResources {
     }
 
     @Override
-    public String packId() {
-        return this.id.toString();
-    }
-
-    @Override
-    public boolean isBuiltin() {
-        return true;
+    public PackLocationInfo location() {
+        Objects.requireNonNull(this.info, "info is null");
+        return this.info;
     }
 
     @Override
     public void close() {
-
+        // NO-OP
     }
 
     /**
      * @return the namespace from the internal id
      */
-    public final String getNamespace() {
-        Objects.requireNonNull(this.id, "id is null");
-        return this.id.getNamespace();
+    protected String getNamespace() {
+        return ResourceLocation.parse(this.packId()).getNamespace();
     }
 
     /**
@@ -148,32 +135,55 @@ public abstract class AbstractModPackResources implements PackResources {
 
     @ApiStatus.Internal
     static Pack buildPack(PackType packType, ResourceLocation identifier, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
-        PackMetadataSection metadataSection = new PackMetadataSection(description,
-                SharedConstants.getCurrentVersion().getPackVersion(packType),
+        PackLocationInfo info = new PackLocationInfo(identifier.toString(),
+                title,
+                PackSource.BUILT_IN,
                 Optional.empty()
         );
-        BuiltInMetadata metadata = BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection);
-        Pack.Info info = CommonAbstractions.INSTANCE.createPackInfo(identifier,
+        Pack.ResourcesSupplier resourcesSupplier = ModPackResourcesSupplier.create(packType,
+                info,
+                factory,
+                description
+        );
+        Pack.Metadata metadata = CommonAbstractions.INSTANCE.createPackInfo(identifier,
                 description,
                 PackCompatibility.COMPATIBLE,
                 features,
                 hidden
         );
-        return Pack.create(identifier.toString(), title, required, new Pack.ResourcesSupplier() {
-            @Override
-            public PackResources openPrimary(String id) {
-                AbstractModPackResources packResources = factory.get();
-                packResources.id = identifier;
-                packResources.metadata = metadata;
-                packResources.packType = packType;
-                packResources.setup();
-                return packResources;
-            }
+        PackSelectionConfig config = new PackSelectionConfig(required, position, fixedPosition);
+        return new Pack(info, resourcesSupplier, metadata, config);
+    }
 
-            @Override
-            public PackResources openFull(String id, Pack.Info info) {
-                return this.openPrimary(id);
-            }
-        }, info, position, fixedPosition, PackSource.BUILT_IN);
+    private record ModPackResourcesSupplier(PackType packType, PackLocationInfo info, Supplier<AbstractModPackResources> factory, BuiltInMetadata metadata) implements Pack.ResourcesSupplier {
+
+        static ModPackResourcesSupplier create(PackType packType, PackLocationInfo info, Supplier<AbstractModPackResources> factory, Component description) {
+            PackMetadataSection metadataSection = new PackMetadataSection(description,
+                    SharedConstants.getCurrentVersion().getPackVersion(packType),
+                    Optional.empty()
+            );
+            return new ModPackResourcesSupplier(packType, info, factory,
+                    BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection)
+            );
+        }
+
+        @Override
+        public PackResources openPrimary(PackLocationInfo info) {
+            return this.getAndSetupPackResources();
+        }
+
+        @Override
+        public PackResources openFull(PackLocationInfo info, Pack.Metadata packMetadata) {
+            return this.getAndSetupPackResources();
+        }
+
+        private AbstractModPackResources getAndSetupPackResources() {
+            AbstractModPackResources packResources = this.factory.get();
+            packResources.info = this.info;
+            packResources.metadata = this.metadata;
+            packResources.packType = this.packType;
+            packResources.setup();
+            return packResources;
+        }
     }
 }

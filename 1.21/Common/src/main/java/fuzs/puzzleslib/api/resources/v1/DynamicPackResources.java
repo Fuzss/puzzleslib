@@ -85,9 +85,9 @@ public class DynamicPackResources extends AbstractModPackResources {
                     // good times with Windows...
                     List<String> strings = FileUtil.decomposePath(filePath.normalize()
                             .toString()
-                            .replace(File.separator, "/")).get().left().filter(list -> list.size() >= 2).orElse(null);
+                            .replace(File.separator, "/")).result().filter(list -> list.size() >= 2).orElse(null);
                     if (strings != null) {
-                        PackType packType = PATHS_FOR_TYPE.get(strings.get(0));
+                        PackType packType = PATHS_FOR_TYPE.get(strings.getFirst());
                         Objects.requireNonNull(packType,
                                 "pack type for directory %s is null".formatted(strings.get(0))
                         );

@@ -42,7 +42,11 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     private static void initializeCommands() {
         CommandOverrides.registerServerCommand("time set 4000", false);
         CommandOverrides.registerPlayerCommand("op @s", true);
-        CommandOverrides.registerEffectCommand(MobEffects.NIGHT_VISION, MobEffects.DAMAGE_RESISTANCE, MobEffects.FIRE_RESISTANCE, MobEffects.DAMAGE_BOOST, MobEffects.WATER_BREATHING);
+        CommandOverrides.registerEffectCommand(MobEffects.NIGHT_VISION);
+        CommandOverrides.registerEffectCommand(MobEffects.DAMAGE_RESISTANCE);
+        CommandOverrides.registerEffectCommand(MobEffects.FIRE_RESISTANCE);
+        CommandOverrides.registerEffectCommand(MobEffects.DAMAGE_BOOST);
+        CommandOverrides.registerEffectCommand(MobEffects.WATER_BREATHING);
     }
 
     private static void initializeGameRules() {

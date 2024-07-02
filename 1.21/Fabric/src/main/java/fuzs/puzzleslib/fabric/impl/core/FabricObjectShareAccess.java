@@ -8,7 +8,7 @@ public final class FabricObjectShareAccess implements ObjectShareAccess {
     public static final ObjectShareAccess INSTANCE = new FabricObjectShareAccess();
 
     private FabricObjectShareAccess() {
-
+        // NO-OP
     }
 
     @Override

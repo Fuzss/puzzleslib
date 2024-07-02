@@ -12,13 +12,14 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
+import fuzs.puzzleslib.api.event.v1.entity.EntityTickEvents;
 import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -95,7 +96,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     private static <T> void onRegistryEntryAdded(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        Registry<T> registry = RegistryHelperV2.findBuiltInRegistry(resourceKey);
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
         BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
             Registry.register(registry, resourceLocation, supplier.get());
         };
@@ -182,7 +183,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                                 ));
                         // send interaction packet to the server with a new sequentially assigned id
                         ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level,
-                                (int id) -> new ServerboundUseItemPacket(hand, id)
+                                (int id) -> new ServerboundUseItemPacket(hand, id, player.getYRot(), player.getXRot())
                         );
                     }
 
@@ -246,7 +247,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             };
         });
         INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_XP);
-        INSTANCE.register(BonemealCallback.class, FabricPlayerEvents.BONEMEAL);
+        INSTANCE.register(UseBoneMealCallback.class, FabricPlayerEvents.USE_BONEMEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
@@ -290,7 +291,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LootingLevelCallback.class, FabricLivingEvents.LOOTING_LEVEL);
         INSTANCE.register(AnvilEvents.Update.class, FabricPlayerEvents.ANVIL_UPDATE);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
-        INSTANCE.register(LivingTickCallback.class, FabricLivingEvents.LIVING_TICK);
+        INSTANCE.register(EntityTickEvents.Start.class, FabricEntityEvents.ENTITY_TICK_START);
+        INSTANCE.register(EntityTickEvents.End.class, FabricEntityEvents.ENTITY_TICK_END);
         INSTANCE.register(ArrowLooseCallback.class, FabricPlayerEvents.ARROW_LOOSE);
         INSTANCE.register(LivingHurtCallback.class, FabricLivingEvents.LIVING_HURT);
         INSTANCE.register(UseItemEvents.Start.class, FabricLivingEvents.USE_ITEM_START);

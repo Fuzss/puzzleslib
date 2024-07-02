@@ -65,10 +65,10 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
     }
 
     protected ResourceLocation id(String path) {
-        return new ResourceLocation(this.modId, path);
+        return ResourceLocation.fromNamespaceAndPath(this.modId, path);
     }
 
     protected ResourceLocation vanilla(String path) {
-        return new ResourceLocation(path);
+        return ResourceLocation.withDefaultNamespace(path);
     }
 }

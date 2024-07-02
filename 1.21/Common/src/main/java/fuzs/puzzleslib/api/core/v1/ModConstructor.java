@@ -47,7 +47,7 @@ public interface ModConstructor extends BaseModConstructor {
      * @return the new resource location
      */
     static ResourceLocation id(String modId, String path) {
-        return new ResourceLocation(modId, path);
+        return ResourceLocation.fromNamespaceAndPath(modId, path);
     }
 
     /**

@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -40,12 +41,9 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
     }
 
     @Inject(
-            method = "onTake",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/Container;setItem(ILnet/minecraft/world/item/ItemStack;)V"
-            ),
-            slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getCount()I"))
+            method = "onTake", at = @At(
+            value = "INVOKE", target = "Lnet/minecraft/world/Container;setItem(ILnet/minecraft/world/item/ItemStack;)V"
+    ), slice = @Slice(to = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;getCount()I"))
     )
     protected void onTake$0(Player player, ItemStack itemStack, CallbackInfo callback, @Share("breakChance") LocalRef<MutableFloat> breakChanceRef) {
         if (!player.level().isClientSide) {
@@ -61,13 +59,9 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
     }
 
     @Inject(
-            method = "onTake",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/inventory/DataSlot;set(I)V",
-                    shift = At.Shift.AFTER
-            ),
-            cancellable = true
+            method = "onTake", at = @At(
+            value = "INVOKE", target = "Lnet/minecraft/world/inventory/DataSlot;set(I)V", shift = At.Shift.AFTER
+    ), cancellable = true
     )
     protected void onTake$1(Player player, ItemStack itemStack, CallbackInfo callback, @Share("breakChance") LocalRef<MutableFloat> breakChanceRef) {
         // just copy this part from vanilla, not in the mood to mixin into this lambda
@@ -100,8 +94,8 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
         if (leftInput.isEmpty()) return;
         ItemStack rightInput = this.inputSlots.getItem(1);
         MutableValue<ItemStack> output = MutableValue.fromValue(ItemStack.EMPTY);
-        MutableInt enchantmentCost = MutableInt.fromValue(
-                leftInput.getBaseRepairCost() + rightInput.getBaseRepairCost());
+        MutableInt enchantmentCost = MutableInt.fromValue(leftInput.getOrDefault(DataComponents.REPAIR_COST, 0) +
+                rightInput.getOrDefault(DataComponents.REPAIR_COST, 0));
         MutableInt materialCost = MutableInt.fromValue(0);
         EventResult result = FabricPlayerEvents.ANVIL_UPDATE.invoker()
                 .onAnvilUpdate(leftInput,

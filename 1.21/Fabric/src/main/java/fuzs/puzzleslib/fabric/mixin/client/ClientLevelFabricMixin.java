@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEntityEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientLevelEvents;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
@@ -51,6 +54,14 @@ abstract class ClientLevelFabricMixin extends Level {
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(ClientPacketListener clientPacketListener, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> resourceKey, Holder<DimensionType> holder, int i, int j, Supplier<ProfilerFiller> supplier, LevelRenderer levelRenderer, boolean bl, long l, CallbackInfo callback) {
         FabricClientLevelEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
+    }
+
+    @WrapOperation(method = "tickNonPassenger", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
+    public void tickNonPassenger(Entity entity, Operation<Void> operation) {
+        if (FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity).isPass()) {
+            operation.call(entity);
+            FabricEntityEvents.ENTITY_TICK_END.invoker().onEndEntityTick(entity);
+        }
     }
 
     @Inject(method = "addEntity", at = @At("HEAD"), cancellable = true)

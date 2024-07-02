@@ -4,7 +4,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
@@ -21,10 +20,12 @@ import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
+import fuzs.puzzleslib.neoforge.mixin.client.accessor.ModelBakeryNeoForgeAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
@@ -54,16 +55,13 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry.INSTANCE;
 
 @SuppressWarnings("unchecked")
 public final class NeoForgeClientEventInvokers {
-    private static final Supplier<Set<ResourceLocation>> TOP_LEVEL_MODEL_LOCATIONS = Suppliers.memoize(NeoForgeClientEventInvokers::getTopLevelModelLocations);
+    private static final Supplier<Set<ModelResourceLocation>> TOP_LEVEL_MODEL_LOCATIONS = Suppliers.memoize(NeoForgeClientEventInvokers::getTopLevelModelLocations);
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
@@ -79,14 +77,14 @@ public final class NeoForgeClientEventInvokers {
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
             // just like bakedCache in ModelBakery
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
             Function<ResourceLocation, UnbakedModel> modelGetter = (ResourceLocation resourceLocation) -> {
                 if (additionalModels.containsKey(resourceLocation)) {
                     return additionalModels.get(resourceLocation);
                 } else {
-                    return evt.getModelBakery().getModel(resourceLocation);
+                    return ((ModelBakeryNeoForgeAccessor) evt.getModelBakery()).puzzleslib$callGetModel(resourceLocation);
                 }
             };
             // do not use resource location keys or rely on the baked cache used by the model baker, it will rebake different block states even though the model is the same
@@ -95,24 +93,17 @@ public final class NeoForgeClientEventInvokers {
             // Forge does not grant access to unbaked models, so lookup every unbaked model and replace the baked model if necessary
             // this also means the event is limited to top level models which should be fine though, the same restriction is applied on Fabric
             // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
-            for (ResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
+            for (ModelResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
                 try {
                     EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, () -> {
-                        return modelGetter.apply(modelLocation);
-                    }, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                        // the Fabric callback for adding additional models does not work with model resource locations, so force that restriction here, too
-                        if (resourceLocation instanceof ModelResourceLocation) {
-                            throw new IllegalArgumentException("model resource location is not supported");
-                        } else {
-                            additionalModels.put(resourceLocation, unbakedModel);
-                        }
-                    });
+                        return modelGetter.apply(modelLocation.id());
+                    }, modelGetter, additionalModels::put);
                     if (result.isInterrupt()) {
                         UnbakedModel unbakedModel = result.getInterrupt().get();
-                        additionalModels.put(modelLocation, unbakedModel);
+                        additionalModels.put(modelLocation.id(), unbakedModel);
                         BakedModel bakedModel = unbakedCache.computeIfAbsent(unbakedModel, $ -> {
                             NeoForgeModelBakerImpl modelBaker = new NeoForgeModelBakerImpl(bakedCache, modelGetter, evt.getTextureGetter(), missingModel);
-                            return modelBaker.bake(unbakedModel, modelLocation);
+                            return modelBaker.bake(unbakedModel, modelLocation.id());
                         });
                         models.put(modelLocation, bakedModel);
                     }
@@ -124,33 +115,35 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<ResourceLocation, BakedModel> models = evt.getModels();
+            Map<ModelResourceLocation, BakedModel> models = evt.getModels();
             // just like bakedCache in ModelBakery
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
-            Function<ResourceLocation, BakedModel> modelGetter = (ResourceLocation resourceLocation) -> {
+            Function<ModelResourceLocation, BakedModel> modelGetter = (ModelResourceLocation resourceLocation) -> {
                 if (models.containsKey(resourceLocation)) {
                     return models.get(resourceLocation);
                 } else {
+                    Function<ResourceLocation, UnbakedModel> unbakedModelGetter = ((ModelBakeryNeoForgeAccessor) evt.getModelBakery())::puzzleslib$callGetModel;
                     ModelBaker modelBaker = new NeoForgeModelBakerImpl(bakedCache,
-                            evt.getModelBakery()::getModel,
+                            unbakedModelGetter,
                             evt.getTextureGetter(),
                             missingModel
                     );
-                    return modelBaker.bake(resourceLocation, BlockModelRotation.X0_Y0, evt.getTextureGetter());
+                    return modelBaker.bake(resourceLocation.id(), BlockModelRotation.X0_Y0, evt.getTextureGetter());
                 }
             };
             // Forge has no event firing for every baked model like Fabric,
             // instead go through the baked models map and fire the event for every model manually
             // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
-            for (ResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
+            for (ModelResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
                 try {
                     EventResultHolder<BakedModel> result = callback.onModifyBakedModel(modelLocation, () -> {
                         return modelGetter.apply(modelLocation);
                     }, () -> {
+                        Function<ResourceLocation, UnbakedModel> unbakedModelGetter = ((ModelBakeryNeoForgeAccessor) evt.getModelBakery())::puzzleslib$callGetModel;
                         return new NeoForgeModelBakerImpl(bakedCache,
-                                evt.getModelBakery()::getModel,
+                                unbakedModelGetter,
                                 evt.getTextureGetter(),
                                 missingModel
                         );
@@ -166,16 +159,18 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(ModelEvents.AdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<ResourceLocation, BakedModel> models = evt.getModels();
+            Map<ModelResourceLocation, BakedModel> models = evt.getModels();
             Map<NeoForgeModelBakerImpl.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_LOCATION);
+            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             try {
-                callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
+                callback.onAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
                     return models.getOrDefault(resourceLocation, missingModel);
                 }, () -> {
                     // just use a dummy model, we cut this out when printing missing textures to the log
-                    return new NeoForgeModelBakerImpl(bakedCache, evt.getModelBakery()::getModel, evt.getTextureGetter(), missingModel);
+                    Function<ResourceLocation, UnbakedModel> unbakedModelGetter = ((ModelBakeryNeoForgeAccessor) evt.getModelBakery())::puzzleslib$callGetModel;
+                    return new NeoForgeModelBakerImpl(bakedCache,
+                            unbakedModelGetter, evt.getTextureGetter(), missingModel);
                 });
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.error("Failed to add additional baked models", exception);
@@ -195,9 +190,7 @@ public final class NeoForgeClientEventInvokers {
             callback.onEndClientTick(Minecraft.getInstance());
         });
         INSTANCE.register(RenderGuiCallback.class, RenderGuiEvent.Post.class, (RenderGuiCallback callback, RenderGuiEvent.Post evt) -> {
-            Minecraft minecraft = Minecraft.getInstance();
-            Window window = minecraft.getWindow();
-            callback.onRenderGui(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), window.getGuiScaledWidth(), window.getGuiScaledHeight());
+            callback.onRenderGui(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
         });
         INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
             callback.onItemTooltip(evt.getItemStack(), evt.getToolTip(), evt.getContext(), evt.getEntity(), evt.getFlags());
@@ -233,9 +226,10 @@ public final class NeoForgeClientEventInvokers {
             callback.onBeforeInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ScreenButtonList(evt.getScreen().renderables));
         });
         registerScreenEvent(ScreenEvents.AfterInit.class, ScreenEvent.Init.Post.class, (callback, evt) -> {
-            ScreenEvents.ConsumingOperator<GuiEventListener> addWidget = new ScreenEvents.ConsumingOperator<>(evt::addListener);
-            ScreenEvents.ConsumingOperator<GuiEventListener> removeWidget = new ScreenEvents.ConsumingOperator<>(evt::removeListener);
-            callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ScreenButtonList(evt.getScreen().renderables), addWidget, removeWidget);
+            callback.onAfterInit(Minecraft.getInstance(), evt.getScreen(), evt.getScreen().width, evt.getScreen().height, new ScreenButtonList(evt.getScreen().renderables), (UnaryOperator<AbstractWidget>) (AbstractWidget abstractWidget) -> {
+                evt.addListener(abstractWidget);
+                return abstractWidget;
+            }, (Consumer<AbstractWidget>) evt::removeListener);
         });
         registerScreenEvent(ScreenEvents.Remove.class, ScreenEvent.Closing.class, (callback, evt) -> {
             callback.onRemove(evt.getScreen());
@@ -288,25 +282,23 @@ public final class NeoForgeClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, ScreenEvent.KeyReleased.Post.class, (callback, evt) -> {
             callback.onAfterKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
         });
-        INSTANCE.register(RenderGuiElementEvents.Before.class, RenderGuiOverlayEvent.Pre.class, (RenderGuiElementEvents.Before callback, RenderGuiOverlayEvent.Pre evt, @Nullable Object context) -> {
+        INSTANCE.register(RenderGuiLayerEvents.Before.class, RenderGuiLayerEvent.Pre.class, (RenderGuiLayerEvents.Before callback, RenderGuiLayerEvent.Pre evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
-            RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
-            Minecraft minecraft = Minecraft.getInstance();
-            if (!evt.getOverlay().id().equals(overlay.id()) || !overlay.filter().test(minecraft)) return;
-            EventResult result = callback.onBeforeRenderGuiElement(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            ResourceLocation resourceLocation = (ResourceLocation) context;
+            if (!evt.getName().equals(resourceLocation)) return;
+            EventResult result = callback.onBeforeRenderGuiLayer(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(RenderGuiElementEvents.After.class, RenderGuiOverlayEvent.Post.class, (RenderGuiElementEvents.After callback, RenderGuiOverlayEvent.Post evt, @Nullable Object context) -> {
+        INSTANCE.register(RenderGuiLayerEvents.After.class, RenderGuiLayerEvent.Post.class, (RenderGuiLayerEvents.After callback, RenderGuiLayerEvent.Post evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
-            RenderGuiElementEvents.GuiOverlay overlay = (RenderGuiElementEvents.GuiOverlay) context;
-            Minecraft minecraft = Minecraft.getInstance();
-            if (!evt.getOverlay().id().equals(overlay.id()) || !overlay.filter().test(minecraft)) return;
-            callback.onAfterRenderGuiElement(minecraft, evt.getGuiGraphics(), evt.getPartialTick(), evt.getWindow().getGuiScaledWidth(), evt.getWindow().getGuiScaledHeight());
+            ResourceLocation resourceLocation = (ResourceLocation) context;
+            if (!evt.getName().equals(resourceLocation)) return;
+            callback.onAfterRenderGuiLayer(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {
             MutableInt posX = MutableInt.fromEvent(evt::setPosX, evt::getPosX);
             MutableInt posY = MutableInt.fromEvent(evt::setPosY, evt::getPosY);
-            callback.onRenderChatPanel(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), posX, posY);
+            callback.onRenderChatPanel(evt.getGuiGraphics(), evt.getPartialTick(), posX, posY);
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!evt.getLevel().isClientSide) return;
@@ -360,11 +352,11 @@ public final class NeoForgeClientEventInvokers {
             callback.onAfterRenderEntity(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
         INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
-            EventResult result = callback.onBeforeRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            EventResult result = callback.onBeforeRenderPlayer((AbstractClientPlayer) evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderPlayerEvents.After.class, RenderPlayerEvent.Post.class, (RenderPlayerEvents.After callback, RenderPlayerEvent.Post evt) -> {
-            callback.onAfterRenderPlayer(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            callback.onAfterRenderPlayer((AbstractClientPlayer) evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
         INSTANCE.register(RenderHandEvents.MainHand.class, RenderHandEvent.class, (RenderHandEvents.MainHand callback, RenderHandEvent evt) -> {
             if (evt.getHand() != InteractionHand.MAIN_HAND) return;
@@ -479,10 +471,6 @@ public final class NeoForgeClientEventInvokers {
             MutableFloat green = MutableFloat.fromEvent(evt::setGreen, evt::getGreen);
             MutableFloat blue = MutableFloat.fromEvent(evt::setBlue, evt::getBlue);
             callback.onComputeFogColor(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), red, green, blue);
-        });
-        INSTANCE.register(ScreenTooltipEvents.Render.class, RenderTooltipEvent.Pre.class, (ScreenTooltipEvents.Render callback, RenderTooltipEvent.Pre evt) -> {
-            EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getX(), evt.getY(), evt.getScreenWidth(), evt.getScreenHeight(), evt.getFont(), evt.getComponents(), evt.getTooltipPositioner());
-            if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderTooltipCallback.class, RenderTooltipEvent.Pre.class, (RenderTooltipCallback callback, RenderTooltipEvent.Pre evt) -> {
             EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getFont(), evt.getX(), evt.getY(), evt.getComponents(), evt.getTooltipPositioner());

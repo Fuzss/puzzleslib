@@ -7,14 +7,10 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,64 +19,77 @@ import java.util.Optional;
 
 /**
  * A helper class for Minecraft's registries.
- *
- * @deprecated use {@link RegistryHelperV2}
  */
-@Deprecated(forRemoval = true)
 public final class RegistryHelper {
 
     private RegistryHelper() {
-
+        // NO-OP
     }
 
     /**
-     * Finds a registry for the provided {@link ResourceKey},
-     * with dynamic registries only being supported when a game server is already running.
-     *
-     * @param registryKey the registry key
-     * @param <T>         registry value type
-     * @return the corresponding registry
-     */
-    public static <T> Registry<T> findRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
-        return findRegistry(registryKey, false);
-    }
-
-    /**
-     * Finds a built-in registry for the provided {@link ResourceKey}.
+     * Finds a registry for the provided {@link ResourceKey} from searching in {@link BuiltInRegistries#REGISTRY}.
      *
      * @param registryKey the registry key
      * @param <T>         registry value type
      * @return the corresponding registry
      */
     public static <T> Registry<T> findBuiltInRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
-        return findRegistry(registryKey, true);
+        Registry<T> registry = findNullableBuiltInRegistry(registryKey);
+        Objects.requireNonNull(registry, "registry for %s is null".formatted(registryKey));
+        return registry;
     }
 
     /**
-     * Finds a registry for the provided {@link ResourceKey},
-     * with dynamic registries only being supported when a game server is already running.
+     * Finds a registry for the provided {@link ResourceKey} from searching in {@link BuiltInRegistries#REGISTRY}.
      *
      * @param registryKey the registry key
-     * @param onlyBuiltIn only search in {@link BuiltInRegistries#REGISTRY}
      * @param <T>         registry value type
      * @return the corresponding registry
      */
     @SuppressWarnings("unchecked")
-    private static <T> Registry<T> findRegistry(ResourceKey<? extends Registry<? super T>> registryKey, boolean onlyBuiltIn) {
+    @Nullable
+    public static <T> Registry<T> findNullableBuiltInRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
+        Objects.requireNonNull(registryKey, "registry key is null");
+        return ((Registry<Registry<T>>) BuiltInRegistries.REGISTRY).get((ResourceKey<Registry<T>>) registryKey);
+    }
+
+    /**
+     * Finds a registry for the provided {@link ResourceKey}.
+     * <p>
+     * Dynamic registries are supported while a game server is already running.
+     *
+     * @param registryKey the registry key
+     * @param <T>         registry value type
+     * @return the corresponding registry
+     */
+    public static <T> Registry<T> findGameRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
+        Registry<T> registry = findNullableGameRegistry(registryKey);
+        Objects.requireNonNull(registry, "registry for %s is null".formatted(registryKey));
+        return registry;
+    }
+
+    /**
+     * Finds a registry for the provided {@link ResourceKey}.
+     * <p>
+     * Dynamic registries are supported while a game server is already running.
+     *
+     * @param registryKey the registry key
+     * @param <T>         registry value type
+     * @return the corresponding registry
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Registry<T> findNullableGameRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
         Objects.requireNonNull(registryKey, "registry key is null");
         Optional<Registry<T>> registry = Optional.empty();
-        if (!onlyBuiltIn) {
-            MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
-            if (minecraftServer != null) {
-                registry = minecraftServer.registryAccess().registry((ResourceKey<Registry<T>>) registryKey);
-            }
+        MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
+        if (minecraftServer != null) {
+            registry = minecraftServer.registryAccess().registry((ResourceKey<Registry<T>>) registryKey);
         }
         if (registry.isEmpty()) {
-            registry = ((Registry<Registry<T>>) BuiltInRegistries.REGISTRY).getOptional((ResourceKey<Registry<T>>) registryKey);
+            registry = Optional.ofNullable(findNullableBuiltInRegistry(registryKey));
         }
-        return registry.orElseThrow(() -> {
-            return new IllegalArgumentException("Registry for key %s not found".formatted(registryKey));
-        });
+
+        return registry.orElse(null);
     }
 
     /**
@@ -92,7 +101,19 @@ public final class RegistryHelper {
      * @return the resource key for this game object
      */
     public static <T> Optional<ResourceKey<T>> getResourceKey(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
-        return getHolder(registryKey, object).map(Holder.Reference::key);
+        return getHolderReference(registryKey, object).map(Holder.Reference::key);
+    }
+
+    /**
+     * Retrieves the {@link ResourceKey} for a game object from a {@link Registry}.
+     *
+     * @param registry the registry
+     * @param object   the game object to retrieve
+     * @param <T>      registry and game object type
+     * @return the resource key for this game object
+     */
+    public static <T> Optional<ResourceKey<T>> getResourceKey(Registry<T> registry, T object) {
+        return getHolderReference(registry, object).map(Holder.Reference::key);
     }
 
     /**
@@ -110,6 +131,20 @@ public final class RegistryHelper {
     }
 
     /**
+     * Retrieves the {@link ResourceKey} for a game object from a {@link Registry}.
+     *
+     * @param registry the registry
+     * @param object   the game object to retrieve
+     * @param <T>      registry and game object type
+     * @return the resource key for this game object
+     */
+    public static <T> ResourceKey<T> getResourceKeyOrThrow(Registry<T> registry, T object) {
+        return getResourceKey(registry, object).orElseThrow(() -> {
+            return new IllegalStateException("Missing object in " + registry.key() + ": " + object);
+        });
+    }
+
+    /**
      * Retrieves the {@link Holder.Reference} for a game object from a {@link Registry}.
      *
      * @param registryKey the registry key
@@ -117,9 +152,23 @@ public final class RegistryHelper {
      * @param <T>         registry and game object type
      * @return the holder reference for this game object
      */
-    public static <T> Optional<Holder.Reference<T>> getHolder(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
+    public static <T> Optional<Holder.Reference<T>> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
         return Optional.ofNullable(getBuiltInRegistryHolder(object)).or(() -> {
-            Registry<T> registry = findRegistry(registryKey);
+            Registry<T> registry = findGameRegistry(registryKey);
+            return registry.getResourceKey(object).flatMap(registry::getHolder);
+        });
+    }
+
+    /**
+     * Retrieves the {@link Holder.Reference} for a game object from a {@link Registry}.
+     *
+     * @param registry the registry
+     * @param object   the game object to retrieve
+     * @param <T>      registry and game object type
+     * @return the holder reference for this game object
+     */
+    public static <T> Optional<Holder.Reference<T>> getHolderReference(Registry<T> registry, T object) {
+        return Optional.ofNullable(getBuiltInRegistryHolder(object)).or(() -> {
             return registry.getResourceKey(object).flatMap(registry::getHolder);
         });
     }
@@ -133,8 +182,22 @@ public final class RegistryHelper {
      * @return the holder reference for this game object
      */
     public static <T> Holder.Reference<T> getHolderOrThrow(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
-        return getHolder(registryKey, object).orElseThrow(() -> {
+        return getHolderReference(registryKey, object).orElseThrow(() -> {
             return new IllegalStateException("Missing object in " + registryKey + ": " + object);
+        });
+    }
+
+    /**
+     * Retrieves the {@link Holder.Reference} for a game object from a {@link Registry}.
+     *
+     * @param registry the registry
+     * @param object   the game object to retrieve
+     * @param <T>      registry and game object type
+     * @return the holder reference for this game object
+     */
+    public static <T> Holder.Reference<T> getHolderOrThrow(Registry<T> registry, T object) {
+        return getHolderReference(registry, object).orElseThrow(() -> {
+            return new IllegalStateException("Missing object in " + registry.key() + ": " + object);
         });
     }
 
@@ -147,7 +210,7 @@ public final class RegistryHelper {
      * @return the holder for this game object
      */
     public static <T> Holder<T> wrapAsHolder(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
-        return findRegistry(registryKey).wrapAsHolder(object);
+        return findGameRegistry(registryKey).wrapAsHolder(object);
     }
 
     /**
@@ -163,7 +226,7 @@ public final class RegistryHelper {
         if (holder != null) {
             return holder.is(tagKey);
         } else {
-            Registry<T> registry = findRegistry(tagKey.registry());
+            Registry<T> registry = findGameRegistry(tagKey.registry());
             return tagKey.isFor(registry.key()) && registry.wrapAsHolder(object).is(tagKey);
         }
     }
@@ -178,26 +241,13 @@ public final class RegistryHelper {
     @SuppressWarnings({"deprecation", "unchecked"})
     @Nullable
     public static <T> Holder.Reference<T> getBuiltInRegistryHolder(T object) {
-        Holder.Reference<?> holder = null;
-        if (object instanceof Block block) {
-            holder = block.builtInRegistryHolder();
-        } else if (object instanceof Item item) {
-            holder = item.builtInRegistryHolder();
-        } else if (object instanceof EntityType<?> entityType) {
-            holder = entityType.builtInRegistryHolder();
-        } else if (object instanceof GameEvent gameEvent) {
-            holder = gameEvent.builtInRegistryHolder();
-        } else if (object instanceof Fluid fluid) {
-            holder = fluid.builtInRegistryHolder();
-        } else if (object instanceof Enchantment enchantment) {
-            holder = enchantment.builtInRegistryHolder();
-        } else if (object instanceof MobEffect mobEffect) {
-            holder = mobEffect.builtInRegistryHolder();
-        } else if (object instanceof Potion potion) {
-            holder = potion.builtInRegistryHolder();
-        } else if (object instanceof BlockEntityType<?> blockEntityType) {
-            holder = blockEntityType.builtInRegistryHolder();
-        }
-        return (Holder.Reference<T>) holder;
+        return (Holder.Reference<T>) switch (object) {
+            case Block block -> block.builtInRegistryHolder();
+            case Item item -> item.builtInRegistryHolder();
+            case EntityType<?> entityType -> entityType.builtInRegistryHolder();
+            case Fluid fluid -> fluid.builtInRegistryHolder();
+            case BlockEntityType<?> blockEntityType -> blockEntityType.builtInRegistryHolder();
+            default -> null;
+        };
     }
 }

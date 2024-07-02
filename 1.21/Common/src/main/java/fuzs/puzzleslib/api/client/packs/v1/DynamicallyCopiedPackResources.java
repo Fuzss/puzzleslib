@@ -25,11 +25,12 @@ import java.util.stream.Stream;
 /**
  * A {@link net.minecraft.server.packs.PackResources} implementation for copying existing texture resources at runtime,
  * mainly in an effort to handle changed aspect ratios in entity textures with custom models.
- * <p>Generally the implementation will try to pick the same texture the vanilla pack handler would (meaning the
- * texture
+ * <p>
+ * Generally the implementation will try to pick the same texture the vanilla pack handler would (meaning the texture
  * from the top-most pack). But if the aspect ratio of that texture doesn't match the expected ratio, the original
  * texture from {@link VanillaPackResources} will be used.
- * <p>To be registered via
+ * <p>
+ * To be registered via
  * {@link
  * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)} and
  * {@link fuzs.puzzleslib.api.resources.v1.PackResourcesHelper}.
@@ -105,8 +106,9 @@ public class DynamicallyCopiedPackResources extends AbstractModPackResources {
 
         public TextureCopy {
             if (vanillaLocation.getNamespace().equals(destinationLocation.getNamespace())) {
-                throw new IllegalStateException(
-                        "%s and %s share same namespace".formatted(vanillaLocation, destinationLocation));
+                throw new IllegalStateException("%s and %s share same namespace".formatted(vanillaLocation,
+                        destinationLocation
+                ));
             }
             if (!vanillaLocation.getPath().endsWith(".png")) {
                 throw new IllegalArgumentException("%s is no texture location".formatted(vanillaLocation));

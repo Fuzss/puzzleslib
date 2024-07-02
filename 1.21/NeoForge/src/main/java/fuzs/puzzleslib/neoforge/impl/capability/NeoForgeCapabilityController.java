@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.capability.data.*;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
@@ -67,7 +68,7 @@ public final class NeoForgeCapabilityController implements CapabilityController 
             }).serialize(new IAttachmentSerializer<>() {
 
                 @Override
-                public C read(IAttachmentHolder attachmentHolder, Tag tag) {
+                public C read(IAttachmentHolder attachmentHolder, Tag tag, HolderLookup.Provider provider) {
                     C capabilityComponent = capabilityFactory.get();
                     Objects.requireNonNull(capabilityComponent, "capability component is null");
                     capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], (T) attachmentHolder);
@@ -76,7 +77,7 @@ public final class NeoForgeCapabilityController implements CapabilityController 
                 }
 
                 @Override
-                public Tag write(C object) {
+                public Tag write(C object, HolderLookup.Provider provider) {
                     return object.toCompoundTag();
                 }
             }).build();

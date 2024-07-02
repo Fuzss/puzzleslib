@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
@@ -79,6 +78,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import static fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry.INSTANCE;
 
@@ -107,14 +107,9 @@ public final class FabricClientEventInvokers {
                 Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
                 pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
                     // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.id(), () -> model, context.loader()::getModel, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                        // the Fabric callback for adding additional models does not work with model resource locations
-                        if (resourceLocation instanceof ModelResourceLocation) {
-                            throw new IllegalArgumentException("model resource location is not supported");
-                        } else {
-                            additionalModels.put(resourceLocation, unbakedModel);
-                        }
-                    });
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.topLevelId(), () -> model, context.baker()::getModel,
+                            additionalModels::put
+                    );
                     return result.getInterrupt().orElse(model);
                 });
                 pluginContext.resolveModel().register((ModelResolver.Context context) -> {
@@ -126,9 +121,9 @@ public final class FabricClientEventInvokers {
             ModelLoadingPlugin.register(pluginContext -> {
                 pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     if (model != null) {
-                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
-                        EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.id(), () -> model, context::baker, (ResourceLocation resourceLocation) -> {
-                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                        Map<ModelResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                        EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.topLevelId(), () -> model, context::baker, (ModelResourceLocation resourceLocation) -> {
+                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
                         }, models::putIfAbsent);
                         return result.getInterrupt().orElse(model);
                     } else {
@@ -142,11 +137,11 @@ public final class FabricClientEventInvokers {
                 pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     // all we want is access to the top level baked models map to be able to insert our own models
                     // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
-                    if (context.id().equals(ModelBakery.MISSING_MODEL_LOCATION)) {
-                        Map<ResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                    if (context.topLevelId().equals(ModelBakery.MISSING_MODEL_VARIANT)) {
+                        Map<ModelResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
                         // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
-                        callback.onAdditionalBakedModel(models::putIfAbsent, (ResourceLocation resourceLocation) -> {
-                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation, BlockModelRotation.X0_Y0);
+                        callback.onAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
+                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
                         }, context::baker);
                     }
                     return model;
@@ -171,9 +166,7 @@ public final class FabricClientEventInvokers {
         });
         INSTANCE.register(RenderGuiCallback.class, HudRenderCallback.EVENT, callback -> {
             return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
-                Minecraft minecraft = Minecraft.getInstance();
-                Window window = minecraft.getWindow();
-                callback.onRenderGui(minecraft, drawContext, tickCounter, window.getGuiScaledWidth(), window.getGuiScaledHeight());
+                callback.onRenderGui(Minecraft.getInstance(), drawContext, tickCounter);
             };
         });
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, callback -> {
@@ -198,9 +191,13 @@ public final class FabricClientEventInvokers {
             return (Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (!((Class<?>) context).isInstance(screen)) return;
                 List<AbstractWidget> widgets = Screens.getButtons(screen);
-                ScreenEvents.ConsumingOperator<AbstractWidget> addWidget = new ScreenEvents.ConsumingOperator<>(widgets::add);
-                ScreenEvents.ConsumingOperator<AbstractWidget> removeWidget = new ScreenEvents.ConsumingOperator<>(widgets::remove);
-                callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets), addWidget, removeWidget);
+                callback.onAfterInit(minecraft, screen, scaledWidth, scaledHeight, Collections.unmodifiableList(widgets),
+                        (UnaryOperator<AbstractWidget>) (AbstractWidget abstractWidget) -> {
+                            widgets.add(abstractWidget);
+                            return abstractWidget;
+                        },
+                        (Consumer<AbstractWidget>) widgets::remove
+                );
             };
         });
         registerScreenEvent(ScreenEvents.Remove.class, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.Remove.class, callback -> {
@@ -260,13 +257,13 @@ public final class FabricClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AfterKeyRelease.class, callback -> {
             return callback::onAfterKeyRelease;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
-        INSTANCE.register(RenderGuiElementEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
+        INSTANCE.register(RenderGuiLayerEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            applyToInvoker.accept(FabricGuiEvents.beforeRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
+            applyToInvoker.accept(FabricGuiEvents.beforeRenderGuiElement(((ResourceLocation) context)));
         });
-        INSTANCE.register(RenderGuiElementEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
+        INSTANCE.register(RenderGuiLayerEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
-            applyToInvoker.accept(FabricGuiEvents.afterRenderGuiElement(((RenderGuiElementEvents.GuiOverlay) context).id()));
+            applyToInvoker.accept(FabricGuiEvents.afterRenderGuiElement(((ResourceLocation) context)));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricGuiEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEntityEvents.ENTITY_LOAD);

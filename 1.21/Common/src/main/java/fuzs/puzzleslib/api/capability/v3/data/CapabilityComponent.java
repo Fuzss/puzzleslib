@@ -62,11 +62,8 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
      * To be called when capability data changed and requires serializing and / or syncing.
      * <p>
      * Should basically be called in all setters after the new value has been set.
-     * <p>
-     * TODO make this final, only {@link #setChanged(PlayerSet)} should be overridden
      */
-    @MustBeInvokedByOverriders
-    public void setChanged() {
+    public final void setChanged() {
         this.setChanged(null);
     }
 

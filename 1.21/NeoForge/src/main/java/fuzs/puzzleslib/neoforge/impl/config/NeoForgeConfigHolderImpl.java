@@ -3,21 +3,15 @@ package fuzs.puzzleslib.neoforge.impl.config;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.config.ConfigTracker;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -30,14 +24,12 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        // TODO migrate to startup config type for 1.20.6
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.CLIENT, "client", supplier);
+        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, "client", supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        // TODO migrate to startup config type for 1.20.6
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.COMMON, "common", supplier);
+        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, "common", supplier);
     }
 
     @Override
@@ -98,18 +90,6 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
             ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
             this.modConfig = new ModConfig(this.configType, this.buildSpec(), modContainer, this.fileName.apply(modId));
             modContainer.addConfig(this.modConfig);
-            // TODO remove after migrating to startup config type for 1.20.6
-            if (this.configType != ModConfig.Type.SERVER) {
-                try {
-                    Method method = ConfigTracker.class.getDeclaredMethod("openConfig", ModConfig.class, Path.class, Path.class);
-                    method.setAccessible(true);
-                    MethodHandles.lookup().unreflect(method).invoke(ConfigTracker.INSTANCE, this.modConfig,
-                            ModLoaderEnvironment.INSTANCE.getConfigDirectory(), null
-                    );
-                } catch (Throwable throwable) {
-                    PuzzlesLib.LOGGER.warn("Unable to load {} config for mod {} early", this.configTypeName, modId, throwable);
-                }
-            }
         }
     }
 }

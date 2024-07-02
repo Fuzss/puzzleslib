@@ -11,13 +11,14 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
+import fuzs.puzzleslib.api.event.v1.entity.EntityTickEvents;
 import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelperV2;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.AttributeModifiersMultimap;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
@@ -69,6 +70,7 @@ import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.callback.AddCallback;
@@ -95,7 +97,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
     private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        Registry<T> registry = RegistryHelperV2.findBuiltInRegistry(resourceKey);
+        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
         boolean[] loadComplete = new boolean[1];
         // synchronize on the registry to allow other mods requiring synchronization here to do so as well
         synchronized (registry) {
@@ -189,15 +191,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(BonemealCallback.class, BonemealEvent.class, (BonemealCallback callback, BonemealEvent evt) -> {
-            EventResult result = callback.onBonemeal(evt.getLevel(), evt.getPos(), evt.getState(), evt.getStack());
-            // cancelling bone meal event is kinda weird...
+        INSTANCE.register(UseBoneMealCallback.class, BonemealEvent.class, (UseBoneMealCallback callback, BonemealEvent evt) -> {
+            EventResult result = callback.onUseBoneMeal(evt.getLevel(), evt.getPos(), evt.getState(), evt.getStack());
             if (result.isInterrupt()) {
-                if (result.getAsBoolean()) {
-                    evt.setResult(Event.Result.ALLOW);
-                } else {
-                    evt.setCanceled(true);
-                }
+                evt.setSuccessful(result.getAsBoolean());
             }
         });
         INSTANCE.register(LivingExperienceDropCallback.class, LivingExperienceDropEvent.class, (LivingExperienceDropCallback callback, LivingExperienceDropEvent evt) -> {
@@ -213,9 +210,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
             GameType gameType = ((ServerPlayer) evt.getPlayer()).gameMode.getGameModeForPlayer();
             if (evt.getPlayer().blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
-                return;
-            }
-            if (evt.getPlayer().getMainHandItem().onBlockStartBreak(evt.getPos(), evt.getPlayer())) {
                 return;
             }
             EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
@@ -308,10 +302,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(LivingTickCallback.class, LivingEvent.LivingTickEvent.class, (LivingTickCallback callback, LivingEvent.LivingTickEvent evt) -> {
-            if (callback.onLivingTick(evt.getEntity()).isInterrupt()) {
+        INSTANCE.register(EntityTickEvents.Start.class, EntityTickEvent.Pre.class, (EntityTickEvents.Start callback, EntityTickEvent.Pre evt) -> {
+            if (callback.onStartEntityTick(evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }
+        });
+        INSTANCE.register(EntityTickEvents.End.class, EntityTickEvent.Post.class, (EntityTickEvents.End callback, EntityTickEvent.Post evt) -> {
+            callback.onEndEntityTick(evt.getEntity());
         });
         INSTANCE.register(ArrowLooseCallback.class, ArrowLooseEvent.class, (ArrowLooseCallback callback, ArrowLooseEvent evt) -> {
             MutableInt charge = MutableInt.fromEvent(evt::setCharge, evt::getCharge);

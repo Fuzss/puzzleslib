@@ -1,18 +1,15 @@
 package fuzs.puzzleslib.api.client.gui.v2.components;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
@@ -63,7 +60,8 @@ public final class TooltipRenderHelper {
     public static List<Component> getTooltipLines(ItemStack itemStack, TooltipFlag tooltipFlag) {
         Objects.requireNonNull(itemStack, "item stack is null");
         Objects.requireNonNull(tooltipFlag, "tooltip flag is null");
-        return itemStack.getTooltipLines(Minecraft.getInstance().player, tooltipFlag);
+        Minecraft minecraft = Minecraft.getInstance();
+        return itemStack.getTooltipLines(Item.TooltipContext.of(minecraft.level), minecraft.player, tooltipFlag);
     }
 
     /**
@@ -215,28 +213,6 @@ public final class TooltipRenderHelper {
      * @param posX        position on x-axis, would be mouse cursor x for vanilla
      * @param posY        position on y-axis, would be mouse cursor y for vanilla
      * @param components  components to render in the tooltip
-     *
-     * @deprecated use {@link #renderTooltipComponents(GuiGraphics, int, int, List)}
-     */
-    @Deprecated(forRemoval = true)
-    public static void renderTooltipInternal(GuiGraphics guiGraphics, int posX, int posY, List<ClientTooltipComponent> components) {
-        renderTooltipComponents(guiGraphics, posX, posY, components);
-    }
-
-    /**
-     * Finally renders the tooltip, simply copied from the vanilla implementation.
-     * <p>
-     * Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
-     * <p>
-     * Also, the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning
-     * to avoid running offscreen are made.
-     * <p>
-     * The behavior is like using {@link DefaultTooltipPositioner#INSTANCE}.
-     *
-     * @param guiGraphics the gui graphics component
-     * @param posX        position on x-axis, would be mouse cursor x for vanilla
-     * @param posY        position on y-axis, would be mouse cursor y for vanilla
-     * @param components  components to render in the tooltip
      */
     public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> components) {
 
@@ -253,49 +229,41 @@ public final class TooltipRenderHelper {
 
         if (result) return;
 
-        int i = 0;
-        int j = components.size() == 1 ? -2 : 0;
+        int lineWidth = 0;
+        int lineHeight = components.size() == 1 ? -2 : 0;
 
         for (ClientTooltipComponent component : components) {
-            int k = component.getWidth(minecraft.font);
-            if (k > i) {
-                i = k;
+            int width = component.getWidth(minecraft.font);
+            if (width > lineWidth) {
+                lineWidth = width;
             }
-            j += component.getHeight();
+            lineHeight += component.getHeight();
         }
 
-        int l = posX + 12;
-        int m = posY - 12;
+        posX += 12;
+        posY -= 12;
+
         guiGraphics.pose().pushPose();
-        Tesselator tesselator = Tesselator.getInstance();
-        BufferBuilder bufferBuilder = tesselator.getBuilder();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
-        bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        TooltipRenderUtil.renderTooltipBackground(guiGraphics, l, m, i, j, 400);
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        BufferUploader.drawWithShader(bufferBuilder.end());
-        MultiBufferSource.BufferSource bufferSource = MultiBufferSource.immediate(Tesselator.getInstance()
-                .getBuilder());
+        int _posX = posX;
+        int _posY = posY;
+        int _lineWidth = lineWidth;
+        int _lineHeight = lineHeight;
+        guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, _posX,
+                _posY, _lineWidth, _lineHeight, 400));
         guiGraphics.pose().translate(0.0F, 0.0F, 400.0F);
-        int p = m;
 
-        int q;
-        ClientTooltipComponent clientTooltipComponent2;
-        for (q = 0; q < components.size(); ++q) {
-            clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderText(minecraft.font, l, p, guiGraphics.pose().last().pose(), bufferSource);
-            p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
+        int currentPosY = posY;
+        for (int i = 0; i < components.size(); ++i) {
+            ClientTooltipComponent component = components.get(i);
+            component.renderText(minecraft.font, posX, currentPosY, guiGraphics.pose().last().pose(), guiGraphics.bufferSource());
+            currentPosY += component.getHeight() + (i == 0 ? 2 : 0);
         }
 
-        bufferSource.endBatch();
-        p = m;
-
-        for (q = 0; q < components.size(); ++q) {
-            clientTooltipComponent2 = components.get(q);
-            clientTooltipComponent2.renderImage(minecraft.font, l, p, guiGraphics);
-            p += clientTooltipComponent2.getHeight() + (q == 0 ? 2 : 0);
+        currentPosY = posY;
+        for (int i = 0; i < components.size(); ++i) {
+            ClientTooltipComponent component = components.get(i);
+            component.renderImage(minecraft.font, posX, currentPosY, guiGraphics);
+            currentPosY += component.getHeight() + (i == 0 ? 2 : 0);
         }
 
         guiGraphics.pose().popPose();

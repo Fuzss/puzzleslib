@@ -60,9 +60,8 @@ abstract class PlayerFabricMixin extends LivingEntity {
         }
     }
 
-    @ModifyReturnValue(method = "getDestroySpeed", at = @At("TAIL"), require = 0)
+    @ModifyReturnValue(method = "getDestroySpeed", at = @At("TAIL"))
     public float getDestroySpeed(float destroySpeed, BlockState blockState) {
-        // TODO remove require = 0 when ViaFabricPlus removes their @Overwrite
         DefaultedFloat defaultedFloat = DefaultedFloat.fromValue(destroySpeed);
         if (FabricPlayerEvents.BREAK_SPEED.invoker()
                 .onBreakSpeed(Player.class.cast(this), blockState, defaultedFloat)

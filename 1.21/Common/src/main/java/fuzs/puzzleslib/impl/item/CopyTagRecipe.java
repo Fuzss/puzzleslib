@@ -51,7 +51,7 @@ public interface CopyTagRecipe {
         for (int i = 0; i < craftingContainer.getContainerSize(); i++) {
             ItemStack itemStack = craftingContainer.getItem(i);
             if (this.getCopyTagSource().test(itemStack) && itemStack.hasTag()) {
-                result.setTag(itemStack.getTag().copy());
+                result.setTag(itemStack.getComponents().copy());
                 return;
             }
         }

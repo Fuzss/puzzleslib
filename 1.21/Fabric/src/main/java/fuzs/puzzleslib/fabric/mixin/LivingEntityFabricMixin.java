@@ -2,13 +2,13 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
-import fuzs.puzzleslib.impl.event.EventImplHelper;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
+import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.event.EventImplHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -74,12 +74,6 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     public LivingEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
-    }
-
-    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
-    public void tick(CallbackInfo callback) {
-        if (FabricLivingEvents.LIVING_TICK.invoker().onLivingTick(LivingEntity.class.cast(this)).isInterrupt())
-            callback.cancel();
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)

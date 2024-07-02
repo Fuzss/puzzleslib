@@ -7,7 +7,6 @@ import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
@@ -22,7 +21,7 @@ public final class NeoForgeItemDisplayOverrides extends ItemDisplayOverridesImpl
     {
         NeoForgeModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent(eventBus -> {
             eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
-                Map<ResourceLocation, BakedModel> models = evt.getModels();
+                Map<ModelResourceLocation, BakedModel> models = evt.getModels();
                 for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : this.overrideLocations.entrySet()) {
                     BakedModel itemModel = models.get(entry.getKey());
                     Objects.requireNonNull(itemModel, "item model is null");

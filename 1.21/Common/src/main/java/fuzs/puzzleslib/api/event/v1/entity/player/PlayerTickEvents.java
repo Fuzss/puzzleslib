@@ -8,14 +8,14 @@ public final class PlayerTickEvents {
     public static final EventInvoker<End> END = EventInvoker.lookup(End.class);
 
     private PlayerTickEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
     public interface Start {
 
         /**
-         * Fires at the beginning of {@link Player#tick()}.
+         * Called at the beginning of {@link Player#tick()}.
          *
          * @param player the ticking player
          */
@@ -26,7 +26,7 @@ public final class PlayerTickEvents {
     public interface End {
 
         /**
-         * Fires at the end of {@link Player#tick()}.
+         * Called at the end of {@link Player#tick()}.
          *
          * @param player the ticking player
          */

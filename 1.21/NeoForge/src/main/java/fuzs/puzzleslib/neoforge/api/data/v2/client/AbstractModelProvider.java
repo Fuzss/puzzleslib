@@ -95,10 +95,10 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
     public ResourceLocation extendKey(Block block, String... extensions) {
         ResourceLocation loc = this.key(block);
         extensions = ArrayUtils.add(extensions, loc.getPath());
-        return new ResourceLocation(loc.getNamespace(), String.join("/", extensions));
+        return ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), String.join("/", extensions));
     }
 
     public ResourceLocation extend(ResourceLocation rl, String suffix) {
-        return new ResourceLocation(rl.getNamespace(), rl.getPath() + suffix);
+        return ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), rl.getPath() + suffix);
     }
 }

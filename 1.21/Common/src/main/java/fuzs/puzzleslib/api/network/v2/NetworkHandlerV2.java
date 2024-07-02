@@ -32,7 +32,7 @@ public interface NetworkHandlerV2 {
      * @return mod specific network handler with configured channel
      */
     static NetworkHandlerV2 build(String modId, boolean optional) {
-        return build(new ResourceLocation(modId, "main"), optional);
+        return build(ResourceLocation.fromNamespaceAndPath(modId, "main"), optional);
     }
 
     /**
