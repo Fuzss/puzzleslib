@@ -1,9 +1,10 @@
 package fuzs.puzzleslib.neoforge.impl.event;
 
-import com.google.common.collect.Multimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.event.v1.FinalizeItemComponentsCallback;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
@@ -20,7 +21,7 @@ import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.event.AttributeModifiersMultimap;
+import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
@@ -30,7 +31,9 @@ import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -43,11 +46,10 @@ import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.Attribute;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -86,6 +88,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvokerRegistry {
@@ -515,9 +518,19 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(ItemAttributeModifiersCallback.class, ItemAttributeModifierEvent.class, (ItemAttributeModifiersCallback callback, ItemAttributeModifierEvent evt) -> {
-            Multimap<Attribute, AttributeModifier> attributeModifiers = new AttributeModifiersMultimap(evt::getModifiers, evt::addModifier, evt::removeModifier, evt::removeAttribute, evt::clearModifiers);
-            callback.onItemAttributeModifiers(evt.getItemStack(), evt.getSlotType(), attributeModifiers);
+        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, ModifyDefaultComponentsEvent.class, (ComputeItemAttributeModifiersCallback callback, ModifyDefaultComponentsEvent evt) -> {
+            evt.getAllItems().forEach((Item item) -> {
+                ItemAttributeModifiers itemAttributeModifiers = item.components()
+                        .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+                CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
+                        itemAttributeModifiers.modifiers());
+                callback.onComputeItemAttributeModifiers(item, entries);
+                if (entries.delegate() != itemAttributeModifiers.modifiers()) {
+                    evt.modify(item, (DataComponentPatch.Builder builder) -> {
+                        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
+                    });
+                }
+            });
         });
         INSTANCE.register(ProjectileImpactCallback.class, ProjectileImpactEvent.class, (ProjectileImpactCallback callback, ProjectileImpactEvent evt) -> {
             if (callback.onProjectileImpact(evt.getProjectile(), evt.getRayTraceResult()).isInterrupt()) {
@@ -684,9 +697,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(FinalizeItemComponentsCallback.class, ModifyDefaultComponentsEvent.class, (FinalizeItemComponentsCallback callback, ModifyDefaultComponentsEvent evt) -> {
             evt.getAllItems().forEach((Item item) -> {
-                callback.onFinalizeItemComponents(item, (DataComponentPatch dataComponentPatch) -> {
+                callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
                     evt.modify(item, (DataComponentPatch.Builder builder) -> {
-                        DataComponentPatch.SplitResult splitResult = dataComponentPatch.split();
+                        DataComponentPatch.SplitResult splitResult = function.apply(item.components()).split();
                         splitResult.added().stream().forEach(builder::set);
                         splitResult.removed().forEach(builder::remove);
                     });

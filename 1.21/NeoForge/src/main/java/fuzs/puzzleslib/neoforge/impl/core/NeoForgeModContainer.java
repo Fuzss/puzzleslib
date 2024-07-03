@@ -3,8 +3,8 @@ package fuzs.puzzleslib.neoforge.impl.core;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
+import net.neoforged.fml.i18n.MavenVersionTranslator;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
-import net.neoforged.neoforge.common.util.MavenVersionStringHelper;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.jetbrains.annotations.Nullable;
 
@@ -42,7 +42,7 @@ public final class NeoForgeModContainer implements ModContainer {
 
     @Override
     public String getVersion() {
-        return MavenVersionStringHelper.artifactVersionToString(this.metadata.getVersion());
+        return MavenVersionTranslator.artifactVersionToString(this.metadata.getVersion());
     }
 
     @Override

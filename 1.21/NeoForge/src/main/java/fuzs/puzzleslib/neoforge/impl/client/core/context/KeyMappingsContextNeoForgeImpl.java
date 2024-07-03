@@ -6,9 +6,9 @@ import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.TickEvent;
 
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -26,8 +26,7 @@ public record KeyMappingsContextNeoForgeImpl(Consumer<KeyMapping> consumer) impl
 
     private static void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         if (activationHandler.gameHandler() != null) {
-            NeoForge.EVENT_BUS.addListener((final TickEvent.ClientTickEvent evt) -> {
-                if (evt.phase != TickEvent.Phase.START) return;
+            NeoForge.EVENT_BUS.addListener((final ClientTickEvent.Pre evt) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 if (minecraft.player != null) {
                     while (keyMapping.consumeClick()) {

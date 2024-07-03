@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.event.v1.FinalizeItemComponentsCallback;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -25,6 +27,7 @@ import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingBuilder;
+import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
@@ -38,7 +41,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
-import net.fabricmc.fabric.api.item.v1.ModifyItemAttributeModifiersCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
@@ -51,6 +53,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
@@ -71,6 +74,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionBrewing;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -389,8 +393,21 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(ItemEntityEvents.Toss.class, FabricPlayerEvents.ITEM_TOSS);
         INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
-        INSTANCE.register(ItemAttributeModifiersCallback.class, ModifyItemAttributeModifiersCallback.EVENT, (ItemAttributeModifiersCallback callback) -> {
-            return callback::onItemAttributeModifiers;
+        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, DefaultItemComponentEvents.MODIFY, (ComputeItemAttributeModifiersCallback callback) -> {
+            return (DefaultItemComponentEvents.ModifyContext context) -> {
+                for (Item item : BuiltInRegistries.ITEM) {
+                    ItemAttributeModifiers itemAttributeModifiers = item.components()
+                            .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+                    CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
+                            itemAttributeModifiers.modifiers());
+                    callback.onComputeItemAttributeModifiers(item, entries);
+                    if (entries.delegate() != itemAttributeModifiers.modifiers()) {
+                        context.modify(item, (DataComponentMap.Builder builder) -> {
+                            builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
+                        });
+                    }
+                }
+            };
         });
         INSTANCE.register(ProjectileImpactCallback.class, FabricEntityEvents.PROJECTILE_IMPACT);
         INSTANCE.register(BreakSpeedCallback.class, FabricPlayerEvents.BREAK_SPEED);
@@ -428,9 +445,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(FinalizeItemComponentsCallback.class, DefaultItemComponentEvents.MODIFY, (FinalizeItemComponentsCallback callback) -> {
             return (DefaultItemComponentEvents.ModifyContext context) -> {
                 for (Item item : BuiltInRegistries.ITEM) {
-                    callback.onFinalizeItemComponents(item, (DataComponentPatch dataComponentPatch) -> {
+                    callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
                         context.modify(item, (DataComponentMap.Builder builder) -> {
-                            dataComponentPatch.entrySet().forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
+                            function.apply(builder.build()).entrySet().forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
                                 builder.set((DataComponentType<Object>) entry.getKey(), entry.getValue().orElse(null));
                             });
                         });
