@@ -24,99 +24,99 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
 
     @ApiStatus.Internal
     @Override
-    <T extends Record & ClientboundMessage<T>> Packet<ClientCommonPacketListener> toClientboundPacket(T message);
+    <T> Packet<ClientCommonPacketListener> toClientboundPacket(ClientboundMessage<T> message);
 
     @ApiStatus.Internal
     @Override
-    <T extends Record & ServerboundMessage<T>> Packet<ServerCommonPacketListener> toServerboundPacket(T message);
+    <T> Packet<ServerCommonPacketListener> toServerboundPacket(ServerboundMessage<T> message);
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendMessage(PlayerSet playerSet, T message) {
+    default <T> void sendMessage(PlayerSet playerSet, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendMessage(playerSet, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ServerboundMessage<T>> void sendMessage(T message) {
+    default <T> void sendMessage(ServerboundMessage<T> message) {
         NetworkHandlerV3.super.sendMessage(message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ServerboundMessage<T>> void sendToServer(T message) {
+    default <T> void sendToServer(ServerboundMessage<T> message) {
         NetworkHandlerV3.super.sendToServer(message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendTo(ServerPlayer player, T message) {
+    default <T> void sendTo(ServerPlayer player, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendTo(player, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, T message) {
+    default <T> void sendToAll(MinecraftServer server, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAll(server, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, T message) {
+    default <T> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAll(server, exclude, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, T message) {
+    default <T> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAll(playerList, exclude, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(ServerLevel level, T message) {
+    default <T> void sendToAll(ServerLevel level, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAll(level, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(Vec3i pos, ServerLevel level, T message) {
+    default <T> void sendToAllNear(Vec3i pos, ServerLevel level, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAllNear(pos, level, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, ServerLevel level, T message) {
+    default <T> void sendToAllNear(double posX, double posY, double posZ, ServerLevel level, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAllNear(posX, posY, posZ, level, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
+    default <T> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAllNear(exclude, posX, posY, posZ, distance, level, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(BlockEntity blockEntity, T message) {
+    default <T> void sendToAllTracking(BlockEntity blockEntity, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAllTracking(blockEntity, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(LevelChunk chunk, T message) {
+    default <T> void sendToAllTracking(LevelChunk chunk, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAllTracking(chunk, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(ServerLevel level, ChunkPos chunkPos, T message) {
+    default <T> void sendToAllTracking(ServerLevel level, ChunkPos chunkPos, ClientboundMessage<T> message) {
         NetworkHandlerV3.super.sendToAllTracking(level, chunkPos, message);
     }
 
     @ApiStatus.Internal
     @Override
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message, boolean includeSelf) {
+    default <T> void sendToAllTracking(Entity entity, ClientboundMessage<T> message, boolean includeSelf) {
         NetworkHandlerV3.super.sendToAllTracking(entity, message, includeSelf);
     }
 }

@@ -82,7 +82,7 @@ public final class MessageSerializers {
      * @param <T> data type
      */
     public static <T> void registerSerializer(Class<T> type, BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) {
-        registerSerializer(type, new MessageSerializerImpl<T>(writer, reader));
+        registerSerializer(type, new MessageSerializerImpl<>(writer, reader));
     }
 
     /**
@@ -204,9 +204,9 @@ public final class MessageSerializers {
         MessageSerializer<K> keySerializer = findByType((Class<K>) typeArguments[0]);
         MessageSerializer<V> valueSerializer = findByType((Class<V>) typeArguments[1]);
         return new MessageSerializerImpl<>((FriendlyByteBuf friendlyByteBuf, Map<K, V> o) -> {
-            friendlyByteBuf.writeMap(o, keySerializer::write, valueSerializer::write);
+            friendlyByteBuf.writeMap(o, keySerializer::encode, valueSerializer::encode);
         }, (FriendlyByteBuf friendlyByteBuf) -> {
-            return friendlyByteBuf.readMap(keySerializer::read, valueSerializer::read);
+            return friendlyByteBuf.readMap(keySerializer::decode, valueSerializer::decode);
         });
     }
 
@@ -214,9 +214,9 @@ public final class MessageSerializers {
     private static <T, C extends Collection<T>> MessageSerializer<C> createCollectionSerializer(Type[] typeArguments, IntFunction<C> factory) {
         MessageSerializer<T> serializer = findByType((Class<T>) typeArguments[0]);
         return new MessageSerializerImpl<>((FriendlyByteBuf friendlyByteBuf, C o) -> {
-            friendlyByteBuf.writeCollection(o, serializer::write);
+            friendlyByteBuf.writeCollection(o, serializer::encode);
         }, (FriendlyByteBuf friendlyByteBuf) -> {
-            return friendlyByteBuf.readCollection(factory, serializer::read);
+            return friendlyByteBuf.readCollection(factory, serializer::decode);
         });
     }
 
@@ -224,9 +224,9 @@ public final class MessageSerializers {
     private static <T> MessageSerializer<Optional<T>> createOptionalSerializer(Type[] typeArguments) {
         MessageSerializer<T> serializer = findByType((Class<T>) typeArguments[0]);
         return new MessageSerializerImpl<>((FriendlyByteBuf friendlyByteBuf, Optional<T> o) -> {
-            friendlyByteBuf.writeOptional(o, serializer::write);
+            friendlyByteBuf.writeOptional(o, serializer::encode);
         }, (FriendlyByteBuf friendlyByteBuf) -> {
-            return friendlyByteBuf.readOptional(serializer::read);
+            return friendlyByteBuf.readOptional(serializer::decode);
         });
     }
 
@@ -237,13 +237,13 @@ public final class MessageSerializers {
             final int length = Array.getLength(t);
             buf.writeVarInt(length);
             for (int i = 0; i < length; i++) {
-                serializer.write(buf, Array.get(t, i));
+                serializer.encode(buf, Array.get(t, i));
             }
         }, (FriendlyByteBuf buf) -> {
             final int length = buf.readVarInt();
             Object array = Array.newInstance(clazz, length);
             for (int i = 0; i < length; i++) {
-                Array.set(array, i, serializer.read(buf));
+                Array.set(array, i, serializer.decode(buf));
             }
             return array;
         });
@@ -256,12 +256,12 @@ public final class MessageSerializers {
     private record MessageSerializerImpl<T>(BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) implements MessageSerializer<T> {
 
         @Override
-        public void write(FriendlyByteBuf buf, T instance) {
+        public void encode(FriendlyByteBuf buf, T instance) {
             this.writer.accept(buf, instance);
         }
 
         @Override
-        public T read(FriendlyByteBuf buf) {
+        public T decode(FriendlyByteBuf buf) {
             return this.reader.apply(buf);
         }
     }

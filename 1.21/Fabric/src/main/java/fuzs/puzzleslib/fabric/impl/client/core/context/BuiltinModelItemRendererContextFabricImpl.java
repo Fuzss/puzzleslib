@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContex
 import fuzs.puzzleslib.api.client.init.v1.BuiltinItemRenderer;
 import fuzs.puzzleslib.api.client.init.v1.ReloadingBuiltInItemRenderer;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -32,7 +33,7 @@ public record BuiltinModelItemRendererContextFabricImpl(String modId, List<Resou
         this.registerItemRenderer((BuiltinItemRenderer) renderer, items);
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
-        ResourceLocation identifier = new ResourceLocation(this.modId, itemName + "_built_in_model_renderer");
-        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(identifier, renderer));
+        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId, itemName + "_built_in_model_renderer");
+        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation, renderer));
     }
 }

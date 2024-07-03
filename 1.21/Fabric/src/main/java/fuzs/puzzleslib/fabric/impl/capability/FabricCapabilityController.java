@@ -47,7 +47,7 @@ public final class FabricCapabilityController implements CapabilityController {
         // AttachmentTarget is not injected into Level, only ServerLevel, via interface injection
         // But the mixin responsible for implementing the interface on all supported classes does in fact target Level, not just ServerLevel
         // This also mirrors the attachment implementation on NeoForge
-        return this.registerCapability((Class<? extends AttachmentTarget>) Level.class, identifier, capabilityFactory, (FabricCapabilityKey.Factory<Level, C, FabricLevelCapabilityKey<C>>) FabricLevelCapabilityKey::new);
+        return this.registerCapability((Class<? extends AttachmentTarget>) (Class<?>) Level.class, identifier, capabilityFactory, (FabricCapabilityKey.Factory<Level, C, FabricLevelCapabilityKey<C>>) FabricLevelCapabilityKey::new);
     }
 
     @SuppressWarnings("UnstableApiUsage")

@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -33,6 +34,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Handler for network communications between clients and a server.
@@ -65,7 +67,7 @@ public interface NetworkHandlerV3 {
      * @param message message to create packet from
      * @return packet for message
      */
-    <T extends Record & ClientboundMessage<T>> Packet<ClientCommonPacketListener> toClientboundPacket(T message);
+    <T> Packet<ClientCommonPacketListener> toClientboundPacket(ClientboundMessage<T> message);
 
     /**
      * creates a packet heading to the server side
@@ -73,7 +75,7 @@ public interface NetworkHandlerV3 {
      * @param message message to create packet from
      * @return packet for message
      */
-    <T extends Record & ServerboundMessage<T>> Packet<ServerCommonPacketListener> toServerboundPacket(T message);
+    <T> Packet<ServerCommonPacketListener> toServerboundPacket(ServerboundMessage<T> message);
 
     /**
      * Send message from server to clients.
@@ -81,7 +83,7 @@ public interface NetworkHandlerV3 {
      * @param playerSet players to send to
      * @param message   message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendMessage(PlayerSet playerSet, T message) {
+    default <T> void sendMessage(PlayerSet playerSet, ClientboundMessage<T> message) {
         playerSet.notify(this.toClientboundPacket(message));
     }
 
@@ -90,7 +92,7 @@ public interface NetworkHandlerV3 {
      *
      * @param message message to send
      */
-    default <T extends Record & ServerboundMessage<T>> void sendMessage(T message) {
+    default <T> void sendMessage(ServerboundMessage<T> message) {
         ClientPacketListener clientPacketListener = Proxy.INSTANCE.getClientPacketListener();
         Objects.requireNonNull(clientPacketListener, "client packet listener is null");
         clientPacketListener.send(this.toServerboundPacket(message));
@@ -101,7 +103,7 @@ public interface NetworkHandlerV3 {
      *
      * @param message message to send
      */
-    default <T extends Record & ServerboundMessage<T>> void sendToServer(T message) {
+    default <T> void sendToServer(ServerboundMessage<T> message) {
         this.sendMessage(message);
     }
 
@@ -111,7 +113,7 @@ public interface NetworkHandlerV3 {
      * @param player  player to send to
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendTo(ServerPlayer player, T message) {
+    default <T> void sendTo(ServerPlayer player, ClientboundMessage<T> message) {
         Objects.requireNonNull(player, "player is null");
         player.connection.send(this.toClientboundPacket(message));
     }
@@ -122,7 +124,7 @@ public interface NetworkHandlerV3 {
      * @param server  server for retrieving the player list
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, T message) {
+    default <T> void sendToAll(MinecraftServer server, ClientboundMessage<T> message) {
         this.sendToAll(server, null, message);
     }
 
@@ -133,7 +135,7 @@ public interface NetworkHandlerV3 {
      * @param exclude player to exclude
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, T message) {
+    default <T> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, ClientboundMessage<T> message) {
         Objects.requireNonNull(server, "server is null");
         this.sendToAll(server.getPlayerList().getPlayers(), exclude, message);
     }
@@ -145,7 +147,7 @@ public interface NetworkHandlerV3 {
      * @param exclude    player to exclude
      * @param message    message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, T message) {
+    default <T> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, ClientboundMessage<T> message) {
         Objects.requireNonNull(playerList, "player list is null");
         for (ServerPlayer player : playerList) {
             if (player != exclude) this.sendTo(player, message);
@@ -158,7 +160,7 @@ public interface NetworkHandlerV3 {
      * @param level   the level
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAll(ServerLevel level, T message) {
+    default <T> void sendToAll(ServerLevel level, ClientboundMessage<T> message) {
         Objects.requireNonNull(level, "level is null");
         for (ServerPlayer player : level.players()) {
             this.sendTo(player, message);
@@ -172,7 +174,7 @@ public interface NetworkHandlerV3 {
      * @param level   the current level
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(Vec3i pos, ServerLevel level, T message) {
+    default <T> void sendToAllNear(Vec3i pos, ServerLevel level, ClientboundMessage<T> message) {
         Objects.requireNonNull(pos, "pos is null");
         this.sendToAllNear(pos.getX(), pos.getY(), pos.getZ(), level, message);
     }
@@ -186,7 +188,7 @@ public interface NetworkHandlerV3 {
      * @param level   the current level
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(double posX, double posY, double posZ, ServerLevel level, T message) {
+    default <T> void sendToAllNear(double posX, double posY, double posZ, ServerLevel level, ClientboundMessage<T> message) {
         this.sendToAllNear(null, posX, posY, posZ, 64.0, level, message);
     }
 
@@ -201,7 +203,7 @@ public interface NetworkHandlerV3 {
      * @param level    the current level
      * @param message  message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
+    default <T> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, ClientboundMessage<T> message) {
         Objects.requireNonNull(level, "level is null");
         level.getServer()
                 .getPlayerList()
@@ -214,7 +216,7 @@ public interface NetworkHandlerV3 {
      * @param blockEntity the block entity a player must track to receive this message
      * @param message     message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(BlockEntity blockEntity, T message) {
+    default <T> void sendToAllTracking(BlockEntity blockEntity, ClientboundMessage<T> message) {
         Objects.requireNonNull(blockEntity, "block entity is null");
         Level level = blockEntity.getLevel();
         Objects.requireNonNull(level, "block entity level is null");
@@ -228,7 +230,7 @@ public interface NetworkHandlerV3 {
      * @param chunk   the chunk a player must track to receive this message
      * @param message message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(LevelChunk chunk, T message) {
+    default <T> void sendToAllTracking(LevelChunk chunk, ClientboundMessage<T> message) {
         Objects.requireNonNull(chunk, "chunk is null");
         Preconditions.checkState(!chunk.getLevel().isClientSide, "chunk level is client level");
         this.sendToAllTracking((ServerLevel) chunk.getLevel(), chunk.getPos(), message);
@@ -241,7 +243,7 @@ public interface NetworkHandlerV3 {
      * @param chunkPos the chunk pos a player must track to receive this message
      * @param message  message to send
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(ServerLevel level, ChunkPos chunkPos, T message) {
+    default <T> void sendToAllTracking(ServerLevel level, ChunkPos chunkPos, ClientboundMessage<T> message) {
         Objects.requireNonNull(level, "level is null");
         Objects.requireNonNull(chunkPos, "chunk pos is null");
         List<ServerPlayer> players = level.getChunkSource().chunkMap.getPlayers(chunkPos, false);
@@ -255,7 +257,7 @@ public interface NetworkHandlerV3 {
      * @param message     message to send
      * @param includeSelf when the tracked entity is a player will they receive the message as well
      */
-    default <T extends Record & ClientboundMessage<T>> void sendToAllTracking(Entity entity, T message, boolean includeSelf) {
+    default <T> void sendToAllTracking(Entity entity, ClientboundMessage<T> message, boolean includeSelf) {
         Objects.requireNonNull(entity, "entity is null");
         Preconditions.checkState(!entity.getCommandSenderWorld().isClientSide, "entity level is client level");
         ServerChunkCache chunkSource = ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource();
@@ -335,6 +337,54 @@ public interface NetworkHandlerV3 {
          * @return this builder instance
          */
         <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz);
+
+        /**
+         * Register a message that will be sent to clients.
+         *
+         * @param <T>     message implementation
+         * @param clazz   message class type
+         * @param factory message factory
+         */
+        default <T extends MessageV2<T>> Builder registerLegacyClientbound(Class<T> clazz, Supplier<T> factory) {
+            return this.registerLegacyClientbound(clazz, (FriendlyByteBuf friendlyByteBuf) -> {
+                T message = factory.get();
+                message.read(friendlyByteBuf);
+                return message;
+            });
+        }
+
+        /**
+         * Register a message that will be sent to servers.
+         *
+         * @param <T>     message implementation
+         * @param clazz   message class type
+         * @param factory message factory
+         */
+        default <T extends MessageV2<T>> Builder registerLegacyServerbound(Class<T> clazz, Supplier<T> factory) {
+            return this.registerLegacyServerbound(clazz, (FriendlyByteBuf friendlyByteBuf) -> {
+                T message = factory.get();
+                message.read(friendlyByteBuf);
+                return message;
+            });
+        }
+
+        /**
+         * Register a message that will be sent to clients.
+         *
+         * @param <T>     message implementation
+         * @param clazz   message class type
+         * @param factory message factory
+         */
+        <T extends MessageV2<T>> Builder registerLegacyClientbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory);
+
+        /**
+         * Register a message that will be sent to servers.
+         *
+         * @param <T>     message implementation
+         * @param clazz   message class type
+         * @param factory message factory
+         */
+        <T extends MessageV2<T>> Builder registerLegacyServerbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory);
 
         /**
          * Are clients &amp; servers without this mod or vanilla clients &amp; servers compatible.

@@ -1,28 +1,34 @@
 package fuzs.puzzleslib.api.network.v2;
 
+import fuzs.puzzleslib.api.network.v3.ClientMessageListener;
+import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.ServerMessageListener;
+import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 
 /**
- * network message template
+ * Network message template providing a handler that runs when the message is received.
+ * <p>
+ * Additionally, controls decoding and encoding directly in the message class.
  *
- * @param <T> the message type for the handler
+ * @param <T> the implemented message type
  */
 public interface MessageV2<T extends MessageV2<T>> {
 
     /**
-     * writes message data to buffer
+     * Serialize this instance to a byte buffer.
      *
-     * @param buf    network data byte buffer
+     * @param buf network data byte buffer
      */
-    void write(final FriendlyByteBuf buf);
+    void write(FriendlyByteBuf buf);
 
     /**
-     * reads message data from buffer
+     * Deserialize this instance from a byte buffer.
      *
-     * @param buf    network data byte buffer
+     * @param buf network data byte buffer
      */
-    void read(final FriendlyByteBuf buf);
+    void read(FriendlyByteBuf buf);
 
     /**
      * @return message handler for message on reception side
@@ -30,19 +36,57 @@ public interface MessageV2<T extends MessageV2<T>> {
     MessageHandler<T> makeHandler();
 
     /**
-     * this is a class, so it cannot be implemented as a functional interface to avoid client only calls somehow running into problems on a dedicated server
+     * @return this message wrapped as {@link fuzs.puzzleslib.api.network.v3.ClientboundMessage}
+     */
+    default ClientboundMessage<T> toClientboundMessage() {
+        return new ClientboundMessage<>() {
+
+            @Override
+            public ClientMessageListener<T> getHandler() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public T unwrap() {
+                return (T) MessageV2.this;
+            }
+        };
+    }
+
+    /**
+     * @return this message wrapped as {@link fuzs.puzzleslib.api.network.v3.ServerboundMessage}
+     */
+    default ServerboundMessage<T> toServerboundMessage() {
+        return new ServerboundMessage<>() {
+
+            @Override
+            public ServerMessageListener<T> getHandler() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public T unwrap() {
+                return (T) MessageV2.this;
+            }
+        };
+    }
+
+    /**
+     * Handler for received messages.
+     * <p>
+     * This is implemented as an anonymous class, to force implementations to be a class as well, to prevent issues
+     * concerning loading server-only classes on a client.
      *
-     * @param <T>   this message
+     * @param <T> the message to handle
      */
     abstract class MessageHandler<T extends MessageV2<T>> {
 
         /**
-         * handle given message
-         * handler implemented as separate class to hopefully avoid invoking client class on the server
+         * Called to handle the given message.
          *
-         * @param message       message to handle
-         * @param player        server or client player
-         * @param instance  server or client instance
+         * @param message  the message to handle
+         * @param player   the server or client player
+         * @param instance the minecraft server or minecraft client instance
          */
         public abstract void handle(T message, Player player, Object instance);
     }

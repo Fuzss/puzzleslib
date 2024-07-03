@@ -30,12 +30,13 @@ abstract class EntityRendererFabricMixin<T extends Entity> {
             callback.cancel();
             if (!this.shouldShowName(entity)) return;
         }
-        this.renderNameTag(entity, content.get(), poseStack, buffer, packedLight);
+
+        this.renderNameTag(entity, content.get(), poseStack, buffer, packedLight, partialTick);
     }
 
     @Shadow
     protected abstract boolean shouldShowName(T entity);
 
     @Shadow
-    protected abstract void renderNameTag(T entity, Component displayName, PoseStack matrixStack, MultiBufferSource buffer, int packedLight);
+    protected abstract void renderNameTag(T entity, Component displayName, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float partialTick);
 }

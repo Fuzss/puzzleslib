@@ -55,14 +55,14 @@ public final class RecordSerializer<T extends Record> implements MessageSerializ
     }
 
     @Override
-    public void write(FriendlyByteBuf buf, T instance) {
+    public void encode(FriendlyByteBuf buf, T instance) {
         for (RecordAccess<?, T> access : this.recordAccess) {
             access.write(buf, instance);
         }
     }
 
     @Override
-    public T read(FriendlyByteBuf buf) {
+    public T decode(FriendlyByteBuf buf) {
         Object[] values = this.recordAccess.stream().map(recordAccess -> recordAccess.read(buf)).toArray();
         return this.instanceFactory.apply(values);
     }
@@ -86,11 +86,11 @@ public final class RecordSerializer<T extends Record> implements MessageSerializ
         }
 
         public void write(FriendlyByteBuf buf, R instance) {
-            this.serializer.write(buf, this.fieldAccess.apply(instance));
+            this.serializer.encode(buf, this.fieldAccess.apply(instance));
         }
 
         public T read(FriendlyByteBuf buf) {
-            return this.serializer.read(buf);
+            return this.serializer.decode(buf);
         }
     }
 }
