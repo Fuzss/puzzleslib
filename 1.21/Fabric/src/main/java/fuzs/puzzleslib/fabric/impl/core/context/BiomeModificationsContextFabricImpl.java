@@ -6,11 +6,11 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.fabric.impl.biome.*;
 import net.fabricmc.fabric.api.biome.v1.BiomeModification;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.ModificationPhase;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.biome.Biome;
 
 import java.util.HashMap;
@@ -31,7 +31,7 @@ public record BiomeModificationsContextFabricImpl(
     }});
 
     public BiomeModificationsContextFabricImpl(String modId, Set<ContentRegistrationFlags> availableFlags) {
-        this(BiomeModifications.create(new ResourceLocation(modId, "biome_modifiers")), availableFlags);
+        this(BiomeModifications.create(ResourceLocationHelper.fromNamespaceAndPath(modId, "biome_modifiers")), availableFlags);
     }
 
     private static BiomeModificationContext getBiomeModificationContext(net.fabricmc.fabric.api.biome.v1.BiomeModificationContext modificationContext, Biome biome) {

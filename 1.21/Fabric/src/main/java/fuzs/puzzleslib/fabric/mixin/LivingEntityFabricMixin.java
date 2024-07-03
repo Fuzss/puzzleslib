@@ -12,6 +12,7 @@ import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -188,7 +189,7 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "dropExperience", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"), cancellable = true)
     protected void dropExperience(CallbackInfo callback) {
-        DefaultedInt experienceReward = DefaultedInt.fromValue(this.getExperienceReward());
+        DefaultedInt experienceReward = DefaultedInt.fromValue(this.getBaseExperienceReward());
         EventResult result = FabricLivingEvents.EXPERIENCE_DROP.invoker().onLivingExperienceDrop(LivingEntity.class.cast(this), this.lastHurtByPlayer, experienceReward);
         if (result.isInterrupt()) {
             callback.cancel();
@@ -201,7 +202,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     }
 
     @Shadow
-    protected abstract int getExperienceReward();
+    protected abstract int getBaseExperienceReward();
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback) {
@@ -339,14 +340,14 @@ abstract class LivingEntityFabricMixin extends Entity {
     }
 
     @Inject(method = "removeEffect", at = @At("HEAD"), cancellable = true)
-    public void removeEffect(MobEffect effect, CallbackInfoReturnable<Boolean> callback) {
+    public void removeEffect(Holder<MobEffect> effect, CallbackInfoReturnable<Boolean> callback) {
         EventResult result = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker().onMobEffectRemove(LivingEntity.class.cast(this), this.getEffect(effect));
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
     @Shadow
     @Nullable
-    public abstract MobEffectInstance getEffect(MobEffect effect);
+    public abstract MobEffectInstance getEffect(Holder<MobEffect> effect);
 
     @Inject(method = "removeEffect", at = @At("HEAD"))
     public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {

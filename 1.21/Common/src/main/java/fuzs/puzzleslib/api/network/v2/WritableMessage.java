@@ -14,7 +14,7 @@ public interface WritableMessage<T extends MessageV2<T>> extends MessageV2<T> {
 
     @ApiStatus.NonExtendable
     @Override
-    default void read(final FriendlyByteBuf friendlyByteBuf) {
+    default void read(FriendlyByteBuf friendlyByteBuf) {
         throw new UnsupportedOperationException();
     }
 }

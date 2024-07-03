@@ -56,7 +56,7 @@ public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
 
     private <T> void register(Class<T> clazz, BiFunction<T, PlayPayloadContext, CompletableFuture<Void>> handle, GenericPayloadHandler<T> receiverHandler, GenericPayloadHandler<T> senderHandler) {
         Objects.requireNonNull(this.channel, "channel is null");
-        Function<FriendlyByteBuf, T> factory = MessageSerializers.findByType(clazz)::read;
+        Function<FriendlyByteBuf, T> factory = MessageSerializers.findByType(clazz)::decode;
         ResourceLocation messageName = this.registerMessageType(clazz);
         this.channel.play(messageName, (FriendlyByteBuf friendlyByteBuf) -> {
             return new CustomPacketPayloadAdapter<>(factory.apply(friendlyByteBuf), messageName);

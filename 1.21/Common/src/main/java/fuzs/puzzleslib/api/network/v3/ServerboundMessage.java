@@ -3,8 +3,8 @@ package fuzs.puzzleslib.api.network.v3;
 /**
  * Template for a message sent by clients and received on the server.
  *
- * @param <T> message type
+ * @param <T> the message type
  */
-public interface ServerboundMessage<T extends Record> extends MessageV3<ServerMessageListener<T>> {
+public interface ServerboundMessage<T> extends MessageV3<T, ServerMessageListener<T>> {
 
 }
