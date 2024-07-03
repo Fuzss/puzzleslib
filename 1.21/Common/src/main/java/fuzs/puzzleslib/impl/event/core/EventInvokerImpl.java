@@ -26,16 +26,20 @@ public final class EventInvokerImpl {
     }
 
     private EventInvokerImpl() {
-
+        // NO-OP
     }
 
     public static void initialize() {
-        // initialize most of the events as late as possible to avoid loading many classes very early,
-        // and being blamed for possible class loading errors that follow
-        CommonFactories.INSTANCE.registerEventHandlers();
-        initialized = true;
-        while (!DEFERRED_INVOKER_REGISTRATIONS.isEmpty()) {
-            DEFERRED_INVOKER_REGISTRATIONS.poll().run();
+        if (!initialized) {
+            // initialize most of the events as late as possible to avoid loading many classes very early,
+            // and being blamed for possible class loading errors that follow
+            CommonFactories.INSTANCE.registerEventHandlers();
+            initialized = true;
+            while (!DEFERRED_INVOKER_REGISTRATIONS.isEmpty()) {
+                DEFERRED_INVOKER_REGISTRATIONS.poll().run();
+            }
+        } else {
+            throw new IllegalStateException("event handlers already initialized");
         }
     }
 

@@ -116,7 +116,11 @@ public final class MessageSerializers {
 
     private static <T> void registerSerializer(Class<T> type, EntityDataSerializer<T> entityDataSerializer) {
         StreamCodec<? super RegistryFriendlyByteBuf, T> codec = entityDataSerializer.codec();
-        registerSerializer(type, (friendlyByteBuf, t) -> codec.encode(friendlyByteBuf, t), friendlyByteBuf -> codec.decode(friendlyByteBuf));
+        registerSerializer(type, (FriendlyByteBuf friendlyByteBuf, T t) -> {
+            codec.encode((RegistryFriendlyByteBuf) friendlyByteBuf, t);
+        }, (FriendlyByteBuf friendlyByteBuf) -> {
+            return codec.decode((RegistryFriendlyByteBuf) friendlyByteBuf);
+        });
     }
 
     private static <T> void registerSerializer(Class<T> type, StreamCodec<ByteBuf, T> streamCodec) {

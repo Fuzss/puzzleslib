@@ -20,7 +20,7 @@ import java.util.OptionalDouble;
 public final class EventImplHelper {
 
     private EventImplHelper() {
-
+        // NO-OP
     }
 
     public static void onLivingJump(LivingJumpCallback callback, LivingEntity entity) {
