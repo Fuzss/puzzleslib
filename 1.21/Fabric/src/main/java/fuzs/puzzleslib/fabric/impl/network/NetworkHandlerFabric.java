@@ -23,10 +23,10 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
+public class NetworkHandlerFabric extends NetworkHandlerRegistryImpl {
     private boolean building = true;
 
-    public NetworkHandlerFabricV3(ResourceLocation channelName) {
+    public NetworkHandlerFabric(ResourceLocation channelName) {
         super(channelName);
     }
 

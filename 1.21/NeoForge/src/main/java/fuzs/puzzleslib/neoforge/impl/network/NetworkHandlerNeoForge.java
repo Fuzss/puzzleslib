@@ -34,11 +34,11 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class NetworkHandlerNeoForgeV3 extends NetworkHandlerRegistryImpl {
+public class NetworkHandlerNeoForge extends NetworkHandlerRegistryImpl {
     @Nullable
     private IPayloadRegistrar channel;
 
-    public NetworkHandlerNeoForgeV3(ResourceLocation channelName) {
+    public NetworkHandlerNeoForge(ResourceLocation channelName) {
         super(channelName);
     }
 
