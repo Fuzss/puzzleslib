@@ -3,14 +3,12 @@ package fuzs.puzzleslib.neoforge.impl.core;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
-import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.neoforge.impl.capability.NeoForgeCapabilityController;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryManager;
-import fuzs.puzzleslib.neoforge.impl.network.NetworkHandlerNeoForgeV2;
-import fuzs.puzzleslib.neoforge.impl.network.NetworkHandlerNeoForgeV3;
+import fuzs.puzzleslib.neoforge.impl.network.NetworkHandlerNeoForge;
 import net.minecraft.resources.ResourceLocation;
 
 public final class NeoForgeModContext extends ModContext {
@@ -20,13 +18,8 @@ public final class NeoForgeModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandlerV2 getNetworkHandlerV2(ResourceLocation channelName, boolean optional) {
-        return new NetworkHandlerNeoForgeV2(channelName, optional);
-    }
-
-    @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName) {
-        return this.addBuildable(new NetworkHandlerNeoForgeV3(channelName));
+        return this.addBuildable(new NetworkHandlerNeoForge(channelName));
     }
 
     @Override

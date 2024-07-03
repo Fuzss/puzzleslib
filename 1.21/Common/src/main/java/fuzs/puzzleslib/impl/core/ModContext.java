@@ -15,7 +15,6 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
-import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
@@ -90,8 +89,6 @@ public abstract class ModContext {
     public static boolean isPresentServerside(String modId) {
         return MOD_CONTEXTS.containsKey(modId) && MOD_CONTEXTS.get(modId).presentServerside;
     }
-
-    public abstract NetworkHandlerV2 getNetworkHandlerV2(ResourceLocation channelName, boolean optional);
 
     public abstract NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName);
 
