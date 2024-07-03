@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
-import fuzs.puzzleslib.api.init.v3.PotionBrewingRegistry;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import net.minecraft.resources.ResourceKey;
@@ -25,8 +24,6 @@ public interface CommonFactories {
     ProxyImpl getClientProxy();
 
     ProxyImpl getServerProxy();
-
-    PotionBrewingRegistry getPotionBrewingRegistry();
 
     GameRulesFactory getGameRulesFactory();
 

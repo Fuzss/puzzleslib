@@ -28,7 +28,7 @@ public final class ItemEquipmentFactories {
     };
 
     private ItemEquipmentFactories() {
-
+        // NO-OP
     }
 
     /**

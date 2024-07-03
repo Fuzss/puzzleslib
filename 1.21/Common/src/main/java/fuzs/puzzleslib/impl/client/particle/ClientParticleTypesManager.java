@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.client.particle;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 
 public final class ClientParticleTypesManager implements PreparableReloadListener {
     private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
-    private static final ResourceLocation PARTICLES_ATLAS_INFO = ResourceLocation.withDefaultNamespace("particles");
+    private static final ResourceLocation PARTICLES_ATLAS_INFO = ResourceLocationHelper.withDefaultNamespace("particles");
 
     private final Map<ResourceLocation, ParticleProvider<?>> providers = Maps.newHashMap();
     private final Map<ResourceLocation, MutableSpriteSet> spriteSets = Maps.newHashMap();

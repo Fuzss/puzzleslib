@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.client;
 
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.client.model.ModItemModelProvider;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.ForgeDataProviderContext;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -19,7 +20,7 @@ import org.apache.commons.lang3.ArrayUtils;
 public abstract class AbstractModelProvider extends BlockStateProvider {
     private final ModItemModelProvider itemModels;
 
-    public AbstractModelProvider(ForgeDataProviderContext context) {
+    public AbstractModelProvider(NeoForgeDataProviderContext context) {
         this(context.getModId(), context.getPackOutput(), context.getFileHelper());
     }
 
@@ -95,10 +96,10 @@ public abstract class AbstractModelProvider extends BlockStateProvider {
     public ResourceLocation extendKey(Block block, String... extensions) {
         ResourceLocation loc = this.key(block);
         extensions = ArrayUtils.add(extensions, loc.getPath());
-        return ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), String.join("/", extensions));
+        return ResourceLocationHelper.fromNamespaceAndPath(loc.getNamespace(), String.join("/", extensions));
     }
 
     public ResourceLocation extend(ResourceLocation rl, String suffix) {
-        return ResourceLocation.fromNamespaceAndPath(rl.getNamespace(), rl.getPath() + suffix);
+        return ResourceLocationHelper.fromNamespaceAndPath(rl.getNamespace(), rl.getPath() + suffix);
     }
 }

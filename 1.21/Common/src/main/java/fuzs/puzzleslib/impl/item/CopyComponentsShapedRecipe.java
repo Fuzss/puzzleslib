@@ -1,30 +1,31 @@
 package fuzs.puzzleslib.impl.item;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 
-public class CopyTagShapedRecipe extends ShapedRecipe implements CopyTagRecipe {
+public class CopyComponentsShapedRecipe extends ShapedRecipe implements CopyComponentsRecipe {
     private final RecipeSerializer<?> recipeSerializer;
     private final Ingredient copyFrom;
 
-    public CopyTagShapedRecipe(String modId, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
-        this(CopyTagRecipe.getModSerializer(modId, CopyTagRecipe.SHAPED_RECIPE_SERIALIZER_ID), shapedRecipe, copyFrom);
+    public CopyComponentsShapedRecipe(String modId, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
+        this(CopyComponentsRecipe.getModSerializer(modId, CopyComponentsRecipe.SHAPED_RECIPE_SERIALIZER_ID), shapedRecipe, copyFrom);
     }
 
-    public CopyTagShapedRecipe(RecipeSerializer<?> recipeSerializer, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
+    public CopyComponentsShapedRecipe(RecipeSerializer<?> recipeSerializer, ShapedRecipe shapedRecipe, Ingredient copyFrom) {
         super(shapedRecipe.getGroup(), shapedRecipe.category(), shapedRecipe.pattern, shapedRecipe.getResultItem(RegistryAccess.EMPTY), shapedRecipe.showNotification());
         this.recipeSerializer = recipeSerializer;
         this.copyFrom = copyFrom;
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer craftingContainer, RegistryAccess registryAccess) {
-        ItemStack itemStack = super.assemble(craftingContainer, registryAccess);
-        CopyTagRecipe.super.tryCopyTagToResult(itemStack, craftingContainer);
+    public ItemStack assemble(CraftingInput craftingInput, HolderLookup.Provider registries) {
+        ItemStack itemStack = super.assemble(craftingInput, registries);
+        CopyComponentsRecipe.super.copyComponentsToResult(itemStack, craftingInput);
         return itemStack;
     }
 
@@ -34,7 +35,7 @@ public class CopyTagShapedRecipe extends ShapedRecipe implements CopyTagRecipe {
     }
 
     @Override
-    public Ingredient getCopyTagSource() {
+    public Ingredient getComponentsSource() {
         return this.copyFrom;
     }
 }

@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RunAroundLikeCrazyGoal.class)
-public abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
+abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
     @Shadow
     @Final
     private AbstractHorse horse;

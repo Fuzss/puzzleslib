@@ -23,7 +23,7 @@ public final class GlobalCapabilityRegister {
 
     public static <T, C extends CapabilityComponent<T>> void register(CapabilityKey<T, C> capabilityKey) {
         if (REGISTER.put(capabilityKey.identifier(), capabilityKey) != null) {
-            throw new IllegalStateException("Duplicate capability %s".formatted(capabilityKey.identifier()));
+            throw new IllegalStateException("Duplicate capability " + capabilityKey.identifier());
         }
     }
 
@@ -33,13 +33,13 @@ public final class GlobalCapabilityRegister {
         if (capabilityKey != null) {
             return capabilityKey;
         } else {
-            throw new IllegalStateException("No capability registered for identifier %s".formatted(identifier));
+            throw new IllegalStateException("No capability registered for identifier " + identifier);
         }
     }
 
     public static void testHolderType(Class<?> holderType) {
         if (!GlobalCapabilityRegister.VALID_CAPABILITY_TYPES.contains(holderType)) {
-            throw new IllegalArgumentException("%s is an invalid type".formatted(holderType.getName()));
+            throw new IllegalArgumentException(holderType.getName() + " is an invalid type");
         }
     }
 }

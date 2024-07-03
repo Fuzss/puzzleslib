@@ -7,6 +7,7 @@ import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.network.serialization.RecordSerializer;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -99,7 +100,7 @@ public final class MessageSerializers {
         } else {
             registry = null;
         }
-        Objects.requireNonNull(registry, "Registry for key %s not found".formatted(resourceKey.location()));
+        Objects.requireNonNull(registry, () -> "Registry for key %s not found".formatted(resourceKey.location()));
         registerSerializer((Class<T>) type, (FriendlyByteBuf friendlyByteBuf, T t) -> {
             friendlyByteBuf.writeVarInt(registry.getId(t));
         }, (FriendlyByteBuf friendlyByteBuf) -> {
@@ -315,11 +316,15 @@ public final class MessageSerializers {
         }, (FriendlyByteBuf friendlyByteBuf) -> {
             return new Vector3f(friendlyByteBuf.readFloat(), friendlyByteBuf.readFloat(), friendlyByteBuf.readFloat());
         });
-        registerSerializer(FriendlyByteBuf.class, (FriendlyByteBuf buf, FriendlyByteBuf other) -> {
-            buf.writeVarInt(other.readableBytes());
-            buf.writeBytes(other);
-            other.release();
-        }, (FriendlyByteBuf buf) -> new FriendlyByteBuf(buf.readBytes(buf.readVarInt())));
+        registerSerializer(FriendlyByteBuf.class, (FriendlyByteBuf newBuf, FriendlyByteBuf buf) -> {
+            newBuf.writeBytes(buf.copy());
+            buf.release();
+        }, (FriendlyByteBuf buf) -> {
+            FriendlyByteBuf newBuf = new FriendlyByteBuf(Unpooled.buffer());
+            newBuf.writeBytes(buf.copy());
+            buf.skipBytes(buf.readableBytes());
+            return newBuf;
+        });
 
         registerSerializer(SoundEvent.class, Registries.SOUND_EVENT);
         registerSerializer(Fluid.class, Registries.FLUID);

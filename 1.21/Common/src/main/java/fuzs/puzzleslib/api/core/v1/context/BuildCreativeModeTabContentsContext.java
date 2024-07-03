@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.core.v1.context;
 
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -17,7 +18,7 @@ public interface BuildCreativeModeTabContentsContext {
      * @param itemsGenerator context for adding items to the creative mode tab
      */
     default void registerBuildListener(String modId, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
-        ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(modId, "main");
+        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(modId, "main");
         this.registerBuildListener(resourceLocation, itemsGenerator);
     }
 

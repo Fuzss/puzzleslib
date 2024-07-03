@@ -58,9 +58,9 @@ public final class EventInvokerImpl {
     private static <T> EventInvoker<T> lookup(Class<T> clazz, @Nullable Object context) {
         Objects.requireNonNull(clazz, "type is null");
         EventInvokerLike<T> invokerLike = (EventInvokerLike<T>) EVENT_INVOKER_LOOKUP.get(clazz);
-        Objects.requireNonNull(invokerLike, "invoker for type %s is null".formatted(clazz));
+        Objects.requireNonNull(invokerLike, "invoker is null for type " + clazz);
         EventInvoker<T> invoker = invokerLike.asEventInvoker(context);
-        Objects.requireNonNull(invoker, "invoker for type %s is null".formatted(clazz));
+        Objects.requireNonNull(invoker, "invoker is null for type " + clazz);
         return invoker;
     }
 
@@ -71,7 +71,7 @@ public final class EventInvokerImpl {
             if (joinInvokers) {
                 invoker = join(invoker, other);
             } else {
-                throw new IllegalArgumentException("duplicate event invoker for type %s".formatted(clazz));
+                throw new IllegalArgumentException("duplicate event invoker for type " + clazz);
             }
         }
         EVENT_INVOKER_LOOKUP.put(clazz, invoker);

@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.client;
 
-import fuzs.puzzleslib.neoforge.api.data.v2.core.ForgeDataProviderContext;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -11,7 +12,7 @@ import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
     protected final String modId;
 
-    public AbstractSoundDefinitionProvider(ForgeDataProviderContext context) {
+    public AbstractSoundDefinitionProvider(NeoForgeDataProviderContext context) {
         this(context.getModId(), context.getPackOutput(), context.getFileHelper());
     }
 
@@ -65,10 +66,10 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
     }
 
     protected ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(this.modId, path);
+        return ResourceLocationHelper.fromNamespaceAndPath(this.modId, path);
     }
 
     protected ResourceLocation vanilla(String path) {
-        return ResourceLocation.withDefaultNamespace(path);
+        return ResourceLocationHelper.withDefaultNamespace(path);
     }
 }

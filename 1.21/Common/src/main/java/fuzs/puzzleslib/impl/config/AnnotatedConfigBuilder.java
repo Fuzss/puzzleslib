@@ -181,7 +181,7 @@ public class AnnotatedConfigBuilder {
         } else if (type == String.class) {
             Config.AllowedValues allowedValues = field.getDeclaredAnnotation(Config.AllowedValues.class);
             if (allowedValues != null && allowedValues.values().length != 0) {
-                builder.comment(ObjectArrays.concat(description, String.format("Allowed Values: %s", String.join(", ", allowedValues.values()))));
+                builder.comment(ObjectArrays.concat(description, "Allowed Values: " + String.join(", ", allowedValues.values())));
                 addCallback(context, builder.define(name, (String) defaultValue, o -> testAllowedValues(allowedValues.values(), o)), field, instance);
             } else {
                 addCallback(context, builder.define(name, (String) defaultValue), field, instance);
@@ -198,13 +198,13 @@ public class AnnotatedConfigBuilder {
             // currently, only supports a predicate for string and enum lists, might also want to add range check for number values
             Config.AllowedValues allowedValues = field.getDeclaredAnnotation(Config.AllowedValues.class);
             if (allowedValues != null && allowedValues.values().length != 0) {
-                builder.comment(ObjectArrays.concat(description, String.format("Allowed Values: %s", String.join(", ", allowedValues.values()))));
+                builder.comment(ObjectArrays.concat(description, "Allowed Values: " + String.join(", ", allowedValues.values())));
                 addCallback(context, builder.defineList(name, (List<?>) defaultValue, o -> testAllowedValues(allowedValues.values(), o)), field, instance);
             } else {
                 addCallback(context, builder.defineList(name, (List<?>) defaultValue, o -> true), field, instance);
             }
         } else {
-            throw new IllegalArgumentException(String.format("Unsupported config value type: %s", type));
+            throw new IllegalArgumentException("Unsupported config value type: " + type);
         }
     }
 

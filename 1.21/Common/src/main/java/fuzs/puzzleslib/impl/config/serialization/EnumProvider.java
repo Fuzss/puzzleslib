@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.config.serialization;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.Util;
 import net.minecraft.resources.ResourceLocation;
 
@@ -19,7 +20,7 @@ public final class EnumProvider<T extends Enum<T>> implements KeyedValueProvider
     public EnumProvider(Class<T> enumClazz, String modId) {
         this.clazz = enumClazz;
         this.values = Stream.of(enumClazz.getEnumConstants()).collect(ImmutableBiMap.toImmutableBiMap((T t) -> {
-            return ResourceLocation.fromNamespaceAndPath(modId, Util.sanitizeName(t.name(), ResourceLocation::validPathChar));
+            return ResourceLocationHelper.fromNamespaceAndPath(modId, Util.sanitizeName(t.name(), ResourceLocation::validPathChar));
         }, Function.identity()));
     }
 

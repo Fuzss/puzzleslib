@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.client.model;
 
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
@@ -41,7 +42,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     public ItemModelBuilder basicItem(ResourceLocation item, ResourceLocation texture) {
-        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/generated")).texture("layer0", ResourceLocation.fromNamespaceAndPath(texture.getNamespace(), "item/" + texture.getPath()));
+        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/generated")).texture("layer0", ResourceLocationHelper.fromNamespaceAndPath(texture.getNamespace(), "item/" + texture.getPath()));
     }
 
     public ItemModelBuilder handheldItem(Item item) {
@@ -49,7 +50,7 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     public ItemModelBuilder handheldItem(ResourceLocation item) {
-        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/handheld")).texture("layer0", ResourceLocation.fromNamespaceAndPath(item.getNamespace(), "item/" + item.getPath()));
+        return this.getBuilder(item.toString()).parent(new ModelFile.UncheckedModelFile("item/handheld")).texture("layer0", ResourceLocationHelper.fromNamespaceAndPath(item.getNamespace(), "item/" + item.getPath()));
     }
 
     public ItemModelBuilder spawnEgg(Item item) {

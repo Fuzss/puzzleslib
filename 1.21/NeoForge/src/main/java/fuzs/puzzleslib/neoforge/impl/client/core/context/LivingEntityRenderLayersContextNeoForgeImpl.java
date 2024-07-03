@@ -29,7 +29,7 @@ public record LivingEntityRenderLayersContextNeoForgeImpl(
             });
         } else {
             LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) this.evt.getRenderer(entityType);
-            Objects.requireNonNull(entityRenderer, "entity renderer for %s is null".formatted(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString()));
+            Objects.requireNonNull(entityRenderer, () -> "entity renderer for %s is null".formatted(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString()));
             this.register(entityRenderer, factory);
         }
     }

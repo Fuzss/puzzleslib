@@ -24,6 +24,7 @@ import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
+import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingBuilder;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
@@ -36,15 +37,21 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
+import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.item.v1.ModifyItemAttributeModifiersCallback;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
@@ -61,7 +68,9 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -288,7 +297,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(AnvilEvents.Use.class, FabricPlayerEvents.ANVIL_USE);
         INSTANCE.register(ItemEntityEvents.Touch.class, FabricPlayerEvents.ITEM_TOUCH);
         INSTANCE.register(ItemEntityEvents.Pickup.class, FabricPlayerEvents.ITEM_PICKUP);
-        INSTANCE.register(LootingLevelCallback.class, FabricLivingEvents.LOOTING_LEVEL);
+        INSTANCE.register(ComputeLootingLevelCallback.class, FabricLivingEvents.COMPUTE_LOOTING_LEVEL);
         INSTANCE.register(AnvilEvents.Update.class, FabricPlayerEvents.ANVIL_UPDATE);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
         INSTANCE.register(EntityTickEvents.Start.class, FabricEntityEvents.ENTITY_TICK_START);
@@ -411,6 +420,24 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ContainerEvents.Open.class, FabricPlayerEvents.CONTAINER_OPEN);
         INSTANCE.register(ContainerEvents.Close.class, FabricPlayerEvents.CONTAINER_CLOSE);
         INSTANCE.register(LookingAtEndermanCallback.class, FabricLivingEvents.LOOKING_AT_ENDERMAN);
+        INSTANCE.register(RegisterPotionBrewingMixesCallback.class, FabricBrewingRecipeRegistryBuilder.BUILD, (RegisterPotionBrewingMixesCallback callback) -> {
+            return (PotionBrewing.Builder builder) -> {
+                callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
+            };
+        });
+        INSTANCE.register(FinalizeItemComponentsCallback.class, DefaultItemComponentEvents.MODIFY, (FinalizeItemComponentsCallback callback) -> {
+            return (DefaultItemComponentEvents.ModifyContext context) -> {
+                for (Item item : BuiltInRegistries.ITEM) {
+                    callback.onFinalizeItemComponents(item, (DataComponentPatch dataComponentPatch) -> {
+                        context.modify(item, (DataComponentMap.Builder builder) -> {
+                            dataComponentPatch.entrySet().forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
+                                builder.set((DataComponentType<Object>) entry.getKey(), entry.getValue().orElse(null));
+                            });
+                        });
+                    });
+                }
+            };
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }

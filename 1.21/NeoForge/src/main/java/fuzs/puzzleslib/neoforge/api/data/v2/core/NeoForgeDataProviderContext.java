@@ -14,7 +14,7 @@ import java.util.function.Function;
 /**
  * An enhanced implementation of {@link DataProviderContext} that also holds an {@link ExistingFileHelper} instance.
  */
-public class ForgeDataProviderContext extends DataProviderContext {
+public class NeoForgeDataProviderContext extends DataProviderContext {
     /**
      * The file helper.
      */
@@ -26,7 +26,7 @@ public class ForgeDataProviderContext extends DataProviderContext {
      * @param lookupProvider registry lookup provider
      * @param fileHelper     the file helper
      */
-    public ForgeDataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
+    public NeoForgeDataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
         super(modId, packOutput, () -> lookupProvider);
         this.fileHelper = fileHelper;
     }
@@ -38,8 +38,8 @@ public class ForgeDataProviderContext extends DataProviderContext {
      * @param evt   the Forge event
      * @return new context instance
      */
-    public static ForgeDataProviderContext fromEvent(String modId, GatherDataEvent evt) {
-        return new ForgeDataProviderContext(modId, evt.getGenerator().getPackOutput(), evt.getLookupProvider(), evt.getExistingFileHelper());
+    public static NeoForgeDataProviderContext fromEvent(String modId, GatherDataEvent evt) {
+        return new NeoForgeDataProviderContext(modId, evt.getGenerator().getPackOutput(), evt.getLookupProvider(), evt.getExistingFileHelper());
     }
 
     /**
@@ -53,7 +53,7 @@ public class ForgeDataProviderContext extends DataProviderContext {
      * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about parametrized varargs.
      */
     @FunctionalInterface
-    public interface Factory extends Function<ForgeDataProviderContext, DataProvider> {
+    public interface Factory extends Function<NeoForgeDataProviderContext, DataProvider> {
         // NO-OP
     }
 

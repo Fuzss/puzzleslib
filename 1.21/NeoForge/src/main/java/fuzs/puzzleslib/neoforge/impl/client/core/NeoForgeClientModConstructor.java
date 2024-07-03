@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
@@ -12,7 +13,6 @@ import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesManager;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import fuzs.puzzleslib.neoforge.impl.core.context.AddReloadListenersContextNeoForgeImpl;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.bus.api.IEventBus;
@@ -80,11 +80,12 @@ public final class NeoForgeClientModConstructor {
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextNeoForgeImpl(modId, evt::registerReloadListener));
             if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
-                evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(ResourceLocation.fromNamespaceAndPath(modId, "built_in_model_item_renderers"), dynamicRenderers));
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(
+                        ResourceLocationHelper.fromNamespaceAndPath(modId, "built_in_model_item_renderers"), dynamicRenderers));
             }
             if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
                 ClientParticleTypesManager particleTypesManager = ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId);
-                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(ResourceLocation.fromNamespaceAndPath(modId, "client_particle_types"), particleTypesManager));
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(ResourceLocationHelper.fromNamespaceAndPath(modId, "client_particle_types"), particleTypesManager));
             }
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {

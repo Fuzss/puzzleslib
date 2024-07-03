@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.data.v2;
 
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -71,7 +72,7 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
         Set<ResourceLocation> set = new HashSet<>();
         List<CompletableFuture<?>> list = new ArrayList<>();
         Consumer<AdvancementHolder> consumer = (AdvancementHolder advancementHolder) -> {
-            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(this.modId, advancementHolder.id().getPath());
+            ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId, advancementHolder.id().getPath());
             if (!set.add(resourceLocation)) {
                 throw new IllegalStateException("Duplicate advancement " + resourceLocation);
             } else {

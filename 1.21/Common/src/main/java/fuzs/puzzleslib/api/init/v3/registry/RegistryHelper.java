@@ -35,7 +35,7 @@ public final class RegistryHelper {
      */
     public static <T> Registry<T> findBuiltInRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
         Registry<T> registry = findNullableBuiltInRegistry(registryKey);
-        Objects.requireNonNull(registry, "registry for %s is null".formatted(registryKey));
+        Objects.requireNonNull(registry, () -> "registry for %s is null".formatted(registryKey));
         return registry;
     }
 
@@ -64,7 +64,7 @@ public final class RegistryHelper {
      */
     public static <T> Registry<T> findGameRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
         Registry<T> registry = findNullableGameRegistry(registryKey);
-        Objects.requireNonNull(registry, "registry for %s is null".formatted(registryKey));
+        Objects.requireNonNull(registry, () -> "registry for %s is null".formatted(registryKey));
         return registry;
     }
 

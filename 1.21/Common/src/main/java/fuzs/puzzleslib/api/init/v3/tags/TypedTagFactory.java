@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.init.v3.tags;
 
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -86,7 +87,7 @@ public final class TypedTagFactory<T> {
     public TagKey<T> make(String namespace, String path) {
         Objects.requireNonNull(namespace, "namespace is null");
         Objects.requireNonNull(path, "path is null");
-        return this.make(ResourceLocation.fromNamespaceAndPath(namespace, path));
+        return this.make(ResourceLocationHelper.fromNamespaceAndPath(namespace, path));
     }
 
     /**

@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -120,7 +121,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
             final ResourceLocation oldLocation = location;
             // relocate all recipes to the mod id, so they do not depend on the item namespace which would
             // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
-            location = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, location.getPath());
+            location = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, location.getPath());
             if (!this.generatedRecipes.add(location)) {
                 throw new IllegalStateException("Duplicate recipe " + location);
             } else {
@@ -128,7 +129,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
                 if (advancement != null) {
                     JsonElement jsonElement = Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()).getOrThrow(IllegalStateException::new);
                     jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
-                    ResourceLocation advancementLocation = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, advancement.id().getPath());
+                    ResourceLocation advancementLocation = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, advancement.id().getPath());
                     this.completableFutures.add(DataProvider.saveStable(this.output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
                 }
             }

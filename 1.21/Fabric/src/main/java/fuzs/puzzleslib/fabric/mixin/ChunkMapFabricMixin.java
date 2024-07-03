@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.storage.ChunkStorage;
+import net.minecraft.world.level.chunk.storage.RegionStorageInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,8 +23,8 @@ abstract class ChunkMapFabricMixin extends ChunkStorage {
     @Final
     ServerLevel level;
 
-    public ChunkMapFabricMixin(Path regionFolder, DataFixer fixerUpper, boolean sync) {
-        super(regionFolder, fixerUpper, sync);
+    public ChunkMapFabricMixin(RegionStorageInfo info, Path folder, DataFixer fixerUpper, boolean sync) {
+        super(info, folder, fixerUpper, sync);
     }
 
     @Inject(method = "dropChunk", at = @At("HEAD"))

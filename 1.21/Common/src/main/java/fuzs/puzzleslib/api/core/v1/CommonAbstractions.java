@@ -2,8 +2,9 @@ package fuzs.puzzleslib.api.core.v1;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -20,6 +21,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -42,24 +45,13 @@ public interface CommonAbstractions {
     MinecraftServer getMinecraftServer();
 
     /**
-     * Opens a menu on both client and server.
+     * Opens a menu on both client and server while also providing additional data.
      *
      * @param player       player to open menu for
      * @param menuProvider menu factory
+     * @param dataWriter   additional data added via {@link RegistryFriendlyByteBuf}
      */
-    default void openMenu(ServerPlayer player, MenuProvider menuProvider) {
-        this.openMenu(player, menuProvider, (ServerPlayer serverPlayer, FriendlyByteBuf buf) -> {
-        });
-    }
-
-    /**
-     * Opens a menu on both client and server while also providing additional data.
-     *
-     * @param player                  player to open menu for
-     * @param menuProvider            menu factory
-     * @param screenOpeningDataWriter additional data added via {@link FriendlyByteBuf}
-     */
-    void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter);
+    void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter);
 
     /**
      * Is <code>entityType</code> considered a boss mob like {@link EntityType#ENDER_DRAGON} and
@@ -97,12 +89,21 @@ public interface CommonAbstractions {
      * Called before an entity drops loot for determining the level of
      * {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} to apply when generating drops.
      *
-     * @param entity       the entity that has been killed
-     * @param killerEntity another entity responsible for killing <code>entity</code>
-     * @param damageSource the damage source <code>entity</code> has been killed by
+     * @param target       the entity that has been killed
+     * @param attacker     another entity responsible for killing the entity
+     * @param damageSource the damage source the entity has been killed by
      * @return the level of looting to apply when generating drops.
      */
-    int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource);
+    default int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
+        if (attacker instanceof LivingEntity livingEntity) {
+            Holder.Reference<Enchantment> holder = target.registryAccess()
+                    .lookupOrThrow(Registries.ENCHANTMENT)
+                    .getOrThrow(Enchantments.LOOTING);
+            return EnchantmentHelper.getEnchantmentLevel(holder, livingEntity);
+        } else {
+            return 0;
+        }
+    }
 
     /**
      * Called when a <code>mobGriefing</code> game rule check is required instead of vanilla's

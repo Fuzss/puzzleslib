@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.init.v3.tags;
 
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -72,7 +73,7 @@ public final class BoundTagFactory {
      * @return new tag key
      */
     public <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return TagKey.create(registryKey, ResourceLocation.fromNamespaceAndPath(this.namespace, path));
+        return TagKey.create(registryKey, ResourceLocationHelper.fromNamespaceAndPath(this.namespace, path));
     }
 
     /**

@@ -26,13 +26,25 @@ public interface DefaultedInt extends MutableInt {
     /**
      * Creates a new instance backed by a consumer and supplier.
      *
-     * @param consumer value consumer
-     * @param supplier value supplier
+     * @param consumer        value consumer
+     * @param supplier        value supplier
      * @param defaultSupplier default value supplier
      * @return new instance
      */
     static DefaultedInt fromEvent(IntConsumer consumer, IntSupplier supplier, IntSupplier defaultSupplier) {
         return new EventDefaultedInt(consumer, supplier, defaultSupplier);
+    }
+
+    /**
+     * Creates a new instance backed by a consumer and supplier.
+     *
+     * @param consumer     value consumer
+     * @param supplier     value supplier
+     * @param defaultValue default value
+     * @return new instance
+     */
+    static DefaultedInt fromEventWithValue(IntConsumer consumer, IntSupplier supplier, int defaultValue) {
+        return fromEvent(consumer, supplier, () -> defaultValue);
     }
 
     /**
@@ -43,7 +55,8 @@ public interface DefaultedInt extends MutableInt {
     int getAsDefaultInt();
 
     /**
-     * An optional getter for the contained value which will return empty if the value has not changed from the default value (determined via reference comparison).
+     * An optional getter for the contained value which will return empty if the value has not changed from the default
+     * value (determined via reference comparison).
      *
      * @return container value as optional
      */

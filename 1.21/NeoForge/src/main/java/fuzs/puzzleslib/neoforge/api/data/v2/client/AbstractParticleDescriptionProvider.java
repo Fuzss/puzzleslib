@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.client;
 
 import com.mojang.serialization.Codec;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.ForgeDataProviderContext;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -24,7 +25,7 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
 
     private final ExistingFileHelper.ResourceType textureResourceType;
 
-    public AbstractParticleDescriptionProvider(ForgeDataProviderContext context) {
+    public AbstractParticleDescriptionProvider(NeoForgeDataProviderContext context) {
         this(context.getModId(), context.getPackOutput(), context.getRegistries(), context.getFileHelper());
     }
 
@@ -82,7 +83,7 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
             List<ResourceLocation> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd),
                             Math.max(indexStart, indexEnd)
                     )
-                    .mapToObj(index -> ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(),
+                    .mapToObj(index -> ResourceLocationHelper.fromNamespaceAndPath(resourceLocation.getNamespace(),
                             resourceLocation.getPath() + "_" + index
                     ))
                     .collect(Collectors.toList());
@@ -103,6 +104,7 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
                             String.join(",", missing)
                     ));
         }
+
         super.unconditional(id, value);
     }
 

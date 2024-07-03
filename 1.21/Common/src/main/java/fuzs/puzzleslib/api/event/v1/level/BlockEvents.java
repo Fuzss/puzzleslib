@@ -31,8 +31,8 @@ public final class BlockEvents {
          * @param state      the block state before it is broken
          * @param player     the player involved with breaking the block
          * @param itemInHand the tool used to mine the block held in the player's main hand
-         * @return {@link EventResult#INTERRUPT} to prevent the block from being broken, it will remain in the level and a packet notifying the client will be sent,
-         * {@link EventResult#PASS} to allow the block to be broken
+         * @return {@link EventResult#INTERRUPT} to prevent the block from being broken, it will remain in the level and
+         *         a packet notifying the client will be sent, {@link EventResult#PASS} to allow the block to be broken
          */
         EventResult onBreakBlock(ServerLevel level, BlockPos pos, BlockState state, Player player, ItemStack itemInHand);
     }
@@ -50,24 +50,24 @@ public final class BlockEvents {
          * @param state            the block state before it is broken
          * @param player           the player involved with breaking the block
          * @param itemInHand       the tool used to mine the block held in the player's main hand
-         * @param experienceToDrop the amount of experience to drop for this block
+         * @param experienceAmount the amount of experience to drop for this block
          */
-        void onDropExperience(ServerLevel level, BlockPos pos, BlockState state, Player player, ItemStack itemInHand, MutableInt experienceToDrop);
+        void onDropExperience(ServerLevel level, BlockPos pos, BlockState state, Player player, ItemStack itemInHand, MutableInt experienceAmount);
     }
 
     @FunctionalInterface
     public interface FarmlandTrample {
 
         /**
-         * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block into dirt and destroying potential crops.
+         * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block
+         * into dirt and destroying potential crops.
          *
          * @param level        level farmland block is trampled in
          * @param pos          farmland block position
          * @param state        block state farmland will be converted to after trampling
          * @param fallDistance fall distance of the entity
          * @param entity       the entity falling on the farmland block
-         * @return {@link EventResult#INTERRUPT} to prevent trampling,
-         * {@link EventResult#PASS} to allow the trampling
+         * @return {@link EventResult#INTERRUPT} to prevent trampling, {@link EventResult#PASS} to allow the trampling
          */
         EventResult onFarmlandTrample(Level level, BlockPos pos, BlockState state, float fallDistance, Entity entity);
     }

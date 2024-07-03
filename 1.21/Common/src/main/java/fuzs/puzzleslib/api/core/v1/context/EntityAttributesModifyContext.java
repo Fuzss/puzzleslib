@@ -1,33 +1,36 @@
 package fuzs.puzzleslib.api.core.v1.context;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 
 /**
- * registers modifications to attributes of already existing entities (not from our mod)
+ * Registers modifications to attributes of already existing entities.
  */
 @FunctionalInterface
 public interface EntityAttributesModifyContext {
 
     /**
-     * use this method for modifying attributes of existing entity types
-     * this overrides/adds attributes individually as this is what is done on Forge
+     * Modify attributes of existing entity types.
+     * <p>
+     * This overrides or adds attributes individually.
      *
-     * @param entityType type of entity
-     * @param attribute  attribute to override/add
+     * @param entityType the entity type
+     * @param attribute  attribute to override or add
      */
-    default void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Attribute attribute) {
-        this.registerAttributeModification(entityType, attribute, attribute.getDefaultValue());
+    default void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Holder<Attribute> attribute) {
+        this.registerAttributeModification(entityType, attribute, attribute.value().getDefaultValue());
     }
 
     /**
-     * use this method for modifying attributes of existing entity types
-     * this overrides/adds attributes individually as this is what is done on Forge
+     * Modify attributes of existing entity types.
+     * <p>
+     * This overrides or adds attributes individually.
      *
-     * @param entityType     type of entity
-     * @param attribute      attribute to override/add
+     * @param entityType     the entity type
+     * @param attribute      attribute to override or add
      * @param attributeValue new value, possibly {@link Attribute#getDefaultValue()}
      */
-    void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Attribute attribute, double attributeValue);
+    void registerAttributeModification(EntityType<? extends LivingEntity> entityType, Holder<Attribute> attribute, double attributeValue);
 }

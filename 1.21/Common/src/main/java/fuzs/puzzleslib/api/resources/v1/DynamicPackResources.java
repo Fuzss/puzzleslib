@@ -89,7 +89,7 @@ public class DynamicPackResources extends AbstractModPackResources {
                     if (strings != null) {
                         PackType packType = PATHS_FOR_TYPE.get(strings.getFirst());
                         Objects.requireNonNull(packType,
-                                "pack type for directory %s is null".formatted(strings.get(0))
+                                () -> "pack type for directory %s is null".formatted(strings.getFirst())
                         );
                         String path = strings.stream().skip(2).collect(Collectors.joining("/"));
                         ResourceLocation resourceLocation = ResourceLocation.tryBuild(strings.get(1), path);

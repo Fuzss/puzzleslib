@@ -127,7 +127,7 @@ public class NetworkHandlerNeoForgeV2 implements NetworkHandlerV2 {
 
     protected <S extends PacketListener> Packet<S> toPacket(MessageV2<?> message, BiFunction<ResourceLocation, Consumer<FriendlyByteBuf>, Packet<S>> packetFactory) {
         ResourceLocation channelName = this.messageNames.get(message.getClass());
-        Objects.requireNonNull(channelName, "Unknown message of type %s".formatted(message.getClass()));
+        Objects.requireNonNull(channelName, "Unknown message of type " + message.getClass());
         return packetFactory.apply(channelName, message::write);
     }
 }

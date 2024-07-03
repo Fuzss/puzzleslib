@@ -10,8 +10,7 @@
     "TagsProviderNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
     "accessor.FireBlockNeoForgeAccessor",
-    "accessor.MobSpawnSettingsBuilderNeoForgeAccessor",
-    "accessor.PotionBrewingNeoForgeAccessor"
+    "accessor.MobSpawnSettingsBuilderNeoForgeAccessor"
   ],
   "client": [
     "client.accessor.BlockColorsNeoForgeAccessor",

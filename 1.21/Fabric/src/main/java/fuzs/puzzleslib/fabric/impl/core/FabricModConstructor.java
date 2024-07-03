@@ -2,14 +2,17 @@ package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.fabric.impl.core.context.*;
-import fuzs.puzzleslib.impl.item.CopyTagRecipe;
+import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 
 import java.util.Set;
+import java.util.function.Supplier;
 
 public final class FabricModConstructor {
 
@@ -23,9 +26,9 @@ public final class FabricModConstructor {
     }
 
     private static void registerContent(String modId, Set<ContentRegistrationFlags> flagsToHandle) {
-        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
-            CopyTagRecipe.registerSerializers((s, recipeSerializerSupplier) -> {
-                Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocation.fromNamespaceAndPath(modId, s), recipeSerializerSupplier.get());
+        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_RECIPES)) {
+            CopyComponentsRecipe.registerSerializers((String s, Supplier<RecipeSerializer<?>> supplier) -> {
+                Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocationHelper.fromNamespaceAndPath(modId, s), supplier.get());
             });
         }
     }
