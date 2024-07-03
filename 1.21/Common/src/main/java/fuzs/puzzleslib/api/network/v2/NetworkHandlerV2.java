@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.network.v2;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -32,7 +33,7 @@ public interface NetworkHandlerV2 {
      * @return mod specific network handler with configured channel
      */
     static NetworkHandlerV2 build(String modId, boolean optional) {
-        return build(ResourceLocation.fromNamespaceAndPath(modId, "main"), optional);
+        return build(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"), optional);
     }
 
     /**

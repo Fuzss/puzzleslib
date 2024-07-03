@@ -11,7 +11,7 @@ public record TierImpl(TagKey<Block> incorrectBlocksForDrops,
                        int itemDurability,
                        float miningSpeed,
                        float attackDamage,
-                       int enchantability,
+                       int enchantmentValue,
                        Supplier<Ingredient> repairIngredient) implements Tier {
 
     @Override
@@ -36,7 +36,7 @@ public record TierImpl(TagKey<Block> incorrectBlocksForDrops,
 
     @Override
     public int getEnchantmentValue() {
-        return this.enchantability;
+        return this.enchantmentValue;
     }
 
     @Override

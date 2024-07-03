@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.data.v2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.CachedOutput;
@@ -175,7 +176,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         String path = resourceLocation.getPath();
         if (path.contains(s)) {
             path = path.substring(path.lastIndexOf(s) + 1);
-            return ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(), path);
+            return ResourceLocationHelper.fromNamespaceAndPath(resourceLocation.getNamespace(), path);
         } else {
             return resourceLocation;
         }

@@ -55,7 +55,7 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
         Preconditions.checkState(!skipRegistration, "Skipping registration is not supported on NeoForge");
         DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
             DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.modId);
-            Objects.requireNonNull(this.eventBus, "mod event bus for %s is null".formatted(this.modId));
+            Objects.requireNonNull(this.eventBus, "mod event bus is null for " + this.modId);
             deferredRegister.register(this.eventBus);
             return deferredRegister;
         });

@@ -26,13 +26,25 @@ public interface DefaultedBoolean extends MutableBoolean {
     /**
      * Creates a new instance backed by a consumer and supplier.
      *
-     * @param consumer value consumer
-     * @param supplier value supplier
+     * @param consumer        value consumer
+     * @param supplier        value supplier
      * @param defaultSupplier default value supplier
      * @return new instance
      */
     static DefaultedBoolean fromEvent(Consumer<Boolean> consumer, Supplier<Boolean> supplier, Supplier<Boolean> defaultSupplier) {
         return new EventDefaultedBoolean(consumer, supplier, defaultSupplier);
+    }
+
+    /**
+     * Creates a new instance backed by a consumer and supplier.
+     *
+     * @param consumer     value consumer
+     * @param supplier     value supplier
+     * @param defaultValue default value
+     * @return new instance
+     */
+    static DefaultedBoolean fromEventWithValue(Consumer<Boolean> consumer, Supplier<Boolean> supplier, boolean defaultValue) {
+        return fromEvent(consumer, supplier, () -> defaultValue);
     }
 
     /**
@@ -43,7 +55,8 @@ public interface DefaultedBoolean extends MutableBoolean {
     boolean getAsDefaultBoolean();
 
     /**
-     * An optional getter for the contained value which will return empty if the value has not changed from the default value (determined via reference comparison).
+     * An optional getter for the contained value which will return empty if the value has not changed from the default
+     * value (determined via reference comparison).
      *
      * @return container value as optional
      */

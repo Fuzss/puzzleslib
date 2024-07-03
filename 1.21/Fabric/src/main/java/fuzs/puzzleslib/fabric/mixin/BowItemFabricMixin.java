@@ -27,22 +27,19 @@ abstract class BowItemFabricMixin extends ProjectileWeaponItem {
     }
 
     @Inject(
-            method = "releaseUsing",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z",
-                    ordinal = 0,
-                    shift = At.Shift.BEFORE
-            ),
-            cancellable = true,
-            locals = LocalCapture.CAPTURE_FAILEXCEPTION
+            method = "releaseUsing", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z",
+            ordinal = 0,
+            shift = At.Shift.BEFORE
+    ), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION
     )
-    public void releaseUsing(ItemStack stack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfo callback, Player player, boolean hasInfiniteAmmo, ItemStack projectileStack, @Share(
+    public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfo callback, Player player, boolean hasInfiniteAmmo, ItemStack projectileStack, @Share(
             "charge"
     ) LocalRef<DefaultedInt> chargeRef) {
-        chargeRef.set(DefaultedInt.fromValue(this.getUseDuration(stack) - timeCharged));
+        chargeRef.set(DefaultedInt.fromValue(this.getUseDuration(itemStack, livingEntity) - timeCharged));
         if (FabricPlayerEvents.ARROW_LOOSE.invoker()
-                .onArrowLoose(player, stack, level, chargeRef.get(), !projectileStack.isEmpty() || hasInfiniteAmmo)
+                .onArrowLoose(player, itemStack, level, chargeRef.get(), !projectileStack.isEmpty() || hasInfiniteAmmo)
                 .isInterrupt()) {
             callback.cancel();
         }

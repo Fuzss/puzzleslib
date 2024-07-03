@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.gson.JsonObject;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
@@ -73,7 +74,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         return DataProvider.saveStable(writer,
                 jsonObject,
-                this.pathProvider.json(ResourceLocation.fromNamespaceAndPath(this.modId, this.languageCode))
+                this.pathProvider.json(ResourceLocationHelper.fromNamespaceAndPath(this.modId, this.languageCode))
         );
     }
 
@@ -244,7 +245,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void addCreativeModeTab(String modId, String tabId, String value) {
             Objects.requireNonNull(modId, "mod id is null");
             Objects.requireNonNull(tabId, "tab id is null");
-            this.addCreativeModeTab(ResourceLocation.fromNamespaceAndPath(modId, tabId), value);
+            this.addCreativeModeTab(ResourceLocationHelper.fromNamespaceAndPath(modId, tabId), value);
         }
 
         default void addCreativeModeTab(ResourceLocation identifier, String value) {

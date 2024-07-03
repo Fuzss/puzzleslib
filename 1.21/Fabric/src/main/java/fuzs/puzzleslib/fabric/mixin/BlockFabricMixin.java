@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -23,6 +24,7 @@ import java.util.Objects;
 
 @Mixin(Block.class)
 abstract class BlockFabricMixin extends BlockBehaviour {
+    @Unique
     @Nullable
     private int[] puzzleslib$capturedExperience;
 
@@ -60,7 +62,7 @@ abstract class BlockFabricMixin extends BlockBehaviour {
         int[] capturedExperience = this.puzzleslib$capturedExperience;
         if (capturedExperience != null) {
             capturedExperience[0] += i;
-            // method will stop processing when zero is returned
+            // method will do nothing when zero is returned
             return 0;
         } else {
             return i;

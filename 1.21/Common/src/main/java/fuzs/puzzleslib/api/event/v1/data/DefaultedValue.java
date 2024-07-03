@@ -26,13 +26,25 @@ public interface DefaultedValue<T> extends MutableValue<T> {
     /**
      * Creates a new instance backed by a consumer and supplier.
      *
-     * @param consumer value consumer
-     * @param supplier value supplier
+     * @param consumer        value consumer
+     * @param supplier        value supplier
      * @param defaultSupplier default value supplier
      * @return new instance
      */
     static <T> DefaultedValue<T> fromEvent(Consumer<T> consumer, Supplier<T> supplier, Supplier<T> defaultSupplier) {
         return new EventDefaultedValue<>(consumer, supplier, defaultSupplier);
+    }
+
+    /**
+     * Creates a new instance backed by a consumer and supplier.
+     *
+     * @param consumer     value consumer
+     * @param supplier     value supplier
+     * @param defaultValue default value
+     * @return new instance
+     */
+    static <T> DefaultedValue<T> fromEventWithValue(Consumer<T> consumer, Supplier<T> supplier, T defaultValue) {
+        return fromEvent(consumer, supplier, (Supplier<T>) () -> defaultValue);
     }
 
     /**
@@ -43,7 +55,8 @@ public interface DefaultedValue<T> extends MutableValue<T> {
     T getAsDefault();
 
     /**
-     * An optional getter for the contained value which will return empty if the value has not changed from the default value (determined via reference comparison).
+     * An optional getter for the contained value which will return empty if the value has not changed from the default
+     * value (determined via reference comparison).
      *
      * @return container value as optional
      */

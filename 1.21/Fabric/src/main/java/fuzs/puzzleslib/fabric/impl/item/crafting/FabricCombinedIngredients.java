@@ -31,9 +31,8 @@ public final class FabricCombinedIngredients implements CombinedIngredients {
     }
 
     @Override
-    public Ingredient nbt(ItemStack stack, boolean strict) {
-        Objects.requireNonNull(stack, "stack is null");
-        if (!strict) Objects.requireNonNull(stack.getTag(), "tag is null");
-        return DefaultCustomIngredients.components(stack, strict);
+    public Ingredient components(ItemStack itemStack) {
+        Objects.requireNonNull(itemStack, "item stack is null");
+        return DefaultCustomIngredients.components(itemStack);
     }
 }

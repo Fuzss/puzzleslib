@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
 import fuzs.puzzleslib.api.init.v3.override.GameRuleValueOverrides;
@@ -65,6 +66,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     public static ResourceLocation id(String path) {
-        return ModConstructor.id(MOD_ID, path);
+        return ResourceLocationHelper.fromNamespaceAndPath(MOD_ID, path);
     }
 }

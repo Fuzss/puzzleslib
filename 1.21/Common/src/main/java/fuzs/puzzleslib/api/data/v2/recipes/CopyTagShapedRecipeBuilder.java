@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.data.v2.recipes;
 
 import fuzs.puzzleslib.api.data.v2.AbstractRecipeProvider;
-import fuzs.puzzleslib.impl.item.CopyTagRecipe;
-import fuzs.puzzleslib.impl.item.CopyTagShapedRecipe;
+import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
+import fuzs.puzzleslib.impl.item.CopyComponentsShapedRecipe;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
@@ -98,8 +98,8 @@ public class CopyTagShapedRecipeBuilder extends ShapedRecipeBuilder {
             public void accept(ResourceLocation location, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
                 // some weird hack to get the proper mod id for the serializer
                 String modId = recipeOutput instanceof AbstractRecipeProvider.IdentifiableRecipeOutput identifiableRecipeOutput ? identifiableRecipeOutput.getModId() : id.getNamespace();
-                RecipeSerializer<?> recipeSerializer = CopyTagRecipe.getModSerializer(modId, CopyTagRecipe.SHAPED_RECIPE_SERIALIZER_ID);
-                recipe = new CopyTagShapedRecipe(recipeSerializer, (ShapedRecipe) recipe, CopyTagShapedRecipeBuilder.this.copyFrom);
+                RecipeSerializer<?> recipeSerializer = CopyComponentsRecipe.getModSerializer(modId, CopyComponentsRecipe.SHAPED_RECIPE_SERIALIZER_ID);
+                recipe = new CopyComponentsShapedRecipe(recipeSerializer, (ShapedRecipe) recipe, CopyTagShapedRecipeBuilder.this.copyFrom);
                 recipeOutput.accept(location, recipe, advancement);
             }
         }, id);

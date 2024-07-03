@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.init;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.Holder;
@@ -28,7 +29,7 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     @Override
     public ResourceLocation makeKey(String path) {
         if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("path is invalid");
-        return ResourceLocation.fromNamespaceAndPath(this.modId, path);
+        return ResourceLocationHelper.fromNamespaceAndPath(this.modId, path);
     }
 
     @Override

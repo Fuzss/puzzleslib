@@ -51,7 +51,7 @@ public class NetworkHandlerFabricV3 extends NetworkHandlerRegistryImpl {
 
         CustomPacketPayload.Type<CustomPacketPayload> id = new CustomPacketPayload.Type<>(resourceLocation);
         MessageSerializer<T> byType = MessageSerializers.findByType(clazz);
-        StreamCodec<? super RegistryFriendlyByteBuf, ClientboundCustomPayloadPacket> codec = Packet.codec((ClientboundCustomPayloadPacket object, RegistryFriendlyByteBuf object2) -> {
+        StreamCodec<? super RegistryFriendlyByteBuf, ClientboundCustomPayloadPacket> codec = CustomPacketPayload.codec((ClientboundCustomPayloadPacket object, RegistryFriendlyByteBuf object2) -> {
             byType.write(object2, object.payload());
         }, (RegistryFriendlyByteBuf object) -> {
             CustomPacketPayloadAdapter<T> customPacketPayload = new CustomPacketPayloadAdapter<>(id,

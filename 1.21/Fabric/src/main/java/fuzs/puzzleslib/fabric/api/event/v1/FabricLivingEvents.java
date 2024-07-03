@@ -32,9 +32,10 @@ public final class FabricLivingEvents {
     public static final Event<LivingFallCallback> LIVING_FALL = FabricEventFactory.createResult(LivingFallCallback.class);
     /**
      * Called just before a {@link LivingEntity} drops all its loot for determining the level of
-     * {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} that should be applied to the drops.
+     * {@link net.minecraft.world.item.enchantment.Enchantments#LOOTING} that should be applied to the drops.
      */
-    public static final Event<LootingLevelCallback> LOOTING_LEVEL = FabricEventFactory.create(LootingLevelCallback.class);
+    public static final Event<ComputeLootingLevelCallback> COMPUTE_LOOTING_LEVEL = FabricEventFactory.create(
+            ComputeLootingLevelCallback.class);
     /**
      * Called right before drops from a killed entity are spawned in the world.
      * <p>This event is fired whenever an Entity dies and drops items in {@link LivingEntity#die(DamageSource)}.

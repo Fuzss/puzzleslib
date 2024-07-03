@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.item.v2;
 
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.item.CreativeModeTabConfiguratorImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -44,7 +45,7 @@ public interface CreativeModeTabConfigurator {
      * @return builder instance
      */
     static CreativeModeTabConfigurator from(String modId, String tabId) {
-        return from(ResourceLocation.fromNamespaceAndPath(modId, tabId));
+        return from(ResourceLocationHelper.fromNamespaceAndPath(modId, tabId));
     }
 
     /**

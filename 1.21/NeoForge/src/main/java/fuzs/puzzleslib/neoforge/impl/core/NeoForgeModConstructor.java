@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.impl.item.CopyTagRecipe;
+import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.core.context.*;
 import net.minecraft.core.registries.Registries;
@@ -45,10 +45,10 @@ public final class NeoForgeModConstructor {
         if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             NeoForgeBiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
-        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_TAG_RECIPES)) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_RECIPES)) {
             DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER, modId);
             deferredRegister.register(modEventBus);
-            CopyTagRecipe.registerSerializers(deferredRegister::register);
+            CopyComponentsRecipe.registerSerializers(deferredRegister::register);
         }
     }
 

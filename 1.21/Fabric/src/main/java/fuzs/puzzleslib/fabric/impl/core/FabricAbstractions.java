@@ -7,11 +7,12 @@ import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalEntityTypeTags;
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -21,7 +22,6 @@ import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +29,6 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -58,12 +57,14 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {
-        player.openMenu(new ExtendedScreenHandlerFactory() {
+    public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
+        player.openMenu(new ExtendedScreenHandlerFactory<RegistryFriendlyByteBuf>() {
 
             @Override
-            public void writeScreenOpeningData(ServerPlayer player, FriendlyByteBuf buf) {
-                screenOpeningDataWriter.accept(player, buf);
+            public RegistryFriendlyByteBuf getScreenOpeningData(ServerPlayer player) {
+                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess());
+                dataWriter.accept(player, buf);
+                return buf;
             }
 
             @Override
@@ -95,11 +96,6 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource) {
-        return killerEntity instanceof LivingEntity livingEntity ? EnchantmentHelper.getMobLooting(livingEntity) : 0;
-    }
-
-    @Override
     public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
         return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
     }
@@ -127,11 +123,6 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     @Override
     public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
         return enchantment.value().isPrimaryItem(itemStack);
-    }
-
-    @Override
-    public boolean isAllowedOnBooks(Holder<Enchantment> enchantment) {
-        return true;
     }
 
     @Override

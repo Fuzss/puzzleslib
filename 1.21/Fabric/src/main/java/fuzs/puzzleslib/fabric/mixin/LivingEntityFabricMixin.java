@@ -3,7 +3,10 @@ package fuzs.puzzleslib.fabric.mixin;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
@@ -17,7 +20,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
@@ -54,11 +56,9 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Final
     private Map<MobEffect, MobEffectInstance> activeEffects;
     @Unique
-    private MutableInt puzzleslib$lootingLevel;
+    private DefaultedFloat puzzleslib$actuallyHurt$damageAmount;
     @Unique
-    private DefaultedFloat puzzleslib$damageAmount;
-    @Unique
-    private float puzzleslib$hurtAmount;
+    private float puzzleslib$hurt$damageAmount;
     @Unique
     private DefaultedFloat puzzleslib$fallDistance;
     @Unique
@@ -166,15 +166,6 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "dropAllDeathLoot", at = @At("STORE"), ordinal = 0)
-    protected int dropAllDeathLoot$0(int lootingLevel, DamageSource damageSource) {
-        // we do not have access to the local lootingLevel variable at TAIL later where it is needed for invoking LivingDropsCallback
-        // (the local capture seems to fail due to the way the local lootingLevel variable is initialised)
-        // so instead capture the value after our LootingLevelCallback has run, potentially missing out on changes applied by other mixins
-        this.puzzleslib$lootingLevel = FabricEventImplHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
-        return this.puzzleslib$lootingLevel.getAsInt();
-    }
-
     @Inject(method = "dropAllDeathLoot", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;lastHurtByPlayerTime:I", shift = At.Shift.BEFORE))
     protected void dropAllDeathLoot$1(DamageSource damageSource, CallbackInfo callback) {
         ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(Lists.newArrayList());
@@ -182,10 +173,9 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
     protected void dropAllDeathLoot$2(DamageSource damageSource, CallbackInfo callback) {
-        if (!FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> this.puzzleslib$lootingLevel)) {
+        if (!FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime)) {
             PuzzlesLib.LOGGER.warn("Unable to invoke LivingDropsCallback for entity {}: Drops is null", this.getName().getString());
         }
-        this.puzzleslib$lootingLevel = null;
     }
 
     @Inject(method = "die", at = @At("TAIL"))
@@ -193,10 +183,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         // this is a safety precaution, in case LivingEntity::dropAllDeathLoot does not reach TAIL and therefore doesn't spawn the captured drops (another mixin might cancel the method mid-way)
         // this should work rather fine, as LivingEntity::dropAllDeathLoot is basically exclusively called from LivingEntity::die,
         // and spawning captured drops in LivingEntity::dropAllDeathLoot only rarely has a conflict if any at all
-        FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime, () -> {
-            int lootingLevel = damageSource.getEntity() instanceof Player player ? EnchantmentHelper.getMobLooting(player) : 0;
-            return FabricEventImplHelper.onLootingLevel(LivingEntity.class.cast(this), damageSource, lootingLevel);
-        });
+        FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime);
     }
 
     @Inject(method = "dropExperience", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/ExperienceOrb;award(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/phys/Vec3;I)V"), cancellable = true)
@@ -219,8 +206,8 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
     protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback) {
         if (!this.isInvulnerableTo(damageSource)) {
-            this.puzzleslib$damageAmount = DefaultedFloat.fromValue(damageAmount);
-            if (FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(LivingEntity.class.cast(this), damageSource, this.puzzleslib$damageAmount).isInterrupt()) {
+            this.puzzleslib$actuallyHurt$damageAmount = DefaultedFloat.fromValue(damageAmount);
+            if (FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(LivingEntity.class.cast(this), damageSource, this.puzzleslib$actuallyHurt$damageAmount).isInterrupt()) {
                 callback.cancel();
             }
         }
@@ -229,10 +216,11 @@ abstract class LivingEntityFabricMixin extends Entity {
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
     protected float actuallyHurt(float damageAmount, DamageSource damageSource) {
         if (!this.isInvulnerableTo(damageSource)) {
-            Objects.requireNonNull(this.puzzleslib$damageAmount, "damage amount is null");
-            damageAmount = this.puzzleslib$damageAmount.getAsOptionalFloat().orElse(damageAmount);
-            this.puzzleslib$damageAmount = null;
+            Objects.requireNonNull(this.puzzleslib$actuallyHurt$damageAmount, "damage amount is null");
+            damageAmount = this.puzzleslib$actuallyHurt$damageAmount.getAsOptionalFloat().orElse(damageAmount);
+            this.puzzleslib$actuallyHurt$damageAmount = null;
         }
+
         return damageAmount;
     }
 
@@ -251,27 +239,29 @@ abstract class LivingEntityFabricMixin extends Entity {
         // hook in before any blocking checks are done, there is no good way to cancel the block after this
         // check everything again, it shouldn't affect anything
         if (amount > 0.0F && this.isDamageSourceBlocked(source)) {
-            this.puzzleslib$hurtAmount = amount;
+            this.puzzleslib$hurt$damageAmount = amount;
             DefaultedFloat blockedDamage = DefaultedFloat.fromValue(amount);
             EventResult result = FabricLivingEvents.SHIELD_BLOCK.invoker().onShieldBlock(LivingEntity.class.cast(this), source, blockedDamage);
             // prevent vanilla shield logic from running when the callback was cancelled, the original damage amount is restored from puzzleslib$hurtAmount later
             if (result.isInterrupt()) return 0.0F;
             // reduce by blocked amount
-            this.puzzleslib$hurtAmount -= blockedDamage.getAsFloat();
+            this.puzzleslib$hurt$damageAmount -= blockedDamage.getAsFloat();
             // return the amount blocked by the shield
             return blockedDamage.getAsFloat();
         }
+
         return amount;
     }
 
     @ModifyVariable(method = "hurt", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;walkAnimation:Lnet/minecraft/world/entity/WalkAnimationState;", shift = At.Shift.BEFORE), ordinal = 0)
     public float hurt$1(float amount, DamageSource source) {
         // this is only present if the damage source could be blocked
-        if (this.puzzleslib$hurtAmount != 0.0F) {
+        if (this.puzzleslib$hurt$damageAmount != 0.0F) {
             // restore original amount when the shield blocking callback was cancelled
-            amount = this.puzzleslib$hurtAmount;
-            this.puzzleslib$hurtAmount = 0.0F;
+            amount = this.puzzleslib$hurt$damageAmount;
+            this.puzzleslib$hurt$damageAmount = 0.0F;
         }
+
         return amount;
     }
 

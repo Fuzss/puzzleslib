@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.network.v3;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -45,7 +46,7 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return NetworkHandlerV3.builder(ResourceLocation.fromNamespaceAndPath(modId, "main"));
+        return NetworkHandlerV3.builder(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"));
     }
 
     /**

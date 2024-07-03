@@ -2,63 +2,79 @@ package fuzs.puzzleslib.neoforge.impl.item;
 
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.Tags;
-import net.neoforged.neoforge.common.ToolActions;
 
 public final class NeoForgeToolTypeHelper implements ToolTypeHelper {
 
     @Override
-    public boolean isSword(ItemStack stack) {
-        return ToolTypeHelper.super.isSword(stack) || stack.canPerformAction(ToolActions.SWORD_SWEEP);
+    public boolean isSword(ItemStack itemStack) {
+        return ToolTypeHelper.super.isSword(itemStack) || itemStack.canPerformAction(ItemAbilities.SWORD_SWEEP);
     }
 
     @Override
-    public boolean isAxe(ItemStack stack) {
-        return ToolTypeHelper.super.isAxe(stack) || stack.canPerformAction(ToolActions.AXE_DIG);
+    public boolean isAxe(ItemStack itemStack) {
+        return ToolTypeHelper.super.isAxe(itemStack) || itemStack.canPerformAction(ItemAbilities.AXE_DIG);
     }
 
     @Override
-    public boolean isHoe(ItemStack stack) {
-        return ToolTypeHelper.super.isHoe(stack) || stack.canPerformAction(ToolActions.HOE_DIG);
+    public boolean isHoe(ItemStack itemStack) {
+        return ToolTypeHelper.super.isHoe(itemStack) || itemStack.canPerformAction(ItemAbilities.HOE_DIG);
     }
 
     @Override
-    public boolean isPickaxe(ItemStack stack) {
-        return ToolTypeHelper.super.isPickaxe(stack) || stack.canPerformAction(ToolActions.PICKAXE_DIG);
+    public boolean isPickaxe(ItemStack itemStack) {
+        return ToolTypeHelper.super.isPickaxe(itemStack) || itemStack.canPerformAction(ItemAbilities.PICKAXE_DIG);
     }
 
     @Override
-    public boolean isShovel(ItemStack stack) {
-        return ToolTypeHelper.super.isShovel(stack) || stack.canPerformAction(ToolActions.SHOVEL_DIG);
+    public boolean isShovel(ItemStack itemStack) {
+        return ToolTypeHelper.super.isShovel(itemStack) || itemStack.canPerformAction(ItemAbilities.SHOVEL_DIG);
     }
 
     @Override
-    public boolean isShears(ItemStack stack) {
-        return ToolTypeHelper.super.isShears(stack) || stack.is(Tags.Items.SHEARS) || stack.canPerformAction(ToolActions.SHEARS_DIG);
+    public boolean isShears(ItemStack itemStack) {
+        return ToolTypeHelper.super.isShears(itemStack) || itemStack.is(Tags.Items.TOOLS_SHEAR) || itemStack.canPerformAction(
+                ItemAbilities.SHEARS_DIG);
     }
 
     @Override
-    public boolean isShield(ItemStack stack) {
-        return ToolTypeHelper.super.isShield(stack) || stack.is(Tags.Items.TOOLS_SHIELDS) || stack.canPerformAction(ToolActions.SHIELD_BLOCK);
+    public boolean isShield(ItemStack itemStack) {
+        return ToolTypeHelper.super.isShield(itemStack) || itemStack.is(Tags.Items.TOOLS_SHIELD) || itemStack.canPerformAction(ItemAbilities.SHIELD_BLOCK);
     }
 
     @Override
-    public boolean isBow(ItemStack stack) {
-        return ToolTypeHelper.super.isBow(stack) || stack.is(Tags.Items.TOOLS_BOWS);
+    public boolean isBow(ItemStack itemStack) {
+        return ToolTypeHelper.super.isBow(itemStack) || itemStack.is(Tags.Items.TOOLS_BOW);
     }
 
     @Override
-    public boolean isCrossbow(ItemStack stack) {
-        return ToolTypeHelper.super.isCrossbow(stack) || stack.is(Tags.Items.TOOLS_CROSSBOWS);
+    public boolean isCrossbow(ItemStack itemStack) {
+        return ToolTypeHelper.super.isCrossbow(itemStack) || itemStack.is(Tags.Items.TOOLS_CROSSBOW);
     }
 
     @Override
-    public boolean isFishingRod(ItemStack stack) {
-        return ToolTypeHelper.super.isFishingRod(stack) || stack.is(Tags.Items.TOOLS_FISHING_RODS) || stack.canPerformAction(ToolActions.FISHING_ROD_CAST);
+    public boolean isFishingRod(ItemStack itemStack) {
+        return ToolTypeHelper.super.isFishingRod(itemStack) || itemStack.is(Tags.Items.TOOLS_FISHING_ROD) || itemStack.canPerformAction(ItemAbilities.FISHING_ROD_CAST);
     }
 
     @Override
-    public boolean isTridentLike(ItemStack stack) {
-        return ToolTypeHelper.super.isTridentLike(stack) || stack.is(Tags.Items.TOOLS_TRIDENTS);
+    public boolean isTridentLike(ItemStack itemStack) {
+        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(Tags.Items.TOOLS_SPEAR);
+    }
+
+    @Override
+    public boolean isBrush(ItemStack itemStack) {
+        return ToolTypeHelper.super.isBrush(itemStack) || itemStack.is(Tags.Items.TOOLS_BRUSH);
+    }
+
+    @Override
+    public boolean isArmor(ItemStack itemStack) {
+        return ToolTypeHelper.super.isArmor(itemStack) || itemStack.is(Tags.Items.ARMORS);
+    }
+
+    @Override
+    public boolean isTool(ItemStack itemStack) {
+        return ToolTypeHelper.super.isTool(itemStack) || itemStack.is(Tags.Items.TOOLS);
     }
 }

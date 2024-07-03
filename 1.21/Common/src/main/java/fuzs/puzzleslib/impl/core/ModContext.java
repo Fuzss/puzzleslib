@@ -11,6 +11,7 @@ import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
@@ -79,7 +80,7 @@ public abstract class ModContext {
 
     public static ResourceLocation getPairingIdentifier(String modId, BaseModConstructor modConstructor) {
         ResourceLocation identifier = modConstructor.getPairingIdentifier();
-        return identifier != null ? identifier : ResourceLocation.fromNamespaceAndPath(modId, "main");
+        return identifier != null ? identifier : ResourceLocationHelper.fromNamespaceAndPath(modId, "main");
     }
 
     public static void acceptServersideMods(Collection<String> modList) {

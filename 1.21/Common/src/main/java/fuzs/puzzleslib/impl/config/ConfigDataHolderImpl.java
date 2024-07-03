@@ -96,7 +96,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     protected void onModConfig(String modId, boolean isLoading, String eventType) {
         Objects.requireNonNull(this.config,
-                "Attempting to register invalid %s config for mod %s".formatted(this.configTypeName, modId)
+                () -> "Attempting to register invalid %s config for mod %s".formatted(this.configTypeName, modId)
         );
         if (isLoading) {
             this.configValueCallbacks.forEach(Runnable::run);

@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -13,7 +15,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -27,26 +28,25 @@ abstract class ItemEntityFabricMixin extends Entity {
     @Shadow
     @Nullable
     private UUID target;
-    @Unique
-    private ItemStack puzzleslib$originalItem = ItemStack.EMPTY;
 
     public ItemEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
     }
 
     @Inject(method = "playerTouch", at = @At("HEAD"), cancellable = true)
-    public void playerTouch$0(Player player, CallbackInfo callback) {
+    public void playerTouch$0(Player player, CallbackInfo callback, @Share("originalItemStack") LocalRef<ItemStack> originalItemStack) {
         if (!this.level().isClientSide) {
+            originalItemStack.set(ItemStack.EMPTY);
             if (this.pickupDelay > 0) {
-                this.puzzleslib$originalItem = this.getItem().copy();
+                originalItemStack.set(this.getItem().copy());
                 return;
             }
             ItemStack itemStack = this.getItem();
             Item item = itemStack.getItem();
-            int i = itemStack.getCount();
+            int count = itemStack.getCount();
             EventResult result = FabricPlayerEvents.ITEM_TOUCH.invoker().onItemTouch(player, ItemEntity.class.cast(this));
             if (!result.isInterrupt()) {
-                this.puzzleslib$originalItem = this.getItem().copy();
+                originalItemStack.set(this.getItem().copy());
                 return;
             } else {
                 callback.cancel();
@@ -56,25 +56,25 @@ abstract class ItemEntityFabricMixin extends Entity {
             }
             if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID()))) {
                 FabricPlayerEvents.ITEM_PICKUP.invoker().onItemPickup(player, ItemEntity.class.cast(this), itemStack.copy());
-                player.take(this, i);
+                player.take(this, count);
                 if (itemStack.isEmpty()) {
                     this.discard();
-                    itemStack.setCount(i);
+                    itemStack.setCount(count);
                 }
 
-                player.awardStat(Stats.ITEM_PICKED_UP.get(item), i);
+                player.awardStat(Stats.ITEM_PICKED_UP.get(item), count);
                 player.onItemPickup(ItemEntity.class.cast(this));
             }
         }
     }
 
     @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"))
-    public void playerTouch$1(Player player, CallbackInfo callback) {
-        if (this.puzzleslib$originalItem.isEmpty()) return;
-        ItemStack copy = this.puzzleslib$originalItem;
-        copy.setCount(copy.getCount() - this.getItem().getCount());
-        FabricPlayerEvents.ITEM_PICKUP.invoker().onItemPickup(player, ItemEntity.class.cast(this), copy);
-        this.puzzleslib$originalItem = ItemStack.EMPTY;
+    public void playerTouch$1(Player player, CallbackInfo callback, @Share("originalItemStack") LocalRef<ItemStack> originalItemStack) {
+        ItemStack itemStack = originalItemStack.get();
+        if (!itemStack.isEmpty()) {
+            itemStack.setCount(itemStack.getCount() - this.getItem().getCount());
+            FabricPlayerEvents.ITEM_PICKUP.invoker().onItemPickup(player, ItemEntity.class.cast(this), itemStack);
+        }
     }
 
     @Shadow

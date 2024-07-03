@@ -27,8 +27,10 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
+import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -44,6 +46,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -57,7 +60,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.*;
+import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityMountEvent;
@@ -71,7 +76,9 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.callback.AddCallback;
 import org.jetbrains.annotations.Nullable;
@@ -217,9 +224,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(BlockEvents.DropExperience.class, BlockEvent.BreakEvent.class, (BlockEvents.DropExperience callback, BlockEvent.BreakEvent evt) -> {
-            MutableInt experienceToDrop = MutableInt.fromEvent(evt::setExpToDrop, evt::getExpToDrop);
-            callback.onDropExperience((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem(), experienceToDrop);
+        INSTANCE.register(BlockEvents.DropExperience.class, BlockDropsEvent.class, (BlockEvents.DropExperience callback, BlockDropsEvent evt) -> {
+            if (!(evt.getBreaker() instanceof Player player)) return;
+            MutableInt experienceAmount = MutableInt.fromEvent(evt::setDroppedExperience, evt::getDroppedExperience);
+            callback.onDropExperience(evt.getLevel(), evt.getPos(), evt.getState(), player, evt.getTool(), experienceAmount);
         });
         INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
             if (callback.onFarmlandTrample((Level) evt.getLevel(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
@@ -260,30 +268,19 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
             callback.onAnvilUse(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
         });
-        INSTANCE.register(ItemEntityEvents.Touch.class, EntityItemPickupEvent.class, (ItemEntityEvents.Touch callback, EntityItemPickupEvent evt) -> {
-            EventResult result = callback.onItemTouch(evt.getEntity(), evt.getItem());
+        INSTANCE.register(ItemEntityEvents.Touch.class, ItemEntityPickupEvent.Pre.class, (ItemEntityEvents.Touch callback, ItemEntityPickupEvent.Pre evt) -> {
+            EventResult result = callback.onItemTouch(evt.getPlayer(), evt.getItemEntity());
             if (result.isInterrupt()) {
-                if (result.getAsBoolean()) {
-                    evt.setResult(Event.Result.ALLOW);
-                } else {
-                    evt.setCanceled(true);
-                }
+                evt.setCanPickup(result.getAsBoolean() ? TriState.TRUE : TriState.FALSE);
             }
         });
-        INSTANCE.register(ItemEntityEvents.Pickup.class, PlayerEvent.ItemPickupEvent.class, (ItemEntityEvents.Pickup callback, PlayerEvent.ItemPickupEvent evt) -> {
-            callback.onItemPickup(evt.getEntity(), evt.getOriginalEntity(), evt.getStack());
-        });
-        INSTANCE.register(LootingLevelCallback.class, LootingLevelEvent.class, (LootingLevelCallback callback, LootingLevelEvent evt) -> {
-            MutableInt lootingLevel = MutableInt.fromEvent(evt::setLootingLevel, evt::getLootingLevel);
-            callback.onLootingLevel(evt.getEntity(), evt.getDamageSource(), lootingLevel);
+        INSTANCE.register(ItemEntityEvents.Pickup.class, ItemEntityPickupEvent.Post.class, (ItemEntityEvents.Pickup callback, ItemEntityPickupEvent.Post evt) -> {
+            callback.onItemPickup(evt.getPlayer(), evt.getItemEntity(), evt.getOriginalStack());
         });
         INSTANCE.register(AnvilEvents.Update.class, AnvilUpdateEvent.class, (AnvilEvents.Update callback, AnvilUpdateEvent evt) -> {
-            ItemStack originalOutput = evt.getOutput();
-            int originalEnchantmentCost = evt.getCost();
-            int originalMaterialCost = evt.getMaterialCost();
-            MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
-            MutableInt enchantmentCost = MutableInt.fromEvent(evt::setCost, evt::getCost);
-            MutableInt materialCost = MutableInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost);
+            DefaultedValue<ItemStack> output = DefaultedValue.fromEventWithValue(evt::setOutput, evt::getOutput, evt.getOutput());
+            DefaultedInt enchantmentCost = DefaultedInt.fromEventWithValue(evt::setCost, () -> (int) evt.getCost(), (int) evt.getCost());
+            DefaultedInt materialCost = DefaultedInt.fromEventWithValue(evt::setMaterialCost, evt::getMaterialCost, evt.getMaterialCost());
             EventResult result = callback.onAnvilUpdate(evt.getLeft(), evt.getRight(), output, evt.getName(), enchantmentCost, materialCost, evt.getPlayer());
             if (result.isInterrupt()) {
                 // interruption for allow will run properly as long as output is changed from an empty stack
@@ -292,13 +289,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 }
             } else {
                 // revert any changes made by us if the callback has not been cancelled
-                evt.setOutput(originalOutput);
-                evt.setCost(originalEnchantmentCost);
-                evt.setMaterialCost(originalMaterialCost);
+                evt.setOutput(output.getAsDefault());
+                evt.setCost(enchantmentCost.getAsDefaultInt());
+                evt.setMaterialCost(materialCost.getAsDefaultInt());
             }
         });
         INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (LivingDropsCallback callback, LivingDropsEvent evt) -> {
-            if (callback.onLivingDrops(evt.getEntity(), evt.getSource(), evt.getDrops(), evt.getLootingLevel(), evt.isRecentlyHit()).isInterrupt()) {
+            if (callback.onLivingDrops(evt.getEntity(), evt.getSource(), evt.getDrops(), evt.isRecentlyHit()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -316,10 +313,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(LivingHurtCallback.class, LivingHurtEvent.class, (LivingHurtCallback callback, LivingHurtEvent evt) -> {
-            MutableFloat amount = MutableFloat.fromEvent(evt::setAmount, evt::getAmount);
-            if (callback.onLivingHurt(evt.getEntity(), evt.getSource(), amount).isInterrupt()) {
-                evt.setCanceled(true);
+        INSTANCE.register(LivingHurtCallback.class, LivingDamageEvent.Pre.class, (LivingHurtCallback callback, LivingDamageEvent.Pre evt) -> {
+            MutableFloat damageAmount = MutableFloat.fromEvent(evt.getContainer()::setNewDamage, evt.getContainer()::getNewDamage);
+            if (callback.onLivingHurt(evt.getEntity(), evt.getContainer().getSource(), damageAmount).isInterrupt()) {
+                // this effectively cancels the event
+                evt.getContainer().setNewDamage(0.0F);
             }
         });
         INSTANCE.register(UseItemEvents.Start.class, LivingEntityUseItemEvent.Start.class, (UseItemEvents.Start callback, LivingEntityUseItemEvent.Start evt) -> {
@@ -344,7 +342,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             MutableValue<ItemStack> stack = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
             callback.onUseItemFinish(evt.getEntity(), stack, evt.getDuration(), evt.getItem());
         });
-        INSTANCE.register(ShieldBlockCallback.class, ShieldBlockEvent.class, (ShieldBlockCallback callback, ShieldBlockEvent evt) -> {
+        INSTANCE.register(ShieldBlockCallback.class, LivingShieldBlockEvent.class, (ShieldBlockCallback callback, LivingShieldBlockEvent evt) -> {
             DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(evt::setBlockedDamage, evt::getBlockedDamage, evt::getOriginalBlockedDamage);
             // Forge event can also prevent the shield taking durability damage, but that's hard to implement...
             if (callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), blockedDamage).isInterrupt()) {
@@ -463,7 +461,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(LivingAttackCallback.class, LivingAttackEvent.class, (LivingAttackCallback callback, LivingAttackEvent evt) -> {
+        INSTANCE.register(LivingAttackCallback.class, LivingIncomingDamageEvent.class, (LivingAttackCallback callback, LivingIncomingDamageEvent evt) -> {
             if (callback.onLivingAttack(evt.getEntity(), evt.getSource(), evt.getAmount()).isInterrupt()) {
                 evt.setCanceled(true);
             }
@@ -474,20 +472,18 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(PlayerCopyEvents.Respawn.class, PlayerEvent.PlayerRespawnEvent.class, (PlayerCopyEvents.Respawn callback, PlayerEvent.PlayerRespawnEvent evt) -> {
             callback.onRespawn((ServerPlayer) evt.getEntity(), evt.isEndConquered());
         });
-        INSTANCE.register(ServerTickEvents.Start.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.Start callback, TickEvent.ServerTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START) return;
+        INSTANCE.register(ServerTickEvents.Start.class, ServerTickEvent.Pre.class, (ServerTickEvents.Start callback, ServerTickEvent.Pre evt) -> {
             callback.onStartServerTick(evt.getServer());
         });
-        INSTANCE.register(ServerTickEvents.End.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.End callback, TickEvent.ServerTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END) return;
+        INSTANCE.register(ServerTickEvents.End.class, ServerTickEvent.Post.class, (ServerTickEvents.End callback, ServerTickEvent.Post evt) -> {
             callback.onEndServerTick(evt.getServer());
         });
-        INSTANCE.register(ServerLevelTickEvents.Start.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.Start callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.START || !(evt.level instanceof ServerLevel level)) return;
+        INSTANCE.register(ServerLevelTickEvents.Start.class, LevelTickEvent.Pre.class, (ServerLevelTickEvents.Start callback, LevelTickEvent.Pre evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel level)) return;
             callback.onStartLevelTick(level.getServer(), level);
         });
-        INSTANCE.register(ServerLevelTickEvents.End.class, TickEvent.LevelTickEvent.class, (ServerLevelTickEvents.End callback, TickEvent.LevelTickEvent evt) -> {
-            if (evt.phase != TickEvent.Phase.END || !(evt.level instanceof ServerLevel level)) return;
+        INSTANCE.register(ServerLevelTickEvents.End.class, LevelTickEvent.Post.class, (ServerLevelTickEvents.End callback, LevelTickEvent.Post evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel level)) return;
             callback.onEndLevelTick(level.getServer(), level);
         });
         INSTANCE.register(ServerLevelEvents.Load.class, LevelEvent.Load.class, (ServerLevelEvents.Load callback, LevelEvent.Load evt) -> {
@@ -678,10 +674,24 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(ContainerEvents.Close.class, PlayerContainerEvent.Close.class, (ContainerEvents.Close callback, PlayerContainerEvent.Close evt) -> {
             callback.onContainerClose((ServerPlayer) evt.getEntity(), evt.getContainer());
         });
-        INSTANCE.register(LookingAtEndermanCallback.class, EnderManAngerEvent.class, (callback, evt) -> {
+        INSTANCE.register(LookingAtEndermanCallback.class, EnderManAngerEvent.class, (LookingAtEndermanCallback callback, EnderManAngerEvent evt) -> {
             if (callback.onLookingAtEnderManCallback(evt.getEntity(), evt.getPlayer()).isInterrupt()) {
                 evt.setCanceled(true);
             }
+        });
+        INSTANCE.register(RegisterPotionBrewingMixesCallback.class, RegisterBrewingRecipesEvent.class, (RegisterPotionBrewingMixesCallback callback, RegisterBrewingRecipesEvent evt) -> {
+            callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(evt.getBuilder()));
+        });
+        INSTANCE.register(FinalizeItemComponentsCallback.class, ModifyDefaultComponentsEvent.class, (FinalizeItemComponentsCallback callback, ModifyDefaultComponentsEvent evt) -> {
+            evt.getAllItems().forEach((Item item) -> {
+                callback.onFinalizeItemComponents(item, (DataComponentPatch dataComponentPatch) -> {
+                    evt.modify(item, (DataComponentPatch.Builder builder) -> {
+                        DataComponentPatch.SplitResult splitResult = dataComponentPatch.split();
+                        splitResult.added().stream().forEach(builder::set);
+                        splitResult.removed().forEach(builder::remove);
+                    });
+                });
+            });
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();

@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.server.TagsUpdatedCallback;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.core.Holder;
@@ -343,7 +344,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private Collection<D> findRegistryMatches(String source) {
             Collection<D> matches = Sets.newHashSet();
             if (!source.contains("*")) {
-                Optional.ofNullable(ResourceLocation.tryParse(source)).flatMap(this::toValue).ifPresent(matches::add);
+                Optional.ofNullable(ResourceLocationHelper.tryParse(source)).flatMap(this::toValue).ifPresent(matches::add);
             } else {
                 String regexSource = source.replace("*", "[a-z0-9/._-]*");
                 this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(Map.Entry::getValue).forEach(matches::add);

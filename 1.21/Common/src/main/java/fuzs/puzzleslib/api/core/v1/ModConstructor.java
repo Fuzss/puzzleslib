@@ -38,19 +38,6 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * Creates a new {@link ResourceLocation} for this mod.
-     * <p>
-     * An overload for easier Minecraft 1.21 compatibility with the new resource location factory methods.
-     *
-     * @param modId the mod id
-     * @param path  the path value
-     * @return the new resource location
-     */
-    static ResourceLocation id(String modId, String path) {
-        return ResourceLocation.fromNamespaceAndPath(modId, path);
-    }
-
-    /**
      * Runs when the mod is first constructed.
      * <p>
      * Mainly used for registering game content, configs, network packages, and event callbacks.

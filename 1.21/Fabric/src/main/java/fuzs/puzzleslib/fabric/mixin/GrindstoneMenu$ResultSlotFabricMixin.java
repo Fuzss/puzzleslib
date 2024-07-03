@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.mixin;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.mixin.accessor.GrindstoneMenuFabricAccessor;
-import fuzs.puzzleslib.fabric.impl.event.GrindstoneXpHolder;
+import fuzs.puzzleslib.fabric.impl.event.GrindstoneExperienceHolder;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.GrindstoneMenu;
@@ -64,7 +64,7 @@ abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
 
     @Inject(method = "getExperienceAmount", at = @At("HEAD"), cancellable = true)
     private void getExperienceAmount(Level level, CallbackInfoReturnable<Integer> callback) {
-        int xp = ((GrindstoneXpHolder) this.this$0).puzzleslib$getXp();
+        int xp = ((GrindstoneExperienceHolder) this.this$0).puzzleslib$getExperience();
         if (xp != -1) callback.setReturnValue(xp);
     }
 }

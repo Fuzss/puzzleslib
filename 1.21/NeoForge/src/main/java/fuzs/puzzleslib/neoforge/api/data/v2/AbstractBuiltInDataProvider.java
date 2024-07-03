@@ -1,8 +1,9 @@
 package fuzs.puzzleslib.neoforge.api.data.v2;
 
 import com.google.common.base.CaseFormat;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.ForgeDataProviderContext;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.Util;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
@@ -10,14 +11,14 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.worldgen.BootstapContext;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
@@ -31,22 +32,22 @@ import java.util.concurrent.CompletableFuture;
 public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
     private final PackOutput output;
     private final String modId;
-    private final CompletableFuture<HolderLookup.Provider> lookupProvider;
+    private final CompletableFuture<HolderLookup.Provider> registries;
 
     private final ResourceKey<? extends Registry<T>> registryKey;
     private final ExistingFileHelper fileHelper;
     private final ExistingFileHelper.ResourceType resourceType;
-    private BootstapContext<T> bootstrapContext;
+    private BootstrapContext<T> bootstrapContext;
 
-    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, ForgeDataProviderContext context) {
+    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, NeoForgeDataProviderContext context) {
         this(registryKey, context.getModId(), context.getPackOutput(), context.getRegistries(), context.getFileHelper());
     }
 
-    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
+    public AbstractBuiltInDataProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> registries, ExistingFileHelper fileHelper) {
         this.registryKey = registryKey;
         this.output = output;
         this.modId = modId;
-        this.lookupProvider = lookupProvider;
+        this.registries = registries;
         this.fileHelper = fileHelper;
         this.resourceType = new ExistingFileHelper.ResourceType(PackType.SERVER_DATA, ".json", registryKey.location().getPath());
     }
@@ -56,11 +57,11 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
         this.bootstrapContext.register(key, value);
     }
 
-    protected abstract void addBootstrap(BootstapContext<T> bootstrapContext);
+    protected abstract void addBootstrap(BootstrapContext<T> bootstrapContext);
 
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
-        return new DatapackBuiltinEntriesProvider(this.output, this.lookupProvider, new RegistrySetBuilder().add(this.registryKey, context -> {
+        return new DatapackBuiltinEntriesProvider(this.output, this.registries, new RegistrySetBuilder().add(this.registryKey, (BootstrapContext<T> context) -> {
             this.bootstrapContext = context;
             this.addBootstrap(context);
         }), Collections.singleton(this.modId)).run(output);
@@ -76,7 +77,7 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
 
     public static abstract class DamageTypes extends AbstractBuiltInDataProvider<DamageType> {
 
-        public DamageTypes(ForgeDataProviderContext context) {
+        public DamageTypes(NeoForgeDataProviderContext context) {
             super(Registries.DAMAGE_TYPE, context);
         }
 
@@ -95,7 +96,7 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
 
     public static abstract class TrimMaterials extends AbstractBuiltInDataProvider<TrimMaterial> {
 
-        public TrimMaterials(ForgeDataProviderContext context) {
+        public TrimMaterials(NeoForgeDataProviderContext context) {
             super(Registries.TRIM_MATERIAL, context);
         }
 
@@ -107,7 +108,7 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
             this.add(resourceKey, ingredient, descriptionColor, itemModelIndex, Collections.emptyMap());
         }
 
-        protected void add(ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<ArmorMaterials, String> overrideArmorMaterials) {
+        protected void add(ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<Holder<ArmorMaterial>, String> overrideArmorMaterials) {
             Component description = Component.translatable(Util.makeDescriptionId("trim_material", resourceKey.location())).withStyle(Style.EMPTY.withColor(descriptionColor));
             TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(), ingredient, itemModelIndex, description, overrideArmorMaterials);
             this.add(resourceKey, trimMaterial);

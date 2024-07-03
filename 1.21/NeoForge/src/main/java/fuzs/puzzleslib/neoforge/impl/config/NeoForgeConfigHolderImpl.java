@@ -85,8 +85,8 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
         }
 
         public void register(String modId) {
-            Objects.requireNonNull(this.config, "Attempting to register invalid config of type %s".formatted(this.configTypeName));
-            if (this.modConfig != null) throw new IllegalStateException(String.format("Config for type %s has already been registered", this.configTypeName));
+            Objects.requireNonNull(this.config, "Attempting to register invalid config of type " + this.configTypeName);
+            if (this.modConfig != null) throw new IllegalStateException("Config has already been registered for type " + this.configTypeName);
             ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
             this.modConfig = new ModConfig(this.configType, this.buildSpec(), modContainer, this.fileName.apply(modId));
             modContainer.addConfig(this.modConfig);

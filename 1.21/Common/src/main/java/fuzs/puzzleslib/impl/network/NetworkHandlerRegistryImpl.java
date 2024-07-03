@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.network;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
@@ -33,7 +34,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
     @Override
     public <T extends Record & ClientboundMessage<T>> Builder registerClientbound(Class<T> clazz) {
         if (this.clientboundMessages.contains(clazz)) {
-            throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            throw new IllegalStateException("Duplicate message of type " + clazz);
         }
         this.clientboundMessages.add(clazz);
         return this;
@@ -42,7 +43,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
     @Override
     public <T extends Record & ServerboundMessage<T>> Builder registerServerbound(Class<T> clazz) {
         if (this.serverboundMessages.contains(clazz)) {
-            throw new IllegalStateException("Duplicate message of type %s".formatted(clazz));
+            throw new IllegalStateException("Duplicate message of type " + clazz);
         }
         this.serverboundMessages.add(clazz);
         return this;
@@ -65,7 +66,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
     }
 
     protected ResourceLocation registerMessageType(Class<?> clazz) {
-        ResourceLocation messageName = ResourceLocation.fromNamespaceAndPath(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
+        ResourceLocation messageName = ResourceLocationHelper.fromNamespaceAndPath(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
         this.messageNames.put(clazz, messageName);
         return messageName;
     }
@@ -74,7 +75,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
     protected <T extends Record, S extends PacketListener> Packet<S> toPacket(T message, BiFunction<ResourceLocation, Consumer<FriendlyByteBuf>, Packet<S>> packetFactory) {
         Class<T> clazz = (Class<T>) message.getClass();
         ResourceLocation channelName = this.messageNames.get(clazz);
-        Objects.requireNonNull(channelName, "Unknown message of type %s".formatted(clazz));
+        Objects.requireNonNull(channelName, "Unknown message of type " + clazz);
         return packetFactory.apply(channelName, (FriendlyByteBuf friendlyByteBuf) -> {
             MessageSerializers.findByType(clazz).write(friendlyByteBuf, message);
         });

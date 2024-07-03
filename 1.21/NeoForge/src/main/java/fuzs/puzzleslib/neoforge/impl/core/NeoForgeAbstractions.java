@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.core;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -12,7 +12,6 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -21,7 +20,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.CommonHooks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
@@ -38,8 +36,10 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, FriendlyByteBuf> screenOpeningDataWriter) {
-        player.openMenu(menuProvider, buf -> screenOpeningDataWriter.accept(player, buf));
+    public void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
+        player.openMenu(menuProvider, (RegistryFriendlyByteBuf buf) -> {
+            dataWriter.accept(player, buf);
+        });
     }
 
     @Override
@@ -55,11 +55,6 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
         return stack.canEquip(slot, entity);
-    }
-
-    @Override
-    public int getMobLootingLevel(Entity entity, @Nullable Entity killerEntity, @Nullable DamageSource damageSource) {
-        return CommonHooks.getLootingLevel(entity, killerEntity, damageSource);
     }
 
     @Override
