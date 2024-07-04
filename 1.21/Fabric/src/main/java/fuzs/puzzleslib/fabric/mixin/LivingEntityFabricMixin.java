@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
@@ -35,10 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Mixin(LivingEntity.class)
 abstract class LivingEntityFabricMixin extends Entity {
@@ -167,13 +163,13 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @Inject(method = "dropAllDeathLoot", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;lastHurtByPlayerTime:I", shift = At.Shift.BEFORE))
-    protected void dropAllDeathLoot$1(DamageSource damageSource, CallbackInfo callback) {
-        ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(Lists.newArrayList());
+    @Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
+    protected void dropAllDeathLoot$1(ServerLevel level, DamageSource damageSource, CallbackInfo callback) {
+        ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(new ArrayList<>());
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
-    protected void dropAllDeathLoot$2(DamageSource damageSource, CallbackInfo callback) {
+    protected void dropAllDeathLoot$2(ServerLevel level, DamageSource damageSource, CallbackInfo callback) {
         if (!FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this), damageSource, this.lastHurtByPlayerTime)) {
             PuzzlesLib.LOGGER.warn("Unable to invoke LivingDropsCallback for entity {}: Drops is null", this.getName().getString());
         }
@@ -422,7 +418,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @Inject(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/level/Level;isClientSide:Z", ordinal = 0, shift = At.Shift.BEFORE), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;increaseAirSupply(I)I")))
+    @Inject(method = "baseTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;level()Lnet/minecraft/world/level/Level;", ordinal = 0), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;increaseAirSupply(I)I")))
     public void baseTick$4(CallbackInfo callback) {
         if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
             FabricEventImplHelper.tickAirSupply(LivingEntity.class.cast(this), this.puzzleslib$originalAirSupply, true, true);

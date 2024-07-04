@@ -9,6 +9,7 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.DeathScreen;
+import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -52,12 +53,12 @@ public abstract class MinecraftFabricMixin {
     @Unique
     private DefaultedValue<Screen> puzzleslib$newScreen;
 
-    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.BEFORE))
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V", shift = At.Shift.BEFORE))
     private void runTick$0(boolean renderLevel, CallbackInfo callback) {
         FabricRendererEvents.BEFORE_GAME_RENDER.invoker().onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.timer);
     }
 
-    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(FJZ)V", shift = At.Shift.AFTER))
+    @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V", shift = At.Shift.AFTER))
     private void runTick$1(boolean renderLevel, CallbackInfo callback) {
         FabricRendererEvents.AFTER_GAME_RENDER.invoker().onAfterGameRender(Minecraft.class.cast(this), this.gameRenderer, this.timer);
     }
@@ -99,14 +100,14 @@ public abstract class MinecraftFabricMixin {
     }
 
     @Inject(method = "setLevel", at = @At("HEAD"))
-    public void setLevel(ClientLevel clientLevel, CallbackInfo callback) {
+    public void setLevel(ClientLevel clientLevel, ReceivingLevelScreen.Reason reason, CallbackInfo callback) {
         if (this.level != null) {
             FabricClientLevelEvents.UNLOAD_LEVEL.invoker().onLevelUnload(Minecraft.class.cast(this), this.level);
         }
     }
 
-    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V", shift = At.Shift.AFTER))
-    public void disconnect(Screen screen, CallbackInfo callback) {
+    @Inject(method = "disconnect(Lnet/minecraft/client/gui/screens/Screen;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;resetData()V", shift = At.Shift.AFTER))
+    public void disconnect(Screen screen, boolean keepResourcePacks, CallbackInfo callback) {
         if (this.player != null && this.gameMode != null) {
             Connection connection = this.player.connection.getConnection();
             Objects.requireNonNull(connection, "connection is null");

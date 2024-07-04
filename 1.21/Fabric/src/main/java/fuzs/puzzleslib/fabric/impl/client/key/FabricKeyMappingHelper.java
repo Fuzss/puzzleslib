@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.client.key;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -16,12 +15,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 public final class FabricKeyMappingHelper implements KeyMappingHelper {
-    private static final Multimap<KeyActivationContext, KeyMapping> KEY_MAPPINGS_BY_ACTIVATION = Multimaps.newListMultimap(Maps.newEnumMap(KeyActivationContext.class), Lists::newArrayList);
+    private static final Multimap<KeyActivationContext, KeyMapping> KEY_MAPPINGS_BY_ACTIVATION = Multimaps.newListMultimap(Maps.newEnumMap(KeyActivationContext.class), ArrayList::new);
     private static final Map<KeyMapping, KeyActivationContext> KEY_MAPPINGS_TO_ACTIVATION = Maps.newIdentityHashMap();
 
     {

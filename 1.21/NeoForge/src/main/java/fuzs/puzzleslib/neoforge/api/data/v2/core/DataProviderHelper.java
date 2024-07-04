@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 public final class DataProviderHelper {
 
     private DataProviderHelper() {
-
+        // NO-OP
     }
 
     /**

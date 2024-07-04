@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.config;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
@@ -12,6 +11,7 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -25,8 +25,8 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     @Nullable
     private T defaultConfig;
     protected UnaryOperator<String> fileName;
-    private final List<Consumer<T>> additionalCallbacks = Lists.newArrayList();
-    private List<Runnable> configValueCallbacks = Lists.newArrayList();
+    private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
+    private List<Runnable> configValueCallbacks = new ArrayList<>();
     private boolean available;
 
     protected ConfigDataHolderImpl(String configTypeName, Supplier<T> supplier) {

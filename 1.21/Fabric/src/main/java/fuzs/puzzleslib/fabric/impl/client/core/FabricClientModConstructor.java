@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
-import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
 import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
@@ -24,6 +23,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -68,7 +68,7 @@ public final class FabricClientModConstructor {
     }
 
     private static void registerBuiltinModelItemRenderers(String modId, Consumer<BuiltinModelItemRendererContext> consumer, Set<ContentRegistrationFlags> availableFlags) {
-        List<ResourceManagerReloadListener> dynamicRenderers = Lists.newArrayList();
+        List<ResourceManagerReloadListener> dynamicRenderers = new ArrayList<>();
         consumer.accept(new BuiltinModelItemRendererContextFabricImpl(modId, dynamicRenderers));
         // do not punish ContentRegistrationFlags#DYNAMIC_RENDERERS being absent as not every built-in item renderer needs to reload
         if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.config.v3.json;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
@@ -9,6 +8,7 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -79,7 +79,7 @@ public class JsonConfigFileUtil {
      */
     public static void getAllAndLoad(String jsonName, Consumer<File> serializer, Consumer<FileReader> deserializer, Runnable prepareForLoad) {
         File jsonDir = getConfigPath(jsonName);
-        List<File> files = Lists.newArrayList();
+        List<File> files = new ArrayList<>();
         createAllIfAbsent(jsonDir, serializer, files);
         loadAllFiles(jsonDir, deserializer, prepareForLoad, files);
     }

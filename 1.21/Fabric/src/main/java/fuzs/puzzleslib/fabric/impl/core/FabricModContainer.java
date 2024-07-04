@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
-import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
@@ -19,7 +18,7 @@ public final class FabricModContainer implements ModContainer {
     public FabricModContainer(net.fabricmc.loader.api.ModContainer container) {
         this.container = container;
         this.metadata = container.getMetadata();
-        this.children = Lists.newArrayList();
+        this.children = new ArrayList<>();
     }
 
     @Override

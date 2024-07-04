@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.config;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.ObjectArrays;
 import fuzs.puzzleslib.api.config.v3.Config;
@@ -86,7 +85,7 @@ public class AnnotatedConfigBuilder {
         for (Field field : getAllFieldsRecursive(target)) {
             Config annotation = field.getDeclaredAnnotation(Config.class);
             if (annotation != null) {
-                pathToField.put(Lists.newArrayList(annotation.category()), field);
+                pathToField.put(new ArrayList<>(Arrays.asList(annotation.category())), field);
             }
         }
         return pathToField.asMap();

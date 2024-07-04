@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.network.v3.serialization;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
@@ -358,7 +357,7 @@ public final class MessageSerializers {
         registerSerializer(PoiType.class, Registries.POINT_OF_INTEREST_TYPE);
 
         registerContainerProvider(Map.class, MessageSerializers::createMapSerializer);
-        registerContainerProvider(List.class, (Type[] typeArguments) -> createCollectionSerializer(typeArguments, Lists::newArrayListWithExpectedSize));
+        registerContainerProvider(List.class, (Type[] typeArguments) -> createCollectionSerializer(typeArguments, ArrayList::new));
         registerContainerProvider(Optional.class, MessageSerializers::createOptionalSerializer);
         registerContainerProvider(Holder.class, MessageSerializers::createHolderSerializer);
     }

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
-import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
@@ -20,6 +19,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -38,7 +38,7 @@ public final class NeoForgeClientModConstructor {
     }
 
     private static void registerModHandlers(ClientModConstructor constructor, String modId, IEventBus eventBus, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        List<ResourceManagerReloadListener> dynamicRenderers = Lists.newArrayList();
+        List<ResourceManagerReloadListener> dynamicRenderers = new ArrayList<>();
         eventBus.addListener((final FMLClientSetupEvent evt) -> {
             // need to run this deferred as most registries here do not use concurrent maps
             evt.enqueueWork(() -> {
