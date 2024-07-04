@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.config.serialization;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
@@ -42,7 +41,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     /**
      * internal entry holder storage, will be dissolved when {@link #toMap()} is called for the first time
      */
-    private final List<EntryHolder<?, T>> values = Lists.newArrayList();
+    private final List<EntryHolder<?, T>> values = new ArrayList<>();
     /**
      * filter for when {@link EntryHolder}s are constructed, first argument is index (only index 0 when no data is specified), second is entry/data value
      */

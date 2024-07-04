@@ -25,7 +25,7 @@ import java.util.OptionalInt;
 public final class FabricEventImplHelper {
 
     private FabricEventImplHelper() {
-
+        // NO-OP
     }
 
     public static int onComputeLootingLevel(Holder<Enchantment> enchantment, int enchantmentLevel, LootContext lootContext) {

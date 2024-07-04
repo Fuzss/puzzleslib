@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.llamalad7.mixinextras.sugar.Local;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,12 +11,7 @@ import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
-
-import java.util.Objects;
 
 @Mixin(BowItem.class)
 abstract class BowItemFabricMixin extends ProjectileWeaponItem {
@@ -26,29 +20,18 @@ abstract class BowItemFabricMixin extends ProjectileWeaponItem {
         super(properties);
     }
 
-    @Inject(
-            method = "releaseUsing", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z",
-            ordinal = 0,
-            shift = At.Shift.BEFORE
-    ), cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION
-    )
-    public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int timeCharged, CallbackInfo callback, Player player, boolean hasInfiniteAmmo, ItemStack projectileStack, @Share(
-            "charge"
-    ) LocalRef<DefaultedInt> chargeRef) {
-        chargeRef.set(DefaultedInt.fromValue(this.getUseDuration(itemStack, livingEntity) - timeCharged));
-        if (FabricPlayerEvents.ARROW_LOOSE.invoker()
-                .onArrowLoose(player, itemStack, level, chargeRef.get(), !projectileStack.isEmpty() || hasInfiniteAmmo)
-                .isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
     @ModifyVariable(method = "releaseUsing", at = @At("STORE"), ordinal = 1)
-    public int releaseUsing(int charge, @Share("charge") LocalRef<DefaultedInt> chargeRef) {
-        Objects.requireNonNull(chargeRef.get(), "charge is null");
-        charge = chargeRef.get().getAsOptionalInt().orElse(charge);
-        return charge;
+    public int releaseUsing(int chargeValue, ItemStack bow, Level level, LivingEntity livingEntity, int timeCharged, @Local(
+            ordinal = 1
+    ) ItemStack ammo) {
+        DefaultedInt charge = DefaultedInt.fromValue(this.getUseDuration(bow, livingEntity) - timeCharged);
+        if (FabricPlayerEvents.ARROW_LOOSE.invoker()
+                .onArrowLoose((Player) livingEntity, bow, level, charge, !ammo.isEmpty())
+                .isInterrupt()) {
+            // returning zero will effectively cancel the method as it won't process for a charge too low
+            return 0;
+        } else {
+            return charge.getAsOptionalInt().orElse(chargeValue);
+        }
     }
 }

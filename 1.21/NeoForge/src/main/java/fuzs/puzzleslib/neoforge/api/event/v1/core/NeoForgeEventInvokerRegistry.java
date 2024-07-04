@@ -50,7 +50,7 @@ public interface NeoForgeEventInvokerRegistry extends EventInvokerRegistry {
      * @param <T>       common event type
      * @param <E>       Forge event type
      */
-    default <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter) {
+    default <T, E extends Event> void register(Class<T> clazz, Class<E> event, NeoForgeEventContextConsumer<T, E> converter) {
         this.register(clazz, event, converter, false);
     }
 
@@ -64,7 +64,7 @@ public interface NeoForgeEventInvokerRegistry extends EventInvokerRegistry {
      * @param <T>          common event type
      * @param <E>          Forge event type
      */
-    <T, E extends Event> void register(Class<T> clazz, Class<E> event, ForgeEventContextConsumer<T, E> converter, boolean joinInvokers);
+    <T, E extends Event> void register(Class<T> clazz, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, boolean joinInvokers);
 
     /**
      * A helper context for dealing with context based {@link EventInvoker} implementations.
@@ -73,7 +73,7 @@ public interface NeoForgeEventInvokerRegistry extends EventInvokerRegistry {
      * @param <E> Forge event type
      */
     @FunctionalInterface
-    interface ForgeEventContextConsumer<T, E extends Event> {
+    interface NeoForgeEventContextConsumer<T, E extends Event> {
 
         /**
          * Runs the consumer.

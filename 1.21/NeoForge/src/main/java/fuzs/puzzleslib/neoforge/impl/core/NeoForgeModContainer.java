@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import net.neoforged.fml.i18n.MavenVersionTranslator;
 import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
@@ -22,7 +21,7 @@ public final class NeoForgeModContainer implements ModContainer {
 
     public NeoForgeModContainer(IModInfo metadata) {
         this.metadata = metadata;
-        this.children = Lists.newArrayList();
+        this.children = new ArrayList<>();
     }
 
     @Override

@@ -12,6 +12,7 @@ import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -52,8 +53,12 @@ public final class ScreenTooltipFactory {
      * @param tooltipLines components to split for building tooltip
      * @return stream of split char sequences
      */
-    public static List<FormattedCharSequence> splitToCharSequence(List<? extends FormattedText> tooltipLines) {
-        return tooltipLines.stream().flatMap(ScreenTooltipFactory::splitToCharSequence).toList();
+    public static List<FormattedCharSequence> splitToCharSequence(@Nullable List<? extends FormattedText> tooltipLines) {
+        if (tooltipLines != null) {
+            return tooltipLines.stream().flatMap(ScreenTooltipFactory::splitToCharSequence).toList();
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -117,7 +122,7 @@ public final class ScreenTooltipFactory {
      * @param tooltipLines      the lines to build the tooltip from
      * @return the original widget
      */
-    public static AbstractWidget setWidgetTooltipFromText(AbstractWidget abstractWidget, List<? extends FormattedText> tooltipLines) {
+    public static AbstractWidget setWidgetTooltipFromText(AbstractWidget abstractWidget, @Nullable List<? extends FormattedText> tooltipLines) {
         return setWidgetTooltipFromCharSequence(abstractWidget, splitToCharSequence(tooltipLines));
     }
 
@@ -128,7 +133,7 @@ public final class ScreenTooltipFactory {
      * @param tooltipLines      the lines to build the tooltip from
      * @return the original widget
      */
-    public static AbstractWidget setWidgetTooltipFromCharSequence(AbstractWidget abstractWidget, List<FormattedCharSequence> tooltipLines) {
+    public static AbstractWidget setWidgetTooltipFromCharSequence(AbstractWidget abstractWidget, @Nullable List<FormattedCharSequence> tooltipLines) {
         return setWidgetTooltipFromCharSequence(abstractWidget, tooltipLines, null);
     }
 
@@ -140,14 +145,17 @@ public final class ScreenTooltipFactory {
      * @param positionerFactory factory for creating the tooltip positioner
      * @return the original widget
      */
-    public static AbstractWidget setWidgetTooltipFromCharSequence(AbstractWidget abstractWidget, List<FormattedCharSequence> tooltipLines, @Nullable BiFunction<ScreenRectangle, Boolean, ClientTooltipPositioner> positionerFactory) {
+    public static AbstractWidget setWidgetTooltipFromCharSequence(AbstractWidget abstractWidget, @Nullable List<FormattedCharSequence> tooltipLines, @Nullable BiFunction<ScreenRectangle, Boolean, ClientTooltipPositioner> positionerFactory) {
 
         if (positionerFactory != null) {
+            Objects.requireNonNull(tooltipLines, "tooltip lines is null");
             WidgetTooltipHolder holder = createTooltipHolder(tooltipLines, positionerFactory);
             holder.setDelay(abstractWidget.tooltip.delay);
             abstractWidget.tooltip = holder;
-        } else {
+        } else if (tooltipLines != null) {
             abstractWidget.setTooltip(createFromCharSequence(tooltipLines));
+        } else {
+            abstractWidget.setTooltip(null);
         }
 
         return abstractWidget;

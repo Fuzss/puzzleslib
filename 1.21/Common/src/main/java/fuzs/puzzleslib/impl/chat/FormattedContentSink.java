@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.chat;
 
-import com.google.common.collect.Lists;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -15,9 +14,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FormattedContentSink implements FormattedText.StyledContentConsumer<Unit>, FormattedCharSink {
-    private final List<Map.Entry<StringBuilder, Style>> builders = Lists.newArrayList(Map.entry(new StringBuilder(),
+    private final List<Map.Entry<StringBuilder, Style>> builders = new ArrayList<>(Collections.singletonList(Map.entry(new StringBuilder(),
             Style.EMPTY
-    ));
+    )));
     @Nullable
     private Component component;
     @Nullable

@@ -28,13 +28,7 @@ abstract class ServerPlayerFabricMixin extends Player {
         super(level, pos, yRot, gameProfile);
     }
 
-    @Inject(
-            method = "die", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;gameEvent(Lnet/minecraft/world/level/gameevent/GameEvent;)V",
-            shift = At.Shift.AFTER
-    ), cancellable = true
-    )
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
         EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
         if (result.isInterrupt()) callback.cancel();

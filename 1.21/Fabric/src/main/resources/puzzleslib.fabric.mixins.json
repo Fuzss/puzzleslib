@@ -56,6 +56,7 @@
   "client": [
     "client.AbstractClientPlayerFabricMixin",
     "client.AbstractContainerScreenFabricMixin",
+    "client.CameraFabricMixin",
     "client.ClientLevelFabricMixin",
     "client.ClientPacketListenerFabricMixin",
     "client.DebugScreenOverlayMixin",
@@ -84,7 +85,6 @@
     "client.ToastComponentFabricMixin",
     "client.WindowFabricMixin",
     "client.accessor.AbstractContainerScreenFabricAccessor",
-    "client.accessor.CameraFabricAccessor",
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "server": [

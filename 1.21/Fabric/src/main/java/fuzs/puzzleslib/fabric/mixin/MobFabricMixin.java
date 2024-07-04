@@ -35,7 +35,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     }
 
     @Inject(method = "finalizeSpawn", at = @At("TAIL"))
-    public void finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag dataTag, CallbackInfoReturnable<SpawnGroupData> callback) {
+    public void finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, CallbackInfoReturnable<SpawnGroupData> callback) {
         this.puzzleslib$spawnType = reason;
     }
 
