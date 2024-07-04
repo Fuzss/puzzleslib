@@ -10,8 +10,8 @@ public interface RenderGuiCallback {
     EventInvoker<RenderGuiCallback> EVENT = EventInvoker.lookup(RenderGuiCallback.class);
 
     /**
-     * Called at the end of {@link net.minecraft.client.gui.Gui#render(GuiGraphics, float)} after vanilla has drawn all
-     * elements.
+     * Called at the end of {@link net.minecraft.client.gui.Gui#render(GuiGraphics, DeltaTracker)} after vanilla has
+     * drawn all elements.
      * <p>
      * Allows for rendering additional elements on the screen.
      * <p>

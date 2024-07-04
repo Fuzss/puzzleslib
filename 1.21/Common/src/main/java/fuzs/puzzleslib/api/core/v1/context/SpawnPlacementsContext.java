@@ -7,19 +7,20 @@ import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 /**
- * register a default spawn placement for entities
+ * Register a default spawn placement for entities.
  */
 @FunctionalInterface
 public interface SpawnPlacementsContext {
 
     /**
-     * registers a spawning behavior for an <code>entityType</code>
+     * Registers a spawning behavior for an entity type.
      *
      * @param entityType     the entity type
-     * @param location       type of spawn placement, probably {@link SpawnPlacements.Type#ON_GROUND}
+     * @param location       type of spawn placement, probably
+     *                       {@link net.minecraft.world.entity.SpawnPlacementTypes#ON_GROUND}
      * @param heightmap      heightmap type, probably {@link Heightmap.Types#MOTION_BLOCKING_NO_LEAVES}
      * @param spawnPredicate custom spawn predicate for mob
-     * @param <T>            type of entity
+     * @param <T>            the type of entity
      */
     <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacementType location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate);
 }

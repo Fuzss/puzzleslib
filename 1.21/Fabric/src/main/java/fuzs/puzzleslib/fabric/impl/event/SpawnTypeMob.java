@@ -11,15 +11,16 @@ import org.jetbrains.annotations.Nullable;
  * An extension to {@link net.minecraft.world.entity.Mob} that stores the {@link MobSpawnType} the mob was initially
  * spawned with when
  * {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType,
- * SpawnGroupData, CompoundTag)} was called.
+ * SpawnGroupData)} was called.
  * <p>
  * The implementation is just like Forge, but also allows for setting the spawn type in case e.g.
  * {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType,
- * SpawnGroupData, CompoundTag)} was overridden without calling super.
+ * SpawnGroupData)} was overridden without calling super.
  */
 public interface SpawnTypeMob {
 
-    @Nullable MobSpawnType puzzleslib$getSpawnType();
+    @Nullable
+    MobSpawnType puzzleslib$getSpawnType();
 
     void puzzleslib$setSpawnType(@Nullable MobSpawnType mobSpawnType);
 }

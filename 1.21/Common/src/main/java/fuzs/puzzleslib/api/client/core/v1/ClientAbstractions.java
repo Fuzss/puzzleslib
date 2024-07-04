@@ -41,8 +41,8 @@ public interface ClientAbstractions {
     /**
      * Converts an image {@link TooltipComponent} into the appropriate client-side component.
      * <p>{@link ClientTooltipComponent}s must first be registered in
-     * {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)},
-     * otherwise {@link IllegalArgumentException} will be thrown.
+     * {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)}, otherwise
+     * {@link IllegalArgumentException} will be thrown.
      * <p>For simple text based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)}
      * instead.
      *
@@ -108,8 +108,7 @@ public interface ClientAbstractions {
     }
 
     /**
-     * Get the search registry for registering a new search tree via
-     * {@link SearchRegistry#register(SearchRegistry.Key, SearchRegistry.TreeBuilderSupplier)}.
+     * Get the search registry for registering a new search tree.
      *
      * @return the search registry
      */
