@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.network;
 
+import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
@@ -9,6 +10,7 @@ import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -19,6 +21,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Builder {
@@ -89,6 +93,20 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
         }
         this.clientboundMessages.clear();
         this.serverboundMessages.clear();
+    }
+
+    protected BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally(Class<?> clazz) {
+        return (Throwable throwable, Consumer<Component> consumer) -> {
+            String modName = ModContainer.getDisplayName(this.channelName.getNamespace());
+            consumer.accept(Component.literal("Receiving %s from %s failed: %s".formatted(clazz.getSimpleName(), modName, throwable.getMessage())));
+        };
+    }
+
+    protected Consumer<Consumer<Component>> disconnectWrongSide(Class<?> clazz) {
+        return (Consumer<Component> consumer) -> {
+            String modName = ModContainer.getDisplayName(this.channelName.getNamespace());
+            consumer.accept(Component.literal("Receiving %s from %s on wrong side!".formatted(clazz.getSimpleName(), modName)));
+        };
     }
 
     @SuppressWarnings("unchecked")

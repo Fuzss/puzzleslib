@@ -8,10 +8,7 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.network.serialization.RecordSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.Rotations;
+import net.minecraft.core.*;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,7 +36,6 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -231,6 +227,20 @@ public final class MessageSerializers {
     }
 
     @SuppressWarnings("unchecked")
+    private static <T> MessageSerializer<Holder<?>> createHolderSerializer(Type[] typeArguments) {
+        return new MessageSerializerImpl<>((FriendlyByteBuf friendlyByteBuf, Holder<?> o) -> {
+            ResourceKey<T> resourceKey = (ResourceKey<T>) o.unwrapKey().orElseThrow();
+            ExtraStreamCodecs.DIRECT_RESOURCE_KEY.encode(friendlyByteBuf, resourceKey);
+            ByteBufCodecs.holderRegistry(
+                    resourceKey.registryKey()).encode((RegistryFriendlyByteBuf) friendlyByteBuf, (Holder<T>) o);
+        }, (FriendlyByteBuf friendlyByteBuf) -> {
+            ResourceKey<T> resourceKey = (ResourceKey<T>) ExtraStreamCodecs.DIRECT_RESOURCE_KEY.decode(friendlyByteBuf);
+            return ByteBufCodecs.holderRegistry(
+                    resourceKey.registryKey()).decode((RegistryFriendlyByteBuf) friendlyByteBuf);
+        });
+    }
+
+    @SuppressWarnings("unchecked")
     private static MessageSerializer<?> createArraySerializer(Class<?> clazz) {
         MessageSerializer<Object> serializer = (MessageSerializer<Object>) findByType(clazz);
         return new MessageSerializerImpl<>((FriendlyByteBuf buf, Object t) -> {
@@ -253,7 +263,7 @@ public final class MessageSerializers {
         return new MessageSerializerImpl<>(FriendlyByteBuf::writeEnum, (FriendlyByteBuf buf) -> buf.readEnum(clazz));
     }
 
-    private record MessageSerializerImpl<T>(BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) implements MessageSerializer<T> {
+    record MessageSerializerImpl<T>(BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) implements MessageSerializer<T> {
 
         @Override
         public void encode(FriendlyByteBuf buf, T instance) {
@@ -302,6 +312,7 @@ public final class MessageSerializers {
         registerSerializer(Pose.class, EntityDataSerializers.POSE);
         registerSerializer(ChunkPos.class, FriendlyByteBuf::writeChunkPos, FriendlyByteBuf::readChunkPos);
         registerSerializer(ResourceLocation.class, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::readResourceLocation);
+//        registerSerializer(ResourceKey.class, ExtraStreamCodecs.DIRECT_RESOURCE_KEY);
         registerSerializer(BlockHitResult.class, FriendlyByteBuf::writeBlockHitResult, FriendlyByteBuf::readBlockHitResult);
         registerSerializer(BitSet.class, FriendlyByteBuf::writeBitSet, FriendlyByteBuf::readBitSet);
         registerSerializer(GameProfile.class, ByteBufCodecs.GAME_PROFILE);
@@ -334,7 +345,6 @@ public final class MessageSerializers {
         registerSerializer(Fluid.class, Registries.FLUID);
         registerSerializer(MobEffect.class, Registries.MOB_EFFECT);
         registerSerializer(Block.class, Registries.BLOCK);
-//        registerSerializer(Enchantment.class, Registries.ENCHANTMENT);
         registerSerializer(EntityType.class, Registries.ENTITY_TYPE);
         registerSerializer(Item.class, Registries.ITEM);
         registerSerializer(Potion.class, Registries.POTION);
@@ -350,5 +360,6 @@ public final class MessageSerializers {
         registerContainerProvider(Map.class, MessageSerializers::createMapSerializer);
         registerContainerProvider(List.class, (Type[] typeArguments) -> createCollectionSerializer(typeArguments, Lists::newArrayListWithExpectedSize));
         registerContainerProvider(Optional.class, MessageSerializers::createOptionalSerializer);
+        registerContainerProvider(Holder.class, MessageSerializers::createHolderSerializer);
     }
 }

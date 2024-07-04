@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.network.v3.serialization;
 
 import fuzs.puzzleslib.impl.network.CustomPacketPayloadAdapterImpl;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -44,6 +45,22 @@ public interface MessageSerializer<T> extends StreamEncoder<FriendlyByteBuf, T>,
             this.encode(buf, adapter.unwrap());
         }, (RegistryFriendlyByteBuf buf) -> {
             return new CustomPacketPayloadAdapterImpl<>(type, this.decode(buf));
+        });
+    }
+
+    /**
+     * Converts a stream codec to a new message serializer.
+     *
+     * @param streamCodec the stream codec
+     * @param <B>         the byte buffer type
+     * @param <V>         the value type
+     * @return the new message serializer
+     */
+    static <B extends ByteBuf, V> MessageSerializer<V> fromStreamCodec(StreamCodec<? super B, V> streamCodec) {
+        return new MessageSerializers.MessageSerializerImpl<>((FriendlyByteBuf buf, V v) -> {
+            streamCodec.encode((B) buf, v);
+        }, (FriendlyByteBuf buf) -> {
+            return streamCodec.decode((B) buf);
         });
     }
 }
