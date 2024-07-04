@@ -15,7 +15,8 @@ public interface ItemTooltipCallback {
     EventInvoker<ItemTooltipCallback> EVENT = EventInvoker.lookup(ItemTooltipCallback.class);
 
     /**
-     * Called at the end of item tooltip gathering in {@link ItemStack#getTooltipLines(Player, TooltipFlag)}.
+     * Called at the end of item tooltip gathering in
+     * {@link ItemStack#getTooltipLines(Item.TooltipContext, Player, TooltipFlag)}.
      * <p>
      * Allows for both appending additional tooltip lines, and removing / replacing existing lines.
      *

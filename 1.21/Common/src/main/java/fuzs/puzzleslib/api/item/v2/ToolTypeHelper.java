@@ -238,7 +238,7 @@ public interface ToolTypeHelper {
     }
 
     /**
-     * Tests if an item stack is any sort of tool, mainly in the sense of {@link ItemTags#TOOLS}.
+     * Tests if an item stack is any sort of tool.
      *
      * @param itemStack the stack to test
      * @return is this stack a tool

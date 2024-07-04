@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
 
 public final class FabricRendererEvents {
@@ -68,11 +69,11 @@ public final class FabricRendererEvents {
      */
     public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.create(FogEvents.ComputeColor.class);
     /**
-     * Fires before the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+     * Fires before the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
      */
     public static final Event<GameRenderEvents.Before> BEFORE_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.Before.class);
     /**
-     * Fires after the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+     * Fires after the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
      */
     public static final Event<GameRenderEvents.After> AFTER_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.After.class);
     /**

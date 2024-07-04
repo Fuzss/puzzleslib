@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.core.v1;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -54,9 +53,10 @@ public interface CommonAbstractions {
     void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter);
 
     /**
-     * Is <code>entityType</code> considered a boss mob like {@link EntityType#ENDER_DRAGON} and
-     * {@link EntityType#WITHER} in vanilla.
-     * <p>A common property of such entities usually is {@link LivingEntity#canChangeDimensions()} returns
+     * Is the entity type considered a boss mob like {@link EntityType#ENDER_DRAGON} and {@link EntityType#WITHER} in
+     * vanilla.
+     * <p>
+     * A common property of such entities usually is {@link LivingEntity#canChangeDimensions(Level, Level)} returns
      * <code>false</code>.
      *
      * @param type the entity type
@@ -87,7 +87,7 @@ public interface CommonAbstractions {
 
     /**
      * Called before an entity drops loot for determining the level of
-     * {@link net.minecraft.world.item.enchantment.Enchantments#MOB_LOOTING} to apply when generating drops.
+     * {@link net.minecraft.world.item.enchantment.Enchantments#LOOTING} to apply when generating drops.
      *
      * @param target       the entity that has been killed
      * @param attacker     another entity responsible for killing the entity
@@ -129,7 +129,7 @@ public interface CommonAbstractions {
 
     /**
      * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during
-     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)}.
+     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData)}.
      * <p>Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
      *
      * @param mob the mob
@@ -139,7 +139,7 @@ public interface CommonAbstractions {
     MobSpawnType getMobSpawnType(Mob mob);
 
     /**
-     * Creates a new {@link Pack.Info} instance with additional parameters only supported on Forge.
+     * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.
      *
      * @param id                the pack identifier
      * @param description       the pack description component

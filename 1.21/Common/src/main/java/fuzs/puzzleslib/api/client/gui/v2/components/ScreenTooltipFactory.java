@@ -84,14 +84,7 @@ public final class ScreenTooltipFactory {
     /**
      * Create a new tooltip instance from already split lines of text.
      *
-     * @param tooltipLines      the split lines to build the tooltip from
-     * @param positionerFactory factory to replace
-     *                          {@link Tooltip#createTooltipPositioner(boolean, boolean, ScreenRectangle)}, the boolean
-     *                          parameter for the factory defines where vanilla would return
-     *                          {@link
-     *                          net.minecraft.client.gui.screens.inventory.tooltip.BelowOrAboveWidgetTooltipPositioner}
-     *                          instead of
-     *                          {@link net.minecraft.client.gui.screens.inventory.tooltip.MenuTooltipPositioner}
+     * @param tooltipLines the split lines to build the tooltip from
      * @return the tooltip instance
      */
     public static Tooltip createFromCharSequence(List<FormattedCharSequence> tooltipLines) {
@@ -107,8 +100,8 @@ public final class ScreenTooltipFactory {
     /**
      * Set some text as a new tooltip instance for an {@link AbstractWidget}.
      *
-     * @param abstractWidget    the widget
-     * @param tooltipLines      the lines to build the tooltip from
+     * @param abstractWidget the widget
+     * @param tooltipLines   the lines to build the tooltip from
      * @return the original widget
      */
     public static AbstractWidget setWidgetTooltipFromText(AbstractWidget abstractWidget, FormattedText... tooltipLines) {
@@ -118,8 +111,8 @@ public final class ScreenTooltipFactory {
     /**
      * Set some text as a new tooltip instance for an {@link AbstractWidget}.
      *
-     * @param abstractWidget    the widget
-     * @param tooltipLines      the lines to build the tooltip from
+     * @param abstractWidget the widget
+     * @param tooltipLines   the lines to build the tooltip from
      * @return the original widget
      */
     public static AbstractWidget setWidgetTooltipFromText(AbstractWidget abstractWidget, @Nullable List<? extends FormattedText> tooltipLines) {
@@ -129,8 +122,8 @@ public final class ScreenTooltipFactory {
     /**
      * Set some text as a new tooltip instance for an {@link AbstractWidget}.
      *
-     * @param abstractWidget    the widget
-     * @param tooltipLines      the lines to build the tooltip from
+     * @param abstractWidget the widget
+     * @param tooltipLines   the lines to build the tooltip from
      * @return the original widget
      */
     public static AbstractWidget setWidgetTooltipFromCharSequence(AbstractWidget abstractWidget, @Nullable List<FormattedCharSequence> tooltipLines) {

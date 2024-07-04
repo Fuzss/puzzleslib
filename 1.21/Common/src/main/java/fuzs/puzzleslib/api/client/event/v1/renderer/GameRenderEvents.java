@@ -17,11 +17,11 @@ public final class GameRenderEvents {
     public interface Before {
 
         /**
-         * Fires before the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+         * Fires before the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
          *
          * @param minecraft    minecraft singleton instance
          * @param gameRenderer game renderer instance
-         * @param deltaTracker  partial tick time, different when the game is paused
+         * @param deltaTracker partial tick time, different when the game is paused
          */
         void onBeforeGameRender(Minecraft minecraft, GameRenderer gameRenderer, DeltaTracker deltaTracker);
     }
@@ -30,11 +30,11 @@ public final class GameRenderEvents {
     public interface After {
 
         /**
-         * Fires after the game and level are rendered in {@link GameRenderer#render(float, long, boolean)}.
+         * Fires after the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
          *
          * @param minecraft    minecraft singleton instance
          * @param gameRenderer game renderer instance
-         * @param deltaTracker  partial tick time, different when the game is paused
+         * @param deltaTracker partial tick time, different when the game is paused
          */
         void onAfterGameRender(Minecraft minecraft, GameRenderer gameRenderer, DeltaTracker deltaTracker);
     }

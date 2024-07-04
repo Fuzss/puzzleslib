@@ -11,6 +11,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -33,8 +34,8 @@ public final class PlayerInteractEvents {
 
         /**
          * This event is fired on both sides before the player triggers
-         * {@link net.minecraft.world.level.block.Block#use(BlockState, Level, BlockPos, Player, InteractionHand,
-         * BlockHitResult)} by right-clicking.
+         * {@link net.minecraft.world.level.block.Block#useItemOn(ItemStack, BlockState, Level, BlockPos, Player,
+         * InteractionHand, BlockHitResult)} by right-clicking.
          *
          * @param player          the player interacting with the block
          * @param level           the level the interaction is happening in

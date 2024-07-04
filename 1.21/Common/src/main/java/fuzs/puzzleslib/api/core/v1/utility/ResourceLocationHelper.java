@@ -49,7 +49,6 @@ public final class ResourceLocationHelper {
      * characters are present.
      *
      * @param location the location input
-     * @param path     the path
      * @return the new resource location or null
      */
     @Nullable

@@ -16,7 +16,6 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
-import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -274,9 +273,7 @@ public interface NetworkHandlerV3 {
     interface Builder extends NetworkHandlerRegistry, Buildable {
 
         /**
-         * Register a new {@link MessageSerializer} by providing a {@link net.minecraft.network.FriendlyByteBuf.Writer}
-         * and a {@link net.minecraft.network.FriendlyByteBuf.Reader}, similarly to vanilla's
-         * {@link EntityDataSerializer}
+         * Register a new {@link MessageSerializer} by providing an encoder and decoder.
          *
          * @param type   type to serialize, inheritance is not supported
          * @param writer writer to byte buffer
@@ -307,8 +304,8 @@ public interface NetworkHandlerV3 {
          * implementation will be handled by a provider registered for {@link Map}.
          *
          * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a
-         * specific collection type, a unique serializer must be registered.
-         * This is already done for {@link List}s, which are deserialized as {@link ArrayList}.
+         * specific collection type, a unique serializer must be registered. This is already done for {@link List}s,
+         * which are deserialized as {@link ArrayList}.
          *
          * @param type    container type
          * @param factory new empty collection provider (preferable with pre-configured size)

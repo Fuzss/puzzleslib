@@ -3,9 +3,9 @@ package fuzs.puzzleslib.fabric.api.event.v1;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.core.Holder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -56,12 +56,12 @@ public final class FabricLivingEvents {
     public static final Event<UseItemEvents.Tick> USE_ITEM_TICK = FabricEventFactory.createResult(UseItemEvents.Tick.class);
     /**
      * Fired when an item is stopped being used without being finished, meaning
-     * {@link net.minecraft.world.item.Item#getUseDuration(ItemStack)} has not been reached.
+     * {@link net.minecraft.world.item.Item#getUseDuration(ItemStack, LivingEntity)} has not been reached.
      */
     public static final Event<UseItemEvents.Stop> USE_ITEM_STOP = FabricEventFactory.createResult(UseItemEvents.Stop.class);
     /**
      * Fired when an item is finished being used, meaning
-     * {@link net.minecraft.world.item.Item#getUseDuration(ItemStack)} has run out.
+     * {@link net.minecraft.world.item.Item#getUseDuration(ItemStack, LivingEntity)} has run out.
      */
     public static final Event<UseItemEvents.Finish> USE_ITEM_FINISH = FabricEventFactory.create(UseItemEvents.Finish.class);
     /**
@@ -108,7 +108,7 @@ public final class FabricLivingEvents {
     public static final Event<MobEffectEvents.Apply> MOB_EFFECT_APPLY = FabricEventFactory.create(MobEffectEvents.Apply.class);
     /**
      * Called when a {@link MobEffectInstance} is removed from a {@link LivingEntity} in
-     * {@link LivingEntity#removeEffect(MobEffect)}.
+     * {@link LivingEntity#removeEffect(Holder)}.
      */
     public static final Event<MobEffectEvents.Remove> MOB_EFFECT_REMOVE = FabricEventFactory.createResult(
             MobEffectEvents.Remove.class);

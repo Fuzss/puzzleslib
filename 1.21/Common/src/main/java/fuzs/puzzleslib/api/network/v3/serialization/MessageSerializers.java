@@ -57,24 +57,25 @@ import java.util.function.IntFunction;
 /**
  * Main class for storing {@link MessageSerializer} implementations.
  *
- * <p>This implementation is heavily inspired by and largely based upon <a href="https://github.com/wisp-forest/owo-lib">Owo Lib</a> by <a href="https://github.com/gliscowo">Glisco</a>.
+ * <p>This implementation is heavily inspired by and largely based upon <a
+ * href="https://github.com/wisp-forest/owo-lib">Owo Lib</a> by <a href="https://github.com/gliscowo">Glisco</a>.
  */
 public final class MessageSerializers {
     private static final Map<Class<?>, MessageSerializer<?>> SERIALIZERS = Collections.synchronizedMap(Maps.newIdentityHashMap());
-    private static final Map<Class<?>, Function<Type[], MessageSerializer<?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(Maps.newLinkedHashMap());
+    private static final Map<Class<?>, Function<Type[], MessageSerializer<?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(
+            Maps.newLinkedHashMap());
 
     private MessageSerializers() {
         // NO-OP
     }
 
     /**
-     * Register a new {@link MessageSerializer} by providing a {@link net.minecraft.network.FriendlyByteBuf.Writer} and a {@link net.minecraft.network.FriendlyByteBuf.Reader},
-     * similarly to vanilla's {@link EntityDataSerializer}
+     * Register a new {@link MessageSerializer} by providing an encoder and a decoder.
      *
-     * @param type type to serialize, inheritance is not supported
+     * @param type   type to serialize, inheritance is not supported
      * @param writer writer to byte buffer
      * @param reader reader from byte buffer
-     * @param <T> data type
+     * @param <T>    data type
      */
     public static <T> void registerSerializer(Class<T> type, BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) {
         registerSerializer(type, new MessageSerializerImpl<>(writer, reader));
@@ -83,9 +84,9 @@ public final class MessageSerializers {
     /**
      * Register a serializer for a data type handled by vanilla's registry system.
      *
-     * @param type registry content type to serialize
+     * @param type        registry content type to serialize
      * @param resourceKey registry resource key
-     * @param <T> data type
+     * @param <T>         data type
      */
     @SuppressWarnings("unchecked")
     public static <T> void registerSerializer(Class<? super T> type, ResourceKey<Registry<T>> resourceKey) {
@@ -123,14 +124,16 @@ public final class MessageSerializers {
     }
 
     /**
-     * Register a custom serializer for container types. Subclasses are supported, meaning e.g. any map implementation will be handled by a provider registered for {@link Map}.
+     * Register a custom serializer for container types. Subclasses are supported, meaning e.g. any map implementation
+     * will be handled by a provider registered for {@link Map}.
      *
-     * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a specific collection type, a unique serializer must be registered.
+     * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a specific
+     * collection type, a unique serializer must be registered.
      * This is already done for {@link List}s, which are deserialized as {@link ArrayList}.
      *
-     * @param type container type
+     * @param type    container type
      * @param factory new empty collection provider (preferable with pre-configured size)
-     * @param <T> container type
+     * @param <T>     container type
      */
     @SuppressWarnings("unchecked")
     public static <T> void registerContainerProvider(Class<T> type, Function<Type[], MessageSerializer<? extends T>> factory) {
@@ -140,7 +143,8 @@ public final class MessageSerializers {
     }
 
     /**
-     * Find a serializer for a given type. Some serializers (for records, arrays, and enums) can be created dynamically.
+     * Find a serializer for a given type. Some serializers (for records, arrays, and enums) can be created
+     * dynamically.
      *
      * @param type serializable type
      * @param <T>  data type
@@ -230,12 +234,12 @@ public final class MessageSerializers {
         return new MessageSerializerImpl<>((FriendlyByteBuf friendlyByteBuf, Holder<?> o) -> {
             ResourceKey<T> resourceKey = (ResourceKey<T>) o.unwrapKey().orElseThrow();
             ExtraStreamCodecs.DIRECT_RESOURCE_KEY.encode(friendlyByteBuf, resourceKey);
-            ByteBufCodecs.holderRegistry(
-                    resourceKey.registryKey()).encode((RegistryFriendlyByteBuf) friendlyByteBuf, (Holder<T>) o);
+            ByteBufCodecs.holderRegistry(resourceKey.registryKey())
+                    .encode((RegistryFriendlyByteBuf) friendlyByteBuf, (Holder<T>) o);
         }, (FriendlyByteBuf friendlyByteBuf) -> {
             ResourceKey<T> resourceKey = (ResourceKey<T>) ExtraStreamCodecs.DIRECT_RESOURCE_KEY.decode(friendlyByteBuf);
-            return ByteBufCodecs.holderRegistry(
-                    resourceKey.registryKey()).decode((RegistryFriendlyByteBuf) friendlyByteBuf);
+            return ByteBufCodecs.holderRegistry(resourceKey.registryKey())
+                    .decode((RegistryFriendlyByteBuf) friendlyByteBuf);
         });
     }
 
@@ -262,7 +266,8 @@ public final class MessageSerializers {
         return new MessageSerializerImpl<>(FriendlyByteBuf::writeEnum, (FriendlyByteBuf buf) -> buf.readEnum(clazz));
     }
 
-    record MessageSerializerImpl<T>(BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) implements MessageSerializer<T> {
+    record MessageSerializerImpl<T>(BiConsumer<FriendlyByteBuf, T> writer,
+                                    Function<FriendlyByteBuf, T> reader) implements MessageSerializer<T> {
 
         @Override
         public void encode(FriendlyByteBuf buf, T instance) {
@@ -286,12 +291,30 @@ public final class MessageSerializers {
         registerSerializer(Float.class, FriendlyByteBuf::writeFloat, FriendlyByteBuf::readFloat);
         registerSerializer(double.class, FriendlyByteBuf::writeDouble, FriendlyByteBuf::readDouble);
         registerSerializer(Double.class, FriendlyByteBuf::writeDouble, FriendlyByteBuf::readDouble);
-        registerSerializer(byte.class, (BiConsumer<FriendlyByteBuf, Byte>) FriendlyByteBuf::writeByte, FriendlyByteBuf::readByte);
-        registerSerializer(Byte.class, (BiConsumer<FriendlyByteBuf, Byte>) FriendlyByteBuf::writeByte, FriendlyByteBuf::readByte);
-        registerSerializer(short.class, (BiConsumer<FriendlyByteBuf, Short>) FriendlyByteBuf::writeShort, FriendlyByteBuf::readShort);
-        registerSerializer(Short.class, (BiConsumer<FriendlyByteBuf, Short>) FriendlyByteBuf::writeShort, FriendlyByteBuf::readShort);
-        registerSerializer(char.class, (BiConsumer<FriendlyByteBuf, Character>) FriendlyByteBuf::writeChar, FriendlyByteBuf::readChar);
-        registerSerializer(Character.class, (BiConsumer<FriendlyByteBuf, Character>) FriendlyByteBuf::writeChar, FriendlyByteBuf::readChar);
+        registerSerializer(byte.class,
+                (BiConsumer<FriendlyByteBuf, Byte>) FriendlyByteBuf::writeByte,
+                FriendlyByteBuf::readByte
+        );
+        registerSerializer(Byte.class,
+                (BiConsumer<FriendlyByteBuf, Byte>) FriendlyByteBuf::writeByte,
+                FriendlyByteBuf::readByte
+        );
+        registerSerializer(short.class,
+                (BiConsumer<FriendlyByteBuf, Short>) FriendlyByteBuf::writeShort,
+                FriendlyByteBuf::readShort
+        );
+        registerSerializer(Short.class,
+                (BiConsumer<FriendlyByteBuf, Short>) FriendlyByteBuf::writeShort,
+                FriendlyByteBuf::readShort
+        );
+        registerSerializer(char.class,
+                (BiConsumer<FriendlyByteBuf, Character>) FriendlyByteBuf::writeChar,
+                FriendlyByteBuf::readChar
+        );
+        registerSerializer(Character.class,
+                (BiConsumer<FriendlyByteBuf, Character>) FriendlyByteBuf::writeChar,
+                FriendlyByteBuf::readChar
+        );
 
         registerSerializer(String.class, EntityDataSerializers.STRING);
         registerSerializer(Date.class, FriendlyByteBuf::writeDate, FriendlyByteBuf::readDate);
@@ -310,9 +333,15 @@ public final class MessageSerializers {
         registerSerializer(VillagerData.class, EntityDataSerializers.VILLAGER_DATA);
         registerSerializer(Pose.class, EntityDataSerializers.POSE);
         registerSerializer(ChunkPos.class, FriendlyByteBuf::writeChunkPos, FriendlyByteBuf::readChunkPos);
-        registerSerializer(ResourceLocation.class, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::readResourceLocation);
+        registerSerializer(ResourceLocation.class,
+                FriendlyByteBuf::writeResourceLocation,
+                FriendlyByteBuf::readResourceLocation
+        );
 //        registerSerializer(ResourceKey.class, ExtraStreamCodecs.DIRECT_RESOURCE_KEY);
-        registerSerializer(BlockHitResult.class, FriendlyByteBuf::writeBlockHitResult, FriendlyByteBuf::readBlockHitResult);
+        registerSerializer(BlockHitResult.class,
+                FriendlyByteBuf::writeBlockHitResult,
+                FriendlyByteBuf::readBlockHitResult
+        );
         registerSerializer(BitSet.class, FriendlyByteBuf::writeBitSet, FriendlyByteBuf::readBitSet);
         registerSerializer(GameProfile.class, ByteBufCodecs.GAME_PROFILE);
 
@@ -357,7 +386,9 @@ public final class MessageSerializers {
         registerSerializer(PoiType.class, Registries.POINT_OF_INTEREST_TYPE);
 
         registerContainerProvider(Map.class, MessageSerializers::createMapSerializer);
-        registerContainerProvider(List.class, (Type[] typeArguments) -> createCollectionSerializer(typeArguments, ArrayList::new));
+        registerContainerProvider(List.class,
+                (Type[] typeArguments) -> createCollectionSerializer(typeArguments, ArrayList::new)
+        );
         registerContainerProvider(Optional.class, MessageSerializers::createOptionalSerializer);
         registerContainerProvider(Holder.class, MessageSerializers::createHolderSerializer);
     }

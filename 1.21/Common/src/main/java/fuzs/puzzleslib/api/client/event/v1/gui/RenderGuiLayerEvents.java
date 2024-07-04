@@ -72,9 +72,9 @@ public final class RenderGuiLayerEvents {
         /**
          * Called before a gui element is rendered, allows for cancelling rendering.
          *
-         * @param minecraft   minecraft singleton instance
-         * @param guiGraphics the gui graphics component
-         * @param partialTick partial tick time
+         * @param minecraft    minecraft singleton instance
+         * @param guiGraphics  the gui graphics component
+         * @param deltaTracker partial tick time
          * @return {@link EventResult#INTERRUPT} to prevent the element from rendering, {@link EventResult#PASS} to
          *         allow the element to render normally
          */

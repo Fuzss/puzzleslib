@@ -30,7 +30,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Save items to a given tag, reading from an item list.
      * <p>
-     * Equivalent to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList)}.
+     * Equivalent to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tag   tag to save to
      * @param items item list to save
@@ -43,7 +43,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Save items to a given tag, reading from a container.
      * <p>
-     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList)}.
+     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tag       tag to save to
      * @param container container to save
@@ -56,7 +56,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Save items to a given tag, reading from an item list.
      * <p>
-     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList)}.
+     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tagKey nbt tag key
      * @param tag    tag to save to
@@ -70,7 +70,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Save items to a given tag, reading from a container.
      * <p>
-     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean)}.
+     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean, HolderLookup.Provider)}.
      *
      * @param tag       tag to save to
      * @param container container to save
@@ -78,13 +78,19 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @return the original tag
      */
     public static CompoundTag saveAllItems(CompoundTag tag, Container container, boolean saveEmpty, HolderLookup.Provider lookupProvider) {
-        return saveAllItems(TAG_ITEMS, tag, container.getContainerSize(), container::getItem, saveEmpty, lookupProvider);
+        return saveAllItems(TAG_ITEMS,
+                tag,
+                container.getContainerSize(),
+                container::getItem,
+                saveEmpty,
+                lookupProvider
+        );
     }
 
     /**
      * Save items to a given tag, reading from an item list.
      * <p>
-     * Equivalent to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean)}.
+     * Equivalent to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean, HolderLookup.Provider)}.
      *
      * @param tag       tag to save to
      * @param items     item list to save
@@ -98,7 +104,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Save items to a given tag, reading from an item list.
      * <p>
-     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean)}.
+     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean, HolderLookup.Provider)}.
      *
      * @param tagKey    nbt tag key
      * @param tag       tag to save to
@@ -113,7 +119,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Save items to a given tag, reading from a provider.
      * <p>
-     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean)}.
+     * Similar to {@link ContainerHelper#saveAllItems(CompoundTag, NonNullList, boolean, HolderLookup.Provider)}.
      *
      * @param tagKey     nbt tag key
      * @param tag        tag to save to
@@ -134,7 +140,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Create a list tag with all items from the provider. The tag is not saved anywhere yet.
      * <p>
-     * Equivalent to {@link SimpleContainer#createTag()}.
+     * Equivalent to {@link SimpleContainer#createTag(HolderLookup.Provider)}.
      *
      * @param size       item provider size
      * @param itemGetter get items from the provider
@@ -157,7 +163,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Read items from a given tag, saving them to an item list.
      * <p>
-     * Equivalent to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList)}.
+     * Equivalent to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tag   tag to read from
      * @param items item list to fill
@@ -169,7 +175,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Read items from a given tag, saving them to a container.
      * <p>
-     * Similar to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList)}.
+     * Similar to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tag       tag to read from
      * @param container container to fill
@@ -183,7 +189,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Read items from a given tag, saving them to an item list.
      * <p>
-     * Similar to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList)}.
+     * Similar to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tagKey nbt tag key
      * @param tag    tag to read from
@@ -198,7 +204,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Read items from a given tag, saving to a provider.
      * <p>
-     * Similar to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList)}.
+     * Similar to {@link ContainerHelper#loadAllItems(CompoundTag, NonNullList, HolderLookup.Provider)}.
      *
      * @param tagKey     nbt tag key
      * @param tag        tag to read from
@@ -213,7 +219,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
     /**
      * Read items from a given tag, saving to a provider.
      * <p>
-     * Equivalent to {@link net.minecraft.world.SimpleContainer#fromTag(ListTag)}.
+     * Equivalent to {@link net.minecraft.world.SimpleContainer#fromTag(ListTag, HolderLookup.Provider)}.
      *
      * @param listTag    the list tag
      * @param size       item provider size

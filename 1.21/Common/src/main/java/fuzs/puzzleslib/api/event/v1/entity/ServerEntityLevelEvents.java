@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.event.v1.entity;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
@@ -45,8 +44,8 @@ public final class ServerEntityLevelEvents {
          * @param level        the level the entity is spawned in
          * @param mobSpawnType this provides the spawn type which has been captured in
          *                     {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor,
-         *                     DifficultyInstance, MobSpawnType, SpawnGroupData, CompoundTag)} if it has been called,
-         *                     otherwise <code>null</code>
+         *                     DifficultyInstance, MobSpawnType, SpawnGroupData)} if it has been called, otherwise
+         *                     <code>null</code>
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
          *         discarding it, {@link EventResult#PASS} for the entity to be added normally
          */
