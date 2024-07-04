@@ -8,7 +8,7 @@ import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.neoforge.impl.capability.NeoForgeCapabilityController;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryManager;
-import fuzs.puzzleslib.neoforge.impl.network.NetworkHandlerNeoForge;
+import fuzs.puzzleslib.neoforge.impl.network.NeoForgeNetworkHandler;
 import net.minecraft.resources.ResourceLocation;
 
 public final class NeoForgeModContext extends ModContext {
@@ -19,7 +19,7 @@ public final class NeoForgeModContext extends ModContext {
 
     @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName) {
-        return this.addBuildable(new NetworkHandlerNeoForge(channelName));
+        return this.addBuildable(new NeoForgeNetworkHandler(channelName));
     }
 
     @Override

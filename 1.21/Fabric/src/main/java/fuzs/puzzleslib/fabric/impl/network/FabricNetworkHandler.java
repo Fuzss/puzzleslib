@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.impl.network;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.MessageV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
@@ -23,42 +24,51 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class NetworkHandlerFabric extends NetworkHandlerRegistryImpl {
+public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     private boolean building = true;
 
-    public NetworkHandlerFabric(ResourceLocation channelName) {
+    public FabricNetworkHandler(ResourceLocation channelName) {
         super(channelName);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, PayloadTypeRegistry.playS2C(), ((FabricProxy) Proxy.INSTANCE)::registerClientReceiver);
+        this.register((Class<T>) clazz, PayloadTypeRegistry.playS2C(),
+                (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type) -> {
+                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type, MessageV3::unwrap);
+                }
+        );
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz, PayloadTypeRegistry.playC2S(), ((FabricProxy) Proxy.INSTANCE)::registerServerReceiver);
-    }
-
-    private <T> void register(Class<T> clazz, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, Consumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>> receiverRegistrar) {
-        if (this.building) throw new IllegalStateException("channel is null");
-        CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = this.registerMessageType(clazz);
-        registry.register(type, MessageSerializers.findByType(clazz).streamCodec(type));
-        receiverRegistrar.accept(type);
+        this.register((Class<T>) clazz, PayloadTypeRegistry.playC2S(),
+                (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type) -> {
+                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type, MessageV3::unwrap);
+                }
+        );
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, Function<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz, (Function<FriendlyByteBuf, T>) factory, PayloadTypeRegistry.playS2C(), ((FabricProxy) Proxy.INSTANCE)::registerLegacyClientReceiver);
+        this.registerLegacy((Class<T>) clazz, (Function<FriendlyByteBuf, T>) factory, PayloadTypeRegistry.playS2C(),
+                (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type) -> {
+                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type, MessageV2::toClientboundMessage);
+                }
+        );
     }
 
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, Function<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz, (Function<FriendlyByteBuf, T>) factory, PayloadTypeRegistry.playC2S(), ((FabricProxy) Proxy.INSTANCE)::registerLegacyServerReceiver);
+        this.registerLegacy((Class<T>) clazz, (Function<FriendlyByteBuf, T>) factory, PayloadTypeRegistry.playC2S(),
+                (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type) -> {
+                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type, MessageV2::toServerboundMessage);
+                }
+        );
     }
 
     private <T extends MessageV2<T>> void registerLegacy(Class<T> clazz, Function<FriendlyByteBuf, T> factory, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, Consumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>> receiverRegistrar) {
@@ -66,6 +76,13 @@ public class NetworkHandlerFabric extends NetworkHandlerRegistryImpl {
             message.write(buf);
         }, factory);
         this.register(clazz, registry, receiverRegistrar);
+    }
+
+    private <T> void register(Class<T> clazz, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, Consumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>> receiverRegistrar) {
+        if (this.building) throw new IllegalStateException("channel is null");
+        CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = this.registerMessageType(clazz);
+        registry.register(type, MessageSerializers.findByType(clazz).streamCodec(type));
+        receiverRegistrar.accept(type);
     }
 
     @Override

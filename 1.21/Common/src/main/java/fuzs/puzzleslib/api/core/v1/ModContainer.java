@@ -86,7 +86,16 @@ public interface ModContainer {
     /**
      * @return parent mod when provided via jar-in-jar systems
      */
-    @Nullable ModContainer getParent();
+    @Nullable
+    ModContainer getParent();
+
+    /**
+     * @param modId the mod id
+     * @return the mod name, possibly the mod id if not present
+     */
+    static String getDisplayName(String modId) {
+        return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).orElse(modId);
+    }
 
     @ApiStatus.Internal
     static Map<String, ModContainer> toModList(Supplier<Stream<? extends ModContainer>> modContainers) {

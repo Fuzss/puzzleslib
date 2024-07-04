@@ -334,7 +334,7 @@ public final class MessageSerializers {
         registerSerializer(Fluid.class, Registries.FLUID);
         registerSerializer(MobEffect.class, Registries.MOB_EFFECT);
         registerSerializer(Block.class, Registries.BLOCK);
-        registerSerializer(Enchantment.class, Registries.ENCHANTMENT);
+//        registerSerializer(Enchantment.class, Registries.ENCHANTMENT);
         registerSerializer(EntityType.class, Registries.ENTITY_TYPE);
         registerSerializer(Item.class, Registries.ITEM);
         registerSerializer(Potion.class, Registries.POTION);

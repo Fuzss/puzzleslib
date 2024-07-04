@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContex
 import fuzs.puzzleslib.api.client.init.v1.BuiltinItemRenderer;
 import fuzs.puzzleslib.api.client.init.v1.ReloadingBuiltInItemRenderer;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.NeoForgeClientItemExtensionsImpl;
 import fuzs.puzzleslib.neoforge.mixin.client.accessor.ItemNeoForgeAccessor;
 import net.minecraft.client.Minecraft;
@@ -18,8 +19,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
-import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -31,7 +32,7 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(String modId,
     @Override
     public void registerItemRenderer(BuiltinItemRenderer renderer, ItemLike... items) {
         // copied from Forge, supposed to break data gen otherwise
-        if (FMLLoader.getLaunchHandler().isData()) return;
+        if (DatagenModLoader.isRunningDataGen()) return;
         // do not check for ContentRegistrationFlags#DYNAMIC_RENDERERS being properly set as not every built-in item renderer needs to reload
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
@@ -60,8 +61,8 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(String modId,
         this.registerItemRenderer((BuiltinItemRenderer) renderer, items);
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
-        ResourceLocation identifier = new ResourceLocation(this.modId, itemName + "_built_in_model_renderer");
-        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(identifier, renderer));
+        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId, itemName + "_built_in_model_renderer");
+        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation, renderer));
     }
 
     private static void setClientItemExtensions(Item item, IClientItemExtensions itemExtensions) {
