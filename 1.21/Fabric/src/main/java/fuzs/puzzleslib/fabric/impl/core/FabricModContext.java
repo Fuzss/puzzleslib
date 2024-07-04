@@ -7,7 +7,7 @@ import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
 import fuzs.puzzleslib.fabric.impl.capability.FabricCapabilityController;
 import fuzs.puzzleslib.fabric.impl.config.FabricConfigHolderImpl;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryManager;
-import fuzs.puzzleslib.fabric.impl.network.NetworkHandlerFabric;
+import fuzs.puzzleslib.fabric.impl.network.FabricNetworkHandler;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 
@@ -19,7 +19,7 @@ public final class FabricModContext extends ModContext {
 
     @Override
     public NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName) {
-        return this.addBuildable(new NetworkHandlerFabric(channelName));
+        return this.addBuildable(new FabricNetworkHandler(channelName));
     }
 
     @Override

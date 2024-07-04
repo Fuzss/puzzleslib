@@ -1,23 +1,25 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
+import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.impl.core.ClientProxyImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public class NeoForgeClientProxy extends NeoForgeServerProxy implements ClientProxyImpl {
 
     @Override
-    public <T extends Record & ClientboundMessage<T>> CompletableFuture<Void> registerClientReceiverV2(T message, PlayPayloadContext context) {
-        return context.workHandler().submitAsync(() -> {
-            Minecraft minecraft = Minecraft.getInstance();
-            LocalPlayer player = minecraft.player;
+    public <M1, M2> CompletableFuture<Void> registerClientReceiver(CustomPacketPayloadAdapter<M1> payload, IPayloadContext context, Function<M1, ClientboundMessage<M2>> adapter) {
+        return context.enqueueWork(() -> {
+            LocalPlayer player = (LocalPlayer) context.player();
             Objects.requireNonNull(player, "player is null");
-            message.getHandler().handle(message, minecraft, player.connection, player, minecraft.level);
+            ClientboundMessage<M2> message = adapter.apply(payload.unwrap());
+            message.getHandler().handle((M2) message, Minecraft.getInstance(), player.connection, player, player.clientLevel);
         });
     }
 }

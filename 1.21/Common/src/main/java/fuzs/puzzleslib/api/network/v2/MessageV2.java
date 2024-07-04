@@ -4,7 +4,15 @@ import fuzs.puzzleslib.api.network.v3.ClientMessageListener;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerMessageListener;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.player.Player;
 
 /**
@@ -43,7 +51,13 @@ public interface MessageV2<T extends MessageV2<T>> {
 
             @Override
             public ClientMessageListener<T> getHandler() {
-                throw new UnsupportedOperationException();
+                return new ClientMessageListener<>() {
+
+                    @Override
+                    public void handle(T message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
+                        MessageV2.this.makeHandler().handle(message, player, client);
+                    }
+                };
             }
 
             @Override
@@ -61,7 +75,13 @@ public interface MessageV2<T extends MessageV2<T>> {
 
             @Override
             public ServerMessageListener<T> getHandler() {
-                throw new UnsupportedOperationException();
+                return new ServerMessageListener<>() {
+
+                    @Override
+                    public void handle(T message, MinecraftServer server, ServerGamePacketListenerImpl handler, ServerPlayer player, ServerLevel level) {
+                        MessageV2.this.makeHandler().handle(message, player, server);
+                    }
+                };
             }
 
             @Override

@@ -10,6 +10,7 @@ import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
 import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforge.data.loading.DatagenModLoader;
 import net.neoforged.neoforgespi.language.IModInfo;
 
 import java.nio.file.Path;
@@ -103,7 +104,7 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isDataGeneration() {
-        return FMLLoader.getLaunchHandler().isData();
+        return DatagenModLoader.isRunningDataGen();
     }
 
     @Override

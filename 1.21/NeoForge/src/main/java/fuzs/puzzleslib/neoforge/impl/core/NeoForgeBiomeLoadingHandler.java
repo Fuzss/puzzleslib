@@ -2,10 +2,11 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.resources.v1.AbstractModPackResources;
 import fuzs.puzzleslib.api.resources.v1.PackResourcesHelper;
 import fuzs.puzzleslib.neoforge.impl.biome.*;
@@ -44,24 +45,28 @@ public class NeoForgeBiomeLoadingHandler {
     }});
     private static final String BIOME_MODIFICATIONS_NAME_KEY = "biome_modifications";
     private static final String BIOME_MODIFIERS_DATA_KEY = NeoForgeRegistries.Keys.BIOME_MODIFIERS.location().toString().replace(":", "/");
-    private static final Function<String, ResourceLocation> BIOME_MODIFICATIONS_FILE_KEY = id -> new ResourceLocation(id, BIOME_MODIFIERS_DATA_KEY + "/" + id + ".json");
-    private static final Function<ResourceLocation, String> BIOME_MODIFICATIONS_FILE_CONTENTS = id -> "{\"type\":\"" + id + "\"}";
+    private static final Function<String, ResourceLocation> BIOME_MODIFICATIONS_FILE_KEY = (String id) -> {
+        return ResourceLocationHelper.fromNamespaceAndPath(id, BIOME_MODIFIERS_DATA_KEY + "/" + id + ".json");
+    };
+    private static final Function<ResourceLocation, String> BIOME_MODIFICATIONS_FILE_CONTENTS = (ResourceLocation id) -> {
+        return "{\"type\":\"" + id + "\"}";
+    };
 
     public static void register(String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications) {
-        DeferredRegister<Codec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
+        DeferredRegister<MapCodec<? extends BiomeModifier>> deferredRegister = DeferredRegister.create(NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, modId);
         deferredRegister.register(modEventBus);
         deferredRegister.register(BIOME_MODIFICATIONS_NAME_KEY, new BiomeModifierImpl(biomeModifications)::codec);
     }
 
     public static RepositorySource buildPack(String modId) {
-        ResourceLocation id = new ResourceLocation(modId, NeoForgeBiomeLoadingHandler.BIOME_MODIFICATIONS_NAME_KEY);
-        return PackResourcesHelper.buildServerPack(id, () -> new AbstractModPackResources() {
+        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(modId, NeoForgeBiomeLoadingHandler.BIOME_MODIFICATIONS_NAME_KEY);
+        return PackResourcesHelper.buildServerPack(resourceLocation, () -> new AbstractModPackResources() {
 
             @Override
             public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
                 if (path.equals(NeoForgeBiomeLoadingHandler.BIOME_MODIFIERS_DATA_KEY)) {
                     resourceOutput.accept(NeoForgeBiomeLoadingHandler.BIOME_MODIFICATIONS_FILE_KEY.apply(modId), () -> {
-                        return new ByteArrayInputStream(NeoForgeBiomeLoadingHandler.BIOME_MODIFICATIONS_FILE_CONTENTS.apply(id).getBytes(StandardCharsets.UTF_8));
+                        return new ByteArrayInputStream(NeoForgeBiomeLoadingHandler.BIOME_MODIFICATIONS_FILE_CONTENTS.apply(resourceLocation).getBytes(StandardCharsets.UTF_8));
                     });
                 }
             }
@@ -69,11 +74,11 @@ public class NeoForgeBiomeLoadingHandler {
     }
 
     private record BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications,
-                                     Codec<? extends BiomeModifier> codec) implements BiomeModifier {
+                                     MapCodec<? extends BiomeModifier> codec) implements BiomeModifier {
 
-        private BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications, @Nullable Codec<? extends BiomeModifier> codec) {
+        private BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications, @Nullable MapCodec<? extends BiomeModifier> codec) {
             this.biomeModifications = biomeModifications;
-            this.codec = Codec.unit(this);
+            this.codec = MapCodec.unit(this);
         }
 
         public BiomeModifierImpl(Multimap<BiomeLoadingPhase, BiomeModification> biomeModifications) {
