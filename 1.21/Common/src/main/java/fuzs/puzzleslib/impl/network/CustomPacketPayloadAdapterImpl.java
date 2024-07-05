@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.network;
 
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 
 public record CustomPacketPayloadAdapterImpl<T>(Type<CustomPacketPayloadAdapter<T>> type,
                                                 T message) implements CustomPacketPayloadAdapter<T> {

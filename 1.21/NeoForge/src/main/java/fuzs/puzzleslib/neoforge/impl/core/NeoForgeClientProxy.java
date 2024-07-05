@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.impl.core.ClientProxyImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;

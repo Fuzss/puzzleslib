@@ -5,16 +5,18 @@ import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.MessageV3;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
-import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.StreamCodecRegistryImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.StreamDecoder;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
@@ -24,7 +26,6 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     private boolean building = true;
@@ -63,9 +64,9 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, Function<FriendlyByteBuf, ?> factory) {
+    protected <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
         this.registerLegacy((Class<T>) clazz,
-                (Function<FriendlyByteBuf, T>) factory,
+                (StreamDecoder<FriendlyByteBuf, T>) factory,
                 PayloadTypeRegistry.playS2C(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
                     ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type,
@@ -78,9 +79,9 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, Function<FriendlyByteBuf, ?> factory) {
+    protected <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
         this.registerLegacy((Class<T>) clazz,
-                (Function<FriendlyByteBuf, T>) factory,
+                (StreamDecoder<FriendlyByteBuf, T>) factory,
                 PayloadTypeRegistry.playC2S(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
                     ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type,
@@ -91,7 +92,7 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
         );
     }
 
-    private <T extends MessageV2<T>> void registerLegacy(Class<T> clazz, Function<FriendlyByteBuf, T> factory, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, BiConsumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>, BiConsumer<Throwable, Consumer<Component>>> receiverRegistrar) {
+    private <T extends MessageV2<T>> void registerLegacy(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> factory, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, BiConsumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>, BiConsumer<Throwable, Consumer<Component>>> receiverRegistrar) {
         this.registerSerializer(clazz, (FriendlyByteBuf buf, T message) -> {
             message.write(buf);
         }, factory);
@@ -101,7 +102,11 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     private <T> void register(Class<T> clazz, PayloadTypeRegistry<RegistryFriendlyByteBuf> registry, BiConsumer<CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>>, BiConsumer<Throwable, Consumer<Component>>> receiverRegistrar) {
         if (this.building) throw new IllegalStateException("channel is null");
         CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = this.registerMessageType(clazz);
-        registry.register(type, MessageSerializers.findByType(clazz).streamCodec(type));
+        StreamCodec<? super RegistryFriendlyByteBuf, CustomPacketPayloadAdapter<T>> streamCodec = CustomPacketPayloadAdapter.streamCodec(
+                type,
+                StreamCodecRegistryImpl.fromType(clazz)
+        );
+        registry.register(type, streamCodec);
         receiverRegistrar.accept(type, this.disconnectExceptionally(clazz));
     }
 

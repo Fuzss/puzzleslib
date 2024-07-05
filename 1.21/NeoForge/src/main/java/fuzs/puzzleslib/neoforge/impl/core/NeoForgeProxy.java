@@ -2,7 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.impl.core.ProxyImpl;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 

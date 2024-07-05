@@ -7,7 +7,7 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
 import fuzs.puzzleslib.api.init.v3.override.GameRuleValueOverrides;
-import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
@@ -21,7 +21,7 @@ import net.minecraft.world.level.GameRules;
  * This has been separated from {@link PuzzlesLib} to prevent issues with static initialization when accessing constants in {@link PuzzlesLib} early.
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
-    public static final NetworkHandlerV3 NETWORK = NetworkHandlerV3.builder(MOD_ID).optional()
+    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID).optional()
             .registerClientbound(ClientboundEntityCapabilityMessage.class)
             .registerClientbound(ClientboundModListMessage.class);
 

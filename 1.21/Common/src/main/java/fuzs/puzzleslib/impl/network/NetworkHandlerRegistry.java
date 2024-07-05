@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.network;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.minecraft.core.Vec3i;
@@ -15,108 +15,107 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 
-public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
+public interface NetworkHandlerRegistry extends NetworkHandler {
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     <T> Packet<ClientCommonPacketListener> toClientboundPacket(ClientboundMessage<T> message);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     <T> Packet<ServerCommonPacketListener> toServerboundPacket(ServerboundMessage<T> message);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendMessage(PlayerSet playerSet, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendMessage(playerSet, message);
+        NetworkHandler.super.sendMessage(playerSet, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendMessage(ServerboundMessage<T> message) {
-        NetworkHandlerV3.super.sendMessage(message);
+        NetworkHandler.super.sendMessage(message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToServer(ServerboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToServer(message);
+        NetworkHandler.super.sendToServer(message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendTo(ServerPlayer player, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendTo(player, message);
+        NetworkHandler.super.sendTo(player, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAll(MinecraftServer server, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAll(server, message);
+        NetworkHandler.super.sendToAll(server, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAll(MinecraftServer server, @Nullable ServerPlayer exclude, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAll(server, exclude, message);
+        NetworkHandler.super.sendToAll(server, exclude, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAll(Collection<ServerPlayer> playerList, @Nullable ServerPlayer exclude, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAll(playerList, exclude, message);
+        NetworkHandler.super.sendToAll(playerList, exclude, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAll(ServerLevel level, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAll(level, message);
+        NetworkHandler.super.sendToAll(level, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllNear(Vec3i pos, ServerLevel level, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAllNear(pos, level, message);
+        NetworkHandler.super.sendToAllNear(pos, level, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllNear(double posX, double posY, double posZ, ServerLevel level, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAllNear(posX, posY, posZ, level, message);
+        NetworkHandler.super.sendToAllNear(posX, posY, posZ, level, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAllNear(exclude, posX, posY, posZ, distance, level, message);
+        NetworkHandler.super.sendToAllNear(exclude, posX, posY, posZ, distance, level, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllTracking(BlockEntity blockEntity, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAllTracking(blockEntity, message);
+        NetworkHandler.super.sendToAllTracking(blockEntity, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllTracking(LevelChunk chunk, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAllTracking(chunk, message);
+        NetworkHandler.super.sendToAllTracking(chunk, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllTracking(ServerLevel level, ChunkPos chunkPos, ClientboundMessage<T> message) {
-        NetworkHandlerV3.super.sendToAllTracking(level, chunkPos, message);
+        NetworkHandler.super.sendToAllTracking(level, chunkPos, message);
     }
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     default <T> void sendToAllTracking(Entity entity, ClientboundMessage<T> message, boolean includeSelf) {
-        NetworkHandlerV3.super.sendToAllTracking(entity, message, includeSelf);
+        NetworkHandler.super.sendToAllTracking(entity, message, includeSelf);
     }
 }

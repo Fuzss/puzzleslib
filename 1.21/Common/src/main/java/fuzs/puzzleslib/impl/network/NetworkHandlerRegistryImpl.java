@@ -5,12 +5,13 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.MessageV3;
-import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamDecoder;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -25,10 +26,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Builder {
+public abstract class NetworkHandlerRegistryImpl implements NetworkHandler.Builder {
     private final Map<Class<?>, CustomPacketPayload.Type<CustomPacketPayloadAdapter<?>>> messageNames = new IdentityHashMap<>();
-    private final Map<Class<?>, Function<FriendlyByteBuf, ?>> clientboundMessages = new LinkedHashMap<>();
-    private final Map<Class<?>, Function<FriendlyByteBuf, ?>> serverboundMessages = new LinkedHashMap<>();
+    private final Map<Class<?>, StreamDecoder<FriendlyByteBuf, ?>> clientboundMessages = new LinkedHashMap<>();
+    private final Map<Class<?>, StreamDecoder<FriendlyByteBuf, ?>> serverboundMessages = new LinkedHashMap<>();
     protected final AtomicInteger discriminator = new AtomicInteger();
     protected final ResourceLocation channelName;
     protected boolean optional;
@@ -50,18 +51,18 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
     }
 
     @Override
-    public <T extends MessageV2<T>> Builder registerLegacyClientbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory) {
+    public <T extends MessageV2<T>> Builder registerLegacyClientbound(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> factory) {
         this.registerMessage(this.clientboundMessages, clazz, factory);
         return this;
     }
 
     @Override
-    public <T extends MessageV2<T>> Builder registerLegacyServerbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory) {
+    public <T extends MessageV2<T>> Builder registerLegacyServerbound(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> factory) {
         this.registerMessage(this.serverboundMessages, clazz, factory);
         return this;
     }
 
-    private void registerMessage(Map<Class<?>, Function<FriendlyByteBuf, ?>> messages, Class<?> clazz, @Nullable Function<FriendlyByteBuf, ?> factory) {
+    private void registerMessage(Map<Class<?>, StreamDecoder<FriendlyByteBuf, ?>> messages, Class<?> clazz, @Nullable StreamDecoder<FriendlyByteBuf, ?> factory) {
         if (messages.containsKey(clazz)) {
             throw new IllegalStateException("Duplicate message of type " + clazz);
         } else {
@@ -77,14 +78,14 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
 
     @Override
     public void build() {
-        for (Map.Entry<Class<?>, Function<FriendlyByteBuf, ?>> entry : this.clientboundMessages.entrySet()) {
+        for (Map.Entry<Class<?>, StreamDecoder<FriendlyByteBuf, ?>> entry : this.clientboundMessages.entrySet()) {
             if (entry.getValue() != null) {
                 this.registerLegacyClientbound$Internal(entry.getKey(), entry.getValue());
             } else {
                 this.registerClientbound$Internal(entry.getKey());
             }
         }
-        for (Map.Entry<Class<?>, Function<FriendlyByteBuf, ?>> entry : this.serverboundMessages.entrySet()) {
+        for (Map.Entry<Class<?>, StreamDecoder<FriendlyByteBuf, ?>> entry : this.serverboundMessages.entrySet()) {
             if (entry.getValue() != null) {
                 this.registerLegacyServerbound$Internal(entry.getKey(), entry.getValue());
             } else {
@@ -130,7 +131,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandlerV3.Bui
 
     protected abstract <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz);
 
-    protected abstract <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, Function<FriendlyByteBuf, ?> factory);
+    protected abstract <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory);
 
-    protected abstract <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, Function<FriendlyByteBuf, ?> factory);
+    protected abstract <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory);
 }
