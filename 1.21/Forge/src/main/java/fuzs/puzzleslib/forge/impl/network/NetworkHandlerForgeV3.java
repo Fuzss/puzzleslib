@@ -3,7 +3,7 @@ package fuzs.puzzleslib.forge.impl.network;
 import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
+import fuzs.puzzleslib.api.network.v3.codec.MessageSerializers;
 import fuzs.puzzleslib.forge.impl.core.ForgeProxy;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistryImpl;
 import net.minecraft.network.FriendlyByteBuf;

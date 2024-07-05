@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.core;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
-import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.neoforge.impl.capability.NeoForgeCapabilityController;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
@@ -18,7 +18,7 @@ public final class NeoForgeModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName) {
+    public NetworkHandler.Builder getNetworkHandler(ResourceLocation channelName) {
         return this.addBuildable(new NeoForgeNetworkHandler(channelName));
     }
 

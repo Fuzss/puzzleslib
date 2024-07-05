@@ -15,7 +15,7 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
-import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
@@ -90,7 +90,7 @@ public abstract class ModContext {
         return MOD_CONTEXTS.containsKey(modId) && MOD_CONTEXTS.get(modId).presentServerside;
     }
 
-    public abstract NetworkHandlerV3.Builder getNetworkHandlerV3(ResourceLocation channelName);
+    public abstract NetworkHandler.Builder getNetworkHandler(ResourceLocation channelName);
 
     public abstract ConfigHolder.Builder getConfigHolder();
 

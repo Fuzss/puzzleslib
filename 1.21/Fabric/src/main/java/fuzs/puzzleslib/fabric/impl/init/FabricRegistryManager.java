@@ -4,9 +4,9 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.network.v3.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
-import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -14,8 +14,6 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
@@ -33,22 +31,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public final class FabricRegistryManager extends RegistryManagerImpl {
-    static final StreamCodec<RegistryFriendlyByteBuf, RegistryFriendlyByteBuf> REGISTRY_FRIENDLY_BYTE_BUF_STREAM_CODEC = new StreamCodec<>() {
-
-        @Override
-        public RegistryFriendlyByteBuf decode(RegistryFriendlyByteBuf buf) {
-            RegistryFriendlyByteBuf newBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), buf.registryAccess());
-            newBuf.writeBytes(buf.copy());
-            buf.skipBytes(buf.readableBytes());
-            return newBuf;
-        }
-
-        @Override
-        public void encode(RegistryFriendlyByteBuf buf, RegistryFriendlyByteBuf toEncode) {
-            buf.writeBytes(toEncode.copy());
-            toEncode.release();
-        }
-    };
 
     public FabricRegistryManager(String modId) {
         super(modId);
@@ -80,7 +62,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     @Override
     public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> new ExtendedScreenHandlerType<>(entry.get()::create,
-                REGISTRY_FRIENDLY_BYTE_BUF_STREAM_CODEC
+                ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF
         ));
     }
 

@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;

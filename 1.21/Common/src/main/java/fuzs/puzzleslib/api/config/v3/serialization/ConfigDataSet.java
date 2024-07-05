@@ -23,7 +23,7 @@ public interface ConfigDataSet<T> extends Collection<T> {
     /**
      * Config option comment excluding notion regarding tags for options backed by {@link ConfigDataSet}.
      */
-    String CONFIG_DESCRIPTION_NO_TAG = "Format for every entry is \"<namespace>:<path>\". Namespace may be omitted to use \"minecraft\" by default. May use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*_shulker_box\" to match all shulker boxes no matter of color. Begin an entry with \"!\" to make sure it is excluded, useful e.g. when it has already been matched by another pattern.";
+    String CONFIG_DESCRIPTION_WITHOUT_TAGS = "Format for every entry is \"<namespace>:<path>\". Namespace may be omitted to use \"minecraft\" by default. May use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*_shulker_box\" to match all shulker boxes no matter of color. Begin an entry with \"!\" to make sure it is excluded, useful e.g. when it has already been matched by another pattern.";
 
     /**
      * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse. The underlying data structure will be similar to a set.

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.network.v3.serialization.CustomPacketPayloadAdapter;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import fuzs.puzzleslib.impl.core.ClientProxyImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;

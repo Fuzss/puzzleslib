@@ -5,18 +5,19 @@ import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
-import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializer;
-import fuzs.puzzleslib.api.network.v3.serialization.MessageSerializers;
+import fuzs.puzzleslib.api.network.v3.codec.StreamCodecRegistry;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.network.NetworkHandlerRegistry;
+import fuzs.puzzleslib.impl.network.codec.StreamCodecRegistryImpl;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.StreamDecoder;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerChunkCache;
@@ -30,15 +31,16 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Type;
-import java.util.*;
-import java.util.function.BiConsumer;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
  * Handler for network communications between clients and a server.
  */
-public interface NetworkHandlerV3 {
+public interface NetworkHandler {
 
     /**
      * Creates a new network handler builder.
@@ -47,7 +49,7 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return NetworkHandlerV3.builder(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"));
+        return NetworkHandler.builder(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"));
     }
 
     /**
@@ -57,7 +59,7 @@ public interface NetworkHandlerV3 {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(ResourceLocation channelName) {
-        return ModContext.get(channelName.getNamespace()).getNetworkHandlerV3(channelName);
+        return ModContext.get(channelName.getNamespace()).getNetworkHandler(channelName);
     }
 
     /**
@@ -270,51 +272,16 @@ public interface NetworkHandlerV3 {
     /**
      * A builder for a network handler, allows for registering messages.
      */
-    interface Builder extends NetworkHandlerRegistry, Buildable {
+    interface Builder extends NetworkHandlerRegistry, StreamCodecRegistry, Buildable {
 
-        /**
-         * Register a new {@link MessageSerializer} by providing an encoder and decoder.
-         *
-         * @param type   type to serialize, inheritance is not supported
-         * @param writer writer to byte buffer
-         * @param reader reader from byte buffer
-         * @param <T>    data type
-         * @return this builder instance
-         */
-        default <T> Builder registerSerializer(Class<T> type, BiConsumer<FriendlyByteBuf, T> writer, Function<FriendlyByteBuf, T> reader) {
-            MessageSerializers.registerSerializer(type, writer, reader);
-            return this;
+        @Override
+        default <B extends ByteBuf, V> void registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {
+            StreamCodecRegistryImpl.INSTANCE.registerSerializer(type, streamCodec);
         }
 
-        /**
-         * Register a serializer for a data type handled by vanilla's registry system.
-         *
-         * @param type        registry content type to serialize
-         * @param resourceKey registry resource key
-         * @param <T>         data type
-         * @return this builder instance
-         */
-        default <T> Builder registerSerializer(Class<? super T> type, ResourceKey<Registry<T>> resourceKey) {
-            MessageSerializers.registerSerializer(type, resourceKey);
-            return this;
-        }
-
-        /**
-         * Register a custom serializer for container types. Subclasses are supported, meaning e.g. any map
-         * implementation will be handled by a provider registered for {@link Map}.
-         *
-         * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a
-         * specific collection type, a unique serializer must be registered. This is already done for {@link List}s,
-         * which are deserialized as {@link ArrayList}.
-         *
-         * @param type    container type
-         * @param factory new empty collection provider (preferable with pre-configured size)
-         * @param <T>     container type
-         * @return this builder instance
-         */
-        default <T> Builder registerContainerProvider(Class<T> type, Function<Type[], MessageSerializer<? extends T>> factory) {
-            MessageSerializers.registerContainerProvider(type, factory);
-            return this;
+        @Override
+        default <B extends ByteBuf, V> void registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory) {
+            StreamCodecRegistryImpl.INSTANCE.registerContainerProvider(type, factory);
         }
 
         /**
@@ -372,7 +339,7 @@ public interface NetworkHandlerV3 {
          * @param clazz   message class type
          * @param factory message factory
          */
-        <T extends MessageV2<T>> Builder registerLegacyClientbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory);
+        <T extends MessageV2<T>> Builder registerLegacyClientbound(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> factory);
 
         /**
          * Register a message that will be sent to servers.
@@ -381,7 +348,7 @@ public interface NetworkHandlerV3 {
          * @param clazz   message class type
          * @param factory message factory
          */
-        <T extends MessageV2<T>> Builder registerLegacyServerbound(Class<T> clazz, Function<FriendlyByteBuf, T> factory);
+        <T extends MessageV2<T>> Builder registerLegacyServerbound(Class<T> clazz, StreamDecoder<FriendlyByteBuf, T> factory);
 
         /**
          * Are clients &amp; servers without this mod or vanilla clients &amp; servers compatible.
