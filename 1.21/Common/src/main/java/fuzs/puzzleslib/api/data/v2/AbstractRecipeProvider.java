@@ -20,6 +20,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -79,11 +80,15 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
     }
 
     public static String getHasName(ItemLike item, ItemLike... items) {
-        return "has_" + Stream.concat(Stream.of(item), Stream.of(items)).map(RecipeProvider::getItemName).collect(Collectors.joining("_and_"));
+        return "has_" + Stream.concat(Stream.of(item), Stream.of(items))
+                .map(RecipeProvider::getItemName)
+                .collect(Collectors.joining("_and_"));
     }
 
     public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item, ItemLike... items) {
-        return inventoryTrigger(ItemPredicate.Builder.item().of(Stream.concat(Stream.of(item), Stream.of(items)).toArray(ItemLike[]::new)).build());
+        return inventoryTrigger(ItemPredicate.Builder.item()
+                .of(Stream.concat(Stream.of(item), Stream.of(items)).toArray(ItemLike[]::new))
+                .build());
     }
 
     @Override
@@ -121,16 +126,31 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
             final ResourceLocation oldLocation = location;
             // relocate all recipes to the mod id, so they do not depend on the item namespace which would
             // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
-            location = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, location.getPath());
+            location = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
+                    location.getPath()
+            );
             if (!this.generatedRecipes.add(location)) {
                 throw new IllegalStateException("Duplicate recipe " + location);
             } else {
-                this.completableFutures.add(DataProvider.saveStable(this.output, this.registries, Recipe.CODEC, recipe, AbstractRecipeProvider.this.recipePathProvider.json(location)));
+                this.completableFutures.add(DataProvider.saveStable(this.output,
+                        this.registries,
+                        Recipe.CODEC,
+                        recipe,
+                        AbstractRecipeProvider.this.recipePathProvider.json(location)
+                ));
                 if (advancement != null) {
-                    JsonElement jsonElement = Advancement.CODEC.encodeStart(JsonOps.INSTANCE, advancement.value()).getOrThrow(IllegalStateException::new);
+                    RegistryOps<JsonElement> registryOps = this.registries.createSerializationContext(JsonOps.INSTANCE);
+                    JsonElement jsonElement = Advancement.CODEC.encodeStart(registryOps, advancement.value())
+                            .getOrThrow();
                     jsonElement = searchAndReplaceValue(jsonElement, oldLocation, location);
-                    ResourceLocation advancementLocation = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId, advancement.id().getPath());
-                    this.completableFutures.add(DataProvider.saveStable(this.output, jsonElement, AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)));
+                    ResourceLocation advancementLocation = ResourceLocationHelper.fromNamespaceAndPath(
+                            AbstractRecipeProvider.this.modId,
+                            advancement.id().getPath()
+                    );
+                    this.completableFutures.add(DataProvider.saveStable(this.output,
+                            jsonElement,
+                            AbstractRecipeProvider.this.advancementPathProvider.json(advancementLocation)
+                    ));
                 }
             }
         }

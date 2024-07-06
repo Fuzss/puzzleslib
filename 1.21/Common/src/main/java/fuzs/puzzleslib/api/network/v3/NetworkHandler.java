@@ -49,7 +49,7 @@ public interface NetworkHandler {
      * @return builder for mod specific network handler with default channel
      */
     static Builder builder(String modId) {
-        return NetworkHandler.builder(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"));
+        return builder(ResourceLocationHelper.fromNamespaceAndPath(modId, "play"));
     }
 
     /**

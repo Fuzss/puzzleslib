@@ -352,10 +352,8 @@ public final class AbstractLootProvider {
                     Lifecycle.experimental(),
                     false
             );
-            registry.register(ResourceKey.create(Registries.LOOT_TABLE, registry.getDefaultKey()),
-                    LootTable.EMPTY,
-                    RegistrationInfo.BUILT_IN
-            );
+            ResourceKey<LootTable> defaultKey = ResourceKey.create(Registries.LOOT_TABLE, registry.getDefaultKey());
+            registry.register(defaultKey, LootTable.EMPTY, RegistrationInfo.BUILT_IN);
             Map<RandomSupport.Seed128bit, ResourceLocation> seeds = new Object2ObjectOpenHashMap<>();
             this.generate((ResourceKey<LootTable> resourceKey, LootTable.Builder builder) -> {
                 ResourceLocation resourceLocation = resourceKey.location();
@@ -378,6 +376,9 @@ public final class AbstractLootProvider {
 
             return CompletableFuture.allOf(registry.entrySet()
                     .stream()
+                    .filter((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
+                        return entry.getKey() != defaultKey;
+                    })
                     .map((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
                         ResourceKey<LootTable> resourceKey = entry.getKey();
                         LootTable lootTable = entry.getValue();

@@ -21,7 +21,8 @@ public class NeoForgeServerProxy implements NeoForgeProxy {
         return context.enqueueWork(() -> {
             ServerPlayer player = (ServerPlayer) context.player();
             ServerboundMessage<M2> message = adapter.apply(payload.unwrap());
-            message.getHandler().handle((M2) message, player.server, player.connection, player, player.serverLevel());
+            message.getHandler()
+                    .handle(message.unwrap(), player.server, player.connection, player, player.serverLevel());
         });
     }
 }

@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.network;
 
 import fuzs.puzzleslib.api.core.v1.ModContainer;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.network.v2.MessageV2;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.MessageV3;
@@ -112,7 +111,7 @@ public abstract class NetworkHandlerRegistryImpl implements NetworkHandler.Build
 
     @SuppressWarnings("unchecked")
     protected <T> CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> registerMessageType(Class<T> clazz) {
-        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.channelName.toLanguageKey(), String.valueOf(this.discriminator.getAndIncrement()));
+        ResourceLocation resourceLocation = this.channelName.withPath((String path) -> path + "/" + this.discriminator.getAndIncrement());
         CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = new CustomPacketPayload.Type<>(resourceLocation);
         this.messageNames.put(clazz, (CustomPacketPayload.Type<CustomPacketPayloadAdapter<?>>) (CustomPacketPayload.Type<?>) type);
         return type;

@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.impl.core.ClientProxyImpl;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -19,7 +19,8 @@ public class NeoForgeClientProxy extends NeoForgeServerProxy implements ClientPr
             LocalPlayer player = (LocalPlayer) context.player();
             Objects.requireNonNull(player, "player is null");
             ClientboundMessage<M2> message = adapter.apply(payload.unwrap());
-            message.getHandler().handle((M2) message, Minecraft.getInstance(), player.connection, player, player.clientLevel);
+            message.getHandler()
+                    .handle(message.unwrap(), Minecraft.getInstance(), player.connection, player, player.clientLevel);
         });
     }
 }

@@ -25,7 +25,7 @@ public class FabricServerProxy implements FabricProxy {
                     context.server().submit(() -> {
                         ServerboundMessage<M2> message = messageAdapter.apply(payload.unwrap());
                         message.getHandler()
-                                .handle((M2) message,
+                                .handle(message.unwrap(),
                                         context.server(),
                                         context.player().connection,
                                         context.player(),

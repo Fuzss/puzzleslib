@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import fuzs.puzzleslib.impl.core.ClientProxyImpl;
+import fuzs.puzzleslib.impl.network.codec.CustomPacketPayloadAdapter;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -30,7 +30,7 @@ public class FabricClientProxy extends FabricServerProxy implements ClientProxyI
                         Objects.requireNonNull(context.player(), "player is null");
                         ClientboundMessage<M2> message = messageAdapter.apply(payload.unwrap());
                         message.getHandler()
-                                .handle((M2) message,
+                                .handle(message.unwrap(),
                                         context.client(),
                                         context.player().connection,
                                         context.player(),
