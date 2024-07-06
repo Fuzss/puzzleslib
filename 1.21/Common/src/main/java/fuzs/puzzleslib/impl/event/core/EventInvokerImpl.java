@@ -38,8 +38,6 @@ public final class EventInvokerImpl {
             while (!DEFERRED_INVOKER_REGISTRATIONS.isEmpty()) {
                 DEFERRED_INVOKER_REGISTRATIONS.poll().run();
             }
-        } else {
-            throw new IllegalStateException("event handlers already initialized");
         }
     }
 

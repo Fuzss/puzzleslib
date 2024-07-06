@@ -10,6 +10,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -148,5 +149,19 @@ public final class ExtraStreamCodecs {
      */
     public static void writeComponent(FriendlyByteBuf buf, Component component) {
         ComponentSerialization.TRUSTED_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, component);
+    }
+
+    /**
+     * read {@link ItemStack}
+     */
+    public static ItemStack readItem(FriendlyByteBuf buf) {
+        return ItemStack.OPTIONAL_STREAM_CODEC.decode((RegistryFriendlyByteBuf) buf);
+    }
+
+    /**
+     * write {@link ItemStack}
+     */
+    public static void writeItem(FriendlyByteBuf buf, ItemStack itemStack) {
+        ItemStack.OPTIONAL_STREAM_CODEC.encode((RegistryFriendlyByteBuf) buf, itemStack);
     }
 }
