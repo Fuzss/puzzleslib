@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.0.4-1.21] - 2024-07-06
+### Fixed
+- Fix `AbstractLootProvider` generating an empty loot table
+- Fix item lookup failing in `AbstractRecipeProvider`
+- Fix `ClassCastException` when sending `MessageV2`
+
 ## [v21.0.3-1.21] - 2024-07-06
 ### Added
 - Add `SearchRegistryHelper`
