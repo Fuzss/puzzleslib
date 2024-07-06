@@ -213,7 +213,7 @@ public final class NeoForgeClientEventInvokers {
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ComputeFovModifierCallback.class, ComputeFovModifierEvent.class, (ComputeFovModifierCallback callback, ComputeFovModifierEvent evt) -> {
-            final float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
+            float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
             if (fovEffectScale == 0.0F) return;
             // reverse fovEffectScale calculations applied by vanilla in return statement / by Forge when setting up the event
             // this approach is chosen so the callback may work with the actual fov modifier, and does not have to deal with the fovEffectScale option,

@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 public final class ContainerMenuHelper {
 
     private ContainerMenuHelper() {
-
+        // NO-OP
     }
 
     /**
@@ -72,6 +72,7 @@ public final class ContainerMenuHelper {
         if (listener != null) {
             simpleContainer.addListener(listener);
         }
+
         return simpleContainer;
     }
 }

@@ -7,16 +7,16 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
-import java.util.List;
 import java.util.Objects;
 
 /**
- * A helper class containing utilities for replacing an existing block by modifying the corresponding {@link BlockItem} and copying block tags.
+ * A helper class containing utilities for replacing an existing block by modifying the corresponding {@link BlockItem}
+ * and copying block tags.
  */
 public final class BlockConversionHelper {
 
     private BlockConversionHelper() {
-
+        // NO-OP
     }
 
     /**
@@ -38,8 +38,11 @@ public final class BlockConversionHelper {
      * @param item  the new item
      */
     public static void setItemForBlock(Block block, Item item) {
-        Objects.requireNonNull(block, "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "") + "is null");
-        Objects.requireNonNull(item, "item for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' is null");
+        Objects.requireNonNull(block,
+                () -> "block " + (item != null ? "for item '" + BuiltInRegistries.ITEM.getKey(item) + "' " : "") +
+                        "is null"
+        );
+        Objects.requireNonNull(item, () -> "item for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' is null");
         Item.BY_BLOCK.put(block, item);
         block.item = item;
     }
@@ -52,8 +55,11 @@ public final class BlockConversionHelper {
      * @param block the new block
      */
     public static void setBlockForItem(BlockItem item, Block block) {
-        Objects.requireNonNull(item, "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "") + "is null");
-        Objects.requireNonNull(block, "block for item '" + BuiltInRegistries.ITEM.getKey(item) + "' is null");
+        Objects.requireNonNull(item,
+                () -> "item " + (block != null ? "for block '" + BuiltInRegistries.BLOCK.getKey(block) + "' " : "") +
+                        "is null"
+        );
+        Objects.requireNonNull(block, () -> "block for item '" + BuiltInRegistries.ITEM.getKey(item) + "' is null");
         Block oldBlock = item.getBlock();
         // block can somehow be null on Forge apparently
         if (oldBlock != null) oldBlock.item = item;
@@ -69,12 +75,16 @@ public final class BlockConversionHelper {
      */
     @SuppressWarnings("deprecation")
     public static void copyBoundTags(Block from, Block to) {
-        Objects.requireNonNull(from, "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "") + "is null");
-        Objects.requireNonNull(to, "target for source '" + BuiltInRegistries.BLOCK.getKey(from) + "' is null");
+        Objects.requireNonNull(from,
+                () -> "source " + (to != null ? "for target '" + BuiltInRegistries.BLOCK.getKey(to) + "' " : "") +
+                        "is null"
+        );
+        Objects.requireNonNull(to, () -> "target for source '" + BuiltInRegistries.BLOCK.getKey(from) + "' is null");
         if (to.builtInRegistryHolder().tags().findAny().isPresent()) {
-            throw new IllegalStateException("target block tags not empty");
+            throw new IllegalStateException(
+                    "Target block tags for " + to.builtInRegistryHolder().key() + " not empty: " +
+                            to.builtInRegistryHolder().tags().map(TagKey::toString).toList());
         }
-        List<TagKey<Block>> tagKeys = from.builtInRegistryHolder().tags().toList();
-        to.builtInRegistryHolder().bindTags(tagKeys);
+        to.builtInRegistryHolder().bindTags(from.builtInRegistryHolder().tags().toList());
     }
 }

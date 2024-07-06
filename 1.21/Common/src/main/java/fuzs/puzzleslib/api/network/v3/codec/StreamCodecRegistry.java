@@ -18,7 +18,7 @@ import java.util.function.Function;
 /**
  * Registry for {@link StreamCodec} implementations.
  */
-public interface StreamCodecRegistry {
+public interface StreamCodecRegistry<T extends StreamCodecRegistry<T>> {
 
     /**
      * Register a stream codec by providing an encoder and a decoder.
@@ -28,8 +28,8 @@ public interface StreamCodecRegistry {
      * @param decoder read from byte buffer
      * @param <V>     data type
      */
-    default <B extends ByteBuf, V> void registerSerializer(Class<V> type, StreamEncoder<B, V> encoder, StreamDecoder<B, V> decoder) {
-        this.registerSerializer(type, StreamCodec.of(encoder, decoder));
+    default <B extends ByteBuf, V> T registerSerializer(Class<V> type, StreamEncoder<B, V> encoder, StreamDecoder<B, V> decoder) {
+        return this.registerSerializer(type, StreamCodec.of(encoder, decoder));
     }
 
     /**
@@ -40,8 +40,8 @@ public interface StreamCodecRegistry {
      * @param <V>         data type
      */
     @SuppressWarnings("unchecked")
-    default <V> void registerSerializer(Class<? super V> type, ResourceKey<Registry<V>> resourceKey) {
-        this.registerSerializer((Class<V>) type, ByteBufCodecs.registry(resourceKey));
+    default <V> T registerSerializer(Class<? super V> type, ResourceKey<Registry<V>> resourceKey) {
+        return this.registerSerializer((Class<V>) type, ByteBufCodecs.registry(resourceKey));
     }
 
     /**
@@ -52,7 +52,7 @@ public interface StreamCodecRegistry {
      * @param <B>         byte buffer type
      * @param <V>         data type
      */
-    <B extends ByteBuf, V> void registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec);
+    <B extends ByteBuf, V> T registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec);
 
     /**
      * Register a custom serializer for container types. Subclasses are supported, meaning e.g. any map implementation
@@ -66,5 +66,5 @@ public interface StreamCodecRegistry {
      * @param factory new empty collection provider (preferable with pre-configured size)
      * @param <V>     container type
      */
-    <B extends ByteBuf, V> void registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory);
+    <B extends ByteBuf, V> T registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory);
 }

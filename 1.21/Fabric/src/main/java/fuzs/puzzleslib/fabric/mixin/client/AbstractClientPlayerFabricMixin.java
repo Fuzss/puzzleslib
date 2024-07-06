@@ -31,7 +31,7 @@ abstract class AbstractClientPlayerFabricMixin extends Player {
             // we could capture the original value previous to return, but this approach only needs one mixin
             DefaultedFloat fieldOfViewModifier = DefaultedFloat.fromValue(fieldOfView);
             FabricClientPlayerEvents.COMPUTE_FOV_MODIFIER.invoker().onComputeFovModifier(this, fieldOfViewModifier);
-            return fieldOfViewModifier.getAsOptionalFloat().map(value -> Mth.lerp(fovEffectScale, 1.0F, value)).orElse(fieldOfView);
+            return fieldOfViewModifier.getAsOptionalFloat().map(value -> Mth.lerp(fovEffectScale, 1.0F, value)).orElse(scaledFieldOfView);
         } else {
             return scaledFieldOfView;
         }

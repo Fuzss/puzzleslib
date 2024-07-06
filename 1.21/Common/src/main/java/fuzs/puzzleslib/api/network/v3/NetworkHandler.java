@@ -272,16 +272,18 @@ public interface NetworkHandler {
     /**
      * A builder for a network handler, allows for registering messages.
      */
-    interface Builder extends NetworkHandlerRegistry, StreamCodecRegistry, Buildable {
+    interface Builder extends NetworkHandlerRegistry, StreamCodecRegistry<Builder>, Buildable {
 
         @Override
-        default <B extends ByteBuf, V> void registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {
+        default <B extends ByteBuf, V> Builder registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {
             StreamCodecRegistryImpl.INSTANCE.registerSerializer(type, streamCodec);
+            return this;
         }
 
         @Override
-        default <B extends ByteBuf, V> void registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory) {
+        default <B extends ByteBuf, V> Builder registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory) {
             StreamCodecRegistryImpl.INSTANCE.registerContainerProvider(type, factory);
+            return this;
         }
 
         /**

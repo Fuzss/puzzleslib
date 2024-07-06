@@ -53,25 +53,29 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
-public final class StreamCodecRegistryImpl implements StreamCodecRegistry {
-    public static final StreamCodecRegistry INSTANCE = new StreamCodecRegistryImpl();
+public final class StreamCodecRegistryImpl implements StreamCodecRegistry<StreamCodecRegistryImpl> {
+    public static final StreamCodecRegistry<StreamCodecRegistryImpl> INSTANCE = new StreamCodecRegistryImpl();
     private static final Map<Class<?>, StreamCodec<?, ?>> SERIALIZERS = Collections.synchronizedMap(Maps.newIdentityHashMap());
     private static final Map<Class<?>, Function<Type[], StreamCodec<?, ?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(
             Maps.newLinkedHashMap());
 
     @Override
-    public <B extends ByteBuf, V> void registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {
+    public <B extends ByteBuf, V> StreamCodecRegistryImpl registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {
         if (SERIALIZERS.put(type, streamCodec) != null) {
             PuzzlesLib.LOGGER.warn("Overriding serializer registered for type {}", type);
         }
+
+        return this;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public <B extends ByteBuf, V> void registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory) {
+    public <B extends ByteBuf, V> StreamCodecRegistryImpl registerContainerProvider(Class<V> type, Function<Type[], StreamCodec<? super B, ? extends V>> factory) {
         if (CONTAINER_PROVIDERS.put(type, (Function<Type[], StreamCodec<?, ?>>) (Function<?, ?>) factory) != null) {
             PuzzlesLib.LOGGER.warn("Overriding collection provider registered for type {}", type);
         }
+
+        return this;
     }
 
     /**
@@ -91,6 +95,7 @@ public final class StreamCodecRegistryImpl implements StreamCodecRegistry {
             streamCodec = computeIfAbsent(type);
             SERIALIZERS.put(type, streamCodec);
         }
+
         return streamCodec;
     }
 

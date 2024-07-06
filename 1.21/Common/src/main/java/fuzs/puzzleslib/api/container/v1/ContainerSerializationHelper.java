@@ -153,8 +153,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
             if (!itemStack.isEmpty()) {
                 CompoundTag compoundTag = new CompoundTag();
                 compoundTag.putByte(TAG_SLOT, (byte) i);
-                itemStack.save(lookupProvider, compoundTag);
-                listTag.add(compoundTag);
+                listTag.add(itemStack.save(lookupProvider, compoundTag));
             }
         }
         return listTag;

@@ -17,6 +17,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.stats.StatType;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
@@ -119,6 +120,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(resourceLocation, "resource location is null");
             this.add(Util.makeDescriptionId(registry, resourceLocation), value);
+        }
+
+        default void add(TagKey<?> tagKey, String value) {
+            this.add("tag." + tagKey.location().toLanguageKey(tagKey.registry().location().getPath()), value);
         }
 
         default void add(Block block, String value) {
