@@ -8,7 +8,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.client.multiplayer.SessionSearchTrees;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
@@ -105,15 +104,6 @@ public interface ClientAbstractions {
      */
     default float getPartialTick() {
         return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
-    }
-
-    /**
-     * Get the search registry for registering a new search tree.
-     *
-     * @return the search registry
-     */
-    default SessionSearchTrees getSearchRegistry() {
-        return Minecraft.getInstance().getConnection().searchTrees();
     }
 
     /**
