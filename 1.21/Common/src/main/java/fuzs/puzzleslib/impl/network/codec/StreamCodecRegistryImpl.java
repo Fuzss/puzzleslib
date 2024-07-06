@@ -54,7 +54,7 @@ import java.util.function.Function;
 import java.util.function.IntFunction;
 
 public final class StreamCodecRegistryImpl implements StreamCodecRegistry<StreamCodecRegistryImpl> {
-    public static final StreamCodecRegistry<StreamCodecRegistryImpl> INSTANCE = new StreamCodecRegistryImpl();
+    public static final StreamCodecRegistry<?> INSTANCE = new StreamCodecRegistryImpl();
     private static final Map<Class<?>, StreamCodec<?, ?>> SERIALIZERS = Collections.synchronizedMap(Maps.newIdentityHashMap());
     private static final Map<Class<?>, Function<Type[], StreamCodec<?, ?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(
             Maps.newLinkedHashMap());
