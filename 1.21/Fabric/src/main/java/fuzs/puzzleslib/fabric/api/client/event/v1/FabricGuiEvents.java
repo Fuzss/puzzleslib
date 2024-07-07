@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.api.client.event.v1;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
-import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.gui.GuiGraphics;
@@ -65,6 +64,12 @@ public final class FabricGuiEvents {
      */
     public static final Event<GatherDebugTextEvents.Right> GATHER_RIGHT_DEBUG_TEXT = FabricEventFactory.create(
             GatherDebugTextEvents.Right.class);
+    /**
+     * Called when tooltip lines are gathered for an effect widget in the player inventory when it is hovered by the
+     * cursor.
+     */
+    public static final Event<GatherEffectScreenTooltipCallback> GATHER_EFFECT_SCREEN_TOOLTIP = FabricEventFactory.create(
+            GatherEffectScreenTooltipCallback.class);
     private static final Map<String, Event<RenderGuiLayerEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
     private static final Map<String, Event<RenderGuiLayerEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
 
