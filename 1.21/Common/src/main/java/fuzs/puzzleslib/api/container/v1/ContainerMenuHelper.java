@@ -75,4 +75,40 @@ public final class ContainerMenuHelper {
 
         return simpleContainer;
     }
+
+    /**
+     * Writes contents from a list of items to a container.
+     * <p>
+     * Intended to be used with
+     * {@link net.minecraft.world.level.block.entity.BaseContainerBlockEntity#setItems(NonNullList)} to be able to keep
+     * the internal items list final.
+     *
+     * @param from the source item list
+     * @param to   the target container
+     */
+    public static void copyItemsIntoContainer(NonNullList<ItemStack> from, Container to) {
+        for (int i = 0; i < from.size(); i++) {
+            if (i < to.getContainerSize()) {
+                to.setItem(i, from.get(i));
+            }
+        }
+    }
+
+    /**
+     * Writes contents from a list of items to another list of items.
+     * <p>
+     * Intended to be used with
+     * {@link net.minecraft.world.level.block.entity.BaseContainerBlockEntity#setItems(NonNullList)} to be able to keep
+     * the internal items list final.
+     *
+     * @param from the source item list
+     * @param to   the target item list
+     */
+    public static void copyItemsIntoList(NonNullList<ItemStack> from, NonNullList<ItemStack> to) {
+        for (int i = 0; i < from.size(); i++) {
+            if (i < to.size()) {
+                to.set(i, from.get(i));
+            }
+        }
+    }
 }

@@ -21,7 +21,7 @@ transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  (Ljava/lang/String;Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   field   net/minecraft/data/loot/EntityLootSubProvider   map Ljava/util/Map;
 transitive-accessible   method  net/minecraft/client/gui/GuiGraphics    blitNineSlicedSprite    (Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/resources/metadata/gui/GuiSpriteScaling$NineSlice;IIIII)V
-transitive-accessible   field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
+accessible  field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
 mutable field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
 accessible  field   net/minecraft/world/SimpleContainer size    I
 mutable field   net/minecraft/world/SimpleContainer size    I

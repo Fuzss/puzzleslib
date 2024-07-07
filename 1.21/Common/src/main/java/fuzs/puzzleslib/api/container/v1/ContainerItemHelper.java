@@ -6,7 +6,10 @@ import net.minecraft.world.item.ItemStack;
 
 /**
  * Small helper class for working with implementations of {@link Container}.
+ *
+ * @deprecated moved to {@link ContainerMenuHelper}
  */
+@Deprecated(forRemoval = true)
 public final class ContainerItemHelper {
 
     private ContainerItemHelper() {
@@ -24,11 +27,7 @@ public final class ContainerItemHelper {
      * @param items     the source item list
      */
     public static void copyItemsToContainer(Container container, NonNullList<ItemStack> items) {
-        for (int i = 0; i < items.size(); i++) {
-            if (i < container.getContainerSize()) {
-                container.setItem(i, items.get(i));
-            }
-        }
+        ContainerMenuHelper.copyItemsIntoContainer(items, container);
     }
 
     /**
@@ -42,10 +41,6 @@ public final class ContainerItemHelper {
      * @param to   the target item list
      */
     public static void copyItemList(NonNullList<ItemStack> from, NonNullList<ItemStack> to) {
-        for (int i = 0; i < from.size(); i++) {
-            if (i < to.size()) {
-                to.set(i, from.get(i));
-            }
-        }
+        ContainerMenuHelper.copyItemsIntoList(from, to);
     }
 }
