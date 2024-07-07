@@ -103,14 +103,24 @@ public final class FabricClientEventInvokers {
         });
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
-            ModelLoadingPlugin.register(pluginContext -> {
+            ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
                 Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
                 pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
                     // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.topLevelId(), () -> model, context.baker()::getModel,
-                            additionalModels::put
-                    );
-                    return result.getInterrupt().orElse(model);
+                    if (context.topLevelId() != null) {
+                        EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.topLevelId(),
+                                () -> model,
+                                (ModelResourceLocation modelResourceLocation) -> {
+                                    return context.loader().topLevelModels.get(modelResourceLocation);
+                                },
+                                additionalModels::put
+                        );
+
+                        return result.getInterrupt().orElse(model);
+                    } else {
+                        return model;
+                    }
+
                 });
                 pluginContext.resolveModel().register((ModelResolver.Context context) -> {
                     return additionalModels.get(context.id());
@@ -118,7 +128,7 @@ public final class FabricClientEventInvokers {
             });
         });
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, (ModelEvents.ModifyBakedModel callback, @Nullable Object o) -> {
-            ModelLoadingPlugin.register(pluginContext -> {
+            ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
                 pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     if (model != null) {
                         Map<ModelResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
@@ -133,7 +143,7 @@ public final class FabricClientEventInvokers {
             });
         });
         INSTANCE.register(ModelEvents.AdditionalBakedModel.class, (ModelEvents.AdditionalBakedModel callback, @Nullable Object o) -> {
-            ModelLoadingPlugin.register(pluginContext -> {
+            ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
                 pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     // all we want is access to the top level baked models map to be able to insert our own models
                     // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
@@ -144,6 +154,7 @@ public final class FabricClientEventInvokers {
                             return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
                         }, context::baker);
                     }
+
                     return model;
                 });
             });

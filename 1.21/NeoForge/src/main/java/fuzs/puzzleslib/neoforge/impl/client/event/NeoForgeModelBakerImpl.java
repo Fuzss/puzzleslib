@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
-import com.mojang.math.Transformation;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.neoforge.mixin.client.accessor.ModelBakeryNeoForgeAccessor;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -12,8 +11,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Function;
 
-public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache,
+public record NeoForgeModelBakerImpl(Map<ModelBakery.BakedCacheKey, BakedModel> bakedCache,
                                      Function<ResourceLocation, UnbakedModel> unbakedModelGetter,
+                                     Function<ModelResourceLocation, UnbakedModel> unbakedTopLevelGetter,
                                      Function<Material, TextureAtlasSprite> modelTextureGetter,
                                      BakedModel missingModel) implements ModelBaker {
 
@@ -29,8 +29,8 @@ public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache,
     }
 
     @Override
-    public @Nullable UnbakedModel getTopLevelModel(ModelResourceLocation resourceLocation) {
-        throw new UnsupportedOperationException();
+    public @Nullable UnbakedModel getTopLevelModel(ModelResourceLocation modelLocation) {
+        return this.unbakedTopLevelGetter.apply(modelLocation);
     }
 
     @Override
@@ -57,7 +57,7 @@ public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache,
     private BakedModel bake(UnbakedModel unbakedModel, ResourceLocation resourceLocation, ModelState modelState, Function<Material, TextureAtlasSprite> modelTextureGetter) {
         // implementation is pretty much the same as the vanilla model baker in the model bakery
         // do not use Map::computeIfAbsent, it will throw ConcurrentModificationException due to the map potentially being modified in the provided Function
-        BakedCacheKey key = new BakedCacheKey(resourceLocation, modelState.getRotation(), modelState.isUvLocked());
+        ModelBakery.BakedCacheKey key = new ModelBakery.BakedCacheKey(resourceLocation, modelState.getRotation(), modelState.isUvLocked());
         BakedModel bakedModel = this.bakedCache.get(key);
         if (bakedModel == null) {
             try {
@@ -75,10 +75,5 @@ public record NeoForgeModelBakerImpl(Map<BakedCacheKey, BakedModel> bakedCache,
     @Override
     public Function<Material, TextureAtlasSprite> getModelTextureGetter() {
         return this.modelTextureGetter;
-    }
-
-    // copied from net.minecraft.client.resources.model.ModelBakery$BakedCacheKey
-    public record BakedCacheKey(ResourceLocation resourceLocation, Transformation rotation, boolean isUvLocked) {
-
     }
 }
