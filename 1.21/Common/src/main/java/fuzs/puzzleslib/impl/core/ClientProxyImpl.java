@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.chat.v1.ComponentHelper;
-import fuzs.puzzleslib.api.client.gui.v2.components.ScreenTooltipFactory;
+import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -48,6 +48,6 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     @Override
     default List<Component> splitTooltipLines(Component component) {
-        return ScreenTooltipFactory.splitToCharSequence(component).map(ComponentHelper::toComponent).toList();
+        return ClientComponentSplitter.splitTooltipLines(component).map(ComponentHelper::toComponent).toList();
     }
 }
