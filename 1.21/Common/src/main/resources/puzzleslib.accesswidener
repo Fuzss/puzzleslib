@@ -93,6 +93,9 @@ accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees register
 accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees getTooltipLines (Ljava/util/stream/Stream;Lnet/minecraft/world/item/Item$TooltipContext;Lnet/minecraft/world/item/TooltipFlag;)Ljava/util/stream/Stream;
 accessible  class   net/minecraft/client/multiplayer/SessionSearchTrees$Key
 accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees$Key <init>  ()V
+accessible  field   net/minecraft/client/resources/model/ModelBakery    topLevelModels  Ljava/util/Map;
+accessible  class   net/minecraft/client/resources/model/ModelBakery$BakedCacheKey
+accessible  method  net/minecraft/client/resources/model/ModelBakery$BakedCacheKey  <init> (Lnet/minecraft/resources/ResourceLocation;Lcom/mojang/math/Transformation;Z)V
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
