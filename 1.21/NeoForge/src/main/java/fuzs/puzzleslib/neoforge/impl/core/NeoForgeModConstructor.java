@@ -19,7 +19,7 @@ import net.neoforged.neoforge.event.AddReloadListenerEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
-import net.neoforged.neoforge.event.entity.SpawnPlacementRegisterEvent;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Set;
@@ -62,7 +62,7 @@ public final class NeoForgeModConstructor {
                 constructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());
             });
         });
-        eventBus.addListener((final SpawnPlacementRegisterEvent evt) -> {
+        eventBus.addListener((final RegisterSpawnPlacementsEvent evt) -> {
             constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextNeoForgeImpl(evt));
         });
         eventBus.addListener((final EntityAttributeCreationEvent evt) -> {

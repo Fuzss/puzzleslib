@@ -6,11 +6,11 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnPlacementType;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.neoforged.neoforge.event.entity.SpawnPlacementRegisterEvent;
+import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
 import java.util.Objects;
 
-public record SpawnPlacementsContextNeoForgeImpl(SpawnPlacementRegisterEvent evt) implements SpawnPlacementsContext {
+public record SpawnPlacementsContextNeoForgeImpl(RegisterSpawnPlacementsEvent evt) implements SpawnPlacementsContext {
 
     @Override
     public <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacementType location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
@@ -18,6 +18,11 @@ public record SpawnPlacementsContextNeoForgeImpl(SpawnPlacementRegisterEvent evt
         Objects.requireNonNull(location, "location is null");
         Objects.requireNonNull(heightmap, "heightmap is null");
         Objects.requireNonNull(spawnPredicate, "spawnPredicate is null");
-        this.evt.register(entityType, location, heightmap, spawnPredicate, SpawnPlacementRegisterEvent.Operation.REPLACE);
+        this.evt.register(entityType,
+                location,
+                heightmap,
+                spawnPredicate,
+                RegisterSpawnPlacementsEvent.Operation.REPLACE
+        );
     }
 }

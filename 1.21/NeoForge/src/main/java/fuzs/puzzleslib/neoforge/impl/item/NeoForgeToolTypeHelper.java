@@ -60,21 +60,26 @@ public final class NeoForgeToolTypeHelper implements ToolTypeHelper {
 
     @Override
     public boolean isTridentLike(ItemStack itemStack) {
-        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(Tags.Items.TOOLS_SPEAR);
+        return ToolTypeHelper.super.isTridentLike(itemStack) || itemStack.is(Tags.Items.TOOLS_SPEAR) || itemStack.canPerformAction(ItemAbilities.TRIDENT_THROW);
     }
 
     @Override
     public boolean isBrush(ItemStack itemStack) {
-        return ToolTypeHelper.super.isBrush(itemStack) || itemStack.is(Tags.Items.TOOLS_BRUSH);
+        return ToolTypeHelper.super.isBrush(itemStack) || itemStack.is(Tags.Items.TOOLS_BRUSH) || itemStack.canPerformAction(ItemAbilities.BRUSH_BRUSH);
     }
 
     @Override
-    public boolean isArmor(ItemStack itemStack) {
-        return ToolTypeHelper.super.isArmor(itemStack) || itemStack.is(Tags.Items.ARMORS);
+    public boolean isMace(ItemStack itemStack) {
+        return ToolTypeHelper.super.isMace(itemStack) || itemStack.is(Tags.Items.TOOLS_MACE);
     }
 
     @Override
     public boolean isTool(ItemStack itemStack) {
         return ToolTypeHelper.super.isTool(itemStack) || itemStack.is(Tags.Items.TOOLS);
+    }
+
+    @Override
+    public boolean isArmor(ItemStack itemStack) {
+        return ToolTypeHelper.super.isArmor(itemStack) || itemStack.is(Tags.Items.ARMORS);
     }
 }
