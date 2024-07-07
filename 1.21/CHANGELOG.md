@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.0.9-1.21] - 2024-07-07
 ### Added
 - Add `TooltipComponent`
+### Changed
+- Update to NeoForge v21.0.75
 
 ## [v21.0.8-1.21] - 2024-07-07
 ### Fixed

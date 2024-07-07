@@ -569,7 +569,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }, evt::getVisibilityModifier));
         });
         INSTANCE.register(LivingChangeTargetCallback.class, LivingChangeTargetEvent.class, (LivingChangeTargetCallback callback, LivingChangeTargetEvent evt) -> {
-            DefaultedValue<LivingEntity> target = DefaultedValue.fromEvent(evt::setNewTarget, evt::getNewTarget, evt::getOriginalTarget);
+            DefaultedValue<LivingEntity> target = DefaultedValue.fromEvent(evt::setNewAboutToBeSetTarget, evt::getNewAboutToBeSetTarget, evt::getOriginalAboutToBeSetTarget);
             if (callback.onLivingChangeTarget(evt.getEntity(), target).isInterrupt()) {
                 evt.setCanceled(true);
             }

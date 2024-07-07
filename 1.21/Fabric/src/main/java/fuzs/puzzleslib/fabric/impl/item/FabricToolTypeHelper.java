@@ -42,8 +42,8 @@ public final class FabricToolTypeHelper implements ToolTypeHelper {
     }
 
     @Override
-    public boolean isArmor(ItemStack itemStack) {
-        return ToolTypeHelper.super.isArmor(itemStack) || itemStack.is(ConventionalItemTags.ARMORS);
+    public boolean isMace(ItemStack itemStack) {
+        return ToolTypeHelper.super.isMace(itemStack) || itemStack.is(ConventionalItemTags.MACE_TOOLS);
     }
 
     @Override
@@ -64,5 +64,10 @@ public final class FabricToolTypeHelper implements ToolTypeHelper {
     @Override
     public boolean isTool(ItemStack itemStack) {
         return ToolTypeHelper.super.isTool(itemStack) || itemStack.is(ConventionalItemTags.TOOLS);
+    }
+
+    @Override
+    public boolean isArmor(ItemStack itemStack) {
+        return ToolTypeHelper.super.isArmor(itemStack) || itemStack.is(ConventionalItemTags.ARMORS);
     }
 }

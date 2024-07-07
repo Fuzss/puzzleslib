@@ -17,9 +17,7 @@ import net.minecraft.network.codec.StreamDecoder;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
-import net.minecraft.network.protocol.common.ServerboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -126,13 +124,13 @@ public class NeoForgeNetworkHandler extends NetworkHandlerRegistryImpl {
     @Override
     public <T> Packet<ClientCommonPacketListener> toClientboundPacket(ClientboundMessage<T> message) {
         Objects.requireNonNull(message, "message is null");
-        return this.toPacket(ClientboundCustomPayloadPacket::new, message);
+        return this.toPacket(CustomPacketPayload::toVanillaClientbound, message);
     }
 
     @Override
     public <T> Packet<ServerCommonPacketListener> toServerboundPacket(ServerboundMessage<T> message) {
         Objects.requireNonNull(message, "message is null");
-        return this.toPacket(ServerboundCustomPayloadPacket::new, message);
+        return this.toPacket(CustomPacketPayload::toVanillaServerbound, message);
     }
 
     @Override

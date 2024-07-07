@@ -7,12 +7,11 @@ import net.minecraft.world.item.*;
 
 /**
  * A small helper class for testing an item stack for a given tool type.
- * <p>Mainly exists for handling item tags across different mod loaders as well as Forge's
- * <code>net.minecraftforge.common.ToolAction</code> feature.
- * <p>Inspired by <a
- * href="https://github.com/ricksouth/serilum-mc-mod-sources/blob/main/sources/Collective/1.20.0/Common/src/main/java/com/natamus/collective/services/helpers/ToolFunctionsHelper.java">ToolFunctionsHelper.java</a>
- * found in the <a
- * href="https://github.com/ricksouth/serilum-mc-mod-sources/tree/main/sources/Collective">Collective</a> mod.
+ * <p>
+ * Mainly exists for handling item tags across different mod loaders as well as NeoForge's item abilities feature.
+ * <p>
+ * Inspired by <code>ToolFunctionsHelper</code> found in the <a
+ * href="https://github.com/Serilum/Collective">Collective</a> mod.
  */
 public interface ToolTypeHelper {
     ToolTypeHelper INSTANCE = CommonFactories.INSTANCE.getToolTypeHelper();
@@ -138,63 +137,13 @@ public interface ToolTypeHelper {
     }
 
     /**
-     * Tests if an item stack can be equipped as head armor.
+     * Tests if an item stack is similar to a mace, like a club.
      *
      * @param itemStack the stack to test
-     * @return is this stack head armor
+     * @return is this stack a brush
      */
-    default boolean isHeadArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.HEAD || itemStack.is(ItemTags.HEAD_ARMOR);
-    }
-
-    /**
-     * Tests if an item stack can be equipped as chest armor.
-     *
-     * @param itemStack the stack to test
-     * @return is this stack chest armor
-     */
-    default boolean isChestArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.CHEST || itemStack.is(ItemTags.CHEST_ARMOR);
-    }
-
-    /**
-     * Tests if an item stack can be equipped as leg armor.
-     *
-     * @param itemStack the stack to test
-     * @return is this stack leg armor
-     */
-    default boolean isLegArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.LEGS || itemStack.is(ItemTags.LEG_ARMOR);
-    }
-
-    /**
-     * Tests if an item stack can be equipped as foot armor.
-     *
-     * @param itemStack the stack to test
-     * @return is this stack foot armor
-     */
-    default boolean isFootArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.FEET || itemStack.is(ItemTags.FOOT_ARMOR);
-    }
-
-    /**
-     * Tests if an item stack can be equipped as body armor.
-     *
-     * @param itemStack the stack to test
-     * @return is this stack body armor
-     */
-    default boolean isBodyArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.BODY;
-    }
-
-    /**
-     * Tests if an item stack can be equipped as armor.
-     *
-     * @param itemStack the stack to test
-     * @return is this stack armor
-     */
-    default boolean isArmor(ItemStack itemStack) {
-        return this.isHeadArmor(itemStack) || this.isChestArmor(itemStack) || this.isLegArmor(itemStack) || this.isFootArmor(itemStack) || this.isBodyArmor(itemStack);
+    default boolean isMace(ItemStack itemStack) {
+        return itemStack.getItem() instanceof MaceItem;
     }
 
     /**
@@ -204,7 +153,8 @@ public interface ToolTypeHelper {
      * @return is this stack a melee weapon
      */
     default boolean isMeleeWeapon(ItemStack itemStack) {
-        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack);
+        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) ||
+                this.isMace(itemStack);
     }
 
     /**
@@ -244,6 +194,72 @@ public interface ToolTypeHelper {
      * @return is this stack a tool
      */
     default boolean isTool(ItemStack itemStack) {
-        return this.isMiningTool(itemStack) || this.isMeleeWeapon(itemStack);
+        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) ||
+                this.isShield(itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as head armor.
+     *
+     * @param itemStack the stack to test
+     * @return is this stack head armor
+     */
+    default boolean isHeadArmor(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ArmorItem armorItem &&
+                armorItem.getEquipmentSlot() == EquipmentSlot.HEAD || itemStack.is(ItemTags.HEAD_ARMOR);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as chest armor.
+     *
+     * @param itemStack the stack to test
+     * @return is this stack chest armor
+     */
+    default boolean isChestArmor(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ArmorItem armorItem &&
+                armorItem.getEquipmentSlot() == EquipmentSlot.CHEST || itemStack.is(ItemTags.CHEST_ARMOR);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as leg armor.
+     *
+     * @param itemStack the stack to test
+     * @return is this stack leg armor
+     */
+    default boolean isLegArmor(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ArmorItem armorItem &&
+                armorItem.getEquipmentSlot() == EquipmentSlot.LEGS || itemStack.is(ItemTags.LEG_ARMOR);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as foot armor.
+     *
+     * @param itemStack the stack to test
+     * @return is this stack foot armor
+     */
+    default boolean isFootArmor(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ArmorItem armorItem &&
+                armorItem.getEquipmentSlot() == EquipmentSlot.FEET || itemStack.is(ItemTags.FOOT_ARMOR);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as body armor.
+     *
+     * @param itemStack the stack to test
+     * @return is this stack body armor
+     */
+    default boolean isBodyArmor(ItemStack itemStack) {
+        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.BODY;
+    }
+
+    /**
+     * Tests if an item stack can be equipped as armor.
+     *
+     * @param itemStack the stack to test
+     * @return is this stack armor
+     */
+    default boolean isArmor(ItemStack itemStack) {
+        return this.isHeadArmor(itemStack) || this.isChestArmor(itemStack) || this.isLegArmor(itemStack) ||
+                this.isFootArmor(itemStack) || this.isBodyArmor(itemStack);
     }
 }
