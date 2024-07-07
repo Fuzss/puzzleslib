@@ -458,6 +458,7 @@ public final class FabricClientEventInvokers {
                 }
             };
         });
+        INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {
