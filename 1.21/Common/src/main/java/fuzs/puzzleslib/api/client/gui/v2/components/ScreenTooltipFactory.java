@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.client.gui.v2.components;
 
+import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
+import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.TooltipComponent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -22,7 +24,10 @@ import java.util.stream.Stream;
  * A small helper class for creating new instances of {@link Tooltip} from multiple
  * {@link net.minecraft.network.chat.Component} instances instead of just a single one, as is the case in the vanilla
  * implementation.
+ *
+ * @deprecated refactored into {@link TooltipComponent} &amp; {@link ClientComponentSplitter}
  */
+@Deprecated(forRemoval = true)
 public final class ScreenTooltipFactory {
     public static final int MAX_TOOLTIP_WIDTH = 170;
 

@@ -14,7 +14,10 @@ transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$Spr
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
-transitive-extendable	method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
+extendable  method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
+accessible  field   net/minecraft/client/gui/components/Tooltip message Lnet/minecraft/network/chat/Component;
+accessible  field   net/minecraft/client/gui/components/Tooltip cachedTooltip   Ljava/util/List;
+accessible  field   net/minecraft/client/gui/components/Tooltip splitWithLanguage   Lnet/minecraft/locale/Language;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  ([Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  createItem  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
@@ -60,9 +63,9 @@ transitive-accessible   field   net/minecraft/client/KeyMapping key Lcom/mojang/
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper  target  Lnet/minecraft/world/inventory/Slot;
 transitive-accessible   field   net/minecraft/client/multiplayer/MultiPlayerGameMode    destroyDelay    I
 transitive-extendable   method  net/minecraft/client/gui/components/AbstractSliderButton    setValue    (D)V
-transitive-accessible   field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
-transitive-mutable  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
-transitive-extendable   method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
+accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
+mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
+extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
 accessible  field   net/minecraft/client/gui/components/WidgetTooltipHolder delay   Ljava/time/Duration;
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
