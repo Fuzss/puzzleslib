@@ -712,7 +712,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(evt.getBuilder()));
         });
         INSTANCE.register(AddDataPackReloadListenersCallback.class, AddReloadListenerEvent.class, (AddDataPackReloadListenersCallback callback, AddReloadListenerEvent evt) -> {
-            callback.onAddDataPackReloadListeners(evt.getServerResources(), (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
+            callback.onAddDataPackReloadListeners(evt.getServerResources().getRegistryLookup(), (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
                 evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
             });
         });
