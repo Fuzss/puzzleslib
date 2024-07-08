@@ -17,17 +17,18 @@ import java.util.List;
 abstract class ReloadableServerResourcesFabricMixin {
 
     @WrapOperation(
-            method = "lambda$loadResources$2",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/ReloadableServerResources;listeners()Ljava/util/List;"
-            )
+            method = "lambda$loadResources$2", at = @At(
+            value = "INVOKE", target = "Lnet/minecraft/server/ReloadableServerResources;listeners()Ljava/util/List;"
+    )
     )
     private static List<PreparableReloadListener> loadResources(ReloadableServerResources serverResources, Operation<List<PreparableReloadListener>> operation) {
         List<PreparableReloadListener> listeners = new CopyOnWriteForwardingList<>(operation.call(serverResources));
-        FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS.invoker().onAddDataPackReloadListeners(serverResources, (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-            listeners.add(new FabricReloadListener(resourceLocation, reloadListener));
-        });
+        FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS.invoker()
+                .onAddDataPackReloadListeners(serverResources.registryLookup,
+                        (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
+                            listeners.add(new FabricReloadListener(resourceLocation, reloadListener));
+                        }
+                );
         return listeners;
     }
 }

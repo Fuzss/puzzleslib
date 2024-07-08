@@ -4,11 +4,13 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
+import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
 import fuzs.puzzleslib.impl.core.CommonFactories;
@@ -41,6 +43,11 @@ public final class FabricFactories implements CommonFactories {
     @Override
     public ProxyImpl getServerProxy() {
         return new FabricServerProxy();
+    }
+
+    @Override
+    public RegistryFactory getRegistryFactory() {
+        return new FabricRegistryFactory();
     }
 
     @Override

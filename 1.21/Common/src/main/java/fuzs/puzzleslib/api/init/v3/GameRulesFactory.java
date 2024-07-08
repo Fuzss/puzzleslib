@@ -12,6 +12,9 @@ import java.util.function.BiConsumer;
  * <p>Fabric has many custom options for game rules (mainly double and enum rules), but since they don't exist on Forge we don't support them.
  */
 public interface GameRulesFactory {
+    /**
+     * the instance
+     */
     GameRulesFactory INSTANCE = CommonFactories.INSTANCE.getGameRulesFactory();
 
     /**
