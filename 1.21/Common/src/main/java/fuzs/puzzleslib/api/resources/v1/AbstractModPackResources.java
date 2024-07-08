@@ -3,15 +3,15 @@ package fuzs.puzzleslib.api.resources.v1;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import net.minecraft.SharedConstants;
+import fuzs.puzzleslib.impl.resources.ModPackResourcesSupplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.ApiStatus;
@@ -30,12 +30,17 @@ import java.util.function.Supplier;
  * assets.
  * <p>This pack automatically uses the mod's mod logo for the pack icon.
  */
-public abstract class AbstractModPackResources implements PackResources {
+public class AbstractModPackResources implements PackResources {
     /**
      * Path to the mod logo inside the mod jar to be used in place of <code>pack.png</code> for the pack icon.
      * <p>Defaults to <code>mod_logo.png</code>, path is separated using "/".
      */
     protected final String modLogoPath;
+    /**
+     * The pack type for this pack, set internally during construction.
+     */
+    @Nullable
+    private PackType packType;
     /**
      * Location info of this pack, set internally during construction.
      */
@@ -46,23 +51,18 @@ public abstract class AbstractModPackResources implements PackResources {
      */
     @Nullable
     private BuiltInMetadata metadata;
-    /**
-     * The pack type for this pack, set internally during construction.
-     */
-    @Nullable
-    private PackType packType;
 
     /**
      * Simple constructor with default file path parameter for the pack icon.
      */
-    protected AbstractModPackResources() {
+    public AbstractModPackResources() {
         this("mod_logo.png");
     }
 
     /**
      * Constructor with full control over the pack icon.
      */
-    protected AbstractModPackResources(String modLogoPath) {
+    public AbstractModPackResources(String modLogoPath) {
         Objects.requireNonNull(modLogoPath, "mod logo path is null");
         this.modLogoPath = modLogoPath;
     }
@@ -121,7 +121,7 @@ public abstract class AbstractModPackResources implements PackResources {
     /**
      * @return the namespace from the internal id
      */
-    protected String getNamespace() {
+    public String getNamespace() {
         return ResourceLocationHelper.parse(this.packId()).getNamespace();
     }
 
@@ -130,23 +130,36 @@ public abstract class AbstractModPackResources implements PackResources {
      * <p>
      * Runs after the id has been set.
      */
+    @ApiStatus.OverrideOnly
     protected void setup() {
         // NO-OP
     }
 
-    @ApiStatus.Internal
-    static Pack buildPack(PackType packType, ResourceLocation identifier, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
-        PackLocationInfo info = new PackLocationInfo(identifier.toString(),
-                title,
-                PackSource.BUILT_IN,
-                Optional.empty()
-        );
+    /**
+     * Creates a new pack for registering a repository source.
+     *
+     * @param packType      type marking this pack as containing data or resource pack resources
+     * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
+     * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
+     * @param title         the title of this pack shown in the pack selection screen
+     * @param description   the description for this pack shown in the pack selection screen
+     * @param required      a required pack cannot be disabled, like in the pack selection screen the pack cannot be
+     *                      moved to the left side; this is used for the vanilla resource pack
+     * @param position      insertion end in the pack list, new packs are usually inserted at the top above vanilla
+     * @param fixedPosition a fixed pack cannot be moved up or down, like a server or world resource pack
+     * @param hidden        controls whether the pack is hidden from user-facing screens like the resource pack and data
+     *                      pack selection screens, only available on Forge
+     * @param features      {@link net.minecraft.world.flag.FeatureFlags} enabled through this pack
+     * @return the pack to be used for creating a {@link RepositorySource}
+     */
+    public static Pack buildPack(PackType packType, ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
+        PackLocationInfo info = new PackLocationInfo(id.toString(), title, PackSource.BUILT_IN, Optional.empty());
         Pack.ResourcesSupplier resourcesSupplier = ModPackResourcesSupplier.create(packType,
                 info,
-                factory,
+                createSupplier(factory),
                 description
         );
-        Pack.Metadata metadata = CommonAbstractions.INSTANCE.createPackInfo(identifier,
+        Pack.Metadata metadata = CommonAbstractions.INSTANCE.createPackInfo(id,
                 description,
                 PackCompatibility.COMPATIBLE,
                 features,
@@ -156,35 +169,14 @@ public abstract class AbstractModPackResources implements PackResources {
         return new Pack(info, resourcesSupplier, metadata, config);
     }
 
-    private record ModPackResourcesSupplier(PackType packType, PackLocationInfo info, Supplier<AbstractModPackResources> factory, BuiltInMetadata metadata) implements Pack.ResourcesSupplier {
-
-        static ModPackResourcesSupplier create(PackType packType, PackLocationInfo info, Supplier<AbstractModPackResources> factory, Component description) {
-            PackMetadataSection metadataSection = new PackMetadataSection(description,
-                    SharedConstants.getCurrentVersion().getPackVersion(packType),
-                    Optional.empty()
-            );
-            return new ModPackResourcesSupplier(packType, info, factory,
-                    BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection)
-            );
-        }
-
-        @Override
-        public PackResources openPrimary(PackLocationInfo info) {
-            return this.getAndSetupPackResources();
-        }
-
-        @Override
-        public PackResources openFull(PackLocationInfo info, Pack.Metadata packMetadata) {
-            return this.getAndSetupPackResources();
-        }
-
-        private AbstractModPackResources getAndSetupPackResources() {
-            AbstractModPackResources packResources = this.factory.get();
-            packResources.info = this.info;
-            packResources.metadata = this.metadata;
-            packResources.packType = this.packType;
+    private static ModPackResourcesSupplier.PackResourcesSupplier<AbstractModPackResources> createSupplier(Supplier<AbstractModPackResources> factory) {
+        return (PackType packType, PackLocationInfo info, BuiltInMetadata metadata) -> {
+            AbstractModPackResources packResources = factory.get();
+            packResources.info = info;
+            packResources.metadata = metadata;
+            packResources.packType = packType;
             packResources.setup();
             return packResources;
-        }
+        };
     }
 }

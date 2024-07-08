@@ -6,6 +6,7 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientLevelEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.DeathScreen;
@@ -52,6 +53,13 @@ public abstract class MinecraftFabricMixin {
     public Screen screen;
     @Unique
     private DefaultedValue<Screen> puzzleslib$newScreen;
+
+    @Inject(method = "<init>", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/systems/RenderSystem;getBackendDescription()Ljava/lang/String;", shift = At.Shift.AFTER, remap = false))
+    public void init(CallbackInfo callback) {
+        // run after Fabric Data Generation Api for same behavior as Forge where load complete does not run
+        // during data generation (not that we use Fabric's data generation, but ¯\_(ツ)_/¯)
+        FabricLifecycleEvents.LOAD_COMPLETE.invoker().onLoadComplete();
+    }
 
     @Inject(method = "runTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V", shift = At.Shift.BEFORE))
     private void runTick$0(boolean renderLevel, CallbackInfo callback) {

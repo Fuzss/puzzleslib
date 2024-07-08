@@ -19,14 +19,36 @@ import java.util.function.Supplier;
 public final class PackResourcesHelper {
 
     private PackResourcesHelper() {
+        // NO-OP
+    }
 
+    /**
+     * Create a simple pack title for a {@link PackType}.
+     *
+     * @param packType pack type for title
+     * @return title component
+     */
+    public static Component getPackTitle(PackType packType) {
+        return Component.literal(
+                "Generated " + (packType == PackType.CLIENT_RESOURCES ? "Resource" : "Data") + " Pack");
+    }
+
+    /**
+     * Create a fancy pack description for dynamic resources from a mod.
+     *
+     * @param modId the source mod for the dynamic pack
+     * @return description component
+     */
+    public static Component getPackDescription(String modId) {
+        return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).map(name -> {
+            return Component.literal(name + " Dynamic Resources");
+        }).orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
     }
 
     /**
      * Creates a new resource pack repository source (for the client).
-     * <p>Can be added via
-     * {@link
-     * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)}.
+     * <p>
+     * Can be added via {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}.
      *
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -41,9 +63,8 @@ public final class PackResourcesHelper {
 
     /**
      * Creates a new resource pack repository source (for the client).
-     * <p>Can be added via
-     * {@link
-     * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)}.
+     * <p>
+     * Can be added via {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -74,9 +95,8 @@ public final class PackResourcesHelper {
 
     /**
      * Creates a new resource pack repository source (for the client).
-     * <p>Can be added via
-     * {@link
-     * fuzs.puzzleslib.api.client.core.v1.ClientModConstructor#onAddResourcePackFinders(PackRepositorySourcesContext)}.
+     * <p>
+     * Can be added via {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -108,32 +128,9 @@ public final class PackResourcesHelper {
     }
 
     /**
-     * Create a simple pack title for a {@link PackType}.
-     *
-     * @param packType pack type for title
-     * @return title component
-     */
-    public static Component getPackTitle(PackType packType) {
-        return Component.literal(
-                "Generated " + (packType == PackType.CLIENT_RESOURCES ? "Resource" : "Data") + " Pack");
-    }
-
-    /**
-     * Create a fancy pack description for dynamic resources from a mod.
-     *
-     * @param modId the source mod for the dynamic pack
-     * @return description component
-     */
-    public static Component getPackDescription(String modId) {
-        return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).map(name -> {
-            return Component.literal(name + " Dynamic Resources");
-        }).orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
-    }
-
-    /**
      * Creates a new hidden data pack repository source (for the server).
-     * <p>Can be added via
-     * {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackFinders(PackRepositorySourcesContext)}.
+     * <p>
+     * Can be added via {@link fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback}.
      *
      * @param id      id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -148,8 +145,8 @@ public final class PackResourcesHelper {
 
     /**
      * Creates a new data pack repository source (for the server).
-     * <p>Can be added via
-     * {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackFinders(PackRepositorySourcesContext)}.
+     * <p>
+     * Can be added via {@link fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
@@ -180,8 +177,8 @@ public final class PackResourcesHelper {
 
     /**
      * Creates a new data pack repository source (for the server).
-     * <p>Can be added via
-     * {@link fuzs.puzzleslib.api.core.v1.ModConstructor#onAddDataPackFinders(PackRepositorySourcesContext)}.
+     * <p>
+     * Can be added via {@link fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback}.
      *
      * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
      * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.0.10-1.21] - 2024-07-07
 ### Added
 - Add `GatherEffectScreenTooltipCallback`
+- Add `AddDataPackReloadListenersCallback` for replacing `ModConstructor::onRegisterDataPackReloadListeners`
+- Add `AddResourcePackReloadListenersCallback` for replacing `ClientModConstructor::onRegisterResourcePackReloadListeners`
+### Changed
+- Call `LoadCompleteCallback` much earlier on clients
+### Fixed
+- Fix `FinalizeItemComponentsCallback` and `ComputeItemAttributeModifiersCallback` not being called on NeoForge due to registering too late
 
 ## [v21.0.9-1.21] - 2024-07-07
 ### Added

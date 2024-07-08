@@ -16,10 +16,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -27,7 +24,7 @@ import java.util.stream.Stream;
 
 /**
  * A pack resources implementation that is able to dynamically generate contents based on provided
- * {@link net.minecraft.data.DataProvider}s.
+ * {@link net.minecraft.data.DataProvider DataProviders}.
  */
 public class DynamicPackResources extends AbstractModPackResources {
     /**
@@ -97,7 +94,7 @@ public class DynamicPackResources extends AbstractModPackResources {
                             packTypes.get(packType).put(resourceLocation, () -> new ByteArrayInputStream(data));
                         }
                     }
-                }).get();
+                }).join();
             }
             packTypes.replaceAll((packType, map) -> {
                 return ImmutableMap.copyOf(map);
@@ -108,7 +105,7 @@ public class DynamicPackResources extends AbstractModPackResources {
                     modId,
                     throwable
             );
-            paths = Map.of();
+            paths = Collections.emptyMap();
         }
         PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms",
                 modId,

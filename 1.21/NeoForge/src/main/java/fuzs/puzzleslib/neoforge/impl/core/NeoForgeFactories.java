@@ -55,6 +55,7 @@ public final class NeoForgeFactories implements CommonFactories {
 
     @Override
     public void registerEventHandlers() {
+        NeoForgeEventInvokerRegistryImpl.freezeModBusEvents();
         NeoForgeEventInvokerRegistryImpl.registerEventHandlers();
     }
 
