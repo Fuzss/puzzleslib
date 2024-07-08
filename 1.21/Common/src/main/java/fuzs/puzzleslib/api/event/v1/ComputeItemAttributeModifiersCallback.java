@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.event.v1.entity.living;
+package fuzs.puzzleslib.api.event.v1;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.world.item.Item;

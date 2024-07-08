@@ -1,11 +1,10 @@
 package fuzs.puzzleslib.impl.event;
 
-import com.google.common.collect.ForwardingList;
-
+import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class CopyOnWriteForwardingList<T> extends ForwardingList<T> {
+public final class CopyOnWriteForwardingList<T> extends AbstractList<T> {
     private List<T> delegate;
     private boolean copyOnWrite = true;
 
@@ -13,27 +12,31 @@ public final class CopyOnWriteForwardingList<T> extends ForwardingList<T> {
         this.delegate = delegate;
     }
 
-    @Override
     public List<T> delegate() {
         return this.delegate;
     }
 
     @Override
-    public void add(int index, T element) {
-        this.tryCopyOnWrite();
-        super.add(index, element);
-    }
-
-    @Override
-    public T remove(int index) {
-        this.tryCopyOnWrite();
-        return super.remove(index);
+    public T get(int index) {
+        return this.delegate().get(index);
     }
 
     @Override
     public T set(int index, T element) {
         this.tryCopyOnWrite();
-        return super.set(index, element);
+        return this.delegate().set(index, element);
+    }
+
+    @Override
+    public void add(int index, T element) {
+        this.tryCopyOnWrite();
+        this.delegate().add(index, element);
+    }
+
+    @Override
+    public T remove(int index) {
+        this.tryCopyOnWrite();
+        return this.delegate().remove(index);
     }
 
     private void tryCopyOnWrite() {
@@ -41,5 +44,10 @@ public final class CopyOnWriteForwardingList<T> extends ForwardingList<T> {
             this.delegate = new ArrayList<>(this.delegate);
             this.copyOnWrite = false;
         }
+    }
+
+    @Override
+    public int size() {
+        return this.delegate().size();
     }
 }

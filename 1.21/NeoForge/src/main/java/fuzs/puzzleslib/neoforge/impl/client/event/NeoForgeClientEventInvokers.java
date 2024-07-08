@@ -5,6 +5,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.shaders.FogShape;
+import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
@@ -15,6 +16,7 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -34,6 +36,7 @@ import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
@@ -64,6 +67,11 @@ public final class NeoForgeClientEventInvokers {
     private static final Supplier<Set<ModelResourceLocation>> TOP_LEVEL_MODEL_LOCATIONS = Suppliers.memoize(NeoForgeClientEventInvokers::getTopLevelModelLocations);
 
     public static void registerLoadingHandlers() {
+        INSTANCE.register(AddResourcePackReloadListenersCallback.class, RegisterClientReloadListenersEvent.class, (AddResourcePackReloadListenersCallback callback, RegisterClientReloadListenersEvent evt) -> {
+            callback.onAddResourcePackReloadListeners((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
+                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
+            });
+        });
         INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
             DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setNewScreen, evt::getNewScreen, evt::getScreen);
             EventResult result = callback.onScreenOpening(evt.getCurrentScreen(), newScreen);

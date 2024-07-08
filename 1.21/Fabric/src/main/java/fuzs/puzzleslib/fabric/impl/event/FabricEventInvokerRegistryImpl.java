@@ -6,8 +6,10 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
+import fuzs.puzzleslib.api.event.v1.ComputeItemAttributeModifiersCallback;
 import fuzs.puzzleslib.api.event.v1.FinalizeItemComponentsCallback;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -39,7 +41,6 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
-import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
@@ -97,23 +98,23 @@ import java.util.function.UnaryOperator;
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
 
     public static void registerLoadingHandlers() {
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
+        INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.LOAD_COMPLETE);
+        INSTANCE.register(RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
+        INSTANCE.register(AddDataPackReloadListenersCallback.class, FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerLoadingHandlers();
-        } else {
-            INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.SERVER_LOAD_COMPLETE);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> void onRegistryEntryAdded(fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
+    private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
         Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
         BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
             Registry.register(registry, resourceLocation, supplier.get());
         };
-        RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
+        net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
             callback.onRegistryEntryAdded(registry, id, object, registrar);
         });
         // do not register directly to prevent ConcurrentModificationException

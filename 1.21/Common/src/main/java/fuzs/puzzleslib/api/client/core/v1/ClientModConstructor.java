@@ -154,7 +154,10 @@ public interface ClientModConstructor extends BaseModConstructor {
 
     /**
      * @param context adds a listener to the client resource manager to reload at the end of all resources
+     *
+     * @deprecated replaced with {@link fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback}
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterResourcePackReloadListeners(final AddReloadListenersContext context) {
         // NO-OP
     }

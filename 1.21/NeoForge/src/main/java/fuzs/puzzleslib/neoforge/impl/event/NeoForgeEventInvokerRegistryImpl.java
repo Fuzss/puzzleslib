@@ -1,9 +1,12 @@
 package fuzs.puzzleslib.neoforge.impl.event;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.api.event.v1.ComputeItemAttributeModifiersCallback;
 import fuzs.puzzleslib.api.event.v1.FinalizeItemComponentsCallback;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
@@ -39,6 +42,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -92,12 +96,38 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvokerRegistry {
+    private static boolean frozenModBusEvents;
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, FMLLoadCompleteEvent.class, (LoadCompleteCallback callback, FMLLoadCompleteEvent evt) -> {
             evt.enqueueWork(callback::onLoadComplete);
         });
         INSTANCE.register(RegistryEntryAddedCallback.class, NeoForgeEventInvokerRegistryImpl::onRegistryEntryAdded);
+        INSTANCE.register(FinalizeItemComponentsCallback.class, ModifyDefaultComponentsEvent.class, (FinalizeItemComponentsCallback callback, ModifyDefaultComponentsEvent evt) -> {
+            evt.getAllItems().forEach((Item item) -> {
+                callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
+                    evt.modify(item, (DataComponentPatch.Builder builder) -> {
+                        DataComponentPatch.SplitResult splitResult = function.apply(item.components()).split();
+                        splitResult.added().stream().forEach(builder::set);
+                        splitResult.removed().forEach(builder::remove);
+                    });
+                });
+            });
+        });
+        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, ModifyDefaultComponentsEvent.class, (ComputeItemAttributeModifiersCallback callback, ModifyDefaultComponentsEvent evt) -> {
+            evt.getAllItems().forEach((Item item) -> {
+                ItemAttributeModifiers itemAttributeModifiers = item.components()
+                        .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+                CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
+                        itemAttributeModifiers.modifiers());
+                callback.onComputeItemAttributeModifiers(item, entries);
+                if (entries.delegate() != itemAttributeModifiers.modifiers()) {
+                    evt.modify(item, (DataComponentPatch.Builder builder) -> {
+                        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
+                    });
+                }
+            });
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerLoadingHandlers();
         }
@@ -156,6 +186,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             });
             callbacks.clear();
         });
+    }
+
+    public static void freezeModBusEvents() {
+        frozenModBusEvents = true;
     }
 
     public static void registerEventHandlers() {
@@ -364,13 +398,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onExplosionDetonate(evt.getLevel(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
         });
         INSTANCE.register(SyncDataPackContentsCallback.class, OnDatapackSyncEvent.class, (SyncDataPackContentsCallback callback, OnDatapackSyncEvent evt) -> {
-            if (evt.getPlayer() != null) {
-                callback.onSyncDataPackContents(evt.getPlayer(), true);
-            } else {
-                for (ServerPlayer player : evt.getPlayerList().getPlayers()) {
-                    callback.onSyncDataPackContents(player, false);
-                }
-            }
+            evt.getRelevantPlayers().forEach((ServerPlayer player) -> {
+                callback.onSyncDataPackContents(player, evt.getPlayer() != null);
+            });
         });
         INSTANCE.register(ServerLifecycleEvents.Starting.class, ServerAboutToStartEvent.class, (ServerLifecycleEvents.Starting callback, ServerAboutToStartEvent evt) -> {
             callback.onServerStarting(evt.getServer());
@@ -517,20 +547,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             if (callback.onLivingKnockBack(evt.getEntity(), strength, ratioX, ratioZ).isInterrupt()) {
                 evt.setCanceled(true);
             }
-        });
-        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, ModifyDefaultComponentsEvent.class, (ComputeItemAttributeModifiersCallback callback, ModifyDefaultComponentsEvent evt) -> {
-            evt.getAllItems().forEach((Item item) -> {
-                ItemAttributeModifiers itemAttributeModifiers = item.components()
-                        .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-                CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
-                        itemAttributeModifiers.modifiers());
-                callback.onComputeItemAttributeModifiers(item, entries);
-                if (entries.delegate() != itemAttributeModifiers.modifiers()) {
-                    evt.modify(item, (DataComponentPatch.Builder builder) -> {
-                        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
-                    });
-                }
-            });
         });
         INSTANCE.register(ProjectileImpactCallback.class, ProjectileImpactEvent.class, (ProjectileImpactCallback callback, ProjectileImpactEvent evt) -> {
             if (callback.onProjectileImpact(evt.getProjectile(), evt.getRayTraceResult()).isInterrupt()) {
@@ -695,15 +711,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, RegisterBrewingRecipesEvent.class, (RegisterPotionBrewingMixesCallback callback, RegisterBrewingRecipesEvent evt) -> {
             callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(evt.getBuilder()));
         });
-        INSTANCE.register(FinalizeItemComponentsCallback.class, ModifyDefaultComponentsEvent.class, (FinalizeItemComponentsCallback callback, ModifyDefaultComponentsEvent evt) -> {
-            evt.getAllItems().forEach((Item item) -> {
-                callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
-                    evt.modify(item, (DataComponentPatch.Builder builder) -> {
-                        DataComponentPatch.SplitResult splitResult = function.apply(item.components()).split();
-                        splitResult.added().stream().forEach(builder::set);
-                        splitResult.removed().forEach(builder::remove);
-                    });
-                });
+        INSTANCE.register(AddDataPackReloadListenersCallback.class, AddReloadListenerEvent.class, (AddDataPackReloadListenersCallback callback, AddReloadListenerEvent evt) -> {
+            callback.onAddDataPackReloadListeners(evt.getServerResources(), (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
+                evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
             });
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
@@ -717,6 +727,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         Objects.requireNonNull(converter, "converter is null");
         IEventBus eventBus;
         if (IModBusEvent.class.isAssignableFrom(event)) {
+            // Most events are registered during the load complete phase, where most mod bus events have already run,
+            // so they will be missed silently. Check this lock to avoid that.
+            Preconditions.checkState(!frozenModBusEvents, "Mod bus events already frozen");
             // this will be null when an event is registered after the initial mod loading
             eventBus = NeoForgeModContainerHelper.getOptionalActiveModEventBus().orElse(null);
         } else {

@@ -11,6 +11,7 @@ import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
  * Fabric has a very limited way of setting some sort of resource dependencies,
  * but they don't work for most stuff and Forge doesn't have them anyway, so we skip that.
  */
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface AddReloadListenersContext {
 
