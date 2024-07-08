@@ -97,10 +97,40 @@ import java.util.function.UnaryOperator;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
 
+    @SuppressWarnings("unchecked")
     public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.LOAD_COMPLETE);
         INSTANCE.register(RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(AddDataPackReloadListenersCallback.class, FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS);
+        INSTANCE.register(FinalizeItemComponentsCallback.class, DefaultItemComponentEvents.MODIFY, (FinalizeItemComponentsCallback callback) -> {
+            return (DefaultItemComponentEvents.ModifyContext context) -> {
+                for (Item item : BuiltInRegistries.ITEM) {
+                    callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
+                        context.modify(item, (DataComponentMap.Builder builder) -> {
+                            function.apply(builder.build()).entrySet().forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
+                                builder.set((DataComponentType<Object>) entry.getKey(), entry.getValue().orElse(null));
+                            });
+                        });
+                    });
+                }
+            };
+        });
+        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, DefaultItemComponentEvents.MODIFY, (ComputeItemAttributeModifiersCallback callback) -> {
+            return (DefaultItemComponentEvents.ModifyContext context) -> {
+                for (Item item : BuiltInRegistries.ITEM) {
+                    ItemAttributeModifiers itemAttributeModifiers = item.components()
+                            .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+                    CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
+                            itemAttributeModifiers.modifiers());
+                    callback.onComputeItemAttributeModifiers(item, entries);
+                    if (entries.delegate() != itemAttributeModifiers.modifiers()) {
+                        context.modify(item, (DataComponentMap.Builder builder) -> {
+                            builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
+                        });
+                    }
+                }
+            };
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerLoadingHandlers();
         }
@@ -394,22 +424,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(ItemEntityEvents.Toss.class, FabricPlayerEvents.ITEM_TOSS);
         INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
-        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, DefaultItemComponentEvents.MODIFY, (ComputeItemAttributeModifiersCallback callback) -> {
-            return (DefaultItemComponentEvents.ModifyContext context) -> {
-                for (Item item : BuiltInRegistries.ITEM) {
-                    ItemAttributeModifiers itemAttributeModifiers = item.components()
-                            .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-                    CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
-                            itemAttributeModifiers.modifiers());
-                    callback.onComputeItemAttributeModifiers(item, entries);
-                    if (entries.delegate() != itemAttributeModifiers.modifiers()) {
-                        context.modify(item, (DataComponentMap.Builder builder) -> {
-                            builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
-                        });
-                    }
-                }
-            };
-        });
         INSTANCE.register(ProjectileImpactCallback.class, FabricEntityEvents.PROJECTILE_IMPACT);
         INSTANCE.register(BreakSpeedCallback.class, FabricPlayerEvents.BREAK_SPEED);
         INSTANCE.register(MobEffectEvents.Affects.class, FabricLivingEvents.MOB_EFFECT_AFFECTS);
@@ -441,19 +455,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, FabricBrewingRecipeRegistryBuilder.BUILD, (RegisterPotionBrewingMixesCallback callback) -> {
             return (PotionBrewing.Builder builder) -> {
                 callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
-            };
-        });
-        INSTANCE.register(FinalizeItemComponentsCallback.class, DefaultItemComponentEvents.MODIFY, (FinalizeItemComponentsCallback callback) -> {
-            return (DefaultItemComponentEvents.ModifyContext context) -> {
-                for (Item item : BuiltInRegistries.ITEM) {
-                    callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
-                        context.modify(item, (DataComponentMap.Builder builder) -> {
-                            function.apply(builder.build()).entrySet().forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
-                                builder.set((DataComponentType<Object>) entry.getKey(), entry.getValue().orElse(null));
-                            });
-                        });
-                    });
-                }
             };
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {

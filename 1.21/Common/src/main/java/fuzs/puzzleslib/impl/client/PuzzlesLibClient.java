@@ -2,14 +2,11 @@ package fuzs.puzzleslib.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.api.event.v1.server.AddDataPackReloadListenersCallback;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.EditBox;
@@ -20,8 +17,6 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,11 +36,6 @@ public class PuzzlesLibClient implements ClientModConstructor {
     }
 
     private static void registerEventHandlers() {
-        AddDataPackReloadListenersCallback.EVENT.register((c, consumer) -> {
-            consumer.accept(PuzzlesLibMod.id("test2"), (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-                System.out.println();
-            });
-        });
         ScreenOpeningCallback.EVENT.register((@Nullable Screen oldScreen, DefaultedValue<Screen> newScreen) -> {
             if (newScreen.get() instanceof CreateWorldScreen screen) {
                 screen.getUiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
