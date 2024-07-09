@@ -45,7 +45,7 @@ public interface EntityCapabilityKey<T extends Entity, C extends CapabilityCompo
     default ClientboundEntityCapabilityMessage toPacket(C capabilityComponent) {
         return new ClientboundEntityCapabilityMessage(this.identifier(),
                 capabilityComponent.getHolder().getId(),
-                capabilityComponent.toCompoundTag()
+                capabilityComponent.toCompoundTag(capabilityComponent.getHolder().registryAccess())
         );
     }
 

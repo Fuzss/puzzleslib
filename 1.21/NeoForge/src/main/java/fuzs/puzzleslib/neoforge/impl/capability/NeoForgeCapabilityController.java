@@ -68,17 +68,17 @@ public final class NeoForgeCapabilityController implements CapabilityController 
             }).serialize(new IAttachmentSerializer<>() {
 
                 @Override
-                public C read(IAttachmentHolder attachmentHolder, Tag tag, HolderLookup.Provider provider) {
+                public C read(IAttachmentHolder attachmentHolder, Tag tag, HolderLookup.Provider registries) {
                     C capabilityComponent = capabilityFactory.get();
                     Objects.requireNonNull(capabilityComponent, "capability component is null");
                     capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) capabilityKey[0], (T) attachmentHolder);
-                    capabilityComponent.read((CompoundTag) tag);
+                    capabilityComponent.read((CompoundTag) tag, registries);
                     return capabilityComponent;
                 }
 
                 @Override
-                public Tag write(C object, HolderLookup.Provider provider) {
-                    return object.toCompoundTag();
+                public Tag write(C object, HolderLookup.Provider registries) {
+                    return object.toCompoundTag(registries);
                 }
             }).build();
         });

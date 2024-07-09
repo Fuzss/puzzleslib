@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.0.12-1.21] - 2024-07-09
+### Added
+- Add `NbtSerializableCodec`
+- Add `LookupHelper`
+### Changed
+- Some adjustments for data-driven enchantments
+- Provide `HolderLookup.Provider` to `NbtSerializable`
+
 ## [v21.0.11-1.21] - 2024-07-08
 ### Added
 - Add `RegistryFactory`

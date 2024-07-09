@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.capability.v3.data;
 
 import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -31,12 +32,7 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
 
     @ApiStatus.Internal
     public final void initialize(CapabilityKey<T, CapabilityComponent<T>> capabilityKey, T holder) {
-        this.initialize(capabilityKey, holder, false);
-    }
-
-    @ApiStatus.Internal
-    public final void initialize(CapabilityKey<T, CapabilityComponent<T>> capabilityKey, T holder, boolean forceOverride) {
-        if (forceOverride || !this.initialized) {
+        if (!this.initialized) {
             this.initialized = true;
             Objects.requireNonNull(capabilityKey, "capability key is null");
             this.capabilityKey = capabilityKey;
@@ -80,12 +76,12 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
     }
 
     @Override
-    public void write(CompoundTag compoundTag) {
+    public void write(CompoundTag compoundTag, HolderLookup.Provider registries) {
         // NO-OP
     }
 
     @Override
-    public void read(CompoundTag compoundTag) {
+    public void read(CompoundTag compoundTag, HolderLookup.Provider registries) {
         // NO-OP
     }
 }

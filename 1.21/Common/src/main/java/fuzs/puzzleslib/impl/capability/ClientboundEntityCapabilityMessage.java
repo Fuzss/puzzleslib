@@ -23,7 +23,7 @@ public record ClientboundEntityCapabilityMessage(ResourceLocation identifier, in
                 Entity entity = level.getEntity(message.entityId);
                 if (entity != null) {
                     CapabilityKey<?, ?> capabilityKey = CapabilityController.get(message.identifier);
-                    capabilityKey.getIfProvided(entity).ifPresent(capabilityComponent -> capabilityComponent.read(message.tag));
+                    capabilityKey.getIfProvided(entity).ifPresent(capabilityComponent -> capabilityComponent.read(message.tag, handler.registryAccess()));
                 }
             }
         };

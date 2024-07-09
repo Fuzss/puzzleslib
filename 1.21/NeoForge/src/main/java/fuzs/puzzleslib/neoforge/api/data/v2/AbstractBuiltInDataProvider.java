@@ -21,6 +21,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.armortrim.TrimMaterial;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +58,7 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
         this.bootstrapContext.register(key, value);
     }
 
-    protected abstract void addBootstrap(BootstrapContext<T> bootstrapContext);
+    protected abstract void addBootstrap(BootstrapContext<T> context);
 
     @Override
     public CompletableFuture<?> run(CachedOutput output) {
@@ -73,6 +74,17 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
         name = CaseFormat.LOWER_UNDERSCORE.converterTo(CaseFormat.UPPER_CAMEL).convert(name);
         name = StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(name), ' ');
         return name + " Built In Data";
+    }
+
+    public static abstract class Enchantments extends AbstractBuiltInDataProvider<Enchantment> {
+
+        public Enchantments(NeoForgeDataProviderContext context) {
+            super(Registries.ENCHANTMENT, context);
+        }
+
+        protected static void register(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> key, Enchantment.Builder builder) {
+            context.register(key, builder.build(key.location()));
+        }
     }
 
     public static abstract class DamageTypes extends AbstractBuiltInDataProvider<DamageType> {

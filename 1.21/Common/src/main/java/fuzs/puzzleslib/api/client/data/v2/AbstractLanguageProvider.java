@@ -88,20 +88,20 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     @FunctionalInterface
     public interface TranslationBuilder {
 
-        void add(String key, String value);
+        void add(String translationKey, String value);
 
-        default void add(String key, String additionalKey, String value) {
+        default void add(String translationKey, String additionalKey, String value) {
             Objects.requireNonNull(additionalKey, "additional key is null");
-            this.add(key + (additionalKey.isEmpty() ? "" : "." + additionalKey), value);
+            this.add(translationKey + (additionalKey.isEmpty() ? "" : "." + additionalKey), value);
         }
 
-        default void add(ResourceLocation identifier, String value) {
-            this.add(identifier, "", value);
+        default void add(ResourceLocation resourceLocation, String value) {
+            this.add(resourceLocation, "", value);
         }
 
-        default void add(ResourceLocation identifier, String additionalKey, String value) {
-            Objects.requireNonNull(identifier, "identifier is null");
-            this.add(identifier.toLanguageKey(), additionalKey, value);
+        default void add(ResourceLocation resourceLocation, String additionalKey, String value) {
+            Objects.requireNonNull(resourceLocation, "resource location is null");
+            this.add(resourceLocation.toLanguageKey(), additionalKey, value);
         }
 
         default void add(String registry, Holder<?> holder, String value) {
@@ -152,18 +152,14 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(item.getDescriptionId(), additionalKey, value);
         }
 
-        default void addEnchantment(Holder<Enchantment> enchantment, String value) {
+        default void addEnchantment(ResourceKey<Enchantment> enchantment, String value) {
             this.addEnchantment(enchantment, "", value);
         }
 
-        default void addEnchantment(Holder<Enchantment> enchantment, String additionalKey, String value) {
+        default void addEnchantment(ResourceKey<Enchantment> enchantment, String additionalKey, String value) {
             Objects.requireNonNull(enchantment, "enchantment is null");
-            String descriptionId = enchantment.unwrapKey()
-                    .map(resourceKey -> Util.makeDescriptionId(resourceKey.registry().getPath(),
-                            resourceKey.location()
-                    ))
-                    .orElse(null);
-            this.add(descriptionId, additionalKey, value);
+            String translationKey = Util.makeDescriptionId(enchantment.registry().getPath(), enchantment.location());
+            this.add(translationKey, additionalKey, value);
         }
 
         default void add(MobEffect mobEffect, String value) {
@@ -253,9 +249,9 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.addCreativeModeTab(ResourceLocationHelper.fromNamespaceAndPath(modId, tabId), value);
         }
 
-        default void addCreativeModeTab(ResourceLocation identifier, String value) {
-            Objects.requireNonNull(identifier, "identifier is null");
-            this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, identifier), value);
+        default void addCreativeModeTab(ResourceLocation resourceLocation, String value) {
+            Objects.requireNonNull(resourceLocation, "resource location is null");
+            this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, resourceLocation), value);
         }
 
         default void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
