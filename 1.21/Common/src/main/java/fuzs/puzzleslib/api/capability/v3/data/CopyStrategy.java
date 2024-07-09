@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
@@ -14,7 +15,7 @@ public enum CopyStrategy {
     ALWAYS {
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
-            this.copy(oldCapability, newCapability);
+            this.copy(newEntity.registryAccess(), oldCapability, newCapability);
         }
     },
     /**
@@ -23,7 +24,7 @@ public enum CopyStrategy {
     NEVER {
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
-            if (originalStillAlive) this.copy(oldCapability, newCapability);
+            if (originalStillAlive) this.copy(newEntity.registryAccess(), oldCapability, newCapability);
         }
     },
     /**
@@ -50,7 +51,7 @@ public enum CopyStrategy {
      */
     public abstract void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive);
 
-    void copy(CapabilityComponent<?> oldCapability, CapabilityComponent<?> newCapability) {
-        newCapability.read(oldCapability.toCompoundTag());
+    void copy(HolderLookup.Provider registries, CapabilityComponent<?> oldCapability, CapabilityComponent<?> newCapability) {
+        newCapability.read(oldCapability.toCompoundTag(registries), registries);
     }
 }

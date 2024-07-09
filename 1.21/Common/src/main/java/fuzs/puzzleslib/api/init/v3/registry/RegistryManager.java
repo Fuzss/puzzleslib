@@ -224,8 +224,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param entry supplier for entry to register
      * @return holder reference
      */
-    default Holder.Reference<Enchantment> registerEnchantment(String path, Supplier<Enchantment> entry) {
-        return this.register(Registries.ENCHANTMENT, path, entry);
+    default ResourceKey<Enchantment> registerEnchantment(String path) {
+        return this.makeResourceKey(Registries.ENCHANTMENT, path);
     }
 
     /**
