@@ -8,6 +8,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A helper class containing utilities for replacing an existing block by modifying the corresponding {@link BlockItem}
@@ -80,11 +82,13 @@ public final class BlockConversionHelper {
                         "is null"
         );
         Objects.requireNonNull(to, () -> "target for source '" + BuiltInRegistries.BLOCK.getKey(from) + "' is null");
-        if (to.builtInRegistryHolder().tags().findAny().isPresent()) {
+        Set<TagKey<Block>> fromTagKeys = from.builtInRegistryHolder().tags().collect(Collectors.toSet());
+        Set<TagKey<Block>> toTagKeys = to.builtInRegistryHolder().tags().collect(Collectors.toSet());
+        if (toTagKeys.isEmpty()) {
+            to.builtInRegistryHolder().bindTags(fromTagKeys);
+        } else if (!Objects.equals(fromTagKeys, toTagKeys)) {
             throw new IllegalStateException(
-                    "Target block tags for " + to.builtInRegistryHolder().key() + " not empty: " +
-                            to.builtInRegistryHolder().tags().map(TagKey::toString).toList());
+                    "Target block tags for " + to.builtInRegistryHolder().key() + " not empty: " + toTagKeys);
         }
-        to.builtInRegistryHolder().bindTags(from.builtInRegistryHolder().tags().toList());
     }
 }
