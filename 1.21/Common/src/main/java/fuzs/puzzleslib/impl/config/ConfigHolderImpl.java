@@ -76,9 +76,9 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     protected abstract <T extends ConfigCore> ConfigDataHolderImpl<T> server(Supplier<T> supplier);
 
     @Override
-    public <T extends ConfigCore> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileName) {
+    public <T extends ConfigCore> Builder setFileName(Class<T> clazz, UnaryOperator<String> fileNameFactory) {
         ConfigDataHolderImpl<T> holder = (ConfigDataHolderImpl<T>) this.getHolder(clazz);
-        holder.fileName = fileName;
+        holder.setFileNameFactory(fileNameFactory);
         return this;
     }
 

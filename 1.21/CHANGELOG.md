@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.0.13-1.21] - 2024-07-12
+### Fixed
+- Fix crash on NeoForge v21.0.82 by updating config system internals
+- Fix `BlockConversionHelper` failing to copy tags client-side
+- Fix `TooltipRenderHelper` drawing tooltip contents above the screen layer
+
 ## [v21.0.12-1.21] - 2024-07-09
 ### Added
 - Add `NbtSerializableCodec`
