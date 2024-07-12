@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,6 +32,6 @@ abstract class CameraFabricMixin {
 
     @ModifyExpressionValue(method = "setRotation", at = @At(value = "CONSTANT", args = "floatValue=0.0"))
     protected float setRotation(float zRot) {
-        return this.puzzleslib$zRot;
+        return -this.puzzleslib$zRot * Mth.DEG_TO_RAD;
     }
 }
