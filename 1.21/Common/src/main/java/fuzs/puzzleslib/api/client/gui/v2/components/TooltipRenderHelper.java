@@ -244,18 +244,18 @@ public final class TooltipRenderHelper {
         posY -= 12;
 
         guiGraphics.pose().pushPose();
-        int _posX = posX;
-        int _posY = posY;
-        int _lineWidth = lineWidth;
-        int _lineHeight = lineHeight;
-        guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, _posX,
-                _posY, _lineWidth, _lineHeight, 400));
+        renderTooltipBackground(guiGraphics, posX, posY, lineWidth, lineHeight);
         guiGraphics.pose().translate(0.0F, 0.0F, 400.0F);
 
         int currentPosY = posY;
         for (int i = 0; i < components.size(); ++i) {
             ClientTooltipComponent component = components.get(i);
-            component.renderText(minecraft.font, posX, currentPosY, guiGraphics.pose().last().pose(), guiGraphics.bufferSource());
+            component.renderText(minecraft.font,
+                    posX,
+                    currentPosY,
+                    guiGraphics.pose().last().pose(),
+                    guiGraphics.bufferSource()
+            );
             currentPosY += component.getHeight() + (i == 0 ? 2 : 0);
         }
 
@@ -266,6 +266,19 @@ public final class TooltipRenderHelper {
             currentPosY += component.getHeight() + (i == 0 ? 2 : 0);
         }
 
+        // we need this as opposed to the renderer in GuiGraphics, otherwise tooltip text leaks through screens
+        guiGraphics.flush();
         guiGraphics.pose().popPose();
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void renderTooltipBackground(GuiGraphics guiGraphics, int posX, int posY, int lineWidth, int lineHeight) {
+        guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics,
+                posX,
+                posY,
+                lineWidth,
+                lineHeight,
+                400
+        ));
     }
 }

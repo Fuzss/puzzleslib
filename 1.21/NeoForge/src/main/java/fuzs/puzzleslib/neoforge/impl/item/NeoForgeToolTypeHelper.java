@@ -74,6 +74,21 @@ public final class NeoForgeToolTypeHelper implements ToolTypeHelper {
     }
 
     @Override
+    public boolean isMeleeWeapon(ItemStack itemStack) {
+        return ToolTypeHelper.super.isMeleeWeapon(itemStack) || itemStack.is(Tags.Items.MELEE_WEAPON_TOOLS);
+    }
+
+    @Override
+    public boolean isRangedWeapon(ItemStack itemStack) {
+        return ToolTypeHelper.super.isRangedWeapon(itemStack) || itemStack.is(Tags.Items.RANGED_WEAPON_TOOLS);
+    }
+
+    @Override
+    public boolean isMiningTool(ItemStack itemStack) {
+        return ToolTypeHelper.super.isMiningTool(itemStack) || itemStack.is(Tags.Items.MINING_TOOL_TOOLS);
+    }
+
+    @Override
     public boolean isTool(ItemStack itemStack) {
         return ToolTypeHelper.super.isTool(itemStack) || itemStack.is(Tags.Items.TOOLS);
     }

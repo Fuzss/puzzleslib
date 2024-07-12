@@ -19,21 +19,21 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>, ValueCallback {
-    protected final T config;
+    final T config;
     private final Supplier<T> defaultConfigSupplier;
-    protected final String configTypeName;
+    private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
     @Nullable
     private T defaultConfig;
-    protected UnaryOperator<String> fileName;
-    private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
+    private UnaryOperator<String> fileNameFactory;
+    @Nullable
+    private String fileName;
     private List<Runnable> configValueCallbacks = new ArrayList<>();
-    private boolean available;
+    private boolean isAvailable;
 
     protected ConfigDataHolderImpl(String configTypeName, Supplier<T> supplier) {
-        this.configTypeName = configTypeName;
         this.config = supplier.get();
         this.defaultConfigSupplier = supplier;
-        this.fileName = modId -> ConfigHolder.defaultName(modId, configTypeName);
+        this.setFileNameFactory((String modId) -> ConfigHolder.defaultName(modId, configTypeName));
     }
 
     @Override
@@ -57,7 +57,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     @Override
     public boolean isAvailable() {
-        return this.findErrorMessage().left().isPresent();
+        return this.config != null && this.findErrorMessage().left().isPresent();
     }
 
     @Override
@@ -79,8 +79,8 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     private void testAvailable() {
         this.findErrorMessage().ifRight(message -> {
             PuzzlesLib.LOGGER.error(
-                    "Calling {} config when it is not yet available. This is a harmless oversight, please report to the author. {}",
-                    this.configTypeName,
+                    "Calling config at {} when it is not yet available. This is a harmless oversight, please report to the author. {}",
+                    this.getFileName(),
                     message,
                     new Exception("Config not yet available")
             );
@@ -88,27 +88,32 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     }
 
     protected Either<Unit, String> findErrorMessage() {
-        if (!this.available) {
-            return Either.right("Config callbacks have not been loaded");
+        if (this.fileName == null) {
+            return Either.right("Mod config is missing");
+        } else if (!this.isAvailable) {
+            return Either.right("Config data is missing");
+        } else {
+            return Either.left(Unit.INSTANCE);
         }
-        return Either.left(Unit.INSTANCE);
     }
 
-    protected void onModConfig(String modId, boolean isLoading, String eventType) {
-        Objects.requireNonNull(this.config,
-                () -> "Attempting to register invalid %s config for mod %s".formatted(this.configTypeName, modId)
-        );
-        if (isLoading) {
-            this.configValueCallbacks.forEach(Runnable::run);
-            // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
-            this.available = true;
-            for (Consumer<T> callback : this.additionalCallbacks) {
-                callback.accept(this.config);
+    protected void onModConfig(String fileName, ModConfigEventType eventType) {
+        if (Objects.equals(fileName, this.getFileName())) {
+            Objects.requireNonNull(this.config,
+                    () -> "Attempting to register invalid config at %s".formatted(this.getFileName())
+            );
+            if (eventType.isLoading()) {
+                this.configValueCallbacks.forEach(Runnable::run);
+                // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
+                this.isAvailable = true;
+                for (Consumer<T> callback : this.additionalCallbacks) {
+                    callback.accept(this.config);
+                }
+            } else {
+                this.isAvailable = false;
             }
-        } else {
-            this.available = false;
+            PuzzlesLib.LOGGER.info("Dispatching {} event for config at {}", eventType, this.getFileName());
         }
-        PuzzlesLib.LOGGER.info("{} {} config for {}", eventType, this.configTypeName, modId);
     }
 
     protected ModConfigSpec buildSpec() {
@@ -116,5 +121,32 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         AnnotatedConfigBuilder.serialize(builder, this, this.config);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
+    }
+
+    protected void register(String modId) {
+        Objects.requireNonNull(this.config, "Attempting to register invalid config for " + modId);
+        if (this.fileName == null) {
+            this.fileName = this.fileNameFactory.apply(modId);
+        } else {
+            throw new IllegalStateException("Config has already been registered at " + this.getFileName());
+        }
+    }
+
+    public String getFileName() {
+        Objects.requireNonNull(this.fileName, "file name is null");
+        return this.fileName;
+    }
+
+    public void setFileNameFactory(UnaryOperator<String> fileNameFactory) {
+        Objects.requireNonNull(fileNameFactory, "file name factory is null");
+        this.fileNameFactory = fileNameFactory;
+    }
+
+    public enum ModConfigEventType {
+        LOADING, RELOADING, UNLOADING;
+
+        public boolean isLoading() {
+            return this == LOADING || this == RELOADING;
+        }
     }
 }
