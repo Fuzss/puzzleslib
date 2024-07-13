@@ -25,12 +25,12 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
     @Override
     public AbstractTagAppender<T> remove(ResourceLocation resourceLocation) {
         // only supported on Forge & NeoForge
-        return this;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation) {
         // only supported on Forge & NeoForge
-        return this;
+        throw new UnsupportedOperationException();
     }
 }
