@@ -61,7 +61,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     }
 
     @Override
-    public void accept(Consumer<T> callback) {
+    public void addCallback(Consumer<T> callback) {
         this.additionalCallbacks.add(callback);
     }
 
