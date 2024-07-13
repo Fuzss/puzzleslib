@@ -19,6 +19,7 @@ import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
+// TODO rename to CopyComponentsShapedRecipeBuilder
 public class CopyTagShapedRecipeBuilder extends ShapedRecipeBuilder {
     private Ingredient copyFrom;
     
