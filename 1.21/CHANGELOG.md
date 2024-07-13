@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.0.14-1.21] - 2024-07-14
+### Added
+- Add custom `/config` command format for development
+### Fixed
+- Fix camera z-rotation from `ComputeCameraAnglesCallback` on Fabric
+- Fix loot tables and advancements data generation output paths
+
 ## [v21.0.13-1.21] - 2024-07-12
 ### Fixed
 - Fix crash on NeoForge v21.0.82 by updating config system internals

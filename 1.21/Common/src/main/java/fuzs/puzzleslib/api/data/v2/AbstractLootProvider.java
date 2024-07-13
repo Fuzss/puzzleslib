@@ -57,7 +57,7 @@ public final class AbstractLootProvider {
         public Blocks(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
             // we set the correct lookup provider just before we run data generation, it is not available here yet
             super(Collections.emptySet(), FeatureFlags.REGISTRY.allFlags(), RegistryAccess.EMPTY);
-            this.pathProvider = packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "loot_tables");
+            this.pathProvider = packOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE);
             this.registries = registries;
             this.modId = modId;
         }
@@ -160,7 +160,7 @@ public final class AbstractLootProvider {
         public EntityTypes(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
             // we set the correct lookup provider just before we run data generation, it is not available here yet
             super(FeatureFlags.REGISTRY.allFlags(), RegistryAccess.EMPTY);
-            this.pathProvider = packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "loot_tables");
+            this.pathProvider = packOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE);
             this.registries = registries;
             this.modId = modId;
         }
@@ -285,7 +285,7 @@ public final class AbstractLootProvider {
 
         public Simple(LootContextParamSet paramSet, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
             this.paramSet = paramSet;
-            this.pathProvider = packOutput.createPathProvider(PackOutput.Target.DATA_PACK, "loot_tables");
+            this.pathProvider = packOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE);
             this.registries = registries;
         }
 
