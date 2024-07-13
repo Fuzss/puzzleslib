@@ -17,12 +17,12 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(ModConfig.Type.CLIENT, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(ModConfig.Type.COMMON, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
     }
 
     @Override
