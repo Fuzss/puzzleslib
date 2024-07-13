@@ -21,12 +21,28 @@ public interface ConfigDataHolder<T extends ConfigCore> {
     /**
      * @param callback add a callback for this config, like data that has to be processed after every reload
      */
+    @Deprecated(forRemoval = true)
     default void accept(Runnable callback) {
-        this.accept(config -> callback.run());
+        this.addCallback(callback);
     }
 
     /**
      * @param callback add a callback for this config, like data that has to be processed after every reload
      */
-    void accept(Consumer<T> callback);
+    default void addCallback(Runnable callback) {
+        this.addCallback(config -> callback.run());
+    }
+
+    /**
+     * @param callback add a callback for this config, like data that has to be processed after every reload
+     */
+    @Deprecated(forRemoval = true)
+    default void accept(Consumer<T> callback) {
+        this.addCallback(callback);
+    }
+
+    /**
+     * @param callback add a callback for this config, like data that has to be processed after every reload
+     */
+    void addCallback(Consumer<T> callback);
 }
