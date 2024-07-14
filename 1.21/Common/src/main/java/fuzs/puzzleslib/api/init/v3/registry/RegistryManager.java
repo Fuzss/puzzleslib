@@ -221,7 +221,6 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register an enchantment.
      *
      * @param path  path for new entry
-     * @param entry supplier for entry to register
      * @return holder reference
      */
     default ResourceKey<Enchantment> registerEnchantment(String path) {
