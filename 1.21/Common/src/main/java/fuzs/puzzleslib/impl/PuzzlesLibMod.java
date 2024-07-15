@@ -18,10 +18,12 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
 
 /**
- * This has been separated from {@link PuzzlesLib} to prevent issues with static initialization when accessing constants in {@link PuzzlesLib} early.
+ * This has been separated from {@link PuzzlesLib} to prevent issues with static initialization when accessing constants
+ * in {@link PuzzlesLib} early.
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
-    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID).optional()
+    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID)
+            .optional()
             .registerClientbound(ClientboundEntityCapabilityMessage.class)
             .registerClientbound(ClientboundModListMessage.class);
 
@@ -34,7 +36,10 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() || ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() ||
+                ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+            return;
+        }
         CommandOverrides.registerHandlers();
         initializeGameRules();
         initializeCommands();

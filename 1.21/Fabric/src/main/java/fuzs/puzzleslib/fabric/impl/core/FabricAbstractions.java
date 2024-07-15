@@ -8,6 +8,7 @@ import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
@@ -122,7 +123,7 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
 
     @Override
     public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
-        return enchantment.value().isPrimaryItem(itemStack);
+        return itemStack.canBeEnchantedWith(enchantment, EnchantingContext.PRIMARY);
     }
 
     @Override
