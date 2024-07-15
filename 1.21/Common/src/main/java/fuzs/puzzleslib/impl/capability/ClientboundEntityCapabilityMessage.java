@@ -19,7 +19,7 @@ public record ClientboundEntityCapabilityMessage(ResourceLocation identifier, in
         return new ClientMessageListener<>() {
 
             @Override
-            public void handle(ClientboundEntityCapabilityMessage message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
+            public void handle(ClientboundEntityCapabilityMessage message, Minecraft minecraft, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
                 Entity entity = level.getEntity(message.entityId);
                 if (entity != null) {
                     CapabilityKey<?, ?> capabilityKey = CapabilityController.get(message.identifier);

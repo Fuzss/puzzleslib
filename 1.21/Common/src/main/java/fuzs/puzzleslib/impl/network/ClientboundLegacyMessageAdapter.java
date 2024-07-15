@@ -15,8 +15,8 @@ public record ClientboundLegacyMessageAdapter<T extends MessageV2<T>>(T message)
         return new ClientMessageListener<>() {
 
             @Override
-            public void handle(T message, Minecraft client, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
-                message.makeHandler().handle(message, player, client);
+            public void handle(T message, Minecraft minecraft, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
+                message.makeHandler().handle(message, player, minecraft);
             }
         };
     }

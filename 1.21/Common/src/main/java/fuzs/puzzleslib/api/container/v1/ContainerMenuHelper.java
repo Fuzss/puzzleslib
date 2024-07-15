@@ -22,18 +22,33 @@ public final class ContainerMenuHelper {
     /**
      * Adds the player inventory slots to an {@link AbstractContainerMenu}.
      *
-     * @param abstractContainerMenu menu to add slots to
-     * @param inventory             player inventory instance
-     * @param offsetY               vertical offset
+     * @param containerMenu menu to add slots to
+     * @param inventory     player inventory instance
+     * @param offsetY       vertical offset
      */
-    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetY) {
+    public static void addInventorySlots(AbstractContainerMenu containerMenu, Inventory inventory, int offsetY) {
+        addInventorySlots(containerMenu, inventory, 8, offsetY);
+    }
+
+    /**
+     * Adds the player inventory slots to an {@link AbstractContainerMenu}.
+     *
+     * @param containerMenu menu to add slots to
+     * @param inventory     player inventory instance
+     * @param offsetX       horizontal offset
+     * @param offsetY       vertical offset
+     */
+    public static void addInventorySlots(AbstractContainerMenu containerMenu, Inventory inventory, int offsetX, int offsetY) {
+        final int slotSize = 18;
         for (int i = 0; i < 3; ++i) {
             for (int j = 0; j < 9; ++j) {
-                abstractContainerMenu.addSlot(new Slot(inventory, j + i * 9 + 9, 8 + j * 18, i * 18 + offsetY));
+                containerMenu.addSlot(new Slot(inventory, j + i * 9 + 9, offsetX + j * slotSize, offsetY));
             }
+            offsetY += slotSize;
         }
+        offsetY += 4;
         for (int i = 0; i < 9; ++i) {
-            abstractContainerMenu.addSlot(new Slot(inventory, i, 8 + i * 18, 3 * 18 + offsetY + 4));
+            containerMenu.addSlot(new Slot(inventory, i, offsetX + i * slotSize, offsetY));
         }
     }
 

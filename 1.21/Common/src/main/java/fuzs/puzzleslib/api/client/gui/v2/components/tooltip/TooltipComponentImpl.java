@@ -48,11 +48,21 @@ public class TooltipComponentImpl extends AbstractTooltipComponent implements To
         Language language = Language.getInstance();
         if (this.getTooltip().cachedTooltip == null || language != this.getTooltip().splitWithLanguage) {
             Preconditions.checkState(!this.lines.isEmpty(), "lines is empty");
-            this.getTooltip().cachedTooltip = ClientComponentSplitter.splitTooltipLines(this.lines).toList();
+            this.getTooltip().cachedTooltip = this.processTooltipLines(this.lines);
             this.getTooltip().splitWithLanguage = language;
         }
 
         return this.getTooltip().cachedTooltip;
+    }
+
+    /**
+     * Process formatted text instances into char sequences.
+     *
+     * @param tooltipLines components for building the tooltip
+     * @return list of char sequences
+     */
+    public List<FormattedCharSequence> processTooltipLines(List<? extends FormattedText> tooltipLines) {
+        return ClientComponentSplitter.splitTooltipLines(tooltipLines).toList();
     }
 
     @Override
