@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.0.17-1.21] - 2024-07-18
 ### Added
 - Add `TooltipBuilder`
+### Changed
+- Compatible with NeoForge v21.0.102
 
 ## [v21.0.16-1.21] - 2024-07-15
 ### Changed

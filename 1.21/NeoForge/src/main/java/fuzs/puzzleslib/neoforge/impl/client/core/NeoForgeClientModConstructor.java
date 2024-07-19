@@ -17,6 +17,7 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 
 import java.util.ArrayList;
@@ -44,7 +45,6 @@ public final class NeoForgeClientModConstructor {
             evt.enqueueWork(() -> {
                 constructor.onClientSetup();
                 constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextNeoForgeImpl());
-                constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextNeoForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
                 constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
             });
@@ -110,6 +110,9 @@ public final class NeoForgeClientModConstructor {
         });
         eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
             constructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));
+        });
+        eventBus.addListener((final RegisterClientExtensionsEvent evt) -> {
+            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextNeoForgeImpl(evt::registerItem, modId, dynamicRenderers));
         });
     }
 }

@@ -16,7 +16,6 @@
   "client": [
     "client.accessor.BlockColorsNeoForgeAccessor",
     "client.accessor.ItemColorsNeoForgeAccessor",
-    "client.accessor.ItemNeoForgeAccessor",
     "client.accessor.ModelBakeryNeoForgeAccessor"
   ],
   "injectors": {

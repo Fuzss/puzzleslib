@@ -7,8 +7,6 @@ import fuzs.puzzleslib.api.client.init.v1.BuiltinItemRenderer;
 import fuzs.puzzleslib.api.client.init.v1.ReloadingBuiltInItemRenderer;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.neoforge.impl.client.core.NeoForgeClientItemExtensionsImpl;
-import fuzs.puzzleslib.neoforge.mixin.client.accessor.ItemNeoForgeAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -25,8 +23,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 
-public record BuiltinModelItemRendererContextNeoForgeImpl(String modId,
+public record BuiltinModelItemRendererContextNeoForgeImpl(BiConsumer<IClientItemExtensions, Item> consumer,
+                                                          String modId,
                                                           List<ResourceManagerReloadListener> dynamicRenderers) implements BuiltinModelItemRendererContext {
 
     @Override
@@ -37,22 +37,10 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(String modId,
         Objects.requireNonNull(renderer, "renderer is null");
         Objects.requireNonNull(items, "items is null");
         Preconditions.checkState(items.length > 0, "items is empty");
-        IClientItemExtensions itemExtensions = new IClientItemExtensions() {
-            @Nullable
-            private BlockEntityWithoutLevelRenderer blockEntityWithoutLevelRenderer;
-
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                if (this.blockEntityWithoutLevelRenderer == null) {
-                    this.blockEntityWithoutLevelRenderer = new ForwardingBlockEntityWithoutLevelRenderer(Minecraft.getInstance(), renderer);
-                }
-                return this.blockEntityWithoutLevelRenderer;
-            }
-        };
-
+        IClientItemExtensions clientItemExtensions = new ClientItemExtensionsImpl(renderer);
         for (ItemLike item : items) {
             Objects.requireNonNull(item, "item is null");
-            setClientItemExtensions(item.asItem(), itemExtensions);
+            this.consumer.accept(clientItemExtensions, item.asItem());
         }
     }
 
@@ -61,34 +49,39 @@ public record BuiltinModelItemRendererContextNeoForgeImpl(String modId,
         this.registerItemRenderer((BuiltinItemRenderer) renderer, items);
         // store this to enable listening to resource reloads
         String itemName = BuiltInRegistries.ITEM.getKey(items[0].asItem()).getPath();
-        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId, itemName + "_built_in_model_renderer");
-        this.dynamicRenderers.add(ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation, renderer));
+        ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId,
+                itemName + "_built_in_model_renderer"
+        );
+        this.dynamicRenderers.add(
+                ForwardingReloadListenerHelper.fromResourceManagerReloadListener(resourceLocation, renderer));
     }
 
-    private static void setClientItemExtensions(Item item, IClientItemExtensions itemExtensions) {
-        // this solution is very dangerous as it relies on internal stuff in Forge
-        // but there is no other way for multi-loader and without making this a huge inconvenience so ¯\_(ツ)_/¯
-        Object renderProperties = ((ItemNeoForgeAccessor) item).puzzleslib$getRenderProperties();
-        ((ItemNeoForgeAccessor) item).puzzleslib$setRenderProperties(renderProperties != null ? new NeoForgeClientItemExtensionsImpl((IClientItemExtensions) renderProperties) {
+    private static class ClientItemExtensionsImpl implements IClientItemExtensions {
+        private final BuiltinItemRenderer itemRenderer;
+        @Nullable
+        private BlockEntityWithoutLevelRenderer blockEntityRenderer;
 
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return itemExtensions.getCustomRenderer();
-            }
-        } : itemExtensions);
-    }
-
-    private static class ForwardingBlockEntityWithoutLevelRenderer extends BlockEntityWithoutLevelRenderer {
-        private final BuiltinItemRenderer renderer;
-
-        public ForwardingBlockEntityWithoutLevelRenderer(Minecraft minecraft, BuiltinItemRenderer renderer) {
-            super(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels());
-            this.renderer = renderer;
+        public ClientItemExtensionsImpl(BuiltinItemRenderer itemRenderer) {
+            this.itemRenderer = itemRenderer;
         }
 
         @Override
-        public void renderByItem(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-            this.renderer.renderByItem(stack, mode, matrices, vertexConsumers, light, overlay);
+        public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+            if (this.blockEntityRenderer == null) {
+                Minecraft minecraft = Minecraft.getInstance();
+                return this.blockEntityRenderer = new BlockEntityWithoutLevelRenderer(
+                        minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels()) {
+
+                    @Override
+                    public void renderByItem(ItemStack itemStack, ItemDisplayContext displayContext, PoseStack matrices, MultiBufferSource buffer, int packedLight, int packedOverlay) {
+                        ClientItemExtensionsImpl.this.itemRenderer.renderByItem(itemStack, displayContext, matrices,
+                                buffer, packedLight, packedOverlay
+                        );
+                    }
+                };
+            } else {
+                return this.blockEntityRenderer;
+            }
         }
     }
 }
