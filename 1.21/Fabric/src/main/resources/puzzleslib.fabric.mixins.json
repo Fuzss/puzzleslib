@@ -42,7 +42,6 @@
     "PersistentEntitySectionManagerFabricMixin",
     "PlayerChunkSenderFabricMixin",
     "PlayerFabricMixin",
-    "ReloadableServerResourcesFabricMixin",
     "RunAroundLikeCrazyGoalFabricMixin",
     "ServerEntityFabricMixin",
     "ServerLevelFabricMixin",

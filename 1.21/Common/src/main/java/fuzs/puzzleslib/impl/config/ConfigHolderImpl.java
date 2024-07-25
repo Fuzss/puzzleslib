@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
-    private final String modId;
+    protected final String modId;
     private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = Maps.newIdentityHashMap();
 
     protected ConfigHolderImpl(String modId) {
