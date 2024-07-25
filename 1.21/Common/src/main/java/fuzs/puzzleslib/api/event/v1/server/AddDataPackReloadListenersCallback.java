@@ -6,21 +6,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @FunctionalInterface
 public interface AddDataPackReloadListenersCallback {
-    EventInvoker<AddDataPackReloadListenersCallback> EVENT = EventInvoker.lookup(AddDataPackReloadListenersCallback.class);
+    EventInvoker<AddDataPackReloadListenersCallback> EVENT = EventInvoker.lookup(
+            AddDataPackReloadListenersCallback.class);
 
     /**
      * Adds a listener to the server resource manager (for data packs) to reload at the end of all resources.
      *
-     * @param registries the registry lookup
-     * @param consumer   registers a reload listener with an id for debugging, common listener types include:
-     *                   <ul>
-     *                   <li>{@link net.minecraft.server.packs.resources.PreparableReloadListener}</li>
-     *                   <li>{@link net.minecraft.server.packs.resources.ResourceManagerReloadListener}</li>
-     *                   <li>{@link net.minecraft.server.packs.resources.SimplePreparableReloadListener}</li>
-     *                   </ul>
+     * @param consumer registers a reload listener with an id for debugging, common listener types include:
+     *                 <ul>
+     *                 <li>{@link net.minecraft.server.packs.resources.PreparableReloadListener}</li>
+     *                 <li>{@link net.minecraft.server.packs.resources.ResourceManagerReloadListener}</li>
+     *                 <li>{@link net.minecraft.server.packs.resources.SimplePreparableReloadListener}</li>
+     *                 </ul>
      */
-    void onAddDataPackReloadListeners(HolderLookup.Provider registries, BiConsumer<ResourceLocation, PreparableReloadListener> consumer);
+    void onAddDataPackReloadListeners(BiConsumer<ResourceLocation, Function<HolderLookup.Provider, PreparableReloadListener>> consumer);
 }

@@ -5,7 +5,6 @@ import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.config.v3.ValueCallback;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -19,6 +18,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>, ValueCallback {
+    private final String modId;
     final T config;
     private final Supplier<T> defaultConfigSupplier;
     private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
@@ -30,10 +30,14 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     private List<Runnable> configValueCallbacks = new ArrayList<>();
     private boolean isAvailable;
 
-    protected ConfigDataHolderImpl(String configTypeName, Supplier<T> supplier) {
+    protected ConfigDataHolderImpl(String modId, Supplier<T> supplier) {
+        this.modId = modId;
         this.config = supplier.get();
         this.defaultConfigSupplier = supplier;
-        this.setFileNameFactory((String modId) -> ConfigHolder.defaultName(modId, configTypeName));
+    }
+
+    public String getModId() {
+        return this.modId;
     }
 
     @Override
@@ -123,10 +127,10 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         return builder.build();
     }
 
-    protected void register(String modId) {
-        Objects.requireNonNull(this.config, "Attempting to register invalid config for " + modId);
+    protected final void initializeFileName() {
+        Objects.requireNonNull(this.config, "Attempting to register invalid config for " + this.modId);
         if (this.fileName == null) {
-            this.fileName = this.fileNameFactory.apply(modId);
+            this.fileName = this.fileNameFactory.apply(this.modId);
         } else {
             throw new IllegalStateException("Config has already been registered at " + this.getFileName());
         }
@@ -147,6 +151,11 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
         public boolean isLoading() {
             return this == LOADING || this == RELOADING;
+        }
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
         }
     }
 }

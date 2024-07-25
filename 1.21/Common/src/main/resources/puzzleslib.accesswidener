@@ -104,6 +104,8 @@ accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees$Key <ini
 accessible  field   net/minecraft/client/resources/model/ModelBakery    topLevelModels  Ljava/util/Map;
 accessible  class   net/minecraft/client/resources/model/ModelBakery$BakedCacheKey
 accessible  method  net/minecraft/client/resources/model/ModelBakery$BakedCacheKey  <init> (Lnet/minecraft/resources/ResourceLocation;Lcom/mojang/math/Transformation;Z)V
+accessible  field   net/minecraft/client/resources/language/ClientLanguage  storage Ljava/util/Map;
+mutable field   net/minecraft/client/resources/language/ClientLanguage  storage Ljava/util/Map;
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;

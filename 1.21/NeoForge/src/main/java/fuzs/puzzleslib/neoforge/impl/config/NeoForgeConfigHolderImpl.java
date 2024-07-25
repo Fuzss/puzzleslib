@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.config;
 
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
+import fuzs.puzzleslib.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
@@ -8,6 +10,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -20,17 +24,26 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> server(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.SERVER, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.SERVER, supplier);
+    }
+
+    @Override
+    public void build() {
+        super.build();
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(this.modId);
+            modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        }
     }
 
     @Override
@@ -51,18 +64,19 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
                     ConfigDataHolderImpl.ModConfigEventType.UNLOADING
             );
         }));
-        ((NeoForgeConfigDataHolderImpl<?>) holder).register(modId);
+        ((NeoForgeConfigDataHolderImpl<?>) holder).register();
     }
 
     private static class NeoForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
         private final ModConfig.Type configType;
 
-        protected NeoForgeConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> supplier) {
-            this(configType, configType, supplier);
+        NeoForgeConfigDataHolderImpl(String modId, ModConfig.Type configType, Supplier<T> supplier) {
+            this(modId, configType, configType, supplier);
         }
 
-        protected NeoForgeConfigDataHolderImpl(ModConfig.Type type, ModConfig.Type configNameType, Supplier<T> supplier) {
-            super(configNameType.extension(), supplier);
+        NeoForgeConfigDataHolderImpl(String modId, ModConfig.Type type, ModConfig.Type configNameType, Supplier<T> supplier) {
+            super(modId, supplier);
+            this.setFileNameFactory(ConfigHolder.getDefaultNameFactory(configNameType.extension()));
             this.configType = type;
         }
 
@@ -72,10 +86,9 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
             }
         }
 
-        @Override
-        protected void register(String modId) {
-            super.register(modId);
-            ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
+        void register() {
+            this.initializeFileName();
+            ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(this.getModId());
             modContainer.registerConfig(this.configType, this.buildSpec(), this.getFileName());
         }
     }
