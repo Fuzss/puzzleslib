@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -24,12 +25,12 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.CLIENT, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(this.modId, ModConfig.Type.COMMON, ModConfig.Type.COMMON, supplier);
     }
 
     @Override
@@ -47,8 +48,8 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
     }
 
     @Override
-    protected void bake(ConfigDataHolderImpl<?> holder, String modId) {
-        Optional<IEventBus> optional = NeoForgeModContainerHelper.getOptionalModEventBus(modId);
+    protected void bake(ConfigDataHolderImpl<?> holder) {
+        Optional<IEventBus> optional = NeoForgeModContainerHelper.getOptionalModEventBus(this.modId);
         optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Loading evt) -> {
             ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
                     ConfigDataHolderImpl.ModConfigEventType.LOADING
@@ -90,6 +91,7 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
             this.initializeFileName();
             ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(this.getModId());
             modContainer.registerConfig(this.configType, this.buildSpec(), this.getFileName());
+            ConfigTranslationsManager.addConfig(this.getModId(), this.getFileName(), this.configType.extension());
         }
     }
 }
