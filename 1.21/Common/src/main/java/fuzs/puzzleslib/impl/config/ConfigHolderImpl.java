@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
-    protected final String modId;
+    private final String modId;
     private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = Maps.newIdentityHashMap();
 
     protected ConfigHolderImpl(String modId) {
@@ -82,15 +82,20 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     }
 
     @Override
-    public void build() {
+    public final void build() {
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
         for (ConfigDataHolderImpl<?> holder : this.configsByClass.values()) {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
-            if (holder.config != null) this.bake(holder);
+            if (holder.config != null) this.bake(holder, this.modId);
         }
-        ConfigTranslationsManager.addConfigTitle(this.modId);
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ConfigTranslationsManager.addConfigTitle(this.modId);
+            this.registerConfigurationScreen(this.modId);
+        }
     }
 
-    protected abstract void bake(ConfigDataHolderImpl<?> holder);
+    protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
+
+    protected abstract void registerConfigurationScreen(String modId);
 }
