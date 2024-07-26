@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ValueCallback;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.config.annotation.ConfigBuilder;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +77,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         return entry;
     }
 
-    void acceptValueCallback(Runnable runnable) {
+    public void acceptValueCallback(Runnable runnable) {
         this.configValueCallbacks.add(runnable);
     }
 
@@ -122,7 +123,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     protected ModConfigSpec buildSpec() {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
-        AnnotatedConfigBuilder.serialize(builder, this, this.config);
+        ConfigBuilder.build(builder, this, this.config);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }

@@ -8,7 +8,6 @@ import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -20,12 +19,8 @@ import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.function.BiConsumer;
 
 public class PuzzlesLibClient implements ClientModConstructor {
 
@@ -37,9 +32,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     private static void registerEventHandlers() {
         AddResourcePackReloadListenersCallback.EVENT.register(
-                (BiConsumer<ResourceLocation, PreparableReloadListener> consumer) -> {
-                    consumer.accept(PuzzlesLibMod.id("config_translations"), ConfigTranslationsManager.INSTANCE);
-                });
+                ConfigTranslationsManager::onAddResourcePackReloadListeners);
     }
 
     private static void setupDevelopmentEnvironment() {

@@ -2,7 +2,9 @@ package fuzs.puzzleslib.impl.config.annotation;
 
 import com.google.common.base.CaseFormat;
 import fuzs.puzzleslib.api.config.v3.Config;
+import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
+import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -10,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class ConfigEntry<T> {
@@ -28,8 +31,10 @@ public abstract class ConfigEntry<T> {
         }
     }
 
-    public List<String> getComments() {
-        return new ArrayList<>(Arrays.asList(this.getAnnotation().description()));
+    public List<String> getComments(T defaultValue) {
+        ArrayList<String> comments = new ArrayList<>(Arrays.asList(this.getAnnotation().description()));
+        comments.add("Default Value: " + defaultValue);
+        return comments;
     }
 
     public T getDefaultValue(@Nullable Object o) {
@@ -45,4 +50,22 @@ public abstract class ConfigEntry<T> {
     }
 
     public abstract void defineValue(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @Nullable Object o);
+
+    public static final class ChildEntry extends ConfigEntry<ConfigCore> {
+
+        public ChildEntry(Field field) {
+            super(field);
+        }
+
+        @Override
+        public void defineValue(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @Nullable Object o) {
+            List<String> comments = this.getComments(this.getDefaultValue(o));
+            builder.comment(comments.toArray(String[]::new));
+            builder.push(this.getName());
+            ConfigBuilder.build(builder, context, (Class<? extends ConfigCore>) this.field.getType(), this.getDefaultValue(o));
+            builder.pop();
+            ConfigTranslationsManager.addConfigValue(context.getModId(), Collections.singletonList(this.getName()));
+            ConfigTranslationsManager.addConfigValueComment(context.getModId(), Collections.singletonList(this.getName()), comments);
+        }
+    }
 }

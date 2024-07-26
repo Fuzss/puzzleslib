@@ -23,13 +23,13 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
         // final fields are permitted until here, since values must be able to change
         // previously only new config categories are handled, those instances never change
         if (Modifier.isFinal(this.field.getModifiers())) throw new RuntimeException("Field may not be final");
-        List<String> comments = this.getComments();
+        List<String> comments = this.getComments(this.getDefaultValue(o));
         builder.comment(comments.toArray(String[]::new));
         if (this.getAnnotation().worldRestart()) builder.worldRestart();
         ModConfigSpec.ConfigValue<T> configValue = this.getConfigValue(builder, o);
         context.accept(configValue, this.getValueCallback(configValue, o));
-        ConfigTranslationsManager.INSTANCE.addConfigValue(context.getModId(), configValue.getPath());
-        ConfigTranslationsManager.INSTANCE.addConfigValueComment(context.getModId(), configValue.getPath(), comments);
+        ConfigTranslationsManager.addConfigValue(context.getModId(), configValue.getPath());
+        ConfigTranslationsManager.addConfigValueComment(context.getModId(), configValue.getPath(), comments);
     }
 
     public abstract ModConfigSpec.ConfigValue<T> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o);
@@ -46,6 +46,18 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
             };
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public static final class BooleanEntry extends ValueEntry<Boolean> {
+
+        public BooleanEntry(Field field) {
+            super(field);
+        }
+
+        @Override
+        public ModConfigSpec.BooleanValue getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o) {
+            return builder.define(this.getName(), (boolean) this.getDefaultValue(o));
         }
     }
 }
