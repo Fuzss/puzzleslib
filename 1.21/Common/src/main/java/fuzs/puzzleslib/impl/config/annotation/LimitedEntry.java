@@ -27,8 +27,8 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
     }
 
     @Override
-    public List<String> getComments(T defaultValue) {
-        List<String> comments = super.getComments(defaultValue);
+    public List<String> getComments(@Nullable Object o) {
+        List<String> comments = super.getComments(o);
         Set<String> allowedValues = this.getAllowedValues();
         if (!allowedValues.isEmpty()) {
             comments.add("Allowed Values: " + String.join(", ", allowedValues));

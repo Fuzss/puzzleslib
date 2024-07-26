@@ -5,12 +5,11 @@ import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
-import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.function.Supplier;
 
@@ -22,56 +21,53 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(this.modId, ModConfig.Type.CLIENT, ModConfig.Type.CLIENT, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.CLIENT, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(this.modId, ModConfig.Type.COMMON, ModConfig.Type.COMMON, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.COMMON, ModConfig.Type.COMMON, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> server(Supplier<T> supplier) {
-        return new FabricConfigDataHolderImpl<>(this.modId, ModConfig.Type.SERVER, supplier);
+        return new FabricConfigDataHolderImpl<>(ModConfig.Type.SERVER, supplier);
     }
 
     @Override
-    public void build() {
-        super.build();
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ConfigScreenFactoryRegistry.INSTANCE.register(this.modId, ConfigurationScreen::new);
-        }
-    }
-
-    @Override
-    protected void bake(ConfigDataHolderImpl<?> holder) {
-        NeoForgeModConfigEvents.loading(this.modId).register((ModConfig config) -> {
+    protected void bake(ConfigDataHolderImpl<?> holder, String modId) {
+        NeoForgeModConfigEvents.loading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
                     ConfigDataHolderImpl.ModConfigEventType.LOADING
             );
         });
-        NeoForgeModConfigEvents.reloading(this.modId).register((ModConfig config) -> {
+        NeoForgeModConfigEvents.reloading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
                     ConfigDataHolderImpl.ModConfigEventType.RELOADING
             );
         });
-        NeoForgeModConfigEvents.unloading(this.modId).register((ModConfig config) -> {
+        NeoForgeModConfigEvents.unloading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
                     ConfigDataHolderImpl.ModConfigEventType.UNLOADING
             );
         });
-        ((FabricConfigDataHolderImpl<?>) holder).register();
+        ((FabricConfigDataHolderImpl<?>) holder).register(modId);
+    }
+
+    @Override
+    public void registerConfigurationScreen(String modId) {
+        ConfigScreenFactoryRegistry.INSTANCE.register(modId, ConfigurationScreen::new);
     }
 
     private static class FabricConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
         private final ModConfig.Type configType;
 
-        FabricConfigDataHolderImpl(String modId, ModConfig.Type configType, Supplier<T> supplier) {
-            this(modId, configType, configType, supplier);
+        FabricConfigDataHolderImpl(ModConfig.Type configType, Supplier<T> supplier) {
+            this(configType, configType, supplier);
         }
 
-        FabricConfigDataHolderImpl(String modId, ModConfig.Type configType, ModConfig.Type configNameType, Supplier<T> supplier) {
-            super(modId, supplier);
+        FabricConfigDataHolderImpl(ModConfig.Type configType, ModConfig.Type configNameType, Supplier<T> supplier) {
+            super(supplier);
             this.setFileNameFactory(ConfigHolder.getDefaultNameFactory(configNameType.extension()));
             this.configType = configType;
         }
@@ -82,10 +78,9 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
             }
         }
 
-        void register() {
-            this.initializeFileName();
-            NeoForgeConfigRegistry.INSTANCE.register(this.getModId(), this.configType, this.buildSpec(), this.getFileName());
-            ConfigTranslationsManager.addConfig(this.getModId(), this.getFileName(), this.configType.extension());
+        void register(String modId) {
+            ModConfigSpec configSpec = this.setupConfigSpec(modId, this.configType.extension());
+            NeoForgeConfigRegistry.INSTANCE.register(modId, this.configType, configSpec, this.getFileName());
         }
     }
 }

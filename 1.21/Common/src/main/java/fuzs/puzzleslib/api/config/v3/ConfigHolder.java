@@ -42,7 +42,6 @@ public interface ConfigHolder {
     }
 
     /**
-     * @param modId mod id this config belongs to
      * @return config name
      */
     static UnaryOperator<String> getSimpleNameFactory() {
@@ -50,7 +49,6 @@ public interface ConfigHolder {
     }
 
     /**
-     * @param modId      mod id this config belongs to
      * @param configType type of config
      * @return config name
      */
@@ -59,8 +57,8 @@ public interface ConfigHolder {
     }
 
     /**
-     * @param directory  dir to move config to
      * @param configType config file name
+     * @param directory  directory to move config to
      * @return path to config in dir
      */
     static UnaryOperator<String> getDirectoryNameFactory(String configType, String directory) {

@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.config.annotation;
 
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
-import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,17 +18,22 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
     }
 
     @Override
+    public List<String> getComments(@Nullable Object o) {
+        List<String> comments = super.getComments(o);
+        comments.add("Default Value: " + this.getDefaultValue(o));
+        return comments;
+    }
+
+    @Override
     public final void defineValue(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @Nullable Object o) {
         // final fields are permitted until here, since values must be able to change
         // previously only new config categories are handled, those instances never change
         if (Modifier.isFinal(this.field.getModifiers())) throw new RuntimeException("Field may not be final");
-        List<String> comments = this.getComments(this.getDefaultValue(o));
+        List<String> comments = this.getComments(o);
         builder.comment(comments.toArray(String[]::new));
         if (this.getAnnotation().worldRestart()) builder.worldRestart();
         ModConfigSpec.ConfigValue<T> configValue = this.getConfigValue(builder, o);
         context.accept(configValue, this.getValueCallback(configValue, o));
-        ConfigTranslationsManager.addConfigValue(context.getModId(), configValue.getPath());
-        ConfigTranslationsManager.addConfigValueComment(context.getModId(), configValue.getPath(), comments);
     }
 
     public abstract ModConfigSpec.ConfigValue<T> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o);

@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.config;
 
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.ClientLanguage;
 import net.minecraft.locale.Language;
 import net.minecraft.resources.ResourceLocation;
@@ -8,11 +9,9 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringJoiner;
+import java.util.*;
 import java.util.function.BiConsumer;
 
 public final class ConfigTranslationsManager {
@@ -38,26 +37,48 @@ public final class ConfigTranslationsManager {
     }
 
     public static void addConfig(String modId, String fileName, String configType) {
-        configType = capitalizeFully(configType);
+        configType = getCapitalizedString(configType);
         fileName = fileName.replaceAll("[^a-zA-Z0-9]+", ".").replaceFirst("^\\.", "").replaceFirst("\\.$", "").toLowerCase();
         TRANSLATIONS.put(modId + ".configuration.section." + fileName, configType + " Settings");
         TRANSLATIONS.put(modId + ".configuration.section." + fileName + ".title", "%s " + configType + " Configuration");
     }
 
+    public static void addConfigValue(String modId, String valueName) {
+        Objects.requireNonNull(valueName, "value name is null");
+        addConfigValue(modId, Collections.singletonList(valueName));
+    }
+
     public static void addConfigValue(String modId, List<String> valuePath) {
-        TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast(), capitalizeFully(valuePath.getLast()));
+        TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast(), getCapitalizedString(valuePath.getLast()));
+    }
+
+    public static void addConfigValueComment(String modId, String valueName, @Nullable String comment) {
+        Objects.requireNonNull(valueName, "value name is null");
+        addConfigValueComment(modId, Collections.singletonList(valueName), comment != null ? Arrays.asList(comment.split("\\r?\\n")) : Collections.emptyList());
     }
 
     public static void addConfigValueComment(String modId, List<String> valuePath, List<String> comments) {
-        TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".tooltip", String.join(System.lineSeparator(), comments));
+        String value = String.join(System.lineSeparator(), getStylizedStrings(comments));
+        if (!value.isEmpty()) {
+            TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".tooltip", value);
+        }
     }
 
-    private static String capitalizeFully(String s) {
+    static String getCapitalizedString(String s) {
         String[] strings = s.toLowerCase().split("[\\s_]+");
         StringJoiner joiner = new StringJoiner(" ");
         for (String string : strings) {
             joiner.add(StringUtils.capitalize(string));
         }
         return joiner.toString();
+    }
+
+    static List<String> getStylizedStrings(List<String> strings) {
+        strings = new ArrayList<>(strings);
+        for (int i = 0; i < strings.size(); i++) {
+            ChatFormatting chatFormatting = i % 2 == 0 ? ChatFormatting.YELLOW : ChatFormatting.GOLD;
+            strings.set(i, chatFormatting + strings.get(i) + ChatFormatting.RESET);
+        }
+        return strings;
     }
 }

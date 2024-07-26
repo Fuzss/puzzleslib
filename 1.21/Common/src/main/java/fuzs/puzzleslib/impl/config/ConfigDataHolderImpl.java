@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.impl.config;
 
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ValueCallback;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.annotation.ConfigBuilder;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -13,13 +15,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>, ValueCallback {
-    private final String modId;
     final T config;
     private final Supplier<T> defaultConfigSupplier;
     private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
@@ -31,14 +33,9 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     private List<Runnable> configValueCallbacks = new ArrayList<>();
     private boolean isAvailable;
 
-    protected ConfigDataHolderImpl(String modId, Supplier<T> supplier) {
-        this.modId = modId;
+    protected ConfigDataHolderImpl(Supplier<T> supplier) {
         this.config = supplier.get();
         this.defaultConfigSupplier = supplier;
-    }
-
-    public String getModId() {
-        return this.modId;
     }
 
     @Override
@@ -85,9 +82,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         this.findErrorMessage().ifRight(message -> {
             PuzzlesLib.LOGGER.error(
                     "Calling config at {} when it is not yet available. This is a harmless oversight, please report to the author. {}",
-                    this.getFileName(),
-                    message,
-                    new Exception("Config not yet available")
+                    this.getFileName(), message, new Exception("Config not yet available")
             );
         });
     }
@@ -121,19 +116,47 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         }
     }
 
-    protected ModConfigSpec buildSpec() {
+    protected ModConfigSpec setupConfigSpec(String modId, String configType) {
+        this.initializeFileName(modId);
+        ModConfigSpec configSpec = this.buildConfigSpec();
+        if (ModLoaderEnvironment.INSTANCE.isClient()) {
+            ConfigTranslationsManager.addConfig(modId, this.getFileName(), configType);
+            this.addConfigSpecTranslations(modId, configSpec.getSpec(), new ArrayList<>(), configSpec);
+        }
+        return configSpec;
+    }
+
+    private void initializeFileName(String modId) {
+        Objects.requireNonNull(this.config, "Attempting to register invalid config for " + modId);
+        if (this.fileName == null) {
+            this.fileName = this.fileNameFactory.apply(modId);
+        } else {
+            throw new IllegalStateException("Config has already been registered at " + this.getFileName());
+        }
+    }
+
+    private ModConfigSpec buildConfigSpec() {
         ModConfigSpec.Builder builder = new ModConfigSpec.Builder();
         ConfigBuilder.build(builder, this, this.config);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
     }
 
-    protected final void initializeFileName() {
-        Objects.requireNonNull(this.config, "Attempting to register invalid config for " + this.modId);
-        if (this.fileName == null) {
-            this.fileName = this.fileNameFactory.apply(this.modId);
-        } else {
-            throw new IllegalStateException("Config has already been registered at " + this.getFileName());
+    private void addConfigSpecTranslations(String modId, UnmodifiableConfig config, List<String> path, ModConfigSpec configSpec) {
+        for (Map.Entry<String, Object> entry : config.valueMap().entrySet()) {
+            ConfigTranslationsManager.addConfigValue(modId, entry.getKey());
+            String comment;
+            if (entry.getValue() instanceof ModConfigSpec.ValueSpec valueSpec) {
+                comment = valueSpec.getComment();
+            } else if (entry.getValue() instanceof UnmodifiableConfig) {
+                path = new ArrayList<>(path);
+                path.add(entry.getKey());
+                comment = configSpec.getLevelComment(path);
+                this.addConfigSpecTranslations(modId, (UnmodifiableConfig) entry.getValue(), path, configSpec);
+            } else {
+                comment = null;
+            }
+            ConfigTranslationsManager.addConfigValueComment(modId, entry.getKey(), comment);
         }
     }
 
@@ -148,7 +171,9 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     }
 
     public enum ModConfigEventType {
-        LOADING, RELOADING, UNLOADING;
+        LOADING,
+        RELOADING,
+        UNLOADING;
 
         public boolean isLoading() {
             return this == LOADING || this == RELOADING;
