@@ -106,6 +106,9 @@ accessible  class   net/minecraft/client/resources/model/ModelBakery$BakedCacheK
 accessible  method  net/minecraft/client/resources/model/ModelBakery$BakedCacheKey  <init> (Lnet/minecraft/resources/ResourceLocation;Lcom/mojang/math/Transformation;Z)V
 accessible  field   net/minecraft/client/resources/language/ClientLanguage  storage Ljava/util/Map;
 mutable field   net/minecraft/client/resources/language/ClientLanguage  storage Ljava/util/Map;
+accessible  field   net/minecraft/resources/RegistryOps lookupProvider  Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;
+accessible  class   net/minecraft/resources/RegistryOps$HolderLookupAdapter
+accessible  field   net/minecraft/resources/RegistryOps$HolderLookupAdapter lookupProvider  Lnet/minecraft/core/HolderLookup$Provider;
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;

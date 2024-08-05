@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.impl.capability;
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.*;
-import fuzs.puzzleslib.api.core.v1.utility.NbtSerializableCodec;
+import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.fabric.impl.capability.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
@@ -58,7 +58,7 @@ public final class FabricCapabilityController implements CapabilityController {
     @SuppressWarnings("UnstableApiUsage")
     private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends AttachmentTarget> holderType, String identifier, Supplier<C> capabilityFactory, Predicate<Object> filter, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
-        Codec<C> codec = new NbtSerializableCodec<>(capabilityFactory);
+        Codec<C> codec = NbtSerializable.codec(capabilityFactory);
         ResourceLocation capabilityName = ResourceLocationHelper.fromNamespaceAndPath(this.modId, identifier);
         AttachmentType<C> attachmentType = AttachmentRegistry.<C>builder().persistent(codec).buildAndRegister(capabilityName);
         return capabilityKeyFactory.apply(attachmentType, filter, capabilityFactory);
