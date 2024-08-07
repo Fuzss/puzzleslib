@@ -31,9 +31,14 @@ public @interface Config {
     String[] category() default {};
 
     /**
-     * @return does this option require a world restart, currently unused by forge
+     * @return does this option require a world restart
      */
     boolean worldRestart() default false;
+
+    /**
+     * @return does this option require a game restart
+     */
+    boolean gameRestart() default false;
 
     /**
      * range for int values

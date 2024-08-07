@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.0.19-1.21] - 2024-08-07
+### Changed
+- Disable config file watcher after too many reloads
+### Fixed
+- Fix enum values in configs causing the config to be reloaded indefinitely
+
 ## [v21.0.18-1.21] - 2024-07-26
 ### Added
 - Add support for in-game configuration screens

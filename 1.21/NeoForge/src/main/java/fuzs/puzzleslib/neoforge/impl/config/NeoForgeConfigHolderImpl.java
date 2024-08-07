@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.neoforge.impl.config;
 
+import com.electronwill.nightconfig.core.file.FileWatcher;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
@@ -13,6 +15,7 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.nio.file.Path;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -79,7 +82,16 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
         void onModConfig(ModConfig modConfig, ModConfigEventType eventType) {
             if (modConfig.getType() == this.configType) {
-                super.onModConfig(modConfig.getFileName(), eventType);
+                super.onModConfig(eventType, modConfig.getFileName(), () -> {
+                    if (modConfig.getLoadedConfig() != null && !modConfig.getLoadedConfig().config().configFormat().isInMemory()) {
+                        try {
+                            Path path = modConfig.getFullPath();
+                            FileWatcher.defaultInstance().removeWatch(path);
+                        } catch (RuntimeException exception) {
+                            PuzzlesLib.LOGGER.error("Failed to remove config {} from tracker!", modConfig.getFileName(), exception);
+                        }
+                    }
+                });
             }
         }
 
