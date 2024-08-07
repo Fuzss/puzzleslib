@@ -32,6 +32,7 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
         List<String> comments = this.getComments(o);
         builder.comment(comments.toArray(String[]::new));
         if (this.getAnnotation().worldRestart()) builder.worldRestart();
+        if (this.getAnnotation().gameRestart()) builder.gameRestart();
         ModConfigSpec.ConfigValue<T> configValue = this.getConfigValue(builder, o);
         context.accept(configValue, this.getValueCallback(configValue, o));
     }

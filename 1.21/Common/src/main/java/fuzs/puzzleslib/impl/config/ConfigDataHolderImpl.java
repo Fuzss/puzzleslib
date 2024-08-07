@@ -22,6 +22,8 @@ import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHolder<T>, ValueCallback {
+    static final int MAX_CONSECUTIVE_CONFIG_RELOADS = 25;
+
     final T config;
     private final Supplier<T> defaultConfigSupplier;
     private final List<Consumer<T>> additionalCallbacks = new ArrayList<>();
@@ -32,6 +34,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     private String fileName;
     private List<Runnable> configValueCallbacks = new ArrayList<>();
     private boolean isAvailable;
+    private int consecutiveConfigReloads;
 
     protected ConfigDataHolderImpl(Supplier<T> supplier) {
         this.config = supplier.get();
@@ -97,11 +100,9 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         }
     }
 
-    protected void onModConfig(String fileName, ModConfigEventType eventType) {
+    protected void onModConfig(ModConfigEventType eventType, String fileName, Runnable removeWatch) {
         if (Objects.equals(fileName, this.getFileName())) {
-            Objects.requireNonNull(this.config,
-                    () -> "Attempting to register invalid config at %s".formatted(this.getFileName())
-            );
+            Objects.requireNonNull(this.config, () -> "Attempting to register invalid config " + fileName);
             if (eventType.isLoading()) {
                 this.configValueCallbacks.forEach(Runnable::run);
                 // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
@@ -109,10 +110,19 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
                 for (Consumer<T> callback : this.additionalCallbacks) {
                     callback.accept(this.config);
                 }
+                // do not log unloading event, it's not important to us and can be falsely associated with world unloading hanging
+                PuzzlesLib.LOGGER.info("Dispatching {} event for config {}", eventType, fileName);
             } else {
                 this.isAvailable = false;
             }
-            PuzzlesLib.LOGGER.info("Dispatching {} event for config at {}", eventType, this.getFileName());
+            if (eventType != ModConfigEventType.RELOADING) {
+                this.consecutiveConfigReloads = 0;
+            } else if (++this.consecutiveConfigReloads >= MAX_CONSECUTIVE_CONFIG_RELOADS) {
+                // remove file watcher for configs that reload too often consecutively,
+                // this is sometimes caused by issues with the file system and pointlessly creates new config files repeatedly
+                // this is also triggered after editing the config in-game, but if the user is doing that they are unlikely to also edit the file in the same session
+                removeWatch.run();
+            }
         }
     }
 
