@@ -3,6 +3,4 @@ apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/${
 dependencies {
     // Puzzles Lib
 //    modApi libs.puzzleslib.neoforge
-
-    modImplementation "maven.modrinth:modernfix:5.19.0+mc1.21-neoforge"
 }
