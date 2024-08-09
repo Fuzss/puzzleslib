@@ -3,7 +3,6 @@ package fuzs.puzzleslib.impl.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
-import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
@@ -34,8 +33,6 @@ public class PuzzlesLibClient implements ClientModConstructor {
     private static void registerEventHandlers() {
         AddResourcePackReloadListenersCallback.EVENT.register(
                 ConfigTranslationsManager::onAddResourcePackReloadListeners);
-        // TODO remove after testing
-        ModelEvents.MODIFY_UNBAKED_MODEL.register(BlockModelHandler::onModifyUnbakedModel);
     }
 
     private static void setupDevelopmentEnvironment() {
