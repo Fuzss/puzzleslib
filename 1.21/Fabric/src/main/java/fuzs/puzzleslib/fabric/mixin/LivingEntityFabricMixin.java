@@ -399,7 +399,7 @@ abstract class LivingEntityFabricMixin extends Entity {
         }
     }
 
-    @ModifyVariable(method = "baseTick", at = @At("LOAD"), slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAbilities()Lnet/minecraft/world/entity/player/Abilities;")))
+    @ModifyVariable(method = "baseTick", at = @At(value = "STORE", ordinal = 0), ordinal = 0, slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAbilities()Lnet/minecraft/world/entity/player/Abilities;")))
     public boolean baseTick$2(boolean canLoseAir) {
         if (!canLoseAir) {
             if (this.puzzleslib$originalAirSupply != Integer.MIN_VALUE) {
@@ -435,7 +435,7 @@ abstract class LivingEntityFabricMixin extends Entity {
             if (result.getAsBoolean()) {
                 this.setAirSupply(-20);
             } else {
-                this.setAirSupply(Integer.MAX_VALUE);
+                this.setAirSupply(Integer.MIN_VALUE);
             }
         }
     }

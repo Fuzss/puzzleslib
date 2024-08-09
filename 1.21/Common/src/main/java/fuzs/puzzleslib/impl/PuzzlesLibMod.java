@@ -29,10 +29,14 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     @Override
     public void onConstructMod() {
-        ModContext.registerHandlers();
+        registerEventHandlers();
+        setupDevelopmentEnvironment();
+    }
+
+    private static void registerEventHandlers() {
+        ModContext.registerEventHandlers();
         EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
-        setupDevelopmentEnvironment();
     }
 
     private static void setupDevelopmentEnvironment() {

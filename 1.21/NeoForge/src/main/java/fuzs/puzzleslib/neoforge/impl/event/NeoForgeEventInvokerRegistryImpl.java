@@ -6,10 +6,7 @@ import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
-import fuzs.puzzleslib.api.event.v1.ComputeItemAttributeModifiersCallback;
-import fuzs.puzzleslib.api.event.v1.FinalizeItemComponentsCallback;
-import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
+import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -128,6 +125,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     });
                 }
             });
+        });
+        INSTANCE.register(AddBlockEntityTypeBlocksCallback.class, BlockEntityTypeAddBlocksEvent.class, (AddBlockEntityTypeBlocksCallback callback, BlockEntityTypeAddBlocksEvent evt) -> {
+            callback.onAddBlockEntityTypeBlocks(evt::modify);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerLoadingHandlers();
@@ -649,10 +649,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(LivingBreathEvents.Breathe.class, LivingBreatheEvent.class, (LivingBreathEvents.Breathe callback, LivingBreatheEvent evt) -> {
             final int airAmountValue;
-            if (!evt.canBreathe()) {
-                airAmountValue = -evt.getConsumeAirAmount();
-            } else {
+            if (evt.canBreathe()) {
                 airAmountValue = evt.getRefillAirAmount();
+            } else {
+                airAmountValue = -evt.getConsumeAirAmount();
             }
             DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
             LivingEntity entity = evt.getEntity();
@@ -661,7 +661,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             EventResult result = callback.onLivingBreathe(entity, airAmount, true, canLoseAir);
             if (result.isInterrupt()) {
                 // just some trickery so the event does nothing
-                evt.setCanBreathe(true);
+                evt.setConsumeAirAmount(0);
                 evt.setRefillAirAmount(0);
             } else {
                 OptionalInt optional = airAmount.getAsOptionalInt();
@@ -669,9 +669,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     if (optional.getAsInt() < 0) {
                         evt.setCanBreathe(false);
                         evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
+                        evt.setRefillAirAmount(0);
                     } else {
                         evt.setCanBreathe(true);
-                        evt.setRefillAirAmount(optional.getAsInt());
+                        evt.setConsumeAirAmount(0);
+                        evt.setRefillAirAmount(Math.abs(optional.getAsInt()));
                     }
                 }
             }

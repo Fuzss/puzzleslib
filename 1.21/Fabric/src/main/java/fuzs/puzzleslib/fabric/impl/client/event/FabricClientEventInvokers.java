@@ -22,6 +22,7 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
+import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -113,17 +114,13 @@ public final class FabricClientEventInvokers {
                     if (context.topLevelId() != null) {
                         EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.topLevelId(),
                                 () -> model,
-                                (ModelResourceLocation modelResourceLocation) -> {
-                                    return context.loader().topLevelModels.get(modelResourceLocation);
-                                },
+                                ModelLoadingHelper.getUnbakedTopLevelModel(context.loader()),
                                 additionalModels::put
                         );
-
                         return result.getInterrupt().orElse(model);
                     } else {
                         return model;
                     }
-
                 });
                 pluginContext.resolveModel().register((ModelResolver.Context context) -> {
                     return additionalModels.get(context.id());

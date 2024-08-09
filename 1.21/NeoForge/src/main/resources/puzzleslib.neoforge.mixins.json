@@ -15,8 +15,7 @@
   ],
   "client": [
     "client.accessor.BlockColorsNeoForgeAccessor",
-    "client.accessor.ItemColorsNeoForgeAccessor",
-    "client.accessor.ModelBakeryNeoForgeAccessor"
+    "client.accessor.ItemColorsNeoForgeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

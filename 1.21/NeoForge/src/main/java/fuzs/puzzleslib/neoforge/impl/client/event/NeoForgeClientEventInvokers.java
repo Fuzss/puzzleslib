@@ -2,7 +2,6 @@ package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
@@ -21,8 +20,8 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
-import fuzs.puzzleslib.neoforge.mixin.client.accessor.ModelBakeryNeoForgeAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
@@ -54,10 +53,7 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.*;
 
 import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry.INSTANCE;
@@ -83,21 +79,19 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            // just like bakedCache in ModelBakery
-            Map<ModelBakery.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
-            Map<ModelResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
+            Map<ModelResourceLocation, UnbakedModel> additionalModels = new HashMap<>();
             Function<ModelResourceLocation, UnbakedModel> modelGetter = (ModelResourceLocation modelResourceLocation) -> {
                 if (additionalModels.containsKey(modelResourceLocation)) {
                     return additionalModels.get(modelResourceLocation);
                 } else {
-                    return evt.getModelBakery().topLevelModels.get(modelResourceLocation);
+                    return ModelLoadingHelper.getUnbakedTopLevelModel(evt.getModelBakery()).apply(modelResourceLocation);
                 }
             };
             // do not use resource location keys or rely on the baked cache used by the model baker, it will rebake different block states even though the model is the same
             // this also means we cannot use baked models as keys since they are different instances despite having been baked from the same unbaked model
-            Map<UnbakedModel, BakedModel> unbakedCache = Maps.newIdentityHashMap();
+            Map<UnbakedModel, BakedModel> unbakedCache = new IdentityHashMap<>();
             // Forge does not grant access to unbaked models, so lookup every unbaked model and replace the baked model if necessary
             // this also means the event is limited to top level models which should be fine though, the same restriction is applied on Fabric
             // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
@@ -112,14 +106,7 @@ public final class NeoForgeClientEventInvokers {
                         UnbakedModel unbakedModel = result.getInterrupt().get();
                         additionalModels.put(modelLocation, unbakedModel);
                         BakedModel bakedModel = unbakedCache.computeIfAbsent(unbakedModel, $ -> {
-                            NeoForgeModelBakerImpl modelBaker = new NeoForgeModelBakerImpl(bakedCache, (ResourceLocation resourceLocation) -> {
-                                ModelResourceLocation modelResourceLocation = ModelResourceLocation.standalone(resourceLocation);
-                                if (additionalModels.containsKey(modelResourceLocation)) {
-                                    return additionalModels.get(modelResourceLocation);
-                                } else {
-                                    return ((ModelBakeryNeoForgeAccessor) evt.getModelBakery()).puzzleslib$callGetModel(resourceLocation);
-                                }
-                            }, evt.getModelBakery().topLevelModels::get, evt.getTextureGetter(), missingModel);
+                            NeoForgeModelBakerImpl modelBaker = NeoForgeModelBakerImpl.create(evt, missingModel, additionalModels);
                             return modelBaker.bake(unbakedModel, modelLocation.id());
                         });
                         models.put(modelLocation, bakedModel);
@@ -133,21 +120,13 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            // just like bakedCache in ModelBakery
-            Map<ModelBakery.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             Function<ModelResourceLocation, BakedModel> modelGetter = (ModelResourceLocation resourceLocation) -> {
                 if (models.containsKey(resourceLocation)) {
                     return models.get(resourceLocation);
                 } else {
-                    Function<ResourceLocation, UnbakedModel> unbakedModelGetter = ((ModelBakeryNeoForgeAccessor) evt.getModelBakery())::puzzleslib$callGetModel;
-                    ModelBaker modelBaker = new NeoForgeModelBakerImpl(bakedCache,
-                            unbakedModelGetter,
-                            evt.getModelBakery().topLevelModels::get,
-                            evt.getTextureGetter(),
-                            missingModel
-                    );
+                    ModelBaker modelBaker = NeoForgeModelBakerImpl.create(evt, missingModel);
                     return modelBaker.bake(resourceLocation.id(), BlockModelRotation.X0_Y0, evt.getTextureGetter());
                 }
             };
@@ -159,13 +138,7 @@ public final class NeoForgeClientEventInvokers {
                     EventResultHolder<BakedModel> result = callback.onModifyBakedModel(modelLocation, () -> {
                         return modelGetter.apply(modelLocation);
                     }, () -> {
-                        Function<ResourceLocation, UnbakedModel> unbakedModelGetter = ((ModelBakeryNeoForgeAccessor) evt.getModelBakery())::puzzleslib$callGetModel;
-                        return new NeoForgeModelBakerImpl(bakedCache,
-                                unbakedModelGetter,
-                                evt.getModelBakery().topLevelModels::get,
-                                evt.getTextureGetter(),
-                                missingModel
-                        );
+                        return NeoForgeModelBakerImpl.create(evt, missingModel);
                     }, modelGetter, models::putIfAbsent);
                     result.getInterrupt().ifPresent(bakedModel -> {
                         models.put(modelLocation, bakedModel);
@@ -179,17 +152,13 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.AdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            Map<ModelBakery.BakedCacheKey, BakedModel> bakedCache = Maps.newHashMap();
             BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             try {
                 callback.onAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
                     return models.getOrDefault(resourceLocation, missingModel);
                 }, () -> {
-                    // just use a dummy model, we cut this out when printing missing textures to the log
-                    Function<ResourceLocation, UnbakedModel> unbakedModelGetter = ((ModelBakeryNeoForgeAccessor) evt.getModelBakery())::puzzleslib$callGetModel;
-                    return new NeoForgeModelBakerImpl(bakedCache,
-                            unbakedModelGetter, evt.getModelBakery().topLevelModels::get, evt.getTextureGetter(), missingModel);
+                    return NeoForgeModelBakerImpl.create(evt, missingModel);
                 });
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.error("Failed to add additional baked models", exception);
