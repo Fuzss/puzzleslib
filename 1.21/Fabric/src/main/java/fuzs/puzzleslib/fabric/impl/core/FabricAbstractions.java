@@ -45,7 +45,7 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     private MinecraftServer gameServer;
 
     @Override
-    public void registerHandlers() {
+    public void registerEventHandlers() {
         // registers for game server starting and stopping, so we can keep an instance of the server here so that
         // {@link FabricNetworkHandler} can be implemented much more similarly to Forge
         ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, server -> this.gameServer = server);

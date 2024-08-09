@@ -6,10 +6,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.Proxy;
-import fuzs.puzzleslib.api.event.v1.ComputeItemAttributeModifiersCallback;
-import fuzs.puzzleslib.api.event.v1.FinalizeItemComponentsCallback;
-import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.RegistryEntryAddedCallback;
+import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -82,7 +79,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -142,6 +141,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                         });
                     }
                 }
+            };
+        });
+        INSTANCE.register(AddBlockEntityTypeBlocksCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, (AddBlockEntityTypeBlocksCallback callback) -> {
+            return () -> {
+                callback.onAddBlockEntityTypeBlocks((BlockEntityType<?> blockEntityType, Block block) -> {
+                    blockEntityType.addSupportedBlock(block);
+                });
             };
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {

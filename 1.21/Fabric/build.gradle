@@ -9,4 +9,6 @@ dependencies {
 
     // Puzzles Lib
 //    modApi libs.puzzleslib.fabric
+
+    modImplementation "maven.modrinth:modernfix:5.19.0+mc1.21-fabric"
 }

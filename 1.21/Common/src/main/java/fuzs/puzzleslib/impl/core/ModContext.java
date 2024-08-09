@@ -46,7 +46,7 @@ public abstract class ModContext {
         this.modId = modId;
     }
 
-    public static void registerHandlers() {
+    public static void registerEventHandlers() {
         LoadCompleteCallback.EVENT.register(() -> {
             for (ModContext context : MOD_CONTEXTS.values()) {
                 if (!context.buildables.isEmpty()) {

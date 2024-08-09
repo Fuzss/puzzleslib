@@ -17,7 +17,7 @@ public final class ModelEvents {
     public static final EventInvoker<AfterModelLoading> AFTER_MODEL_LOADING = EventInvoker.lookup(AfterModelLoading.class);
 
     private ModelEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
