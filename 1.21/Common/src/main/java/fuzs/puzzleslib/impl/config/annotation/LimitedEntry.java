@@ -6,6 +6,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.function.Predicate;
@@ -32,10 +33,14 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
     }
 
     public final Set<String> getAllowedValueStrings() {
-        Set<String> allowedValues = this.getAllowedValues().stream().map(String::toUpperCase)
+        Set<String> allowedValues = this.getAllowedValues()
+                .stream()
+                .map(String::toUpperCase)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         if (!allowedValues.isEmpty()) {
-            Set<String> allValues = this.getAllValues().stream().map(String::toUpperCase)
+            Set<String> allValues = this.getAllValues()
+                    .stream()
+                    .map(String::toUpperCase)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             if (!allValues.isEmpty()) {
                 for (String s : allowedValues) {
@@ -135,8 +140,14 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
             super(field);
         }
 
+        @Nullable
         public Type getListType() {
-            return this.field.getGenericType();
+            if (this.field.getGenericType() instanceof ParameterizedType type &&
+                    type.getActualTypeArguments().length > 0) {
+                return type.getActualTypeArguments()[0];
+            } else {
+                return null;
+            }
         }
 
         @Override
@@ -157,6 +168,7 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         }
 
         static Supplier<?> getNewElementSupplier(Type type) {
+            Objects.requireNonNull(type, "type is null");
             // all the value types supported by ModConfigSpec
             return () -> switch (type) {
                 case Class<?> clazz when clazz == String.class -> "";
