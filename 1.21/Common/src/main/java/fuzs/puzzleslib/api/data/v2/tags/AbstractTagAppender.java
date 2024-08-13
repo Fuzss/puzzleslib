@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
@@ -68,6 +69,17 @@ public abstract class AbstractTagAppender<T> {
     public AbstractTagAppender<T> add(T... values) {
         for (T value : values) {
             this.add(value);
+        }
+        return this;
+    }
+
+    public AbstractTagAppender<T> add(Holder.Reference<T> holder) {
+        return this.add(holder.key());
+    }
+
+    public AbstractTagAppender<T> add(Holder.Reference<T>... holders) {
+        for (Holder.Reference<T> holder : holders) {
+            this.add(holder);
         }
         return this;
     }
