@@ -19,16 +19,16 @@ public interface MessageV2<T extends MessageV2<T>> {
     /**
      * Serialize this instance to a byte buffer.
      *
-     * @param buf network data byte buffer
+     * @param friendlyByteBuf network data byte buffer
      */
-    void write(FriendlyByteBuf buf);
+    void write(FriendlyByteBuf friendlyByteBuf);
 
     /**
      * Deserialize this instance from a byte buffer.
      *
-     * @param buf network data byte buffer
+     * @param friendlyByteBuf network data byte buffer
      */
-    void read(FriendlyByteBuf buf);
+    void read(FriendlyByteBuf friendlyByteBuf);
 
     /**
      * @return message handler for message on reception side
