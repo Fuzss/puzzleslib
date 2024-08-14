@@ -167,7 +167,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 }
             });
         }
-        IEventBus eventBus = NeoForgeModContainerHelper.getActiveModEventBus();
+        // active mod event bus is no longer available when ModifyRegistriesEvent fires,
+        // so just use the Puzzles Lib event bus for everything
+        IEventBus eventBus = NeoForgeModContainerHelper.getModEventBus(PuzzlesLib.MOD_ID);
         eventBus.addListener((final RegisterEvent evtx) -> {
             if (evtx.getRegistryKey() != resourceKey) return;
             Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer;
@@ -760,17 +762,20 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         private void register(EventPhase phase, T callback, @Nullable Object context) {
             Objects.requireNonNull(phase, "phase is null");
             Objects.requireNonNull(callback, "callback is null");
+            IEventBus eventBus = this.getEventBus(context);
             EventPriority eventPriority = PHASE_TO_PRIORITY.getOrDefault(phase, EventPriority.NORMAL);
-            IEventBus eventBus = this.eventBus;
-            if (eventBus == null) {
+            // filter out mod id which has been used to retrieve a missing mod event bus
+            Object eventContext = this.eventBus != eventBus ? null : context;
+            // we don't support receiving cancelled events since the event api on Fabric is not designed for it
+            eventBus.addListener(eventPriority, false, this.event, (E evt) -> this.converter.accept(callback, evt, eventContext));
+        }
+
+        private IEventBus getEventBus(@Nullable Object context) {
+            if (this.eventBus == null) {
                 Objects.requireNonNull(context, "mod id context is null");
-                eventBus = NeoForgeModContainerHelper.getModEventBus((String) context);
-            }
-            if (eventBus == NeoForge.EVENT_BUS || eventPriority == EventPriority.NORMAL) {
-                // we don't support receiving cancelled events since the event api on Fabric is not designed for it
-                eventBus.addListener(eventPriority, false, this.event, (E evt) -> this.converter.accept(callback, evt, context));
+                return NeoForgeModContainerHelper.getModEventBus((String) context);
             } else {
-                throw new IllegalStateException("mod event bus does not support event phases");
+                return this.eventBus;
             }
         }
     }

@@ -18,6 +18,9 @@ import java.util.function.UnaryOperator;
  * <p>See {@link FabricEventFactory} for easily creating dedicated Fabric events from common event implementations.
  */
 public interface FabricEventInvokerRegistry extends EventInvokerRegistry {
+    /**
+     * the instance
+     */
     FabricEventInvokerRegistry INSTANCE = new FabricEventInvokerRegistryImpl();
 
     /**
