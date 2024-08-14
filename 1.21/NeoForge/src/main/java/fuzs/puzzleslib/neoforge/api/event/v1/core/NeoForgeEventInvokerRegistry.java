@@ -12,6 +12,9 @@ import java.util.function.BiConsumer;
  * A registry for linking common events implemented as functional interfaces to the corresponding Forge {@link Event} instances.
  */
 public interface NeoForgeEventInvokerRegistry extends EventInvokerRegistry {
+    /**
+     * the instance
+     */
     NeoForgeEventInvokerRegistry INSTANCE = new NeoForgeEventInvokerRegistryImpl();
 
     /**
