@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.data.v2;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.mojang.serialization.Lifecycle;
@@ -104,6 +105,12 @@ public final class AbstractLootProvider {
             if (!this.map.isEmpty()) {
                 throw new IllegalStateException("Created block loot tables for non-blocks: " + this.map.keySet());
             }
+        }
+
+        @Override
+        public HolderLookup.Provider registries() {
+            Preconditions.checkState(super.registries != RegistryAccess.EMPTY, "registry access is empty");
+            return super.registries;
         }
 
         @Override
@@ -236,6 +243,12 @@ public final class AbstractLootProvider {
         }
 
         @Override
+        public HolderLookup.Provider registries() {
+            Preconditions.checkState(super.registries != RegistryAccess.EMPTY, "registry access is empty");
+            return super.registries;
+        }
+
+        @Override
         public PackOutput.PathProvider pathProvider() {
             return this.pathProvider;
         }
@@ -278,6 +291,7 @@ public final class AbstractLootProvider {
         private final LootContextParamSet paramSet;
         private final PackOutput.PathProvider pathProvider;
         private final CompletableFuture<HolderLookup.Provider> registries;
+        private HolderLookup.Provider registryAccess;
 
         public Simple(LootContextParamSet paramSet, DataProviderContext context) {
             this(paramSet, context.getPackOutput(), context.getRegistries());
@@ -287,12 +301,16 @@ public final class AbstractLootProvider {
             this.paramSet = paramSet;
             this.pathProvider = packOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE);
             this.registries = registries;
+            this.registryAccess = RegistryAccess.EMPTY;
         }
 
         @Override
         public CompletableFuture<?> run(CachedOutput output) {
             return this.registries.thenCompose((HolderLookup.Provider registries) -> {
-                return this.run(output, registries);
+                this.registryAccess = registries;
+                return this.run(output, registries).thenRun(() -> {
+                    this.registryAccess = RegistryAccess.EMPTY;
+                });
             });
         }
 
@@ -306,6 +324,12 @@ public final class AbstractLootProvider {
         public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> exporter) {
             this.addLootTables();
             this.tables.forEach(exporter);
+        }
+
+        @Override
+        public HolderLookup.Provider registries() {
+            Preconditions.checkState(this.registryAccess != RegistryAccess.EMPTY, "registry access is empty");
+            return this.registryAccess;
         }
 
         @Override
@@ -339,6 +363,8 @@ public final class AbstractLootProvider {
     }
 
     public interface LootTableDataProvider extends DataProvider, LootTableSubProvider {
+
+        HolderLookup.Provider registries();
 
         PackOutput.PathProvider pathProvider();
 
