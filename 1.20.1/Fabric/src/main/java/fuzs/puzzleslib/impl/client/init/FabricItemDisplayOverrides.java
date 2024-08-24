@@ -4,6 +4,7 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -33,7 +34,7 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
                     return itemModelOverride;
                 })));
             }
-        }));
+        }, ResourceReloadListenerKeys.MODELS));
     }
 
     @Override

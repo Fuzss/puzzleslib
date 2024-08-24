@@ -10,6 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.model.BakedModelWrapper;
+import net.minecraftforge.eventbus.api.IEventBus;
 
 import java.util.Map;
 import java.util.Objects;
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 public final class ForgeItemDisplayOverrides extends ItemDisplayOverridesImpl {
 
     {
-        ModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent(eventBus -> {
+        ModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
                 Map<ResourceLocation, BakedModel> models = evt.getModels();
                 for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : this.overrideLocations.entrySet()) {

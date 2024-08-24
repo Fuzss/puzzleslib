@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.0.23-1.21] - 2024-08-23
 ### Changed
 - Enable accessing `HolderLookup$Provider` in `AbstractLootProvider` implementations
+### Fixed
+- Fix item model display overrides being able to compute before models have been reloaded on Fabric
 
 ## [v21.0.22-1.21] - 2024-08-14
 ### Fixed

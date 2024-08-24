@@ -8,6 +8,7 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
 
@@ -19,7 +20,7 @@ import java.util.stream.Stream;
 public final class NeoForgeItemDisplayOverrides extends ItemDisplayOverridesImpl {
 
     {
-        NeoForgeModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent(eventBus -> {
+        NeoForgeModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
                 Map<ModelResourceLocation, BakedModel> models = evt.getModels();
                 for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> entry : this.overrideLocations.entrySet()) {

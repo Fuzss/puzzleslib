@@ -5,6 +5,7 @@ import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -35,7 +36,7 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
                     return itemModelOverride;
                 })));
             }
-        }));
+        }, ResourceReloadListenerKeys.MODELS));
     }
 
     public BakedModel getItemModelDisplayOverride(BakedModel itemModel, ItemDisplayContext itemDisplayContext) {
