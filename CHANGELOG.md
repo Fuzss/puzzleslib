@@ -3,7 +3,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.1.22-1.20.1] - 2024-08-24
+## [v8.1.22-1.20.1] - 2024-08-25
 ### Fixed
 - Fix item model display overrides being able to compute before models have been reloaded on Fabric
 
