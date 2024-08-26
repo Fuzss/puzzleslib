@@ -1,19 +1,11 @@
 package fuzs.puzzleslib.impl.client.init;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
-import fuzs.puzzleslib.api.core.v1.resources.FabricReloadListener;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
-import net.minecraft.client.Minecraft;
+import fuzs.puzzleslib.api.client.event.v1.FabricClientEvents;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.item.ItemDisplayContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,18 +18,19 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl {
     private Map<BakedModel, Map<ItemDisplayContext, BakedModel>> overrideModels;
 
     {
-        ModelEvents.BAKING_COMPLETED.register(
-                (Supplier<ModelManager> modelManager, Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
+        FabricClientEvents.COMPLETE_MODEL_LOADING.register(
+                (Supplier<ModelManager> modelManager, Supplier<ModelBakery> modelBakery) -> {
                     this.overrideModels = Maps.newIdentityHashMap();
                     for (Map.Entry<ModelResourceLocation, Map<ItemDisplayContext, ModelResourceLocation>> overrideEntry : this.overrideLocations.entrySet()) {
-                        BakedModel itemModel = models.get(overrideEntry.getKey());
+                        BakedModel itemModel = modelManager.get().getModel(overrideEntry.getKey());
                         Objects.requireNonNull(itemModel, "item model is null");
                         this.overrideModels.put(itemModel, overrideEntry.getValue()
                                 .entrySet()
                                 .stream()
                                 .collect(Maps.toImmutableEnumMap(Map.Entry::getKey,
                                         (Map.Entry<ItemDisplayContext, ModelResourceLocation> entry) -> {
-                                            BakedModel itemModelOverride = models.get(entry.getValue());
+                                            BakedModel itemModelOverride = modelManager.get()
+                                                    .getModel(entry.getValue());
                                             Objects.requireNonNull(itemModelOverride, "item model override is null");
                                             return itemModelOverride;
                                         }

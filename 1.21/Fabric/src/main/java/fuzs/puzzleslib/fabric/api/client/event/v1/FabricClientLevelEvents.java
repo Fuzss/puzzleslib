@@ -15,6 +15,6 @@ public final class FabricClientLevelEvents {
     public static final Event<ClientLevelEvents.Unload> UNLOAD_LEVEL = FabricEventFactory.create(ClientLevelEvents.Unload.class);
 
     private FabricClientLevelEvents() {
-
+        // NO-OP
     }
 }

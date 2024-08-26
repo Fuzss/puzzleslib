@@ -10,11 +10,16 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class ModelEvents {
-    public static final EventInvoker<ModifyUnbakedModel> MODIFY_UNBAKED_MODEL = EventInvoker.lookup(ModifyUnbakedModel.class);
+    public static final EventInvoker<ModifyUnbakedModel> MODIFY_UNBAKED_MODEL = EventInvoker.lookup(
+            ModifyUnbakedModel.class);
     public static final EventInvoker<ModifyBakedModel> MODIFY_BAKED_MODEL = EventInvoker.lookup(ModifyBakedModel.class);
     public static final EventInvoker<AdditionalBakedModel> ADDITIONAL_BAKED_MODEL = EventInvoker.lookup(
             AdditionalBakedModel.class);
-    public static final EventInvoker<AfterModelLoading> AFTER_MODEL_LOADING = EventInvoker.lookup(AfterModelLoading.class);
+    @Deprecated(forRemoval = true)
+    public static final EventInvoker<AfterModelLoading> AFTER_MODEL_LOADING = EventInvoker.lookup(
+            AfterModelLoading.class);
+    public static final EventInvoker<CompleteModelLoading> COMPLETE_MODEL_LOADING = EventInvoker.lookup(
+            CompleteModelLoading.class);
 
     private ModelEvents() {
         // NO-OP
@@ -76,6 +81,8 @@ public final class ModelEvents {
          * custom baked models in the model manager.
          * <p>
          * Cannot be used for replacing baked models in the bakery, use {@link ModifyBakedModel} for that.
+         * <p>
+         * TODO rename to AddAdditionalBakedModel
          *
          * @param modelAdder  add a baked model to the bakery, existing models cannot be replaced
          * @param modelGetter get baked models from the bakery, if only an unbaked model is present it will be baked
@@ -86,6 +93,10 @@ public final class ModelEvents {
         void onAdditionalBakedModel(BiConsumer<ModelResourceLocation, BakedModel> modelAdder, Function<ModelResourceLocation, BakedModel> modelGetter, Supplier<ModelBaker> modelBaker);
     }
 
+    /**
+     * @deprecated migrate to {@link CompleteModelLoading}
+     */
+    @Deprecated(forRemoval = true)
     @FunctionalInterface
     public interface AfterModelLoading {
 
@@ -99,5 +110,21 @@ public final class ModelEvents {
          * @param modelManager model manager instance
          */
         void onAfterModelLoading(Supplier<ModelManager> modelManager);
+    }
+
+    @FunctionalInterface
+    public interface CompleteModelLoading {
+
+        /**
+         * Fired after the resource manager has reloaded models.
+         * <p>
+         * Use a {@link Supplier} for {@link ModelManager} and {@link ModelBakery} to prevent an issue with loading the
+         * {@link net.minecraft.client.renderer.Sheets} class too early on Fabric, preventing modded materials from
+         * being added.
+         *
+         * @param modelManager the model manager
+         * @param modelBakery  the model bakery
+         */
+        void onCompleteModelLoading(Supplier<ModelManager> modelManager, Supplier<ModelBakery> modelBakery);
     }
 }

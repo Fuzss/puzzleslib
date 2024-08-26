@@ -387,6 +387,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(MovementInputUpdateCallback.class, FabricClientEvents.MOVEMENT_INPUT_UPDATE);
         INSTANCE.register(ModelEvents.ModifyBakingResult.class, FabricClientEvents.MODIFY_BAKING_RESULT);
         INSTANCE.register(ModelEvents.BakingCompleted.class, FabricClientEvents.BAKING_COMPLETED);
+        INSTANCE.register(ModelEvents.CompleteModelLoading.class, FabricClientEvents.COMPLETE_MODEL_LOADING);
         INSTANCE.register(RenderBlockOverlayCallback.class, FabricClientEvents.RENDER_BLOCK_OVERLAY);
         INSTANCE.register(FogEvents.Render.class, FabricClientEvents.RENDER_FOG);
         INSTANCE.register(FogEvents.ComputeColor.class, FabricClientEvents.COMPUTE_FOG_COLOR);

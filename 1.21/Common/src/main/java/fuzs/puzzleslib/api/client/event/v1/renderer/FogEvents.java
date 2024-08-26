@@ -14,7 +14,7 @@ public final class FogEvents {
     public static final EventInvoker<ComputeColor> COMPUTE_COLOR = EventInvoker.lookup(ComputeColor.class);
 
     private FogEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

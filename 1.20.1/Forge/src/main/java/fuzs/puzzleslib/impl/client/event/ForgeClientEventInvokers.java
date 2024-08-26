@@ -176,6 +176,9 @@ public final class ForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.AfterModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.AfterModelLoading callback, ModelEvent.BakingCompleted evt) -> {
             callback.onAfterModelLoading(evt::getModelManager);
         });
+        INSTANCE.register(ModelEvents.CompleteModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.CompleteModelLoading callback, ModelEvent.BakingCompleted evt) -> {
+            callback.onCompleteModelLoading(evt::getModelManager, evt::getModelBakery);
+        });
     }
 
     public static void register() {

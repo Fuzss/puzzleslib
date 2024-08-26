@@ -123,6 +123,11 @@ public final class FabricClientEvents {
     @Deprecated(forRemoval = true)
     public static final Event<ModelEvents.BakingCompleted> BAKING_COMPLETED = FabricEventFactory.create(ModelEvents.BakingCompleted.class);
     /**
+     * Fired after the resource manager has reloaded models.
+     */
+    public static final Event<ModelEvents.CompleteModelLoading> COMPLETE_MODEL_LOADING = FabricEventFactory.create(
+            ModelEvents.CompleteModelLoading.class);
+    /**
      * Called before a block overlay is rendered on the screen.
      */
     public static final Event<RenderBlockOverlayCallback> RENDER_BLOCK_OVERLAY = FabricEventFactory.createResult(RenderBlockOverlayCallback.class);
