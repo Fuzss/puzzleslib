@@ -13,7 +13,7 @@ public final class RenderLivingEvents {
     public static final EventInvoker<After> AFTER = EventInvoker.lookup(After.class);
 
     private RenderLivingEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

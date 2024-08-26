@@ -73,6 +73,7 @@
     "client.LivingEntityRendererFabricMixin",
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",
+    "client.ModelManagerFabricMixin",
     "client.MouseHandlerFabricMixin",
     "client.OptionsFabricMixin",
     "client.PackSelectionScreenFabricMixin",

@@ -7,9 +7,9 @@ import net.minecraft.client.gui.screens.Screen;
 import java.util.Objects;
 
 public final class ExtraScreenMouseEvents {
-    
+
     private ExtraScreenMouseEvents() {
-        
+        // NO-OP
     }
 
     public static Event<AllowMouseDrag> allowMouseDrag(Screen screen) {
@@ -29,9 +29,10 @@ public final class ExtraScreenMouseEvents {
 
     @FunctionalInterface
     public interface AllowMouseDrag {
-        
+
         /**
-         * Checks if the mouse should be allowed to drag in a screen by moving the cursor while a mouse button is held down.
+         * Checks if the mouse should be allowed to drag in a screen by moving the cursor while a mouse button is held
+         * down.
          *
          * @param screen the currently displayed screen
          * @param mouseX mouse x-position
@@ -46,7 +47,7 @@ public final class ExtraScreenMouseEvents {
 
     @FunctionalInterface
     public interface BeforeMouseDrag {
-        
+
         /**
          * Called before a mouse is dragged on screen.
          *
@@ -62,7 +63,7 @@ public final class ExtraScreenMouseEvents {
 
     @FunctionalInterface
     public interface AfterMouseDrag {
-        
+
         /**
          * Called after a mouse is dragged on screen.
          *

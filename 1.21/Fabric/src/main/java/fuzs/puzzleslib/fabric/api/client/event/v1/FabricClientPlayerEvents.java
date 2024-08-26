@@ -39,6 +39,6 @@ public final class FabricClientPlayerEvents {
             MovementInputUpdateCallback.class);
 
     private FabricClientPlayerEvents() {
-
+        // NO-OP
     }
 }

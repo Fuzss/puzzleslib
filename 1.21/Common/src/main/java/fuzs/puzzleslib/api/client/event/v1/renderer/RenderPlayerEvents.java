@@ -13,7 +13,7 @@ public final class RenderPlayerEvents {
     public static final EventInvoker<After> AFTER = EventInvoker.lookup(After.class);
 
     private RenderPlayerEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

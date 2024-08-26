@@ -21,7 +21,6 @@ import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
@@ -40,7 +39,6 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourceReloadListenerKeys;
 import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.GuiMessageTag;
@@ -80,6 +78,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
 import static fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry.INSTANCE;
@@ -159,12 +158,11 @@ public final class FabricClientEventInvokers {
                 });
             });
         });
-        INSTANCE.register(ModelEvents.AfterModelLoading.class, (ModelEvents.AfterModelLoading callback, @Nullable Object o) -> {
-            ResourceLocation resourceLocation = PuzzlesLibMod.id("after_model_loading/" + MODEL_LOADING_LISTENERS.incrementAndGet());
-            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(resourceLocation, resourceManager -> {
-                Minecraft minecraft = Minecraft.getInstance();
-                callback.onAfterModelLoading(minecraft::getModelManager);
-            }, ResourceReloadListenerKeys.MODELS));
+        INSTANCE.register(ModelEvents.CompleteModelLoading.class, FabricClientEvents.COMPLETE_MODEL_LOADING);
+        INSTANCE.register(ModelEvents.AfterModelLoading.class, FabricClientEvents.COMPLETE_MODEL_LOADING, callback -> {
+            return (Supplier<ModelManager> modelManager, Supplier<ModelBakery> modelBakery) -> {
+                callback.onAfterModelLoading(modelManager);
+            };
         });
     }
 

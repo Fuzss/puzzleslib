@@ -84,6 +84,6 @@ public final class FabricRendererEvents {
             ComputeFieldOfViewCallback.class);
 
     private FabricRendererEvents() {
-
+        // NO-OP
     }
 }

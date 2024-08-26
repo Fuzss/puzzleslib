@@ -18,7 +18,7 @@ public final class RenderLevelEvents {
     public static final EventInvoker<AfterLevel> AFTER_LEVEL = EventInvoker.lookup(AfterLevel.class);
 
     private RenderLevelEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
