@@ -4,7 +4,9 @@ import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import io.netty.buffer.Unpooled;
@@ -23,6 +25,7 @@ import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +33,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
@@ -94,6 +98,16 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot slot, LivingEntity entity) {
         return slot == entity.getEquipmentSlotForItem(stack);
+    }
+
+    @Override
+    public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
+        int enchantmentLevel = CommonAbstractions.super.getMobLootingLevel(target, attacker, damageSource);
+        if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
+        Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
+        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, livingEntity,
+                damageSource
+        );
     }
 
     @Override

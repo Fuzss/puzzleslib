@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.0.25-1.21] - 2024-09-04
+### Changed
+- Expand `ComputeLootingLevelCallback` as `ComputeEnchantedLootBonusCallback`
+- Add new helper methods to `LookupHelper`
+### Fixed
+- Fix skipping validation option not always working in `AbstractLootProvider`
+
 ## [v21.0.24-1.21] - 2024-08-26
 ### Fixed
 - Fix item model display overrides being able to compute before models have been reloaded on Fabric again

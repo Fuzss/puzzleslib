@@ -7,7 +7,7 @@ public final class EmptyObjectShareAccessImpl implements ObjectShareAccess {
     public static final ObjectShareAccess INSTANCE = new EmptyObjectShareAccessImpl();
 
     private EmptyObjectShareAccessImpl() {
-
+        // NO-OP
     }
 
     @Override

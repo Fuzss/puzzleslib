@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -92,14 +92,12 @@ public interface CommonAbstractions {
      * @param target       the entity that has been killed
      * @param attacker     another entity responsible for killing the entity
      * @param damageSource the damage source the entity has been killed by
-     * @return the level of looting to apply when generating drops.
+     * @return the level of looting to apply when generating drops
      */
     default int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         if (attacker instanceof LivingEntity livingEntity) {
-            Holder.Reference<Enchantment> holder = target.registryAccess()
-                    .lookupOrThrow(Registries.ENCHANTMENT)
-                    .getOrThrow(Enchantments.LOOTING);
-            return EnchantmentHelper.getEnchantmentLevel(holder, livingEntity);
+            Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
+            return EnchantmentHelper.getEnchantmentLevel(enchantment, livingEntity);
         } else {
             return 0;
         }

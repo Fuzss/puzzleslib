@@ -18,7 +18,8 @@ public final class LivingBreathEvents {
 
         /**
          * Runs when the game updates an entity's air supply depending on if the entity can currently breathe or not.
-         * <p>Allows for updating the air supply with a custom value or for preventing any update at all.
+         * <p>
+         * Allows for updating the air supply with a custom value or for preventing any update at all.
          *
          * @param entity       the entity to update air supply for
          * @param airAmount    amount to change air supply by; a negative value will consume air like when the entity is
@@ -39,8 +40,8 @@ public final class LivingBreathEvents {
         /**
          * Runs before the game checks if an entity that is submerged should be damaged from drowning.
          * <p>
-         *     Allows for both preventing an entity from drowning and inflicting drowning damage when vanilla would not
-         * do so.
+         * Allows for both preventing an entity from drowning and inflicting drowning damage when vanilla would not do
+         * so.
          *
          * @param entity     the entity that is drowning
          * @param airSupply  current air supply of the entity, retrieved from {@link LivingEntity#getAirSupply()}

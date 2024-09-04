@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.init.v3.override;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
@@ -18,6 +17,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
@@ -44,7 +44,7 @@ public final class CommandOverrides {
         CommandEnvironment commandEnvironment = onlyDedicated ?
                 CommandEnvironment.DEDICATED_SERVER :
                 CommandEnvironment.SERVER;
-        COMMAND_OVERRIDES.computeIfAbsent(commandEnvironment, $ -> Sets.newLinkedHashSet()).add(command);
+        COMMAND_OVERRIDES.computeIfAbsent(commandEnvironment, $ -> new LinkedHashSet<>()).add(command);
     }
 
     /**
@@ -70,7 +70,7 @@ public final class CommandOverrides {
         CommandEnvironment commandEnvironment = onlyDedicated ?
                 CommandEnvironment.DEDICATED_PLAYER :
                 CommandEnvironment.PLAYER;
-        COMMAND_OVERRIDES.computeIfAbsent(commandEnvironment, $ -> Sets.newLinkedHashSet()).add(command);
+        COMMAND_OVERRIDES.computeIfAbsent(commandEnvironment, $ -> new LinkedHashSet<>()).add(command);
     }
 
     @ApiStatus.Internal

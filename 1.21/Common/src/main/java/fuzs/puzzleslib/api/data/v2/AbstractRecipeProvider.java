@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.data.v2;
 
-import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -109,7 +108,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
         private final CachedOutput output;
         private final HolderLookup.Provider registries;
         private final List<CompletableFuture<?>> completableFutures;
-        private final Set<ResourceLocation> generatedRecipes = Sets.newHashSet();
+        private final Set<ResourceLocation> generatedRecipes = new HashSet<>();
 
         public IdentifiableRecipeOutput(CachedOutput output, HolderLookup.Provider registries, List<CompletableFuture<?>> completableFutures) {
             this.output = output;

@@ -15,15 +15,15 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(EnchantmentHelper.class)
-abstract class EnchantmentHelperFabrixMixin {
+abstract class EnchantmentHelperFabricMixin {
 
     @ModifyVariable(method = "lambda$processEquipmentDropChance$24", at = @At("HEAD"), argsOnly = true)
-    private static int processEquipmentDropChance$0(int enchantmentValue, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int _enchantmentLevel, EnchantedItemInUse enchantedItemInUse) {
-        return FabricEventImplHelper.onComputeLootingLevel(enchantment, enchantmentValue, entity, damageSource);
+    private static int processEquipmentDropChance$0(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int enchantmentLevelX, EnchantedItemInUse enchantedItemInUse) {
+        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, entity, damageSource);
     }
 
     @ModifyVariable(method = "lambda$processEquipmentDropChance$26", at = @At("HEAD"), argsOnly = true)
-    private static int processEquipmentDropChance$1(int enchantmentValue, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int _enchantmentLevel, EnchantedItemInUse enchantedItemInUse) {
-        return FabricEventImplHelper.onComputeLootingLevel(enchantment, enchantmentValue, entity, damageSource);
+    private static int processEquipmentDropChance$1(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int enchantmentLevelX, EnchantedItemInUse enchantedItemInUse) {
+        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, entity, damageSource);
     }
 }

@@ -1,6 +1,6 @@
-package fuzs.puzzleslib.fabric.mixin;
+package fuzs.puzzleslib.neoforge.mixin;
 
-import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
+import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EnchantedCountIncreaseFunction.class)
-abstract class EnchantedCountIncreaseFunctionFabricMixin {
+abstract class EnchantedCountIncreaseFunctionNeoForgeMixin {
     @Shadow
     @Final
     private Holder<Enchantment> enchantment;
@@ -36,7 +36,9 @@ abstract class EnchantedCountIncreaseFunctionFabricMixin {
 
     @ModifyVariable(method = "run", at = @At("STORE"), ordinal = 0)
     public int run(int enchantmentLevel, ItemStack itemStack, LootContext lootContext) {
-        return FabricEventImplHelper.onComputeEnchantedLootBonus(this.enchantment, enchantmentLevel, lootContext);
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment, enchantmentLevel,
+                lootContext
+        );
     }
 
     @Inject(method = "run", at = @At("HEAD"))
@@ -45,7 +47,9 @@ abstract class EnchantedCountIncreaseFunctionFabricMixin {
         // or being present at all (like when damage is coming from a block)
         // no need to cancel, vanilla does nothing but returning the item stack in the case of a non-living attacker
         if (!(context.getParamOrNull(LootContextParams.ATTACKING_ENTITY) instanceof LivingEntity)) {
-            int enchantmentLevel = FabricEventImplHelper.onComputeEnchantedLootBonus(this.enchantment, 0, context);
+            int enchantmentLevel = ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment, 0,
+                    context
+            );
             if (enchantmentLevel != 0) {
                 float f = (float) enchantmentLevel * this.value.getFloat(context);
                 stack.grow(Math.round(f));

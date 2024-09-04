@@ -209,7 +209,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     private Map<T, Object[]> dissolve() {
         Map<T, Object[]> dissolved = this.dissolved;
         if (dissolved == null) {
-            Map<T, Object[]> entries = Maps.newIdentityHashMap();
+            Map<T, Object[]> entries = new IdentityHashMap<>();
             Set<T> toRemove = Sets.newIdentityHashSet();
             // split this to ensure data values from individual entries take precedence over tag entries
             for (EntryHolder<?, T> holder : this.values) {
