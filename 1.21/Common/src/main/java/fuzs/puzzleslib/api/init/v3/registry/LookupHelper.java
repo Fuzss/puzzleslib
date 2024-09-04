@@ -63,7 +63,6 @@ public final class LookupHelper {
      *
      * @param entity      the registry access for retrieving the registry
      * @param resourceKey the value key
-     * @param <T>         registry value type
      * @return the holder from the registry
      */
     public static Holder<Enchantment> lookupEnchantment(Entity entity, ResourceKey<Enchantment> resourceKey) {
@@ -75,7 +74,6 @@ public final class LookupHelper {
      *
      * @param levelReader the registry access for retrieving the registry
      * @param resourceKey the value key
-     * @param <T>         registry value type
      * @return the holder from the registry
      */
     public static Holder<Enchantment> lookupEnchantment(LevelReader levelReader, ResourceKey<Enchantment> resourceKey) {
@@ -87,7 +85,6 @@ public final class LookupHelper {
      *
      * @param registries  the registry access for retrieving the registry
      * @param resourceKey the value key
-     * @param <T>         registry value type
      * @return the holder from the registry
      */
     public static Holder<Enchantment> lookupEnchantment(HolderLookup.Provider registries, ResourceKey<Enchantment> resourceKey) {
@@ -99,7 +96,6 @@ public final class LookupHelper {
      *
      * @param entity      the registry access for retrieving the registry
      * @param resourceKey the value key
-     * @param <T>         registry value type
      * @return the holder from the registry
      */
     public static Holder<DamageType> lookupDamageType(Entity entity, ResourceKey<DamageType> resourceKey) {
@@ -111,7 +107,6 @@ public final class LookupHelper {
      *
      * @param levelReader the registry access for retrieving the registry
      * @param resourceKey the value key
-     * @param <T>         registry value type
      * @return the holder from the registry
      */
     public static Holder<DamageType> lookupDamageType(LevelReader levelReader, ResourceKey<DamageType> resourceKey) {
@@ -123,7 +118,6 @@ public final class LookupHelper {
      *
      * @param registries  the registry access for retrieving the registry
      * @param resourceKey the value key
-     * @param <T>         registry value type
      * @return the holder from the registry
      */
     public static Holder<DamageType> lookupDamageType(HolderLookup.Provider registries, ResourceKey<DamageType> resourceKey) {
