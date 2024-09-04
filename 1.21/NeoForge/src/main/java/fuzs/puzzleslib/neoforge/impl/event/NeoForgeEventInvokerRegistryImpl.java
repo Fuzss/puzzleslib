@@ -25,6 +25,7 @@ import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
+import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
@@ -316,6 +317,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(ItemEntityEvents.Pickup.class, ItemEntityPickupEvent.Post.class, (ItemEntityEvents.Pickup callback, ItemEntityPickupEvent.Post evt) -> {
             callback.onItemPickup(evt.getPlayer(), evt.getItemEntity(), evt.getOriginalStack());
+        });
+        INSTANCE.register(ComputeEnchantedLootBonusCallback.class, ComputeEnchantedLootBonusEvent.class, (ComputeEnchantedLootBonusCallback callback, ComputeEnchantedLootBonusEvent evt) -> {
+            MutableInt enchantmentLevel = MutableInt.fromEvent(evt::setEnchantmentLevel, evt::getEnchantmentLevel);
+            callback.onComputeEnchantedLootBonus(evt.getEntity(), evt.getDamageSource(), evt.getEnchantment(),
+                    enchantmentLevel
+            );
         });
         INSTANCE.register(AnvilEvents.Update.class, AnvilUpdateEvent.class, (AnvilEvents.Update callback, AnvilUpdateEvent evt) -> {
             DefaultedValue<ItemStack> output = DefaultedValue.fromEventWithValue(evt::setOutput, evt::getOutput, evt.getOutput());

@@ -17,7 +17,7 @@
     "ChunkMapFabricMixin",
     "CrossbowItemFabricMixin",
     "EnchantedCountIncreaseFunctionFabricMixin",
-    "EnchantmentHelperFabrixMixin",
+    "EnchantmentHelperFabricMixin",
     "EnderManFabricMixin",
     "EntityFabricMixin",
     "ExperienceOrbFabricMixin",

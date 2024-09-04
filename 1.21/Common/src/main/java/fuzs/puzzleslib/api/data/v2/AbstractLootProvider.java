@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.data.v2;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -46,7 +45,7 @@ public final class AbstractLootProvider {
     }
 
     public static abstract class Blocks extends BlockLootSubProvider implements LootTableDataProvider {
-        private final Set<ResourceKey<LootTable>> skipValidation = Sets.newHashSet();
+        private final Set<ResourceKey<LootTable>> skipValidation = new HashSet<>();
         private final PackOutput.PathProvider pathProvider;
         private final CompletableFuture<HolderLookup.Provider> registries;
         private final String modId;
@@ -88,17 +87,16 @@ public final class AbstractLootProvider {
         @Override
         public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> consumer) {
             this.generate();
-            Set<ResourceKey<LootTable>> generatedLootTables = new HashSet<>();
+            Set<ResourceKey<LootTable>> lootTables = new HashSet<>();
             this.getRegistryEntries().forEach((Holder.Reference<Block> holder) -> {
-                ResourceKey<LootTable> lootTableLocation = holder.value().getLootTable();
-                if (lootTableLocation != BuiltInLootTables.EMPTY && generatedLootTables.add(lootTableLocation)) {
-                    LootTable.Builder builder = this.map.remove(lootTableLocation);
-                    if (builder == null) {
-                        throw new IllegalStateException("Missing loot table '%s' for '%s'".formatted(lootTableLocation,
-                                holder.key().location()
-                        ));
-                    } else {
-                        consumer.accept(lootTableLocation, builder);
+                ResourceKey<LootTable> resourceKey = holder.value().getLootTable();
+                if (resourceKey != BuiltInLootTables.EMPTY && lootTables.add(resourceKey)) {
+                    LootTable.Builder builder = this.map.remove(resourceKey);
+                    if (builder != null) {
+                        consumer.accept(resourceKey, builder);
+                    } else if (!this.skipValidationFor(resourceKey)) {
+                        throw new IllegalStateException(
+                                "Missing loot table '%s' for '%s'".formatted(resourceKey, holder.key().location()));
                     }
                 }
             });
@@ -155,7 +153,7 @@ public final class AbstractLootProvider {
     }
 
     public abstract static class EntityTypes extends EntityLootSubProvider implements LootTableDataProvider {
-        private final Set<ResourceKey<LootTable>> skipValidation = Sets.newHashSet();
+        private final Set<ResourceKey<LootTable>> skipValidation = new HashSet<>();
         private final PackOutput.PathProvider pathProvider;
         private final CompletableFuture<HolderLookup.Provider> registries;
         private final String modId;
@@ -197,23 +195,23 @@ public final class AbstractLootProvider {
         @Override
         public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> consumer) {
             this.generate();
-            Set<ResourceKey<LootTable>> generatedLootTables = new HashSet<>();
+            Set<ResourceKey<LootTable>> lootTables = new HashSet<>();
             this.getRegistryEntries().forEach((Holder.Reference<EntityType<?>> holder) -> {
                 EntityType<?> entityType = holder.value();
                 Map<ResourceKey<LootTable>, LootTable.Builder> map = this.map.remove(entityType);
                 if (this.canHaveLootTable(entityType)) {
-                    ResourceKey<LootTable> lootTableLocation = entityType.getDefaultLootTable();
-                    if (!lootTableLocation.equals(BuiltInLootTables.EMPTY) &&
-                            (map == null || !map.containsKey(lootTableLocation))) {
+                    ResourceKey<LootTable> resourceKey = entityType.getDefaultLootTable();
+                    if (!resourceKey.equals(BuiltInLootTables.EMPTY) && !this.skipValidationFor(resourceKey) &&
+                            (map == null || !map.containsKey(resourceKey))) {
                         throw new IllegalStateException(String.format(Locale.ROOT,
                                 "Missing loot table '%s' for '%s'",
-                                lootTableLocation,
+                                resourceKey,
                                 holder.key().location()
                         ));
                     }
                     if (map != null) {
                         map.forEach((resourceLocation, builder) -> {
-                            if (!generatedLootTables.add(resourceLocation)) {
+                            if (!lootTables.add(resourceLocation)) {
                                 throw new IllegalStateException(String.format(Locale.ROOT,
                                         "Duplicate loot table '%s' for '%s'",
                                         resourceLocation,
@@ -287,7 +285,7 @@ public final class AbstractLootProvider {
 
     public static abstract class Simple implements LootTableDataProvider {
         private final Map<ResourceKey<LootTable>, LootTable.Builder> tables = new HashMap<>();
-        private final Set<ResourceKey<LootTable>> skipValidation = Sets.newHashSet();
+        private final Set<ResourceKey<LootTable>> skipValidation = new HashSet<>();
         private final LootContextParamSet paramSet;
         private final PackOutput.PathProvider pathProvider;
         private final CompletableFuture<HolderLookup.Provider> registries;

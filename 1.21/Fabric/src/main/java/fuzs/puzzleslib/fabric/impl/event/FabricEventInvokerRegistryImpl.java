@@ -351,7 +351,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(AnvilEvents.Use.class, FabricPlayerEvents.ANVIL_USE);
         INSTANCE.register(ItemEntityEvents.Touch.class, FabricPlayerEvents.ITEM_TOUCH);
         INSTANCE.register(ItemEntityEvents.Pickup.class, FabricPlayerEvents.ITEM_PICKUP);
-        INSTANCE.register(ComputeLootingLevelCallback.class, FabricLivingEvents.COMPUTE_LOOTING_LEVEL);
+        INSTANCE.register(ComputeEnchantedLootBonusCallback.class, FabricLivingEvents.COMPUTE_ENCHANTED_LOOT_BONUS);
         INSTANCE.register(AnvilEvents.Update.class, FabricPlayerEvents.ANVIL_UPDATE);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
         INSTANCE.register(EntityTickEvents.Start.class, FabricEntityEvents.ENTITY_TICK_START);

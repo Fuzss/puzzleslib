@@ -8,6 +8,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 public final class AnvilEvents {
     public static final EventInvoker<Update> UPDATE = EventInvoker.lookup(Update.class);
@@ -37,7 +38,7 @@ public final class AnvilEvents {
          *         from running, the output item stack will not be updated, {@link EventResult#PASS} to only listen to
          *         the event without applying any changes made to mutable value provided by the event
          */
-        EventResult onAnvilUpdate(ItemStack primaryItem, ItemStack secondaryItem, MutableValue<ItemStack> outputItem, String itemName, MutableInt enchantmentCost, MutableInt materialCost, Player player);
+        EventResult onAnvilUpdate(ItemStack primaryItem, ItemStack secondaryItem, MutableValue<ItemStack> outputItem, @Nullable String itemName, MutableInt enchantmentCost, MutableInt materialCost, Player player);
     }
 
     @FunctionalInterface
