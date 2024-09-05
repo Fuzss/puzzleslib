@@ -112,6 +112,8 @@ mutable field   net/minecraft/client/resources/language/ClientLanguage  storage 
 accessible  field   net/minecraft/resources/RegistryOps lookupProvider  Lnet/minecraft/resources/RegistryOps$RegistryInfoLookup;
 accessible  class   net/minecraft/resources/RegistryOps$HolderLookupAdapter
 accessible  field   net/minecraft/resources/RegistryOps$HolderLookupAdapter lookupProvider  Lnet/minecraft/core/HolderLookup$Provider;
+accessible  field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
+mutable field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;

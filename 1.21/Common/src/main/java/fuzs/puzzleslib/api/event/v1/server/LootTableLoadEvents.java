@@ -24,10 +24,10 @@ public final class LootTableLoadEvents {
          * Allows for replacing {@link LootTable LootTables} on loading.
          * <p>To remove a loot table completely pass in {@link LootTable#EMPTY}.
          *
-         * @param identifier the loot table id
-         * @param table      the loot table that can be replaced
+         * @param resourceLocation the loot table id
+         * @param lootTable        the loot table that can be replaced
          */
-        void onReplaceLootTable(ResourceLocation identifier, MutableValue<LootTable> table);
+        void onReplaceLootTable(ResourceLocation resourceLocation, MutableValue<LootTable> lootTable);
     }
 
     @FunctionalInterface
@@ -36,12 +36,12 @@ public final class LootTableLoadEvents {
         /**
          * Allows changing of {@link LootPool LootPools} in a {@link LootTable}.
          *
-         * @param identifier the loot table id
-         * @param addPool    add a {@link LootPool}
-         * @param removePool removes a pool at a given index, pools are indexed starting from 0, succeeds if the pool
-         *                   was removed at the given index, also note that indices are consistent and will not update
-         *                   when other indices are removed
+         * @param resourceLocation the loot table id
+         * @param addLootPool      add a {@link LootPool}
+         * @param removeLootPool   removes a pool at a given index, pools are indexed starting from 0, succeeds if the
+         *                         pool was removed at the given index, also note that indices are consistent and will
+         *                         not update when other indices are removed
          */
-        void onModifyLootTable(ResourceLocation identifier, Consumer<LootPool> addPool, IntPredicate removePool);
+        void onModifyLootTable(ResourceLocation resourceLocation, Consumer<LootPool> addLootPool, IntPredicate removeLootPool);
     }
 }

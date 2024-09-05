@@ -30,6 +30,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * @deprecated replaced by {@link fuzs.puzzleslib.api.data.v2.AbstractRegistriesDatapackGenerator}
+ */
+@Deprecated
 public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
     private final PackOutput output;
     private final String modId;
@@ -53,9 +57,9 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
         this.resourceType = new ExistingFileHelper.ResourceType(PackType.SERVER_DATA, ".json", registryKey.location().getPath());
     }
 
-    protected final void add(ResourceKey<T> key, T value) {
-        this.fileHelper.trackGenerated(key.location(), this.resourceType);
-        this.bootstrapContext.register(key, value);
+    protected final void add(ResourceKey<T> resourceKey, T value) {
+        this.fileHelper.trackGenerated(resourceKey.location(), this.resourceType);
+        this.bootstrapContext.register(resourceKey, value);
     }
 
     protected abstract void addBootstrap(BootstrapContext<T> context);
@@ -82,8 +86,12 @@ public abstract class AbstractBuiltInDataProvider<T> implements DataProvider {
             super(Registries.ENCHANTMENT, context);
         }
 
-        protected static void register(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> key, Enchantment.Builder builder) {
-            context.register(key, builder.build(key.location()));
+        protected static void register(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
+            context.register(resourceKey, builder.build(resourceKey.location()));
+        }
+
+        protected void add(ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
+            this.add(resourceKey, builder.build(resourceKey.location()));
         }
     }
 
