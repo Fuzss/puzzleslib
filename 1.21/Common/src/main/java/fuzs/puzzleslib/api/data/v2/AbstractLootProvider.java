@@ -64,11 +64,12 @@ public final class AbstractLootProvider {
 
         @Override
         public CompletableFuture<?> run(CachedOutput output) {
-            return this.registries.thenCompose((HolderLookup.Provider registries) -> {
-                super.registries = registries;
-                return this.run(output, registries).thenRun(() -> {
-                    super.registries = RegistryAccess.EMPTY;
-                });
+            return this.registries.thenApply((HolderLookup.Provider registries) -> {
+                return super.registries = registries;
+            }).thenCompose((HolderLookup.Provider registries) -> {
+                return this.run(output, registries);
+            }).thenRun(() -> {
+                super.registries = RegistryAccess.EMPTY;
             });
         }
 
@@ -147,8 +148,8 @@ public final class AbstractLootProvider {
         }
 
         protected Stream<Holder.Reference<Block>> getRegistryEntries() {
-            return BuiltInRegistries.BLOCK.holders()
-                    .filter(holder -> holder.key().location().getNamespace().equals(this.modId));
+            return BuiltInRegistries.BLOCK.holders().filter(
+                    holder -> holder.key().location().getNamespace().equals(this.modId));
         }
     }
 
@@ -203,20 +204,18 @@ public final class AbstractLootProvider {
                     ResourceKey<LootTable> resourceKey = entityType.getDefaultLootTable();
                     if (!resourceKey.equals(BuiltInLootTables.EMPTY) && !this.skipValidationFor(resourceKey) &&
                             (map == null || !map.containsKey(resourceKey))) {
-                        throw new IllegalStateException(String.format(Locale.ROOT,
-                                "Missing loot table '%s' for '%s'",
-                                resourceKey,
-                                holder.key().location()
-                        ));
+                        throw new IllegalStateException(
+                                String.format(Locale.ROOT, "Missing loot table '%s' for '%s'", resourceKey,
+                                        holder.key().location()
+                                ));
                     }
                     if (map != null) {
                         map.forEach((resourceLocation, builder) -> {
                             if (!lootTables.add(resourceLocation)) {
-                                throw new IllegalStateException(String.format(Locale.ROOT,
-                                        "Duplicate loot table '%s' for '%s'",
-                                        resourceLocation,
-                                        holder.key().location()
-                                ));
+                                throw new IllegalStateException(
+                                        String.format(Locale.ROOT, "Duplicate loot table '%s' for '%s'",
+                                                resourceLocation, holder.key().location()
+                                        ));
                             } else {
                                 consumer.accept(resourceLocation, builder);
                             }
@@ -229,8 +228,7 @@ public final class AbstractLootProvider {
                                     .stream()
                                     .map(ResourceKey::location)
                                     .map(ResourceLocation::toString)
-                                    .collect(Collectors.joining(",")),
-                            holder.key().location()
+                                    .collect(Collectors.joining(",")), holder.key().location()
                     ));
                 }
             });
@@ -278,8 +276,8 @@ public final class AbstractLootProvider {
         }
 
         protected Stream<Holder.Reference<EntityType<?>>> getRegistryEntries() {
-            return BuiltInRegistries.ENTITY_TYPE.holders()
-                    .filter(holder -> holder.key().location().getNamespace().equals(this.modId));
+            return BuiltInRegistries.ENTITY_TYPE.holders().filter(
+                    holder -> holder.key().location().getNamespace().equals(this.modId));
         }
     }
 
@@ -371,10 +369,8 @@ public final class AbstractLootProvider {
         boolean skipValidationFor(ResourceKey<LootTable> resourceKey);
 
         default CompletableFuture<?> run(CachedOutput output, HolderLookup.Provider registries) {
-            DefaultedMappedRegistry<LootTable> registry = new DefaultedMappedRegistry<>("empty",
-                    Registries.LOOT_TABLE,
-                    Lifecycle.experimental(),
-                    false
+            DefaultedMappedRegistry<LootTable> registry = new DefaultedMappedRegistry<>("empty", Registries.LOOT_TABLE,
+                    Lifecycle.experimental(), false
             );
             ResourceKey<LootTable> defaultKey = ResourceKey.create(Registries.LOOT_TABLE, registry.getDefaultKey());
             registry.register(defaultKey, LootTable.EMPTY, RegistrationInfo.BUILT_IN);
@@ -398,26 +394,22 @@ public final class AbstractLootProvider {
             registry.freeze();
             this.validate(registry);
 
-            return CompletableFuture.allOf(registry.entrySet()
-                    .stream()
-                    .filter((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
+            return CompletableFuture.allOf(registry.entrySet().stream().filter(
+                    (Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
                         return entry.getKey() != defaultKey;
-                    })
-                    .map((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
-                        ResourceKey<LootTable> resourceKey = entry.getKey();
-                        LootTable lootTable = entry.getValue();
-                        Path path = this.pathProvider().json(resourceKey.location());
-                        return DataProvider.saveStable(output, registries, LootTable.DIRECT_CODEC, lootTable, path);
-                    })
-                    .toArray(CompletableFuture[]::new));
+                    }).map((Map.Entry<ResourceKey<LootTable>, LootTable> entry) -> {
+                ResourceKey<LootTable> resourceKey = entry.getKey();
+                LootTable lootTable = entry.getValue();
+                Path path = this.pathProvider().json(resourceKey.location());
+                return DataProvider.saveStable(output, registries, LootTable.DIRECT_CODEC, lootTable, path);
+            }).toArray(CompletableFuture[]::new));
         }
 
         default void validate(Registry<LootTable> registry) {
             ProblemReporter.Collector collector = new ProblemReporter.Collector();
             HolderGetter.Provider registries = new RegistryAccess.ImmutableRegistryAccess(List.of(registry)).freeze()
                     .asGetterLookup();
-            ValidationContext validationContext = new ValidationContext(collector,
-                    LootContextParamSets.ALL_PARAMS,
+            ValidationContext validationContext = new ValidationContext(collector, LootContextParamSets.ALL_PARAMS,
                     registries
             );
 
@@ -436,9 +428,8 @@ public final class AbstractLootProvider {
 
         default void validate(Holder.Reference<LootTable> holder, ValidationContext validationContext) {
             if (!this.skipValidationFor(holder.key())) {
-                holder.value()
-                        .validate(validationContext.setParams(holder.value().getParamSet())
-                                .enterElement("{" + holder.key().location() + "}", holder.key()));
+                holder.value().validate(validationContext.setParams(holder.value().getParamSet())
+                        .enterElement("{" + holder.key().location() + "}", holder.key()));
             }
         }
     }
