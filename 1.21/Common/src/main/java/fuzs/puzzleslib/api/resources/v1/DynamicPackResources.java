@@ -17,10 +17,10 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A pack resources implementation that is able to dynamically generate contents based on provided
@@ -30,7 +30,7 @@ public class DynamicPackResources extends AbstractModPackResources {
     /**
      * Helper map for quickly turning a pack type directory back into the {@link PackType}.
      */
-    public static final Map<String, PackType> PATHS_FOR_TYPE = Stream.of(PackType.values())
+    public static final Map<String, PackType> PATHS_FOR_TYPE = Arrays.stream(PackType.values())
             .collect(ImmutableMap.toImmutableMap(PackType::getDirectory, Function.identity()));
 
     /**
@@ -41,7 +41,7 @@ public class DynamicPackResources extends AbstractModPackResources {
      * A map containing all generated files stored by {@link PackType} and path (in form of a
      * {@link ResourceLocation}).
      */
-    protected Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths;
+    private Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths;
 
     /**
      * @param factories the {@link net.minecraft.data.DataProvider} factories used by this pack resources instances
@@ -70,15 +70,12 @@ public class DynamicPackResources extends AbstractModPackResources {
      * @return map containing all generated files
      */
     public static Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
-        PuzzlesLib.LOGGER.info("Running data generation for dynamic pack resources provided by '{}'", modId);
-        Stopwatch stopwatch = Stopwatch.createStarted();
-        DataProviderContext context = DataProviderContext.fromModId(modId);
-        Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths;
         try {
-            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> packTypes = Stream.of(PackType.values())
-                    .collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
-            for (DataProviderContext.Factory provider : factories) {
-                provider.apply(context).run((Path filePath, byte[] data, HashCode hashCode) -> {
+            Stopwatch stopwatch = Stopwatch.createStarted();
+            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = new EnumMap<>(PackType.class);
+            DataProviderContext context = DataProviderContext.fromModId(modId);
+            for (DataProviderContext.Factory factory : factories) {
+                factory.apply(context).run((Path filePath, byte[] data, HashCode hashCode) -> {
                     // good times with Windows...
                     List<String> strings = FileUtil.decomposePath(filePath.normalize()
                             .toString()
@@ -91,33 +88,34 @@ public class DynamicPackResources extends AbstractModPackResources {
                         String path = strings.stream().skip(2).collect(Collectors.joining("/"));
                         ResourceLocation resourceLocation = ResourceLocation.tryBuild(strings.get(1), path);
                         if (resourceLocation != null) {
-                            packTypes.get(packType).put(resourceLocation, () -> new ByteArrayInputStream(data));
+                            paths.computeIfAbsent(packType, $ -> new ConcurrentHashMap<>()).put(resourceLocation, () -> new ByteArrayInputStream(data));
                         }
                     }
                 }).join();
             }
-            packTypes.replaceAll((packType, map) -> {
+            paths.replaceAll((PackType packType, Map<ResourceLocation, IoSupplier<InputStream>> map) -> {
                 return ImmutableMap.copyOf(map);
             });
-            paths = Maps.immutableEnumMap(packTypes);
+            PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms",
+                    modId,
+                    stopwatch.stop().elapsed().toMillis()
+            );
+            return Maps.immutableEnumMap(paths);
         } catch (Throwable throwable) {
-            PuzzlesLib.LOGGER.error("Unable to complete data generation for dynamic pack resources provided by '{}'",
+            PuzzlesLib.LOGGER.warn("Unable to complete data generation for dynamic pack resources provided by '{}'",
                     modId,
                     throwable
             );
-            paths = Collections.emptyMap();
+            return Collections.emptyMap();
         }
-        PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms",
-                modId,
-                stopwatch.stop().elapsed().toMillis()
-        );
-        return paths;
     }
 
-    protected void generatePathsIfAbsent() {
-        if (this.paths == null) {
-            this.paths = this.generatePathsFromProviders();
+    protected Map<ResourceLocation, IoSupplier<InputStream>> getPathsForType(PackType packType) {
+        Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = this.paths;
+        if (paths == null) {
+            paths = this.paths = this.generatePathsFromProviders();
         }
+        return paths.getOrDefault(packType, Collections.emptyMap());
     }
 
     protected Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders() {
@@ -127,23 +125,21 @@ public class DynamicPackResources extends AbstractModPackResources {
     @Nullable
     @Override
     public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation location) {
-        this.generatePathsIfAbsent();
-        return this.paths.get(packType).get(location);
+        return this.getPathsForType(packType).get(location);
     }
 
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-        this.generatePathsIfAbsent();
-        this.paths.get(packType).entrySet().stream().filter(entry -> {
+        this.getPathsForType(packType).entrySet().stream().filter(
+                (Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
             return entry.getKey().getNamespace().equals(namespace) && entry.getKey().getPath().startsWith(path);
-        }).forEach(entry -> {
+        }).forEach((Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
             resourceOutput.accept(entry.getKey(), entry.getValue());
         });
     }
 
     @Override
-    public Set<String> getNamespaces(PackType type) {
-        this.generatePathsIfAbsent();
-        return this.paths.get(type).keySet().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet());
+    public Set<String> getNamespaces(PackType packType) {
+        return this.getPathsForType(packType).keySet().stream().map(ResourceLocation::getNamespace).collect(Collectors.toSet());
     }
 }

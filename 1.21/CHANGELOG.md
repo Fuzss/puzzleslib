@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.0.27-1.21] - 2024-09-06
 ### Added
 - Experimental settings screens are now automatically skipped to avoid being shown for bundled data packs
+### Fixed
+- Fix `DynamicPackResources` providing an invalid pack when dynamic data generation fails
 
 ## [v21.0.26-1.21] - 2024-09-05
 ### Added
