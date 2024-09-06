@@ -5,20 +5,27 @@ import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
+import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.BackupConfirmScreen;
+import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,6 +40,12 @@ public class PuzzlesLibClient implements ClientModConstructor {
     private static void registerEventHandlers() {
         AddResourcePackReloadListenersCallback.EVENT.register(
                 ConfigTranslationsManager::onAddResourcePackReloadListeners);
+        ScreenHelper.autoPressScreenButton(BackupConfirmScreen.class, "selectWorld.backupQuestion.experimental",
+                "selectWorld.backupJoinSkipButton"
+        );
+        ScreenHelper.autoPressScreenButton(ConfirmScreen.class, "selectWorld.warning.experimental.title",
+                CommonComponents.GUI_YES
+        );
     }
 
     private static void setupDevelopmentEnvironment() {
@@ -51,11 +64,12 @@ public class PuzzlesLibClient implements ClientModConstructor {
             return EventResult.PASS;
         });
         // required for EditBox mixin to work properly on all screens like ChatScreen
-        ScreenMouseEvents.beforeMouseClick(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button) -> {
+        ScreenMouseEvents.beforeMouseClick(Screen.class).register(
+                (Screen screen, double mouseX, double mouseY, int button) -> {
                     for (GuiEventListener guiEventListener : screen.children()) {
-                        if (guiEventListener instanceof EditBox &&
-                                guiEventListener.mouseClicked(mouseX, mouseY, button)) {
+                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseX, mouseY,
+                                button
+                        )) {
                             screen.setFocused(guiEventListener);
                             if (button == InputConstants.MOUSE_BUTTON_LEFT) {
                                 screen.setDragging(true);
@@ -65,22 +79,20 @@ public class PuzzlesLibClient implements ClientModConstructor {
                     }
                     return EventResult.PASS;
                 });
-        ScreenMouseEvents.beforeMouseRelease(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button) -> {
+        ScreenMouseEvents.beforeMouseRelease(Screen.class).register(
+                (Screen screen, double mouseX, double mouseY, int button) -> {
                     screen.setDragging(false);
-                    return screen.getChildAt(mouseX, mouseY)
-                            .filter(EditBox.class::isInstance)
-                            .filter((GuiEventListener guiEventListener) -> {
+                    return screen.getChildAt(mouseX, mouseY).filter(EditBox.class::isInstance).filter(
+                            (GuiEventListener guiEventListener) -> {
                                 return guiEventListener.mouseReleased(mouseX, mouseY, button);
-                            })
-                            .isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
+                            }).isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
                 });
-        ScreenMouseEvents.beforeMouseDrag(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
+        ScreenMouseEvents.beforeMouseDrag(Screen.class).register(
+                (Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
                     return screen.getFocused() instanceof EditBox && screen.isDragging() &&
-                            button == InputConstants.MOUSE_BUTTON_LEFT &&
-                            screen.getFocused().mouseDragged(mouseX, mouseY, button, dragX, dragY) ?
-                            EventResult.INTERRUPT : EventResult.PASS;
+                            button == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused().mouseDragged(mouseX,
+                            mouseY, button, dragX, dragY
+                    ) ? EventResult.INTERRUPT : EventResult.PASS;
                 });
     }
 
