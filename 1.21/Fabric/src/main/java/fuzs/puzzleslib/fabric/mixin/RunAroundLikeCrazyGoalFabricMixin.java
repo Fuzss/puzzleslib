@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import net.minecraft.world.entity.EntityEvent;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Local;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.RunAroundLikeCrazyGoal;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
@@ -10,8 +11,6 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(RunAroundLikeCrazyGoal.class)
 abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
@@ -19,15 +18,9 @@ abstract class RunAroundLikeCrazyGoalFabricMixin extends Goal {
     @Final
     private AbstractHorse horse;
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;tameWithName(Lnet/minecraft/world/entity/player/Player;)Z"), cancellable = true)
-    public void tick(CallbackInfo callback) {
-        Player player = (Player) this.horse.getPassengers().get(0);
-        if (FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(this.horse, player).isInterrupt()) {
-            this.horse.modifyTemper(5);
-            this.horse.ejectPassengers();
-            this.horse.makeMad();
-            this.horse.level().broadcastEntityEvent(this.horse, EntityEvent.TAMING_FAILED);
-            callback.cancel();
-        }
+    @ModifyExpressionValue(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
+    public int tick(int intValue, @Local Player player) {
+        int horseTemper = this.horse.getTemper();
+        return FabricEventImplHelper.onAnimalTame(this.horse, player, intValue, horseTemper, intValue < horseTemper);
     }
 }

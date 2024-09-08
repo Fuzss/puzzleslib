@@ -14,8 +14,10 @@ public interface LivingChangeTargetCallback {
      *
      * @param entity the entity setting a new target
      * @param target the target to be set, can be <code>null</code>
-     * @return {@link EventResult#INTERRUPT} to prevent the target from changing,
-     * {@link EventResult#PASS} to allow the target to change to the value set in <code>target</code>
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the target from changing</li>
+     *         <li>{@link EventResult#PASS PASS} to allow the target to change to the set value</li>
+     *         </ul>
      */
     EventResult onLivingChangeTarget(LivingEntity entity, DefaultedValue<LivingEntity> target);
 }

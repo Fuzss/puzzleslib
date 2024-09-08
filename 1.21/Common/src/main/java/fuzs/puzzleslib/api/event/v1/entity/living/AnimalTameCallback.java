@@ -14,8 +14,10 @@ public interface AnimalTameCallback {
      *
      * @param animal the animal that is being tamed
      * @param player the player taming the animal
-     * @return {@link EventResult#INTERRUPT} to prevent the animal from being tamed,
-     * {@link EventResult#PASS} for taming to happen normally
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the animal from being tamed</li>
+     *         <li>{@link EventResult#PASS PASS} for taming to happen normally</li>
+     *         </ul>
      */
     EventResult onAnimalTame(Animal animal, Player player);
 }

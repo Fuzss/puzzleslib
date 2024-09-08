@@ -14,8 +14,11 @@ public interface ProjectileImpactCallback {
      *
      * @param projectile the projectile about to impact
      * @param hitResult  {@link HitResult} context
-     * @return {@link EventResult#INTERRUPT} tp prevent the impact from being processed (<code>Projectile#onHit(HitResult)</code> does not run), the projectile will just keep flying,
-     * {@link EventResult#PASS} to let vanilla behavior process the impact, destroying the projectile as a result
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} tp prevent the impact from being processed, meaning {@link Projectile#onHit(HitResult)} does not run, the projectile will just keep flying</li>
+     *         <li>{@link EventResult#PASS PASS} to let vanilla behavior process the impact, destroying the projectile as a
+     *         result</li>
+     *         </ul>
      */
     EventResult onProjectileImpact(Projectile projectile, HitResult hitResult);
 }

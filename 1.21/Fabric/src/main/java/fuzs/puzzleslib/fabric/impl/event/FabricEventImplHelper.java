@@ -10,6 +10,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -25,6 +26,18 @@ public final class FabricEventImplHelper {
 
     private FabricEventImplHelper() {
         // NO-OP
+    }
+
+    public static int onAnimalTame(Animal animal, Player player, int intValue) {
+        return onAnimalTame(animal, player, intValue, 1, intValue == 0);
+    }
+
+    public static int onAnimalTame(Animal animal, Player player, int intValue, int returnValue, boolean tameCondition) {
+        if (tameCondition && FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(animal, player).isInterrupt()) {
+            return returnValue;
+        } else {
+            return intValue;
+        }
     }
 
     public static int onComputeEnchantedLootBonus(Holder<Enchantment> enchantment, int enchantmentLevel, LootContext lootContext) {
