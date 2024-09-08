@@ -23,7 +23,7 @@
     "ExplosionFabricMixin",
     "FarmBlockFabricMixin",
     "FoxBreedGoalFabricMixin",
-    "GrindstoneMenu\$ResultSlotFabricMixin",
+    "GrindstoneMenuResultSlotFabricMixin",
     "GrindstoneMenuFabricMixin",
     "ItemEntityFabricMixin",
     "LevelFabricMixin",
