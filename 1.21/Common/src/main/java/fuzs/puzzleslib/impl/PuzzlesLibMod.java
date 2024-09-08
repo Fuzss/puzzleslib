@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.entity.living.ComputeEnchantedLootBonusCallback;
 import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
 import fuzs.puzzleslib.api.init.v3.override.GameRuleValueOverrides;
 import fuzs.puzzleslib.api.network.v3.NetworkHandler;
@@ -15,11 +14,7 @@ import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageSources;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 
 /**
@@ -39,11 +34,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void registerEventHandlers() {
-        ComputeEnchantedLootBonusCallback.EVENT.register((entity, damageSource, enchantment, enchantmentLevel) -> {
-            if (enchantment.is(Enchantments.LOOTING) && damageSource != null && damageSource.is(DamageTypes.CACTUS)) {
-                enchantmentLevel.accept(3);
-            }
-        });
         ModContext.registerEventHandlers();
         EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);

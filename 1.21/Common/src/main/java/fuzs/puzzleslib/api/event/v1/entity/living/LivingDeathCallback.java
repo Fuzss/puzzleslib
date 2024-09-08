@@ -14,8 +14,10 @@ public interface LivingDeathCallback {
      *
      * @param entity the entity that has been killed
      * @param source the {@link DamageSource} the entity has been killed by
-     * @return {@link EventResult#INTERRUPT} to prevent the death from happening, the entity will stay alive,
-     *         {@link EventResult#PASS} to allow vanilla logic to continue executing
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the death from happening, the entity will stay alive</li>
+     *         <li>{@link EventResult#PASS PASS} to allow vanilla logic to continue executing</li>
+     *         </ul>
      */
     EventResult onLivingDeath(LivingEntity entity, DamageSource source);
 }

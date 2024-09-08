@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import net.minecraft.world.entity.EntityEvent;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.animal.Cat;
@@ -9,8 +9,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(Cat.class)
 abstract class CatFabricMixin extends TamableAnimal {
@@ -19,11 +17,8 @@ abstract class CatFabricMixin extends TamableAnimal {
         super(entityType, level);
     }
 
-    @Inject(method = "tryToTame", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Cat;tame(Lnet/minecraft/world/entity/player/Player;)V"), cancellable = true)
-    public void tryToTame(Player player, CallbackInfo callback) {
-        if (FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(this, player).isInterrupt()) {
-            this.level().broadcastEntityEvent(this, EntityEvent.TAMING_FAILED);
-            callback.cancel();
-        }
+    @ModifyExpressionValue(method = "tryToTame", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
+    public int tryToTame(int intValue, Player player) {
+        return FabricEventImplHelper.onAnimalTame(this, player, intValue);
     }
 }

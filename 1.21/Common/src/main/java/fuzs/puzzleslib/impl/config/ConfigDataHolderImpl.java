@@ -102,7 +102,8 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     protected void onModConfig(ModConfigEventType eventType, String fileName, Runnable removeWatch) {
         if (Objects.equals(fileName, this.getFileName())) {
-            Objects.requireNonNull(this.config, () -> "Attempting to register invalid config " + fileName);
+            PuzzlesLib.LOGGER.info("Dispatching {} event for config {}", eventType, fileName);
+            Objects.requireNonNull(this.config, () -> "config is null: " + fileName);
             if (eventType.isLoading()) {
                 this.configValueCallbacks.forEach(Runnable::run);
                 // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
@@ -110,8 +111,6 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
                 for (Consumer<T> callback : this.additionalCallbacks) {
                     callback.accept(this.config);
                 }
-                // do not log unloading event, it's not important to us and can be falsely associated with world unloading hanging
-                PuzzlesLib.LOGGER.info("Dispatching {} event for config {}", eventType, fileName);
             } else {
                 this.isAvailable = false;
             }

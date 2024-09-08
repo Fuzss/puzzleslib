@@ -1,19 +1,15 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.EntityEvent;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Ocelot.class)
 abstract class OcelotFabricMixin extends Animal {
@@ -22,17 +18,8 @@ abstract class OcelotFabricMixin extends Animal {
         super(entityType, level);
     }
 
-    @Inject(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/Ocelot;setTrusting(Z)V"), cancellable = true)
-    public void mobInteract(Player player, InteractionHand interactionHand, CallbackInfoReturnable<InteractionResult> callback) {
-        if (FabricLivingEvents.ANIMAL_TAME.invoker().onAnimalTame(this, player).isInterrupt()) {
-            this.spawnTrustingParticles(false);
-            this.level().broadcastEntityEvent(this, EntityEvent.TRUSTING_FAILED);
-            callback.setReturnValue(InteractionResult.CONSUME);
-        }
-    }
-
-    @Shadow
-    private void spawnTrustingParticles(boolean success) {
-        throw new RuntimeException();
+    @ModifyExpressionValue(method = "mobInteract", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
+    public int mobInteract(int intValue, Player player, InteractionHand interactionHand) {
+        return FabricEventImplHelper.onAnimalTame(this, player, intValue);
     }
 }
