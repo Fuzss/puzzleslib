@@ -24,8 +24,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 @Mixin(targets = "net.minecraft.world.inventory.GrindstoneMenu$4")
-abstract class GrindstoneMenuResultSlotFabricMixin extends Slot {
-    @Shadow(aliases = "field_16780")
+abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
+    @Shadow
     @Final
     private GrindstoneMenu this$0;
     @Nullable
@@ -35,7 +35,7 @@ abstract class GrindstoneMenuResultSlotFabricMixin extends Slot {
     @Unique
     private DefaultedValue<ItemStack> puzzleslib$bottomInput;
 
-    public GrindstoneMenuResultSlotFabricMixin(Container container, int slot, int x, int y) {
+    public GrindstoneMenu$ResultSlotFabricMixin(Container container, int slot, int x, int y) {
         super(container, slot, x, y);
     }
 
