@@ -162,6 +162,16 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(translationKey, additionalKey, value);
         }
 
+        default void addMobEffect(Holder<MobEffect> mobEffect, String value) {
+            Objects.requireNonNull(mobEffect, "mob effect is null");
+            this.add(mobEffect.value(), value);
+        }
+
+        default void addMobEffect(Holder<MobEffect> mobEffect, String additionalKey, String value) {
+            Objects.requireNonNull(mobEffect, "mob effect is null");
+            this.add(mobEffect.value(), additionalKey, value);
+        }
+
         default void add(MobEffect mobEffect, String value) {
             this.add(mobEffect, "", value);
         }
@@ -197,7 +207,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             Objects.requireNonNull(statType, "stat type is null");
             Objects.requireNonNull(statType.getDisplayName(), "component is null");
             if (statType.getDisplayName().getContents() instanceof TranslatableContents contents) {
-                this.add(contents.getKey(), value);
+                this.add(contents.getKey(), additionalKey, value);
             } else {
                 throw new IllegalArgumentException("Unsupported component: " + statType.getDisplayName());
             }

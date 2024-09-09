@@ -59,9 +59,17 @@ public final class ConfigTranslationsManager {
 
     public static void addConfigValueComment(String modId, List<String> valuePath, List<String> comments) {
         String value = String.join(System.lineSeparator(), getStylizedStrings(comments));
-        if (!value.isEmpty()) {
-            TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".tooltip", value);
-        }
+        // also put in empty strings, as translations are expected for config values without a comment as well
+        TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".tooltip", value);
+    }
+
+    public static void addConfigValueButton(String valueName) {
+        Objects.requireNonNull(valueName, "value name is null");
+        addConfigValueButton(Collections.singletonList(valueName));
+    }
+
+    public static void addConfigValueButton(List<String> valuePath) {
+        TRANSLATIONS.put(valuePath.getLast() + ".button", "Edit...");
     }
 
     static String getCapitalizedString(String s) {
