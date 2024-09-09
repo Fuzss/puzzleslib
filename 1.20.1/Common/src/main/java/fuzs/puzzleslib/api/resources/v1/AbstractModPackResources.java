@@ -129,9 +129,10 @@ public abstract class AbstractModPackResources implements PackResources {
     /**
      * An internal setup helper intended for setting up {@link DynamicPackResources} after the id has been set.
      */
+    @Deprecated(forRemoval = true)
     @ApiStatus.Internal
     void setup() {
-
+        // NO-OP
     }
 
     @ApiStatus.Internal
