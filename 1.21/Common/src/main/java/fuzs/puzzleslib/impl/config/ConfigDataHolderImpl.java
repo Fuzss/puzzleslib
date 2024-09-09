@@ -166,6 +166,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
                 comment = null;
             }
             ConfigTranslationsManager.addConfigValueComment(modId, entry.getKey(), comment);
+            ConfigTranslationsManager.addConfigValueButton(entry.getKey());
         }
     }
 
