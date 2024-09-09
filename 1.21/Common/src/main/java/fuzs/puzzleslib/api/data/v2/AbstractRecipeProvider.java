@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.data.v2;
 
+import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,11 +17,11 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.recipes.RecipeBuilder;
-import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.*;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
@@ -78,16 +79,64 @@ public abstract class AbstractRecipeProvider extends RecipeProvider {
         return jsonElement;
     }
 
-    public static String getHasName(ItemLike item, ItemLike... items) {
-        return "has_" + Stream.concat(Stream.of(item), Stream.of(items))
-                .map(RecipeProvider::getItemName)
-                .collect(Collectors.joining("_and_"));
+    public static String getItemName(Ingredient ingredient) {
+        return getItemName(Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
     }
 
-    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item, ItemLike... items) {
+    public static String getItemName(ItemLike... items) {
+        Preconditions.checkState(items.length > 0, "items is empty");
+        return Arrays.stream(items)
+                .map(RecipeProvider::getItemName)
+                .collect(Collectors.joining("_or_"));
+    }
+
+    public static String getConversionRecipeName(ItemLike result, Ingredient ingredient) {
+        return getConversionRecipeName(result, Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
+    }
+
+    public static String getConversionRecipeName(ItemLike result, ItemLike... items) {
+        Preconditions.checkState(items.length > 0, "items is empty");
+        return getItemName(result) + "_from_" + getItemName(items);
+    }
+
+    public static String getHasName(Ingredient ingredient) {
+        return getHasName(Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
+    }
+
+    public static String getHasName(ItemLike... items) {
+        Preconditions.checkState(items.length > 0, "items is empty");
+        return "has_" + getItemName(items);
+    }
+
+    @Deprecated(forRemoval = true)
+    public static String getHasName(ItemLike item, ItemLike... items) {
+        return getHasName(Stream.concat(Stream.of(item), Stream.of(items)).toArray(ItemLike[]::new));
+    }
+
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(Ingredient ingredient) {
+        return has(Arrays.stream(ingredient.getItems()).map(ItemStack::getItem).toArray(ItemLike[]::new));
+    }
+
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike... items) {
+        Preconditions.checkState(items.length > 0, "items is empty");
         return inventoryTrigger(ItemPredicate.Builder.item()
-                .of(Stream.concat(Stream.of(item), Stream.of(items)).toArray(ItemLike[]::new))
+                .of(items)
                 .build());
+    }
+
+    @Deprecated(forRemoval = true)
+    public static Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike item, ItemLike... items) {
+        return has(Stream.concat(Stream.of(item), Stream.of(items)).toArray(ItemLike[]::new));
+    }
+
+    public static void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material) {
+        stonecutterResultFromBase(recipeOutput, category, result, material, 1);
+    }
+
+    public static void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material, int resultCount) {
+        SingleItemRecipeBuilder.stonecutting(material, category, result, resultCount)
+                .unlockedBy(getHasName(material), has(material))
+                .save(recipeOutput, getConversionRecipeName(result, material) + "_stonecutting");
     }
 
     @Override
