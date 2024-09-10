@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.client;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
+import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenHelper;
@@ -16,6 +17,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.components.toasts.*;
 import net.minecraft.client.gui.screens.BackupConfirmScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
@@ -40,6 +42,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
         EventHandlerProvider.tryRegister(KeyMappingHelper.INSTANCE);
         AddResourcePackReloadListenersCallback.EVENT.register(
                 ConfigTranslationsManager::onAddResourcePackReloadListeners);
+        // skip experimental settings warning
         ScreenHelper.autoPressScreenButton(BackupConfirmScreen.class, "selectWorld.backupQuestion.experimental",
                 "selectWorld.backupJoinSkipButton"
         );
@@ -62,6 +65,17 @@ public class PuzzlesLibClient implements ClientModConstructor {
                 screen.getUiState().setAllowCommands(true);
             }
             return EventResult.PASS;
+        });
+        AddToastCallback.EVENT.register((ToastComponent toastManager, Toast toast) -> {
+            if (toast instanceof SystemToast systemToast && systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
+                return EventResult.INTERRUPT;
+            } else if (toast instanceof RecipeToast || toast instanceof TutorialToast) {
+                return EventResult.INTERRUPT;
+            } else if (toastManager.freeSlots() == 0) {
+                return EventResult.INTERRUPT;
+            } else {
+                return EventResult.PASS;
+            }
         });
         // required for EditBox mixin to work properly on all screens like ChatScreen
         ScreenMouseEvents.beforeMouseClick(Screen.class).register(
