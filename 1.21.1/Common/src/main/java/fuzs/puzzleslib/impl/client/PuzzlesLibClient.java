@@ -122,6 +122,8 @@ public class PuzzlesLibClient implements ClientModConstructor {
         options.guiScale().set(5);
         options.onboardAccessibility = false;
         options.skipMultiplayerWarning = true;
+        options.damageTiltStrength().set(0.0);
+        options.narratorHotkey().set(false);
     }
 
     @Override
