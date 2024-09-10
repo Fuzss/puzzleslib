@@ -8,7 +8,7 @@ public final class ClientTickEvents {
     public static final EventInvoker<End> END = EventInvoker.lookup(End.class);
 
     private ClientTickEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

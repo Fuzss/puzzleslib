@@ -11,15 +11,37 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
- * A builder implementation for constructing {@link TooltipComponentImpl}.
+ * A builder implementation for handling {@link net.minecraft.client.gui.components.Tooltip} with some extras.
  */
 public interface TooltipBuilder {
 
     /**
-     * @return creates a new builder instance
+     * Creates a new builder instance.
+     *
+     * @return the builder instance
      */
     static TooltipBuilder create() {
         return new TooltipBuilderImpl();
+    }
+
+    /**
+     * Creates a new builder instance.
+     *
+     * @param lines the tooltip lines
+     * @return the builder instance
+     */
+    static TooltipBuilder create(FormattedText... lines) {
+        return new TooltipBuilderImpl(lines);
+    }
+
+    /**
+     * Creates a new builder instance.
+     *
+     * @param lines the tooltip lines
+     * @return the builder instance
+     */
+    static TooltipBuilder create(List<? extends FormattedText> lines) {
+        return new TooltipBuilderImpl(lines);
     }
 
     /**

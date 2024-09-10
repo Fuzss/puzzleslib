@@ -42,8 +42,7 @@ public final class TooltipRenderHelper {
      */
     public static List<Component> getTooltipLines(ItemStack itemStack) {
         return getTooltipLines(itemStack,
-                Minecraft.getInstance().options.advancedItemTooltips ?
-                        TooltipFlag.Default.ADVANCED :
+                Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED :
                         TooltipFlag.Default.NORMAL
         );
     }
@@ -73,8 +72,7 @@ public final class TooltipRenderHelper {
      */
     public static List<ClientTooltipComponent> getTooltip(ItemStack itemStack) {
         return getTooltip(itemStack,
-                Minecraft.getInstance().options.advancedItemTooltips ?
-                        TooltipFlag.Default.ADVANCED :
+                Minecraft.getInstance().options.advancedItemTooltips ? TooltipFlag.Default.ADVANCED :
                         TooltipFlag.Default.NORMAL
         );
     }
@@ -184,13 +182,10 @@ public final class TooltipRenderHelper {
      * @return the client tooltip components
      */
     public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents, int insertAt) {
-        List<ClientTooltipComponent> clientComponents = components.stream()
-                .map(Component::getVisualOrderText)
-                .map(ClientTooltipComponent::create)
-                .collect(Collectors.toList());
-        List<ClientTooltipComponent> clientImageComponents = imageComponents.stream()
-                .map(ClientAbstractions.INSTANCE::createImageComponent)
-                .toList();
+        List<ClientTooltipComponent> clientComponents = components.stream().map(Component::getVisualOrderText).map(
+                ClientTooltipComponent::create).collect(Collectors.toList());
+        List<ClientTooltipComponent> clientImageComponents = imageComponents.stream().map(
+                ClientAbstractions.INSTANCE::createImageComponent).toList();
         if (insertAt == -1) {
             clientComponents.addAll(clientImageComponents);
         } else {
@@ -219,12 +214,8 @@ public final class TooltipRenderHelper {
         if (components.isEmpty()) return;
 
         Minecraft minecraft = Minecraft.getInstance();
-        boolean result = ClientAbstractions.INSTANCE.onRenderTooltip(guiGraphics,
-                minecraft.font,
-                posX,
-                posY,
-                (List<ClientTooltipComponent>) components,
-                DefaultTooltipPositioner.INSTANCE
+        boolean result = ClientAbstractions.INSTANCE.onRenderTooltip(guiGraphics, minecraft.font, posX, posY,
+                (List<ClientTooltipComponent>) components, DefaultTooltipPositioner.INSTANCE
         );
 
         if (result) return;
@@ -250,10 +241,7 @@ public final class TooltipRenderHelper {
         int currentPosY = posY;
         for (int i = 0; i < components.size(); ++i) {
             ClientTooltipComponent component = components.get(i);
-            component.renderText(minecraft.font,
-                    posX,
-                    currentPosY,
-                    guiGraphics.pose().last().pose(),
+            component.renderText(minecraft.font, posX, currentPosY, guiGraphics.pose().last().pose(),
                     guiGraphics.bufferSource()
             );
             currentPosY += component.getHeight() + (i == 0 ? 2 : 0);
@@ -273,12 +261,7 @@ public final class TooltipRenderHelper {
 
     @SuppressWarnings("deprecation")
     private static void renderTooltipBackground(GuiGraphics guiGraphics, int posX, int posY, int lineWidth, int lineHeight) {
-        guiGraphics.drawManaged(() -> TooltipRenderUtil.renderTooltipBackground(guiGraphics,
-                posX,
-                posY,
-                lineWidth,
-                lineHeight,
-                400
-        ));
+        guiGraphics.drawManaged(
+                () -> TooltipRenderUtil.renderTooltipBackground(guiGraphics, posX, posY, lineWidth, lineHeight, 400));
     }
 }

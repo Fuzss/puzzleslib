@@ -56,8 +56,7 @@ public final class ClientComponentSplitter {
      * @param tooltipLines components for building the tooltip
      * @return stream of split char sequences
      */
-    public static Stream<FormattedCharSequence> splitTooltipLines(int maxWidth,
-                                                                  List<? extends FormattedText> tooltipLines) {
+    public static Stream<FormattedCharSequence> splitTooltipLines(int maxWidth, List<? extends FormattedText> tooltipLines) {
         return tooltipLines.stream().flatMap((FormattedText formattedText) -> {
             List<FormattedCharSequence> lines = Minecraft.getInstance().font.split(formattedText, maxWidth);
             if (lines.isEmpty()) {

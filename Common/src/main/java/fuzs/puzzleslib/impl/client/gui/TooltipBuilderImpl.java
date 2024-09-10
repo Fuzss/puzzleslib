@@ -1,30 +1,40 @@
 package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
 import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.TooltipBuilder;
-import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.TooltipComponentImpl;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class TooltipBuilderImpl implements TooltipBuilder {
-    private final List<FormattedText> lines = new ArrayList<>();
+    final List<FormattedText> lines = new ArrayList<>();
+    Duration delay = Duration.ZERO;
+    int maxLineWidth;
     @Nullable
-    private Duration delay;
-    private int maxLineWidth;
+    Function<AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
     @Nullable
-    private Function<AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
-    @Nullable
-    private Supplier<List<? extends FormattedText>> linesSupplier;
+    Supplier<List<? extends FormattedText>> linesSupplier;
+
+    public TooltipBuilderImpl() {
+        this(new FormattedText[0]);
+    }
+
+    public TooltipBuilderImpl(FormattedText... lines) {
+        this(Arrays.asList(lines));
+    }
+
+    public TooltipBuilderImpl(List<? extends FormattedText> lines) {
+        this.lines.addAll(lines);
+    }
 
     @Override
     public TooltipBuilder addLines(FormattedText... lines) {
@@ -67,47 +77,13 @@ public final class TooltipBuilderImpl implements TooltipBuilder {
 
     @Override
     public TooltipBuilder splitLines(int maxWidth) {
+        Preconditions.checkArgument(maxWidth >= 0, "max width is negative");
         this.maxLineWidth = maxWidth;
         return this;
     }
 
     @Override
     public void build(AbstractWidget abstractWidget) {
-        Preconditions.checkState(!this.lines.isEmpty() || this.linesSupplier != null, "lines is empty");
-        new TooltipComponentImpl(abstractWidget, ImmutableList.copyOf(this.lines)) {
-
-            {
-                if (TooltipBuilderImpl.this.delay != null) {
-                    this.setTooltipDelay(TooltipBuilderImpl.this.delay);
-                }
-            }
-
-            @Override
-            public List<FormattedCharSequence> processTooltipLines(List<? extends FormattedText> tooltipLines) {
-                if (TooltipBuilderImpl.this.maxLineWidth != 0) {
-                    return ClientComponentSplitter.splitTooltipLines(TooltipBuilderImpl.this.maxLineWidth, tooltipLines).toList();
-                } else {
-                    return ClientComponentSplitter.processTooltipLines(tooltipLines).toList();
-                }
-            }
-
-            @Override
-            public List<? extends FormattedText> getLinesForNextRenderPass() {
-                if (TooltipBuilderImpl.this.linesSupplier != null) {
-                    return TooltipBuilderImpl.this.linesSupplier.get();
-                } else {
-                    return Collections.emptyList();
-                }
-            }
-
-            @Override
-            public ClientTooltipPositioner createTooltipPositioner(AbstractWidget abstractWidget) {
-                if (TooltipBuilderImpl.this.tooltipPositionerFactory != null) {
-                    return TooltipBuilderImpl.this.tooltipPositionerFactory.apply(abstractWidget);
-                } else {
-                    return super.createTooltipPositioner(abstractWidget);
-                }
-            }
-        };
+        abstractWidget.tooltip = new WidgetTooltipHolderImpl(abstractWidget, this);
     }
 }
