@@ -1,13 +1,11 @@
 package fuzs.puzzleslib.impl.config;
 
-import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.google.common.collect.ImmutableList;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ValueCallback;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.annotation.ConfigBuilder;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -15,7 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -125,14 +122,9 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         }
     }
 
-    protected ModConfigSpec setupConfigSpec(String modId, String configType) {
+    protected ModConfigSpec register(String modId) {
         this.initializeFileName(modId);
-        ModConfigSpec configSpec = this.buildConfigSpec();
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ConfigTranslationsManager.addConfig(modId, this.getFileName(), configType);
-            this.addConfigSpecTranslations(modId, configSpec.getSpec(), new ArrayList<>(), configSpec);
-        }
-        return configSpec;
+        return this.buildConfigSpec();
     }
 
     private void initializeFileName(String modId) {
@@ -149,25 +141,6 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         ConfigBuilder.build(builder, this, this.config);
         this.configValueCallbacks = ImmutableList.copyOf(this.configValueCallbacks);
         return builder.build();
-    }
-
-    private void addConfigSpecTranslations(String modId, UnmodifiableConfig config, List<String> path, ModConfigSpec configSpec) {
-        for (Map.Entry<String, Object> entry : config.valueMap().entrySet()) {
-            ConfigTranslationsManager.addConfigValue(modId, entry.getKey());
-            String comment;
-            if (entry.getValue() instanceof ModConfigSpec.ValueSpec valueSpec) {
-                comment = valueSpec.getComment();
-            } else if (entry.getValue() instanceof UnmodifiableConfig) {
-                path = new ArrayList<>(path);
-                path.add(entry.getKey());
-                comment = configSpec.getLevelComment(path);
-                this.addConfigSpecTranslations(modId, (UnmodifiableConfig) entry.getValue(), path, configSpec);
-            } else {
-                comment = null;
-            }
-            ConfigTranslationsManager.addConfigValueComment(modId, entry.getKey(), comment);
-            ConfigTranslationsManager.addConfigValueButton(entry.getKey());
-        }
     }
 
     public String getFileName() {
