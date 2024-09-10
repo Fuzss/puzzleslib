@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.config;
 
+import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.language.ClientLanguage;
@@ -8,11 +9,13 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 public final class ConfigTranslationsManager {
     public static final Map<String, String> TRANSLATIONS = new HashMap<>();
@@ -22,25 +25,57 @@ public final class ConfigTranslationsManager {
     }
 
     public static void onAddResourcePackReloadListeners(BiConsumer<ResourceLocation, PreparableReloadListener> consumer) {
-        consumer.accept(PuzzlesLibMod.id("config_translations"), (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
-            if (Language.getInstance() instanceof ClientLanguage clientLanguage) {
-                if (!(clientLanguage.storage instanceof HashMap<String, String>)) {
-                    clientLanguage.storage = new HashMap<>(clientLanguage.storage);
+        consumer.accept(PuzzlesLibMod.id("config_translations"),
+                (ResourceManagerReloadListener) (ResourceManager resourceManager) -> {
+                    if (Language.getInstance() instanceof ClientLanguage clientLanguage) {
+                        if (!(clientLanguage.storage instanceof HashMap<String, String>)) {
+                            clientLanguage.storage = new HashMap<>(clientLanguage.storage);
+                        }
+                        TRANSLATIONS.forEach(clientLanguage.storage::putIfAbsent);
+                    }
                 }
-                TRANSLATIONS.forEach(clientLanguage.storage::putIfAbsent);
+        );
+    }
+
+    public static void addModConfig(String modId, String configType, String fileName, ModConfigSpec configSpec) {
+        addConfigTitle(modId);
+        addConfigFile(modId, fileName, configType);
+        addConfigValues(modId, configSpec.getSpec(), new ArrayList<>(), configSpec::getLevelComment);
+    }
+
+    static void addConfigValues(String modId, UnmodifiableConfig config, List<String> path, Function<List<String>, @Nullable String> levelCommentGetter) {
+        for (Map.Entry<String, Object> entry : config.valueMap().entrySet()) {
+            addConfigValue(modId, entry.getKey());
+            String comment;
+            if (entry.getValue() instanceof ModConfigSpec.ValueSpec valueSpec) {
+                comment = valueSpec.getComment();
+            } else if (entry.getValue() instanceof UnmodifiableConfig) {
+                path = new ArrayList<>(path);
+                path.add(entry.getKey());
+                comment = levelCommentGetter.apply(path);
+                addConfigValues(modId, (UnmodifiableConfig) entry.getValue(), path, levelCommentGetter);
+            } else {
+                comment = null;
             }
-        });
+            addConfigValueComment(modId, entry.getKey(), comment);
+            addConfigValueButton(entry.getKey());
+        }
     }
 
     public static void addConfigTitle(String modId) {
         TRANSLATIONS.put(modId + ".configuration.title", "%s Configuration");
     }
 
-    public static void addConfig(String modId, String fileName, String configType) {
+    public static void addConfigFile(String modId, String fileName, String configType) {
         configType = getCapitalizedString(configType);
-        fileName = fileName.replaceAll("[^a-zA-Z0-9]+", ".").replaceFirst("^\\.", "").replaceFirst("\\.$", "").toLowerCase();
+        fileName = fileName.replaceAll("[^a-zA-Z0-9]+", ".")
+                .replaceFirst("^\\.", "")
+                .replaceFirst("\\.$", "")
+                .toLowerCase();
         TRANSLATIONS.put(modId + ".configuration.section." + fileName, configType + " Settings");
-        TRANSLATIONS.put(modId + ".configuration.section." + fileName + ".title", "%s " + configType + " Configuration");
+        TRANSLATIONS.put(modId + ".configuration.section." + fileName + ".title",
+                "%s " + configType + " Configuration"
+        );
     }
 
     public static void addConfigValue(String modId, String valueName) {
@@ -54,7 +89,9 @@ public final class ConfigTranslationsManager {
 
     public static void addConfigValueComment(String modId, String valueName, @Nullable String comment) {
         Objects.requireNonNull(valueName, "value name is null");
-        addConfigValueComment(modId, Collections.singletonList(valueName), comment != null ? Arrays.asList(comment.split("\\r?\\n")) : Collections.emptyList());
+        addConfigValueComment(modId, Collections.singletonList(valueName),
+                comment != null ? Arrays.asList(comment.split("\\r?\\n")) : Collections.emptyList()
+        );
     }
 
     public static void addConfigValueComment(String modId, List<String> valuePath, List<String> comments) {

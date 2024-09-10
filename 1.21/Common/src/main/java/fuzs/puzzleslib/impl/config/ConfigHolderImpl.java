@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.config;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
@@ -9,6 +8,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -16,7 +16,7 @@ import java.util.function.UnaryOperator;
 
 public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     private final String modId;
-    private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = Maps.newIdentityHashMap();
+    private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = new IdentityHashMap<>();
 
     protected ConfigHolderImpl(String modId) {
         this.modId = modId;
@@ -90,7 +90,6 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
             if (holder.config != null) this.bake(holder, this.modId);
         }
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ConfigTranslationsManager.addConfigTitle(this.modId);
             this.registerConfigurationScreen(this.modId);
         }
     }

@@ -6,10 +6,12 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
+import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -65,6 +67,13 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
     public void registerConfigurationScreen(String modId) {
         ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
+            if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
+                ConfigTranslationsManager.addModConfig(modConfig.getModId(), modConfig.getType().extension(),
+                        modConfig.getFileName(), modConfigSpec
+                );
+            }
+        });
     }
 
     private static class NeoForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
@@ -83,22 +92,27 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
         void onModConfig(ModConfig modConfig, ModConfigEventType eventType) {
             if (modConfig.getType() == this.configType) {
                 super.onModConfig(eventType, modConfig.getFileName(), () -> {
-                    if (modConfig.getLoadedConfig() != null && !modConfig.getLoadedConfig().config().configFormat().isInMemory()) {
+                    if (modConfig.getLoadedConfig() != null &&
+                            !modConfig.getLoadedConfig().config().configFormat().isInMemory()) {
                         try {
                             Path path = modConfig.getFullPath();
                             FileWatcher.defaultInstance().removeWatch(path);
                         } catch (RuntimeException exception) {
-                            PuzzlesLib.LOGGER.error("Failed to remove config {} from tracker!", modConfig.getFileName(), exception);
+                            PuzzlesLib.LOGGER.error("Failed to remove config {} from tracker!", modConfig.getFileName(),
+                                    exception
+                            );
                         }
                     }
                 });
             }
         }
 
-        void register(String modId) {
-            ModConfigSpec configSpec = this.setupConfigSpec(modId, this.configType.extension());
+        @Override
+        protected ModConfigSpec register(String modId) {
+            ModConfigSpec modConfigSpec = super.register(modId);
             ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
-            modContainer.registerConfig(this.configType, configSpec, this.getFileName());
+            modContainer.registerConfig(this.configType, modConfigSpec, this.getFileName());
+            return modConfigSpec;
         }
     }
 }

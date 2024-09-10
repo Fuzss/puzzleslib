@@ -60,6 +60,11 @@ public interface PlayerSet {
         };
     }
 
+    /**
+     * Send message from server to all players on the server.
+     *
+     * @param serverPlayer player to exclude from sending to
+     */
     static PlayerSet ofOthers(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
         return (Packet<?> packet) -> {
