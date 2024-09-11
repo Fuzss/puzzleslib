@@ -10,6 +10,7 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -46,6 +47,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 /**
  * Handles registering to game registries. Registration is performed instantly on Fabric and is deferred on Forge.
@@ -173,6 +175,19 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
 
     /**
+     * Register a data component type.
+     *
+     * @param path  path for new entry
+     * @param entry supplier for entry to register
+     * @return holder reference
+     */
+    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> entry) {
+        return this.register(Registries.DATA_COMPONENT_TYPE, path,
+                () -> entry.apply(DataComponentType.builder()).build()
+        );
+    }
+
+    /**
      * Register a fluid.
      *
      * @param path  path for new entry
@@ -220,7 +235,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an enchantment.
      *
-     * @param path  path for new entry
+     * @param path path for new entry
      * @return holder reference
      */
     default ResourceKey<Enchantment> registerEnchantment(String path) {
@@ -237,8 +252,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     @SuppressWarnings("unchecked")
     default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
-        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE,
-                path,
+        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE, path,
                 () -> {
                     return entry.get().build(path);
                 }
@@ -256,8 +270,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     @SuppressWarnings("unchecked")
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
-                path,
-                () -> {
+                path, () -> {
                     return entry.get().build(null);
                 }
         );
@@ -422,13 +435,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<Item> repairItem) {
-        return this.registerArmorMaterial(path,
-                defense,
-                enchantmentValue,
-                SoundEvents.ARMOR_EQUIP_GENERIC,
-                () -> Ingredient.of(repairItem.value()),
-                0.0F,
-                0.0F
+        return this.registerArmorMaterial(path, defense, enchantmentValue, SoundEvents.ARMOR_EQUIP_GENERIC,
+                () -> Ingredient.of(repairItem.value()), 0.0F, 0.0F
         );
     }
 
@@ -448,14 +456,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance) {
-        return this.register(Registries.ARMOR_MATERIAL,
-                path,
-                () -> new ArmorMaterial(defense,
-                        enchantmentValue,
-                        equipSound,
-                        repairIngredient,
-                        Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))),
-                        toughness,
+        return this.register(Registries.ARMOR_MATERIAL, path,
+                () -> new ArmorMaterial(defense, enchantmentValue, equipSound, repairIngredient,
+                        Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))), toughness,
                         knockbackResistance
                 )
         );
