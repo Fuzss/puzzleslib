@@ -22,7 +22,8 @@ public final class RenderHandEvents {
     public interface MainHand {
 
         /**
-         * Called before the player's main hand is rendered in first-person mode.
+         * Called before the player's {@link net.minecraft.world.InteractionHand#MAIN_HAND} is rendered in first-person
+         * mode.
          * <p>
          * Allows for cancelling rendering of the hand.
          *
@@ -40,9 +41,10 @@ public final class RenderHandEvents {
          * @param equipProgress      the height the hand is rendered at, changes when switching between hotbar items and
          *                           after triggering the attack cool-down, originally retrieved from
          *                           {@link Player#getAttackStrengthScale(float)}
-         * @return {@link EventResult#INTERRUPT} to prevent the specific hand from rendering,
-         *         <p>
-         *         {@link EventResult#PASS} to allow the hand to render normally
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT} to prevent the hand from rendering</li>
+         *         <li>{@link EventResult#PASS} to allow the hand to render normally</li>
+         *         </ul>
          */
         EventResult onRenderMainHand(ItemInHandRenderer itemInHandRenderer, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, MultiBufferSource multiBufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
     }
@@ -51,7 +53,8 @@ public final class RenderHandEvents {
     public interface OffHand {
 
         /**
-         * Called before the player's off-hand is rendered in first-person mode.
+         * Called before the player's {@link net.minecraft.world.InteractionHand#OFF_HAND} is rendered in first-person
+         * mode.
          * <p>
          * Allows for cancelling rendering of the hand.
          *
@@ -69,9 +72,10 @@ public final class RenderHandEvents {
          * @param equipProgress      the height the hand is rendered at, changes when switching between hotbar items and
          *                           after triggering the attack cool-down, originally retrieved from
          *                           {@link Player#getAttackStrengthScale(float)}
-         * @return {@link EventResult#INTERRUPT} to prevent the specific hand from rendering,
-         *         <p>
-         *         {@link EventResult#PASS} to allow the hand to render normally
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT} to prevent the hand from rendering</li>
+         *         <li>{@link EventResult#PASS} to allow the hand to render normally</li>
+         *         </ul>
          */
         EventResult onRenderOffHand(ItemInHandRenderer itemInHandRenderer, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, MultiBufferSource multiBufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
     }
