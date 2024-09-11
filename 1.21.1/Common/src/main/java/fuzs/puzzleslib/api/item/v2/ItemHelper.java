@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.item.v2;
 
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -23,15 +25,13 @@ public final class ItemHelper {
     /**
      * Called for damaging an item stack, potentially breaking it when it runs out of durability.
      *
-     * @param itemStack the item stack to be hurt
-     * @param amount    the amount to damage the stack by
-     * @param level     the level
-     * @param player    the player using the stack
-     * @param onBreak   what happens when the stack breaks, usually calls
-     *                  {@link LivingEntity#onEquippedItemBroken(Item, EquipmentSlot)}
+     * @param itemStack       the item stack to be hurt
+     * @param amount          the amount to damage the stack by
+     * @param entity          the entity using the stack
+     * @param interactionHand the hand using the stack
      */
-    public static void hurtAndBreak(ItemStack itemStack, int amount, ServerLevel level, @Nullable ServerPlayer player, Consumer<Item> onBreak) {
-        itemStack.hurtAndBreak(amount, level, player, onBreak);
+    public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity entity, InteractionHand interactionHand) {
+        hurtAndBreak(itemStack, amount, entity, LivingEntity.getSlotForHand(interactionHand));
     }
 
     /**
@@ -43,18 +43,40 @@ public final class ItemHelper {
      * @param slot      the slot the stack is present in
      */
     public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity entity, EquipmentSlot slot) {
-        itemStack.hurtAndBreak(amount, entity, slot);
+        if (entity.level() instanceof ServerLevel serverLevel) {
+            ServerPlayer serverPlayer = entity instanceof ServerPlayer ? (ServerPlayer) entity : null;
+            hurtAndBreak(itemStack, amount, serverLevel, serverPlayer, (Item item) -> {
+                entity.onEquippedItemBroken(item, slot);
+            });
+        }
     }
 
     /**
      * Called for damaging an item stack, potentially breaking it when it runs out of durability.
      *
-     * @param itemStack       the item stack to be hurt
-     * @param amount          the amount to damage the stack by
-     * @param entity          the entity using the stack
-     * @param interactionHand the hand using the stack
+     * @param itemStack    the item stack to be hurt
+     * @param amount       the amount to damage the stack by
+     * @param level        the level
+     * @param serverPlayer the player using the stack
+     * @param onBreak      what happens when the stack breaks, usually calls
+     *                     {@link LivingEntity#onEquippedItemBroken(Item, EquipmentSlot)}
      */
-    public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity entity, InteractionHand interactionHand) {
-        hurtAndBreak(itemStack, amount, entity, LivingEntity.getSlotForHand(interactionHand));
+    public static void hurtAndBreak(ItemStack itemStack, int amount, ServerLevel level, @Nullable ServerPlayer serverPlayer, Consumer<Item> onBreak) {
+        ItemStack originalItemStack = copyItemStackIfNecessary(itemStack, serverPlayer);
+        itemStack.hurtAndBreak(amount, level, serverPlayer, (Item item) -> {
+            onBreak.accept(item);
+            if (serverPlayer != null) {
+                CommonAbstractions.INSTANCE.onPlayerDestroyItem(serverPlayer, originalItemStack, null);
+            }
+        });
+    }
+
+    private static ItemStack copyItemStackIfNecessary(ItemStack itemStack, @Nullable ServerPlayer serverPlayer) {
+        // the Forge item destroy event uses a copy of the original item stack, so make sure we keep this here
+        if (serverPlayer != null && ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
+            return itemStack.copy();
+        } else {
+            return itemStack;
+        }
     }
 }

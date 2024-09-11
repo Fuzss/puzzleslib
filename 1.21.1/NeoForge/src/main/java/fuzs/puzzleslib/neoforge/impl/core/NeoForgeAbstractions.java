@@ -77,8 +77,8 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand) {
-        EventHooks.onPlayerDestroyItem(player, itemStack, interactionHand);
+    public void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand) {
+        EventHooks.onPlayerDestroyItem(player, originalItemStack, interactionHand);
     }
 
     @Override

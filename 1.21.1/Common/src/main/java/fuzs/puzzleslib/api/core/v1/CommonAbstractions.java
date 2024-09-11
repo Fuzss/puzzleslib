@@ -116,14 +116,12 @@ public interface CommonAbstractions {
 
     /**
      * A trigger for running a Forge event for destroying an item.
-     * <p>Ideally this should be migrated to the event api, to also allow for firing the event on Fabric. Until that
-     * happens this functions as a workaround.
      *
-     * @param player          the player destroying the item
-     * @param itemStack       the item stack before being destroyed
-     * @param interactionHand the hand holding the destroyed stack
+     * @param player            the player destroying the item
+     * @param originalItemStack the item stack before being destroyed
+     * @param interactionHand   the hand holding the destroyed stack
      */
-    void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand);
+    void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand);
 
     /**
      * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during

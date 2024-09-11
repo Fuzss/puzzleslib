@@ -115,7 +115,7 @@ public final class ConfigTranslationsManager {
         for (String string : strings) {
             joiner.add(StringUtils.capitalize(string));
         }
-        return joiner.toString();
+        return joiner.toString().replace(" And ", " & ").replace(" Or ", " / ");
     }
 
     static List<String> getStylizedStrings(List<String> strings) {
