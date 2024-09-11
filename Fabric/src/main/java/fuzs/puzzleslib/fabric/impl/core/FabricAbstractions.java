@@ -116,8 +116,8 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public void onPlayerDestroyItem(Player player, ItemStack itemStack, @Nullable InteractionHand interactionHand) {
-
+    public void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand) {
+        // NO-OP
     }
 
     @Override
