@@ -58,7 +58,7 @@ public final class ConfigTranslationsManager {
                 comment = null;
             }
             addConfigValueComment(modId, entry.getKey(), comment);
-            addConfigValueButton(entry.getKey());
+            addConfigValueButton(modId, entry.getKey());
         }
     }
 
@@ -100,13 +100,13 @@ public final class ConfigTranslationsManager {
         TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".tooltip", value);
     }
 
-    public static void addConfigValueButton(String valueName) {
+    public static void addConfigValueButton(String modId, String valueName) {
         Objects.requireNonNull(valueName, "value name is null");
-        addConfigValueButton(Collections.singletonList(valueName));
+        addConfigValueButton(modId, Collections.singletonList(valueName));
     }
 
-    public static void addConfigValueButton(List<String> valuePath) {
-        TRANSLATIONS.put(valuePath.getLast() + ".button", "Edit...");
+    public static void addConfigValueButton(String modId, List<String> valuePath) {
+        TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".button", "Edit...");
     }
 
     static String getCapitalizedString(String s) {
