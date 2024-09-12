@@ -20,10 +20,10 @@ public interface ItemTooltipCallback {
      * <p>
      * Allows for both appending additional tooltip lines, and removing / replacing existing lines.
      *
-     * @param itemStack   the item stack owning this tooltip
-     * @param lines       the tooltip lines
-     * @param player      the player looking at the tooltip, is null when search trees are created
-     * @param tooltipFlag tooltip flag context
+     * @param itemStack    the item stack owning this tooltip
+     * @param tooltipLines the tooltip lines
+     * @param player       the player looking at the tooltip, is null when search trees are created
+     * @param tooltipType  tooltip flag context
      */
-    void onItemTooltip(ItemStack itemStack, List<Component> lines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipFlag);
+    void onItemTooltip(ItemStack itemStack, List<Component> tooltipLines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipType);
 }
