@@ -31,9 +31,9 @@ public final class EnumProvider<T extends Enum<T>> implements KeyedValueProvider
 
     @Override
     public ResourceLocation getKey(T value) {
-        ResourceLocation identifier = this.values.inverse().get(value);
-        Objects.requireNonNull(identifier, "identifier is null");
-        return identifier;
+        ResourceLocation resourceLocation = this.values.inverse().get(value);
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        return resourceLocation;
     }
 
     @Override

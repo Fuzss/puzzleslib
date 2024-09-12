@@ -228,6 +228,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             entries.keySet().removeIf(t -> !this.filter.test(0, t) || toRemove.contains(t));
             this.dissolved = dissolved = Collections.unmodifiableMap(entries);
         }
+
         return dissolved;
     }
 
@@ -340,17 +341,17 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             this.findRegistryMatches(this.input).stream().flatMap(this::dissolveValue).forEach(value -> builder.accept(value, this.data));
         }
 
-        private Collection<D> findRegistryMatches(String source) {
+        private Collection<D> findRegistryMatches(String s) {
             Collection<D> matches = Sets.newHashSet();
-            if (!source.contains("*")) {
-                Optional.ofNullable(ResourceLocationHelper.tryParse(source)).flatMap(this::toValue).ifPresent(matches::add);
+            if (!s.contains("*")) {
+                Optional.ofNullable(ResourceLocationHelper.tryParse(s)).flatMap(this::toValue).ifPresent(matches::add);
             } else {
-                String regexSource = source.replace("*", "[a-z0-9/._-]*");
+                String regexSource = s.replace("*", "[a-z0-9/._-]*");
                 this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(Map.Entry::getValue).forEach(matches::add);
             }
             // test if this is a valid entry first
             if (matches.isEmpty()) {
-                PuzzlesLib.LOGGER.warn("Unable to parse entry {}: No matches found in {}", source, this.providerName);
+                PuzzlesLib.LOGGER.warn("Unable to parse entry {}: No matches found in {}", s, this.providerName);
             }
             return matches;
         }
