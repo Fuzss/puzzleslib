@@ -106,6 +106,7 @@ public final class ConfigTranslationsManager {
     }
 
     public static void addConfigValueButton(String modId, List<String> valuePath) {
+        TRANSLATIONS.put(valuePath.getLast() + ".button", "Edit...");
         TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".button", "Edit...");
     }
 

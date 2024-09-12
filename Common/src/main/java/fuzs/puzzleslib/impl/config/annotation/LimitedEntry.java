@@ -35,12 +35,12 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
     public final Set<String> getAllowedValueStrings() {
         Set<String> allowedValues = this.getAllowedValues()
                 .stream()
-                .map(String::toUpperCase)
+                .map(this::applyStringFormatting)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         if (!allowedValues.isEmpty()) {
             Set<String> allValues = this.getAllValues()
                     .stream()
-                    .map(String::toUpperCase)
+                    .map(this::applyStringFormatting)
                     .collect(Collectors.toCollection(LinkedHashSet::new));
             if (!allValues.isEmpty()) {
                 for (String s : allowedValues) {
@@ -81,7 +81,7 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
             return (Object o) -> {
                 if (o != null) {
                     String s = o instanceof Enum<?> ? ((Enum<?>) o).name() : o.toString();
-                    return allowedValues.contains(s.toUpperCase());
+                    return allowedValues.contains(this.applyStringFormatting(s));
                 } else {
                     return false;
                 }
@@ -89,6 +89,10 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         } else {
             return this.getEmptyValidator();
         }
+    }
+
+    public String applyStringFormatting(String s) {
+        return s.toUpperCase(Locale.ROOT);
     }
 
     public Predicate<Object> getEmptyValidator() {
@@ -165,6 +169,11 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
             } else {
                 return super.getAllValues();
             }
+        }
+
+        @Override
+        public String applyStringFormatting(String s) {
+            return s.toLowerCase(Locale.ROOT);
         }
 
         static Supplier<?> getNewElementSupplier(Type type) {
