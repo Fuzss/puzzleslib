@@ -32,6 +32,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -42,6 +43,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.Collections;
 import java.util.Map;
@@ -472,5 +474,25 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default ResourceKey<DamageType> registerDamageType(String path) {
         return this.makeResourceKey(Registries.DAMAGE_TYPE, path);
+    }
+
+    /**
+     * Creates a new {@link ResourceKey} for a {@link TrimMaterial}.
+     *
+     * @param path path for new resource key
+     * @return new resource key
+     */
+    default ResourceKey<TrimMaterial> registerTrimMaterial(String path) {
+        return this.makeResourceKey(Registries.TRIM_MATERIAL, path);
+    }
+
+    /**
+     * Creates a new {@link ResourceKey} for a {@link LootTable}.
+     *
+     * @param path path for new resource key
+     * @return new resource key
+     */
+    default ResourceKey<LootTable> registerLootTable(String path) {
+        return this.makeResourceKey(Registries.LOOT_TABLE, path);
     }
 }
