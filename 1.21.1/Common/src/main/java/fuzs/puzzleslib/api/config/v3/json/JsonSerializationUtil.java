@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 /**
  * helper for encoding and decoding a json config file
  */
+@Deprecated
 public class JsonSerializationUtil {
     /**
      * default string for json config file format identifier

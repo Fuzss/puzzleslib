@@ -7,7 +7,11 @@ import net.minecraft.util.GsonHelper;
 /**
  * A simple extension to {@link GsonHelper} for allowing the serialization of enum values.
  */
-public class GsonEnumHelper {
+public final class GsonEnumHelper {
+
+    private GsonEnumHelper() {
+        // NO-OP
+    }
 
     /**
      * Gets an enum value from a {@link JsonObject}, or returns a fallback if something goes wrong.
