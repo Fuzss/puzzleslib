@@ -38,5 +38,5 @@ public interface CommonFactories {
 
     CombinedIngredients getCombinedIngredients();
 
-    <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, String modId, @Nullable Function<T, ResourceKey<T>> keyExtractor);
+    <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
 }
