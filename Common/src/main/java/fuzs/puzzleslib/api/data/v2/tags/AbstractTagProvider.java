@@ -10,7 +10,6 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -32,13 +31,14 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         super(packOutput, registryKey, registries);
         this.modId = modId;
         this.registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
-        this.keyExtractor = this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
+        this.keyExtractor =
+                this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
     }
 
     @Override
     public abstract void addTags(HolderLookup.Provider registries);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     public TagAppender<T> tag(TagKey<T> tagKey) {
         // we cannot extend TagAppender as the only constructor is replaced on Forge & NeoForge
@@ -55,10 +55,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     }
 
     public AbstractTagAppender<T> add(TagKey<T> tagKey) {
-        return CommonFactories.INSTANCE.getTagAppender(this.getOrCreateRawBuilder(tagKey),
-                this.modId,
-                this.keyExtractor
-        );
+        return CommonFactories.INSTANCE.getTagAppender(this.getOrCreateRawBuilder(tagKey), this.keyExtractor);
     }
 
     protected Registry<T> registry() {

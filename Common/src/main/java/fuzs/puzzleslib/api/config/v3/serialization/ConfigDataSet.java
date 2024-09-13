@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.config.v3.serialization;
 import fuzs.puzzleslib.impl.config.serialization.ConfigDataSetImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -148,27 +147,27 @@ public interface ConfigDataSet<T> extends Collection<T> {
      */
     <V> Optional<V> getOptional(T entry, int index);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     boolean add(T t);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     boolean remove(Object o);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     boolean addAll(@NotNull Collection<? extends T> c);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     boolean removeAll(@NotNull Collection<?> c);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     boolean retainAll(@NotNull Collection<?> c);
 
-    @ApiStatus.Internal
+    @Deprecated
     @Override
     void clear();
 }

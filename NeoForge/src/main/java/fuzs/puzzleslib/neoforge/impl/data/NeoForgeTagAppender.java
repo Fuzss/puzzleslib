@@ -9,11 +9,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Function;
 
 public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
-    private final String modId;
 
-    public NeoForgeTagAppender(TagBuilder tagBuilder, String modId, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+    public NeoForgeTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
         super(tagBuilder, keyExtractor);
-        this.modId = modId;
     }
 
     @Override
@@ -24,13 +22,13 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
 
     @Override
     public AbstractTagAppender<T> remove(ResourceLocation resourceLocation) {
-        this.tagBuilder.removeElement(resourceLocation, this.modId);
+        this.tagBuilder.removeElement(resourceLocation);
         return this;
     }
 
     @Override
     public AbstractTagAppender<T> removeTag(ResourceLocation resourceLocation) {
-        this.tagBuilder.removeTag(resourceLocation, this.modId);
+        this.tagBuilder.removeTag(resourceLocation);
         return this;
     }
 }

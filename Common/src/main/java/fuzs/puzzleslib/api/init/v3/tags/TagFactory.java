@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.init.v3.tags;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
@@ -15,53 +14,24 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 
-import java.util.Map;
-
 /**
  * A simple helper class for creating new {@link TagKey} instances via a pre-set namespace.
  */
-@Deprecated
-public final class BoundTagFactory {
-    private static final Map<String, BoundTagFactory> VALUES = Maps.newConcurrentMap();
-    /**
-     * Factory instance for namespace <code>minecraft</code>.
-     */
-    public static final BoundTagFactory MINECRAFT = make("minecraft");
-    /**
-     * Factory instance for namespace <code>c</code>.
-     */
-    public static final BoundTagFactory COMMON = make("c");
-    /**
-     * Factory instance for namespace <code>fabric</code>.
-     */
-    public static final BoundTagFactory FABRIC = make("fabric");
-    /**
-     * Factory instance for namespace <code>forge</code>.
-     */
-    public static final BoundTagFactory FORGE = make("forge");
-    /**
-     * Factory instance for namespace <code>curios</code>.
-     */
-    public static final BoundTagFactory CURIOS = make("curios");
-    /**
-     * Factory instance for namespace <code>trinkets</code>.
-     */
-    public static final BoundTagFactory TRINKETS = make("trinkets");
+public interface TagFactory {
 
-    private final String namespace;
-
-    private BoundTagFactory(String namespace) {
-        this.namespace = namespace;
-    }
+    /**
+     * @return the mod id
+     */
+    String modId();
 
     /**
      * Construct a new factory instance backed by a provided namespace.
      *
-     * @param namespace the namespace
+     * @param modId the namespace
      * @return new factory instance
      */
-    public static BoundTagFactory make(String namespace) {
-        return VALUES.computeIfAbsent(namespace, BoundTagFactory::new);
+    static TagFactory make(String modId) {
+        return () -> modId;
     }
 
     /**
@@ -72,8 +42,8 @@ public final class BoundTagFactory {
      * @param <T>         registry type
      * @return new tag key
      */
-    public <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
-        return TagKey.create(registryKey, ResourceLocationHelper.fromNamespaceAndPath(this.namespace, path));
+    default <T> TagKey<T> registerTagKey(ResourceKey<? extends Registry<T>> registryKey, String path) {
+        return TagKey.create(registryKey, ResourceLocationHelper.fromNamespaceAndPath(this.modId(), path));
     }
 
     /**
@@ -82,7 +52,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<Block> registerBlockTag(String path) {
+    default TagKey<Block> registerBlockTag(String path) {
         return this.registerTagKey(Registries.BLOCK, path);
     }
 
@@ -92,7 +62,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<Item> registerItemTag(String path) {
+    default TagKey<Item> registerItemTag(String path) {
         return this.registerTagKey(Registries.ITEM, path);
     }
 
@@ -102,7 +72,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<Fluid> registerFluidTag(String path) {
+    default TagKey<Fluid> registerFluidTag(String path) {
         return this.registerTagKey(Registries.FLUID, path);
     }
 
@@ -112,7 +82,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<EntityType<?>> registerEntityTypeTag(String path) {
+    default TagKey<EntityType<?>> registerEntityTypeTag(String path) {
         return this.registerTagKey(Registries.ENTITY_TYPE, path);
     }
 
@@ -122,7 +92,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<Enchantment> registerEnchantmentTag(String path) {
+    default TagKey<Enchantment> registerEnchantmentTag(String path) {
         return this.registerTagKey(Registries.ENCHANTMENT, path);
     }
 
@@ -132,7 +102,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<Biome> registerBiomeTag(String path) {
+    default TagKey<Biome> registerBiomeTag(String path) {
         return this.registerTagKey(Registries.BIOME, path);
     }
 
@@ -142,7 +112,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<GameEvent> registerGameEventTag(String path) {
+    default TagKey<GameEvent> registerGameEventTag(String path) {
         return this.registerTagKey(Registries.GAME_EVENT, path);
     }
 
@@ -152,7 +122,7 @@ public final class BoundTagFactory {
      * @param path path for new tag key
      * @return new tag key
      */
-    public TagKey<DamageType> registerDamageTypeTag(String path) {
+    default TagKey<DamageType> registerDamageTypeTag(String path) {
         return this.registerTagKey(Registries.DAMAGE_TYPE, path);
     }
 }

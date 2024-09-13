@@ -77,7 +77,7 @@ public final class NeoForgeFactories implements CommonFactories {
     }
 
     @Override
-    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, String modId, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
-        return new NeoForgeTagAppender<>(tagBuilder, modId, keyExtractor);
+    public <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+        return new NeoForgeTagAppender<>(tagBuilder, keyExtractor);
     }
 }

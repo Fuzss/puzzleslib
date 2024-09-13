@@ -24,6 +24,7 @@ import java.util.Objects;
  *
  * @param <T> base type for tags produced by this factory instance
  */
+@Deprecated
 public final class TypedTagFactory<T> {
     private static final Map<ResourceKey<Registry<?>>, TypedTagFactory<?>> VALUES = Maps.newConcurrentMap();
     /**

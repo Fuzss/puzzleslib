@@ -51,12 +51,12 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
-    public AbstractTagAppender<T> add(ResourceKey<T> resourceKey) {
+    public AbstractTagAppender<T> add(ResourceKey<? extends T> resourceKey) {
         return this.add(resourceKey.location());
     }
 
-    public AbstractTagAppender<T> add(ResourceKey<T>... resourceKeys) {
-        for (ResourceKey<T> resourceKey : resourceKeys) {
+    public AbstractTagAppender<T> add(ResourceKey<? extends T>... resourceKeys) {
+        for (ResourceKey<? extends T> resourceKey : resourceKeys) {
             this.add(resourceKey);
         }
         return this;
@@ -73,12 +73,12 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
-    public AbstractTagAppender<T> add(Holder.Reference<T> holder) {
+    public AbstractTagAppender<T> add(Holder.Reference<? extends T> holder) {
         return this.add(holder.key());
     }
 
-    public AbstractTagAppender<T> add(Holder.Reference<T>... holders) {
-        for (Holder.Reference<T> holder : holders) {
+    public AbstractTagAppender<T> add(Holder.Reference<? extends T>... holders) {
+        for (Holder.Reference<? extends T> holder : holders) {
             this.add(holder);
         }
         return this;
@@ -107,12 +107,12 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
-    public AbstractTagAppender<T> addOptional(ResourceKey<T> resourceKey) {
+    public AbstractTagAppender<T> addOptional(ResourceKey<? extends T> resourceKey) {
         return this.addOptional(resourceKey.location());
     }
 
-    public AbstractTagAppender<T> addOptional(ResourceKey<T>... resourceKeys) {
-        for (ResourceKey<T> resourceKey : resourceKeys) {
+    public AbstractTagAppender<T> addOptional(ResourceKey<? extends T>... resourceKeys) {
+        for (ResourceKey<? extends T> resourceKey : resourceKeys) {
             this.addOptional(resourceKey);
         }
         return this;
@@ -206,12 +206,12 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
-    public AbstractTagAppender<T> remove(ResourceKey<T> resourceKey) {
+    public AbstractTagAppender<T> remove(ResourceKey<? extends T> resourceKey) {
         return this.remove(resourceKey.location());
     }
 
-    public AbstractTagAppender<T> remove(ResourceKey<T>... resourceKeys) {
-        for (ResourceKey<T> resourceKey : resourceKeys) {
+    public AbstractTagAppender<T> remove(ResourceKey<? extends T>... resourceKeys) {
+        for (ResourceKey<? extends T> resourceKey : resourceKeys) {
             this.remove(resourceKey);
         }
         return this;
