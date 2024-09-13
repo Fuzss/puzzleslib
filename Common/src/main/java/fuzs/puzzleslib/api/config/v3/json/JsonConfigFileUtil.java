@@ -16,6 +16,7 @@ import java.util.function.Predicate;
 /**
  * handles loading and saving of json config files
  */
+@Deprecated
 public class JsonConfigFileUtil {
     /**
      * gson builder instance, no html escaping to allow certain chars

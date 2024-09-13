@@ -114,6 +114,7 @@ accessible  field   net/minecraft/resources/RegistryOps$HolderLookupAdapter look
 accessible  field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
 mutable field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
 accessible  method  net/minecraft/client/gui/components/toasts/ToastComponent   freeSlots   ()I
+accessible  field   net/minecraft/client/gui/screens/TitleScreen    fading  Z
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
