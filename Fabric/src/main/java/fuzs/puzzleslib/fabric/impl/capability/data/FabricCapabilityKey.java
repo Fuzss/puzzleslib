@@ -49,7 +49,7 @@ public abstract class FabricCapabilityKey<T, C extends CapabilityComponent<T>> i
             capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) this, holder);
             return capabilityComponent;
         } else {
-            throw new IllegalArgumentException("Invalid capability holder: %s".formatted(holder));
+            throw new IllegalArgumentException("Invalid capability holder: " + holder);
         }
     }
 
