@@ -17,12 +17,8 @@ import net.minecraft.world.level.material.Fluid;
 /**
  * A simple helper class for creating new {@link TagKey} instances via a pre-set namespace.
  */
+@FunctionalInterface
 public interface TagFactory {
-
-    /**
-     * @return the mod id
-     */
-    String modId();
 
     /**
      * Construct a new factory instance backed by a provided namespace.
@@ -33,6 +29,11 @@ public interface TagFactory {
     static TagFactory make(String modId) {
         return () -> modId;
     }
+
+    /**
+     * @return the mod id
+     */
+    String modId();
 
     /**
      * Creates a new {@link TagKey} for any type of registry from a given path.

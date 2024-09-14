@@ -17,7 +17,6 @@ import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -27,27 +26,17 @@ import java.util.function.UnaryOperator;
  * screen.
  */
 public final class ScreenSkipper {
-    public static final Codec<ScreenSkipper> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                    Codec.STRING.optionalFieldOf("screen_title_translation_key").forGetter(config -> getOptionalComponent(config.titleComponent)),
-                    Codec.STRING.optionalFieldOf("button_translation_key").forGetter(config -> getOptionalComponent(config.buttonComponent)),
-                    Codec.STRING.optionalFieldOf("last_screen_title_translation_key")
-                            .forGetter(config -> getOptionalComponent(config.lastTitleComponent)),
-                    ExtraCodecs.POSITIVE_INT.optionalFieldOf("skip_buttons")
-                            .forGetter(config -> config.skipButtons > 0 ? Optional.of(config.skipButtons) : Optional.empty()),
-                    Codec.BOOL.optionalFieldOf("single_trigger")
-                            .forGetter(config -> config.singleTrigger ? Optional.of(config.singleTrigger) : Optional.empty())
-            )
-            .apply(instance,
-                    (Optional<String> title, Optional<String> button, Optional<String> lastTitle, Optional<Integer> skipButtons, Optional<Boolean> singleTrigger) -> {
-                        ScreenSkipper screenSkipper = create();
-                        title.ifPresent(screenSkipper::setTitleComponent);
-                        button.ifPresent(screenSkipper::setButtonComponent);
-                        lastTitle.ifPresent(screenSkipper::setLastTitleComponent);
-                        skipButtons.ifPresent(screenSkipper::setSkipButtons);
-                        singleTrigger.ifPresent(o -> screenSkipper.singleTrigger = o);
-                        return screenSkipper;
-                    }
-            ));
+    public static final Codec<ScreenSkipper> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.STRING.optionalFieldOf(
+                    "screen_title_translation_key").forGetter(config -> getOptionalComponent(config.titleComponent)),
+            Codec.STRING.optionalFieldOf("button_translation_key")
+                    .forGetter(config -> getOptionalComponent(config.buttonComponent)),
+            Codec.STRING.optionalFieldOf("last_screen_title_translation_key")
+                    .forGetter(config -> getOptionalComponent(config.lastTitleComponent)),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("skip_buttons")
+                    .forGetter(config -> config.skipButtons > 0 ? Optional.of(config.skipButtons) : Optional.empty()),
+            Codec.BOOL.optionalFieldOf("single_trigger")
+                    .forGetter(config -> config.singleTrigger ? Optional.of(config.singleTrigger) : Optional.empty())
+    ).apply(instance, ScreenSkipper::new));
 
     static Optional<String> getOptionalComponent(@Nullable Component component) {
         if (component != null && component.getContents() instanceof TranslatableContents contents) {
@@ -58,17 +47,34 @@ public final class ScreenSkipper {
     }
 
     @Nullable
-    private Component titleComponent;
+    private final Component titleComponent;
     @Nullable
-    private Component buttonComponent;
+    private final Component buttonComponent;
     @Nullable
-    private Component lastTitleComponent;
-    private int skipButtons;
-    private boolean singleTrigger;
+    private final Component lastTitleComponent;
+    private final int skipButtons;
+    private final boolean singleTrigger;
     private EventResult trigger;
 
+    private ScreenSkipper(Optional<String> titleComponent, Optional<String> buttonComponent, Optional<String> lastTitleComponent, Optional<Integer> skipButtons, Optional<Boolean> singleTrigger) {
+        this(titleComponent.map(Component::translatable).orElse(null),
+                buttonComponent.map(Component::translatable).orElse(null),
+                lastTitleComponent.map(Component::translatable).orElse(null),
+                skipButtons.orElse(0),
+                singleTrigger.orElse(false)
+        );
+    }
+
     private ScreenSkipper() {
-        // NO-OP
+        this(null, null, null, 0, false);
+    }
+
+    private ScreenSkipper(@Nullable Component titleComponent, @Nullable Component buttonComponent, @Nullable Component lastTitleComponent, int skipButtons, boolean singleTrigger) {
+        this.titleComponent = titleComponent;
+        this.buttonComponent = buttonComponent;
+        this.lastTitleComponent = lastTitleComponent;
+        this.skipButtons = skipButtons;
+        this.singleTrigger = singleTrigger;
     }
 
     /**
@@ -91,8 +97,12 @@ public final class ScreenSkipper {
      * @return the builder instance
      */
     public ScreenSkipper setTitleComponent(Component titleComponent) {
-        this.titleComponent = titleComponent;
-        return this;
+        return new ScreenSkipper(titleComponent,
+                this.buttonComponent,
+                this.lastTitleComponent,
+                this.skipButtons,
+                this.singleTrigger
+        );
     }
 
     /**
@@ -108,8 +118,12 @@ public final class ScreenSkipper {
      * @return the builder instance
      */
     public ScreenSkipper setButtonComponent(Component buttonComponent) {
-        this.buttonComponent = buttonComponent;
-        return this;
+        return new ScreenSkipper(this.titleComponent,
+                buttonComponent,
+                this.lastTitleComponent,
+                this.skipButtons,
+                this.singleTrigger
+        );
     }
 
     /**
@@ -125,8 +139,12 @@ public final class ScreenSkipper {
      * @return the builder instance
      */
     public ScreenSkipper setLastTitleComponent(Component lastTitleComponent) {
-        this.lastTitleComponent = lastTitleComponent;
-        return this;
+        return new ScreenSkipper(this.titleComponent,
+                this.buttonComponent,
+                lastTitleComponent,
+                this.skipButtons,
+                this.singleTrigger
+        );
     }
 
     /**
@@ -136,8 +154,12 @@ public final class ScreenSkipper {
      * @return the builder instance
      */
     public ScreenSkipper setSkipButtons(int skipButtons) {
-        this.skipButtons = skipButtons;
-        return this;
+        return new ScreenSkipper(this.titleComponent,
+                this.buttonComponent,
+                this.lastTitleComponent,
+                skipButtons,
+                this.singleTrigger
+        );
     }
 
     /**
@@ -146,8 +168,12 @@ public final class ScreenSkipper {
      * @return the builder instance
      */
     public ScreenSkipper setSingleTrigger() {
-        this.singleTrigger = true;
-        return this;
+        return new ScreenSkipper(this.titleComponent,
+                this.buttonComponent,
+                this.lastTitleComponent,
+                this.skipButtons,
+                true
+        );
     }
 
     /**
@@ -161,7 +187,6 @@ public final class ScreenSkipper {
         ScreenEvents.afterInit(Screen.class).register(this::onAfterInit);
         if (this.lastTitleComponent != null) {
             ScreenEvents.remove(Screen.class).register((Screen screen) -> {
-                Objects.requireNonNull(this.lastTitleComponent, "last title component is null");
                 if (this.trigger == EventResult.PASS && screen.getTitle().equals(this.lastTitleComponent)) {
                     this.trigger = EventResult.ALLOW;
                 }
@@ -178,8 +203,8 @@ public final class ScreenSkipper {
     }
 
     private void onAfterInit(Minecraft minecraft, Screen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, UnaryOperator<AbstractWidget> addWidget, Consumer<AbstractWidget> removeWidget) {
-        if (this.trigger == EventResult.ALLOW && (this.titleComponent == null || screen.getTitle().equals(
-                this.titleComponent))) {
+        if (this.trigger == EventResult.ALLOW &&
+                (this.titleComponent == null || screen.getTitle().equals(this.titleComponent))) {
             this.iterateAllWidgets(widgets, this.skipButtons);
         }
     }
