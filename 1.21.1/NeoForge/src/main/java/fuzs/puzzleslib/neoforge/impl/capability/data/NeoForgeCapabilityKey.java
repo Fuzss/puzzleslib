@@ -35,9 +35,11 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
         if (holder instanceof IAttachmentHolder attachmentHolder && this.isProvidedBy(holder)) {
             C capabilityComponent = attachmentHolder.getData(this.holder.value());
             Objects.requireNonNull(capabilityComponent, "data is null");
+            // if the attachment is created from deserialization this has not been called yet
+            capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) this, holder);
             return capabilityComponent;
         } else {
-            throw new IllegalArgumentException("Invalid capability holder: %s".formatted(holder));
+            throw new IllegalArgumentException("Invalid capability holder: " + holder);
         }
     }
 
