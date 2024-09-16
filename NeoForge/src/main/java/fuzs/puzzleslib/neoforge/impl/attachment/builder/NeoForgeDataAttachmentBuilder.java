@@ -1,10 +1,11 @@
-package fuzs.puzzleslib.neoforge.impl.attachment;
+package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
-import fuzs.puzzleslib.impl.attachment.DataAttachmentBuilderImpl;
+import fuzs.puzzleslib.impl.attachment.builder.DataAttachmentBuilder;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentTypeImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
+import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeAttachmentTypeAdapter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.function.BiConsumer;
 
-public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, A> extends DataAttachmentBuilderImpl<T, A> {
+public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, A> extends DataAttachmentBuilder<T, A> {
 
     @Override
     public DataAttachmentType<T, A> build(ResourceLocation resourceLocation) {

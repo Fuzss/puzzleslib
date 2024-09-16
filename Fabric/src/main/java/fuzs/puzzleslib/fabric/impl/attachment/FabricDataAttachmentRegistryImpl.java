@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.fabric.impl.attachment;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricBlockEntityDataAttachmentBuilder;
+import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricDataAttachmentBuilder;
+import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricEntityDataAttachmentBuilder;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;

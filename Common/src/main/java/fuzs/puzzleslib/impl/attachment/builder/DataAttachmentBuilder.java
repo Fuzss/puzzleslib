@@ -1,8 +1,9 @@
-package fuzs.puzzleslib.impl.attachment;
+package fuzs.puzzleslib.impl.attachment.builder;
 
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
+import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,7 +13,7 @@ import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
-public abstract class DataAttachmentBuilderImpl<T, A> implements DataAttachmentRegistry.Builder<T, A> {
+public abstract class DataAttachmentBuilder<T, A> implements DataAttachmentRegistry.Builder<T, A> {
     protected final Map<Predicate<T>, A> defaultValues = new LinkedHashMap<>();
     @Nullable
     protected Codec<A> codec;

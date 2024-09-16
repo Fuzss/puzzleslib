@@ -1,8 +1,9 @@
-package fuzs.puzzleslib.fabric.impl.attachment;
+package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
+import fuzs.puzzleslib.fabric.impl.attachment.FabricAttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
-import fuzs.puzzleslib.impl.attachment.DataAttachmentBuilderImpl;
+import fuzs.puzzleslib.impl.attachment.builder.DataAttachmentBuilder;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentTypeImpl;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
@@ -20,7 +21,7 @@ import java.util.function.BiConsumer;
  * the attachment implementation on NeoForge.
  */
 @SuppressWarnings("UnstableApiUsage")
-public class FabricDataAttachmentBuilder<T, A> extends DataAttachmentBuilderImpl<T, A> {
+public class FabricDataAttachmentBuilder<T, A> extends DataAttachmentBuilder<T, A> {
 
     @Override
     public DataAttachmentType<T, A> build(ResourceLocation resourceLocation) {

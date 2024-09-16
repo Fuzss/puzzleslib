@@ -48,7 +48,7 @@ public abstract class CapabilityComponent<T> implements NbtSerializable {
      * Must be careful with this on Forge, as capabilities are attached in the base
      * {@link net.minecraft.world.entity.Entity} constructor, so a lot of fields are still <code>null</code> and no nbt
      * data has been deserialized. A viable alternative for entity based capabilities is using
-     * {@link #setChanged(PlayerSet)} for non-empty {@link PlayerSet} instances when using {@link SyncStrategy#PLAYER}.
+     * {@link #setChanged(PlayerSet)} for non-null {@link PlayerSet} instances when using {@link SyncStrategy#PLAYER}.
      */
     protected void initialize() {
         // NO-OP

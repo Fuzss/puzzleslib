@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.neoforge.impl.attachment;
+package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
@@ -6,7 +6,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
-import fuzs.puzzleslib.impl.attachment.EntityDataAttachmentBuilderImpl;
+import fuzs.puzzleslib.impl.attachment.builder.EntityDataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -24,7 +24,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public final class NeoForgeEntityDataAttachmentBuilder<A> extends NeoForgeDataAttachmentBuilder<Entity, A> implements EntityDataAttachmentBuilderImpl<A> {
+public final class NeoForgeEntityDataAttachmentBuilder<A> extends NeoForgeDataAttachmentBuilder<Entity, A> implements EntityDataAttachmentBuilder<A> {
     @Nullable
     private StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec;
     @Nullable
@@ -80,7 +80,7 @@ public final class NeoForgeEntityDataAttachmentBuilder<A> extends NeoForgeDataAt
 
     @Override
     public DataAttachmentRegistry.EntityBuilder<A> defaultValue(A defaultValue) {
-        return EntityDataAttachmentBuilderImpl.super.defaultValue(defaultValue);
+        return EntityDataAttachmentBuilder.super.defaultValue(defaultValue);
     }
 
     @Override
