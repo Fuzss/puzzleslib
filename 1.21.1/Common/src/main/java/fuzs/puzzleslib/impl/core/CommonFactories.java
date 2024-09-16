@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
+import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
@@ -39,4 +40,6 @@ public interface CommonFactories {
     CombinedIngredients getCombinedIngredients();
 
     <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
+
+    DataAttachmentRegistryImpl getDataAttachmentRegistry();
 }

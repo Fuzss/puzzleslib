@@ -25,7 +25,7 @@ public interface PlayerSet {
      *
      * @param packet packet to send to clients
      */
-    void notify(Packet<?> packet);
+    void broadcast(Packet<?> packet);
 
     /**
      * Send message from server to no player.
@@ -68,9 +68,9 @@ public interface PlayerSet {
     static PlayerSet ofOthers(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
         return (Packet<?> packet) -> {
-            serverPlayer.getServer().getPlayerList().getPlayers().forEach(currentServerPlayer -> {
+            serverPlayer.getServer().getPlayerList().getPlayers().forEach((ServerPlayer currentServerPlayer) -> {
                 if (currentServerPlayer != serverPlayer) {
-                    ofPlayer(currentServerPlayer).notify(packet);
+                    ofPlayer(currentServerPlayer).broadcast(packet);
                 }
             });
         };
@@ -83,8 +83,8 @@ public interface PlayerSet {
      */
     static PlayerSet ofAll(MinecraftServer minecraftServer) {
         return (Packet<?> packet) -> {
-            minecraftServer.getPlayerList().getPlayers().forEach(serverPlayer -> {
-                ofPlayer(serverPlayer).notify(packet);
+            minecraftServer.getPlayerList().getPlayers().forEach((ServerPlayer serverPlayer) -> {
+                ofPlayer(serverPlayer).broadcast(packet);
             });
         };
     }
@@ -98,7 +98,7 @@ public interface PlayerSet {
         Objects.requireNonNull(serverLevel, "server level is null");
         return (Packet<?> packet) -> {
             for (ServerPlayer serverPlayer : serverLevel.players()) {
-                ofPlayer(serverPlayer).notify(packet);
+                ofPlayer(serverPlayer).broadcast(packet);
             }
         };
     }
@@ -179,8 +179,8 @@ public interface PlayerSet {
         Objects.requireNonNull(serverLevel, "server level is null");
         Objects.requireNonNull(chunkPos, "chunk pos is null");
         return (Packet<?> packet) -> {
-            serverLevel.getChunkSource().chunkMap.getPlayers(chunkPos, false).forEach(serverPlayer -> {
-                ofPlayer(serverPlayer).notify(packet);
+            serverLevel.getChunkSource().chunkMap.getPlayers(chunkPos, false).forEach((ServerPlayer serverPlayer) -> {
+                ofPlayer(serverPlayer).broadcast(packet);
             });
         };
     }

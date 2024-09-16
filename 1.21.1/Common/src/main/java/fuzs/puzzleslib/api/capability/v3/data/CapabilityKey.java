@@ -1,7 +1,12 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,12 +29,36 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
     ResourceLocation identifier();
 
     /**
-     * Get capability implementation from a holder.
+     * @return the codec for serialization
+     */
+    Codec<C> codec();
+
+    /**
+     * @param capabilityComponent the capability
+     * @param registries          the registry access
+     * @return the cloned capability
+     */
+    default C clone(C capabilityComponent, HolderLookup.Provider registries) {
+        RegistryOps<Tag> ops = registries.createSerializationContext(NbtOps.INSTANCE);
+        Tag tag = this.codec().encodeStart(ops, capabilityComponent).getOrThrow();
+        return this.codec().parse(ops, tag).getOrThrow();
+    }
+
+    /**
+     * Get the capability from a holder.
      *
-     * @param holder provider to get capability from
-     * @return capability implementation for given holder
+     * @param holder the provider to get the capability from
+     * @return the capability
      */
     C get(@NotNull T holder);
+
+    /**
+     * Set the capability for a holder.
+     *
+     * @param holder              the provider to set the capability for
+     * @param capabilityComponent the capability
+     */
+    void set(@NotNull T holder, @NotNull C capabilityComponent);
 
     /**
      * Checks if a capability is compatible with a holder.
