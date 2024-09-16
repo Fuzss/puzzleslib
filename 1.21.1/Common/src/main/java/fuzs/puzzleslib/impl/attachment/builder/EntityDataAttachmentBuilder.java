@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.attachment;
+package fuzs.puzzleslib.impl.attachment.builder;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.event.v1.entity.player.AfterChangeDimensionCallback;
@@ -6,6 +6,8 @@ import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerTrackingEvents;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
+import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
@@ -19,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public interface EntityDataAttachmentBuilderImpl<A> extends DataAttachmentRegistry.EntityBuilder<A> {
+public interface EntityDataAttachmentBuilder<A> extends DataAttachmentRegistry.EntityBuilder<A> {
 
     @Nullable
     default BiConsumer<Entity, A> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, A> attachmentType, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {

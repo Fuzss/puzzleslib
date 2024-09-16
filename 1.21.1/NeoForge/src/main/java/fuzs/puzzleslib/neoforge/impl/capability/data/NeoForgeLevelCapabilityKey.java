@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
-import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.LevelCapabilityKey;
 import net.minecraft.world.level.Level;
@@ -11,7 +10,7 @@ import java.util.function.Predicate;
 
 public class NeoForgeLevelCapabilityKey<C extends CapabilityComponent<Level>> extends NeoForgeCapabilityKey<Level, C> implements LevelCapabilityKey<C> {
 
-    public NeoForgeLevelCapabilityKey(DeferredHolder<AttachmentType<?>, AttachmentType<C>> attachmentType, Codec<C> codec, Predicate<Object> filter) {
-        super(attachmentType, codec, filter);
+    public NeoForgeLevelCapabilityKey(DeferredHolder<AttachmentType<?>, AttachmentType<C>> holder, Predicate<Object> filter) {
+        super(holder, filter);
     }
 }

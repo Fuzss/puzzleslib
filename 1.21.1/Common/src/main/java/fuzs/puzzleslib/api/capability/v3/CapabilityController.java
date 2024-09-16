@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.api.capability.v3;
 
-import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.capability.v3.data.*;
-import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
@@ -51,28 +49,7 @@ public interface CapabilityController {
      * @param <C>               capability component type
      * @return capability key
      */
-    default <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType) {
-        return this.registerEntityCapability(identifier,
-                capabilityType,
-                capabilityFactory,
-                NbtSerializable.codec(capabilityFactory),
-                entityType
-        );
-    }
-
-    /**
-     * Register capability to {@link Entity} objects.
-     *
-     * @param identifier        path for internal identifier, used for serialization
-     * @param capabilityType    class type for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param codec             codec for serialization
-     * @param entityType        entity class to match
-     * @param <T>               entity type
-     * @param <C>               capability component type
-     * @return capability key
-     */
-    <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Codec<C> codec, Class<T> entityType);
+    <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType);
 
     /**
      * Register capability to {@link BlockEntity} objects.
@@ -85,28 +62,7 @@ public interface CapabilityController {
      * @param <C>               capability component type
      * @return capability key
      */
-    default <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> blockEntityType) {
-        return this.registerBlockEntityCapability(identifier,
-                capabilityType,
-                capabilityFactory,
-                NbtSerializable.codec(capabilityFactory),
-                blockEntityType
-        );
-    }
-
-    /**
-     * Register capability to {@link BlockEntity} objects.
-     *
-     * @param identifier        path for internal identifier, used for serialization
-     * @param capabilityType    class type for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param codec             codec for serialization
-     * @param blockEntityType   block entity class to match
-     * @param <T>               block entity type
-     * @param <C>               capability component type
-     * @return capability key
-     */
-    <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Codec<C> codec, Class<T> blockEntityType);
+    <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> blockEntityType);
 
     /**
      * Register capability to {@link LevelChunk} objects.
@@ -117,25 +73,7 @@ public interface CapabilityController {
      * @param <C>               capability component type
      * @return capability key
      */
-    default <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
-        return this.registerLevelChunkCapability(identifier,
-                capabilityType,
-                capabilityFactory,
-                NbtSerializable.codec(capabilityFactory)
-        );
-    }
-
-    /**
-     * Register capability to {@link LevelChunk} objects.
-     *
-     * @param identifier        path for internal identifier, used for serialization
-     * @param capabilityType    interface for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param codec             codec for serialization
-     * @param <C>               capability component type
-     * @return capability key
-     */
-    <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Codec<C> codec);
+    <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory);
 
     /**
      * Register capability to {@link Level} objects.
@@ -146,23 +84,5 @@ public interface CapabilityController {
      * @param <C>               capability component type
      * @return capability key
      */
-    default <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory) {
-        return this.registerLevelCapability(identifier,
-                capabilityType,
-                capabilityFactory,
-                NbtSerializable.codec(capabilityFactory)
-        );
-    }
-
-    /**
-     * Register capability to {@link Level} objects.
-     *
-     * @param identifier        path for internal identifier, used for serialization
-     * @param capabilityType    class type for this capability
-     * @param capabilityFactory capability factory called when attaching to an object
-     * @param codec             codec for serialization
-     * @param <C>               capability component type
-     * @return capability key
-     */
-    <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Codec<C> codec);
+    <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory);
 }

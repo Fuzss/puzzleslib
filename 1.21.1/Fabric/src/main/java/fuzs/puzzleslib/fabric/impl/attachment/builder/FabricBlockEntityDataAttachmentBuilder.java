@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.fabric.impl.attachment;
+package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;

@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class FabricLevelChunkCapabilityKey<C extends CapabilityComponent<LevelChunk>> extends FabricCapabilityKey<LevelChunk, C> implements LevelChunkCapabilityKey<C> {
 
-    public FabricLevelChunkCapabilityKey(Supplier<AttachmentType<C>> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
+    public FabricLevelChunkCapabilityKey(AttachmentType<C> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
         super(attachmentType, filter, factory);
     }
 }
