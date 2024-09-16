@@ -1,8 +1,13 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
+import com.mojang.serialization.DataResult;
 import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -43,9 +48,12 @@ public interface EntityCapabilityKey<T extends Entity, C extends CapabilityCompo
 
     @Override
     default ClientboundEntityCapabilityMessage toPacket(C capabilityComponent) {
+        RegistryAccess registries = capabilityComponent.getHolder().registryAccess();
+        DataResult<Tag> dataResult = this.codec()
+                .encodeStart(registries.createSerializationContext(NbtOps.INSTANCE), capabilityComponent);
         return new ClientboundEntityCapabilityMessage(this.identifier(),
                 capabilityComponent.getHolder().getId(),
-                capabilityComponent.toCompoundTag(capabilityComponent.getHolder().registryAccess())
+                (CompoundTag) dataResult.getOrThrow()
         );
     }
 

@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.*;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.fabric.impl.capability.data.*;
 import fuzs.puzzleslib.impl.capability.GlobalCapabilityRegister;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
@@ -82,13 +83,18 @@ public final class FabricCapabilityController implements CapabilityController {
         );
     }
 
-    @SuppressWarnings("UnstableApiUsage")
+    @SuppressWarnings({"UnstableApiUsage", "unchecked"})
     private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends AttachmentTarget> holderType, String identifier, Supplier<C> capabilityFactory, Codec<C> codec, Predicate<Object> filter, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
         ResourceLocation capabilityName = ResourceLocationHelper.fromNamespaceAndPath(this.modId, identifier);
-        AttachmentType<C> attachmentType = AttachmentRegistry.<C>builder()
-                .persistent(codec)
-                .buildAndRegister(capabilityName);
-        return capabilityKeyFactory.apply(attachmentType, filter, capabilityFactory);
+        Object[] capabilityKey = new Object[1];
+        Supplier<AttachmentType<C>> attachmentType = () -> {
+            AttachmentRegistry.Builder<C> builder = AttachmentRegistry.<C>builder().persistent(codec);
+            ((FabricCapabilityKey<T, C>) capabilityKey[0]).configureBuilder(builder);
+            return builder.buildAndRegister(capabilityName);
+        };
+        // register attachment type after the capability key has all its data, like copy strategy for entity capabilities
+        LoadCompleteCallback.EVENT.register(() -> ((FabricCapabilityKey<T, C>) capabilityKey[0]).register());
+        return (K) (capabilityKey[0] = capabilityKeyFactory.apply(attachmentType, filter, capabilityFactory));
     }
 }

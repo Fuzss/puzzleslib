@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class FabricBlockEntityCapabilityKey<T extends BlockEntity, C extends CapabilityComponent<T>> extends FabricCapabilityKey<T, C> implements BlockEntityCapabilityKey<T, C> {
 
-    public FabricBlockEntityCapabilityKey(AttachmentType<C> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
+    public FabricBlockEntityCapabilityKey(Supplier<AttachmentType<C>> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
         super(attachmentType, filter, factory);
     }
 }

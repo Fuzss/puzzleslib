@@ -19,7 +19,8 @@ public enum SyncStrategy {
     },
     /**
      * Syncing is done automatically with the capability holder and every {@link ServerPlayer} tracking them.
-     * <p>Useful for capabilities that affect rendering (e.g. a glider is equipped for gliding).
+     * <p>
+     * Useful for capabilities that affect rendering (e.g. a glider is equipped for gliding).
      */
     TRACKING {
         @Override
@@ -29,7 +30,8 @@ public enum SyncStrategy {
     },
     /**
      * Syncing is done automatically with just the capability holder if it is a {@link ServerPlayer}.
-     * <p>Useful for capabilities that control an ability, like the amount of midair jumps left.
+     * <p>
+     * Useful for capabilities that control an ability, like the amount of midair jumps left.
      */
     PLAYER {
         @Override

@@ -85,7 +85,7 @@ public interface NetworkHandler {
      * @param message   message to send
      */
     default <T> void sendMessage(PlayerSet playerSet, ClientboundMessage<T> message) {
-        playerSet.notify(this.toClientboundPacket(message));
+        playerSet.broadcast(this.toClientboundPacket(message));
     }
 
     /**

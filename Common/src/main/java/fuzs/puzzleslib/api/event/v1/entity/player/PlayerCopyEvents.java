@@ -8,7 +8,7 @@ public final class PlayerCopyEvents {
     public static final EventInvoker<Respawn> RESPAWN = EventInvoker.lookup(Respawn.class);
 
     private PlayerCopyEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

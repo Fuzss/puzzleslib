@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.capability.data;
 
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.capability.v3.data.CapabilityComponent;
 import fuzs.puzzleslib.api.capability.v3.data.CopyStrategy;
 import fuzs.puzzleslib.api.capability.v3.data.SyncStrategy;
@@ -14,21 +15,24 @@ public class NeoForgeEntityCapabilityKey<T extends Entity, C extends CapabilityC
     private SyncStrategy syncStrategy = SyncStrategy.MANUAL;
     private CopyStrategy copyStrategy = CopyStrategy.NEVER;
 
-    public NeoForgeEntityCapabilityKey(DeferredHolder<AttachmentType<?>, AttachmentType<C>> holder, Predicate<Object> filter) {
-        super(holder, filter);
-        this.initialize();
+    public NeoForgeEntityCapabilityKey(DeferredHolder<AttachmentType<?>, AttachmentType<C>> attachmentType, Codec<C> codec, Predicate<Object> filter) {
+        super(attachmentType, codec, filter);
+    }
+
+    @Override
+    public void configureBuilder(AttachmentType.Builder<C> builder) {
+        if (this.getCopyStrategy().copyOnDeath()) builder.copyOnDeath();
+        this.registerEventHandlers();
     }
 
     @Override
     public Mutable<T, C> setSyncStrategy(SyncStrategy syncStrategy) {
-        EntityCapabilityKeyImpl.super.setSyncStrategy(syncStrategy);
         this.syncStrategy = syncStrategy;
         return this;
     }
 
     @Override
     public Mutable<T, C> setCopyStrategy(CopyStrategy copyStrategy) {
-        EntityCapabilityKeyImpl.super.setCopyStrategy(copyStrategy);
         this.copyStrategy = copyStrategy;
         return this;
     }

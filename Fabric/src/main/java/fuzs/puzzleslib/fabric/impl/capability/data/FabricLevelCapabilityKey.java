@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class FabricLevelCapabilityKey<C extends CapabilityComponent<Level>> extends FabricCapabilityKey<Level, C> implements LevelCapabilityKey<C> {
 
-    public FabricLevelCapabilityKey(AttachmentType<C> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
+    public FabricLevelCapabilityKey(Supplier<AttachmentType<C>> attachmentType, Predicate<Object> filter, Supplier<C> factory) {
         super(attachmentType, filter, factory);
     }
 }
