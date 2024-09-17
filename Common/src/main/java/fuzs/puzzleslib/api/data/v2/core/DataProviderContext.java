@@ -14,7 +14,8 @@ import java.util.function.Supplier;
 
 /**
  * A context class for providing instances required by a {@link DataProvider}.
- * <p>Very similar to Forge's <code>net.minecraftforge.data.event.GatherDataEvent</code>.
+ * <p>
+ * Very similar to Forge's <code>net.minecraftforge.data.event.GatherDataEvent</code>.
  */
 public class DataProviderContext {
     /**
@@ -31,11 +32,20 @@ public class DataProviderContext {
     private final Supplier<CompletableFuture<HolderLookup.Provider>> registries;
 
     /**
-     * @param modId          the generating mod id
-     * @param packOutput     the pack output instance
+     * @param modId      the generating mod id
+     * @param packOutput the pack output instance
      * @param registries registry lookup provider
      */
-    public DataProviderContext(String modId, PackOutput packOutput, Supplier<CompletableFuture<HolderLookup.Provider>> registries) {
+    public DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        this(modId, packOutput, () -> registries);
+    }
+
+    /**
+     * @param modId      the generating mod id
+     * @param packOutput the pack output instance
+     * @param registries registry lookup provider
+     */
+    private DataProviderContext(String modId, PackOutput packOutput, Supplier<CompletableFuture<HolderLookup.Provider>> registries) {
         this.modId = modId;
         this.packOutput = packOutput;
         this.registries = registries;
@@ -88,6 +98,16 @@ public class DataProviderContext {
      */
     public CompletableFuture<HolderLookup.Provider> getRegistries() {
         return this.registries.get();
+    }
+
+    /**
+     * Creates a new data provider context instance with a different set of registries.
+     *
+     * @param registries registry lookup provider
+     * @return new data provider context instance
+     */
+    public DataProviderContext withRegistries(CompletableFuture<HolderLookup.Provider> registries) {
+        return new DataProviderContext(this.modId, this.packOutput, registries);
     }
 
     /**

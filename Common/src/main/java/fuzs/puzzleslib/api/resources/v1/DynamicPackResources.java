@@ -4,9 +4,11 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
+import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.FileUtil;
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
@@ -75,7 +77,11 @@ public class DynamicPackResources extends AbstractModPackResources {
             Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = new EnumMap<>(PackType.class);
             DataProviderContext context = DataProviderContext.fromModId(modId);
             for (DataProviderContext.Factory factory : factories) {
-                factory.apply(context).run((Path filePath, byte[] data, HashCode hashCode) -> {
+                DataProvider dataProvider = factory.apply(context);
+                if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
+                    context = context.withRegistries(registriesDataProvider.getRegistries());
+                }
+                dataProvider.run((Path filePath, byte[] data, HashCode hashCode) -> {
                     // good times with Windows...
                     List<String> strings = FileUtil.decomposePath(
                             filePath.normalize().toString().replace(File.separator, "/")).result().filter(

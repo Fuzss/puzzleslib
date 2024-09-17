@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.mixin;
 
-import fuzs.puzzleslib.neoforge.impl.data.ExistingFileHelperHolder;
+import fuzs.puzzleslib.neoforge.impl.data.FileHelperDataProvider;
 import net.minecraft.data.tags.TagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.spongepowered.asm.mixin.Final;
@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.Mutable;
 import org.spongepowered.asm.mixin.Shadow;
 
 @Mixin(TagsProvider.class)
-abstract class TagsProviderNeoForgeMixin<T> implements ExistingFileHelperHolder {
+abstract class TagsProviderNeoForgeMixin<T> implements FileHelperDataProvider {
     @Shadow(remap = false)
     @Final
     @Mutable
