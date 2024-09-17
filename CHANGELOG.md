@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v3.5.10-1.18.2] - 2024-09-16
+### Fixed
+- Prevent Forge's broken `PlaySoundAtEntityEvent` from crashing the game
+
 ## [v3.5.9-1.18.2] - 2024-02-17
 ### Changed
 - Downgrade Forge to latest stable release

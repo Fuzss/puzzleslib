@@ -279,22 +279,24 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onServerStopped(evt.getServer());
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, PlaySoundAtEntityEvent.class, (PlayLevelSoundEvents.AtPosition callback, PlaySoundAtEntityEvent evt) -> {
-            MutableValue<SoundEvent> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
-            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setCategory, evt::getCategory);
-            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setVolume, evt::getVolume, evt::getDefaultVolume);
-            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setPitch, evt::getPitch, evt::getDefaultPitch);
-            if (callback.onPlaySoundAtPosition(evt.getEntity().level, evt.getEntity().position(), sound, source, volume, pitch).isInterrupt()) {
-                evt.setCanceled(true);
-            }
+            // TODO disabled for now as the implementation is completely broken on Forge with no usable inputs being provided
+//            MutableValue<SoundEvent> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
+//            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setCategory, evt::getCategory);
+//            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setVolume, evt::getVolume, evt::getDefaultVolume);
+//            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setPitch, evt::getPitch, evt::getDefaultPitch);
+//            if (callback.onPlaySoundAtPosition(evt.getEntity().level, evt.getEntity().position(), sound, source, volume, pitch).isInterrupt()) {
+//                evt.setCanceled(true);
+//            }
         });
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, PlaySoundAtEntityEvent.class, (PlayLevelSoundEvents.AtEntity callback, PlaySoundAtEntityEvent evt) -> {
-            MutableValue<SoundEvent> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
-            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setCategory, evt::getCategory);
-            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setVolume, evt::getVolume, evt::getDefaultVolume);
-            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setPitch, evt::getPitch, evt::getDefaultPitch);
-            if (callback.onPlaySoundAtEntity(evt.getEntity().level, evt.getEntity(), sound, source, volume, pitch).isInterrupt()) {
-                evt.setCanceled(true);
-            }
+            // TODO disabled for now as the implementation is completely broken on Forge with no usable inputs being provided
+//            MutableValue<SoundEvent> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
+//            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setCategory, evt::getCategory);
+//            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setVolume, evt::getVolume, evt::getDefaultVolume);
+//            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setPitch, evt::getPitch, evt::getDefaultPitch);
+//            if (callback.onPlaySoundAtEntity(evt.getEntity().level, evt.getEntity(), sound, source, volume, pitch).isInterrupt()) {
+//                evt.setCanceled(true);
+//            }
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinWorldEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinWorldEvent evt) -> {
             if (evt.getWorld().isClientSide) return;
