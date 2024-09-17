@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.1.7-1.21.1] - 2024-09-17
 ### Fixed
 - Fix `LivingDropsCallback` failing to capture player drops on Fabric
+- Fix some keybinds failing to trigger properly on Fabric
 
 ## [v21.1.6-1.21.1] - 2024-09-17
 ### Changed

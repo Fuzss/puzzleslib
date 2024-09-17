@@ -7,17 +7,17 @@ import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenSkipper;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
-import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.components.toasts.*;
+import net.minecraft.client.gui.components.toasts.SystemToast;
+import net.minecraft.client.gui.components.toasts.Toast;
+import net.minecraft.client.gui.components.toasts.ToastComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -38,7 +38,6 @@ public class PuzzlesLibClient implements ClientModConstructor {
     }
 
     private static void registerEventHandlers() {
-        EventHandlerProvider.tryRegister(KeyMappingHelper.INSTANCE);
         AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
     }
 

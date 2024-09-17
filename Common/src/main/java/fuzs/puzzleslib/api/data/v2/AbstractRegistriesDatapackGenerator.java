@@ -43,7 +43,7 @@ public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesD
         this.registryKey = registryKey;
     }
 
-    protected abstract void addBootstrap(BootstrapContext<T> context);
+    public abstract void addBootstrap(BootstrapContext<T> context);
 
     @Override
     public String getName() {
