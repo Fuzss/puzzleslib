@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public final class TooltipBuilderImpl implements TooltipBuilder {
@@ -20,7 +20,7 @@ public final class TooltipBuilderImpl implements TooltipBuilder {
     Duration delay = Duration.ZERO;
     int maxLineWidth;
     @Nullable
-    Function<AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
     @Nullable
     Supplier<List<? extends FormattedText>> linesSupplier;
 
@@ -64,7 +64,7 @@ public final class TooltipBuilderImpl implements TooltipBuilder {
     }
 
     @Override
-    public TooltipBuilder setTooltipPositionerFactory(Function<AbstractWidget, ClientTooltipPositioner> factory) {
+    public TooltipBuilder setTooltipPositionerFactory(BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> factory) {
         Objects.requireNonNull(factory, "tooltip positioner factory is null");
         this.tooltipPositionerFactory = factory;
         return this;
