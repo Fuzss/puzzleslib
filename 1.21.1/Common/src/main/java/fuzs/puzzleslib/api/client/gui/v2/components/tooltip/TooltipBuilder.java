@@ -7,7 +7,7 @@ import net.minecraft.network.chat.FormattedText;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 /**
@@ -83,13 +83,15 @@ public interface TooltipBuilder {
     /**
      * Set a custom factory for positioning the tooltip around a widget.
      * <p>
-     * Usually behaves differently depening on if the tooltip was triggered by the widget being hovered by the cursor,
+     * Usually behaves differently depending on if the tooltip was triggered by the widget being hovered by the cursor,
      * or after becoming selected from navigating via keyboards keys.
+     * <p>
+     * The vanilla behavior is available as a function parameter.
      *
      * @param factory the factory
      * @return the builder instance
      */
-    TooltipBuilder setTooltipPositionerFactory(Function<AbstractWidget, ClientTooltipPositioner> factory);
+    TooltipBuilder setTooltipPositionerFactory(BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> factory);
 
     /**
      * Split text lines on the tooltip.

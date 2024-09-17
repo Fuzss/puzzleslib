@@ -20,7 +20,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
@@ -28,7 +28,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     private List<? extends FormattedText> lines;
     private final int maxLineWidth;
     @Nullable
-    private final Function<AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    private final BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
     @Nullable
     private final Supplier<List<? extends FormattedText>> linesSupplier;
 
@@ -56,9 +56,8 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
             private List<FormattedCharSequence> processTooltipLines(List<? extends FormattedText> tooltipLines) {
                 Preconditions.checkState(!tooltipLines.isEmpty(), "lines is empty");
                 if (WidgetTooltipHolderImpl.this.maxLineWidth != 0) {
-                    return ClientComponentSplitter.splitTooltipLines(WidgetTooltipHolderImpl.this.maxLineWidth,
-                            tooltipLines
-                    ).toList();
+                    return ClientComponentSplitter.splitTooltipLines(WidgetTooltipHolderImpl.this.maxLineWidth, tooltipLines)
+                            .toList();
                 } else {
                     return ClientComponentSplitter.processTooltipLines(tooltipLines).toList();
                 }
@@ -108,10 +107,11 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
 
     @Override
     protected ClientTooltipPositioner createTooltipPositioner(ScreenRectangle screenRectangle, boolean hovering, boolean focused) {
+        ClientTooltipPositioner tooltipPositioner = super.createTooltipPositioner(screenRectangle, hovering, focused);
         if (this.tooltipPositionerFactory != null) {
-            return this.tooltipPositionerFactory.apply(this.abstractWidget);
+            return this.tooltipPositionerFactory.apply(tooltipPositioner, this.abstractWidget);
         } else {
-            return super.createTooltipPositioner(screenRectangle, hovering, focused);
+            return tooltipPositioner;
         }
     }
 }
