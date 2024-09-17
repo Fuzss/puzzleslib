@@ -22,7 +22,7 @@ public interface LivingDropsCallback {
      *
      * @param entity       the entity that has been killed
      * @param damageSource damage source that killed the entity
-     * @param drops        all drops, including equipment, so not just drops from the entity's loot table; this can be
+     * @param itemDrops    all drops, including equipment, so not just drops from the entity's loot table; this can be
      *                     modified
      * @param recentlyHit  does this count as a player kill, meaning {@link LivingEntity#lastHurtByPlayerTime} is not
      *                     zero
@@ -30,5 +30,5 @@ public interface LivingDropsCallback {
      *         to be spawned in the world; will have the same result as {@link EventResult#INTERRUPT} if drops are
      *         empty
      */
-    EventResult onLivingDrops(LivingEntity entity, DamageSource damageSource, Collection<ItemEntity> drops, boolean recentlyHit);
+    EventResult onLivingDrops(LivingEntity entity, DamageSource damageSource, Collection<ItemEntity> itemDrops, boolean recentlyHit);
 }
