@@ -2,13 +2,9 @@ package fuzs.puzzleslib.api.data.v2;
 
 import com.google.common.base.CaseFormat;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import net.minecraft.Util;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.Registry;
-import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.data.CachedOutput;
+import net.minecraft.core.*;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.data.registries.RegistryPatchGenerator;
@@ -28,41 +24,26 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesDatapackGenerator {
+public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesDatapackGenerator implements RegistriesDataProvider {
+    private final CompletableFuture<HolderLookup.Provider> fullRegistries;
     private final ResourceKey<? extends Registry<T>> registryKey;
-    private BootstrapContext<T> bootstrapContext;
 
     public AbstractRegistriesDatapackGenerator(ResourceKey<? extends Registry<T>> registryKey, DataProviderContext context) {
         this(registryKey, context.getPackOutput(), context.getRegistries());
     }
 
     public AbstractRegistriesDatapackGenerator(ResourceKey<? extends Registry<T>> registryKey, PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, registries);
+        super(output, CompletableFuture.completedFuture(RegistryAccess.EMPTY));
+        CompletableFuture<RegistrySetBuilder.PatchedRegistries> patchedRegistries = RegistryPatchGenerator.createLookup(
+                registries,
+                new RegistrySetBuilder().add(registryKey, AbstractRegistriesDatapackGenerator.this::addBootstrap)
+        );
+        this.registries = patchedRegistries.thenApply(RegistrySetBuilder.PatchedRegistries::patches);
+        this.fullRegistries = patchedRegistries.thenApply(RegistrySetBuilder.PatchedRegistries::full);
         this.registryKey = registryKey;
     }
 
-    protected final void add(ResourceKey<T> resourceKey, T value) {
-        this.bootstrapContext.register(resourceKey, value);
-    }
-
     protected abstract void addBootstrap(BootstrapContext<T> context);
-
-    @Override
-    public CompletableFuture<?> run(CachedOutput output) {
-        CompletableFuture<HolderLookup.Provider> registries = this.registries;
-        return CompletableFuture.runAsync(() -> {
-            this.registries = RegistryPatchGenerator.createLookup(registries,
-                    new RegistrySetBuilder().add(this.registryKey, (BootstrapContext<T> context) -> {
-                        this.bootstrapContext = context;
-                        this.addBootstrap(context);
-                    })
-            ).thenApply(RegistrySetBuilder.PatchedRegistries::patches);
-        }).thenCompose((Void $) -> {
-            return super.run(output);
-        }).thenRun(() -> {
-            this.registries = registries;
-        });
-    }
 
     @Override
     public String getName() {
@@ -75,62 +56,42 @@ public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesD
         return StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(registryName), ' ');
     }
 
-    public static abstract class Enchantments extends AbstractRegistriesDatapackGenerator<Enchantment> {
-
-        public Enchantments(DataProviderContext context) {
-            super(Registries.ENCHANTMENT, context);
-        }
-
-        public Enchantments(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-            super(Registries.ENCHANTMENT, output, registries);
-        }
-
-        protected void add(ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
-            this.add(resourceKey, builder.build(resourceKey.location()));
-        }
+    @Override
+    public CompletableFuture<HolderLookup.Provider> getRegistries() {
+        return this.fullRegistries;
     }
 
-    public static abstract class DamageTypes extends AbstractRegistriesDatapackGenerator<DamageType> {
-
-        public DamageTypes(DataProviderContext context) {
-            super(Registries.DAMAGE_TYPE, context);
-        }
-
-        public DamageTypes(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-            super(Registries.DAMAGE_TYPE, output, registries);
-        }
-
-        protected void add(ResourceKey<DamageType> resourceKey) {
-            this.add(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F));
-        }
-
-        protected void add(ResourceKey<DamageType> resourceKey, DamageEffects damageEffects) {
-            this.add(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F, damageEffects));
-        }
+    protected static void registerEnchantment(BootstrapContext<Enchantment> context, ResourceKey<Enchantment> resourceKey, Enchantment.Builder builder) {
+        context.register(resourceKey, builder.build(resourceKey.location()));
     }
 
-    public static abstract class TrimMaterials extends AbstractRegistriesDatapackGenerator<TrimMaterial> {
+    protected static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey) {
+        context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F));
+    }
 
-        public TrimMaterials(DataProviderContext context) {
-            super(Registries.TRIM_MATERIAL, context);
-        }
+    protected static void registerDamageType(BootstrapContext<DamageType> context, ResourceKey<DamageType> resourceKey, DamageEffects damageEffects) {
+        context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F, damageEffects));
+    }
 
-        public TrimMaterials(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-            super(Registries.TRIM_MATERIAL, output, registries);
-        }
+    protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {
+        registerTrimMaterial(context,
+                resourceKey,
+                ingredient,
+                descriptionColor,
+                itemModelIndex,
+                Collections.emptyMap()
+        );
+    }
 
-        protected void add(ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {
-            this.add(resourceKey, ingredient, descriptionColor, itemModelIndex, Collections.emptyMap());
-        }
-
-        protected void add(ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<Holder<ArmorMaterial>, String> overrideArmorMaterials) {
-            Component description = Component.translatable(
-                    Util.makeDescriptionId("trim_material", resourceKey.location())).withStyle(
-                    Style.EMPTY.withColor(descriptionColor));
-            TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(), ingredient,
-                    itemModelIndex, description, overrideArmorMaterials
-            );
-            this.add(resourceKey, trimMaterial);
-        }
+    protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<Holder<ArmorMaterial>, String> overrideArmorMaterials) {
+        Component component = Component.translatable(Util.makeDescriptionId("trim_material", resourceKey.location()))
+                .withStyle(Style.EMPTY.withColor(descriptionColor));
+        TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(),
+                ingredient,
+                itemModelIndex,
+                component,
+                overrideArmorMaterials
+        );
+        context.register(resourceKey, trimMaterial);
     }
 }

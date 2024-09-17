@@ -21,25 +21,35 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     private final ExistingFileHelper fileHelper;
 
     /**
-     * @param modId          the generating mod id
-     * @param packOutput     the pack output instance
-     * @param lookupProvider registry lookup provider
-     * @param fileHelper     the file helper
+     * @param modId      the generating mod id
+     * @param packOutput the pack output instance
+     * @param registries the registry lookup provider
+     * @param fileHelper the file helper
      */
-    public NeoForgeDataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
-        super(modId, packOutput, () -> lookupProvider);
+    public NeoForgeDataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries, ExistingFileHelper fileHelper) {
+        super(modId, packOutput, registries);
         this.fileHelper = fileHelper;
     }
 
     /**
      * Creates a proper context from the corresponding Forge event usable in actual data-generation.
      *
-     * @param modId the generating mod id
-     * @param evt   the Forge event
+     * @param modId      the generating mod id
+     * @param evt        the event
+     * @param registries the registry lookup provider
      * @return new context instance
      */
-    public static NeoForgeDataProviderContext fromEvent(String modId, GatherDataEvent evt) {
-        return new NeoForgeDataProviderContext(modId, evt.getGenerator().getPackOutput(), evt.getLookupProvider(), evt.getExistingFileHelper());
+    public static NeoForgeDataProviderContext fromEvent(String modId, GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) {
+        return new NeoForgeDataProviderContext(modId,
+                evt.getGenerator().getPackOutput(),
+                registries,
+                evt.getExistingFileHelper()
+        );
+    }
+
+    @Override
+    public NeoForgeDataProviderContext withRegistries(CompletableFuture<HolderLookup.Provider> registries) {
+        return new NeoForgeDataProviderContext(this.getModId(), this.getPackOutput(), registries, this.fileHelper);
     }
 
     /**
@@ -50,7 +60,8 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     }
 
     /**
-     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about parametrized varargs.
+     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about
+     * parametrized varargs.
      */
     @FunctionalInterface
     public interface Factory extends Function<NeoForgeDataProviderContext, DataProvider> {
@@ -58,7 +69,8 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     }
 
     /**
-     * Another factory to support the old data providers that have a constructor taking the Forge event directly with an additional mod id.
+     * Another factory to support the old data providers that have a constructor taking the Forge event directly with an
+     * additional mod id.
      */
     @FunctionalInterface
     public interface LegacyFactory extends BiFunction<GatherDataEvent, String, DataProvider> {
