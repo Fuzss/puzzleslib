@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.7-1.21.1] - 2024-09-17
+### Fixed
+- Fix `LivingDropsCallback` failing to capture player drops on Fabric
+
 ## [v21.1.6-1.21.1] - 2024-09-17
 ### Changed
 - Overhaul `AbstractRegistriesDatapackGenerator` so that generated registry values can be used in other data providers

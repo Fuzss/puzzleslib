@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -7,7 +8,6 @@ import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Collection;
 
@@ -47,12 +46,19 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         return oldCapturedDrops;
     }
 
-    @Inject(method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"), locals = LocalCapture.CAPTURE_FAILHARD, cancellable = true)
-    public void spawnAtLocation(ItemStack stack, float offsetY, CallbackInfoReturnable<ItemEntity> callback, ItemEntity itemEntity) {
-        Collection<ItemEntity> capturedDrops = this.puzzleslib$capturedDrops;
+    @Override
+    public @Nullable Collection<ItemEntity> puzzleslib$getCapturedDrops() {
+        return this.puzzleslib$capturedDrops;
+    }
+
+    @WrapWithCondition(method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    public boolean spawnAtLocation(Level level, Entity entity) {
+        Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
-            capturedDrops.add(itemEntity);
-            callback.setReturnValue(itemEntity);
+            capturedDrops.add((ItemEntity) entity);
+            return false;
+        } else {
+            return true;
         }
     }
 
