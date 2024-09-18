@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -21,32 +20,33 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     private final AbstractWidget abstractWidget;
-    private List<? extends FormattedText> lines;
-    private final int maxLineWidth;
+    private List<? extends FormattedText> tooltipLines;
     @Nullable
     private final BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    private final Function<List<? extends FormattedText>, List<FormattedCharSequence>> tooltipLineProcessor;
     @Nullable
-    private final Supplier<List<? extends FormattedText>> linesSupplier;
+    private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public WidgetTooltipHolderImpl(AbstractWidget abstractWidget, TooltipBuilderImpl builder) {
-        Preconditions.checkState(!builder.lines.isEmpty() || builder.linesSupplier != null, "lines is empty");
+        Preconditions.checkState(!builder.tooltipLines.isEmpty() || builder.tooltipLinesSupplier != null, "lines is empty");
         this.abstractWidget = abstractWidget;
-        this.lines = builder.linesSupplier != null ? Collections.emptyList() : ImmutableList.copyOf(builder.lines);
-        this.maxLineWidth = builder.maxLineWidth;
+        this.tooltipLines = builder.tooltipLinesSupplier != null ? Collections.emptyList() : ImmutableList.copyOf(builder.tooltipLines);
+        this.tooltipLineProcessor = builder.tooltipLineProcessor;
         this.tooltipPositionerFactory = builder.tooltipPositionerFactory;
-        this.linesSupplier = builder.linesSupplier;
-        super.setDelay(builder.delay);
+        this.tooltipLinesSupplier = builder.tooltipLinesSupplier;
+        super.setDelay(builder.tooltipDelay);
         super.set(new Tooltip(CommonComponents.EMPTY, null) {
 
             @Override
             public List<FormattedCharSequence> toCharSequence(Minecraft minecraft) {
                 Language language = Language.getInstance();
                 if (this.cachedTooltip == null || language != this.splitWithLanguage) {
-                    this.cachedTooltip = this.processTooltipLines(WidgetTooltipHolderImpl.this.lines);
+                    this.cachedTooltip = this.processTooltipLines(WidgetTooltipHolderImpl.this.tooltipLines);
                     this.splitWithLanguage = language;
                 }
 
@@ -55,12 +55,7 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
 
             private List<FormattedCharSequence> processTooltipLines(List<? extends FormattedText> tooltipLines) {
                 Preconditions.checkState(!tooltipLines.isEmpty(), "lines is empty");
-                if (WidgetTooltipHolderImpl.this.maxLineWidth != 0) {
-                    return ClientComponentSplitter.splitTooltipLines(WidgetTooltipHolderImpl.this.maxLineWidth, tooltipLines)
-                            .toList();
-                } else {
-                    return ClientComponentSplitter.processTooltipLines(tooltipLines).toList();
-                }
+                return WidgetTooltipHolderImpl.this.tooltipLineProcessor.apply(tooltipLines);
             }
         });
     }
@@ -86,21 +81,21 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     @Override
     public void refreshTooltipForNextRenderPass(boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
         this.refreshLines(this.getLinesForNextRenderPass());
-        Preconditions.checkState(!this.lines.isEmpty(), "lines is empty");
+        Preconditions.checkState(!this.tooltipLines.isEmpty(), "lines is empty");
         super.refreshTooltipForNextRenderPass(hovering, focused, screenRectangle);
     }
 
     private List<? extends FormattedText> getLinesForNextRenderPass() {
-        if (this.linesSupplier != null) {
-            return this.linesSupplier.get();
+        if (this.tooltipLinesSupplier != null) {
+            return this.tooltipLinesSupplier.get();
         } else {
             return Collections.emptyList();
         }
     }
 
     private void refreshLines(List<? extends FormattedText> lines) {
-        if (!lines.isEmpty() && !Objects.equals(lines, this.lines)) {
-            this.lines = lines;
+        if (!lines.isEmpty() && !Objects.equals(lines, this.tooltipLines)) {
+            this.tooltipLines = lines;
             this.get().cachedTooltip = null;
         }
     }
