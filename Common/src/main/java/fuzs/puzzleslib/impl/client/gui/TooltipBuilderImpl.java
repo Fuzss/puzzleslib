@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
+import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
 import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.TooltipBuilder;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -13,16 +15,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class TooltipBuilderImpl implements TooltipBuilder {
-    final List<FormattedText> lines = new ArrayList<>();
-    Duration delay = Duration.ZERO;
-    int maxLineWidth;
+    final List<FormattedText> tooltipLines = new ArrayList<>();
+    Duration tooltipDelay = Duration.ZERO;
     @Nullable
     BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    Function<List<? extends FormattedText>, List<FormattedCharSequence>> tooltipLineProcessor = (List<? extends FormattedText> tooltipLines) -> {
+        return ClientComponentSplitter.processTooltipLines(tooltipLines).toList();
+    };
     @Nullable
-    Supplier<List<? extends FormattedText>> linesSupplier;
+    Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public TooltipBuilderImpl() {
         this(new FormattedText[0]);
@@ -33,33 +38,33 @@ public final class TooltipBuilderImpl implements TooltipBuilder {
     }
 
     public TooltipBuilderImpl(List<? extends FormattedText> lines) {
-        this.lines.addAll(lines);
+        this.tooltipLines.addAll(lines);
     }
 
     @Override
     public TooltipBuilder addLines(FormattedText... lines) {
-        Objects.requireNonNull(lines, "lines is null");
+        Objects.requireNonNull(lines, "tooltip lines is null");
         return this.addLines(Arrays.asList(lines));
     }
 
     @Override
     public TooltipBuilder addLines(List<? extends FormattedText> lines) {
-        Objects.requireNonNull(lines, "lines is null");
-        this.lines.addAll(lines);
+        Objects.requireNonNull(lines, "tooltip lines is null");
+        this.tooltipLines.addAll(lines);
         return this;
     }
 
     @Override
     public TooltipBuilder setLines(Supplier<List<? extends FormattedText>> supplier) {
-        Objects.requireNonNull(supplier, "lines supplier is null");
-        this.linesSupplier = supplier;
+        Objects.requireNonNull(supplier, "tooltip lines supplier is null");
+        this.tooltipLinesSupplier = supplier;
         return this;
     }
 
     @Override
     public TooltipBuilder setDelay(Duration delay) {
-        Objects.requireNonNull(delay, "delay is null");
-        this.delay = delay;
+        Objects.requireNonNull(delay, "tooltip delay is null");
+        this.tooltipDelay = delay;
         return this;
     }
 
@@ -77,8 +82,17 @@ public final class TooltipBuilderImpl implements TooltipBuilder {
 
     @Override
     public TooltipBuilder splitLines(int maxWidth) {
-        Preconditions.checkArgument(maxWidth >= 0, "max width is negative");
-        this.maxLineWidth = maxWidth;
+        Preconditions.checkArgument(maxWidth >= 0, "max line width is negative");
+        return this.setTooltipLineProcessor((List<? extends FormattedText> tooltipLines) -> {
+            return ClientComponentSplitter.splitTooltipLines(maxWidth, tooltipLines)
+                    .toList();
+        });
+    }
+
+    @Override
+    public TooltipBuilder setTooltipLineProcessor(Function<List<? extends FormattedText>, List<FormattedCharSequence>> processor) {
+        Objects.requireNonNull(processor, "tooltip line processor is null");
+        this.tooltipLineProcessor = processor;
         return this;
     }
 

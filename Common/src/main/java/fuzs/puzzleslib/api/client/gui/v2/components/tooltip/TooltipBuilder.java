@@ -4,10 +4,12 @@ import fuzs.puzzleslib.impl.client.gui.TooltipBuilderImpl;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.util.FormattedCharSequence;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 /**
@@ -107,6 +109,14 @@ public interface TooltipBuilder {
      * @return the builder instance
      */
     TooltipBuilder splitLines(int maxWidth);
+
+    /**
+     * Prepare tooltip lines for rendering on the tooltip, like splitting by a specified with.
+     *
+     * @param processor the processor function
+     * @return the builder instance
+     */
+    TooltipBuilder setTooltipLineProcessor(Function<List<? extends FormattedText>, List<FormattedCharSequence>> processor);
 
     /**
      * Builds the tooltip instance and attaches it to a widget.
