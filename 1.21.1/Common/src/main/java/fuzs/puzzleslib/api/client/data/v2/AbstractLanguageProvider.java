@@ -126,6 +126,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add("tag." + tagKey.location().toLanguageKey(tagKey.registry().location().getPath()), value);
         }
 
+        default void addBlock(Holder<Block> block, String value) {
+            this.add(block.value(), value);
+        }
+
         default void add(Block block, String value) {
             this.add(block, "", value);
         }
@@ -135,12 +139,8 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(block.getDescriptionId(), additionalKey, value);
         }
 
-        default void addSpawnEgg(Item item, String value) {
-            if (item instanceof SpawnEggItem) {
-                this.add(item, value + " Spawn Egg");
-            } else {
-                throw new IllegalArgumentException("Unsupported item: " + item);
-            }
+        default void addItem(Holder<Item> item, String value) {
+            this.add(item.value(), value);
         }
 
         default void add(Item item, String value) {
@@ -150,6 +150,14 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(Item item, String additionalKey, String value) {
             Objects.requireNonNull(item, "item is null");
             this.add(item.getDescriptionId(), additionalKey, value);
+        }
+
+        default void addSpawnEgg(Item item, String value) {
+            if (item instanceof SpawnEggItem) {
+                this.add(item, value + " Spawn Egg");
+            } else {
+                throw new IllegalArgumentException("Unsupported item: " + item);
+            }
         }
 
         default void addEnchantment(ResourceKey<Enchantment> enchantment, String value) {
@@ -167,11 +175,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(mobEffect.value(), value);
         }
 
-        default void addMobEffect(Holder<MobEffect> mobEffect, String additionalKey, String value) {
-            Objects.requireNonNull(mobEffect, "mob effect is null");
-            this.add(mobEffect.value(), additionalKey, value);
-        }
-
         default void add(MobEffect mobEffect, String value) {
             this.add(mobEffect, "", value);
         }
@@ -181,6 +184,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(mobEffect.getDescriptionId(), additionalKey, value);
         }
 
+        default void addEntityType(Holder<EntityType<?>> entityType, String value) {
+            this.add(entityType.value(), value);
+        }
+
         default void add(EntityType<?> entityType, String value) {
             this.add(entityType, "", value);
         }
@@ -188,6 +195,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(EntityType<?> entityType, String additionalKey, String value) {
             Objects.requireNonNull(entityType, "entity type is null");
             this.add(entityType.getDescriptionId(), additionalKey, value);
+        }
+
+        default void addAttribute(Holder<Attribute> attribute, String value) {
+            this.add(attribute.value(), value);
         }
 
         default void add(Attribute attribute, String value) {
@@ -233,6 +244,10 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add("item.minecraft.potion.effect." + potionName, "Potion of " + value);
             this.add("item.minecraft.splash_potion.effect." + potionName, "Splash Potion of " + value);
             this.add("item.minecraft.lingering_potion.effect." + potionName, "Lingering Potion of " + value);
+        }
+
+        default void addSoundEvent(Holder<SoundEvent> soundEvent, String value) {
+            this.add(soundEvent.value(), value);
         }
 
         default void add(SoundEvent soundEvent, String value) {
