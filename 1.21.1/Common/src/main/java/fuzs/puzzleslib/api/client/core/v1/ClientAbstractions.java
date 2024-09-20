@@ -54,10 +54,25 @@ public interface ClientAbstractions {
      * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
      * {@link net.minecraft.client.resources.model.ModelResourceLocation}.
      *
-     * @param identifier model identifier
-     * @return the model, possibly the missing model
+     * @param modelManager the model manager instance
+     * @return the model, or the missing model if not found
+     *
+     * @deprecated use {@link #getBakedModel(ModelManager, ResourceLocation)}
      */
-    BakedModel getBakedModel(ResourceLocation identifier);
+    @Deprecated(forRemoval = true)
+    default BakedModel getBakedModel(ResourceLocation resourceLocation) {
+        return this.getBakedModel(Minecraft.getInstance().getModelManager(), resourceLocation);
+    }
+
+    /**
+     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
+     * {@link net.minecraft.client.resources.model.ModelResourceLocation}.
+     *
+     * @param modelManager     the model manager instance
+     * @param resourceLocation the model resource location
+     * @return the model, or the missing model if not found
+     */
+    BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation);
 
     /**
      * Allows for retrieving the {@link RenderType} that has been registered for a block.

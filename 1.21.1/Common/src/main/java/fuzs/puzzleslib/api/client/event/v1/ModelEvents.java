@@ -33,16 +33,16 @@ public final class ModelEvents {
          * It is recommended for callers to cache returned models themselves, as the event runs for every single model
          * location, even when the models would match per identity.
          *
-         * @param modelLocation identifier for the unbaked model
-         * @param unbakedModel  the unbaked model
-         * @param modelGetter   get unbaked models from the model bakery
-         * @param modelAdder    add additional unbaked models that are used in the returned model (like as part of
-         *                      {@link net.minecraft.client.renderer.block.model.multipart.Selector}s in
-         *                      {@link net.minecraft.client.renderer.block.model.multipart.MultiPart} models)
+         * @param modelLocation        identifier for the unbaked model
+         * @param unbakedModelSupplier the unbaked model
+         * @param modelGetter          get unbaked models from the model bakery
+         * @param modelAdder           add additional unbaked models that are used in the returned model (like as part
+         *                             of {@link net.minecraft.client.renderer.block.model.multipart.Selector}s in
+         *                             {@link net.minecraft.client.renderer.block.model.multipart.MultiPart} models)
          * @return {@link EventResultHolder#interrupt(Object)} to replace the unbaked model,
          *         {@link EventResultHolder#pass()} to let the original unbaked model go ahead
          */
-        EventResultHolder<UnbakedModel> onModifyUnbakedModel(ModelResourceLocation modelLocation, Supplier<UnbakedModel> unbakedModel, Function<ModelResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, UnbakedModel> modelAdder);
+        EventResultHolder<UnbakedModel> onModifyUnbakedModel(ModelResourceLocation modelLocation, Supplier<UnbakedModel> unbakedModelSupplier, Function<ModelResourceLocation, UnbakedModel> modelGetter, BiConsumer<ResourceLocation, UnbakedModel> modelAdder);
     }
 
     @FunctionalInterface
@@ -56,17 +56,17 @@ public final class ModelEvents {
          * It is recommended for callers to cache returned models themselves, as the event runs for every single model
          * location, even when the models would match per identity.
          *
-         * @param modelLocation identifier for the baked model
-         * @param bakedModel    the baked model
-         * @param modelBaker    the model baker used for baking the model, allows for retrieving and baking unbaked
-         *                      models
-         * @param modelGetter   get baked models from the bakery, if only an unbaked model is present it will be baked
-         *                      automatically
-         * @param modelAdder    add a baked model to the bakery, existing models cannot be replaced
+         * @param modelLocation      identifier for the baked model
+         * @param bakedModelSupplier the baked model
+         * @param modelBakerSupplier the model baker used for baking the model, allows for retrieving and baking unbaked
+         *                           models
+         * @param modelGetter        get baked models from the bakery, if only an unbaked model is present it will be
+         *                           baked automatically
+         * @param modelAdder         add a baked model to the bakery, existing models cannot be replaced
          * @return {@link EventResultHolder#interrupt(Object)} to replace the baked model,
          *         {@link EventResultHolder#pass()} to let the original baked model go ahead
          */
-        EventResultHolder<BakedModel> onModifyBakedModel(ModelResourceLocation modelLocation, Supplier<BakedModel> bakedModel, Supplier<ModelBaker> modelBaker, Function<ModelResourceLocation, BakedModel> modelGetter, BiConsumer<ModelResourceLocation, BakedModel> modelAdder);
+        EventResultHolder<BakedModel> onModifyBakedModel(ModelResourceLocation modelLocation, Supplier<BakedModel> bakedModelSupplier, Supplier<ModelBaker> modelBakerSupplier, Function<ModelResourceLocation, BakedModel> modelGetter, BiConsumer<ModelResourceLocation, BakedModel> modelAdder);
     }
 
     @FunctionalInterface
@@ -79,13 +79,13 @@ public final class ModelEvents {
          * <p>
          * Cannot be used for replacing baked models in the bakery, use {@link ModifyBakedModel} for that.
          *
-         * @param modelAdder  add a baked model to the bakery, existing models cannot be replaced
-         * @param modelGetter get baked models from the bakery, if only an unbaked model is present it will be baked
-         *                    automatically
-         * @param modelBaker  the model baker used for baking the model, allows for retrieving and baking unbaked
-         *                    models
+         * @param modelAdder         add a baked model to the bakery, existing models cannot be replaced
+         * @param modelGetter        get baked models from the bakery, if only an unbaked model is present it will be
+         *                           baked automatically
+         * @param modelBakerSupplier the model baker used for baking the model, allows for retrieving and baking unbaked
+         *                           models
          */
-        void onAddAdditionalBakedModel(BiConsumer<ModelResourceLocation, BakedModel> modelAdder, Function<ModelResourceLocation, BakedModel> modelGetter, Supplier<ModelBaker> modelBaker);
+        void onAddAdditionalBakedModel(BiConsumer<ModelResourceLocation, BakedModel> modelAdder, Function<ModelResourceLocation, BakedModel> modelGetter, Supplier<ModelBaker> modelBakerSupplier);
     }
 
     @FunctionalInterface
@@ -98,9 +98,9 @@ public final class ModelEvents {
          * {@link net.minecraft.client.renderer.Sheets} class too early on Fabric, preventing modded materials from
          * being added.
          *
-         * @param modelManager the model manager
-         * @param modelBakery  the model bakery
+         * @param modelManagerSupplier the model manager
+         * @param modelBakerySupplier  the model bakery
          */
-        void onCompleteModelLoading(Supplier<ModelManager> modelManager, Supplier<ModelBakery> modelBakery);
+        void onCompleteModelLoading(Supplier<ModelManager> modelManagerSupplier, Supplier<ModelBakery> modelBakerySupplier);
     }
 }
