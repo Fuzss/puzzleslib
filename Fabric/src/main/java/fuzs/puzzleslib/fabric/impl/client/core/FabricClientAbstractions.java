@@ -5,7 +5,6 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -13,6 +12,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
@@ -35,8 +35,8 @@ public final class FabricClientAbstractions implements ClientAbstractions {
     }
 
     @Override
-    public BakedModel getBakedModel(ResourceLocation identifier) {
-        return Minecraft.getInstance().getModelManager().getModel(identifier);
+    public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
+        return modelManager.getModel(resourceLocation);
     }
 
     @Override
