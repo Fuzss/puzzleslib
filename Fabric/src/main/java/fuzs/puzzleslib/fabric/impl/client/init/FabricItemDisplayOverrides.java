@@ -18,18 +18,18 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl<B
     private Map<BakedModel, Map<ItemDisplayContext, BakedModel>> overrideModels = Collections.emptyMap();
 
     @Override
-    public void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts) {
+    public void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... itemDisplayContexts) {
         Objects.requireNonNull(itemModelOverride, "item model override is null");
         this.register(itemModel, (BakedModelResolver modelResolver) -> modelResolver.getModel(itemModelOverride),
-                defaultContexts
+                itemDisplayContexts
         );
     }
 
     @Override
-    public void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts) {
+    public void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride, ItemDisplayContext... itemDisplayContexts) {
         Objects.requireNonNull(itemModelOverride, "item model override is null");
         this.register(itemModel, (BakedModelResolver modelResolver) -> modelResolver.getModel(itemModelOverride),
-                defaultContexts
+                itemDisplayContexts
         );
     }
 

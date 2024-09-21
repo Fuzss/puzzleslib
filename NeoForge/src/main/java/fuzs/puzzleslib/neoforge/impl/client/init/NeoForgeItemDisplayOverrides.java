@@ -19,18 +19,18 @@ import java.util.Objects;
 public final class NeoForgeItemDisplayOverrides extends ItemDisplayOverridesImpl<NeoForgeItemDisplayOverrides.BakedModelKey> {
 
     @Override
-    public void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts) {
+    public void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... itemDisplayContexts) {
         Objects.requireNonNull(itemModelOverride, "item model override is null");
         this.register(itemModel, (BakedModelResolver modelResolver) -> modelResolver.getModel(itemModelOverride),
-                defaultContexts
+                itemDisplayContexts
         );
     }
 
     @Override
-    public void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts) {
+    public void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride, ItemDisplayContext... itemDisplayContexts) {
         Objects.requireNonNull(itemModelOverride, "item model override is null");
         this.register(itemModel, (BakedModelResolver modelResolver) -> modelResolver.getModel(
-                ModelResourceLocation.standalone(itemModelOverride)), defaultContexts);
+                ModelResourceLocation.standalone(itemModelOverride)), itemDisplayContexts);
     }
 
     @Override

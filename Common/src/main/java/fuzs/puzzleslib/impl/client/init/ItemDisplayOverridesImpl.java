@@ -3,22 +3,37 @@ package fuzs.puzzleslib.impl.client.init;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.init.v1.ItemModelDisplayOverrides;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public abstract class ItemDisplayOverridesImpl<T> implements ItemModelDisplayOverrides {
     private final Map<ModelResourceLocation, Map<ItemDisplayContext, Function<BakedModelResolver, BakedModel>>> overrideLocations = new HashMap<>();
 
     protected ItemDisplayOverridesImpl() {
         this.registerEventHandlers();
+    }
+
+    @Override
+    public void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride) {
+        this.register(itemModel, itemModelOverride, getVanillaItemModelDisplayOverrides());
+    }
+
+    @Override
+    public void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride) {
+        this.register(itemModel, itemModelOverride, getVanillaItemModelDisplayOverrides());
+    }
+
+    static ItemDisplayContext[] getVanillaItemModelDisplayOverrides() {
+        return EnumSet.complementOf(Sets.newEnumSet(
+                Arrays.asList(ItemDisplayContext.GUI, ItemDisplayContext.GROUND, ItemDisplayContext.FIXED),
+                ItemDisplayContext.class
+        )).toArray(ItemDisplayContext[]::new);
     }
 
     protected void register(ModelResourceLocation modelResourceLocation, Function<BakedModelResolver, BakedModel> bakedModelGetter, ItemDisplayContext[] itemDisplayContexts) {
