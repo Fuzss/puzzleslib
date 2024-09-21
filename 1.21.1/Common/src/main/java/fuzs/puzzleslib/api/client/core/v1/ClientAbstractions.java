@@ -39,10 +39,12 @@ public interface ClientAbstractions {
 
     /**
      * Converts an image {@link TooltipComponent} into the appropriate client-side component.
-     * <p>{@link ClientTooltipComponent}s must first be registered in
+     * <p>
+     * {@link ClientTooltipComponent}s must first be registered in
      * {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)}, otherwise
      * {@link IllegalArgumentException} will be thrown.
-     * <p>For simple text based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)}
+     * <p>
+     * For simple text based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)}
      * instead.
      *
      * @param imageComponent the un-sided {@link TooltipComponent} to convert
@@ -54,7 +56,7 @@ public interface ClientAbstractions {
      * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
      * {@link net.minecraft.client.resources.model.ModelResourceLocation}.
      *
-     * @param modelManager the model manager instance
+     * @param resourceLocation the model resource location
      * @return the model, or the missing model if not found
      *
      * @deprecated use {@link #getBakedModel(ModelManager, ResourceLocation)}
@@ -76,7 +78,8 @@ public interface ClientAbstractions {
 
     /**
      * Allows for retrieving the {@link RenderType} that has been registered for a block.
-     * <p>When not render type is registered {@link RenderType#solid()} is returned.
+     * <p>
+     * When no render type is registered, {@link RenderType#solid()} is returned.
      *
      * @param block the block to get the render type for
      * @return the render type
@@ -85,7 +88,8 @@ public interface ClientAbstractions {
 
     /**
      * Allows for retrieving the {@link RenderType} that has been registered for a fluid.
-     * <p>When not render type is registered {@link RenderType#solid()} is returned.
+     * <p>
+     * When no render type is registered, {@link RenderType#solid()} is returned.
      *
      * @param fluid the fluid to get the render type for
      * @return the render type
@@ -96,7 +100,8 @@ public interface ClientAbstractions {
 
     /**
      * Allows for registering a {@link RenderType} for a block.
-     * <p>When not render type is registered {@link RenderType#solid()} is used.
+     * <p>
+     * When no render type is registered, {@link RenderType#solid()} is used.
      *
      * @param block      the block to register the render type for
      * @param renderType the render type
@@ -105,7 +110,8 @@ public interface ClientAbstractions {
 
     /**
      * Allows for registering a {@link RenderType} for a fluid.
-     * <p>When not render type is registered {@link RenderType#solid()} is used.
+     * <p>
+     * When no render type is registered, {@link RenderType#solid()} is used.
      *
      * @param fluid      the fluid to register the render type for
      * @param renderType the render type

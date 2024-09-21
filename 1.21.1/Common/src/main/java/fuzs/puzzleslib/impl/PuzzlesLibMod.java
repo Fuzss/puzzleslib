@@ -22,10 +22,8 @@ import net.minecraft.world.level.GameRules;
  * in {@link PuzzlesLib} early.
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
-    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID)
-            .optional()
-            .registerClientbound(ClientboundEntityCapabilityMessage.class)
-            .registerClientbound(ClientboundModListMessage.class);
+    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID).optional().registerClientbound(
+            ClientboundEntityCapabilityMessage.class).registerClientbound(ClientboundModListMessage.class);
 
     @Override
     public void onConstructMod() {

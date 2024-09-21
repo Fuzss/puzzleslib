@@ -17,22 +17,42 @@ public interface ItemModelDisplayOverrides {
     ItemModelDisplayOverrides INSTANCE = ClientFactories.INSTANCE.getItemModelDisplayOverrides();
 
     /**
-     * Register an item model override for an item.
+     * Register vanilla item model overrides for an item.
+     * <p>
+     * All display contexts except {@link ItemDisplayContext#GUI GUI}, {@link ItemDisplayContext#GROUND GROUND}, and
+     * {@link ItemDisplayContext#FIXED FIXED} will use the override model.
      *
-     * @param itemModel         the default item model location using the built-in item model template, usually used for
-     *                          the item's appearance in guis and when dropped on the ground
-     * @param itemModelOverride the custom model, usually used for in-hand rendering
-     * @param defaultContexts   item display contexts to keep the default item model for
+     * @param itemModel         the vanilla item model location
+     * @param itemModelOverride the custom item model location
      */
-    void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts);
+    void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride);
 
     /**
-     * Register an item model override for an item.
+     * Register item model overrides for an item.
      *
-     * @param itemModel         the default item model location using the built-in item model template, usually used for
-     *                          the item's appearance in guis and when dropped on the ground
-     * @param itemModelOverride the custom model, usually used for in-hand rendering
-     * @param defaultContexts   item display contexts to keep the default item model for
+     * @param itemModel           the vanilla item model location
+     * @param itemModelOverride   the custom item model location
+     * @param itemDisplayContexts the item display contexts to use the override model for
      */
-    void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride, ItemDisplayContext... defaultContexts);
+    void register(ModelResourceLocation itemModel, ModelResourceLocation itemModelOverride, ItemDisplayContext... itemDisplayContexts);
+
+    /**
+     * Register vanilla item model overrides for an item.
+     * <p>
+     * All display contexts except {@link ItemDisplayContext#GUI GUI}, {@link ItemDisplayContext#GROUND GROUND}, and
+     * {@link ItemDisplayContext#FIXED FIXED} will use the override model.
+     *
+     * @param itemModel         the vanilla item model location
+     * @param itemModelOverride the custom item model location
+     */
+    void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride);
+
+    /**
+     * Register item model overrides for an item.
+     *
+     * @param itemModel           the vanilla item model location
+     * @param itemModelOverride   the custom item model location
+     * @param itemDisplayContexts the item display contexts to use the override model for
+     */
+    void register(ModelResourceLocation itemModel, ResourceLocation itemModelOverride, ItemDisplayContext... itemDisplayContexts);
 }
