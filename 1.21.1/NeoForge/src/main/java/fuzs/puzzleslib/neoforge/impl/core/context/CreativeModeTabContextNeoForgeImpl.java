@@ -17,12 +17,12 @@ public record CreativeModeTabContextNeoForgeImpl(IEventBus modEventBus) implemen
     public void registerCreativeModeTab(CreativeModeTabConfigurator configurator) {
         CreativeModeTabConfiguratorImpl configuratorImpl = (CreativeModeTabConfiguratorImpl) configurator;
         DeferredRegister<CreativeModeTab> deferredRegister = DeferredRegister.create(Registries.CREATIVE_MODE_TAB,
-                configuratorImpl.getIdentifier().getNamespace()
+                configuratorImpl.getResourceLocation().getNamespace()
         );
         deferredRegister.register(this.modEventBus);
         CreativeModeTab.Builder builder = CreativeModeTab.builder();
         this.finalizeCreativeModeTabBuilder(builder, configuratorImpl);
-        deferredRegister.register(configuratorImpl.getIdentifier().getPath(), builder::build);
+        deferredRegister.register(configuratorImpl.getResourceLocation().getPath(), builder::build);
     }
 
     private void finalizeCreativeModeTabBuilder(CreativeModeTab.Builder builder, CreativeModeTabConfiguratorImpl configuratorImpl) {
