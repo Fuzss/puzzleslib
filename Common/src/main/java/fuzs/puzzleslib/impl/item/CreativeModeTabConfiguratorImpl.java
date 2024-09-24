@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabConfigurator {
     private static final Item[] POTION_ITEMS = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION, Items.TIPPED_ARROW};
 
-    private final ResourceLocation identifier;
+    private final ResourceLocation resourceLocation;
     @Nullable
     private Supplier<ItemStack> icon;
     @Nullable
@@ -35,14 +35,15 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     private boolean hasSearchBar;
     private boolean appendEnchantmentsAndPotions;
 
-    public CreativeModeTabConfiguratorImpl(ResourceLocation identifier) {
-        this.identifier = identifier;
+    public CreativeModeTabConfiguratorImpl(ResourceLocation resourceLocation) {
+        this.resourceLocation = resourceLocation;
     }
 
-    public ResourceLocation getIdentifier() {
-        return this.identifier;
+    public ResourceLocation getResourceLocation() {
+        return this.resourceLocation;
     }
 
+    @Nullable
     public Supplier<ItemStack[]> getIcons() {
         return this.icons;
     }
@@ -64,8 +65,8 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     }
 
     @Override
-    public CreativeModeTabConfigurator displayItems(CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
-        this.displayItemsGenerator = displayItemsGenerator;
+    public CreativeModeTabConfigurator displayItems(CreativeModeTab.DisplayItemsGenerator generator) {
+        this.displayItemsGenerator = generator;
         return this;
     }
 
@@ -82,7 +83,7 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     }
 
     public void configure(CreativeModeTab.Builder builder) {
-        String translationKey = "itemGroup.%s.%s".formatted(this.identifier.getNamespace(), this.identifier.getPath());
+        String translationKey = "itemGroup.%s.%s".formatted(this.resourceLocation.getNamespace(), this.resourceLocation.getPath());
         builder.title(Component.translatable(translationKey));
         if (this.icon != null) {
             builder.icon(this.icon);
@@ -100,8 +101,8 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
         if (this.appendEnchantmentsAndPotions) {
             builder.displayItems((CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
                 this.displayItemsGenerator.accept(itemDisplayParameters, output);
-                appendAllEnchantments(this.identifier.getNamespace(), itemDisplayParameters.holders(), output::accept);
-                appendAllPotions(this.identifier.getNamespace(), itemDisplayParameters.holders(), output::accept);
+                appendAllEnchantments(this.resourceLocation.getNamespace(), itemDisplayParameters.holders(), output::accept);
+                appendAllPotions(this.resourceLocation.getNamespace(), itemDisplayParameters.holders(), output::accept);
             });
         } else {
             builder.displayItems(this.displayItemsGenerator);
