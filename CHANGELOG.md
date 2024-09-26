@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.11-1.21.1] - 2024-09-25
+### Added
+- Add `CodecExtras`
+- Add some helper methods to `ItemModelDisplayOverrides`
+- Add enum helpers to `ExtraStreamCodecs`
+- Add some helper methods to `CreativeModeTabConfigurator`
+- Add helper methods to `ShapesHelper` for rotating shapes horizontally
+### Changed
+- Allow for compatibility with Minecraft 1.21 on Fabric if enabled via [dependency overrides](https://fabricmc.net/wiki/tutorial:dependency_overrides)
+- Allow `RegistryManager::registerBlockItem` to take an `Item$Properties` supplier
+### Fixed
+- Fix `RenderHighlightCallback` crashing on NeoForge
+
 ## [v21.1.10-1.21.1] - 2024-09-20
 ### Changed
 - Allow `ItemModelDisplayOverrides` to accept both `ResourceLocation` as well as `ModelResourceLocation`

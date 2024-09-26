@@ -38,7 +38,8 @@ public class PuzzlesLibClient implements ClientModConstructor {
     }
 
     private static void registerEventHandlers() {
-        AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
+        AddResourcePackReloadListenersCallback.EVENT.register(
+                ConfigTranslationsManager::onAddResourcePackReloadListeners);
     }
 
     private static void setupDevelopmentEnvironment() {
@@ -71,14 +72,10 @@ public class PuzzlesLibClient implements ClientModConstructor {
             }
         });
         // skip experimental settings warning
-        ScreenSkipper.create()
-                .setTitleComponent("selectWorld.backupQuestion.experimental")
-                .setButtonComponent("selectWorld.backupJoinSkipButton")
-                .build();
-        ScreenSkipper.create()
-                .setTitleComponent("selectWorld.warning.experimental.title")
-                .setButtonComponent(CommonComponents.GUI_YES)
-                .build();
+        ScreenSkipper.create().setTitleComponent("selectWorld.backupQuestion.experimental").setButtonComponent(
+                "selectWorld.backupJoinSkipButton").build();
+        ScreenSkipper.create().setTitleComponent("selectWorld.warning.experimental.title").setButtonComponent(
+                CommonComponents.GUI_YES).build();
         // launch directly into the key binds screen from the controls button
         ScreenSkipper.create()
                 .setTitleComponent("controls.title")
@@ -86,11 +83,12 @@ public class PuzzlesLibClient implements ClientModConstructor {
                 .setLastTitleComponent("options.title")
                 .build();
         // required for EditBox mixin to work properly on all screens like ChatScreen
-        ScreenMouseEvents.beforeMouseClick(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button) -> {
+        ScreenMouseEvents.beforeMouseClick(Screen.class).register(
+                (Screen screen, double mouseX, double mouseY, int button) -> {
                     for (GuiEventListener guiEventListener : screen.children()) {
-                        if (guiEventListener instanceof EditBox &&
-                                guiEventListener.mouseClicked(mouseX, mouseY, button)) {
+                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseX, mouseY,
+                                button
+                        )) {
                             screen.setFocused(guiEventListener);
                             if (button == InputConstants.MOUSE_BUTTON_LEFT) {
                                 screen.setDragging(true);
@@ -100,22 +98,20 @@ public class PuzzlesLibClient implements ClientModConstructor {
                     }
                     return EventResult.PASS;
                 });
-        ScreenMouseEvents.beforeMouseRelease(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button) -> {
+        ScreenMouseEvents.beforeMouseRelease(Screen.class).register(
+                (Screen screen, double mouseX, double mouseY, int button) -> {
                     screen.setDragging(false);
-                    return screen.getChildAt(mouseX, mouseY)
-                            .filter(EditBox.class::isInstance)
-                            .filter((GuiEventListener guiEventListener) -> {
+                    return screen.getChildAt(mouseX, mouseY).filter(EditBox.class::isInstance).filter(
+                            (GuiEventListener guiEventListener) -> {
                                 return guiEventListener.mouseReleased(mouseX, mouseY, button);
-                            })
-                            .isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
+                            }).isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
                 });
-        ScreenMouseEvents.beforeMouseDrag(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
+        ScreenMouseEvents.beforeMouseDrag(Screen.class).register(
+                (Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
                     return screen.getFocused() instanceof EditBox && screen.isDragging() &&
-                            button == InputConstants.MOUSE_BUTTON_LEFT &&
-                            screen.getFocused().mouseDragged(mouseX, mouseY, button, dragX, dragY) ?
-                            EventResult.INTERRUPT : EventResult.PASS;
+                            button == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused().mouseDragged(mouseX,
+                            mouseY, button, dragX, dragY
+                    ) ? EventResult.INTERRUPT : EventResult.PASS;
                 });
     }
 
@@ -152,7 +148,8 @@ public class PuzzlesLibClient implements ClientModConstructor {
     public void onClientSetup() {
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() &&
                 !ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
-            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(CreativeModeTabs.SEARCH);
+            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(
+                    CreativeModeTabs.SEARCH);
         }
     }
 }

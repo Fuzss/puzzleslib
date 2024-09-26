@@ -376,7 +376,9 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
         INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, callback -> {
             return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
-                if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) return true;
+                if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) {
+                    return true;
+                }
                 Minecraft minecraft = Minecraft.getInstance();
                 if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return true;
                 EventResult result = callback.onRenderHighlight(context.worldRenderer(), context.camera(), context.gameRenderer(), hitResult, context.tickCounter(), context.matrixStack(), context.consumers(), context.world());
