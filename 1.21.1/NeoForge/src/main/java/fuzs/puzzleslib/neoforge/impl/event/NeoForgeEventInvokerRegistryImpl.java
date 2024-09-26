@@ -38,7 +38,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -90,6 +89,7 @@ import net.neoforged.neoforge.registries.callback.AddCallback;
 import net.neoforged.neoforge.registries.callback.BakeCallback;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.function.*;
 
@@ -737,7 +737,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
     @Override
     public <T, E extends Event> void register(Class<T> clazz, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
+        Objects.requireNonNull(event, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
+        Preconditions.checkArgument(!Modifier.isAbstract(event.getModifiers()), event + " is abstract");
         IEventBus eventBus;
         if (IModBusEvent.class.isAssignableFrom(event)) {
             // Most events are registered during the load complete phase, where most mod bus events have already run,

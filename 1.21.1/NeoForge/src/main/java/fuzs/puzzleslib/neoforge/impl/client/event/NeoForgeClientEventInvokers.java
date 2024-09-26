@@ -457,12 +457,17 @@ public final class NeoForgeClientEventInvokers {
             EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getFont(), evt.getX(), evt.getY(), evt.getComponents(), evt.getTooltipPositioner());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.class, (RenderHighlightCallback callback, RenderHighlightEvent evt) -> {
+        INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.Block.class, (RenderHighlightCallback callback, RenderHighlightEvent.Block evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
             EventResult result = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getDeltaTracker(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
-            if (result.isInterrupt() && evt instanceof RenderHighlightEvent.Block block) block.setCanceled(true);
-        });
+            if (result.isInterrupt()) evt.setCanceled(true);
+        }, true);
+        INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.Entity.class, (RenderHighlightCallback callback, RenderHighlightEvent.Entity evt) -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
+            callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getDeltaTracker(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
+        }, true);
         INSTANCE.register(RenderLevelEvents.AfterTerrain.class, RenderLevelStageEvent.class, (RenderLevelEvents.AfterTerrain callback, RenderLevelStageEvent evt) -> {
             // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
             if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_CUTOUT_BLOCKS) return;

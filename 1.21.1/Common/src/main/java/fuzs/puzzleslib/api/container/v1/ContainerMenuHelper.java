@@ -6,6 +6,7 @@ import net.minecraft.world.ContainerListener;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.NonInteractiveResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +18,32 @@ public final class ContainerMenuHelper {
 
     private ContainerMenuHelper() {
         // NO-OP
+    }
+
+    /**
+     * Replace the container slot representing the currently selected hotbar slot with a non-interactive variant.
+     * <p>
+     * Useful for handheld container items such as bags while their menu is open.
+     *
+     * @param containerMenu the container menu
+     */
+    public static void setSelectedSlotLocked(AbstractContainerMenu containerMenu) {
+        for (int i = 0; i < containerMenu.slots.size(); i++) {
+            Slot slot = containerMenu.slots.get(i);
+            if (slot.container instanceof Inventory inventory && inventory.selected == slot.getContainerSlot()) {
+                NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container, slot.getContainerSlot(),
+                        slot.x, slot.y
+                ) {
+                    @Override
+                    public boolean isFake() {
+                        return false;
+                    }
+                };
+                newSlot.index = slot.index;
+                containerMenu.slots.set(i, newSlot);
+                break;
+            }
+        }
     }
 
     /**

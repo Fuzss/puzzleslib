@@ -17,8 +17,8 @@ public interface RenderHighlightCallback {
 
     /**
      * Fires before the highlight outline for the current hit result is attempted to be drawn.
-     * <p>Vanilla only handles this in case the hit result is {@link HitResult.Type#BLOCK}, but the callback also
-     * allows
+     * <p>
+     * Vanilla only handles this in case the hit result is {@link HitResult.Type#BLOCK}, but the callback also allows
      * for handling {@link HitResult.Type#ENTITY}.
      *
      * @param levelRenderer     the level renderer instance
@@ -30,8 +30,10 @@ public interface RenderHighlightCallback {
      * @param poseStack         current pose stack
      * @param multiBufferSource the buffer source
      * @param level             the current client level
-     * @return {@link EventResult#INTERRUPT} to prevent the highlight from rendering, allowing for custom rendering,
-     *         {@link EventResult#PASS} to allow vanilla outline rendering to happen
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT} to prevent the highlight from rendering, allowing for custom rendering</li>
+     *         <li>{@link EventResult#PASS} to allow vanilla outline rendering to happen</li>
+     *         </ul>>
      */
     EventResult onRenderHighlight(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, HitResult hitResult, DeltaTracker deltaTracker, PoseStack poseStack, MultiBufferSource multiBufferSource, ClientLevel level);
 }

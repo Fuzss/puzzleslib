@@ -74,6 +74,8 @@ transitive-accessible   method  net/minecraft/world/item/enchantment/Enchantment
 transitive-accessible   method  net/minecraft/world/item/enchantment/EnchantmentHelper  runIterationOnEquipment (Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor;)V
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor
+transitive-accessible   method  net/minecraft/client/renderer/LevelRenderer renderHitOutline    (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V
+transitive-accessible   method  net/minecraft/client/renderer/LevelRenderer renderShape (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/phys/shapes/VoxelShape;DDDFFFF)V
 accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;

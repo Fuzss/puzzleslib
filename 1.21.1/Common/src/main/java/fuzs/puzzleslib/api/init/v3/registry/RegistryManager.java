@@ -147,9 +147,21 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param itemProperties properties for item
      * @return holder reference
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Item.Properties itemProperties) {
+        return this.registerBlockItem(blockReference, () -> itemProperties);
+    }
+
+    /**
+     * Registers a block item for a block.
+     *
+     * @param blockReference reference for block to register item variant for
+     * @param itemProperties properties for item
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Supplier<Item.Properties> itemProperties) {
         return this.registerItem(blockReference.unwrapKey().orElseThrow().location().getPath(), () -> {
-            return new BlockItem(blockReference.value(), itemProperties);
+            return new BlockItem(blockReference.value(), itemProperties.get());
         });
     }
 
