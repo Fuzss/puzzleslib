@@ -9,6 +9,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,6 +22,7 @@ import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 
 /**
@@ -29,26 +31,35 @@ import java.util.function.BiConsumer;
 public final class NeoForgeCapabilityHelper {
 
     private NeoForgeCapabilityHelper() {
-
+        // NO-OP
     }
 
     /**
-     * Register a {@link ICapabilityProvider} for implementations of {@link ChestBlock} to support handling double chests automatically.
+     * Register an {@link ICapabilityProvider} for {@link ChestBlock ChestBlocks} to support handling double chests
+     * automatically.
      *
      * @param chestBlocks chest blocks to register
      */
+    @SafeVarargs
     public static void registerChestBlock(Holder<? extends ChestBlock>... chestBlocks) {
         register((RegisterCapabilitiesEvent registerCapabilitiesEvent, ChestBlock chestBlock) -> {
-            registerCapabilitiesEvent.registerBlock(Capabilities.ItemHandler.BLOCK, (level, pos, state, blockEntity, side) -> {
-                Container container = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, pos, true);
-                return new InvWrapper(container);
-            }, chestBlock);
+            registerCapabilitiesEvent.registerBlock(Capabilities.ItemHandler.BLOCK,
+                    (level, pos, state, blockEntity, side) -> {
+                        Container container = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, pos,
+                                true
+                        );
+                        Objects.requireNonNull(container, "chest container is null");
+                        return new InvWrapper(container);
+                    }, chestBlock
+            );
         }, chestBlocks);
     }
 
     /**
-     * Register a {@link ICapabilityProvider} for {@link BlockEntityType}s that implement {@link Container}.
-     * <p>An example is {@link net.minecraft.world.level.block.entity.BarrelBlockEntity}.
+     * Register an {@link ICapabilityProvider} for {@link BlockEntityType BlockEntityTypes} that implement
+     * {@link Container}.
+     * <p>
+     * An example is {@link net.minecraft.world.level.block.entity.BarrelBlockEntity}.
      *
      * @param blockEntityTypes block entity types to register
      * @param <T>              block entity super type
@@ -61,8 +72,10 @@ public final class NeoForgeCapabilityHelper {
     }
 
     /**
-     * Register a {@link ICapabilityProvider} for {@link BlockEntityType}s that implement {@link WorldlyContainer} for filtering inputs &amp; outputs based on direction.
-     * <p>An example is {@link net.minecraft.world.level.block.entity.BrewingStandBlockEntity}.
+     * Register an {@link ICapabilityProvider} for {@link BlockEntityType BlockEntityTypes} that implement
+     * {@link WorldlyContainer} for filtering inputs &amp; outputs based on direction.
+     * <p>
+     * An example is {@link net.minecraft.world.level.block.entity.BrewingStandBlockEntity}.
      *
      * @param blockEntityTypes block entity types to register
      * @param <T>              block entity super type
@@ -75,9 +88,12 @@ public final class NeoForgeCapabilityHelper {
     }
 
     /**
-     * Register a {@link ICapabilityProvider} for {@link BlockEntityType}s that implement {@link WorldlyContainer} without filtering inputs &amp; outputs based on direction.
-     * <p>An example is {@link net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity},
-     * which uses {@link WorldlyContainer#canPlaceItemThroughFace(int, ItemStack, Direction)} merely to filter incoming items, ignoring the passed direction.
+     * Register an {@link ICapabilityProvider} for {@link BlockEntityType BlockEntityTypes} that implement
+     * {@link WorldlyContainer} without filtering inputs &amp; outputs based on direction.
+     * <p>
+     * An example is {@link net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity}, which uses
+     * {@link WorldlyContainer#canPlaceItemThroughFace(int, ItemStack, Direction)} merely to filter incoming items,
+     * ignoring the passed direction.
      *
      * @param blockEntityTypes block entity types to register
      * @param <T>              block entity super type
@@ -90,7 +106,7 @@ public final class NeoForgeCapabilityHelper {
     }
 
     /**
-     * Register a {@link ICapabilityProvider} for {@link BlockEntityType}s.
+     * Register an {@link ICapabilityProvider} for {@link BlockEntityType BlockEntityTypes}.
      *
      * @param capabilityProvider capability provider to register
      * @param blockEntityTypes   block entity types to register
@@ -104,30 +120,48 @@ public final class NeoForgeCapabilityHelper {
     }
 
     /**
-     * Register a {@link ICapabilityProvider} for {@link EntityType}s.
-     * <p>An example is {@link net.minecraft.world.entity.vehicle.ChestBoat} and {@link net.minecraft.world.entity.vehicle.MinecartHopper}.
+     * Register an {@link ICapabilityProvider} for {@link EntityType EntityTypes}.
+     * <p>
+     * An example is {@link net.minecraft.world.entity.vehicle.ChestBoat} and
+     * {@link net.minecraft.world.entity.vehicle.MinecartHopper}.
      *
      * @param entityTypes entity types to register
      * @param <T>         entity super type
      */
     @SafeVarargs
     public static <T extends Entity & Container> void registerEntityContainer(Holder<? extends EntityType<? extends T>>... entityTypes) {
-        NeoForgeCapabilityHelper.register((RegisterCapabilitiesEvent evt, EntityType<? extends T> entityType) -> {
+        register((RegisterCapabilitiesEvent evt, EntityType<? extends T> entityType) -> {
             evt.registerEntity(Capabilities.ItemHandler.ENTITY, entityType, (T entity, Void aVoid) -> {
                 return new InvWrapper(entity);
             });
-            evt.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION, entityType, (T entity, @Nullable Direction direction) -> {
-                return new InvWrapper(entity);
-            });
+            evt.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION, entityType,
+                    (T entity, @Nullable Direction direction) -> {
+                        return new InvWrapper(entity);
+                    }
+            );
         }, entityTypes);
+    }
+
+    /**
+     * Register a {@link ICapabilityProvider} for {@link Item Items}.
+     * <p>
+     * An example is {@link net.minecraft.world.level.block.ShulkerBoxBlock}.
+     *
+     * @param items entity types to register
+     */
+    @SafeVarargs
+    public static void registerItemContainer(ICapabilityProvider<ItemStack, Void, IItemHandler> capabilityProvider, Holder<? extends Item>... items) {
+        register((RegisterCapabilitiesEvent evt, Item item) -> {
+            evt.registerItem(Capabilities.ItemHandler.ITEM, capabilityProvider, item);
+        }, items);
     }
 
     /**
      * Helper method for registering types to {@link RegisterCapabilitiesEvent}.
      *
-     * @param consumer    capability registration context
-     * @param types       capability provider values
-     * @param <T>         capability provider type
+     * @param consumer capability registration context
+     * @param types    capability provider values
+     * @param <T>      capability provider type
      */
     @SafeVarargs
     public static <T> void register(BiConsumer<RegisterCapabilitiesEvent, T> consumer, Holder<? extends T>... types) {
