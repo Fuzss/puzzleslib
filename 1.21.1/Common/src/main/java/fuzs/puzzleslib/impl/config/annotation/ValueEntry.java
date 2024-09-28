@@ -21,6 +21,8 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
     public List<String> getComments(@Nullable Object o) {
         List<String> comments = super.getComments(o);
         comments.add("Default Value: " + this.getDefaultValue(o));
+        if (this.requiresWorldRestart()) comments.add("Requires World Restart!");
+        if (this.requiresGameRestart()) comments.add("Requires Game Restart!");
         return comments;
     }
 
@@ -28,13 +30,21 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
     public final void defineValue(ModConfigSpec.Builder builder, ConfigDataHolderImpl<?> context, @Nullable Object o) {
         // final fields are permitted until here, since values must be able to change
         // previously only new config categories are handled, those instances never change
-        if (Modifier.isFinal(this.field.getModifiers())) throw new RuntimeException("Field may not be final");
+        if (Modifier.isFinal(this.field.getModifiers())) throw new RuntimeException("Field must not be final");
         List<String> comments = this.getComments(o);
         builder.comment(comments.toArray(String[]::new));
-        if (this.getAnnotation().worldRestart()) builder.worldRestart();
-        if (this.getAnnotation().gameRestart()) builder.gameRestart();
+        if (this.requiresWorldRestart()) builder.worldRestart();
+        if (this.requiresGameRestart()) builder.gameRestart();
         ModConfigSpec.ConfigValue<T> configValue = this.getConfigValue(builder, o);
         context.accept(configValue, this.getValueCallback(configValue, o));
+    }
+
+    private boolean requiresGameRestart() {
+        return this.getAnnotation().gameRestart();
+    }
+
+    private boolean requiresWorldRestart() {
+        return this.getAnnotation().worldRestart();
     }
 
     public abstract ModConfigSpec.ConfigValue<T> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o);
