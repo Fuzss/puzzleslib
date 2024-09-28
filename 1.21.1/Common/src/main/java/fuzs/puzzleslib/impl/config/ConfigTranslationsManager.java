@@ -90,7 +90,7 @@ public final class ConfigTranslationsManager {
     public static void addConfigValueComment(String modId, String valueName, @Nullable String comment) {
         Objects.requireNonNull(valueName, "value name is null");
         addConfigValueComment(modId, Collections.singletonList(valueName),
-                comment != null ? Arrays.asList(comment.split("\\r?\\n")) : Collections.emptyList()
+                comment != null ? Arrays.asList(comment.split("\\R")) : Collections.emptyList()
         );
     }
 
