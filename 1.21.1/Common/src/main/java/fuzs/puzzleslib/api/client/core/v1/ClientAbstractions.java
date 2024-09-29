@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -27,13 +28,15 @@ public interface ClientAbstractions {
     ClientAbstractions INSTANCE = ServiceProviderHelper.load(ClientAbstractions.class);
 
     /**
-     * checks if a <code>keyMapping</code> is active (=pressed), Forge replaces this everywhere, so we need an
-     * abstraction
+     * Checks if a key mapping is pressed.
+     * <p>
+     * NeoForge replaces the vanilla call to {@link KeyMapping#matches(int, int)} in a few places to account for key
+     * activation contexts (game &amp; screen environments).
      *
      * @param keyMapping the key mapping to check if pressed
-     * @param keyCode    current key code
-     * @param scanCode   scan code
-     * @return is <code>keyMapping</code> active
+     * @param keyCode    the current key code
+     * @param scanCode   the key scan code
+     * @return is the key mapping pressed
      */
     boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode);
 
@@ -139,4 +142,40 @@ public interface ClientAbstractions {
      * @return <code>true</code> to prevent the tooltip from rendering, allows for fully taking over rendering
      */
     boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner);
+
+    /**
+     * Returns the current render height for hotbar decorations on the left side.
+     * <p>
+     * In vanilla this includes player health and armor level.
+     *
+     * @param gui the gui instance
+     * @return the hotbar decorations render height
+     */
+    int getGuiLeftHeight(Gui gui);
+
+    /**
+     * Returns the current render height for hotbar decorations on the right side.
+     * <p>
+     * In vanilla this includes player food level, vehicle health and air supply.
+     *
+     * @param gui the gui instance
+     * @return the hotbar decorations render height
+     */
+    int getGuiRightHeight(Gui gui);
+
+    /**
+     * Add to the current render height for hotbar decorations on the left side.
+     *
+     * @param gui        the gui instance
+     * @param leftHeight the additional hotbar decorations render height
+     */
+    void addGuiLeftHeight(Gui gui, int leftHeight);
+
+    /**
+     * Add to the current render height for hotbar decorations on the right side.
+     *
+     * @param gui         the gui instance
+     * @param rightHeight the additional hotbar decorations render height
+     */
+    void addGuiRightHeight(Gui gui, int rightHeight);
 }

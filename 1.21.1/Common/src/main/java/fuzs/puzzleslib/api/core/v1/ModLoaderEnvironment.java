@@ -44,9 +44,11 @@ public interface ModLoaderEnvironment {
 
     /**
      * The following mapping namespaces are used in the certain situations:
+     * <ul>
      * <li><code>named</code> in a development environment and in production using NeoForge</li>
      * <li><code>intermediary</code> in production using Fabric</li>
      * <li><code>srg</code> in production using Forge</li>
+     * </ul>
      *
      * @return runtime mappings namespace
      */
@@ -85,8 +87,11 @@ public interface ModLoaderEnvironment {
 
     /**
      * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server.
-     * <p>Useful for altering client behavior depending on the server mod state.
-     * <p>This method CANNOT be used for checking the state of any arbitrary mod, only Puzzles Lib mods are supported.
+     * <p>
+     * Useful for altering client behavior depending on the server mod state.
+     * <p>
+     * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
+     * supported.
      *
      * @param modId the mod to check
      * @return is the mod installed on the server
@@ -94,9 +99,4 @@ public interface ModLoaderEnvironment {
     default boolean isModPresentServerside(String modId) {
         return ModContext.isPresentServerside(modId);
     }
-
-    /**
-     * @return a wrapper for Fabric's object share, will return a dummy wrapper on Forge
-     */
-    ObjectShareAccess getObjectShareAccess();
 }

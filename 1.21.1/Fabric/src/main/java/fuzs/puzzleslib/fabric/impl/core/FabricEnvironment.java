@@ -4,7 +4,6 @@ import com.google.common.base.Suppliers;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.FabricLoader;
 
@@ -92,10 +91,5 @@ public final class FabricEnvironment implements ModLoaderEnvironment {
     @Override
     public Map<String, ModContainer> getModList() {
         return this.modList.get();
-    }
-
-    @Override
-    public ObjectShareAccess getObjectShareAccess() {
-        return FabricObjectShareAccess.INSTANCE;
     }
 }

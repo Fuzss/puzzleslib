@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -58,15 +59,28 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
     @Override
     public boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
-        return ClientHooks.onRenderTooltipPre(ItemStack.EMPTY,
-                guiGraphics,
-                mouseX,
-                mouseY,
-                guiGraphics.guiWidth(),
-                guiGraphics.guiHeight(),
-                components,
-                font,
-                positioner
+        return ClientHooks.onRenderTooltipPre(ItemStack.EMPTY, guiGraphics, mouseX, mouseY, guiGraphics.guiWidth(),
+                guiGraphics.guiHeight(), components, font, positioner
         ).isCanceled();
+    }
+
+    @Override
+    public int getGuiLeftHeight(Gui gui) {
+        return gui.leftHeight;
+    }
+
+    @Override
+    public int getGuiRightHeight(Gui gui) {
+        return gui.rightHeight;
+    }
+
+    @Override
+    public void addGuiLeftHeight(Gui gui, int leftHeight) {
+        gui.leftHeight += leftHeight;
+    }
+
+    @Override
+    public void addGuiRightHeight(Gui gui, int rightHeight) {
+        gui.rightHeight += rightHeight;
     }
 }

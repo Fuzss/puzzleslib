@@ -4,9 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.1.12-1.21.1] - 2024-09-27
+## [v21.1.12-1.21.1] - 2024-09-29
 ### Added
 - Add `NeoForgeCapabilityHelper::registerItemContainer`
+- Add `GuiGraphicsHelper::blitTiledSprite`
+- Add a bunch of helper methods to `ClientAbstractions` for handling `Gui#leftHeight` &amp; `Gui#rightHeight`
+### Changed
+- Minor `ConfigTranslationsManager` improvements
+### Removed
+- Remove `ModLoaderEnvironment::getObjectShareAccess`
 
 ## [v21.1.11-1.21.1] - 2024-09-25
 ### Added

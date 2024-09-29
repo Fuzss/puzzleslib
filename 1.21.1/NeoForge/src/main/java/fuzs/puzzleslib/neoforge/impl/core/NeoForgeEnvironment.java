@@ -4,8 +4,6 @@ import com.google.common.base.Suppliers;
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.ObjectShareAccess;
-import fuzs.puzzleslib.impl.core.EmptyObjectShareAccessImpl;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.fml.loading.FMLLoader;
@@ -27,9 +25,8 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
     });
 
     private Stream<? extends ModContainer> getNeoForgeModContainers() {
-        Map<String, NeoForgeModContainer> allMods = getForgeModList().stream()
-                .map(NeoForgeModContainer::new)
-                .collect(Collectors.toMap(modContainer -> {
+        Map<String, NeoForgeModContainer> allMods = getForgeModList().stream().map(NeoForgeModContainer::new).collect(
+                Collectors.toMap(modContainer -> {
                     // alternatively use raw variant for escaped octets
                     return modContainer.getURI().getSchemeSpecificPart();
                 }, Function.identity(), (NeoForgeModContainer o1, NeoForgeModContainer o2) -> {
@@ -58,8 +55,7 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
 
     private static String getParentSchemePart(String schemePart) {
         // jar-in-jar mods can also be put outside META-INF, but this is the default place for NeoGradle & Architectury Loom
-        return schemePart.replace("/jij:file:///", "file:///")
-                .replaceAll("_/META-INF/.+(#|%23)\\d+!/$", "!/");
+        return schemePart.replace("/jij:file:///", "file:///").replaceAll("_/META-INF/.+(#|%23)\\d+!/$", "!/");
     }
 
     @Override
@@ -110,10 +106,5 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
     @Override
     public Map<String, ModContainer> getModList() {
         return this.modList.get();
-    }
-
-    @Override
-    public ObjectShareAccess getObjectShareAccess() {
-        return EmptyObjectShareAccessImpl.INSTANCE;
     }
 }
