@@ -18,9 +18,12 @@ import java.util.Objects;
  * <p>
  * For convenience all ids are the same as the ones used by Forge's current gui system to ease implementation of these
  * callbacks on Forge.
+ * <p>
+ * Note that events for most layers on Fabric are not currently implemented.
  */
 public final class RenderGuiLayerEvents {
-    public static final ResourceLocation CAMERA_OVERLAYS = ResourceLocationHelper.withDefaultNamespace("camera_overlays");
+    public static final ResourceLocation CAMERA_OVERLAYS = ResourceLocationHelper.withDefaultNamespace(
+            "camera_overlays");
     public static final ResourceLocation CROSSHAIR = ResourceLocationHelper.withDefaultNamespace("crosshair");
     public static final ResourceLocation HOTBAR = ResourceLocationHelper.withDefaultNamespace("hotbar");
     public static final ResourceLocation JUMP_METER = ResourceLocationHelper.withDefaultNamespace("jump_meter");
@@ -43,7 +46,8 @@ public final class RenderGuiLayerEvents {
     public static final ResourceLocation DEBUG_OVERLAY = ResourceLocationHelper.withDefaultNamespace("debug_overlay");
     public static final ResourceLocation SCOREBOARD_SIDEBAR = ResourceLocationHelper.withDefaultNamespace(
             "scoreboard_sidebar");
-    public static final ResourceLocation OVERLAY_MESSAGE = ResourceLocationHelper.withDefaultNamespace("overlay_message");
+    public static final ResourceLocation OVERLAY_MESSAGE = ResourceLocationHelper.withDefaultNamespace(
+            "overlay_message");
     public static final ResourceLocation TITLE = ResourceLocationHelper.withDefaultNamespace("title");
     public static final ResourceLocation CHAT = ResourceLocationHelper.withDefaultNamespace("chat");
     public static final ResourceLocation TAB_LIST = ResourceLocationHelper.withDefaultNamespace("tab_list");

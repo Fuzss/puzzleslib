@@ -123,6 +123,10 @@ accessible  field   net/minecraft/data/registries/RegistriesDatapackGenerator   
 mutable field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
 accessible  method  net/minecraft/client/gui/components/toasts/ToastComponent   freeSlots   ()I
 accessible  field   net/minecraft/client/gui/screens/TitleScreen    fading  Z
+accessible  method  net/minecraft/client/gui/GuiGraphics    blitTiledSprite (Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;IIIIIIIIIII)V
+accessible  method  net/minecraft/client/gui/Gui    getVehicleMaxHearts (Lnet/minecraft/world/entity/LivingEntity;)I
+accessible  method  net/minecraft/client/gui/Gui    getPlayerVehicleWithHealth  ()Lnet/minecraft/world/entity/LivingEntity;
+accessible  field   net/minecraft/client/gui/Gui    displayHealth   I
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
