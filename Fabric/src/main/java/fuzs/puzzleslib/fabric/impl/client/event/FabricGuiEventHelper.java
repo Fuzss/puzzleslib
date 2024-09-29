@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
+import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
@@ -41,14 +42,8 @@ public final class FabricGuiEventHelper {
         // NO-OP
     }
 
-    public static void initialize(Minecraft minecraft, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        CANCELLED_GUI_LAYERS.clear();
-        setGuiLeftHeight(39);
-        setGuiRightHeight(39);
-        invokeGuiLayerEvents(minecraft, guiGraphics, deltaTracker);
-    }
-
     private static void invokeGuiLayerEvents(Minecraft minecraft, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        CANCELLED_GUI_LAYERS.clear();
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 50.0F);
         for (ResourceLocation resourceLocation : RenderGuiLayerEvents.VANILLA_GUI_LAYERS_VIEW) {
@@ -94,6 +89,11 @@ public final class FabricGuiEventHelper {
     }
 
     public static void registerEventHandlers() {
+        RenderGuiEvents.BEFORE.register(EventPhase.FIRST, (minecraft, guiGraphics, deltaTracker) -> {
+            setGuiLeftHeight(39);
+            setGuiRightHeight(39);
+        });
+        RenderGuiEvents.BEFORE.register(EventPhase.AFTER, FabricGuiEventHelper::invokeGuiLayerEvents);
         RenderGuiLayerEvents.after(RenderGuiLayerEvents.PLAYER_HEALTH).register(EventPhase.FIRST,
                 (minecraft, guiGraphics, deltaTracker) -> {
                     if (minecraft.getCameraEntity() instanceof Player player) {
