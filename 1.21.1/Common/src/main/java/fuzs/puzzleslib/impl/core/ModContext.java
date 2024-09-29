@@ -50,10 +50,10 @@ public abstract class ModContext {
         LoadCompleteCallback.EVENT.register(() -> {
             for (ModContext context : MOD_CONTEXTS.values()) {
                 if (!context.buildables.isEmpty()) {
-                    throw new IllegalStateException("Mod context for %s has %s remaining buildables".formatted(context.modId, context.buildables.size()));
+                    throw new IllegalStateException("Mod context for %s has %s remaining buildable(s)".formatted(context.modId, context.buildables.size()));
                 }
                 if (!context.clientModConstructors.isEmpty()) {
-                    throw new IllegalStateException("Mod context for %s has remaining client mod constructors: %s".formatted(context.modId, context.clientModConstructors.keySet()));
+                    throw new IllegalStateException("Mod context for %s has remaining client mod constructor(s): %s".formatted(context.modId, context.clientModConstructors.keySet()));
                 }
             }
         });

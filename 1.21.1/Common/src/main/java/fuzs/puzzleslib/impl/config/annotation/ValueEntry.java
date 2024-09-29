@@ -21,8 +21,8 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
     public List<String> getComments(@Nullable Object o) {
         List<String> comments = super.getComments(o);
         comments.add("Default Value: " + this.getDefaultValue(o));
-        if (this.requiresWorldRestart()) comments.add("Requires World Restart!");
-        if (this.requiresGameRestart()) comments.add("Requires Game Restart!");
+        if (this.requiresWorldRestart()) comments.add("Requires Restart: World");
+        if (this.requiresGameRestart()) comments.add("Requires Restart: Game");
         return comments;
     }
 
