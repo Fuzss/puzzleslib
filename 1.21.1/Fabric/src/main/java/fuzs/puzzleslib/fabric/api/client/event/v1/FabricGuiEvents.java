@@ -1,17 +1,20 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 
 public final class FabricGuiEvents {
+    private static final Map<String, Event<RenderGuiLayerEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = new IdentityHashMap<>();
+    private static final Map<String, Event<RenderGuiLayerEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = new IdentityHashMap<>();
     /**
      * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the
      * screen background is drawn (like menu texture).
@@ -70,8 +73,12 @@ public final class FabricGuiEvents {
      */
     public static final Event<GatherEffectScreenTooltipCallback> GATHER_EFFECT_SCREEN_TOOLTIP = FabricEventFactory.create(
             GatherEffectScreenTooltipCallback.class);
-    private static final Map<String, Event<RenderGuiLayerEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
-    private static final Map<String, Event<RenderGuiLayerEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = Maps.newIdentityHashMap();
+    /**
+     * Called at the beginning of {@link net.minecraft.client.gui.Gui#render(GuiGraphics, DeltaTracker)}, before vanilla
+     * has drawn any gui elements.
+     */
+    public static final Event<RenderGuiEvents.Before> BEFORE_RENDER_GUI = FabricEventFactory.create(
+            RenderGuiEvents.Before.class);
 
     private FabricGuiEvents() {
         // NO-OP
