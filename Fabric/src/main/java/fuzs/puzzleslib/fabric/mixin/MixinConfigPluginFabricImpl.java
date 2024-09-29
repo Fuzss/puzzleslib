@@ -10,11 +10,11 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginFabricImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("client.OptionsFabricMixin", "client.WindowFabricMixin");
+    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("client.OptionsFabricMixin");
 
     @Override
     public void onLoad(String mixinPackage) {
-
+        // NO-OP
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MixinConfigPluginFabricImpl implements IMixinConfigPlugin {
 
     @Override
     public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-
+        // NO-OP
     }
 
     @Override
@@ -39,11 +39,11 @@ public class MixinConfigPluginFabricImpl implements IMixinConfigPlugin {
 
     @Override
     public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // NO-OP
     }
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // NO-OP
     }
 }

@@ -140,7 +140,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
         options.entityShadows().set(false);
         options.realmsNotifications().set(false);
         options.showSubtitles().set(true);
-        options.guiScale().set(5);
+        options.guiScale().set(8);
         options.onboardAccessibility = false;
         options.skipMultiplayerWarning = true;
         options.damageTiltStrength().set(0.0);

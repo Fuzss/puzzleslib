@@ -14,7 +14,7 @@ public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
 
     @Override
     public void onLoad(String mixinPackage) {
-
+        // NO-OP
     }
 
     @Override
@@ -29,7 +29,7 @@ public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
 
     @Override
     public void acceptTargets(Set<String> myTargets, Set<String> otherTargets) {
-
+        // NO-OP
     }
 
     @Override
@@ -39,11 +39,11 @@ public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
 
     @Override
     public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // NO-OP
     }
 
     @Override
     public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName, IMixinInfo mixinInfo) {
-
+        // NO-OP
     }
 }

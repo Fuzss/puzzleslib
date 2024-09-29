@@ -6,13 +6,14 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
+import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ChatComponent;
+import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -20,11 +21,23 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+
 @Mixin(value = Gui.class, priority = 500)
 abstract class GuiFabricMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
+
+    @Inject(
+            method = "render", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/LayeredDraw;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"
+    )
+    )
+    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.initialize(this.minecraft, guiGraphics, deltaTracker);
+    }
 
     @WrapOperation(
             method = "renderChat", at = @At(
@@ -46,136 +59,47 @@ abstract class GuiFabricMixin {
 
     @Inject(method = "renderCameraOverlays", at = @At("HEAD"), cancellable = true)
     private void renderCameraOverlays$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.CAMERA_OVERLAYS)
-                .invoker()
-                .onBeforeRenderGuiLayer(this.minecraft, guiGraphics, deltaTracker)
-                .isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderCameraOverlays", at = @At("TAIL"))
-    private void renderCameraOverlays$1(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.CAMERA_OVERLAYS).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker);
-    }
-
-    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
-    private void renderItemHotbar$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.HOTBAR).invoker().onBeforeRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker).isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderItemHotbar", at = @At("TAIL"))
-    private void renderItemHotbar$1(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.HOTBAR).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker);
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CAMERA_OVERLAYS, callback);
     }
 
     @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    private void renderCrosshair$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.CROSSHAIR).invoker().onBeforeRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker).isInterrupt()) {
-            callback.cancel();
-        }
+    private void renderCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CROSSHAIR, callback);
     }
 
-    @Inject(method = "renderCrosshair", at = @At("TAIL"))
-    private void renderCrosshair$1(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.CROSSHAIR).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker);
+    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
+    private void renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.HOTBAR, callback);
     }
 
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    protected void renderEffects$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.EFFECTS).invoker().onBeforeRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker).isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderEffects", at = @At("TAIL"))
-    protected void renderEffects$1(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.EFFECTS).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, deltaTracker);
+    @Inject(method = "renderJumpMeter", at = @At(value = "HEAD"))
+    private void renderJumpMeter(PlayerRideableJumping rideable, GuiGraphics guiGraphics, int x, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.JUMP_METER, callback);
     }
 
     @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"))
-    public void renderExperienceBar$0(GuiGraphics guiGraphics, int xPos, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.EXPERIENCE_BAR)
-                .invoker()
-                .onBeforeRenderGuiLayer(this.minecraft, guiGraphics, this.minecraft.getTimer())
-                .isInterrupt()) {
-            callback.cancel();
-        }
+    public void renderExperienceBar(GuiGraphics guiGraphics, int xPos, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_BAR, callback);
     }
 
-    @Inject(method = "renderExperienceBar", at = @At(value = "TAIL"))
-    public void renderExperienceBar$1(GuiGraphics guiGraphics, int xPos, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.EXPERIENCE_BAR).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer());
-    }
-
-    @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
-    public void renderSelectedItemName$0(GuiGraphics guiGraphics, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.SELECTED_ITEM_NAME)
-                .invoker()
-                .onBeforeRenderGuiLayer(this.minecraft, guiGraphics, this.minecraft.getTimer())
-                .isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderSelectedItemName", at = @At("TAIL"))
-    public void renderSelectedItemName$1(GuiGraphics guiGraphics, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.SELECTED_ITEM_NAME).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer());
+    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
+    private void renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_LEVEL, callback);
     }
 
     @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
-    private static void renderArmor$0(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, CallbackInfo callback) {
-        Minecraft minecraft = Minecraft.getInstance();
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.ARMOR_LEVEL).invoker().onBeforeRenderGuiLayer(
-                minecraft, guiGraphics, minecraft.getTimer()).isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderArmor", at = @At("TAIL"))
-    private static void renderArmor$1(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, CallbackInfo callback) {
-        Minecraft minecraft = Minecraft.getInstance();
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.ARMOR_LEVEL).invoker().onAfterRenderGuiLayer(
-                minecraft, guiGraphics, minecraft.getTimer());
+    private static void renderArmor(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.ARMOR_LEVEL, callback);
     }
 
     @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
-    private void renderHearts$0(GuiGraphics guiGraphics, Player player, int x, int y, int height, int offsetHeartIndex, float maxHealth, int currentHealth, int displayHealth, int absorptionAmount, boolean renderHighlight, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.PLAYER_HEALTH).invoker().onBeforeRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer()).isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderHearts", at = @At("HEAD"))
-    private void renderHearts$1(GuiGraphics guiGraphics, Player player, int x, int y, int height, int offsetHeartIndex, float maxHealth, int currentHealth, int displayHealth, int absorptionAmount, boolean renderHighlight, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.PLAYER_HEALTH).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer());
+    private void renderHearts(GuiGraphics guiGraphics, Player player, int x, int y, int height, int offsetHeartIndex, float maxHealth, int currentHealth, int displayHealth, int absorptionAmount, boolean renderHighlight, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.PLAYER_HEALTH, callback);
     }
 
     @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
-    public void renderFood$0(GuiGraphics guiGraphics, Player player, int y, int x, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.FOOD_LEVEL).invoker().onBeforeRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer()).isInterrupt()) {
-            callback.cancel();
-        }
-    }
-
-    @Inject(method = "renderFood", at = @At("TAIL"))
-    public void renderFood$1(GuiGraphics guiGraphics, Player player, int y, int x, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.FOOD_LEVEL).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer());
+    public void renderFood(GuiGraphics guiGraphics, Player player, int y, int x, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.FOOD_LEVEL, callback);
     }
 
     @ModifyExpressionValue(
@@ -183,42 +107,27 @@ abstract class GuiFabricMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAirSupply()I")
     )
     private int renderPlayerHealth(int airSupply, GuiGraphics guiGraphics) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.AIR_LEVEL).invoker().onBeforeRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer()).isInterrupt()) {
-            return 0;
-        } else {
-            return airSupply;
-        }
-    }
-
-    @Inject(method = "renderPlayerHealth", at = @At("TAIL"))
-    private void renderPlayerHealth(GuiGraphics guiGraphics, CallbackInfo callback) {
-        Player player = this.getCameraPlayer();
-        if (player != null) {
-            FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.AIR_LEVEL).invoker().onAfterRenderGuiLayer(
-                    this.minecraft, guiGraphics, this.minecraft.getTimer());
-        }
-    }
-
-    @Shadow
-    @Nullable
-    private Player getCameraPlayer() {
-        throw new RuntimeException();
+        return FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, () -> Optional.of(0)).orElse(
+                airSupply);
     }
 
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
-    public void renderVehicleHealth$0(GuiGraphics guiGraphics, CallbackInfo callback) {
-        if (FabricGuiEvents.beforeRenderGuiElement(RenderGuiLayerEvents.VEHICLE_HEALTH)
-                .invoker()
-                .onBeforeRenderGuiLayer(this.minecraft, guiGraphics, this.minecraft.getTimer())
-                .isInterrupt()) {
-            callback.cancel();
-        }
+    public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.VEHICLE_HEALTH, callback);
     }
 
-    @Inject(method = "renderVehicleHealth", at = @At("TAIL"))
-    public void renderVehicleHealth$1(GuiGraphics guiGraphics, CallbackInfo callback) {
-        FabricGuiEvents.afterRenderGuiElement(RenderGuiLayerEvents.VEHICLE_HEALTH).invoker().onAfterRenderGuiLayer(
-                this.minecraft, guiGraphics, this.minecraft.getTimer());
+    @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
+    public void renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.SELECTED_ITEM_NAME, callback);
+    }
+
+    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
+    protected void renderEffects(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EFFECTS, callback);
+    }
+
+    @Inject(method = "renderSavingIndicator", at = @At("HEAD"), cancellable = true)
+    public void renderSavingIndicator(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.SAVING_INDICATOR, callback);
     }
 }
