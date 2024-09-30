@@ -16,13 +16,15 @@ import java.util.Objects;
 /**
  * Events for managing all the rendering done in {@link net.minecraft.client.gui.Gui}.
  * <p>
- * This is modelled after Forge's system for handling individual components in the gui before Minecraft 1.17, to avoid
+ * This is modelled after NeoForge's system for handling individual components in the gui before Minecraft 1.17, to avoid
  * having to replace the whole gui renderer as Forge is doing in more recent versions.
  * <p>
  * For convenience all ids are the same as the ones used by Forge's current gui system to ease implementation of these
- * callbacks on Forge.
+ * callbacks on NeoForge.
  * <p>
- * Note that events for most layers on Fabric currently are not fully implemented.
+ * Note that some gui layer events currently cannot be cancelled on Fabric are as they are not fully implemented.
+ * <p>
+ * TODO replace {@link Minecraft} argument with {@link net.minecraft.client.gui.Gui}
  */
 public final class RenderGuiLayerEvents {
     private static final List<ResourceLocation> VANILLA_GUI_LAYERS = new ArrayList<>();

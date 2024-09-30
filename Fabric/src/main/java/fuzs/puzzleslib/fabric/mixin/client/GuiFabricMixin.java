@@ -36,7 +36,7 @@ abstract class GuiFabricMixin {
     )
     )
     public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEvents.BEFORE_RENDER_GUI.invoker().onBeforeRenderGui(this.minecraft, guiGraphics, deltaTracker);
+        FabricGuiEvents.BEFORE_RENDER_GUI.invoker().onBeforeRenderGui(Gui.class.cast(this), guiGraphics, deltaTracker);
     }
 
     @WrapOperation(
