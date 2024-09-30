@@ -173,7 +173,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderGuiEvents.Before.class, FabricGuiEvents.BEFORE_RENDER_GUI);
         INSTANCE.register(RenderGuiEvents.After.class, HudRenderCallback.EVENT, callback -> {
             return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
-                callback.onAfterRenderGui(Minecraft.getInstance(), drawContext, tickCounter);
+                callback.onAfterRenderGui(Minecraft.getInstance().gui, drawContext, tickCounter);
             };
         });
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, callback -> {
