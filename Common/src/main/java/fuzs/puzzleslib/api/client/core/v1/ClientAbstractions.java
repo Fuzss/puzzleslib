@@ -9,10 +9,12 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -26,6 +28,15 @@ import java.util.List;
  */
 public interface ClientAbstractions {
     ClientAbstractions INSTANCE = ServiceProviderHelper.load(ClientAbstractions.class);
+
+    /**
+     * Checks if the connected server declared the ability to receive a specific type of packet.
+     *
+     * @param clientPacketListener the client packet listener
+     * @param type                 the packet type
+     * @return if the connected server has declared the ability to receive a specific type of packet
+     */
+    boolean hasChannel(ClientPacketListener clientPacketListener, CustomPacketPayload.Type<?> type);
 
     /**
      * Checks if a key mapping is pressed.

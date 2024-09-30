@@ -77,7 +77,7 @@ public interface EntityDataAttachmentBuilder<A> extends DataAttachmentRegistry.E
                     entity.getId(),
                     attachmentType.getData(entity)
             );
-            playerSet.broadcast(new ClientboundCustomPayloadPacket(message));
+            playerSet.broadcast(type, new ClientboundCustomPayloadPacket(message));
         }
     }
 }

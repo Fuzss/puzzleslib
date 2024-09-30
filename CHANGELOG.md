@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.17-1.21.1] - 2024-10-01
+### Added
+- Add `ClientAbstractions::hasChannel` & `CommonAbstractions::hasChannel`
+### Changed
+- Network messages are no longer sent to clients & servers that do not understand them
+
 ## [v21.1.16-1.21.1] - 2024-09-30
 ### Changed
 - `RenderGuiLayerEvents` no longer fire when the hud is hidden via `F1`

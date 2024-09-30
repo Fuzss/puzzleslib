@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,6 +38,11 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     @Override
     public MinecraftServer getMinecraftServer() {
         return ServerLifecycleHooks.getCurrentServer();
+    }
+
+    @Override
+    public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
+        return serverPlayer.connection.hasChannel(type);
     }
 
     @Override

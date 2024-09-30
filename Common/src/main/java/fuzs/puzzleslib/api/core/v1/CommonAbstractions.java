@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,6 +43,15 @@ public interface CommonAbstractions {
      * @return current game server, null when not in a world
      */
     MinecraftServer getMinecraftServer();
+
+    /**
+     * Checks if the connected client declared the ability to receive a specific type of packet.
+     *
+     * @param serverPlayer the server player
+     * @param type         the packet type
+     * @return if the connected client has declared the ability to receive a specific type of packet
+     */
+    boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type);
 
     /**
      * Opens a menu on both client and server while also providing additional data.

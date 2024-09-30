@@ -11,12 +11,14 @@ import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalEntityTypeTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,6 +61,11 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     @Override
     public MinecraftServer getMinecraftServer() {
         return this.gameServer;
+    }
+
+    @Override
+    public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
+        return ServerPlayNetworking.canSend(serverPlayer, type);
     }
 
     @Override
