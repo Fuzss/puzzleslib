@@ -17,6 +17,9 @@ import java.util.Objects;
 /**
  * Events for managing all the rendering in {@link net.minecraft.client.gui.Gui#render(GuiGraphics, DeltaTracker)}.
  * <p>
+ * Respects {@link net.minecraft.client.Options#hideGui}, for rendering custom gui layers regardless of that setting use
+ * {@link RenderGuiEvents.After}.
+ * <p>
  * This is modelled after NeoForge's system for handling individual gui layers, for convenience all ids are the same as
  * the ones used there.
  * <p>
