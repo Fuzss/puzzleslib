@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
-import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -21,10 +19,8 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
@@ -33,50 +29,34 @@ import java.util.function.Supplier;
  * Contains the current render height of hotbar decorations as an {@link Integer}.
  * <p>
  * When rendering additional hotbar decorations on the screen make sure to update the value by adding the height of the
- * decorations.
+ * decorations, which is usually {@code 10}.
  * <p>
- * The implementation is very similar to NeoForge's {@code Gui#leftHeight} &amp; {@code Gui#rightHeight}.
+ * The implementation is meant to be similar to NeoForge's {@code Gui#leftHeight} &amp; {@code Gui#rightHeight}.
  */
 public final class FabricGuiEventHelper {
     private static final String KEY_GUI_LEFT_HEIGHT = PuzzlesLibMod.id("left_height").toString();
     private static final String KEY_GUI_RIGHT_HEIGHT = PuzzlesLibMod.id("right_height").toString();
-    private static final Predicate<Gui> DEFAULT_GUI_LAYER_CONDITION = (Gui gui) -> !gui.minecraft.options.hideGui;
-    private static final Map<ResourceLocation, Predicate<Gui>> VANILLA_GUI_LAYER_CONDITIONS;
     private static final Set<ResourceLocation> CANCELLED_GUI_LAYERS = new HashSet<>();
-
-    static {
-        // these are the same conditions as on NeoForge
-        // the survival condition is only used for those few, the others like air supply handle it later themselves
-        ImmutableMap.Builder<ResourceLocation, Predicate<Gui>> builder = ImmutableMap.builder();
-        Predicate<Gui> survivalPlayerCondition = (Gui gui) -> DEFAULT_GUI_LAYER_CONDITION.test(gui) && gui.minecraft.gameMode.canHurtPlayer();
-        builder.put(RenderGuiLayerEvents.PLAYER_HEALTH, survivalPlayerCondition);
-        builder.put(RenderGuiLayerEvents.ARMOR_LEVEL, survivalPlayerCondition);
-        builder.put(RenderGuiLayerEvents.FOOD_LEVEL, survivalPlayerCondition);
-        builder.put(RenderGuiLayerEvents.SLEEP_OVERLAY, Predicates.alwaysTrue());
-        VANILLA_GUI_LAYER_CONDITIONS = builder.build();
-    }
 
     private FabricGuiEventHelper() {
         // NO-OP
     }
 
     private static void invokeGuiLayerEvents(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        CANCELLED_GUI_LAYERS.clear();
+        if (gui.minecraft.options.hideGui) return;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 50.0F);
         for (ResourceLocation resourceLocation : RenderGuiLayerEvents.VANILLA_GUI_LAYERS_VIEW) {
-            if (VANILLA_GUI_LAYER_CONDITIONS.getOrDefault(resourceLocation, DEFAULT_GUI_LAYER_CONDITION).test(gui)) {
-                if (FabricGuiEvents.beforeRenderGuiElement(resourceLocation).invoker().onBeforeRenderGuiLayer(gui.minecraft,
+            if (FabricGuiEvents.beforeRenderGuiElement(resourceLocation).invoker().onBeforeRenderGuiLayer(gui.minecraft,
+                    guiGraphics, deltaTracker
+            ).isInterrupt()) {
+                CANCELLED_GUI_LAYERS.add(resourceLocation);
+            } else {
+                FabricGuiEvents.afterRenderGuiElement(resourceLocation).invoker().onAfterRenderGuiLayer(gui.minecraft,
                         guiGraphics, deltaTracker
-                ).isInterrupt()) {
-                    CANCELLED_GUI_LAYERS.add(resourceLocation);
-                } else {
-                    FabricGuiEvents.afterRenderGuiElement(resourceLocation).invoker().onAfterRenderGuiLayer(gui.minecraft,
-                            guiGraphics, deltaTracker
-                    );
-                }
-                guiGraphics.pose().translate(0.0F, 0.0F, LayeredDraw.Z_SEPARATION);
+                );
             }
+            guiGraphics.pose().translate(0.0F, 0.0F, LayeredDraw.Z_SEPARATION);
         }
         guiGraphics.pose().popPose();
     }
@@ -110,6 +90,7 @@ public final class FabricGuiEventHelper {
 
     public static void registerEventHandlers() {
         RenderGuiEvents.BEFORE.register(EventPhase.FIRST, (minecraft, guiGraphics, deltaTracker) -> {
+            CANCELLED_GUI_LAYERS.clear();
             setGuiLeftHeight(39);
             setGuiRightHeight(39);
         });
