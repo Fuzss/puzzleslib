@@ -280,14 +280,14 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(RenderGuiLayerEvents.Before.class, RenderGuiLayerEvent.Pre.class, (RenderGuiLayerEvents.Before callback, RenderGuiLayerEvent.Pre evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
             ResourceLocation resourceLocation = (ResourceLocation) context;
-            if (!evt.getName().equals(resourceLocation)) return;
+            if (!evt.getName().equals(resourceLocation) || Minecraft.getInstance().options.hideGui) return;
             EventResult result = callback.onBeforeRenderGuiLayer(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderGuiLayerEvents.After.class, RenderGuiLayerEvent.Post.class, (RenderGuiLayerEvents.After callback, RenderGuiLayerEvent.Post evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
             ResourceLocation resourceLocation = (ResourceLocation) context;
-            if (!evt.getName().equals(resourceLocation)) return;
+            if (!evt.getName().equals(resourceLocation) || Minecraft.getInstance().options.hideGui) return;
             callback.onAfterRenderGuiLayer(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {

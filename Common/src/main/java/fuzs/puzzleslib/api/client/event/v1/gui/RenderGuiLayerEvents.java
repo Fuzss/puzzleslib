@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
@@ -14,15 +15,19 @@ import java.util.List;
 import java.util.Objects;
 
 /**
- * Events for managing all the rendering done in {@link net.minecraft.client.gui.Gui}.
+ * Events for managing all the rendering in {@link net.minecraft.client.gui.Gui#render(GuiGraphics, DeltaTracker)}.
  * <p>
- * This is modelled after NeoForge's system for handling individual components in the gui before Minecraft 1.17, to avoid
- * having to replace the whole gui renderer as Forge is doing in more recent versions.
+ * Respects {@link net.minecraft.client.Options#hideGui}, for rendering custom gui layers regardless of that setting use
+ * {@link RenderGuiEvents.After}.
  * <p>
- * For convenience all ids are the same as the ones used by Forge's current gui system to ease implementation of these
- * callbacks on NeoForge.
+ * This is modelled after NeoForge's system for handling individual gui layers, for convenience all ids are the same as
+ * the ones used there.
  * <p>
- * Note that some gui layer events currently cannot be cancelled on Fabric are as they are not fully implemented.
+ * Note that the implementation on Fabric runs before any actual vanilla gui layers are drawn with similar z-offsets.
+ * This is unfortunately necessary to support a proper rendering order that can correctly update
+ * {@link fuzs.puzzleslib.api.client.core.v1.ClientAbstractions#getGuiLeftHeight(Gui)} &amp;
+ * {@link fuzs.puzzleslib.api.client.core.v1.ClientAbstractions#getGuiRightHeight(Gui)} while running. Also some gui
+ * layer events currently cannot be cancelled on Fabric as they are not yet fully implemented.
  * <p>
  * TODO replace {@link Minecraft} argument with {@link net.minecraft.client.gui.Gui}
  */
