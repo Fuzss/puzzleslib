@@ -37,11 +37,9 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ClientboundMessage<T>> void registerClientbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz,
-                PayloadTypeRegistry.playS2C(),
+        this.register((Class<T>) clazz, PayloadTypeRegistry.playS2C(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type,
-                            disconnectExceptionally,
+                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type, disconnectExceptionally,
                             MessageV3::unwrap
                     );
                 }
@@ -51,11 +49,9 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Record & ServerboundMessage<T>> void registerServerbound$Internal(Class<?> clazz) {
-        this.register((Class<T>) clazz,
-                PayloadTypeRegistry.playC2S(),
+        this.register((Class<T>) clazz, PayloadTypeRegistry.playC2S(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type,
-                            disconnectExceptionally,
+                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type, disconnectExceptionally,
                             MessageV3::unwrap
                     );
                 }
@@ -65,12 +61,10 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyClientbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz,
-                (StreamDecoder<FriendlyByteBuf, T>) factory,
+        this.registerLegacy((Class<T>) clazz, (StreamDecoder<FriendlyByteBuf, T>) factory,
                 PayloadTypeRegistry.playS2C(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type,
-                            disconnectExceptionally,
+                    ((FabricProxy) Proxy.INSTANCE).registerClientReceiver(type, disconnectExceptionally,
                             MessageV2::toClientboundMessage
                     );
                 }
@@ -80,12 +74,10 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
     @SuppressWarnings("unchecked")
     @Override
     protected <T extends MessageV2<T>> void registerLegacyServerbound$Internal(Class<?> clazz, StreamDecoder<FriendlyByteBuf, ?> factory) {
-        this.registerLegacy((Class<T>) clazz,
-                (StreamDecoder<FriendlyByteBuf, T>) factory,
+        this.registerLegacy((Class<T>) clazz, (StreamDecoder<FriendlyByteBuf, T>) factory,
                 PayloadTypeRegistry.playC2S(),
                 (CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally) -> {
-                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type,
-                            disconnectExceptionally,
+                    ((FabricProxy) Proxy.INSTANCE).registerServerReceiver(type, disconnectExceptionally,
                             MessageV2::toServerboundMessage
                     );
                 }
@@ -103,9 +95,7 @@ public class FabricNetworkHandler extends NetworkHandlerRegistryImpl {
         if (this.building) throw new IllegalStateException("channel is null");
         CustomPacketPayload.Type<CustomPacketPayloadAdapter<T>> type = this.registerMessageType(clazz);
         StreamCodec<? super RegistryFriendlyByteBuf, CustomPacketPayloadAdapter<T>> streamCodec = CustomPacketPayloadAdapter.streamCodec(
-                type,
-                StreamCodecRegistryImpl.fromType(clazz)
-        );
+                type, StreamCodecRegistryImpl.fromType(clazz));
         registry.register(type, streamCodec);
         receiverRegistrar.accept(type, this.disconnectExceptionally(clazz));
     }
