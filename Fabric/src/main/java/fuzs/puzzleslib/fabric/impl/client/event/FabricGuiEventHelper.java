@@ -43,7 +43,7 @@ public final class FabricGuiEventHelper {
     }
 
     private static void invokeGuiLayerEvents(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        CANCELLED_GUI_LAYERS.clear();
+        if (gui.minecraft.options.hideGui) return;
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 50.0F);
         for (ResourceLocation resourceLocation : RenderGuiLayerEvents.VANILLA_GUI_LAYERS_VIEW) {
@@ -90,6 +90,7 @@ public final class FabricGuiEventHelper {
 
     public static void registerEventHandlers() {
         RenderGuiEvents.BEFORE.register(EventPhase.FIRST, (minecraft, guiGraphics, deltaTracker) -> {
+            CANCELLED_GUI_LAYERS.clear();
             setGuiLeftHeight(39);
             setGuiRightHeight(39);
         });
