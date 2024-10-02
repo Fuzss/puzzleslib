@@ -160,7 +160,36 @@ public final class GuiGraphicsHelper {
      */
     public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         blitNineSliced(guiGraphics, resourceLocation, x, y, 0, width, height, leftBorder, topBorder, rightBorder,
-                bottomBorder, spriteWidth, spriteHeight, uOffset, vOffset
+                bottomBorder, spriteWidth, spriteHeight, uOffset, vOffset, 256, 256
+        );
+    }
+
+    /**
+     * Allows for drawing any sprite from a texture sheet in nine-sliced mode. This does not require the sprite to be
+     * stitched onto an atlas.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics      the gui graphics instance
+     * @param resourceLocation the texture sheet resource location
+     * @param x                the x-position on the screen
+     * @param y                the y-position on the screen
+     * @param width            the width to draw
+     * @param height           the height to draw
+     * @param leftBorder       the border width on the left side of the sprite, for drawing the frame
+     * @param topBorder        the border height on the top side of the sprite, for drawing the frame
+     * @param rightBorder      the border width on the right side of the sprite, for drawing the frame
+     * @param bottomBorder     the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth      the sprite texture width
+     * @param spriteHeight     the sprite texture height
+     * @param uOffset          the sprite u-offset on the texture sheet
+     * @param vOffset          the sprite v-offset on the texture sheet
+     * @param textureWidth     the texture sheet width
+     * @param textureHeight    the texture sheet height
+     */
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
+        blitNineSliced(guiGraphics, resourceLocation, x, y, 0, width, height, leftBorder, topBorder, rightBorder,
+                bottomBorder, spriteWidth, spriteHeight, uOffset, vOffset, textureWidth, textureHeight
         );
     }
 
@@ -185,10 +214,12 @@ public final class GuiGraphicsHelper {
      * @param spriteHeight     the sprite texture height
      * @param uOffset          the sprite u-offset on the texture sheet
      * @param vOffset          the sprite v-offset on the texture sheet
+     * @param textureWidth     the texture sheet width
+     * @param textureHeight    the texture sheet height
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int blitOffset, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int blitOffset, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
         SingleTextureAtlasSprite textureAtlasSprite = new SingleTextureAtlasSprite(resourceLocation, spriteWidth,
-                spriteHeight, uOffset, vOffset
+                spriteHeight, uOffset, vOffset, textureWidth, textureHeight
         );
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(spriteWidth, spriteHeight,
                 new GuiSpriteScaling.NineSlice.Border(leftBorder, topBorder, rightBorder, bottomBorder)
