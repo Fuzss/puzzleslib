@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
+import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenSkipper;
@@ -15,11 +16,13 @@ import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -30,6 +33,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class PuzzlesLibClient implements ClientModConstructor {
 
@@ -61,6 +66,13 @@ public class PuzzlesLibClient implements ClientModConstructor {
             }
             return EventResult.PASS;
         });
+        ScreenEvents.beforeInit(TitleScreen.class).register(
+                (Minecraft minecraft, TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
+                    if (minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay &&
+                            loadingOverlay.fadeOutStart != 0L) {
+                        loadingOverlay.fadeOutStart = 0L;
+                    }
+                });
         AddToastCallback.EVENT.register((ToastComponent toastManager, Toast toast) -> {
             if (toast instanceof SystemToast systemToast &&
                     systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
