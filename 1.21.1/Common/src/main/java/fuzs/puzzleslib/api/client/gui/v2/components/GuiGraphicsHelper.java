@@ -1,23 +1,46 @@
 package fuzs.puzzleslib.api.client.gui.v2.components;
 
-import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.PoseStack;
+import fuzs.puzzleslib.impl.client.gui.SingleTextureAtlasSprite;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceMetadata;
+import org.joml.Matrix4f;
 
 /**
- * A helper for drawing nine sliced sprites from a 256x256 texture source file, opposed to having to use vanilla's new
- * one-sprite-per-image system.
+ * A helper class for extending the functionality of {@link GuiGraphics}. Especially useful for drawing
+ * {@link TextureAtlasSprite TextureAtlasSprites} with a different {@link GuiSpriteScaling} than is defined by the
+ * resource pack.
  */
 public final class GuiGraphicsHelper {
 
     private GuiGraphicsHelper() {
         // NO-OP
+    }
+
+    /**
+     * Creates an on demand {@link GuiGraphics} instance from a provided {@link PoseStack}.
+     *
+     * @param poseStack the pose stack
+     * @return the gui graphics instance
+     */
+    public static GuiGraphics create(PoseStack poseStack) {
+        return create(poseStack.last().pose());
+    }
+
+    /**
+     * Creates an on demand {@link GuiGraphics} instance from a provided {@link PoseStack}.
+     *
+     * @param matrix4f the matrix backing the pose stack
+     * @return the gui graphics instance
+     */
+    public static GuiGraphics create(Matrix4f matrix4f) {
+        Minecraft minecraft = Minecraft.getInstance();
+        GuiGraphics guiGraphics = new GuiGraphics(minecraft, minecraft.renderBuffers().bufferSource());
+        guiGraphics.pose().mulPose(matrix4f);
+        return guiGraphics;
     }
 
     /**
@@ -89,33 +112,163 @@ public final class GuiGraphicsHelper {
         fillFrameArea(guiGraphics, minX, minY, maxX, maxY, borderSize, 0, color);
     }
 
+    /**
+     * Allows for drawing any sprite from a texture sheet in nine-sliced mode. This does not require the sprite to be
+     * stitched onto an atlas.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics      the gui graphics instance
+     * @param resourceLocation the texture sheet resource location
+     * @param x                the x-position on the screen
+     * @param y                the y-position on the screen
+     * @param blitOffset       the z-level offset
+     * @param width            the width to draw
+     * @param height           the height to draw
+     * @param borderSize       the border width &amp; height on the sides of the sprite, for drawing the frame
+     * @param spriteWidth      the sprite texture width
+     * @param spriteHeight     the sprite texture height
+     * @param uOffset          the sprite u-offset on the texture sheet
+     * @param vOffset          the sprite v-offset on the texture sheet
+     */
     public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderSize, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, resourceLocation, x, y, width, height, borderSize, borderSize, spriteWidth, spriteHeight,
-                uOffset, vOffset
+        blitNineSliced(guiGraphics, resourceLocation, x, y, width, height, borderSize, borderSize, borderSize,
+                borderSize, spriteWidth, spriteHeight, uOffset, vOffset
         );
     }
 
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderWidth, int borderHeight, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, resourceLocation, x, y, width, height, borderWidth, borderHeight, borderWidth,
-                borderHeight, spriteWidth, spriteHeight, uOffset, vOffset
-        );
-    }
-
+    /**
+     * Allows for drawing any sprite from a texture sheet in nine-sliced mode. This does not require the sprite to be
+     * stitched onto an atlas.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics      the gui graphics instance
+     * @param resourceLocation the texture sheet resource location
+     * @param x                the x-position on the screen
+     * @param y                the y-position on the screen
+     * @param width            the width to draw
+     * @param height           the height to draw
+     * @param leftBorder       the border width on the left side of the sprite, for drawing the frame
+     * @param topBorder        the border height on the top side of the sprite, for drawing the frame
+     * @param rightBorder      the border width on the right side of the sprite, for drawing the frame
+     * @param bottomBorder     the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth      the sprite texture width
+     * @param spriteHeight     the sprite texture height
+     * @param uOffset          the sprite u-offset on the texture sheet
+     * @param vOffset          the sprite v-offset on the texture sheet
+     */
     public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+        blitNineSliced(guiGraphics, resourceLocation, x, y, 0, width, height, leftBorder, topBorder, rightBorder,
+                bottomBorder, spriteWidth, spriteHeight, uOffset, vOffset
+        );
+    }
+
+    /**
+     * Allows for drawing any sprite from a texture sheet in nine-sliced mode. This does not require the sprite to be
+     * stitched onto an atlas.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics      the gui graphics instance
+     * @param resourceLocation the texture sheet resource location
+     * @param x                the x-position on the screen
+     * @param y                the y-position on the screen
+     * @param blitOffset       the z-level offset
+     * @param width            the width to draw
+     * @param height           the height to draw
+     * @param leftBorder       the border width on the left side of the sprite, for drawing the frame
+     * @param topBorder        the border height on the top side of the sprite, for drawing the frame
+     * @param rightBorder      the border width on the right side of the sprite, for drawing the frame
+     * @param bottomBorder     the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth      the sprite texture width
+     * @param spriteHeight     the sprite texture height
+     * @param uOffset          the sprite u-offset on the texture sheet
+     * @param vOffset          the sprite v-offset on the texture sheet
+     */
+    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int blitOffset, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         SingleTextureAtlasSprite textureAtlasSprite = new SingleTextureAtlasSprite(resourceLocation, spriteWidth,
                 spriteHeight, uOffset, vOffset
         );
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(spriteWidth, spriteHeight,
                 new GuiSpriteScaling.NineSlice.Border(leftBorder, topBorder, rightBorder, bottomBorder)
         );
-        guiGraphics.blitNineSlicedSprite(textureAtlasSprite, nineSlice, x, y, 0, width, height);
+        guiGraphics.blitNineSlicedSprite(textureAtlasSprite, nineSlice, x, y, blitOffset, width, height);
+    }
+
+    /**
+     * Allows for manually drawing any sprite using nine-sliced mode.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics the gui graphics instance
+     * @param sprite      the sprite resource location
+     * @param x           the x-position on the screen
+     * @param y           the y-position on the screen
+     * @param blitOffset  the z-level offset
+     * @param width       the width to draw
+     * @param height      the height to draw
+     * @param borderSize  the border width &amp; height on the sides of the sprite, for drawing the frame
+     */
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderSize) {
+        blitNineSlicedSprite(guiGraphics, resourceLocation, x, y, 0, width, height, borderSize, borderSize, borderSize,
+                borderSize
+        );
+    }
+
+    /**
+     * Allows for manually drawing any sprite using nine-sliced mode.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite resource location
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param leftBorder   the border width on the left side of the sprite, for drawing the frame
+     * @param topBorder    the border height on the top side of the sprite, for drawing the frame
+     * @param rightBorder  the border width on the right side of the sprite, for drawing the frame
+     * @param bottomBorder the border height on the bottom side of the sprite, for drawing the frame
+     */
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder) {
+        blitNineSlicedSprite(guiGraphics, sprite, x, y, 0, width, height, leftBorder, topBorder, rightBorder,
+                bottomBorder
+        );
+    }
+
+    /**
+     * Allows for manually drawing any sprite using nine-sliced mode.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite resource location
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param blitOffset   the z-level offset
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param leftBorder   the border width on the left side of the sprite, for drawing the frame
+     * @param topBorder    the border height on the top side of the sprite, for drawing the frame
+     * @param rightBorder  the border width on the right side of the sprite, for drawing the frame
+     * @param bottomBorder the border height on the bottom side of the sprite, for drawing the frame
+     */
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int leftBorder, int topBorder, int rightBorder, int bottomBorder) {
+        TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getGuiSprites().getSprite(sprite);
+        GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents().width(),
+                textureAtlasSprite.contents().height(),
+                new GuiSpriteScaling.NineSlice.Border(leftBorder, topBorder, rightBorder, bottomBorder)
+        );
+        guiGraphics.blitNineSlicedSprite(textureAtlasSprite, nineSlice, x, y, blitOffset, width, height);
     }
 
     /**
      * Manually draws a sprite using tile mode. Width &amp; height portions outside the texture dimensions are filled by
      * repeating the original texture.
      * <p>
-     * Sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
+     * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
      * @param guiGraphics  the gui graphics instance
      * @param sprite       the sprite resource location
@@ -134,7 +287,7 @@ public final class GuiGraphicsHelper {
      * Manually draws a sprite using tile mode. Width &amp; height portions outside the texture dimensions are filled by
      * repeating the original texture.
      * <p>
-     * Sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
+     * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
      * @param guiGraphics  the gui graphics instance
      * @param sprite       the sprite resource location
@@ -147,23 +300,32 @@ public final class GuiGraphicsHelper {
      * @param spriteHeight the sprite texture file height
      */
     public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int spriteWidth, int spriteHeight) {
-        Minecraft minecraft = Minecraft.getInstance();
-        TextureAtlasSprite textureatlassprite = minecraft.getGuiSprites().getSprite(sprite);
-        guiGraphics.blitTiledSprite(textureatlassprite, x, y, blitOffset, width, height, 0, 0, spriteWidth,
-                spriteHeight, spriteWidth, spriteHeight
-        );
+        blitTiledSprite(guiGraphics, sprite, x, y, blitOffset, width, height, spriteWidth, spriteHeight, 0, 0);
     }
 
-    private static class SingleTextureAtlasSprite extends TextureAtlasSprite {
-
-        public SingleTextureAtlasSprite(ResourceLocation resourceLocation, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-            this(resourceLocation, spriteWidth, spriteHeight, uOffset, vOffset, 256, 256);
-        }
-
-        public SingleTextureAtlasSprite(ResourceLocation resourceLocation, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
-            super(resourceLocation, new SpriteContents(resourceLocation, new FrameSize(spriteWidth, spriteHeight),
-                    new NativeImage(textureWidth, textureHeight, false), ResourceMetadata.EMPTY
-            ), textureWidth, textureHeight, uOffset, vOffset);
-        }
+    /**
+     * Manually draws a sprite using tile mode. Width &amp; height portions outside the texture dimensions are filled by
+     * repeating the original texture.
+     * <p>
+     * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
+     *
+     * @param guiGraphics  the gui graphics instance
+     * @param sprite       the sprite resource location
+     * @param x            the x-position on the screen
+     * @param y            the y-position on the screen
+     * @param blitOffset   the z-level offset
+     * @param width        the width to draw
+     * @param height       the height to draw
+     * @param spriteWidth  the sprite texture file width
+     * @param spriteHeight the sprite texture file height
+     * @param uOffset      the sprite u-offset on the texture sheet
+     * @param vOffset      the sprite v-offset on the texture sheet
+     */
+    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+        Minecraft minecraft = Minecraft.getInstance();
+        TextureAtlasSprite textureatlassprite = minecraft.getGuiSprites().getSprite(sprite);
+        guiGraphics.blitTiledSprite(textureatlassprite, x, y, blitOffset, width, height, uOffset, vOffset, spriteWidth,
+                spriteHeight, spriteWidth, spriteHeight
+        );
     }
 }

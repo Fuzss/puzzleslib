@@ -131,6 +131,7 @@ accessible  field   net/minecraft/client/gui/Gui    displayHealth   I
 accessible  field   net/minecraft/server/level/ChunkMap entityMap   Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
 accessible  class   net/minecraft/server/level/ChunkMap$TrackedEntity
 accessible  field   net/minecraft/server/level/ChunkMap$TrackedEntity   seenBy  Ljava/util/Set;
+accessible  field   net/minecraft/client/gui/screens/LoadingOverlay fadeOutStart    J
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
