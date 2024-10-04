@@ -4,8 +4,8 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.hash.HashCode;
-import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.FileUtil;
 import net.minecraft.data.DataProvider;
@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -74,7 +73,10 @@ public class DynamicPackResources extends AbstractModPackResources {
     public static Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = new EnumMap<>(PackType.class);
+            // start with a map for each type, as data generation below runs on a thread pool,
+            // they will override each other when creating the maps
+            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = Arrays.stream(PackType.values())
+                    .collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
             DataProviderContext context = DataProviderContext.fromModId(modId);
             for (DataProviderContext.Factory factory : factories) {
                 DataProvider dataProvider = factory.apply(context);
@@ -94,16 +96,21 @@ public class DynamicPackResources extends AbstractModPackResources {
                         String path = strings.stream().skip(2).collect(Collectors.joining("/"));
                         ResourceLocation resourceLocation = ResourceLocation.tryBuild(strings.get(1), path);
                         if (resourceLocation != null) {
-                            paths.computeIfAbsent(packType, $ -> new ConcurrentHashMap<>()).put(resourceLocation,
-                                    () -> new ByteArrayInputStream(data)
-                            );
+                            paths.get(packType).put(resourceLocation, () -> new ByteArrayInputStream(data));
                         }
                     }
                 }).join();
             }
-            paths.replaceAll((PackType packType, Map<ResourceLocation, IoSupplier<InputStream>> map) -> {
-                return ImmutableMap.copyOf(map);
-            });
+            Iterator<Map.Entry<PackType, Map<ResourceLocation, IoSupplier<InputStream>>>> iterator = paths.entrySet()
+                    .iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> entry = iterator.next();
+                if (!entry.getValue().isEmpty()) {
+                    entry.setValue(ImmutableMap.copyOf(entry.getValue()));
+                } else {
+                    iterator.remove();
+                }
+            }
             PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms", modId,
                     stopwatch.stop().elapsed().toMillis()
             );
