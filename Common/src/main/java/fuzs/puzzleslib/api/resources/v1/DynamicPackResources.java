@@ -7,6 +7,7 @@ import com.google.common.hash.HashCode;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.FileUtil;
+import net.minecraft.data.DataProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
@@ -17,7 +18,6 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -72,10 +72,14 @@ public class DynamicPackResources extends AbstractModPackResources {
     public static Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> generatePathsFromProviders(String modId, DataProviderContext.Factory... factories) {
         try {
             Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = new EnumMap<>(PackType.class);
+            // start with a map for each type, as data generation below runs on a thread pool,
+            // they will override each other when creating the maps
+            Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = Arrays.stream(PackType.values())
+                    .collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
             DataProviderContext context = DataProviderContext.fromModId(modId);
             for (DataProviderContext.Factory factory : factories) {
-                factory.apply(context).run((Path filePath, byte[] data, HashCode hashCode) -> {
+                DataProvider dataProvider = factory.apply(context);
+                dataProvider.run((Path filePath, byte[] data, HashCode hashCode) -> {
                     // good times with Windows...
                     List<String> strings = FileUtil.decomposePath(
                             filePath.normalize().toString().replace(File.separator, "/")).result().filter(
@@ -88,16 +92,21 @@ public class DynamicPackResources extends AbstractModPackResources {
                         String path = strings.stream().skip(2).collect(Collectors.joining("/"));
                         ResourceLocation resourceLocation = ResourceLocation.tryBuild(strings.get(1), path);
                         if (resourceLocation != null) {
-                            paths.computeIfAbsent(packType, $ -> new ConcurrentHashMap<>()).put(resourceLocation,
-                                    () -> new ByteArrayInputStream(data)
-                            );
+                            paths.get(packType).put(resourceLocation, () -> new ByteArrayInputStream(data));
                         }
                     }
                 }).join();
             }
-            paths.replaceAll((PackType packType, Map<ResourceLocation, IoSupplier<InputStream>> map) -> {
-                return ImmutableMap.copyOf(map);
-            });
+            Iterator<Map.Entry<PackType, Map<ResourceLocation, IoSupplier<InputStream>>>> iterator = paths.entrySet()
+                    .iterator();
+            while (iterator.hasNext()) {
+                Map.Entry<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> entry = iterator.next();
+                if (!entry.getValue().isEmpty()) {
+                    entry.setValue(ImmutableMap.copyOf(entry.getValue()));
+                } else {
+                    iterator.remove();
+                }
+            }
             PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms", modId,
                     stopwatch.stop().elapsed().toMillis()
             );

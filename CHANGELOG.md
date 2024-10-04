@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.24-1.20.1] - 2024-10-04
+### Fixed
+- Fix `DynamicPackResources` failing to generate some resources
+
 ## [v8.1.23-1.20.1] - 2024-09-09
 ### Fixed
 - Fix `DynamicPackResources` providing an invalid pack when dynamic data generation fails
