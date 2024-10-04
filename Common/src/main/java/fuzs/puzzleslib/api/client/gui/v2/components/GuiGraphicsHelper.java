@@ -122,7 +122,6 @@ public final class GuiGraphicsHelper {
      * @param resourceLocation the texture sheet resource location
      * @param x                the x-position on the screen
      * @param y                the y-position on the screen
-     * @param blitOffset       the z-level offset
      * @param width            the width to draw
      * @param height           the height to draw
      * @param borderSize       the border width &amp; height on the sides of the sprite, for drawing the frame
@@ -236,13 +235,12 @@ public final class GuiGraphicsHelper {
      * @param sprite      the sprite resource location
      * @param x           the x-position on the screen
      * @param y           the y-position on the screen
-     * @param blitOffset  the z-level offset
      * @param width       the width to draw
      * @param height      the height to draw
      * @param borderSize  the border width &amp; height on the sides of the sprite, for drawing the frame
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderSize) {
-        blitNineSlicedSprite(guiGraphics, resourceLocation, x, y, 0, width, height, borderSize, borderSize, borderSize,
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int borderSize) {
+        blitNineSlicedSprite(guiGraphics, sprite, x, y, 0, width, height, borderSize, borderSize, borderSize,
                 borderSize
         );
     }
