@@ -1,14 +1,11 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.particle.v1.ClientParticleTypes;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
-import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesImpl;
-import fuzs.puzzleslib.impl.client.particle.ClientParticleTypesManager;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import net.minecraft.server.packs.PackType;
@@ -26,7 +23,7 @@ import java.util.Set;
 public final class NeoForgeClientModConstructor {
 
     private NeoForgeClientModConstructor() {
-
+        // NO-OP
     }
 
 
@@ -53,16 +50,19 @@ public final class NeoForgeClientModConstructor {
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(evt::registerEntityRenderer));
-            constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextNeoForgeImpl(evt::registerBlockEntityRenderer));
+            constructor.onRegisterBlockEntityRenderers(
+                    new BlockEntityRenderersContextNeoForgeImpl(evt::registerBlockEntityRenderer));
         });
         eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent evt) -> {
-            constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(evt::register));
+            constructor.onRegisterClientTooltipComponents(
+                    new ClientTooltipComponentsContextNeoForgeImpl(evt::register));
         });
         eventBus.addListener((final RegisterParticleProvidersEvent evt) -> {
             constructor.onRegisterParticleProviders(new ParticleProvidersContextNeoForgeImpl(evt));
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
-            constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(evt::registerLayerDefinition));
+            constructor.onRegisterLayerDefinitions(
+                    new LayerDefinitionsContextNeoForgeImpl(evt::registerLayerDefinition));
         });
         eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
             constructor.onRegisterAdditionalModels(new AdditionalModelsContextNeoForgeImpl(evt::register));
@@ -74,16 +74,15 @@ public final class NeoForgeClientModConstructor {
             constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextNeoForgeImpl(evt::register));
         });
         eventBus.addListener((final EntityRenderersEvent.CreateSkullModels evt) -> {
-            constructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
+            constructor.onRegisterSkullRenderers(
+                    new SkullRenderersContextNeoForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
         });
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
                 evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(
-                        ResourceLocationHelper.fromNamespaceAndPath(modId, "built_in_model_item_renderers"), dynamicRenderers));
-            }
-            if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
-                ClientParticleTypesManager particleTypesManager = ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId);
-                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(ResourceLocationHelper.fromNamespaceAndPath(modId, "client_particle_types"), particleTypesManager));
+                        ResourceLocationHelper.fromNamespaceAndPath(modId, "built_in_model_item_renderers"),
+                        dynamicRenderers
+                ));
             }
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
@@ -93,24 +92,29 @@ public final class NeoForgeClientModConstructor {
             constructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(evt::register));
         });
         eventBus.addListener((final RegisterColorHandlersEvent.Block evt) -> {
-            constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextNeoForgeImpl(evt::register, evt.getBlockColors()));
+            constructor.onRegisterBlockColorProviders(
+                    new BlockColorProvidersContextNeoForgeImpl(evt::register, evt.getBlockColors()));
         });
         eventBus.addListener((final RegisterColorHandlersEvent.Item evt) -> {
-            constructor.onRegisterItemColorProviders(new ItemColorProvidersContextNeoForgeImpl(evt::register, evt.getItemColors()));
+            constructor.onRegisterItemColorProviders(
+                    new ItemColorProvidersContextNeoForgeImpl(evt::register, evt.getItemColors()));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
-                constructor.onAddResourcePackFinders(new ResourcePackSourcesContextNeoForgeImpl(evt::addRepositorySource));
+                constructor.onAddResourcePackFinders(
+                        new ResourcePackSourcesContextNeoForgeImpl(evt::addRepositorySource));
             }
         });
         eventBus.addListener((final RegisterShadersEvent evt) -> {
-            constructor.onRegisterCoreShaders(new CoreShadersContextNeoForgeImpl(evt::registerShader, evt.getResourceProvider()));
+            constructor.onRegisterCoreShaders(
+                    new CoreShadersContextNeoForgeImpl(evt::registerShader, evt.getResourceProvider()));
         });
         eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
             constructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));
         });
         eventBus.addListener((final RegisterClientExtensionsEvent evt) -> {
-            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextNeoForgeImpl(evt::registerItem, modId, dynamicRenderers));
+            constructor.onRegisterBuiltinModelItemRenderers(
+                    new BuiltinModelItemRendererContextNeoForgeImpl(evt::registerItem, modId, dynamicRenderers));
         });
     }
 }
