@@ -132,6 +132,7 @@ accessible  field   net/minecraft/server/level/ChunkMap entityMap   Lit/unimi/ds
 accessible  class   net/minecraft/server/level/ChunkMap$TrackedEntity
 accessible  field   net/minecraft/server/level/ChunkMap$TrackedEntity   seenBy  Ljava/util/Set;
 accessible  field   net/minecraft/client/gui/screens/LoadingOverlay fadeOutStart    J
+accessible  method  net/minecraft/client/renderer/LevelRenderer addParticleInternal (Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)Lnet/minecraft/client/particle/Particle;
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
