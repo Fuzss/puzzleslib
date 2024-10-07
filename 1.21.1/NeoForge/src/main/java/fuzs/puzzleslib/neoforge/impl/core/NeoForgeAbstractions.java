@@ -26,6 +26,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
@@ -50,6 +51,11 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
         player.openMenu(menuProvider, (RegistryFriendlyByteBuf buf) -> {
             dataWriter.accept(player, buf);
         });
+    }
+
+    @Override
+    public Entity getPartEntityParent(Entity entity) {
+        return entity instanceof PartEntity<?> partEntity ? partEntity.getParent() : entity;
     }
 
     @Override

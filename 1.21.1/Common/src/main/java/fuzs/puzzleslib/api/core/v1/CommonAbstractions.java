@@ -63,6 +63,17 @@ public interface CommonAbstractions {
     void openMenu(ServerPlayer player, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter);
 
     /**
+     * Get the parent mob from a possible mob part entity, like
+     * {@link net.minecraft.world.entity.boss.EnderDragonPart}.
+     * <p>
+     * NeoForge allows extending this, so we need this abstraction.
+     *
+     * @param entity the mob, possibly a mob part
+     * @return the parent mob for the part, otherwise the original entity
+     */
+    Entity getPartEntityParent(Entity entity);
+
+    /**
      * Is the entity type considered a boss mob like {@link EntityType#ENDER_DRAGON} and {@link EntityType#WITHER} in
      * vanilla.
      * <p>

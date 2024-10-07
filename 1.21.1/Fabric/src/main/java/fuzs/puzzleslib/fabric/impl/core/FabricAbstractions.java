@@ -29,6 +29,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -90,6 +91,11 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
                 return menuProvider.createMenu(i, inventory, player);
             }
         });
+    }
+
+    @Override
+    public Entity getPartEntityParent(Entity entity) {
+        return entity instanceof EnderDragonPart enderDragonPart ? enderDragonPart.parentMob : entity;
     }
 
     @Override
