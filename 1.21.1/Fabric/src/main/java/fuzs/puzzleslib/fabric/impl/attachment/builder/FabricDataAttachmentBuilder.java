@@ -21,20 +21,20 @@ import java.util.function.BiConsumer;
  * the attachment implementation on NeoForge.
  */
 @SuppressWarnings("UnstableApiUsage")
-public class FabricDataAttachmentBuilder<T, A> extends DataAttachmentBuilder<T, A> {
+public class FabricDataAttachmentBuilder<T, V> extends DataAttachmentBuilder<T, V> {
 
     @Override
-    public DataAttachmentType<T, A> build(ResourceLocation resourceLocation) {
-        AttachmentRegistry.Builder<A> builder = AttachmentRegistry.builder();
+    public DataAttachmentType<T, V> build(ResourceLocation resourceLocation) {
+        AttachmentRegistry.Builder<V> builder = AttachmentRegistry.builder();
         this.configureBuilder(builder);
-        AttachmentType<A> attachmentType = builder.buildAndRegister(resourceLocation);
-        AttachmentTypeAdapter<T, A> adapter = new FabricAttachmentTypeAdapter<>(attachmentType);
-        BiConsumer<T, A> synchronizer = this.getSynchronizer(resourceLocation, adapter);
+        AttachmentType<V> attachmentType = builder.buildAndRegister(resourceLocation);
+        AttachmentTypeAdapter<T, V> adapter = new FabricAttachmentTypeAdapter<>(attachmentType);
+        BiConsumer<T, V> synchronizer = this.getSynchronizer(resourceLocation, adapter);
         return new DataAttachmentTypeImpl<>(adapter, this.defaultValues, synchronizer);
     }
 
     @MustBeInvokedByOverriders
-    void configureBuilder(AttachmentRegistry.Builder<A> builder) {
+    void configureBuilder(AttachmentRegistry.Builder<V> builder) {
         if (this.codec != null) builder.persistent(this.codec);
     }
 }

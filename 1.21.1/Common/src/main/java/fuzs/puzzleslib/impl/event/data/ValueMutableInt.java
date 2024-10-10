@@ -18,4 +18,9 @@ public class ValueMutableInt implements MutableInt {
     public int getAsInt() {
         return this.value;
     }
+
+    @Override
+    public String toString() {
+        return "MutableInt[" + this.getAsInt() + "]";
+    }
 }

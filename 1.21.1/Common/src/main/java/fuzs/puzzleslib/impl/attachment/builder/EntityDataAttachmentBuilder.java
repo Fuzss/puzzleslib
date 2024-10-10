@@ -18,27 +18,28 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public interface EntityDataAttachmentBuilder<A> extends DataAttachmentRegistry.EntityBuilder<A> {
+public interface EntityDataAttachmentBuilder<V> extends DataAttachmentRegistry.EntityBuilder<V> {
 
     @Nullable
-    default BiConsumer<Entity, A> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, A> attachmentType, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
+    default BiConsumer<Entity, V> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
         if (streamCodec == null) {
             return null;
         } else {
-            CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type = new CustomPacketPayload.Type<>(
+            CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type = new CustomPacketPayload.Type<>(
                     resourceLocation);
             this.registerPayloadHandlers(resourceLocation, attachmentType, type, streamCodec);
             this.registerEventHandlers(attachmentType, type, synchronizationTargets);
-            return this.getDefaultSynchronizer(attachmentType, type, synchronizationTargets);
+            return this.getDefaultSynchronizer(type, synchronizationTargets);
         }
     }
 
-    void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, A> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec);
+    void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec);
 
-    private void registerEventHandlers(AttachmentTypeAdapter<Entity, A> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
+    private void registerEventHandlers(AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
         PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
             this.broadcast(type, serverPlayer, attachmentType);
         });
@@ -55,29 +56,32 @@ public interface EntityDataAttachmentBuilder<A> extends DataAttachmentRegistry.E
         }
     }
 
-    private BiConsumer<Entity, A> getDefaultSynchronizer(AttachmentTypeAdapter<Entity, A> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
-        return (Entity entity, A value) -> {
+    private BiConsumer<Entity, V> getDefaultSynchronizer(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
+        return (Entity entity, @Nullable V value) -> {
             PlayerSet playerSet;
             if (synchronizationTargets != null) {
                 playerSet = synchronizationTargets.apply(entity);
             } else {
                 playerSet = PlayerSet.ofEntity(entity);
             }
-            this.broadcast(type, entity, playerSet, attachmentType);
+            this.broadcast(type, entity, playerSet, value);
         };
     }
 
-    private void broadcast(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type, ServerPlayer serverPlayer, AttachmentTypeAdapter<Entity, A> attachmentType) {
+    private void broadcast(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, ServerPlayer serverPlayer, AttachmentTypeAdapter<Entity, V> attachmentType) {
         this.broadcast(type, serverPlayer, PlayerSet.ofPlayer(serverPlayer), attachmentType);
     }
 
-    private void broadcast(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type, Entity entity, PlayerSet playerSet, AttachmentTypeAdapter<Entity, A> attachmentType) {
+    private void broadcast(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, Entity entity, PlayerSet playerSet, AttachmentTypeAdapter<Entity, V> attachmentType) {
         if (attachmentType.hasData(entity)) {
-            ClientboundEntityDataAttachmentMessage<A> message = new ClientboundEntityDataAttachmentMessage<>(type,
-                    entity.getId(),
-                    attachmentType.getData(entity)
-            );
-            playerSet.broadcast(type, new ClientboundCustomPayloadPacket(message));
+            this.broadcast(type, entity, playerSet, attachmentType.getData(entity));
         }
+    }
+
+    private void broadcast(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, Entity entity, PlayerSet playerSet, @Nullable V value) {
+        ClientboundEntityDataAttachmentMessage<V> message = new ClientboundEntityDataAttachmentMessage<>(type,
+                entity.getId(), Optional.ofNullable(value)
+        );
+        playerSet.broadcast(type, new ClientboundCustomPayloadPacket(message));
     }
 }

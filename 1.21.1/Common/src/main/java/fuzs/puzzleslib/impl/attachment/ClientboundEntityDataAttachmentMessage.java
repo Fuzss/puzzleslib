@@ -1,28 +1,30 @@
 package fuzs.puzzleslib.impl.attachment;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import org.jetbrains.annotations.Nullable;
 
-public record ClientboundEntityDataAttachmentMessage<A>(Type<ClientboundEntityDataAttachmentMessage<A>> messageType,
+import java.util.Optional;
+
+public record ClientboundEntityDataAttachmentMessage<V>(Type<ClientboundEntityDataAttachmentMessage<V>> messageType,
                                                         int entityId,
-                                                        @Nullable A value) implements CustomPacketPayload {
+                                                        Optional<V> value) implements CustomPacketPayload {
 
-    public static <A> StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<A>> streamCodec(Type<ClientboundEntityDataAttachmentMessage<A>> type, StreamCodec<? super RegistryFriendlyByteBuf, A> valueStreamCodec) {
+    public static <V> StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> streamCodec(Type<ClientboundEntityDataAttachmentMessage<V>> type, StreamCodec<? super RegistryFriendlyByteBuf, V> valueStreamCodec) {
         return StreamCodec.composite(ByteBufCodecs.VAR_INT,
                 ClientboundEntityDataAttachmentMessage::entityId,
-                valueStreamCodec,
+                ByteBufCodecs.optional((StreamCodec<ByteBuf, V>) valueStreamCodec),
                 ClientboundEntityDataAttachmentMessage::value,
-                (Integer entityId, A value) -> {
+                (Integer entityId, Optional<V> value) -> {
                     return new ClientboundEntityDataAttachmentMessage<>(type, entityId, value);
                 }
         );
     }
 
     @Override
-    public Type<ClientboundEntityDataAttachmentMessage<A>> type() {
+    public Type<ClientboundEntityDataAttachmentMessage<V>> type() {
         return this.messageType;
     }
 }

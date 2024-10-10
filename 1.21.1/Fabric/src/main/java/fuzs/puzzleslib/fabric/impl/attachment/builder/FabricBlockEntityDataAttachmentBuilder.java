@@ -7,15 +7,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-public final class FabricBlockEntityDataAttachmentBuilder<A> extends FabricDataAttachmentBuilder<BlockEntity, A> implements DataAttachmentRegistry.BlockEntityBuilder<A> {
+public final class FabricBlockEntityDataAttachmentBuilder<V> extends FabricDataAttachmentBuilder<BlockEntity, V> implements DataAttachmentRegistry.BlockEntityBuilder<V> {
 
     @Override
-    public DataAttachmentRegistry.BlockEntityBuilder<A> defaultValue(A defaultValue) {
+    public DataAttachmentRegistry.BlockEntityBuilder<V> defaultValue(V defaultValue) {
         return DataAttachmentRegistry.BlockEntityBuilder.super.defaultValue(defaultValue);
     }
 
     @Override
-    public DataAttachmentRegistry.BlockEntityBuilder<A> defaultValue(Predicate<BlockEntity> defaultFilter, A defaultValue) {
+    public DataAttachmentRegistry.BlockEntityBuilder<V> defaultValue(Predicate<BlockEntity> defaultFilter, V defaultValue) {
         Objects.requireNonNull(defaultFilter, "default filter is null");
         Objects.requireNonNull(defaultValue, "default value is null");
         this.defaultValues.put(defaultFilter, defaultValue);
@@ -23,7 +23,7 @@ public final class FabricBlockEntityDataAttachmentBuilder<A> extends FabricDataA
     }
 
     @Override
-    public DataAttachmentRegistry.BlockEntityBuilder<A> persistent(Codec<A> codec) {
-        return (DataAttachmentRegistry.BlockEntityBuilder<A>) super.persistent(codec);
+    public DataAttachmentRegistry.BlockEntityBuilder<V> persistent(Codec<V> codec) {
+        return (DataAttachmentRegistry.BlockEntityBuilder<V>) super.persistent(codec);
     }
 }

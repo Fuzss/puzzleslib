@@ -18,4 +18,9 @@ public class ValueMutableFloat implements MutableFloat {
     public float getAsFloat() {
         return this.value;
     }
+
+    @Override
+    public String toString() {
+        return "MutableFloat[" + this.getAsFloat() + "]";
+    }
 }

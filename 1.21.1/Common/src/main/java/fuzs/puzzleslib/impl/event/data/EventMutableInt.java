@@ -23,4 +23,9 @@ public class EventMutableInt implements MutableInt {
     public int getAsInt() {
         return this.supplier.getAsInt();
     }
+
+    @Override
+    public String toString() {
+        return "MutableInt[" + this.getAsInt() + "]";
+    }
 }
