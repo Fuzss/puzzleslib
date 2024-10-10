@@ -23,4 +23,9 @@ public class EventMutableDouble implements MutableDouble {
     public double getAsDouble() {
         return this.supplier.getAsDouble();
     }
+
+    @Override
+    public String toString() {
+        return "MutableDouble[" + this.getAsDouble() + "]";
+    }
 }

@@ -10,22 +10,22 @@ import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
-public final class DataAttachmentTypeImpl<T, A> implements DataAttachmentType<T, A> {
-    private final AttachmentTypeAdapter<T, A> attachmentType;
-    private final Map<Predicate<T>, A> defaultValues;
-    private final BiConsumer<T, A> synchronizer;
+public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T, V> {
+    private final AttachmentTypeAdapter<T, V> attachmentType;
+    private final Map<Predicate<T>, V> defaultValues;
+    private final BiConsumer<T, V> synchronizer;
 
-    public DataAttachmentTypeImpl(AttachmentTypeAdapter<T, A> attachmentType, Map<Predicate<T>, A> defaultValues, @Nullable BiConsumer<T, A> synchronizer) {
+    public DataAttachmentTypeImpl(AttachmentTypeAdapter<T, V> attachmentType, Map<Predicate<T>, V> defaultValues, @Nullable BiConsumer<T, V> synchronizer) {
         this.attachmentType = attachmentType;
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
-        this.synchronizer = synchronizer != null ? synchronizer : (T o1, A o2) -> {
+        this.synchronizer = synchronizer != null ? synchronizer : (T o1, V o2) -> {
             // NO-OP
         };
     }
 
     @Nullable
-    private A getDefaultValue(T holder) {
-        for (Map.Entry<Predicate<T>, A> entry : this.defaultValues.entrySet()) {
+    private V getDefaultValue(T holder) {
+        for (Map.Entry<Predicate<T>, V> entry : this.defaultValues.entrySet()) {
             if (entry.getKey().test(holder)) {
                 return entry.getValue();
             }
@@ -34,15 +34,15 @@ public final class DataAttachmentTypeImpl<T, A> implements DataAttachmentType<T,
     }
 
     @Override
-    public @Nullable A get(T holder) {
+    public @Nullable V get(T holder) {
         if (!this.attachmentType.hasData(holder)) {
-            A defaultValue = this.getDefaultValue(holder);
+            V defaultValue = this.getDefaultValue(holder);
             if (defaultValue != null) {
                 this.attachmentType.setData(holder, defaultValue);
             }
         }
         if (this.attachmentType.hasData(holder)) {
-            A value = this.attachmentType.getData(holder);
+            V value = this.attachmentType.getData(holder);
             // do not support setting null values (Fabric does not), the attachment type can still be removed though
             Objects.requireNonNull(value, () -> "value for " + this.attachmentType.resourceLocation() + " is null");
             return value;
@@ -52,8 +52,8 @@ public final class DataAttachmentTypeImpl<T, A> implements DataAttachmentType<T,
     }
 
     @Override
-    public A getOrDefault(T holder, A defaultValue) {
-        A value = this.get(holder);
+    public V getOrDefault(T holder, V defaultValue) {
+        V value = this.get(holder);
         return value != null ? value : defaultValue;
     }
 
@@ -63,8 +63,8 @@ public final class DataAttachmentTypeImpl<T, A> implements DataAttachmentType<T,
     }
 
     @Override
-    public void set(T holder, @Nullable A newValue) {
-        A oldValue;
+    public void set(T holder, @Nullable V newValue) {
+        V oldValue;
         // do not support setting null values (Fabric does not), the attachment type can still be removed though
         if (newValue != null) {
             oldValue = this.attachmentType.setData(holder, newValue);
@@ -77,7 +77,7 @@ public final class DataAttachmentTypeImpl<T, A> implements DataAttachmentType<T,
     }
 
     @Override
-    public void update(T holder, UnaryOperator<A> valueUpdater) {
+    public void update(T holder, UnaryOperator<V> valueUpdater) {
         this.set(holder, valueUpdater.apply(this.get(holder)));
     }
 }

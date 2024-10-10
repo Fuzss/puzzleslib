@@ -23,4 +23,9 @@ public class EventMutableBoolean implements MutableBoolean {
     public boolean getAsBoolean() {
         return this.supplier.get();
     }
+
+    @Override
+    public String toString() {
+        return "MutableBoolean[" + this.getAsBoolean() + "]";
+    }
 }

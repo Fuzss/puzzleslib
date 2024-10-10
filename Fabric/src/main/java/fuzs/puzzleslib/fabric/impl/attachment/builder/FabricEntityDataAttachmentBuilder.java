@@ -23,41 +23,45 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public final class FabricEntityDataAttachmentBuilder<A> extends FabricDataAttachmentBuilder<Entity, A> implements EntityDataAttachmentBuilder<A> {
+public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttachmentBuilder<Entity, V> implements EntityDataAttachmentBuilder<V> {
     @Nullable
-    private StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec;
+    private StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
     @Nullable
     private Function<Entity, PlayerSet> synchronizationTargets;
     private boolean copyOnDeath;
 
     @Override
     @Nullable
-    public BiConsumer<Entity, A> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, A> attachmentType) {
+    public BiConsumer<Entity, V> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType) {
         return this.getSynchronizer(resourceLocation, attachmentType, this.streamCodec, this.synchronizationTargets);
     }
 
     @Override
-    public void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, A> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<A>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec) {
-        StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<A>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
-                type,
-                this.streamCodec
-        );
+    public void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
+        StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
+                type, this.streamCodec);
         PayloadTypeRegistry.playS2C().register(type, messageStreamCodec);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ClientPlayNetworking.registerGlobalReceiver(type, (ClientboundEntityDataAttachmentMessage<A> message, ClientPlayNetworking.Context context) -> {
-                context.client().submit(() -> {
-                    LocalPlayer player = context.player();
-                    Entity entity = player.clientLevel.getEntity(message.entityId());
-                    if (entity != null) {
-                        attachmentType.setData(entity, message.value());
+            ClientPlayNetworking.registerGlobalReceiver(type,
+                    (ClientboundEntityDataAttachmentMessage<V> message, ClientPlayNetworking.Context context) -> {
+                        context.client().submit(() -> {
+                            LocalPlayer player = context.player();
+                            Entity entity = player.clientLevel.getEntity(message.entityId());
+                            if (entity != null) {
+                                if (message.value().isPresent()) {
+                                    attachmentType.setData(entity, message.value().get());
+                                } else {
+                                    attachmentType.removeData(entity);
+                                }
+                            }
+                        });
                     }
-                });
-            });
+            );
         }
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<A> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, A> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
+    public DataAttachmentRegistry.EntityBuilder<V> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
         Objects.requireNonNull(streamCodec, "stream codec is null");
         this.streamCodec = streamCodec;
         this.synchronizationTargets = synchronizationTargets;
@@ -65,18 +69,18 @@ public final class FabricEntityDataAttachmentBuilder<A> extends FabricDataAttach
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<A> copyOnDeath() {
+    public DataAttachmentRegistry.EntityBuilder<V> copyOnDeath() {
         this.copyOnDeath = true;
         return this;
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<A> defaultValue(A defaultValue) {
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(V defaultValue) {
         return EntityDataAttachmentBuilder.super.defaultValue(defaultValue);
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<A> defaultValue(Predicate<Entity> defaultFilter, A defaultValue) {
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, V defaultValue) {
         Objects.requireNonNull(defaultFilter, "default filter is null");
         Objects.requireNonNull(defaultValue, "default value is null");
         this.defaultValues.put(defaultFilter, defaultValue);
@@ -84,15 +88,15 @@ public final class FabricEntityDataAttachmentBuilder<A> extends FabricDataAttach
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<A> persistent(Codec<A> codec) {
-        return (DataAttachmentRegistry.EntityBuilder<A>) super.persistent(codec);
+    public DataAttachmentRegistry.EntityBuilder<V> persistent(Codec<V> codec) {
+        return (DataAttachmentRegistry.EntityBuilder<V>) super.persistent(codec);
     }
 
     @Override
-    void configureBuilder(AttachmentRegistry.Builder<A> builder) {
+    void configureBuilder(AttachmentRegistry.Builder<V> builder) {
         super.configureBuilder(builder);
         if (this.copyOnDeath) {
-            // Fabric does not need this check, but NeoForge does
+            // Fabric does not need this check, but NeoForge does, so implement it for both
             Objects.requireNonNull(this.codec, "codec is null");
             builder.copyOnDeath();
         }

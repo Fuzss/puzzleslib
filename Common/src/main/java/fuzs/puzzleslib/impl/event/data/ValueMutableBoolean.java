@@ -18,4 +18,9 @@ public class ValueMutableBoolean implements MutableBoolean {
     public boolean getAsBoolean() {
         return this.value;
     }
+
+    @Override
+    public String toString() {
+        return "MutableBoolean[" + this.getAsBoolean() + "]";
+    }
 }

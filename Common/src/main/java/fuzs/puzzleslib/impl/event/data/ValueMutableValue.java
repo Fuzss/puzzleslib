@@ -18,4 +18,9 @@ public class ValueMutableValue<T> implements MutableValue<T> {
     public T get() {
         return this.value;
     }
+
+    @Override
+    public String toString() {
+        return "MutableValue[" + this.get() + "]";
+    }
 }

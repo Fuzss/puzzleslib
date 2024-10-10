@@ -8,9 +8,9 @@ import java.util.function.UnaryOperator;
  * Common attachment type implementation.
  *
  * @param <T> attachment holder type
- * @param <A> attachment value type
+ * @param <V> attachment value type
  */
-public interface DataAttachmentType<T, A> {
+public interface DataAttachmentType<T, V> {
 
     /**
      * Get the value for the attachment type.
@@ -19,7 +19,7 @@ public interface DataAttachmentType<T, A> {
      * @return the attachment value if present, or {@code null}
      */
     @Nullable
-    A get(T holder);
+    V get(T holder);
 
     /**
      * Get the value for the attachment type, if no value is present return the provided default value.
@@ -28,7 +28,7 @@ public interface DataAttachmentType<T, A> {
      * @param defaultValue the fallback value
      * @return the attachment value
      */
-    A getOrDefault(T holder, A defaultValue);
+    V getOrDefault(T holder, V defaultValue);
 
     /**
      * Check if the holder has a non-null value for the attachment type.
@@ -46,7 +46,7 @@ public interface DataAttachmentType<T, A> {
      * @param holder   the attachment holder
      * @param newValue the new attachment value
      */
-    void set(T holder, @Nullable A newValue);
+    void set(T holder, @Nullable V newValue);
 
     /**
      * Updates the attachment value on the holder.
@@ -56,5 +56,5 @@ public interface DataAttachmentType<T, A> {
      * @param holder       the attachment holder
      * @param valueUpdater the update operation to apply
      */
-    void update(T holder, UnaryOperator<A> valueUpdater);
+    void update(T holder, UnaryOperator<V> valueUpdater);
 }

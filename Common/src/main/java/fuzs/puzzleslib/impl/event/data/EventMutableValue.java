@@ -23,4 +23,9 @@ public class EventMutableValue<T> implements MutableValue<T> {
     public T get() {
         return this.supplier.get();
     }
+
+    @Override
+    public String toString() {
+        return "MutableValue[" + this.get() + "]";
+    }
 }

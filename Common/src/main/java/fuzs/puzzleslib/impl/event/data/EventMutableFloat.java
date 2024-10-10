@@ -23,4 +23,9 @@ public class EventMutableFloat implements MutableFloat {
     public float getAsFloat() {
         return this.supplier.get();
     }
+
+    @Override
+    public String toString() {
+        return "MutableFloat[" + this.getAsFloat() + "]";
+    }
 }

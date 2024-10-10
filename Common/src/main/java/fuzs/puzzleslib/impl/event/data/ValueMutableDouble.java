@@ -18,4 +18,9 @@ public class ValueMutableDouble implements MutableDouble {
     public double getAsDouble() {
         return this.value;
     }
+
+    @Override
+    public String toString() {
+        return "MutableDouble[" + this.getAsDouble() + "]";
+    }
 }
