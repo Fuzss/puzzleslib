@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.network.v3;
 
-import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.protocol.Packet;
@@ -174,8 +173,7 @@ public interface PlayerSet {
         Objects.requireNonNull(blockEntity, "block entity is null");
         Level level = blockEntity.getLevel();
         Objects.requireNonNull(level, "block entity level is null");
-        Preconditions.checkState(!level.isClientSide, "block entity level is client level");
-        return nearPosition(blockEntity.getBlockPos(), (ServerLevel) level);
+        return level.isClientSide ? PlayerSet.ofNone() : nearPosition(blockEntity.getBlockPos(), (ServerLevel) level);
     }
 
     /**
@@ -185,8 +183,9 @@ public interface PlayerSet {
      */
     static PlayerSet nearChunk(LevelChunk levelChunk) {
         Objects.requireNonNull(levelChunk, "chunk is null");
-        Preconditions.checkState(!levelChunk.getLevel().isClientSide, "chunk level is client level");
-        return nearChunk((ServerLevel) levelChunk.getLevel(), levelChunk.getPos());
+        return levelChunk.getLevel().isClientSide ? PlayerSet.ofNone() : nearChunk((ServerLevel) levelChunk.getLevel(),
+                levelChunk.getPos()
+        );
     }
 
     /**
@@ -218,19 +217,19 @@ public interface PlayerSet {
      */
     static PlayerSet nearEntity(Entity entity) {
         Objects.requireNonNull(entity, "entity is null");
-        Preconditions.checkState(!entity.getCommandSenderWorld().isClientSide, "entity level is client level");
-        return (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
-            ChunkMap chunkMap = ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource().chunkMap;
-            ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
-            if (trackedEntity != null) {
-                for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
-                    ofPlayer(serverPlayerConnection.getPlayer()).broadcast(type, packet);
-                }
-                if (entity instanceof ServerPlayer serverPlayer) {
-                    ofPlayer(serverPlayer).broadcast(type, packet);
-                }
-            }
-        };
+        return entity.getCommandSenderWorld().isClientSide ? PlayerSet.ofNone() :
+                (CustomPacketPayload.Type<?> type, Packet<?> packet) -> {
+                    ChunkMap chunkMap = ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource().chunkMap;
+                    ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
+                    if (trackedEntity != null) {
+                        for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
+                            ofPlayer(serverPlayerConnection.getPlayer()).broadcast(type, packet);
+                        }
+                        if (entity instanceof ServerPlayer serverPlayer) {
+                            ofPlayer(serverPlayer).broadcast(type, packet);
+                        }
+                    }
+                };
     }
 
     /**
