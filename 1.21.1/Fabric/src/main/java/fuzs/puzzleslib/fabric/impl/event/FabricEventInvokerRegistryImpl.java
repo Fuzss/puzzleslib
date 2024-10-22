@@ -12,10 +12,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
-import fuzs.puzzleslib.api.event.v1.entity.EntityTickEvents;
-import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
-import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
@@ -472,6 +469,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
             };
         });
+        INSTANCE.register(ChangeEntitySizeCallback.class, FabricEntityEvents.CHANGE_ENTITY_SIZE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }

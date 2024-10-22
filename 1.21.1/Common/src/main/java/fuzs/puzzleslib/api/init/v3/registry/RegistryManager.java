@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.api.item.v2.ItemEquipmentFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.item.RecipeTypeImpl;
+import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
@@ -23,6 +24,8 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -47,6 +50,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -67,12 +71,12 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     }
 
     /**
-     * Creates a new {@link ResourceKey} for a provided registry from the given <code>path</code>.
+     * Creates a new {@link ResourceKey} for a provided registry from the given path.
      *
      * @param registryKey key for registry to create {@link ResourceKey} for
      * @param path        path for new entry
      * @param <T>         registry type
-     * @return {@link ResourceKey} for <code>path</code>
+     * @return {@link ResourceKey} for path
      */
     @SuppressWarnings("unchecked")
     default <T> ResourceKey<T> makeResourceKey(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
@@ -86,6 +90,17 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return resource location for set namespace
      */
     ResourceLocation makeKey(String path);
+
+    /**
+     * Creates a new description id used in translations for a provided registry from the given path.
+     *
+     * @param registryKey key for registry to create description id for
+     * @param path        path for new entry
+     * @return the description id
+     */
+    default String makeDescriptionId(ResourceKey<? extends Registry<?>> registryKey, String path) {
+        return Util.makeDescriptionId(Registries.elementsDirPath(registryKey), this.makeKey(path));
+    }
 
     /**
      * Creates a lazy holder reference that will update when used.
@@ -410,6 +425,39 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default Holder.Reference<SimpleParticleType> registerParticleType(String path) {
         return this.register(Registries.PARTICLE_TYPE, path, () -> {
             return new SimpleParticleType(false);
+        });
+    }
+
+    /**
+     * Register an attribute.
+     *
+     * @param path         path for new entry
+     * @param defaultValue the default value when no base value is otherwise specified
+     * @param minValue     the min value
+     * @param maxValue     the max value
+     * @return holder reference
+     */
+    default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue) {
+        return this.registerAttribute(path, defaultValue, minValue, maxValue, true, Attribute.Sentiment.POSITIVE);
+    }
+
+    /**
+     * Register an attribute.
+     *
+     * @param path         path for new entry
+     * @param defaultValue the default value when no base value is otherwise specified
+     * @param minValue     the min value
+     * @param maxValue     the max value
+     * @param syncable     is this attribute synced to clients
+     * @param sentiment    the sentiment used for the attribute color on tooltips
+     * @return holder reference
+     */
+    default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue, boolean syncable, Attribute.Sentiment sentiment) {
+        Objects.requireNonNull(sentiment, "sentiment is null");
+        return this.register(Registries.ATTRIBUTE, path, () -> {
+            return new RangedAttribute(this.makeDescriptionId(Registries.ATTRIBUTE, path), defaultValue, minValue,
+                    maxValue
+            ).setSyncable(syncable).setSentiment(sentiment);
         });
     }
 

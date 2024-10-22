@@ -19,8 +19,9 @@ abstract class ExplosionFabricMixin {
     @Final
     private Level level;
 
-    @ModifyVariable(method = "explode", at = @At("STORE"), ordinal = 0)
+    @ModifyVariable(method = "explode", at = @At("STORE"), ordinal = 0, require = 0)
     public List<Entity> explode(List<Entity> entities) {
+        // Moonlight mod overwrites this method, ideally get the explosion events into Fabric Api, for now just make the injection optional
         FabricLevelEvents.EXPLOSION_DETONATE.invoker().onExplosionDetonate(this.level, Explosion.class.cast(this), this.getToBlow(), entities);
         return entities;
     }

@@ -9,11 +9,9 @@ import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
-import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
-import fuzs.puzzleslib.api.event.v1.entity.EntityTickEvents;
-import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
-import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
@@ -46,6 +44,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -67,10 +66,7 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
-import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
-import net.neoforged.neoforge.event.entity.EntityMountEvent;
-import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.*;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.*;
@@ -615,7 +611,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
             if (evt.isDismounting()) return;
-            if (callback.onStartRiding(evt.getLevel(), evt.getEntity(), evt.getEntityBeingMounted()).isInterrupt()) {
+            // same implementation as Fabric
+            if (!evt.getEntityMounting().canRide(evt.getEntityBeingMounted())) return;
+            if (!evt.getEntityBeingMounted().canAddPassenger(evt.getEntityMounting())) return;
+            if (callback.onStartRiding(evt.getLevel(), evt.getEntityMounting(), evt.getEntityBeingMounted()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -728,6 +727,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, factory.apply(
                         registryLookup, evt.getRegistryAccess())));
             });
+        });
+        INSTANCE.register(
+                ChangeEntitySizeCallback.class, EntityEvent.Size.class, (ChangeEntitySizeCallback callback, EntityEvent.Size evt) -> {
+            EventResultHolder<EntityDimensions> result = callback.onChangeEntitySize(
+                    evt.getEntity(), evt.getPose(), evt.getOldSize());
+            result.ifInterrupt(evt::setNewSize);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();

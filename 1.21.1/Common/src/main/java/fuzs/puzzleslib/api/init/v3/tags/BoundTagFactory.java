@@ -19,6 +19,8 @@ import java.util.Map;
 
 /**
  * A simple helper class for creating new {@link TagKey} instances via a pre-set namespace.
+ * <p>
+ * TODO maybe rename to KeyedTagFactory
  */
 @Deprecated
 public final class BoundTagFactory {

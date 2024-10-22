@@ -1,12 +1,10 @@
 package fuzs.puzzleslib.fabric.api.event.v1;
 
-import fuzs.puzzleslib.api.event.v1.entity.EntityRidingEvents;
-import fuzs.puzzleslib.api.event.v1.entity.EntityTickEvents;
-import fuzs.puzzleslib.api.event.v1.entity.ProjectileImpactCallback;
-import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Pose;
 
 /**
  * Events originally found on Forge in the <code>net.minecraftforge.event.entity</code> package.
@@ -14,7 +12,8 @@ import net.minecraft.world.entity.Entity;
 public final class FabricEntityEvents {
     /**
      * Fired when an entity is added to the level on the server after it has been loaded from chunk storage.
-     * <p>We do not use {@link net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents#ENTITY_LOAD} as it does not
+     * <p>
+     * We do not use {@link net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents#ENTITY_LOAD} as it does not
      * allow for preventing the entity from being added.
      */
     public static final Event<ServerEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(
@@ -48,7 +47,13 @@ public final class FabricEntityEvents {
     /**
      * Called after {@link Entity#tick()}.
      */
-    public static final Event<EntityTickEvents.End> ENTITY_TICK_END = FabricEventFactory.create(EntityTickEvents.End.class);
+    public static final Event<EntityTickEvents.End> ENTITY_TICK_END = FabricEventFactory.create(
+            EntityTickEvents.End.class);
+    /**
+     * Called when the size of an entity changes, usually from switching to a different {@link Pose}.
+     */
+    public static final Event<ChangeEntitySizeCallback> CHANGE_ENTITY_SIZE = FabricEventFactory.createResultHolder(
+            ChangeEntitySizeCallback.class);
 
     private FabricEntityEvents() {
         // NO-OP

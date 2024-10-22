@@ -15,10 +15,38 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 
 /**
- * A simple helper class for creating new {@link TagKey} instances via a pre-set namespace.
+ * A simple helper class for creating new {@link TagKey} instances with a set namespace.
  */
 @FunctionalInterface
 public interface TagFactory {
+    /**
+     * A built-in factory for the <code>minecraft</code> namespace.
+     */
+    TagFactory MINECRAFT = make("minecraft");
+    /**
+     * A built-in factory for the <code>common</code> namespace.
+     */
+    TagFactory COMMON = make("c");
+    /**
+     * A built-in factory for the <code>fabric</code> namespace.
+     */
+    TagFactory FABRIC = make("fabric");
+    /**
+     * A built-in factory for the <code>neoforge</code> namespace.
+     */
+    TagFactory NEOFORGE = make("neoforge");
+    /**
+     * A built-in factory for the <code>forge</code> namespace.
+     */
+    TagFactory FORGE = make("forge");
+    /**
+     * A built-in factory for the <code>curios</code> namespace.
+     */
+    TagFactory CURIOS = make("curios");
+    /**
+     * A built-in factory for the <code>trinkets</code> namespace.
+     */
+    TagFactory TRINKETS = make("trinkets");
 
     /**
      * Construct a new factory instance backed by a provided namespace.

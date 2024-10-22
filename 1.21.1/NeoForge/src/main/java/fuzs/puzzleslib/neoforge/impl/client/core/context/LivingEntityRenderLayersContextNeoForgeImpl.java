@@ -1,43 +1,63 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
+import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.client.core.v1.context.LivingEntityRenderLayersContext;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
-public record LivingEntityRenderLayersContextNeoForgeImpl(
-        EntityRenderersEvent.AddLayers evt) implements LivingEntityRenderLayersContext {
+public record LivingEntityRenderLayersContextNeoForgeImpl(EntityRenderersEvent.AddLayers evt) implements LivingEntityRenderLayersContext {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
-        Objects.requireNonNull(entityType, "entity type is null");
+    public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(Predicate<EntityType<E>> filter, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+        Objects.requireNonNull(filter, "filter is null");
         Objects.requireNonNull(factory, "render layer factory is null");
-        if (entityType == EntityType.PLAYER) {
-            this.evt.getSkins().stream().map(this.evt::getSkin).filter(Objects::nonNull).map(entityRenderer -> ((LivingEntityRenderer<T, M>) entityRenderer)).forEach(entityRenderer -> {
-                this.register(entityRenderer, factory);
-            });
-        } else {
-            LivingEntityRenderer<T, M> entityRenderer = (LivingEntityRenderer<T, M>) this.evt.getRenderer(entityType);
-            Objects.requireNonNull(entityRenderer, () -> "entity renderer for %s is null".formatted(BuiltInRegistries.ENTITY_TYPE.getKey(entityType).toString()));
-            this.register(entityRenderer, factory);
+        EntityRendererProvider.Context context = this.evt.getContext();
+        for (EntityType<?> entityType : this.getEntityTypes()) {
+            if (filter.test((EntityType<E>) entityType)) {
+                for (EntityRenderer<?> entityRenderer : this.getEntityRenderer(entityType)) {
+                    if (entityRenderer instanceof LivingEntityRenderer<?, ?>) {
+                        LivingEntityRenderer<T, M> livingEntityRenderer = (LivingEntityRenderer<T, M>) entityRenderer;
+                        livingEntityRenderer.addLayer(factory.apply(livingEntityRenderer, context));
+                    }
+                }
+            }
         }
     }
 
-    private <T extends LivingEntity, M extends EntityModel<T>> void register(LivingEntityRenderer<T, M> entityRenderer, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
-        Minecraft minecraft = Minecraft.getInstance();
-        // not sure if there's a way for getting the reload manager that's actually reloading this currently, let's just hope we never need it here
-        EntityRendererProvider.Context context = new EntityRendererProvider.Context(minecraft.getEntityRenderDispatcher(), minecraft.getItemRenderer(), minecraft.getBlockRenderer(), minecraft.getEntityRenderDispatcher().getItemInHandRenderer(), null, this.evt.getEntityModels(), minecraft.font);
-        entityRenderer.addLayer(factory.apply(entityRenderer, context));
+    private Collection<EntityType<?>> getEntityTypes() {
+        Collection<EntityType<?>> entityTypes = new HashSet<>(this.evt.getEntityTypes());
+        entityTypes.add(EntityType.PLAYER);
+        return entityTypes;
+    }
+
+    private Collection<EntityRenderer<?>> getEntityRenderer(EntityType<?> entityType) {
+        if (entityType == EntityType.PLAYER) {
+            ImmutableSet.Builder<EntityRenderer<?>> builder = ImmutableSet.builder();
+            for (PlayerSkin.Model model : this.evt.getSkins()) {
+                EntityRenderer<? extends Player> entityRenderer = this.evt.getSkin(model);
+                if (entityRenderer != null) {
+                    builder.add(entityRenderer);
+                }
+            }
+            return builder.build();
+        } else {
+            return Collections.singleton(this.evt.getRenderer(entityType));
+        }
     }
 }
