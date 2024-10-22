@@ -12,18 +12,20 @@ import net.minecraft.world.entity.LivingEntity;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 public final class LivingEntityRenderLayersContextFabricImpl implements LivingEntityRenderLayersContext {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(EntityType<E> entityType, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
-        Objects.requireNonNull(entityType, "entity type is null");
+    public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(Predicate<EntityType<E>> filter, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+        Objects.requireNonNull(filter, "filter is null");
         Objects.requireNonNull(factory, "render layer factory is null");
-        LivingEntityFeatureRendererRegistrationCallback.EVENT.register((EntityType<? extends LivingEntity> entityType1, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
-            if (entityType == entityType1) {
-                registrationHelper.register(factory.apply((RenderLayerParent<T, M>) entityRenderer, context));
-            }
-        });
+        LivingEntityFeatureRendererRegistrationCallback.EVENT.register(
+                (EntityType<? extends LivingEntity> entityType, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
+                    if (filter.test((EntityType<E>) entityType)) {
+                        registrationHelper.register(factory.apply((RenderLayerParent<T, M>) entityRenderer, context));
+                    }
+                });
     }
 }

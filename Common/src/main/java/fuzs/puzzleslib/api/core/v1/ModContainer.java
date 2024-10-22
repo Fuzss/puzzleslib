@@ -52,12 +52,12 @@ public interface ModContainer {
     Collection<String> getCredits();
 
     /**
-     * The following keys are universally supported: <code>homepage</code>, <code>issues</code>
+     * The following keys are universally supported: <code>homepage</code>, <code>issues</code>.
      * <p>
-     * Additionally, Fabric defines these keys: <code>source</code>, <code>email</code>, <code>irc</code>
+     * Additionally, Fabric defines these keys: <code>source</code>, <code>email</code>, <code>irc</code>.
      * <p>
      * Furthermore, non-standard keys such as the following are possible: <code>discord</code>, <code>slack</code>,
-     * <code>twitter</code>
+     * <code>twitter</code>.
      *
      * @return various contact information like social profiles and urls for mod downloads and issue reports
      */
