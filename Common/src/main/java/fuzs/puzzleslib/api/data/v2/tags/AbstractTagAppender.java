@@ -8,6 +8,7 @@ import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -263,4 +264,6 @@ public abstract class AbstractTagAppender<T> {
         Objects.requireNonNull(this.keyExtractor, "key extractor is null");
         return this.keyExtractor;
     }
+
+    public abstract List<String> asStringList();
 }

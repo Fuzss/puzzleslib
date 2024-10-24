@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
-    private final String modId;
+    protected final String modId;
     @Nullable
     private final Registry<T> registry;
     @Nullable
@@ -31,8 +31,8 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         super(packOutput, registryKey, registries);
         this.modId = modId;
         this.registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
-        this.keyExtractor =
-                this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
+        this.keyExtractor = this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) :
+                null;
     }
 
     @Override
@@ -41,7 +41,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     @Deprecated
     @Override
     public TagAppender<T> tag(TagKey<T> tagKey) {
-        // we cannot extend TagAppender as the only constructor is replaced on Forge & NeoForge
+        // we do not extend TagAppender to work around some type parameter restrictions,
         // so use differently named methods with our custom TagAppender implementation
         throw new UnsupportedOperationException();
     }

@@ -1,15 +1,20 @@
 package fuzs.puzzleslib.api.config.v3.serialization;
 
+import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.impl.config.serialization.EnumProvider;
 import fuzs.puzzleslib.impl.config.serialization.RegistryProvider;
+import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagBuilder;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -68,6 +73,21 @@ public interface KeyedValueProvider<T> {
     }
 
     /**
+     * Creates an {@link AbstractTagAppender} instance that can be converted to a string list by calling
+     * {@link AbstractTagAppender#asStringList()}.
+     *
+     * @param registryKey the registry to get entry keys from
+     * @param <T>         the type of values
+     * @return the tag appender
+     */
+    static <T> AbstractTagAppender<T> tagAppender(ResourceKey<? extends Registry<? super T>> registryKey) {
+        Registry<T> registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
+        Function<T, ResourceKey<T>> keyExtractor = registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(
+                registry, t) : null;
+        return CommonFactories.INSTANCE.getTagAppender(new TagBuilder(), keyExtractor);
+    }
+
+    /**
      * Converts a bunch of enum constants to their respective key as string.
      *
      * @param enumClazz class for retrieving enum constants
@@ -104,7 +124,8 @@ public interface KeyedValueProvider<T> {
      */
     @SafeVarargs
     static <T> List<String> toString(KeyedValueProvider<T> valueProvider, T... entries) {
-        return Stream.of(entries).peek(Objects::requireNonNull).map(valueProvider::getKey).filter(Objects::nonNull).map(ResourceLocation::toString).collect(Collectors.toList());
+        return Stream.of(entries).peek(Objects::requireNonNull).map(valueProvider::getKey).filter(Objects::nonNull).map(
+                ResourceLocation::toString).collect(Collectors.toList());
     }
 
     /**
