@@ -10,7 +10,8 @@ import java.util.*;
 import java.util.function.BiPredicate;
 
 /**
- * Compiles a list of strings into entries of a Minecraft game registry, supports individual entries and tags, as well as pattern matching using '*'.
+ * Compiles a list of strings into entries of a Minecraft game registry, supports individual entries and tags, as well
+ * as pattern matching using <code>*</code>.
  *
  * @param <T> registry entry type for stored values
  */
@@ -22,94 +23,115 @@ public interface ConfigDataSet<T> extends Collection<T> {
     /**
      * Config option comment excluding notion regarding tags for options backed by {@link ConfigDataSet}.
      */
-    String CONFIG_DESCRIPTION_WITHOUT_TAGS = "Format for every entry is \"<namespace>:<path>\". Namespace may be omitted to use \"minecraft\" by default. May use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*_shulker_box\" to match all shulker boxes no matter of color. Begin an entry with \"!\" to make sure it is excluded, useful e.g. when it has already been matched by another pattern.";
+    String CONFIG_DESCRIPTION_WITHOUT_TAGS = "Format for every entry is \"<namespace>:<path>\". Tags are not supported. Namespace may be omitted to use \"minecraft\" by default. May use asterisk as wildcard parameter via pattern matching, e.g. \"minecraft:*_shulker_box\" to match all shulker boxes no matter of color. Begin an entry with \"!\" to make sure it is excluded, useful e.g. when it has already been matched by another pattern.";
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse. The underlying data structure will be similar to a set.
+     * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse. The
+     * underlying data structure will be similar to a set.
      *
-     * @param registryKey registry for type
-     * @param values      values backing this set
-     * @param <T>         registry type
-     * @return builder backed by <code>registry</code>
+     * @param registryKey the registry
+     * @param values      the values backing this set
+     * @param <T>         the registry type
+     * @return builder backed by a registry
      */
     static <T> ConfigDataSet<T> from(ResourceKey<? extends Registry<? super T>> registryKey, String... values) {
         return from(KeyedValueProvider.registryEntries(registryKey), values);
     }
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse, possibly including attached data types.
-     * <p>If no data types are specified, the config data set will only contain simple values, the underlying data structure will be similar to a set.
-     * <p>Otherwise, the config data set will contain values as keys with associated data values in the form of <code>Object[]</code>, the underlying data structure is similar to a map.
+     * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse, possibly
+     * including attached data types.
+     * <p>
+     * If no data types are specified, the config data set will only contain simple values, the underlying data
+     * structure will be similar to a set.
+     * <p>
+     * Otherwise, the config data set will contain values as keys with associated data values in the form of object
+     * array, the underlying data structure is similar to a map.
      *
-     * @param registryKey registry for type
-     * @param values      values backing this set
-     * @param types       attached data types
-     * @param <T>         registry type
-     * @return builder backed by <code>registry</code>
+     * @param registryKey the registry
+     * @param values      the values backing this set
+     * @param types       the attached data types
+     * @param <T>         the registry type
+     * @return builder backed by a registry
      */
     static <T> ConfigDataSet<T> from(ResourceKey<? extends Registry<? super T>> registryKey, List<String> values, Class<?>... types) {
         return from(KeyedValueProvider.registryEntries(registryKey), values, types);
     }
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse, including attached data types.
-     * <p>The config data set will contain values as keys with associated data values in the form of <code>Object[]</code>, the underlying data structure is similar to a map.
+     * Creates a new {@link ConfigDataSet} instance for a given {@link Registry} and a list of values to parse,
+     * including attached data types.
+     * <p>
+     * The config data set will contain values as keys with associated data values in the form of object array, the
+     * underlying data structure is similar to a map.
      *
-     * @param registryKey registry for type
-     * @param values      values backing this set
-     * @param filter      filter for verifying data values, the filter is passed the index of the data type in <code>types</code> and then the read data value to be tested
-     * @param types       attached data types
-     * @param <T>         registry type
-     * @return builder backed by <code>registry</code>
+     * @param registryKey the registry
+     * @param values      the values backing this set
+     * @param filter      the filter for verifying data values, which is passed the index of the data type in the types
+     *                    array, in addition to the read data value to be tested
+     * @param types       the attached data types
+     * @param <T>         the registry type
+     * @return builder backed by a registry
      */
     static <T> ConfigDataSet<T> from(ResourceKey<? extends Registry<? super T>> registryKey, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
         return from(KeyedValueProvider.registryEntries(registryKey), values, filter, types);
     }
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given {@link KeyedValueProvider} and a list of values to parse. The underlying data structure will be similar to a set.
+     * Creates a new {@link ConfigDataSet} instance for a given {@link KeyedValueProvider} and a list of values to
+     * parse. The underlying data structure will be similar to a set.
      *
-     * @param valueProvider provider for all types
-     * @param values        values backing this set
-     * @param <T>           registry type
-     * @return builder backed by <code>registry</code>
+     * @param valueProvider the provider for all types
+     * @param values        the values backing this set
+     * @param <T>           the value type
+     * @return builder backed by provided values
      */
     static <T> ConfigDataSet<T> from(KeyedValueProvider<T> valueProvider, String... values) {
         return from(valueProvider, Arrays.asList(values));
     }
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given {@link KeyedValueProvider} and a list of values to parse, possibly including attached data types.
-     * <p>If no data types are specified, the config data set will only contain simple values, the underlying data structure will be similar to a set.
-     * <p>Otherwise, the config data set will contain values as keys with associated data values in the form of <code>Object[]</code>, the underlying data structure is similar to a map.
+     * Creates a new {@link ConfigDataSet} instance for a given {@link KeyedValueProvider} and a list of values to
+     * parse, possibly including attached data types.
+     * <p>
+     * If no data types are specified, the config data set will only contain simple values, the underlying data
+     * structure will be similar to a set.
+     * <p>
+     * Otherwise, the config data set will contain values as keys with associated data values in the form of object
+     * array, the underlying data structure is similar to a map.
      *
-     * @param valueProvider provider for all types
-     * @param values        values backing this set
-     * @param types         attached data types
-     * @param <T>           registry type
-     * @return builder backed by <code>registry</code>
+     * @param valueProvider the provider for all types
+     * @param values        the values backing this set
+     * @param types         the attached data types
+     * @param <T>           the value type
+     * @return builder backed by provided values
      */
     static <T> ConfigDataSet<T> from(KeyedValueProvider<T> valueProvider, List<String> values, Class<?>... types) {
         return from(valueProvider, values, (index, value) -> true, types);
     }
 
     /**
-     * Creates a new {@link ConfigDataSet} instance for a given {@link KeyedValueProvider} and a list of values to parse, including attached data types.
-     * <p>The config data set will contain values as keys with associated data values in the form of <code>Object[]</code>, the underlying data structure is similar to a map.
+     * Creates a new {@link ConfigDataSet} instance for a given {@link KeyedValueProvider} and a list of values to
+     * parse, including attached data types.
+     * <p>
+     * The config data set will contain values as keys with associated data values in the form of object array, the
+     * underlying data structure is similar to a map.
      *
-     * @param valueProvider provider for all types
-     * @param values        values backing this set
-     * @param filter        filter for verifying data values, the filter is passed the index of the data type in <code>types</code> and then the read data value to be tested
-     * @param types         attached data types
-     * @param <T>           registry type
-     * @return builder backed by <code>registry</code>
+     * @param valueProvider the provider for all types
+     * @param values        the values backing this set
+     * @param filter        the filter for verifying data values, which is passed the index of the data type in the
+     *                      types array, in addition to the read data value to be tested
+     * @param types         the attached data types
+     * @param <T>           the value type
+     * @return builder backed by provided values
      */
     static <T> ConfigDataSet<T> from(KeyedValueProvider<T> valueProvider, List<String> values, BiPredicate<Integer, Object> filter, Class<?>... types) {
         return new ConfigDataSetImpl<>(valueProvider, values, filter, types);
     }
 
     /**
-     * @return the dissolved entry map backing this config data set (values are mostly an empty array, so this is more like a set actually)
+     * @return the dissolved entry map backing this config data set (values are mostly an empty array, so this is more
+     *         like a set actually)
      */
     Map<T, Object[]> toMap();
 
@@ -124,7 +146,8 @@ public interface ConfigDataSet<T> extends Collection<T> {
      * @param entry entry to query data for
      * @return data array or <code>null</code>
      */
-    @Nullable Object[] get(T entry);
+    @Nullable
+    Object[] get(T entry);
 
     /**
      * Get data for an entry at an index, will throw an exception if index is out of bounds or no data is available.
