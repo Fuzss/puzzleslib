@@ -171,10 +171,10 @@ public final class TooltipRenderHelper {
      * @param insertAt        index to insert <code>imageComponents</code> into <code>components</code>, set to <code>-1</code> to insert at the end
      * @return the client tooltip components
      */
-    public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents, int insertAt) {
+     public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents, int insertAt) {
         List<ClientTooltipComponent> clientComponents = components.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create).collect(Collectors.toList());
         List<ClientTooltipComponent> clientImageComponents = imageComponents.stream().map(ClientAbstractions.INSTANCE::createImageComponent).toList();
-        if (insertAt == -1) {
+        if (insertAt == -1 || insertAt >= clientComponents.size()) {
             clientComponents.addAll(clientImageComponents);
         } else {
             clientComponents.addAll(insertAt, clientImageComponents);
