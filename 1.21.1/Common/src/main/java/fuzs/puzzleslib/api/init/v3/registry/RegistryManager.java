@@ -2,18 +2,22 @@ package fuzs.puzzleslib.api.init.v3.registry;
 
 import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.api.item.v2.ItemEquipmentFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.item.RecipeTypeImpl;
 import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -52,6 +56,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
@@ -399,7 +404,13 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default <T extends Recipe<?>> Holder.Reference<RecipeType<T>> registerRecipeType(String path) {
         return this.register(Registries.RECIPE_TYPE, path, () -> {
-            return new RecipeTypeImpl<>(this.makeKey(path));
+            ResourceLocation resourceLocation = this.makeKey(path);
+            return new RecipeType<>() {
+                @Override
+                public String toString() {
+                    return resourceLocation.toString();
+                }
+            };
         });
     }
 
@@ -425,6 +436,30 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default Holder.Reference<SimpleParticleType> registerParticleType(String path) {
         return this.register(Registries.PARTICLE_TYPE, path, () -> {
             return new SimpleParticleType(false);
+        });
+    }
+
+    /**
+     * Register a particle type.
+     *
+     * @param path              path for new entry
+     * @param overrideLimiter   allow this particle to spawn regardless of the global particle limit
+     * @param codecGetter       the codec for serialization
+     * @param streamCodecGetter the stream codec for network synchronization
+     * @param <T>               the particle type
+     * @return holder reference
+     */
+    default <T extends ParticleOptions> Holder.Reference<ParticleType<T>> registerParticleType(String path, boolean overrideLimiter, Function<ParticleType<T>, MapCodec<T>> codecGetter, Function<ParticleType<T>, StreamCodec<? super RegistryFriendlyByteBuf, T>> streamCodecGetter) {
+        return this.register(Registries.PARTICLE_TYPE, path, () -> new ParticleType<T>(overrideLimiter) {
+            @Override
+            public MapCodec<T> codec() {
+                return codecGetter.apply(this);
+            }
+
+            @Override
+            public StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec() {
+                return streamCodecGetter.apply(this);
+            }
         });
     }
 
