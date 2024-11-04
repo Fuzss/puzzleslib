@@ -5,7 +5,6 @@
   "package": "${modGroup}.mixin",
   "plugin": "${modGroup}.mixin.MixinConfigPluginImpl",
   "mixins": [
-    "AbstractMinecartMixin"
   ],
   "client": [
     "client.EditBoxMixin",

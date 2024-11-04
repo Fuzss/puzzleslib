@@ -4,7 +4,6 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
@@ -18,12 +17,8 @@ public class ForwardingResourceManagerReloadListener extends ForwardingReloadLis
     }
 
     @Override
-    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
-        return ResourceManagerReloadListener.super.reload(preparationBarrier,
-                resourceManager,
-                preparationsProfiler,
-                reloadProfiler,
-                backgroundExecutor,
+    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
+        return ResourceManagerReloadListener.super.reload(preparationBarrier, resourceManager, backgroundExecutor,
                 gameExecutor
         );
     }

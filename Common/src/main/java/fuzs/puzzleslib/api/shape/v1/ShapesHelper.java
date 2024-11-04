@@ -65,16 +65,6 @@ public final class ShapesHelper {
         return new Quaternionf().rotationY((float) Math.atan2(direction.getStepX(), direction.getStepZ()));
     }
 
-    @Deprecated(forRemoval = true)
-    public static VoxelShape rotate(Direction direction, VoxelShape voxelShape) {
-        return rotate(direction.getRotation(), voxelShape);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static VoxelShape rotate(Direction direction, VoxelShape voxelShape, Vector3d originOffset) {
-        return rotate(direction.getRotation(), voxelShape, originOffset);
-    }
-
     /**
      * Rotates a provided {@link VoxelShape} depending on the provided {@link Quaternionf}.
      * <p>

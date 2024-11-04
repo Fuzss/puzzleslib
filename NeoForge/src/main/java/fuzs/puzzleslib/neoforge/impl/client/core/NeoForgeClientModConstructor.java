@@ -106,8 +106,7 @@ public final class NeoForgeClientModConstructor {
             }
         });
         eventBus.addListener((final RegisterShadersEvent evt) -> {
-            constructor.onRegisterCoreShaders(
-                    new CoreShadersContextNeoForgeImpl(evt::registerShader, evt.getResourceProvider()));
+            constructor.onRegisterCoreShaders(new CoreShadersContextNeoForgeImpl(evt::registerShader));
         });
         eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
             constructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));

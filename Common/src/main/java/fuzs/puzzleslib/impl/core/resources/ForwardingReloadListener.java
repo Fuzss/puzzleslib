@@ -6,7 +6,6 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.util.profiling.ProfilerFiller;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -30,17 +29,11 @@ public class ForwardingReloadListener<T extends PreparableReloadListener> implem
     }
 
     @Override
-    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
+    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
         return CompletableFuture.completedFuture(null).thenCompose($ -> {
             return CompletableFuture.allOf(this.reloadListeners().stream().map(reloadListener -> {
                 try {
-                    return reloadListener.reload(preparationBarrier,
-                            resourceManager,
-                            preparationsProfiler,
-                            reloadProfiler,
-                            backgroundExecutor,
-                            gameExecutor
-                    );
+                    return reloadListener.reload(preparationBarrier, resourceManager, backgroundExecutor, gameExecutor);
                 } catch (Exception exception) {
                     PuzzlesLib.LOGGER.error("Unable to reload listener {}", reloadListener.getName(), exception);
                 }

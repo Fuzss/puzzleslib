@@ -70,20 +70,6 @@ public interface ClientAbstractions {
      * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
      * {@link net.minecraft.client.resources.model.ModelResourceLocation}.
      *
-     * @param resourceLocation the model resource location
-     * @return the model, or the missing model if not found
-     *
-     * @deprecated use {@link #getBakedModel(ModelManager, ResourceLocation)}
-     */
-    @Deprecated(forRemoval = true)
-    default BakedModel getBakedModel(ResourceLocation resourceLocation) {
-        return this.getBakedModel(Minecraft.getInstance().getModelManager(), resourceLocation);
-    }
-
-    /**
-     * Retrieves a model from the {@link ModelManager}, allows for using {@link ResourceLocation} instead of
-     * {@link net.minecraft.client.resources.model.ModelResourceLocation}.
-     *
      * @param modelManager     the model manager instance
      * @param resourceLocation the model resource location
      * @return the model, or the missing model if not found
@@ -138,7 +124,7 @@ public interface ClientAbstractions {
      * @return current partial tick time
      */
     default float getPartialTick() {
-        return Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(false);
+        return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
     /**

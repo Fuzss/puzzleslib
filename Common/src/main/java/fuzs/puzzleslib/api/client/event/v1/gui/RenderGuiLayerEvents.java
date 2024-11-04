@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -26,10 +25,8 @@ import java.util.Objects;
  * Note that the implementation on Fabric runs before any actual vanilla gui layers are drawn with similar z-offsets.
  * This is unfortunately necessary to support a proper rendering order that can correctly update
  * {@link fuzs.puzzleslib.api.client.core.v1.ClientAbstractions#getGuiLeftHeight(Gui)} &amp;
- * {@link fuzs.puzzleslib.api.client.core.v1.ClientAbstractions#getGuiRightHeight(Gui)} while running. Also some gui
+ * {@link fuzs.puzzleslib.api.client.core.v1.ClientAbstractions#getGuiRightHeight(Gui)} while running. Also, some gui
  * layer events currently cannot be cancelled on Fabric as they are not yet fully implemented.
- * <p>
- * TODO replace {@link Minecraft} argument with {@link net.minecraft.client.gui.Gui}
  */
 public final class RenderGuiLayerEvents {
     private static final List<ResourceLocation> VANILLA_GUI_LAYERS = new ArrayList<>();
@@ -90,13 +87,13 @@ public final class RenderGuiLayerEvents {
         /**
          * Called before a gui element is rendered, allows for cancelling rendering.
          *
-         * @param minecraft    minecraft singleton instance
+         * @param gui          the gui instance
          * @param guiGraphics  the gui graphics component
          * @param deltaTracker partial tick time
          * @return {@link EventResult#INTERRUPT} to prevent the element from rendering, {@link EventResult#PASS} to
          *         allow the element to render normally
          */
-        EventResult onBeforeRenderGuiLayer(Minecraft minecraft, GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+        EventResult onBeforeRenderGuiLayer(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker);
     }
 
     @FunctionalInterface
@@ -105,10 +102,10 @@ public final class RenderGuiLayerEvents {
         /**
          * Called after a gui element is rendered.
          *
-         * @param minecraft    minecraft singleton instance
+         * @param gui          the gui instance
          * @param guiGraphics  the gui graphics component
          * @param deltaTracker partial tick time
          */
-        void onAfterRenderGuiLayer(Minecraft minecraft, GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+        void onAfterRenderGuiLayer(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker);
     }
 }

@@ -32,7 +32,9 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     /**
      * the data types we currently are able to handle
      */
-    private static final Set<Class<?>> SUPPORTED_DATA_TYPES = ImmutableSet.of(boolean.class, Boolean.class, int.class, Integer.class, double.class, Double.class, String.class);
+    private static final Set<Class<?>> SUPPORTED_DATA_TYPES = ImmutableSet.of(boolean.class, Boolean.class, int.class,
+            Integer.class, double.class, Double.class, String.class
+    );
 
     /**
      * registry to work with
@@ -43,7 +45,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      */
     private final List<EntryHolder<?, T>> values = new ArrayList<>();
     /**
-     * filter for when {@link EntryHolder}s are constructed, first argument is index (only index 0 when no data is specified), second is entry/data value
+     * filter for when {@link EntryHolder}s are constructed, first argument is index (only index 0 when no data is
+     * specified), second is entry/data value
      */
     private final BiPredicate<Integer, Object> filter;
     private final int dataSize;
@@ -223,7 +226,10 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 }
             }
             if (entries.isEmpty() && !toRemove.isEmpty()) {
-                entries = this.valueProvider.streamValues().collect(Collectors.toMap(Function.identity(), t -> EntryHolder.EMPTY_DATA, (o1, o2) -> o1, Maps::newIdentityHashMap));
+                entries = this.valueProvider.streamValues().collect(
+                        Collectors.toMap(Function.identity(), t -> EntryHolder.EMPTY_DATA, (o1, o2) -> o1,
+                                Maps::newIdentityHashMap
+                        ));
             }
             entries.keySet().removeIf(t -> !this.filter.test(0, t) || toRemove.contains(t));
             this.dissolved = dissolved = Collections.unmodifiableMap(entries);
@@ -245,11 +251,17 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 Object[] data = new Object[types.length];
                 for (int i = 0; i < types.length; i++) {
                     if (sources.length - 1 <= i) {
-                        throw new IllegalArgumentException("Data index out of bounds, index was %s, but length is %s".formatted(i + 1, sources.length));
+                        throw new IllegalArgumentException(
+                                "Data index out of bounds, index was %s, but length is %s".formatted(i + 1,
+                                        sources.length
+                                ));
                     }
                     data[i] = deserializeData(types[i], sources[i + 1].trim());
                     if (!this.filter.test(i + 1, data[i])) {
-                        throw new IllegalStateException("Data %s at index %s from source entry %s does not conform to filter".formatted(data[i], i, source));
+                        throw new IllegalStateException(
+                                "Data %s at index %s from source entry %s does not conform to filter".formatted(data[i],
+                                        i, source
+                                ));
                     }
                 }
                 return Optional.of(this.deserialize(newSource).withData(data));
@@ -279,7 +291,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             if (this.valueProvider instanceof RegistryProvider<T> registryProvider) {
                 return new TagEntryHolder<>(registryProvider, source, inverted);
             } else {
-                throw new IllegalArgumentException("Value provider %s does not support tags!".formatted(this.valueProvider.name()));
+                throw new IllegalArgumentException(
+                        "Value provider %s does not support tags!".formatted(this.valueProvider.name()));
             }
         } else {
             return new RegistryEntryHolder<>(this.valueProvider, source, inverted);
@@ -288,7 +301,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
     /**
      * holds a single entry from a string list, ready to be dissolved into registry entries when required
-     * <p>supports pattern matching for {@link ResourceLocation} path, therefore input and path are stored separately instead of as {@link ResourceLocation}
+     * <p>supports pattern matching for {@link ResourceLocation} path, therefore input and path are stored separately
+     * instead of as {@link ResourceLocation}
      *
      * @param <D> raw value type, single registry entry or tag
      * @param <E> value type for set, result from dissolving
@@ -334,11 +348,10 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
 
         /**
          * compile all entries from this holder
-         *
-         * @param entries provided entries to add to
          */
         public final void dissolve(BiConsumer<E, Object[]> builder) {
-            this.findRegistryMatches(this.input).stream().flatMap(this::dissolveValue).forEach(value -> builder.accept(value, this.data));
+            this.findRegistryMatches(this.input).stream().flatMap(this::dissolveValue).forEach(
+                    value -> builder.accept(value, this.data));
         }
 
         private Collection<D> findRegistryMatches(String s) {
@@ -347,7 +360,8 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 Optional.ofNullable(ResourceLocationHelper.tryParse(s)).flatMap(this::toValue).ifPresent(matches::add);
             } else {
                 String regexSource = s.replace("*", "[a-z0-9/._-]*");
-                this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(Map.Entry::getValue).forEach(matches::add);
+                this.allValues().filter(entry -> entry.getKey().toString().matches(regexSource)).map(
+                        Map.Entry::getValue).forEach(matches::add);
             }
             // test if this is a valid entry first
             if (matches.isEmpty()) {
@@ -377,7 +391,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     /**
      * implementation for a single registry value
      *
-     * @param <E> registry type
+     * @param <T> registry type
      */
     private static class RegistryEntryHolder<T> extends EntryHolder<T, T> {
         /**
@@ -386,9 +400,9 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private final KeyedValueProvider<T> valueProvider;
 
         /**
-         * @param registry the registry to compile values from
-         * @param source   the raw {@link ResourceLocation} to parse
-         * @param inverted is this holder meant to exclude entries from being added to the set
+         * @param valueProvider the registry to compile values from
+         * @param source        the raw {@link ResourceLocation} to parse
+         * @param inverted      is this holder meant to exclude entries from being added to the set
          */
         RegistryEntryHolder(KeyedValueProvider<T> valueProvider, String source, boolean inverted) {
             super(valueProvider.name(), source, inverted);
@@ -423,9 +437,9 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         private final Registry<T> registry;
 
         /**
-         * @param registry the registry to compile values from
-         * @param source   the raw {@link ResourceLocation} to parse
-         * @param inverted is this holder meant to exclude entries from being added to the set
+         * @param registryProvider the registry to compile values from
+         * @param source           the raw {@link ResourceLocation} to parse
+         * @param inverted         is this holder meant to exclude entries from being added to the set
          */
         TagEntryHolder(RegistryProvider<T> registryProvider, String source, boolean inverted) {
             super(registryProvider.name(), source, inverted);
@@ -440,13 +454,13 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         @Override
         protected Optional<TagKey<T>> toValue(ResourceLocation identifier) {
             TagKey<T> tag = TagKey.create(this.registry.key(), identifier);
-            if (this.registry.getTag(tag).isEmpty()) return Optional.empty();
+            if (this.registry.get(tag).isEmpty()) return Optional.empty();
             return Optional.of(tag);
         }
 
         @Override
         protected Stream<Map.Entry<ResourceLocation, TagKey<T>>> allValues() {
-            return this.registry.getTagNames().map(tagKey -> Map.entry(tagKey.location(), tagKey));
+            return this.registry.listTagIds().map(tagKey -> Map.entry(tagKey.location(), tagKey));
         }
     }
 }

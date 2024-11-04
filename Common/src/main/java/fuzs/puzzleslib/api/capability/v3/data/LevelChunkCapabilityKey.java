@@ -16,7 +16,7 @@ public interface LevelChunkCapabilityKey<C extends CapabilityComponent<LevelChun
 
     @Override
     default void setChanged(C capabilityComponent, @Nullable PlayerSet playerSet) {
-        capabilityComponent.getHolder().setUnsaved(true);
+        capabilityComponent.getHolder().markUnsaved();
     }
 
     @Override

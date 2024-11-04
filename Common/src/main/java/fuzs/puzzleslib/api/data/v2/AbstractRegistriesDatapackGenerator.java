@@ -4,7 +4,10 @@ import com.google.common.base.CaseFormat;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import net.minecraft.Util;
-import net.minecraft.core.*;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.RegistriesDatapackGenerator;
 import net.minecraft.data.registries.RegistryPatchGenerator;
@@ -12,12 +15,12 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.equipment.trim.TrimMaterial;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
@@ -74,23 +77,16 @@ public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesD
     }
 
     protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {
-        registerTrimMaterial(context,
-                resourceKey,
-                ingredient,
-                descriptionColor,
-                itemModelIndex,
+        registerTrimMaterial(context, resourceKey, ingredient, descriptionColor, itemModelIndex,
                 Collections.emptyMap()
         );
     }
 
-    protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<Holder<ArmorMaterial>, String> overrideArmorMaterials) {
+    protected static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<ResourceLocation, String> overrideArmorMaterials) {
         Component component = Component.translatable(Util.makeDescriptionId("trim_material", resourceKey.location()))
                 .withStyle(Style.EMPTY.withColor(descriptionColor));
-        TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(),
-                ingredient,
-                itemModelIndex,
-                component,
-                overrideArmorMaterials
+        TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(), ingredient, itemModelIndex,
+                component, overrideArmorMaterials
         );
         context.register(resourceKey, trimMaterial);
     }

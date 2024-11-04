@@ -44,9 +44,9 @@ public abstract class RegistryManagerImpl implements RegistryManager {
         Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
         ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
         return new LazyHolder<>(registryKey, resourceKey, () -> {
-            Holder.Reference<T> holder = registry.getHolderOrThrow(resourceKey);
+            Holder.Reference<T> holder = registry.getOrThrow(resourceKey);
             if (!holder.isBound()) {
-                T value = registry.get(resourceKey);
+                T value = registry.getValue(resourceKey);
                 Objects.requireNonNull(value, "value is null");
                 holder.bindValue(value);
             }

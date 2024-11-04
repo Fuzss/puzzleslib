@@ -44,31 +44,14 @@ public interface GenerationSettingsContext {
     /**
      * Adds a configured carver to one of this biomes generation steps.
      */
-    void addCarver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carverKey);
+    void addCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey);
 
     /**
      * Removes all carvers with the given key from one of this biomes generation steps.
      *
      * @return True if any carvers were removed.
      */
-    boolean removeCarver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carverKey);
-
-    /**
-     * Removes all carvers with the given key from all of this biomes generation steps.
-     *
-     * @return True if any carvers were removed.
-     */
-    default boolean removeCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
-        boolean anyFound = false;
-
-        for (GenerationStep.Carving step : GenerationStep.Carving.values()) {
-            if (this.removeCarver(step, carverKey)) {
-                anyFound = true;
-            }
-        }
-
-        return anyFound;
-    }
+    boolean removeCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey);
 
     /**
      * @param stage decoration stage
@@ -77,8 +60,7 @@ public interface GenerationSettingsContext {
     Iterable<Holder<PlacedFeature>> getFeatures(GenerationStep.Decoration stage);
 
     /**
-     * @param stage carving stage
      * @return all carvers registered for the given <code>stage</code>
      */
-    Iterable<Holder<ConfiguredWorldCarver<?>>> getCarvers(GenerationStep.Carving stage);
+    Iterable<Holder<ConfiguredWorldCarver<?>>> getCarvers();
 }

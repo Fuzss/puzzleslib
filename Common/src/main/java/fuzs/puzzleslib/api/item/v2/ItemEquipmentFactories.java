@@ -1,30 +1,23 @@
 package fuzs.puzzleslib.api.item.v2;
 
-import com.google.common.base.Suppliers;
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.impl.item.TierImpl;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.block.Block;
 
 import java.util.EnumMap;
 import java.util.Map;
-import java.util.function.Supplier;
 
 /**
- * A class containing factory methods for default {@link Tier} and {@link ArmorMaterial} implementations.
+ * A class containing factory methods for default {@link ToolMaterial} and
+ * {@link net.minecraft.world.item.equipment.ArmorMaterial} implementations.
  */
 public final class ItemEquipmentFactories {
-    private static final ArmorItem.Type[] ARMOR_TYPES = {
-            ArmorItem.Type.BOOTS,
-            ArmorItem.Type.LEGGINGS,
-            ArmorItem.Type.CHESTPLATE,
-            ArmorItem.Type.HELMET,
-            ArmorItem.Type.BODY
+    private static final ArmorType[] ARMOR_TYPES = {
+            ArmorType.BOOTS, ArmorType.LEGGINGS, ArmorType.CHESTPLATE, ArmorType.HELMET, ArmorType.BODY
     };
 
     private ItemEquipmentFactories() {
@@ -32,7 +25,7 @@ public final class ItemEquipmentFactories {
     }
 
     /**
-     * Creates a new {@link Tier}.
+     * Creates a new {@link ToolMaterial}.
      *
      * @param miningLevel       the mining level of the tier, wood / gold is 0, stone is 1, iron is 2, diamond is 3,
      *                          netherite is 4
@@ -43,16 +36,12 @@ public final class ItemEquipmentFactories {
      *                          specific item, as the base value is different for each one since Minecraft 1.9
      * @param enchantability    enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
      *                          netherite is 15
-     * @param repairIngredient  the repair material used in an anvil for restoring item durability
-     * @return the new {@link Tier}
+     * @param repairItems       the repair material used in an anvil for restoring item durability
+     * @return the new {@link ToolMaterial}
      */
-    public static Tier registerTier(int miningLevel, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, Supplier<Ingredient> repairIngredient) {
-        return registerTier(getVanillaMiningLevelBlockTag(miningLevel),
-                itemDurability,
-                miningSpeed,
-                attackDamageBonus,
-                enchantability,
-                repairIngredient
+    public static ToolMaterial registerTier(int miningLevel, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, TagKey<Item> repairItems) {
+        return registerTier(getVanillaMiningLevelBlockTag(miningLevel), itemDurability, miningSpeed, attackDamageBonus,
+                enchantability, repairItems
         );
     }
 
@@ -83,7 +72,7 @@ public final class ItemEquipmentFactories {
     }
 
     /**
-     * Creates a new {@link Tier}.
+     * Creates a new {@link ToolMaterial}.
      *
      * @param incorrectBlocksForDrops the mining level of the tier as a block tag
      * @param itemDurability          tool durability for this tier
@@ -94,16 +83,12 @@ public final class ItemEquipmentFactories {
      *                                1.9
      * @param enchantability          enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
      *                                netherite is 15
-     * @param repairIngredient        the repair material used in an anvil for restoring item durability
-     * @return the new {@link Tier}
+     * @param repairItems             the repair material used in an anvil for restoring item durability
+     * @return the new {@link ToolMaterial}
      */
-    public static Tier registerTier(TagKey<Block> incorrectBlocksForDrops, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, Supplier<Ingredient> repairIngredient) {
-        return new TierImpl(incorrectBlocksForDrops,
-                itemDurability,
-                miningSpeed,
-                attackDamageBonus,
-                enchantability,
-                Suppliers.memoize(repairIngredient::get)
+    public static ToolMaterial registerTier(TagKey<Block> incorrectBlocksForDrops, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, TagKey<Item> repairItems) {
+        return new ToolMaterial(incorrectBlocksForDrops, itemDurability, miningSpeed, attackDamageBonus, enchantability,
+                repairItems
         );
     }
 
@@ -114,7 +99,7 @@ public final class ItemEquipmentFactories {
      *                          body
      * @return armor type defense values map
      */
-    public static Map<ArmorItem.Type, Integer> toArmorTypeMap(int... protectionAmounts) {
+    public static Map<ArmorType, Integer> toArmorTypeMap(int... protectionAmounts) {
         return toArmorTypeMapWithFallback(0, protectionAmounts);
     }
 
@@ -126,8 +111,8 @@ public final class ItemEquipmentFactories {
      *                                 helmet, body
      * @return armor type defense values map
      */
-    public static Map<ArmorItem.Type, Integer> toArmorTypeMapWithFallback(int protectionAmountFallback, int... protectionAmounts) {
-        Map<ArmorItem.Type, Integer> map = new EnumMap<>(ArmorItem.Type.class);
+    public static Map<ArmorType, Integer> toArmorTypeMapWithFallback(int protectionAmountFallback, int... protectionAmounts) {
+        Map<ArmorType, Integer> map = new EnumMap<>(ArmorType.class);
         for (int i = 0; i < ARMOR_TYPES.length; i++) {
             map.put(ARMOR_TYPES[i], i < protectionAmounts.length ? protectionAmounts[i] : protectionAmountFallback);
         }

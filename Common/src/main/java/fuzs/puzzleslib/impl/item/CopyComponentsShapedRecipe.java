@@ -30,7 +30,7 @@ public class CopyComponentsShapedRecipe extends ShapedRecipe implements CopyComp
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<? extends ShapedRecipe> getSerializer() {
         return this.recipeSerializer;
     }
 

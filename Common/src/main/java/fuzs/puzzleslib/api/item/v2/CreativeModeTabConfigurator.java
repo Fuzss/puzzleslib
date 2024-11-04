@@ -36,20 +36,6 @@ public interface CreativeModeTabConfigurator {
      * The tab id defaults to {@code main}.
      *
      * @param modId the mod this tab is used by
-     * @param icon  the item stack displayed as tab icon
-     * @return the creative mode tab
-     */
-    @Deprecated(forRemoval = true)
-    static CreativeModeTabConfigurator from(String modId, Supplier<ItemStack> icon) {
-        return from(modId).icon(icon);
-    }
-
-    /**
-     * Creates a new creative mode tab, handles adding to the creative screen.
-     * <p>
-     * The tab id defaults to {@code main}.
-     *
-     * @param modId the mod this tab is used by
      * @return builder instance
      */
     static CreativeModeTabConfigurator from(String modId) {
