@@ -26,11 +26,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -281,14 +281,14 @@ public final class NeoForgeClientEventInvokers {
             Objects.requireNonNull(context, "context is null");
             ResourceLocation resourceLocation = (ResourceLocation) context;
             if (!evt.getName().equals(resourceLocation) || Minecraft.getInstance().options.hideGui) return;
-            EventResult result = callback.onBeforeRenderGuiLayer(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
+            EventResult result = callback.onBeforeRenderGuiLayer(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderGuiLayerEvents.After.class, RenderGuiLayerEvent.Post.class, (RenderGuiLayerEvents.After callback, RenderGuiLayerEvent.Post evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
             ResourceLocation resourceLocation = (ResourceLocation) context;
             if (!evt.getName().equals(resourceLocation) || Minecraft.getInstance().options.hideGui) return;
-            callback.onAfterRenderGuiLayer(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
+            callback.onAfterRenderGuiLayer(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, CustomizeGuiOverlayEvent.Chat.class, (CustomizeChatPanelCallback callback, CustomizeGuiOverlayEvent.Chat evt) -> {
             MutableInt posX = MutableInt.fromEvent(evt::setPosX, evt::getPosX);
@@ -332,18 +332,18 @@ public final class NeoForgeClientEventInvokers {
             callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), pitch, yaw, roll);
         });
         INSTANCE.register(RenderLivingEvents.Before.class, RenderLivingEvent.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeRenderEntity(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            EventResult result = callback.onBeforeRenderEntity(evt.getRenderState(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderLivingEvents.After.class, RenderLivingEvent.Post.class, (callback, evt) -> {
-            callback.onAfterRenderEntity(evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            callback.onAfterRenderEntity(evt.getRenderState(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
         INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
-            EventResult result = callback.onBeforeRenderPlayer((AbstractClientPlayer) evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            EventResult result = callback.onBeforeRenderPlayer(evt.getRenderState(), (PlayerRenderer) evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderPlayerEvents.After.class, RenderPlayerEvent.Post.class, (RenderPlayerEvents.After callback, RenderPlayerEvent.Post evt) -> {
-            callback.onAfterRenderPlayer((AbstractClientPlayer) evt.getEntity(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            callback.onAfterRenderPlayer(evt.getRenderState(), (PlayerRenderer) evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
         INSTANCE.register(RenderHandEvents.MainHand.class, RenderHandEvent.class, (RenderHandEvents.MainHand callback, RenderHandEvent evt) -> {
             if (evt.getHand() != InteractionHand.MAIN_HAND) return;
@@ -506,7 +506,7 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(AddToastCallback.class, ToastAddEvent.class, (AddToastCallback callback, ToastAddEvent evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            EventResult result = callback.onAddToast(minecraft.getToasts(), evt.getToast());
+            EventResult result = callback.onAddToast(minecraft.getToastManager(), evt.getToast());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
@@ -520,7 +520,7 @@ public final class NeoForgeClientEventInvokers {
             callback.onGatherRightDebugText(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getRight());
         });
         INSTANCE.register(ComputeFieldOfViewCallback.class, ViewportEvent.ComputeFov.class, (ComputeFieldOfViewCallback callback, ViewportEvent.ComputeFov evt) -> {
-            MutableDouble fieldOfView = MutableDouble.fromEvent(evt::setFOV, evt::getFOV);
+            MutableFloat fieldOfView = MutableFloat.fromEvent(evt::setFOV, evt::getFOV);
             callback.onComputeFieldOfView(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), fieldOfView);
         });
         INSTANCE.register(ChatMessageReceivedEvents.System.class, ClientChatReceivedEvent.System.class, (ChatMessageReceivedEvents.System callback, ClientChatReceivedEvent.System evt) -> {
@@ -564,7 +564,7 @@ public final class NeoForgeClientEventInvokers {
         for (ResourceLocation resourcelocation : BuiltInRegistries.ITEM.keySet()) {
             modelLocations.add(ModelResourceLocation.inventory(resourcelocation));
         }
-        modelLocations.add(ItemRenderer.TRIDENT_IN_HAND_MODEL);
+        modelLocations.add(ResourceLocation.withDefaultNamespace("spyglass_in_hand"));
         modelLocations.add(ItemRenderer.SPYGLASS_IN_HAND_MODEL);
         // skip the Forge additional models call, we probably don't need those and better to avoid accessing internals
         return Collections.unmodifiableSet(modelLocations);

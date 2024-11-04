@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.api.item.v2;
 
 import fuzs.puzzleslib.impl.core.CommonFactories;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.Equippable;
 
 /**
  * A small helper class for testing an item stack for a given tool type.
@@ -153,8 +155,8 @@ public interface ToolTypeHelper {
      * @return is this stack a melee weapon
      */
     default boolean isMeleeWeapon(ItemStack itemStack) {
-        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) ||
-                this.isMace(itemStack);
+        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) || this.isMace(
+                itemStack);
     }
 
     /**
@@ -194,8 +196,8 @@ public interface ToolTypeHelper {
      * @return is this stack a tool
      */
     default boolean isTool(ItemStack itemStack) {
-        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) ||
-                this.isShield(itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
+        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) || this.isShield(
+                itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
     }
 
     /**
@@ -205,8 +207,7 @@ public interface ToolTypeHelper {
      * @return is this stack head armor
      */
     default boolean isHeadArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.HEAD || itemStack.is(ItemTags.HEAD_ARMOR);
+        return this.isArmor(itemStack, ArmorType.HELMET) || itemStack.is(ItemTags.HEAD_ARMOR);
     }
 
     /**
@@ -216,8 +217,7 @@ public interface ToolTypeHelper {
      * @return is this stack chest armor
      */
     default boolean isChestArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.CHEST || itemStack.is(ItemTags.CHEST_ARMOR);
+        return this.isArmor(itemStack, ArmorType.CHESTPLATE) || itemStack.is(ItemTags.CHEST_ARMOR);
     }
 
     /**
@@ -227,8 +227,7 @@ public interface ToolTypeHelper {
      * @return is this stack leg armor
      */
     default boolean isLegArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.LEGS || itemStack.is(ItemTags.LEG_ARMOR);
+        return this.isArmor(itemStack, ArmorType.LEGGINGS) || itemStack.is(ItemTags.LEG_ARMOR);
     }
 
     /**
@@ -238,8 +237,7 @@ public interface ToolTypeHelper {
      * @return is this stack foot armor
      */
     default boolean isFootArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem &&
-                armorItem.getEquipmentSlot() == EquipmentSlot.FEET || itemStack.is(ItemTags.FOOT_ARMOR);
+        return this.isArmor(itemStack, ArmorType.BOOTS) || itemStack.is(ItemTags.FOOT_ARMOR);
     }
 
     /**
@@ -249,7 +247,19 @@ public interface ToolTypeHelper {
      * @return is this stack body armor
      */
     default boolean isBodyArmor(ItemStack itemStack) {
-        return itemStack.getItem() instanceof ArmorItem armorItem && armorItem.getEquipmentSlot() == EquipmentSlot.BODY;
+        return this.isArmor(itemStack, ArmorType.BODY);
+    }
+
+    /**
+     * Tests if an item stack can be equipped as a type of armor.
+     *
+     * @param itemStack the stack to test
+     * @param armorType the type of armor
+     * @return is this stack that type of armor
+     */
+    private boolean isArmor(ItemStack itemStack, ArmorType armorType) {
+        Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
+        return equippable != null && equippable.slot() == armorType.getSlot();
     }
 
     /**

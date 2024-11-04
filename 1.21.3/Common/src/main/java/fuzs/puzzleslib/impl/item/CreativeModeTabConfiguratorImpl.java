@@ -8,10 +8,14 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,7 +26,12 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabConfigurator {
-    private static final Item[] POTION_ITEMS = new Item[]{Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION, Items.TIPPED_ARROW};
+    private static final Item[] POTION_ITEMS = new Item[]{
+            Items.POTION,
+            Items.SPLASH_POTION,
+            Items.LINGERING_POTION,
+            Items.TIPPED_ARROW
+    };
 
     private final ResourceLocation resourceLocation;
     @Nullable
@@ -83,7 +92,9 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
     }
 
     public void configure(CreativeModeTab.Builder builder) {
-        String translationKey = "itemGroup.%s.%s".formatted(this.resourceLocation.getNamespace(), this.resourceLocation.getPath());
+        String translationKey = "itemGroup.%s.%s".formatted(this.resourceLocation.getNamespace(),
+                this.resourceLocation.getPath()
+        );
         builder.title(Component.translatable(translationKey));
         if (this.icon != null) {
             builder.icon(this.icon);
@@ -99,33 +110,38 @@ public final class CreativeModeTabConfiguratorImpl implements CreativeModeTabCon
             }
         }
         if (this.appendEnchantmentsAndPotions) {
-            builder.displayItems((CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
-                this.displayItemsGenerator.accept(itemDisplayParameters, output);
-                appendAllEnchantments(this.resourceLocation.getNamespace(), itemDisplayParameters.holders(), output::accept);
-                appendAllPotions(this.resourceLocation.getNamespace(), itemDisplayParameters.holders(), output::accept);
-            });
+            builder.displayItems(
+                    (CreativeModeTab.ItemDisplayParameters itemDisplayParameters, CreativeModeTab.Output output) -> {
+                        this.displayItemsGenerator.accept(itemDisplayParameters, output);
+                        appendAllEnchantments(this.resourceLocation.getNamespace(), itemDisplayParameters.holders(),
+                                output::accept
+                        );
+                        appendAllPotions(this.resourceLocation.getNamespace(), itemDisplayParameters.holders(),
+                                output::accept
+                        );
+                    });
         } else {
             builder.displayItems(this.displayItemsGenerator);
         }
     }
 
     private static void appendAllEnchantments(String namespace, HolderLookup.Provider holders, Consumer<ItemStack> itemStacks) {
-        Comparator<Holder.Reference<Enchantment>> comparator = Comparator.comparing(entry -> entry.key().location().getPath());
-        holders.lookup(Registries.ENCHANTMENT).stream()
-                .flatMap(HolderLookup::listElements)
-                .filter(entry -> entry.key().location().getNamespace().equals(namespace))
-                .sorted(comparator)
-                .forEach(holder -> {
-                    itemStacks.accept(EnchantedBookItem.createForEnchantment(new EnchantmentInstance(holder, holder.value().getMaxLevel())));
-                });
+        Comparator<Holder.Reference<Enchantment>> comparator = Comparator.comparing(
+                entry -> entry.key().location().getPath());
+        holders.lookup(Registries.ENCHANTMENT).stream().flatMap(HolderLookup::listElements).filter(
+                entry -> entry.key().location().getNamespace().equals(namespace)).sorted(comparator).forEach(holder -> {
+            itemStacks.accept(
+                    EnchantmentHelper.createBook(new EnchantmentInstance(holder, holder.value().getMaxLevel())));
+        });
     }
 
     private static void appendAllPotions(String namespace, HolderLookup.Provider holders, Consumer<ItemStack> itemStacks) {
-        List<Holder.Reference<Potion>> potions = holders.lookup(Registries.POTION).stream()
+        List<Holder.Reference<Potion>> potions = holders.lookup(Registries.POTION)
+                .stream()
                 .flatMap(HolderLookup::listElements)
                 .filter(entry -> entry.key().location().getNamespace().equals(namespace))
                 .filter(holder -> !holder.value().getEffects().isEmpty())
-                .sorted(Comparator.comparing(holder -> holder.value().getEffects().get(0)))
+                .sorted(Comparator.comparing(holder -> holder.value().getEffects().getFirst()))
                 .toList();
         for (Item item : POTION_ITEMS) {
             for (Holder.Reference<Potion> potion : potions) {

@@ -145,15 +145,15 @@ public interface CommonAbstractions {
     void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand);
 
     /**
-     * Retrieves a {@link MobSpawnType} from a {@link Mob} if it has been set during
-     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, MobSpawnType, SpawnGroupData)}.
+     * Retrieves a {@link EntitySpawnReason} from a {@link Mob} if it has been set during
+     * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
      * <p>Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
      *
      * @param mob the mob
      * @return the spawn type or null if none has been set
      */
     @Nullable
-    MobSpawnType getMobSpawnType(Mob mob);
+    EntitySpawnReason getMobSpawnType(Mob mob);
 
     /**
      * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.

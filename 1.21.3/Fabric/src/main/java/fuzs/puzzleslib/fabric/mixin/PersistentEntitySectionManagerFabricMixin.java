@@ -4,6 +4,7 @@ import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.EntityAccess;
@@ -29,7 +30,7 @@ abstract class PersistentEntitySectionManagerFabricMixin<T extends EntityAccess>
                 }
             }
             if (!loadedFromDisk) {
-                MobSpawnType spawnType = entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
+                EntitySpawnReason spawnType = entity instanceof SpawnTypeMob mob ? mob.puzzleslib$getSpawnType() : null;
                 if (FabricEntityEvents.ENTITY_SPAWN.invoker().onEntitySpawn(entity, (ServerLevel) entity.level(), spawnType).isInterrupt()) {
                     if (entity instanceof Player) {
                         // we do not support players as it isn't as straight-forward to implement for the server player on Fabric

@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
@@ -16,7 +16,7 @@ public final class ServerEntityLevelEvents {
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
     private ServerEntityLevelEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -44,12 +44,12 @@ public final class ServerEntityLevelEvents {
          * @param level        the level the entity is spawned in
          * @param mobSpawnType this provides the spawn type which has been captured in
          *                     {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor,
-         *                     DifficultyInstance, MobSpawnType, SpawnGroupData)} if it has been called, otherwise
+         *                     DifficultyInstance, EntitySpawnReason, SpawnGroupData)} if it has been called, otherwise
          *                     <code>null</code>
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
          *         discarding it, {@link EventResult#PASS} for the entity to be added normally
          */
-        EventResult onEntitySpawn(Entity entity, ServerLevel level, @Nullable MobSpawnType mobSpawnType);
+        EventResult onEntitySpawn(Entity entity, ServerLevel level, @Nullable EntitySpawnReason mobSpawnType);
     }
 
     @FunctionalInterface

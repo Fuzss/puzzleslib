@@ -6,6 +6,10 @@ import net.minecraft.resources.ResourceKey;
 
 import java.util.Objects;
 
+/**
+ * An implementation similar to {@link Holder.Direct} on top of {@link Holder.Reference}, useful for accessing
+ * {@link Reference#key()}.
+ */
 public final class DirectReferenceHolder<T> extends Holder.Reference<T> {
 
     public DirectReferenceHolder(ResourceKey<T> key, T value) {

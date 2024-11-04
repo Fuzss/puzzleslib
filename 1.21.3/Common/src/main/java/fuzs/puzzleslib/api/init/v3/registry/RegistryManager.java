@@ -1,14 +1,16 @@
 package fuzs.puzzleslib.api.init.v3.registry;
 
-import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.item.v2.ItemEquipmentFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentType;
@@ -23,6 +25,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -34,31 +37,33 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.Potion;
-import net.minecraft.world.item.armortrim.TrimMaterial;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.trim.TrimMaterial;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Handles registering to game registries. Registration is performed instantly on Fabric and is deferred on Forge.
@@ -131,82 +136,110 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path                    path for new entry
+     * @param blockPropertiesSupplier supplier for block properties
      * @return holder reference
      */
-    default Holder.Reference<Block> registerBlock(String path, Supplier<Block> entry) {
-        return this.register(Registries.BLOCK, path, entry);
+    default Holder.Reference<Block> registerBlock(String path, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
+        return this.registerBlock(path, Block::new, blockPropertiesSupplier);
+    }
+
+    /**
+     * Register a block.
+     *
+     * @param path                    path for new entry
+     * @param factory                 factory for new block
+     * @param blockPropertiesSupplier supplier for block properties
+     * @return holder reference
+     */
+    default Holder.Reference<Block> registerBlock(String path, Function<BlockBehaviour.Properties, Block> factory, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
+        return this.register(Registries.BLOCK, path,
+                () -> factory.apply(blockPropertiesSupplier.get().setId(this.makeResourceKey(Registries.BLOCK, path)))
+        );
     }
 
     /**
      * Register an item.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path path for new entry
      * @return holder reference
      */
-    default Holder.Reference<Item> registerItem(String path, Supplier<Item> entry) {
-        return this.register(Registries.ITEM, path, entry);
+    default Holder.Reference<Item> registerItem(String path) {
+        return this.registerItem(path, Item.Properties::new);
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path                   path for new entry
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerItem(String path, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerItem(path, Item::new, itemPropertiesSupplier);
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path                   path for new entry
+     * @param factory                factory for new item
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.register(Registries.ITEM, path,
+                () -> factory.apply(itemPropertiesSupplier.get().setId(this.makeResourceKey(Registries.ITEM, path)))
+        );
     }
 
     /**
      * Registers a block item for a block.
      *
-     * @param blockReference reference for block to register item variant for
+     * @param block reference for block to register item variant for
      * @return holder reference
      */
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference) {
-        return this.registerBlockItem(blockReference, new Item.Properties());
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block) {
+        return this.registerBlockItem(block, Item.Properties::new);
     }
 
     /**
      * Registers a block item for a block.
      *
-     * @param blockReference reference for block to register item variant for
-     * @param itemProperties properties for item
+     * @param block                  reference for block to register item variant for
+     * @param itemPropertiesSupplier supplier for new item properties
      * @return holder reference
      */
-    @Deprecated(forRemoval = true)
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Item.Properties itemProperties) {
-        return this.registerBlockItem(blockReference, () -> itemProperties);
-    }
-
-    /**
-     * Registers a block item for a block.
-     *
-     * @param blockReference reference for block to register item variant for
-     * @param itemProperties properties for item
-     * @return holder reference
-     */
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Supplier<Item.Properties> itemProperties) {
-        return this.registerItem(blockReference.unwrapKey().orElseThrow().location().getPath(), () -> {
-            return new BlockItem(blockReference.value(), itemProperties.get());
-        });
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
+                (Item.Properties itemProperties) -> {
+                    return new BlockItem(block.value(), itemProperties);
+                }, itemPropertiesSupplier
+        );
     }
 
     /**
      * Registers a spawn egg item for an entity type.
      *
-     * @param entityTypeReference reference for the entity type to register a spawn egg for
-     * @param backgroundColor     background color of the spawn egg item
-     * @param highlightColor      spots color pf the spawn egg item
+     * @param entityType      reference for the entity type to register a spawn egg for
+     * @param backgroundColor background color of the spawn egg item
+     * @param highlightColor  spots color pf the spawn egg item
      * @return holder reference
      */
-    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor) {
-        return this.registerSpawnEggItem(entityTypeReference, backgroundColor, highlightColor, new Item.Properties());
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor) {
+        return this.registerSpawnEggItem(entityType, backgroundColor, highlightColor, Item.Properties::new);
     }
 
     /**
      * Registers a spawn egg item for an entity type.
      *
-     * @param entityTypeReference reference for the entity type to register a spawn egg for
-     * @param backgroundColor     background color of the spawn egg item
-     * @param highlightColor      spots color pf the spawn egg item
-     * @param itemProperties      properties for the item
+     * @param entityType             reference for the entity type to register a spawn egg for
+     * @param backgroundColor        background color of the spawn egg item
+     * @param highlightColor         spots color pf the spawn egg item
+     * @param itemPropertiesSupplier supplier for new item properties
      * @return holder reference
      */
-    Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
+    Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier);
 
     /**
      * Register a data component type.
@@ -288,7 +321,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
         return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE, path,
                 () -> {
-                    return entry.get().build(path);
+                    return entry.get().build(this.makeResourceKey(Registries.ENTITY_TYPE, path));
                 }
         );
     }
@@ -296,19 +329,28 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block entity type.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @param <T>   block entity type parameter
+     * @param path        path for new entry
+     * @param factory     factory for every newly created block entity instance
+     * @param validBlocks blocks allowed to use this block entity
+     * @param <T>         block entity type parameter
      * @return holder reference
      */
-    @SuppressWarnings("unchecked")
-    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
-        return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
-                path, () -> {
-                    return entry.get().build(null);
-                }
-        );
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block>... validBlocks) {
+        return this.registerBlockEntityType(path, factory, () -> Stream.of(validBlocks)
+                .map(Holder::value)
+                .collect(Collectors.toSet()));
     }
+
+    /**
+     * Register a block entity type.
+     *
+     * @param path        path for new entry
+     * @param factory     factory for every newly created block entity instance
+     * @param validBlocks blocks allowed to use this block entity
+     * @param <T>         block entity type parameter
+     * @return holder reference
+     */
+    <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks);
 
     /**
      * Register a menu type.
@@ -338,37 +380,27 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a poi type.
      *
-     * @param path  path for new entry
-     * @param block block valid for this poi type
-     * @return holder reference
-     */
-    default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> block) {
-        return this.registerPoiType(path, block::value);
-    }
-
-    /**
-     * Register a poi type.
-     *
-     * @param path  path for new entry
-     * @param block block valid for this poi type
-     * @return holder reference
-     */
-    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Block> block) {
-        return this.registerPoiType(path, () -> {
-            return ImmutableSet.copyOf(block.get().getStateDefinition().getPossibleStates());
-        }, 0, 1);
-    }
-
-    /**
-     * Register a poi type.
-     *
      * @param path           path for new entry
-     * @param matchingStates blocks states valid for this poi type
-     * @param maxTickets     max amount of accessor tickets
-     * @param validRange     distance to search for this poi type
+     * @param matchingBlocks block valid for this poi type
      * @return holder reference
      */
-    Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange);
+    default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block>... matchingBlocks) {
+        return this.registerPoiType(path, 0, 1, () -> {
+            return Stream.of(matchingBlocks).map(Holder::value).flatMap(
+                    block -> block.getStateDefinition().getPossibleStates().stream()).collect(Collectors.toSet());
+        });
+    }
+
+    /**
+     * Register a poi type.
+     *
+     * @param path                path for new entry
+     * @param maxTickets          max amount of accessor tickets
+     * @param validRange          distance to search for this poi type
+     * @param matchingBlockStates blocks states valid for this poi type
+     * @return holder reference
+     */
+    Holder.Reference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Supplier<Set<BlockState>> matchingBlockStates);
 
     /**
      * Register an argument type.
@@ -511,52 +543,57 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an armor material with default values.
      *
-     * @param path       path for new entry
-     * @param repairItem the repair material used in an anvil for restoring item durability
+     * @param path             path for new entry
+     * @param repairIngredient the repair material used in an anvil for restoring item durability
      * @return holder reference
      */
-    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Holder<Item> repairItem) {
-        return this.registerArmorMaterial(path, ItemEquipmentFactories.toArmorTypeMapWithFallback(1), 0, repairItem);
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, TagKey<Item> repairIngredient) {
+        return this.registerArmorMaterial(path, 0, ItemEquipmentFactories.toArmorTypeMapWithFallback(1), 0,
+                repairIngredient
+        );
     }
 
     /**
      * Register an armor material with default values.
      *
-     * @param path             path for new entry
-     * @param defense          protection value for each slot type, use
-     *                         {@link ItemEquipmentFactories#toArmorTypeMap(int...)} for converting a legacy protection
-     *                         amount values array
-     * @param enchantmentValue enchantment value (leather: 15, gold: 25, chain: 12, iron: 9, diamond: 10, turtle: 9,
-     *                         netherite: 15)
-     * @param repairItem       the repair material used in an anvil for restoring item durability
+     * @param path                 path for new entry
+     * @param durabilityMultiplier multiplier for internal base durability per slot type
+     * @param protectionAmounts    protection value for each slot type, use
+     *                             {@link ItemEquipmentFactories#toArmorTypeMap(int...)} for converting a legacy
+     *                             protection amount values array
+     * @param enchantmentValue     enchantment value (leather: 15, gold: 25, chain: 12, iron: 9, diamond: 10, turtle: 9,
+     *                             netherite: 15)
+     * @param repairIngredient     the repair material used in an anvil for restoring item durability
      * @return holder reference
      */
-    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<Item> repairItem) {
-        return this.registerArmorMaterial(path, defense, enchantmentValue, SoundEvents.ARMOR_EQUIP_GENERIC,
-                () -> Ingredient.of(repairItem.value()), 0.0F, 0.0F
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, int durabilityMultiplier, Map<ArmorType, Integer> protectionAmounts, int enchantmentValue, TagKey<Item> repairIngredient) {
+        return this.registerArmorMaterial(path, durabilityMultiplier, protectionAmounts, enchantmentValue,
+                SoundEvents.ARMOR_EQUIP_GENERIC, repairIngredient, 0.0F, 0.0F
         );
     }
 
     /**
      * Register an armor material.
      *
-     * @param path                path for new entry
-     * @param defense             protection value for each slot type, use
-     *                            {@link ItemEquipmentFactories#toArmorTypeMap(int...)} for converting a legacy
-     *                            protection amount values array
-     * @param enchantmentValue    enchantment value (leather: 15, gold: 25, chain: 12, iron: 9, diamond: 10, turtle: 9,
-     *                            netherite: 15)
-     * @param equipSound          the sound played when putting a piece of armor into the dedicated equipment slot
-     * @param repairIngredient    the repair material used in an anvil for restoring item durability
-     * @param toughness           armor toughness value for all slot types of this armor set
-     * @param knockbackResistance knockback resistance value for all slot types of this armor set
+     * @param path                 path for new entry
+     * @param durabilityMultiplier multiplier for internal base durability per slot type
+     * @param protectionAmounts    protection value for each slot type, use
+     *                             {@link ItemEquipmentFactories#toArmorTypeMap(int...)} for converting a legacy
+     *                             protection amount values array
+     * @param enchantmentValue     enchantment value (leather: 15, gold: 25, chain: 12, iron: 9, diamond: 10, turtle: 9,
+     *                             netherite: 15)
+     * @param equipSound           the sound played when putting a piece of armor into the dedicated equipment slot
+     * @param repairIngredient     the repair material used in an anvil for restoring item durability
+     * @param toughness            armor toughness value for all slot types of this armor set
+     * @param knockbackResistance  knockback resistance value for all slot types of this armor set
      * @return holder reference
      */
-    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance) {
-        return this.register(Registries.ARMOR_MATERIAL, path,
-                () -> new ArmorMaterial(defense, enchantmentValue, equipSound, repairIngredient,
-                        Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))), toughness,
-                        knockbackResistance
+    default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, int durabilityMultiplier, Map<ArmorType, Integer> protectionAmounts, int enchantmentValue, Holder<SoundEvent> equipSound, TagKey<Item> repairIngredient, float toughness, float knockbackResistance) {
+        ResourceKey<Registry<ArmorMaterial>> registryKey = ResourceKey.createRegistryKey(
+                ResourceLocationHelper.withDefaultNamespace("armor_material"));
+        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path),
+                new ArmorMaterial(durabilityMultiplier, protectionAmounts, enchantmentValue, equipSound, toughness,
+                        knockbackResistance, repairIngredient, this.makeKey(path)
                 )
         );
     }
@@ -572,7 +609,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     }
 
     /**
-     * Creates a new {@link ResourceKey} for a {@link TrimMaterial}.
+     * Creates a new {@link ResourceKey} for a {@link net.minecraft.world.item.equipment.trim.TrimMaterial}.
      *
      * @param path path for new resource key
      * @return new resource key

@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.client.event.v1.renderer;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.data.MutableDouble;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 
@@ -18,5 +18,5 @@ public interface ComputeFieldOfViewCallback {
      * @param partialTick partial ticks
      * @param fieldOfView the field of view value
      */
-    void onComputeFieldOfView(GameRenderer renderer, Camera camera, float partialTick, MutableDouble fieldOfView);
+    void onComputeFieldOfView(GameRenderer renderer, Camera camera, float partialTick, MutableFloat fieldOfView);
 }

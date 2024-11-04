@@ -18,16 +18,15 @@ import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ProblemReporter;
+import net.minecraft.util.context.ContextKeySet;
 import net.minecraft.world.RandomSequence;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.RandomSupport;
-import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import org.apache.commons.lang3.StringUtils;
 
@@ -90,14 +89,17 @@ public final class AbstractLootProvider {
             this.generate();
             Set<ResourceKey<LootTable>> lootTables = new HashSet<>();
             this.getRegistryEntries().forEach((Holder.Reference<Block> holder) -> {
-                ResourceKey<LootTable> resourceKey = holder.value().getLootTable();
-                if (resourceKey != BuiltInLootTables.EMPTY && lootTables.add(resourceKey)) {
-                    LootTable.Builder builder = this.map.remove(resourceKey);
-                    if (builder != null) {
-                        consumer.accept(resourceKey, builder);
-                    } else if (!this.skipValidationFor(resourceKey)) {
-                        throw new IllegalStateException(
-                                "Missing loot table '%s' for '%s'".formatted(resourceKey, holder.key().location()));
+                Optional<ResourceKey<LootTable>> optional = holder.value().getLootTable();
+                if (optional.isPresent()) {
+                    ResourceKey<LootTable> resourceKey = optional.get();
+                    if (lootTables.add(resourceKey)) {
+                        LootTable.Builder builder = this.map.remove(resourceKey);
+                        if (builder != null) {
+                            consumer.accept(resourceKey, builder);
+                        } else if (!this.skipValidationFor(resourceKey)) {
+                            throw new IllegalStateException(
+                                    "Missing loot table '%s' for '%s'".formatted(optional, holder.key().location()));
+                        }
                     }
                 }
             });
@@ -118,7 +120,7 @@ public final class AbstractLootProvider {
         }
 
         @Override
-        public LootContextParamSet paramSet() {
+        public ContextKeySet paramSet() {
             return LootContextParamSets.BLOCK;
         }
 
@@ -136,7 +138,7 @@ public final class AbstractLootProvider {
         }
 
         public void skipValidation(Block block) {
-            this.skipValidation(block.getLootTable());
+            block.getLootTable().ifPresent(this::skipValidation);
         }
 
         public void dropNothing(Block block) {
@@ -148,7 +150,7 @@ public final class AbstractLootProvider {
         }
 
         protected Stream<Holder.Reference<Block>> getRegistryEntries() {
-            return BuiltInRegistries.BLOCK.holders().filter(
+            return BuiltInRegistries.BLOCK.listElements().filter(
                     holder -> holder.key().location().getNamespace().equals(this.modId));
         }
     }
@@ -201,13 +203,15 @@ public final class AbstractLootProvider {
                 EntityType<?> entityType = holder.value();
                 Map<ResourceKey<LootTable>, LootTable.Builder> map = this.map.remove(entityType);
                 if (this.canHaveLootTable(entityType)) {
-                    ResourceKey<LootTable> resourceKey = entityType.getDefaultLootTable();
-                    if (!resourceKey.equals(BuiltInLootTables.EMPTY) && !this.skipValidationFor(resourceKey) &&
-                            (map == null || !map.containsKey(resourceKey))) {
-                        throw new IllegalStateException(
-                                String.format(Locale.ROOT, "Missing loot table '%s' for '%s'", resourceKey,
-                                        holder.key().location()
-                                ));
+                    Optional<ResourceKey<LootTable>> optional = entityType.getDefaultLootTable();
+                    if (optional.isPresent()) {
+                        ResourceKey<LootTable> resourceKey = optional.get();
+                        if (!this.skipValidationFor(resourceKey) && (map == null || !map.containsKey(resourceKey))) {
+                            throw new IllegalStateException(
+                                    String.format(Locale.ROOT, "Missing loot table '%s' for '%s'", resourceKey,
+                                            holder.key().location()
+                                    ));
+                        }
                     }
                     if (map != null) {
                         map.forEach((resourceLocation, builder) -> {
@@ -250,7 +254,7 @@ public final class AbstractLootProvider {
         }
 
         @Override
-        public LootContextParamSet paramSet() {
+        public ContextKeySet paramSet() {
             return LootContextParamSets.ENTITY;
         }
 
@@ -268,7 +272,7 @@ public final class AbstractLootProvider {
         }
 
         public void skipValidation(EntityType<?> entityType) {
-            this.skipValidation(entityType.getDefaultLootTable());
+            entityType.getDefaultLootTable().ifPresent(this::skipValidation);
         }
 
         protected boolean canHaveLootTable(EntityType<?> entityType) {
@@ -276,7 +280,7 @@ public final class AbstractLootProvider {
         }
 
         protected Stream<Holder.Reference<EntityType<?>>> getRegistryEntries() {
-            return BuiltInRegistries.ENTITY_TYPE.holders().filter(
+            return BuiltInRegistries.ENTITY_TYPE.listElements().filter(
                     holder -> holder.key().location().getNamespace().equals(this.modId));
         }
     }
@@ -284,16 +288,16 @@ public final class AbstractLootProvider {
     public static abstract class Simple implements LootTableDataProvider {
         private final Map<ResourceKey<LootTable>, LootTable.Builder> tables = new HashMap<>();
         private final Set<ResourceKey<LootTable>> skipValidation = new HashSet<>();
-        private final LootContextParamSet paramSet;
+        private final ContextKeySet paramSet;
         private final PackOutput.PathProvider pathProvider;
         private final CompletableFuture<HolderLookup.Provider> registries;
         private HolderLookup.Provider registryAccess;
 
-        public Simple(LootContextParamSet paramSet, DataProviderContext context) {
+        public Simple(ContextKeySet paramSet, DataProviderContext context) {
             this(paramSet, context.getPackOutput(), context.getRegistries());
         }
 
-        public Simple(LootContextParamSet paramSet, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        public Simple(ContextKeySet paramSet, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
             this.paramSet = paramSet;
             this.pathProvider = packOutput.createRegistryElementsPathProvider(Registries.LOOT_TABLE);
             this.registries = registries;
@@ -334,7 +338,7 @@ public final class AbstractLootProvider {
         }
 
         @Override
-        public LootContextParamSet paramSet() {
+        public ContextKeySet paramSet() {
             return this.paramSet;
         }
 
@@ -364,7 +368,7 @@ public final class AbstractLootProvider {
 
         PackOutput.PathProvider pathProvider();
 
-        LootContextParamSet paramSet();
+        ContextKeySet paramSet();
 
         boolean skipValidationFor(ResourceKey<LootTable> resourceKey);
 
@@ -407,13 +411,12 @@ public final class AbstractLootProvider {
 
         default void validate(Registry<LootTable> registry) {
             ProblemReporter.Collector collector = new ProblemReporter.Collector();
-            HolderGetter.Provider registries = new RegistryAccess.ImmutableRegistryAccess(List.of(registry)).freeze()
-                    .asGetterLookup();
+            HolderGetter.Provider registries = new RegistryAccess.ImmutableRegistryAccess(List.of(registry)).freeze();
             ValidationContext validationContext = new ValidationContext(collector, LootContextParamSets.ALL_PARAMS,
                     registries
             );
 
-            registry.holders().forEach((Holder.Reference<LootTable> holder) -> {
+            registry.listElements().forEach((Holder.Reference<LootTable> holder) -> {
                 this.validate(holder, validationContext);
             });
 
@@ -428,7 +431,7 @@ public final class AbstractLootProvider {
 
         default void validate(Holder.Reference<LootTable> holder, ValidationContext validationContext) {
             if (!this.skipValidationFor(holder.key())) {
-                holder.value().validate(validationContext.setParams(holder.value().getParamSet())
+                holder.value().validate(validationContext.setContextKeySet(holder.value().getParamSet())
                         .enterElement("{" + holder.key().location() + "}", holder.key()));
             }
         }

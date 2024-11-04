@@ -13,7 +13,8 @@ import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 
 import java.util.List;
 
-public record GenerationSettingsContextFabric(BiomeGenerationSettings generationSettings, BiomeModificationContext.GenerationSettingsContext context) implements GenerationSettingsContext {
+public record GenerationSettingsContextFabric(BiomeGenerationSettings generationSettings,
+                                              BiomeModificationContext.GenerationSettingsContext context) implements GenerationSettingsContext {
 
     @Override
     public boolean removeFeature(GenerationStep.Decoration step, ResourceKey<PlacedFeature> featureKey) {
@@ -26,13 +27,13 @@ public record GenerationSettingsContextFabric(BiomeGenerationSettings generation
     }
 
     @Override
-    public void addCarver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
-        this.context.addCarver(step, carverKey);
+    public void addCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
+        this.context.addCarver(carverKey);
     }
 
     @Override
-    public boolean removeCarver(GenerationStep.Carving step, ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
-        return this.context.removeCarver(step, carverKey);
+    public boolean removeCarver(ResourceKey<ConfiguredWorldCarver<?>> carverKey) {
+        return this.context.removeCarver(carverKey);
     }
 
     @Override
@@ -43,7 +44,7 @@ public record GenerationSettingsContextFabric(BiomeGenerationSettings generation
     }
 
     @Override
-    public Iterable<Holder<ConfiguredWorldCarver<?>>> getCarvers(GenerationStep.Carving stage) {
-        return Iterables.unmodifiableIterable(this.generationSettings.getCarvers(stage));
+    public Iterable<Holder<ConfiguredWorldCarver<?>>> getCarvers() {
+        return Iterables.unmodifiableIterable(this.generationSettings.getCarvers());
     }
 }

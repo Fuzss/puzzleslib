@@ -8,7 +8,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
-import net.minecraft.util.profiling.ProfilerFiller;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -16,13 +15,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 /**
- * A helper class for registering a {@link PreparableReloadListener} on Fabric without the need for it to implement {@link IdentifiableResourceReloadListener}.
+ * A helper class for registering a {@link PreparableReloadListener} on Fabric without the need for it to implement
+ * {@link IdentifiableResourceReloadListener}.
  *
  * @param identifier     identifier for this reload listener
  * @param reloadListener the reload listener
  */
 public record FabricReloadListener(ResourceLocation identifier,
-                                   PreparableReloadListener reloadListener, Collection<ResourceLocation> dependencies) implements NamedReloadListener, IdentifiableResourceReloadListener {
+                                   PreparableReloadListener reloadListener,
+                                   Collection<ResourceLocation> dependencies) implements NamedReloadListener, IdentifiableResourceReloadListener {
 
     public FabricReloadListener(ResourceLocation identifier, PreparableReloadListener reloadListener) {
         this(identifier, reloadListener, Collections.emptySet());
@@ -57,8 +58,8 @@ public record FabricReloadListener(ResourceLocation identifier,
     }
 
     @Override
-    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, ProfilerFiller preparationsProfiler, ProfilerFiller reloadProfiler, Executor backgroundExecutor, Executor gameExecutor) {
-        return this.reloadListener.reload(preparationBarrier, resourceManager, preparationsProfiler, reloadProfiler, backgroundExecutor, gameExecutor);
+    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
+        return this.reloadListener.reload(preparationBarrier, resourceManager, backgroundExecutor, gameExecutor);
     }
 
     @Override

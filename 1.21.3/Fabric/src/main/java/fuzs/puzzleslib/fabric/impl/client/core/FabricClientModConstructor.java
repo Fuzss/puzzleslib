@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.BuiltinModelItemRendererContext;
-import fuzs.puzzleslib.api.client.core.v1.context.CoreShadersContext;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
@@ -11,7 +10,6 @@ import fuzs.puzzleslib.fabric.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.client.Minecraft;
@@ -50,7 +48,7 @@ public final class FabricClientModConstructor {
         constructor.onRegisterKeyMappings(new KeyMappingsContextFabricImpl());
         constructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
         registerRenderProperties(constructor);
-        registerCoreShaders(constructor::onRegisterCoreShaders);
+        constructor.onRegisterCoreShaders(new CoreShadersContextFabricImpl());
     }
 
     private static void registerBuiltinModelItemRenderers(String modId, Consumer<BuiltinModelItemRendererContext> consumer, Set<ContentRegistrationFlags> availableFlags) {
@@ -74,12 +72,6 @@ public final class FabricClientModConstructor {
             constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
             constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextFabricImpl());
             constructor.onRegisterItemColorProviders(new ItemColorProvidersContextFabricImpl());
-        });
-    }
-
-    private static void registerCoreShaders(Consumer<CoreShadersContext> modifyBakingResultConsumer) {
-        CoreShaderRegistrationCallback.EVENT.register((CoreShaderRegistrationCallback.RegistrationContext context) -> {
-            modifyBakingResultConsumer.accept(new CoreShadersContextFabricImpl(context));
         });
     }
 }

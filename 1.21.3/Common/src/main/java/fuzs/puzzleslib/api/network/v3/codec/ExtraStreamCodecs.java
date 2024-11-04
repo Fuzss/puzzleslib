@@ -48,8 +48,9 @@ public final class ExtraStreamCodecs {
     /**
      * {@link ChunkPos} stream codec
      */
-    public static final StreamCodec<FriendlyByteBuf, ChunkPos> CHUNK_POS = StreamCodec.of(
-            FriendlyByteBuf::writeChunkPos, FriendlyByteBuf::readChunkPos);
+    public static final StreamCodec<ByteBuf, ChunkPos> CHUNK_POS = StreamCodec.of(FriendlyByteBuf::writeChunkPos,
+            FriendlyByteBuf::readChunkPos
+    );
     /**
      * {@link BlockHitResult} stream codec
      */

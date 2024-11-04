@@ -21,7 +21,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.components.toasts.SystemToast;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.client.gui.components.toasts.ToastComponent;
+import net.minecraft.client.gui.components.toasts.ToastManager;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.TitleScreen;
@@ -73,12 +73,12 @@ public class PuzzlesLibClient implements ClientModConstructor {
                         loadingOverlay.fadeOutStart = 0L;
                     }
                 });
-        AddToastCallback.EVENT.register((ToastComponent toastManager, Toast toast) -> {
+        AddToastCallback.EVENT.register((ToastManager toastManager, Toast toast) -> {
             if (toast instanceof SystemToast systemToast &&
                     systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
                 // block the annoying unsecure server warning when joining a multiplayer server in offline mode
                 return EventResult.INTERRUPT;
-            } else if (toastManager.freeSlots() == 0) {
+            } else if (toastManager.freeSlotCount() == 0) {
                 // prevent toast spam when unlocking all advancements at once
                 return EventResult.INTERRUPT;
             } else {
@@ -147,7 +147,6 @@ public class PuzzlesLibClient implements ClientModConstructor {
         options.advancedItemTooltips = true;
         options.tutorialStep = TutorialSteps.NONE;
         options.joinedFirstServer = true;
-        options.hideBundleTutorial = true;
         options.operatorItemsTab().set(true);
         options.entityShadows().set(false);
         options.realmsNotifications().set(false);
@@ -163,7 +162,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
         EventHandlerProvider.tryRegister(ClientAbstractions.INSTANCE);
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() &&
                 !ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
-            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getOrThrow(
+            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(
                     CreativeModeTabs.SEARCH);
         }
     }

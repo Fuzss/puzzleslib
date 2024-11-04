@@ -13,7 +13,6 @@ abstract class BlockEntityFabricMixin {
 
     @ModifyReturnValue(method = "isValidBlockState", at = @At("TAIL"), require = 0)
     public boolean isValidBlockState(boolean isValidBlockState, BlockState blockState) {
-        // TODO remove require when 1.21 compat is no longer necessary
         // allow 1.21.1 mods to work without any code changes
         return isValidBlockState || this.getType().isValid(blockState);
     }

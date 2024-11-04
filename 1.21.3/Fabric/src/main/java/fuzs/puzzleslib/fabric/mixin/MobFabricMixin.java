@@ -28,25 +28,25 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     private LivingEntity target;
     @Unique
     @Nullable
-    private MobSpawnType puzzleslib$spawnType;
+    private EntitySpawnReason puzzleslib$spawnType;
 
     protected MobFabricMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
     }
 
     @Inject(method = "finalizeSpawn", at = @At("TAIL"))
-    public void finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType reason, @Nullable SpawnGroupData spawnData, CallbackInfoReturnable<SpawnGroupData> callback) {
+    public void finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData, CallbackInfoReturnable<SpawnGroupData> callback) {
         this.puzzleslib$spawnType = reason;
     }
 
     @Override
     @Nullable
-    public final MobSpawnType puzzleslib$getSpawnType() {
+    public final EntitySpawnReason puzzleslib$getSpawnType() {
         return this.puzzleslib$spawnType;
     }
 
     @Override
-    public void puzzleslib$setSpawnType(@Nullable MobSpawnType mobSpawnType) {
+    public void puzzleslib$setSpawnType(@Nullable EntitySpawnReason mobSpawnType) {
         this.puzzleslib$spawnType = mobSpawnType;
     }
 
@@ -57,9 +57,18 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         return result.isInterrupt() ? this.target : target.getAsOptional().orElse(entity);
     }
 
-    @Inject(method = "checkDespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"), cancellable = true)
+    @Inject(
+            method = "checkDespawn",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"
+            ),
+            cancellable = true
+    )
     public void checkDespawn(CallbackInfo callback) {
-        EventResult result = FabricLivingEvents.CHECK_MOB_DESPAWN.invoker().onCheckMobDespawn(Mob.class.cast(this), (ServerLevel) this.level());
+        EventResult result = FabricLivingEvents.CHECK_MOB_DESPAWN.invoker().onCheckMobDespawn(Mob.class.cast(this),
+                (ServerLevel) this.level()
+        );
         if (result.isInterrupt()) {
             if (result.getAsBoolean()) {
                 this.discard();
@@ -83,7 +92,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         String key = PuzzlesLibMod.id("spawn_type").toString();
         if (compound.contains(key)) {
             try {
-                this.puzzleslib$spawnType = MobSpawnType.valueOf(compound.getString(key));
+                this.puzzleslib$spawnType = EntitySpawnReason.valueOf(compound.getString(key));
             } catch (Exception exception) {
                 compound.remove(key);
             }
