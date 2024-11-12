@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -9,10 +10,12 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * An extension to {@link EventResult} allowing to attach any kind of value to the result, <code>null</code> values are not permitted.
+ * An extension to {@link EventResult} allowing to attach any kind of value to the result, <code>null</code> values are
+ * not permitted.
  * <p>The implementation can be used similarly to Java's {@link Optional} class, allowing for functional patterns.
- * <p>Very similar to vanilla's {@link net.minecraft.world.InteractionResultHolder}.
- * <p>Implementation is also remotely similar to <a href="https://github.com/architectury/architectury-api/blob/1.19.3/common/src/main/java/dev/architectury/event/CompoundEventResult.java">CompoundEventResult.java</a> from Architectury API.
+ * <p>Implementation is remotely similar to <a
+ * href="https://github.com/architectury/architectury-api/blob/1.19.3/common/src/main/java/dev/architectury/event/CompoundEventResult.java">CompoundEventResult.java</a>
+ * from Architectury API.
  *
  * @param <T> holder value type
  */
@@ -21,22 +24,21 @@ public final class EventResultHolder<T> {
 
     @NotNull
     private final EventResult result;
-    @NotNull
+    @Nullable
     private final T value;
 
     /**
-     * private constructor
+     * internal constructor
      */
-    @SuppressWarnings("DataFlowIssue")
     private EventResultHolder() {
         this.result = EventResult.PASS;
         this.value = null;
     }
 
     /**
-     * private constructor
+     * internal constructor
      */
-    private EventResultHolder(@NotNull EventResult result, @NotNull T value) {
+    private EventResultHolder(@NotNull EventResult result, @Nullable T value) {
         Objects.requireNonNull(result, "result is null");
         Objects.requireNonNull(value, "value is null");
         this.result = result;
@@ -54,28 +56,28 @@ public final class EventResultHolder<T> {
 
     /**
      * @param value held value instance, <code>null</code> are not permitted
-     * @param <T> holder value type
+     * @param <T>   holder value type
      * @return interrupt instance
      */
-    public static <T> EventResultHolder<T> interrupt(@NotNull T value) {
+    public static <T> EventResultHolder<T> interrupt(@Nullable T value) {
         return new EventResultHolder<>(EventResult.INTERRUPT, value);
     }
 
     /**
      * @param value held value instance, <code>null</code> are not permitted
-     * @param <T> holder value type
+     * @param <T>   holder value type
      * @return allow instance
      */
-    public static <T> EventResultHolder<T> allow(@NotNull T value) {
+    public static <T> EventResultHolder<T> allow(@Nullable T value) {
         return new EventResultHolder<>(EventResult.ALLOW, value);
     }
 
     /**
      * @param value held value instance, <code>null</code> are not permitted
-     * @param <T> holder value type
+     * @param <T>   holder value type
      * @return deny instance
      */
-    public static <T> EventResultHolder<T> deny(@NotNull T value) {
+    public static <T> EventResultHolder<T> deny(@Nullable T value) {
         return new EventResultHolder<>(EventResult.DENY, value);
     }
 
@@ -99,7 +101,7 @@ public final class EventResultHolder<T> {
      */
     public EventResultHolder<T> ifInterrupt(final Consumer<? super T> action) {
         Objects.requireNonNull(action, "action is null");
-        if (this.isInterrupt() && this.result.getAsBoolean()) {
+        if (this.isInterrupt()) {
             action.accept(this.value);
         }
         return this;
@@ -144,7 +146,7 @@ public final class EventResultHolder<T> {
 
     /**
      * @param mapper mapping transformer for {@link #value}
-     * @param <U> data type for new value
+     * @param <U>    data type for new value
      * @return new holder containing the mapped value, {@link #result} is unchanged
      */
     public <U> EventResultHolder<U> map(final Function<? super T, ? extends U> mapper) {
@@ -158,7 +160,7 @@ public final class EventResultHolder<T> {
 
     /**
      * @param mapper mapping transformer for {@link #value}
-     * @param <U> data type for new value
+     * @param <U>    data type for new value
      * @return new holder containing the mapped value, {@link #result} is unchanged
      */
     @SuppressWarnings("unchecked")
@@ -177,10 +179,10 @@ public final class EventResultHolder<T> {
      * @return optional value if {@link #result} is {@link EventResult#INTERRUPT}
      */
     public Optional<T> getInterrupt() {
-        if (!this.isInterrupt() || !this.result.getAsBoolean()) {
+        if (!this.isInterrupt()) {
             return Optional.empty();
         } else {
-            return Optional.of(this.value);
+            return Optional.ofNullable(this.value);
         }
     }
 
@@ -191,7 +193,7 @@ public final class EventResultHolder<T> {
         if (!this.isInterrupt() || !this.result.getAsBoolean()) {
             return Optional.empty();
         } else {
-            return Optional.of(this.value);
+            return Optional.ofNullable(this.value);
         }
     }
 
@@ -202,7 +204,7 @@ public final class EventResultHolder<T> {
         if (!this.isInterrupt() || this.result.getAsBoolean()) {
             return Optional.empty();
         } else {
-            return Optional.of(this.value);
+            return Optional.ofNullable(this.value);
         }
     }
 }

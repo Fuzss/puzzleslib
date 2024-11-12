@@ -43,8 +43,12 @@ import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
+import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.core.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
@@ -57,7 +61,6 @@ import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
@@ -65,18 +68,18 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -89,7 +92,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
 
@@ -99,10 +105,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
         INSTANCE.register(AddDataPackReloadListenersCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, (AddDataPackReloadListenersCallback callback) -> {
             return () -> {
-                callback.onAddDataPackReloadListeners((ResourceLocation resourceLocation, BiFunction<HolderLookup.Provider, RegistryAccess, PreparableReloadListener> factory) -> {
+                callback.onAddDataPackReloadListeners((ResourceLocation resourceLocation, Function<HolderLookup.Provider, PreparableReloadListener> factory) -> {
                     ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(resourceLocation, (HolderLookup.Provider registries) -> {
-                        RegistryAccess registryAccess = ((ReloadableServerResources.ConfigurableRegistryLookup) registries).registryAccess;
-                        return new FabricReloadListener(resourceLocation, factory.apply(registries, registryAccess));
+                        return new FabricReloadListener(resourceLocation, factory.apply(registries));
                     });
                 });
             };
@@ -212,13 +217,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Player player, Level level, InteractionHand hand) -> {
                 // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
                 if (player.isSpectator()) {
-                    return InteractionResultHolder.pass(ItemStack.EMPTY);
-                } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand).getItem())) {
-                    return InteractionResultHolder.pass(ItemStack.EMPTY);
+                    return InteractionResult.PASS;
+                } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand))) {
+                    return InteractionResult.PASS;
                 }
 
                 EventResultHolder<InteractionResult> result = callback.onUseItem(player, level, hand);
-                return new InteractionResultHolder<>(result.getInterrupt().map(interactionResult -> {
+                return result.getInterrupt().map(interactionResult -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -235,7 +240,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                                         player.getZ(),
                                         player.getYRot(),
                                         player.getXRot(),
-                                        player.onGround()
+                                        player.onGround(), player.horizontalCollision
                                 ));
                         // send interaction packet to the server with a new sequentially assigned id
                         ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level,
@@ -244,7 +249,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     }
 
                     return interactionResult;
-                }).orElse(InteractionResult.PASS), ItemStack.EMPTY);
+                }).orElse(InteractionResult.PASS);
             };
         });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, (PlayerInteractEvents.UseEntity callback) -> {
@@ -457,7 +462,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
         INSTANCE.register(LivingConversionCallback.class, ServerLivingEntityEvents.MOB_CONVERSION, (LivingConversionCallback callback) -> {
-            return (Mob previous, Mob converted, boolean keepEquipment) -> {
+            return (Mob previous, Mob converted, ConversionParams conversionContext) -> {
                 callback.onLivingConversion(previous, converted);
             };
         });
@@ -467,6 +472,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, FabricBrewingRecipeRegistryBuilder.BUILD, (RegisterPotionBrewingMixesCallback callback) -> {
             return (PotionBrewing.Builder builder) -> {
                 callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
+            };
+        });
+        INSTANCE.register(RegisterFuelValuesCallback.class, FuelRegistryEvents.BUILD, callback -> {
+            return (FuelValues.Builder builder, FuelRegistryEvents.Context context) -> {
+                callback.onRegisterFuelValues(builder, context.baseSmeltTime());
             };
         });
         INSTANCE.register(ChangeEntitySizeCallback.class, FabricEntityEvents.CHANGE_ENTITY_SIZE);

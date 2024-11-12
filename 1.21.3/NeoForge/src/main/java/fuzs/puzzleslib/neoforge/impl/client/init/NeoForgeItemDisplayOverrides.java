@@ -5,7 +5,7 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.MissingBlockModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -42,7 +42,7 @@ public final class NeoForgeItemDisplayOverrides extends ItemDisplayOverridesImpl
     protected void registerEventHandlers() {
         NeoForgeModContainerHelper.getOptionalModEventBus(PuzzlesLib.MOD_ID).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
-                BakedModel missingModel = evt.getModels().get(ModelBakery.MISSING_MODEL_VARIANT);
+                BakedModel missingModel = evt.getModels().get(MissingBlockModel.VARIANT);
                 Objects.requireNonNull(missingModel, "missing model is null");
                 Map<BakedModelKey, Map<ItemDisplayContext, BakedModel>> overrideModels = this.computeOverrideModels(
                         new BakedModelResolver() {
@@ -60,14 +60,17 @@ public final class NeoForgeItemDisplayOverrides extends ItemDisplayOverridesImpl
                             }
                         }, missingModel);
                 for (Map.Entry<BakedModelKey, Map<ItemDisplayContext, BakedModel>> entry : overrideModels.entrySet()) {
-                    evt.getModels().put(entry.getKey().modelResourceLocation(), new BakedModelWrapper<>(entry.getKey().bakedModel()) {
+                    evt.getModels().put(entry.getKey().modelResourceLocation(),
+                            new BakedModelWrapper<>(entry.getKey().bakedModel()) {
 
-                        @Override
-                        public BakedModel applyTransform(ItemDisplayContext itemDisplayContext, PoseStack poseStack, boolean applyLeftHandTransform) {
-                            return entry.getValue().getOrDefault(itemDisplayContext, this.originalModel).applyTransform(
-                                    itemDisplayContext, poseStack, applyLeftHandTransform);
-                        }
-                    });
+                                @Override
+                                public BakedModel applyTransform(ItemDisplayContext itemDisplayContext, PoseStack poseStack, boolean applyLeftHandTransform) {
+                                    return entry.getValue()
+                                            .getOrDefault(itemDisplayContext, this.originalModel)
+                                            .applyTransform(itemDisplayContext, poseStack, applyLeftHandTransform);
+                                }
+                            }
+                    );
                 }
             });
         });

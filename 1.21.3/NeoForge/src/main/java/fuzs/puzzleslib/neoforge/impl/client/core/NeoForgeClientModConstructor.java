@@ -10,6 +10,7 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
@@ -111,9 +112,13 @@ public final class NeoForgeClientModConstructor {
         eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
             constructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));
         });
-        eventBus.addListener((final RegisterClientExtensionsEvent evt) -> {
+        eventBus.addListener(EventPriority.LOW, (final RegisterClientExtensionsEvent evt) -> {
             constructor.onRegisterBuiltinModelItemRenderers(
-                    new BuiltinModelItemRendererContextNeoForgeImpl(evt::registerItem, modId, dynamicRenderers));
+                    new BuiltinModelItemRendererContextNeoForgeImpl((clientItemExtensions, item) -> {
+                        if (!evt.isItemRegistered(item)) {
+                            evt.registerItem(clientItemExtensions, item);
+                        }
+                    }, modId, dynamicRenderers));
         });
     }
 }

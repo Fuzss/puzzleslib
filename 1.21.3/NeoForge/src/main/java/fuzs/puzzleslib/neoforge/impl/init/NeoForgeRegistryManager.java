@@ -16,18 +16,14 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -71,15 +67,6 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
             Objects.requireNonNull(value, "value is null");
             return value;
         }));
-    }
-
-    @Override
-    public Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.registerItem(entityType.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
-                (Item.Properties itemProperties) -> new DeferredSpawnEggItem(entityType::value, backgroundColor,
-                        highlightColor, itemProperties
-                ), itemPropertiesSupplier
-        );
     }
 
     @Override

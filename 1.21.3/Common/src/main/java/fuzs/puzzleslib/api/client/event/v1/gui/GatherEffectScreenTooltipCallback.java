@@ -20,7 +20,7 @@ public interface GatherEffectScreenTooltipCallback {
      *
      * @param screen            the effect rendering inventory screen instance
      * @param mobEffectInstance the effect instance the tooltip is drawn for
-     * @param lines             the current tooltip components
+     * @param tooltipLines      the current tooltip components
      */
-    void onGatherEffectScreenTooltip(AbstractContainerScreen<?> screen, MobEffectInstance mobEffectInstance, List<Component> lines);
+    void onGatherEffectScreenTooltip(AbstractContainerScreen<?> screen, MobEffectInstance mobEffectInstance, List<Component> tooltipLines);
 }

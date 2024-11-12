@@ -24,16 +24,18 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
+import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
     protected final String languageCode;
@@ -73,8 +75,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             }
         });
 
-        return DataProvider.saveStable(writer,
-                jsonObject,
+        return DataProvider.saveStable(writer, jsonObject,
                 this.pathProvider.json(ResourceLocationHelper.fromNamespaceAndPath(this.modId, this.languageCode))
         );
     }
@@ -239,11 +240,13 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         default void addPotion(Holder<Potion> potion, String value) {
             Objects.requireNonNull(potion, "potion is null");
-            String potionName = Potion.getName(Optional.of(potion), "");
-            this.add("item.minecraft.tipped_arrow.effect." + potionName, "Arrow of " + value);
-            this.add("item.minecraft.potion.effect." + potionName, "Potion of " + value);
-            this.add("item.minecraft.splash_potion.effect." + potionName, "Splash Potion of " + value);
-            this.add("item.minecraft.lingering_potion.effect." + potionName, "Lingering Potion of " + value);
+            Function<Item, Component> potionNameGetter = (Item item) -> {
+                return new PotionContents(potion).getName(item.getDescriptionId() + ".effect.");
+            };
+            this.add(potionNameGetter.apply(Items.TIPPED_ARROW), "Arrow of " + value);
+            this.add(potionNameGetter.apply(Items.POTION), "Potion of " + value);
+            this.add(potionNameGetter.apply(Items.SPLASH_POTION), "Splash Potion of " + value);
+            this.add(potionNameGetter.apply(Items.LINGERING_POTION), "Lingering Potion of " + value);
         }
 
         default void addSoundEvent(Holder<SoundEvent> soundEvent, String value) {
@@ -252,7 +255,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         default void add(SoundEvent soundEvent, String value) {
             Objects.requireNonNull(soundEvent, "sound event is null");
-            this.add("subtitles." + soundEvent.getLocation().getPath(), value);
+            this.add("subtitles." + soundEvent.location().getPath(), value);
         }
 
         default void add(KeyMapping keyMapping, String value) {
@@ -281,7 +284,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         default void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
             Objects.requireNonNull(resourceKey, "resource key is null");
-            this.add(BuiltInRegistries.CREATIVE_MODE_TAB.get(resourceKey), value);
+            this.add(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(resourceKey), value);
         }
 
         default void add(CreativeModeTab tab, String value) {

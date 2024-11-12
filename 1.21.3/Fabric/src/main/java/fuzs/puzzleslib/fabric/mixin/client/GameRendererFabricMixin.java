@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import fuzs.puzzleslib.fabric.impl.client.event.EntitySpectatorShaderRegistryImpl;
 import net.minecraft.client.Camera;
@@ -39,9 +39,11 @@ abstract class GameRendererFabricMixin {
     }
 
     @ModifyReturnValue(method = "getFov", at = @At("TAIL"))
-    private double getFov(double fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {
-        DefaultedDouble fieldOfView = DefaultedDouble.fromValue(fieldOfViewValue);
-        FabricRendererEvents.COMPUTE_FIELD_OF_VIEW.invoker().onComputeFieldOfView(GameRenderer.class.cast(this), this.mainCamera, partialTicks, fieldOfView);
-        return fieldOfView.getAsOptionalDouble().orElse(fieldOfViewValue);
+    private float getFov(float fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {
+        DefaultedFloat fieldOfView = DefaultedFloat.fromValue(fieldOfViewValue);
+        FabricRendererEvents.COMPUTE_FIELD_OF_VIEW.invoker().onComputeFieldOfView(GameRenderer.class.cast(this),
+                this.mainCamera, partialTicks, fieldOfView
+        );
+        return fieldOfView.getAsOptionalFloat().orElse(fieldOfViewValue);
     }
 }

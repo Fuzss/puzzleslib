@@ -2,7 +2,6 @@ package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.base.Suppliers;
-import com.google.common.collect.Sets;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
@@ -29,7 +28,6 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -69,17 +67,22 @@ public final class NeoForgeClientEventInvokers {
             });
         });
         INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
-            DefaultedValue<Screen> newScreen = DefaultedValue.fromEvent(evt::setNewScreen, evt::getNewScreen, evt::getScreen);
-            EventResult result = callback.onScreenOpening(evt.getCurrentScreen(), newScreen);
-            // setting current screen again already prevents Screen#remove from running as implemented by Forge, but Screen#init still runs again,
-            // we just manually fully cancel the event to deal in a more 'proper' way with this, the same is implemented on Fabric
-            if (result.isInterrupt() || newScreen.getAsOptional().filter(screen -> screen == evt.getCurrentScreen()).isPresent())
-                evt.setCanceled(true);
+            EventResultHolder<Screen> result = callback.onScreenOpening(evt.getCurrentScreen(), evt.getNewScreen());
+            // returning the current screen should ideally cause no change at all,
+            // which is implemented fine on NeoForge via cancelling the event,
+            // on Fabric though the screen will be initialized again, after Screen::remove having been called
+            result.ifInterrupt((Screen screen) -> {
+                if (screen == evt.getCurrentScreen()) {
+                    evt.setCanceled(true);
+                } else {
+                    evt.setNewScreen(screen);
+                }
+            });
         });
         INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
+            BakedModel missingModel = models.get(MissingBlockModel.VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             Map<ModelResourceLocation, UnbakedModel> additionalModels = new HashMap<>();
             Function<ModelResourceLocation, UnbakedModel> modelGetter = (ModelResourceLocation modelResourceLocation) -> {
@@ -120,7 +123,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
+            BakedModel missingModel = models.get(MissingBlockModel.VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             Function<ModelResourceLocation, BakedModel> modelGetter = (ModelResourceLocation resourceLocation) -> {
                 if (models.containsKey(resourceLocation)) {
@@ -153,7 +156,7 @@ public final class NeoForgeClientEventInvokers {
                 ModelEvents.AddAdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AddAdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
             Stopwatch stopwatch = Stopwatch.createStarted();
             Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            BakedModel missingModel = models.get(ModelBakery.MISSING_MODEL_VARIANT);
+            BakedModel missingModel = models.get(MissingBlockModel.VARIANT);
             Objects.requireNonNull(missingModel, "missing model is null");
             try {
                 callback.onAddAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
@@ -178,9 +181,6 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ClientTickEvents.End.class, ClientTickEvent.Post.class, (ClientTickEvents.End callback, ClientTickEvent.Post evt) -> {
             callback.onEndClientTick(Minecraft.getInstance());
         });
-        INSTANCE.register(RenderGuiCallback.class, RenderGuiEvent.Post.class, (RenderGuiCallback callback, RenderGuiEvent.Post evt) -> {
-            callback.onRenderGui(Minecraft.getInstance(), evt.getGuiGraphics(), evt.getPartialTick());
-        });
         INSTANCE.register(RenderGuiEvents.Before.class, RenderGuiEvent.Pre.class, (RenderGuiEvents.Before callback, RenderGuiEvent.Pre evt) -> {
             callback.onBeforeRenderGui(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
         });
@@ -190,11 +190,16 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ItemTooltipCallback.class, ItemTooltipEvent.class, (ItemTooltipCallback callback, ItemTooltipEvent evt) -> {
             callback.onItemTooltip(evt.getItemStack(), evt.getToolTip(), evt.getContext(), evt.getEntity(), evt.getFlags());
         });
-        INSTANCE.register(RenderNameTagCallback.class, RenderNameTagEvent.class, (RenderNameTagCallback callback, RenderNameTagEvent evt) -> {
-            DefaultedValue<Component> content = DefaultedValue.fromEvent(evt::setContent, evt::getContent, evt::getOriginalContent);
-            EventResult result = callback.onRenderNameTag(evt.getEntity(), content, evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick());
+        INSTANCE.register(
+                RenderNameTagEvents.Allow.class, RenderNameTagEvent.CanRender.class, (RenderNameTagEvents.Allow callback, RenderNameTagEvent.CanRender evt) -> {
+            EventResult result = callback.onAllowNameTag(evt.getEntity(), evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPartialTick());
             if (result.isInterrupt()) evt.setCanRender(result.getAsBoolean() ? TriState.TRUE : TriState.FALSE);
         });
+        INSTANCE.register(
+                RenderNameTagEvents.Render.class, RenderNameTagEvent.DoRender.class, (RenderNameTagEvents.Render callback, RenderNameTagEvent.DoRender evt) -> {
+                    EventResult result = callback.onRenderNameTag(evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick());
+                    if (result.isInterrupt()) evt.setCanceled(true);
+                });
         INSTANCE.register(ContainerScreenEvents.Background.class, ContainerScreenEvent.Render.Background.class, (ContainerScreenEvents.Background callback, ContainerScreenEvent.Render.Background evt) -> {
             callback.onDrawBackground(evt.getContainerScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
         });
@@ -349,14 +354,14 @@ public final class NeoForgeClientEventInvokers {
             if (evt.getHand() != InteractionHand.MAIN_HAND) return;
             Minecraft minecraft = Minecraft.getInstance();
             ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
-            EventResult result = callback.onRenderMainHand(itemInHandRenderer, minecraft.player, minecraft.player.getMainArm(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
+            EventResult result = callback.onRenderMainHand(itemInHandRenderer, evt.getHand(), minecraft.player, minecraft.player.getMainArm(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderHandEvents.OffHand.class, RenderHandEvent.class, (RenderHandEvents.OffHand callback, RenderHandEvent evt) -> {
             if (evt.getHand() != InteractionHand.OFF_HAND) return;
             Minecraft minecraft = Minecraft.getInstance();
             ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
-            EventResult result = callback.onRenderOffHand(itemInHandRenderer, minecraft.player, minecraft.player.getMainArm().getOpposite(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
+            EventResult result = callback.onRenderOffHand(itemInHandRenderer, evt.getHand(), minecraft.player, minecraft.player.getMainArm().getOpposite(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ClientLevelTickEvents.Start.class, LevelTickEvent.Pre.class, (ClientLevelTickEvents.Start callback, LevelTickEvent.Pre evt) -> {
@@ -555,18 +560,13 @@ public final class NeoForgeClientEventInvokers {
     }
 
     private static Set<ModelResourceLocation> getTopLevelModelLocations() {
-        Set<ModelResourceLocation> modelLocations = Sets.newHashSet(ModelBakery.MISSING_MODEL_VARIANT);
+        Set<ModelResourceLocation> modelLocations = new HashSet<>(List.of(MissingBlockModel.VARIANT));
         for (Block block : BuiltInRegistries.BLOCK) {
             block.getStateDefinition().getPossibleStates().forEach(blockState -> {
                 modelLocations.add(BlockModelShaper.stateToModelLocation(blockState));
             });
         }
-        for (ResourceLocation resourcelocation : BuiltInRegistries.ITEM.keySet()) {
-            modelLocations.add(ModelResourceLocation.inventory(resourcelocation));
-        }
-        modelLocations.add(ResourceLocation.withDefaultNamespace("spyglass_in_hand"));
-        modelLocations.add(ItemRenderer.SPYGLASS_IN_HAND_MODEL);
-        // skip the Forge additional models call, we probably don't need those and better to avoid accessing internals
+        modelLocations.addAll(ModelDiscovery.listMandatoryModels());
         return Collections.unmodifiableSet(modelLocations);
     }
 }

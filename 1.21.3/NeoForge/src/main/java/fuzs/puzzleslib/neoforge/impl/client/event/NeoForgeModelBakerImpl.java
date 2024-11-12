@@ -35,13 +35,18 @@ public record NeoForgeModelBakerImpl(Map<ModelBakery.BakedCacheKey, BakedModel> 
                     return models.get(modelResourceLocation);
                 }
             }
-            return evt.getModelBakery().getModel(resourceLocation);
+            UnbakedModel unbakedModel = evt.getModelBakery().unbakedModels.get(resourceLocation);
+            if (unbakedModel == null) {
+                PuzzlesLib.LOGGER.warn("Requested a model that was not discovered previously: {}", resourceLocation);
+                return MissingBlockModel.missingModel();
+            } else {
+                return unbakedModel;
+            }
         }, ModelLoadingHelper.getUnbakedTopLevelModel(evt.getModelBakery()), evt.getTextureGetter(),
                 () -> missingModel
         );
     }
 
-    @Override
     public UnbakedModel getModel(ResourceLocation resourceLocation) {
         return this.unbakedModelGetter.apply(resourceLocation);
     }
@@ -65,9 +70,9 @@ public record NeoForgeModelBakerImpl(Map<ModelBakery.BakedCacheKey, BakedModel> 
     @Override
     public @Nullable BakedModel bakeUncached(UnbakedModel unbakedModel, ModelState modelState, Function<Material, TextureAtlasSprite> modelTextureGetter) {
         if (unbakedModel instanceof BlockModel blockModel &&
-                blockModel.getRootModel() == ModelBakery.GENERATION_MARKER) {
-            return ModelBakery.ITEM_MODEL_GENERATOR.generateBlockModel(modelTextureGetter, blockModel)
-                    .bake(this, blockModel, modelTextureGetter, modelState, false);
+                blockModel.getRootModel() == SpecialModels.GENERATED_MARKER) {
+            return ModelBakery.ITEM_MODEL_GENERATOR.generateBlockModel(modelTextureGetter, blockModel).bake(
+                    modelTextureGetter, modelState, false);
         } else {
             return unbakedModel.bake(this, modelTextureGetter, modelState);
         }

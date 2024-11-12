@@ -3,12 +3,12 @@ package fuzs.puzzleslib.api.core.v1;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Allows for specifying certain mod contents that need something to be registered to enable the mod loader specific
- * implementation to work (mostly intended for Forge).
+ * Allows for specifying certain mod contents that need something to be registered to enable the implementation to
+ * work.
  */
 public enum ContentRegistrationFlags {
     /**
-     * Registers a biome modifier, and it's codec on Forge to allow the custom biome modification system to work.
+     * Registers a biome modifier, and it's codec on NeoForge to allow the custom biome modification system to work.
      */
     BIOME_MODIFICATIONS,
     /**
@@ -16,16 +16,15 @@ public enum ContentRegistrationFlags {
      */
     DYNAMIC_RENDERERS,
     /**
-     * Registers a {@link net.minecraft.world.item.crafting.RecipeSerializer} for custom crafting recipes that support
-     * copying the full item nbt tag of a single ingredient item to the result item.
+     * Registers {@link net.minecraft.world.item.crafting.RecipeSerializer RecipeSerializers} for transmutation crafting
+     * recipes that support preserving all item stack components.
      * <p>
      * Intended to be used for upgrading items to a higher tier, similar to the smithing table.
      */
-    COPY_RECIPES;
+    CRAFTING_TRANSMUTE;
 
     @ApiStatus.Internal
     public static void throwForFlag(ContentRegistrationFlags flag) {
-        throw new IllegalStateException(
-                "%s#%s is missing".formatted(ContentRegistrationFlags.class.getSimpleName(), flag));
+        throw new IllegalStateException(ContentRegistrationFlags.class.getSimpleName() + "#" + flag + " is missing");
     }
 }

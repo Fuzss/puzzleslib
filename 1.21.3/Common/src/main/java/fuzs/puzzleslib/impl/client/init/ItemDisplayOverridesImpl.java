@@ -3,14 +3,15 @@ package fuzs.puzzleslib.impl.client.init;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.init.v1.ItemModelDisplayOverrides;
+import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 public abstract class ItemDisplayOverridesImpl<T> implements ItemModelDisplayOverrides {
     private final Map<ModelResourceLocation, Map<ItemDisplayContext, Function<BakedModelResolver, BakedModel>>> overrideLocations = new HashMap<>();
@@ -30,10 +31,9 @@ public abstract class ItemDisplayOverridesImpl<T> implements ItemModelDisplayOve
     }
 
     static ItemDisplayContext[] getVanillaItemModelDisplayOverrides() {
-        return EnumSet.complementOf(Sets.newEnumSet(
-                Arrays.asList(ItemDisplayContext.GUI, ItemDisplayContext.GROUND, ItemDisplayContext.FIXED),
-                ItemDisplayContext.class
-        )).toArray(ItemDisplayContext[]::new);
+        return Arrays.stream(ItemDisplayContext.values())
+                .filter(Predicate.not(ItemRenderer::shouldRenderItemFlat))
+                .toArray(ItemDisplayContext[]::new);
     }
 
     protected void register(ModelResourceLocation modelResourceLocation, Function<BakedModelResolver, BakedModel> bakedModelGetter, ItemDisplayContext[] itemDisplayContexts) {

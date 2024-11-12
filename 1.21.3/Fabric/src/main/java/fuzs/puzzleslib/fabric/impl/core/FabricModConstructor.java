@@ -4,7 +4,7 @@ import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.fabric.impl.core.context.*;
-import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
+import fuzs.puzzleslib.impl.item.CustomTransmuteRecipe;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -24,9 +24,11 @@ public final class FabricModConstructor {
     }
 
     private static void registerContent(String modId, Set<ContentRegistrationFlags> flagsToHandle) {
-        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_RECIPES)) {
-            CopyComponentsRecipe.registerSerializers((String s, Supplier<RecipeSerializer<?>> supplier) -> {
-                Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ResourceLocationHelper.fromNamespaceAndPath(modId, s), supplier.get());
+        if (flagsToHandle.contains(ContentRegistrationFlags.CRAFTING_TRANSMUTE)) {
+            CustomTransmuteRecipe.registerSerializers((String s, Supplier<RecipeSerializer<?>> supplier) -> {
+                Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
+                        ResourceLocationHelper.fromNamespaceAndPath(modId, s), supplier.get()
+                );
             });
         }
     }
@@ -39,7 +41,6 @@ public final class FabricModConstructor {
         constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
         constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
         constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
-        constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextFabricImpl());
         constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
         constructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
         constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId, availableFlags));

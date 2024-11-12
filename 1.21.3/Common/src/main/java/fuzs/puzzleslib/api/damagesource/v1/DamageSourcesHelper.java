@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.entity.v1;
+package fuzs.puzzleslib.api.damagesource.v1;
 
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import net.minecraft.core.RegistryAccess;
@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 public final class DamageSourcesHelper {
 
     private DamageSourcesHelper() {
-
+        // NO-OP
     }
 
     /**
@@ -71,8 +71,7 @@ public final class DamageSourcesHelper {
      * @return new {@link DamageSource} instance
      */
     public static DamageSource source(RegistryAccess registryAccess, ResourceKey<DamageType> damageType, @Nullable Entity directEntity, @Nullable Entity causingEntity) {
-        return new DamageSource(LookupHelper.lookup(registryAccess, Registries.DAMAGE_TYPE, damageType),
-                directEntity,
+        return new DamageSource(LookupHelper.lookup(registryAccess, Registries.DAMAGE_TYPE, damageType), directEntity,
                 causingEntity
         );
     }

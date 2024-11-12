@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
@@ -25,6 +26,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -77,7 +79,7 @@ public interface CommonAbstractions {
      * Is the entity type considered a boss mob like {@link EntityType#ENDER_DRAGON} and {@link EntityType#WITHER} in
      * vanilla.
      * <p>
-     * A common property of such entities usually is {@link LivingEntity#canChangeDimensions(Level, Level)} returns
+     * A common property of such entities usually is {@link Entity#canUsePortal(boolean)} returning
      * <code>false</code>.
      *
      * @param type the entity type
@@ -129,11 +131,11 @@ public interface CommonAbstractions {
      * <code>level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)</code>, allowing for a dedicated Forge event
      * to run.
      *
-     * @param level  the level mob griefing is happening in
-     * @param entity the entity responsible for triggering the game rule check
+     * @param serverLevel the level mob griefing is happening in
+     * @param entity      the entity responsible for triggering the game rule check
      * @return is mob griefing allows to happen
      */
-    boolean getMobGriefingRule(Level level, @Nullable Entity entity);
+    boolean getMobGriefingRule(ServerLevel serverLevel, @Nullable Entity entity);
 
     /**
      * A trigger for running a Forge event for destroying an item.
@@ -200,9 +202,9 @@ public interface CommonAbstractions {
     /**
      * Called just before an {@link Explosion} is about to be executed for a level.
      *
-     * @param level     the level the explosion is happening in
-     * @param explosion the explosion that is about to start
-     * @return <code>true</code> to mark the explosion as handled, {@link Explosion#explode()} is not called
+     * @param serverLevel the level the explosion is happening in
+     * @param explosion   the explosion that is about to start
+     * @return <code>true</code> to mark the explosion as handled, {@link ServerExplosion#explode()} is not called
      */
-    boolean onExplosionStart(Level level, Explosion explosion);
+    boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion);
 }

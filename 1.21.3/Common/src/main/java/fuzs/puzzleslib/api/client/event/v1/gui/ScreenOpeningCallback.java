@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.event.v1.gui;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import net.minecraft.client.gui.screens.Screen;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,15 +11,18 @@ public interface ScreenOpeningCallback {
     EventInvoker<ScreenOpeningCallback> EVENT = EventInvoker.lookup(ScreenOpeningCallback.class);
 
     /**
-     * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in {@link net.minecraft.client.Minecraft#setScreen},
-     * allows for exchanging the new screen with a different one, or can prevent a new screen from opening, effectively forcing the old screen to remain.
-     * <p>Do not use {@link net.minecraft.client.Minecraft#setScreen} inside of this event callback, there will be an infinite loop!
+     * Called just before a new screen is set to {@link net.minecraft.client.Minecraft#screen} in
+     * {@link net.minecraft.client.Minecraft#setScreen}, allows for exchanging the new screen with a different one, or
+     * can prevent a new screen from opening, by returning the original screen (which will be initialized once again).
      *
-     * @param oldScreen the screen that is being removed, may be null when opening the screen from {@link net.minecraft.client.gui.Gui}, like {@link net.minecraft.client.gui.screens.PauseScreen}
-     * @param newScreen the new screen that is being set, may be null when closing a screen and returning to {@link net.minecraft.client.gui.Gui}, can be changed;
-     *                  setting <code>oldScreen</code> enacts the same behavior as interrupting the callback by returning {@link EventResult#INTERRUPT}
-     * @return {@link EventResult#INTERRUPT} to prevent the new screen from opening, the old screen will be kept and no call to {@link Screen#removed()} is made,
-     * {@link EventResult#PASS} to allow a new screen to be set, potentially changed via <code>newScreen</code>
+     * @param oldScreen the screen that is being removed, may be null when opening the screen from
+     *                  {@link net.minecraft.client.gui.Gui}, like {@link net.minecraft.client.gui.screens.PauseScreen}
+     * @param newScreen the new screen that is being set, may be <code>null</code> when closing a screen and returning
+     *                  to the in-game gui
+     * @return <ul>
+     *         <li>{@link EventResultHolder#interrupt(Object)} to set a different new screen, potentially the original screen for no change (except the original screen being initialized again), or <code>null</code> when closing a screen and returning to the in-game gui</li>
+     *         <li>{@link EventResultHolder#pass()} to allow the vanilla screen to be set</li>
+     *         </ul>
      */
-    EventResult onScreenOpening(@Nullable Screen oldScreen, DefaultedValue<Screen> newScreen);
+    EventResultHolder<@Nullable Screen> onScreenOpening(@Nullable Screen oldScreen, @Nullable Screen newScreen);
 }

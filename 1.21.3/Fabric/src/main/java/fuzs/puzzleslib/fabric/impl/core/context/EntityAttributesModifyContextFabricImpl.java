@@ -23,11 +23,10 @@ public final class EntityAttributesModifyContextFabricImpl implements EntityAttr
         // Forge makes this very simple by patching in a couple of helper methods, but Fabric should work like this
         AttributeSupplier attributeSupplier = DefaultAttributes.getSupplier(entityType);
         // there aren't many attributes anyway, so iterating the whole registry isn't costly
-        Map<Holder<Attribute>, Double> attributeToBaseValueMap = BuiltInRegistries.ATTRIBUTE.holders()
-                .filter(attributeSupplier::hasAttribute)
-                .map(holder -> attributeSupplier.createInstance(Consumers.nop(), holder))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(AttributeInstance::getAttribute, AttributeInstance::getBaseValue));
+        Map<Holder<Attribute>, Double> attributeToBaseValueMap = BuiltInRegistries.ATTRIBUTE.listElements().filter(
+                attributeSupplier::hasAttribute).map(
+                holder -> attributeSupplier.createInstance(Consumers.nop(), holder)).filter(Objects::nonNull).collect(
+                Collectors.toMap(AttributeInstance::getAttribute, AttributeInstance::getBaseValue));
         attributeToBaseValueMap.put(attribute, attributeValue);
         AttributeSupplier.Builder builder = AttributeSupplier.builder();
         attributeToBaseValueMap.forEach(builder::add);

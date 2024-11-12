@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -16,15 +17,15 @@ import java.util.function.Predicate;
 
 public final class LivingEntityRenderLayersContextFabricImpl implements LivingEntityRenderLayersContext {
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(Predicate<EntityType<E>> filter, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+    public <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(Predicate<EntityType<? extends LivingEntity>> filter, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, RenderLayer<S, M>> factory) {
         Objects.requireNonNull(filter, "filter is null");
         Objects.requireNonNull(factory, "render layer factory is null");
         LivingEntityFeatureRendererRegistrationCallback.EVENT.register(
-                (EntityType<? extends LivingEntity> entityType, LivingEntityRenderer<?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
-                    if (filter.test((EntityType<E>) entityType)) {
-                        registrationHelper.register(factory.apply((RenderLayerParent<T, M>) entityRenderer, context));
+                (EntityType<? extends LivingEntity> entityType, LivingEntityRenderer<?, ?, ?> entityRenderer, LivingEntityFeatureRendererRegistrationCallback.RegistrationHelper registrationHelper, EntityRendererProvider.Context context) -> {
+                    if (filter.test(entityType)) {
+                        registrationHelper.register((RenderLayer<S, ? extends EntityModel<S>>) factory.apply(
+                                (RenderLayerParent<S, M>) entityRenderer, context));
                     }
                 });
     }

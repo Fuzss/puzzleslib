@@ -41,9 +41,9 @@ public final class FabricEventImplHelper {
     }
 
     public static int onComputeEnchantedLootBonus(Holder<Enchantment> enchantment, int enchantmentLevel, LootContext lootContext) {
-        Entity entity = lootContext.getParamOrNull(LootContextParams.THIS_ENTITY);
+        Entity entity = lootContext.getOptionalParameter(LootContextParams.THIS_ENTITY);
         if (!(entity instanceof LivingEntity livingEntity)) return enchantmentLevel;
-        DamageSource damageSource = lootContext.getParamOrNull(LootContextParams.DAMAGE_SOURCE);
+        DamageSource damageSource = lootContext.getOptionalParameter(LootContextParams.DAMAGE_SOURCE);
         return onComputeEnchantedLootBonus(enchantment, enchantmentLevel, livingEntity, damageSource);
     }
 

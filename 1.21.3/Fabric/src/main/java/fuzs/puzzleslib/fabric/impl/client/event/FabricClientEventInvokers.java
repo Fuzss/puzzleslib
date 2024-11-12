@@ -60,7 +60,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -110,7 +109,7 @@ public final class FabricClientEventInvokers {
                     if (context.topLevelId() != null) {
                         EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.topLevelId(),
                                 () -> model,
-                                ModelLoadingHelper.getUnbakedTopLevelModel(context.loader()),
+                                ModelLoadingHelper.getUnbakedTopLevelModel(ModelLoadingHelper.getModelBakery(context.baker())),
                                 additionalModels::put
                         );
                         return result.getInterrupt().orElse(model);
@@ -127,7 +126,7 @@ public final class FabricClientEventInvokers {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
                 pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     if (model != null) {
-                        Map<ModelResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                        Map<ModelResourceLocation, BakedModel> models = ModelLoadingHelper.getModelBakery(context.baker()).getBakedTopLevelModels();
                         EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.topLevelId(), () -> model, context::baker, (ModelResourceLocation resourceLocation) -> {
                             return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
                         }, models::putIfAbsent);
@@ -143,8 +142,8 @@ public final class FabricClientEventInvokers {
                 pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     // all we want is access to the top level baked models map to be able to insert our own models
                     // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
-                    if (context.topLevelId().equals(ModelBakery.MISSING_MODEL_VARIANT)) {
-                        Map<ModelResourceLocation, BakedModel> models = context.loader().getBakedTopLevelModels();
+                    if (context.topLevelId().equals(MissingBlockModel.VARIANT)) {
+                        Map<ModelResourceLocation, BakedModel> models = ModelLoadingHelper.getModelBakery(context.baker()).getBakedTopLevelModels();
                         // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
                         callback.onAddAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
                             return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
@@ -165,11 +164,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK, callback -> {
             return callback::onEndClientTick;
         });
-        INSTANCE.register(RenderGuiCallback.class, HudRenderCallback.EVENT, callback -> {
-            return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
-                callback.onRenderGui(Minecraft.getInstance(), drawContext, tickCounter);
-            };
-        });
         INSTANCE.register(RenderGuiEvents.Before.class, FabricGuiEvents.BEFORE_RENDER_GUI);
         INSTANCE.register(RenderGuiEvents.After.class, HudRenderCallback.EVENT, callback -> {
             return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
@@ -181,7 +175,8 @@ public final class FabricClientEventInvokers {
                 callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
             };
         });
-        INSTANCE.register(RenderNameTagCallback.class, FabricRendererEvents.RENDER_NAME_TAG);
+        INSTANCE.register(RenderNameTagEvents.Allow.class, FabricRendererEvents.ALLOW_NAME_TAG);
+        INSTANCE.register(RenderNameTagEvents.Render.class, FabricRendererEvents.RENDER_NAME_TAG);
         INSTANCE.register(ContainerScreenEvents.Background.class, FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND);
         INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricGuiEvents.CONTAINER_SCREEN_FOREGROUND);
         INSTANCE.register(InventoryMobEffectsCallback.class, FabricGuiEvents.INVENTORY_MOB_EFFECTS);
@@ -353,11 +348,11 @@ public final class FabricClientEventInvokers {
             return (Player player, Level level, InteractionHand hand) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                if (!level.isClientSide) return InteractionResultHolder.pass(ItemStack.EMPTY);
+                if (!level.isClientSide) return InteractionResult.PASS;
                 Minecraft minecraft = Minecraft.getInstance();
                 EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
                 // when interrupted cancel the interaction without the server being notified
-                return result.isInterrupt() ? InteractionResultHolder.fail(ItemStack.EMPTY) : InteractionResultHolder.pass(ItemStack.EMPTY);
+                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Pick.class, ClientPickBlockGatherCallback.EVENT, callback -> {

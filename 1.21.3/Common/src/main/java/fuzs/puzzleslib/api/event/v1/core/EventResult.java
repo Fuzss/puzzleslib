@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.util.NoSuchElementException;
 
 /**
@@ -22,14 +24,14 @@ public enum EventResult {
      * Allows the event to continue processing. It will be passed to both other event implementations and will not
      * prevent vanilla behavior from running.
      */
-    PASS(false, false),
+    PASS(false),
     /**
      * Prevents the event from processing any further and disrupts vanilla behavior, similar to cancelling an event on
      * Forge.
      * <p>
      * Unprocessed callbacks will be skipped if cancelled.
      */
-    INTERRUPT(true, true),
+    INTERRUPT(true),
     /**
      * Interrupts the event just like {@link #INTERRUPT}. Useful for event implementations that require three states for
      * their cancellation result.
@@ -42,9 +44,14 @@ public enum EventResult {
     DENY(true, false);
 
     private final boolean interrupt;
-    private final boolean value;
+    @Nullable
+    private final Boolean value;
 
-    EventResult(boolean interrupt, boolean value) {
+    EventResult(boolean interrupt) {
+        this(interrupt, null);
+    }
+
+    EventResult(boolean interrupt, @Nullable Boolean value) {
         this.interrupt = interrupt;
         this.value = value;
     }
@@ -57,7 +64,7 @@ public enum EventResult {
      * @return value for {@link #ALLOW} and {@link #DENY} states
      */
     public boolean getAsBoolean() {
-        if (!this.interrupt) {
+        if (this.value == null) {
             throw new NoSuchElementException("No value present");
         } else {
             return this.value;

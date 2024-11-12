@@ -1,13 +1,14 @@
 package fuzs.puzzleslib.api.client.gui.v2.components;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
 
 import java.util.function.ToIntFunction;
 
@@ -127,14 +128,10 @@ public class SpritelessImageButton extends Button {
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.drawBackground) {
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
-        } else {
-            guiGraphics.setColor(1.0F, 1.0F, 1.0F, 1.0F);
-            RenderSystem.enableBlend();
-            RenderSystem.enableDepthTest();
         }
-        guiGraphics.blit(this.resourceLocation, this.getX(), this.getY(), this.xTexStart,
+        guiGraphics.blit(RenderType::guiTextured, this.resourceLocation, this.getX(), this.getY(), this.xTexStart,
                 this.yTexStart + this.yDiffTex * this.getTextureY(), this.width, this.height, this.textureWidth,
-                this.textureHeight
+                this.textureHeight, ARGB.white(this.alpha)
         );
     }
 

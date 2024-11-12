@@ -33,7 +33,13 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         super(level, pos, yRot, gameProfile);
     }
 
-    @WrapWithCondition(method = "drop", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    @WrapWithCondition(
+            method = "drop",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
+            )
+    )
     public boolean drop(Level level, Entity entity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
@@ -68,7 +74,8 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
     )
     )
     public void doCloseContainer(CallbackInfo callback) {
-        FabricPlayerEvents.CONTAINER_CLOSE.invoker()
-                .onContainerClose(ServerPlayer.class.cast(this), this.containerMenu);
+        FabricPlayerEvents.CONTAINER_CLOSE.invoker().onContainerClose(ServerPlayer.class.cast(this),
+                this.containerMenu
+        );
     }
 }

@@ -6,14 +6,19 @@ import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public final class FabricRendererEvents {
     /**
-     * Fires before the name tag of an entity is tried to be rendered, in addition to preventing the name tag from
-     * rendering, rendering can also be forced.
+     * Fires during construction of {@link EntityRenderState}, allows control over the set name tag.
      */
-    public static final Event<RenderNameTagCallback> RENDER_NAME_TAG = FabricEventFactory.createResult(
-            RenderNameTagCallback.class);
+    public static final Event<RenderNameTagEvents.Allow> ALLOW_NAME_TAG = FabricEventFactory.createResult(
+            RenderNameTagEvents.Allow.class);
+    /**
+     * Fires before the name tag of an entity is rendered.
+     */
+    public static final Event<RenderNameTagEvents.Render> RENDER_NAME_TAG = FabricEventFactory.createResult(
+            RenderNameTagEvents.Render.class);
     /**
      * Called before a living entity model is rendered, allows for applying transformations to the {@link PoseStack}, or
      * for completely taking over rendering as a whole.
@@ -60,22 +65,25 @@ public final class FabricRendererEvents {
     public static final Event<RenderBlockOverlayCallback> RENDER_BLOCK_OVERLAY = FabricEventFactory.createResult(
             RenderBlockOverlayCallback.class);
     /**
+     * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the
+     * color.
+     */
+    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.create(
+            FogEvents.ComputeColor.class);
+    /**
      * Called before fog is rendered, allows for controlling fog start and end distance.
      */
     public static final Event<FogEvents.Render> RENDER_FOG = FabricEventFactory.create(FogEvents.Render.class);
     /**
-     * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the
-     * color.
-     */
-    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.create(FogEvents.ComputeColor.class);
-    /**
      * Fires before the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
      */
-    public static final Event<GameRenderEvents.Before> BEFORE_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.Before.class);
+    public static final Event<GameRenderEvents.Before> BEFORE_GAME_RENDER = FabricEventFactory.create(
+            GameRenderEvents.Before.class);
     /**
      * Fires after the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
      */
-    public static final Event<GameRenderEvents.After> AFTER_GAME_RENDER = FabricEventFactory.create(GameRenderEvents.After.class);
+    public static final Event<GameRenderEvents.After> AFTER_GAME_RENDER = FabricEventFactory.create(
+            GameRenderEvents.After.class);
     /**
      * Runs after field of view is calculated, based on the game setting, but before in-game effects such as nausea are
      * applied.

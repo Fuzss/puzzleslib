@@ -50,7 +50,7 @@ public final class RegistryHelper {
     @Nullable
     public static <T> Registry<T> findNullableBuiltInRegistry(ResourceKey<? extends Registry<? super T>> registryKey) {
         Objects.requireNonNull(registryKey, "registry key is null");
-        return ((Registry<Registry<T>>) BuiltInRegistries.REGISTRY).get((ResourceKey<Registry<T>>) registryKey);
+        return ((Registry<Registry<T>>) BuiltInRegistries.REGISTRY).getValue((ResourceKey<Registry<T>>) registryKey);
     }
 
     /**
@@ -83,7 +83,7 @@ public final class RegistryHelper {
         Optional<Registry<T>> registry = Optional.empty();
         MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
         if (minecraftServer != null) {
-            registry = minecraftServer.registryAccess().registry((ResourceKey<Registry<T>>) registryKey);
+            registry = minecraftServer.registryAccess().lookup((ResourceKey<Registry<T>>) registryKey);
         }
         if (registry.isEmpty()) {
             registry = Optional.ofNullable(findNullableBuiltInRegistry(registryKey));
@@ -155,7 +155,7 @@ public final class RegistryHelper {
     public static <T> Optional<Holder.Reference<T>> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, T object) {
         return Optional.ofNullable(getBuiltInRegistryHolder(object)).or(() -> {
             Registry<T> registry = findGameRegistry(registryKey);
-            return registry.getResourceKey(object).flatMap(registry::getHolder);
+            return registry.getResourceKey(object).flatMap(registry::get);
         });
     }
 
@@ -169,7 +169,7 @@ public final class RegistryHelper {
      */
     public static <T> Optional<Holder.Reference<T>> getHolderReference(Registry<T> registry, T object) {
         return Optional.ofNullable(getBuiltInRegistryHolder(object)).or(() -> {
-            return registry.getResourceKey(object).flatMap(registry::getHolder);
+            return registry.getResourceKey(object).flatMap(registry::get);
         });
     }
 

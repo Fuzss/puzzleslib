@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
@@ -37,9 +38,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
@@ -124,8 +125,8 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
-        return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+    public boolean getMobGriefingRule(ServerLevel serverLevel, @Nullable Entity entity) {
+        return serverLevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
     }
 
     @Override
@@ -134,7 +135,7 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public @Nullable MobSpawnType getMobSpawnType(Mob mob) {
+    public @Nullable EntitySpawnReason getMobSpawnType(Mob mob) {
         return ((SpawnTypeMob) mob).puzzleslib$getSpawnType();
     }
 
@@ -159,7 +160,7 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
     }
 
     @Override
-    public boolean onExplosionStart(Level level, Explosion explosion) {
-        return FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(level, explosion).isInterrupt();
+    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
+        return FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(serverLevel, explosion).isInterrupt();
     }
 }

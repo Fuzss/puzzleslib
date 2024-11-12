@@ -39,6 +39,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -239,7 +240,13 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param itemPropertiesSupplier supplier for new item properties
      * @return holder reference
      */
-    Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier);
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerItem(entityType.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
+                (Item.Properties itemProperties) -> new SpawnEggItem(entityType.value(), backgroundColor,
+                        highlightColor, itemProperties
+                ), itemPropertiesSupplier
+        );
+    }
 
     /**
      * Register a data component type.

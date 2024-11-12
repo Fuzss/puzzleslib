@@ -15,6 +15,8 @@ abstract class ItemRendererFabricMixin {
 
     @ModifyVariable(method = "render", at = @At(value = "LOAD", ordinal = 0), ordinal = 0, argsOnly = true)
     public BakedModel render(BakedModel bakedModel, ItemStack stack, ItemDisplayContext itemDisplayContext) {
-        return ((FabricItemDisplayOverrides) ItemModelDisplayOverrides.INSTANCE).getItemModelDisplayOverride(bakedModel, itemDisplayContext);
+        return ((FabricItemDisplayOverrides) ItemModelDisplayOverrides.INSTANCE).getItemModelDisplayOverride(bakedModel,
+                itemDisplayContext
+        );
     }
 }
