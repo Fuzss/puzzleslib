@@ -27,8 +27,9 @@ abstract class DebugScreenOverlayMixin {
     )
     )
     protected void drawGameInformation(GuiGraphics guiGraphics, CallbackInfo callback, @Local List<String> list) {
-        FabricGuiEvents.GATHER_LEFT_DEBUG_TEXT.invoker()
-                .onGatherLeftDebugText(this.minecraft.getWindow(), guiGraphics, this.minecraft.getTimer(), list);
+        FabricGuiEvents.GATHER_LEFT_DEBUG_TEXT.invoker().onGatherLeftDebugText(this.minecraft.getWindow(), guiGraphics,
+                this.minecraft.getDeltaTracker(), list
+        );
     }
 
     @Inject(
@@ -38,7 +39,8 @@ abstract class DebugScreenOverlayMixin {
     )
     )
     protected void drawSystemInformation(GuiGraphics guiGraphics, CallbackInfo callback, @Local List<String> list) {
-        FabricGuiEvents.GATHER_RIGHT_DEBUG_TEXT.invoker()
-                .onGatherRightDebugText(this.minecraft.getWindow(), guiGraphics, this.minecraft.getTimer(), list);
+        FabricGuiEvents.GATHER_RIGHT_DEBUG_TEXT.invoker().onGatherRightDebugText(this.minecraft.getWindow(),
+                guiGraphics, this.minecraft.getDeltaTracker(), list
+        );
     }
 }

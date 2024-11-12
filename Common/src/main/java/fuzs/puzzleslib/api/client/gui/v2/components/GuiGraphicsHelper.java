@@ -4,10 +4,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.impl.client.gui.SingleTextureAtlasSprite;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Matrix4f;
+
+import java.util.function.Function;
 
 /**
  * A helper class for extending the functionality of {@link GuiGraphics}. Especially useful for drawing
@@ -119,6 +122,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics      the gui graphics instance
+     * @param renderType       the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param resourceLocation the texture sheet resource location
      * @param x                the x-position on the screen
      * @param y                the y-position on the screen
@@ -130,9 +134,9 @@ public final class GuiGraphicsHelper {
      * @param uOffset          the sprite u-offset on the texture sheet
      * @param vOffset          the sprite v-offset on the texture sheet
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderSize, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, resourceLocation, x, y, width, height, borderSize, borderSize, spriteWidth,
-                spriteHeight, uOffset, vOffset
+    public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderSize, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, width, height, borderSize, borderSize,
+                spriteWidth, spriteHeight, uOffset, vOffset
         );
     }
 
@@ -143,6 +147,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics      the gui graphics instance
+     * @param renderType       the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param resourceLocation the texture sheet resource location
      * @param x                the x-position on the screen
      * @param y                the y-position on the screen
@@ -155,9 +160,9 @@ public final class GuiGraphicsHelper {
      * @param uOffset          the sprite u-offset on the texture sheet
      * @param vOffset          the sprite v-offset on the texture sheet
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderWidth, int borderHeight, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, resourceLocation, x, y, width, height, borderWidth, borderHeight, borderWidth,
-                borderHeight, spriteWidth, spriteHeight, uOffset, vOffset
+    public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderWidth, int borderHeight, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, width, height, borderWidth, borderHeight,
+                borderWidth, borderHeight, spriteWidth, spriteHeight, uOffset, vOffset
         );
     }
 
@@ -168,6 +173,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics      the gui graphics instance
+     * @param renderType       the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param resourceLocation the texture sheet resource location
      * @param x                the x-position on the screen
      * @param y                the y-position on the screen
@@ -182,9 +188,9 @@ public final class GuiGraphicsHelper {
      * @param uOffset          the sprite u-offset on the texture sheet
      * @param vOffset          the sprite v-offset on the texture sheet
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, resourceLocation, x, y, 0, width, height, borderLeft, borderTop, borderRight,
-                borderBottom, spriteWidth, spriteHeight, uOffset, vOffset, 256, 256
+    public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, 0, width, height, borderLeft, borderTop,
+                borderRight, borderBottom, spriteWidth, spriteHeight, uOffset, vOffset, 256, 256
         );
     }
 
@@ -195,6 +201,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics      the gui graphics instance
+     * @param renderType       the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param resourceLocation the texture sheet resource location
      * @param x                the x-position on the screen
      * @param y                the y-position on the screen
@@ -211,9 +218,9 @@ public final class GuiGraphicsHelper {
      * @param textureWidth     the texture sheet width
      * @param textureHeight    the texture sheet height
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
-        blitNineSliced(guiGraphics, resourceLocation, x, y, 0, width, height, borderLeft, borderTop, borderRight,
-                borderBottom, spriteWidth, spriteHeight, uOffset, vOffset, textureWidth, textureHeight
+    public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
+        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, 0, width, height, borderLeft, borderTop,
+                borderRight, borderBottom, spriteWidth, spriteHeight, uOffset, vOffset, textureWidth, textureHeight
         );
     }
 
@@ -224,6 +231,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics      the gui graphics instance
+     * @param renderType       the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param resourceLocation the texture sheet resource location
      * @param x                the x-position on the screen
      * @param y                the y-position on the screen
@@ -241,14 +249,14 @@ public final class GuiGraphicsHelper {
      * @param textureWidth     the texture sheet width
      * @param textureHeight    the texture sheet height
      */
-    public static void blitNineSliced(GuiGraphics guiGraphics, ResourceLocation resourceLocation, int x, int y, int blitOffset, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
+    public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int blitOffset, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
         SingleTextureAtlasSprite textureAtlasSprite = new SingleTextureAtlasSprite(resourceLocation, spriteWidth,
                 spriteHeight, uOffset, vOffset, textureWidth, textureHeight
         );
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(spriteWidth, spriteHeight,
-                new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom)
+                new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom), false
         );
-        guiGraphics.blitNineSlicedSprite(textureAtlasSprite, nineSlice, x, y, blitOffset, width, height);
+        guiGraphics.blitNineSlicedSprite(renderType, textureAtlasSprite, nineSlice, x, y, blitOffset, width, height);
     }
 
     /**
@@ -257,6 +265,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics the gui graphics instance
+     * @param renderType  the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param sprite      the sprite resource location
      * @param x           the x-position on the screen
      * @param y           the y-position on the screen
@@ -264,9 +273,9 @@ public final class GuiGraphicsHelper {
      * @param height      the height to draw
      * @param borderSize  the border width &amp; height on the sides of the sprite, for drawing the frame
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int borderSize) {
-        blitNineSlicedSprite(guiGraphics, sprite, x, y, 0, width, height, borderSize, borderSize, borderSize,
-                borderSize
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int borderSize) {
+        blitNineSlicedSprite(guiGraphics, renderType, sprite, x, y, 0, width, height, borderSize, borderSize,
+                borderSize, borderSize
         );
     }
 
@@ -276,6 +285,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics  the gui graphics instance
+     * @param renderType   the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param sprite       the sprite resource location
      * @param x            the x-position on the screen
      * @param y            the y-position on the screen
@@ -286,9 +296,9 @@ public final class GuiGraphicsHelper {
      * @param borderRight  the border width on the right side of the sprite, for drawing the frame
      * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
-        blitNineSlicedSprite(guiGraphics, sprite, x, y, 0, width, height, borderLeft, borderTop, borderRight,
-                borderBottom
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
+        blitNineSlicedSprite(guiGraphics, renderType, sprite, x, y, 0, width, height, borderLeft, borderTop,
+                borderRight, borderBottom
         );
     }
 
@@ -298,6 +308,7 @@ public final class GuiGraphicsHelper {
      * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
      *
      * @param guiGraphics  the gui graphics instance
+     * @param renderType   the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param sprite       the sprite resource location
      * @param x            the x-position on the screen
      * @param y            the y-position on the screen
@@ -309,13 +320,13 @@ public final class GuiGraphicsHelper {
      * @param borderRight  the border width on the right side of the sprite, for drawing the frame
      * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
      */
-    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
+    public static void blitNineSlicedSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
         TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getGuiSprites().getSprite(sprite);
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents().width(),
                 textureAtlasSprite.contents().height(),
-                new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom)
+                new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom), false
         );
-        guiGraphics.blitNineSlicedSprite(textureAtlasSprite, nineSlice, x, y, blitOffset, width, height);
+        guiGraphics.blitNineSlicedSprite(renderType, textureAtlasSprite, nineSlice, x, y, blitOffset, width, height);
     }
 
     /**
@@ -325,6 +336,7 @@ public final class GuiGraphicsHelper {
      * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
      * @param guiGraphics  the gui graphics instance
+     * @param renderType   the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param sprite       the sprite resource location
      * @param x            the x-position on the screen
      * @param y            the y-position on the screen
@@ -333,8 +345,8 @@ public final class GuiGraphicsHelper {
      * @param spriteWidth  the sprite texture file width
      * @param spriteHeight the sprite texture file height
      */
-    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight) {
-        blitTiledSprite(guiGraphics, sprite, x, y, 0, width, height, spriteWidth, spriteHeight);
+    public static void blitTiledSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight) {
+        blitTiledSprite(guiGraphics, renderType, sprite, x, y, 0, width, height, spriteWidth, spriteHeight);
     }
 
     /**
@@ -344,6 +356,7 @@ public final class GuiGraphicsHelper {
      * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
      * @param guiGraphics  the gui graphics instance
+     * @param renderType   the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param sprite       the sprite resource location
      * @param x            the x-position on the screen
      * @param y            the y-position on the screen
@@ -353,8 +366,10 @@ public final class GuiGraphicsHelper {
      * @param spriteWidth  the sprite texture file width
      * @param spriteHeight the sprite texture file height
      */
-    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int spriteWidth, int spriteHeight) {
-        blitTiledSprite(guiGraphics, sprite, x, y, blitOffset, width, height, spriteWidth, spriteHeight, 0, 0);
+    public static void blitTiledSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int spriteWidth, int spriteHeight) {
+        blitTiledSprite(guiGraphics, renderType, sprite, x, y, blitOffset, width, height, spriteWidth, spriteHeight, 0,
+                0
+        );
     }
 
     /**
@@ -364,6 +379,7 @@ public final class GuiGraphicsHelper {
      * Most sprites by default use the stretch mode, which squeezes them into the provided width &amp; height.
      *
      * @param guiGraphics  the gui graphics instance
+     * @param renderType   the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
      * @param sprite       the sprite resource location
      * @param x            the x-position on the screen
      * @param y            the y-position on the screen
@@ -375,11 +391,11 @@ public final class GuiGraphicsHelper {
      * @param uOffset      the sprite u-offset on the texture sheet
      * @param vOffset      the sprite v-offset on the texture sheet
      */
-    public static void blitTiledSprite(GuiGraphics guiGraphics, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
+    public static void blitTiledSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int blitOffset, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
         Minecraft minecraft = Minecraft.getInstance();
         TextureAtlasSprite textureatlassprite = minecraft.getGuiSprites().getSprite(sprite);
-        guiGraphics.blitTiledSprite(textureatlassprite, x, y, blitOffset, width, height, uOffset, vOffset, spriteWidth,
-                spriteHeight, spriteWidth, spriteHeight
+        guiGraphics.blitTiledSprite(renderType, textureatlassprite, x, y, blitOffset, width, height, uOffset, vOffset,
+                spriteWidth, spriteHeight, spriteWidth, spriteHeight
         );
     }
 }

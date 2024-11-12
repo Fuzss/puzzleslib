@@ -48,8 +48,8 @@ abstract class ClientLevelFabricMixin extends Level {
     @Unique
     private final ThreadLocal<DefaultedFloat> puzzleslib$pitch = new ThreadLocal<>();
 
-    protected ClientLevelFabricMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, Supplier<ProfilerFiller> supplier, boolean bl, boolean bl2, long l, int i) {
-        super(writableLevelData, resourceKey, registryAccess, holder, supplier, bl, bl2, l, i);
+    protected ClientLevelFabricMixin(WritableLevelData writableLevelData, ResourceKey<Level> resourceKey, RegistryAccess registryAccess, Holder<DimensionType> holder, boolean bl, boolean bl2, long l, int i) {
+        super(writableLevelData, resourceKey, registryAccess, holder, bl, bl2, l, i);
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
@@ -130,7 +130,7 @@ abstract class ClientLevelFabricMixin extends Level {
             method = {
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"
-            }, at = @At("HEAD"), ordinal = 0
+            }, at = @At("HEAD"), ordinal = 0, argsOnly = true
     )
     public Holder<SoundEvent> playSeededSound$1(Holder<SoundEvent> soundEvent) {
         Objects.requireNonNull(this.puzzleslib$sound.get(), "sound is null");
@@ -143,7 +143,7 @@ abstract class ClientLevelFabricMixin extends Level {
             method = {
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"
-            }, at = @At("HEAD"), ordinal = 0
+            }, at = @At("HEAD"), ordinal = 0, argsOnly = true
     )
     public SoundSource playSeededSound$2(SoundSource soundSource) {
         Objects.requireNonNull(this.puzzleslib$source.get(), "source is null");
@@ -156,7 +156,7 @@ abstract class ClientLevelFabricMixin extends Level {
             method = {
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"
-            }, at = @At("HEAD"), ordinal = 0
+            }, at = @At("HEAD"), ordinal = 0, argsOnly = true
     )
     public float playSeededSound$3(float volume) {
         Objects.requireNonNull(this.puzzleslib$volume.get(), "sound is null");
@@ -169,7 +169,7 @@ abstract class ClientLevelFabricMixin extends Level {
             method = {
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;DDDLnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V",
                     "playSeededSound(Lnet/minecraft/world/entity/player/Player;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/Holder;Lnet/minecraft/sounds/SoundSource;FFJ)V"
-            }, at = @At("HEAD"), ordinal = 1
+            }, at = @At("HEAD"), ordinal = 1, argsOnly = true
     )
     public float playSeededSound$4(float pitch) {
         Objects.requireNonNull(this.puzzleslib$pitch.get(), "pitch is null");

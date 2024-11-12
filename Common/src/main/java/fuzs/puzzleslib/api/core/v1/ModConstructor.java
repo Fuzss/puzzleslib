@@ -77,13 +77,6 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context add fuel burn time for blocks and items, e.g. in a furnace
-     */
-    default void onRegisterFuelBurnTimes(final FuelBurnTimesContext context) {
-        // NO-OP
-    }
-
-    /**
      * @param context allows for registering modifications (including additions and removals) to biomes loaded from the
      *                current data pack
      */

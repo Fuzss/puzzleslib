@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public record BuiltinModelItemRendererContextNeoForgeImpl(BiConsumer<IClientItemExtensions, Item> consumer,
                                                           String modId,

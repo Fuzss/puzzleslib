@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
@@ -22,8 +23,8 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.entity.PartEntity;
@@ -84,8 +85,8 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public boolean getMobGriefingRule(Level level, @Nullable Entity entity) {
-        return EventHooks.canEntityGrief(level, entity);
+    public boolean getMobGriefingRule(ServerLevel serverLevel, @Nullable Entity entity) {
+        return EventHooks.canEntityGrief(serverLevel, entity);
     }
 
     @Override
@@ -94,7 +95,7 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public @Nullable MobSpawnType getMobSpawnType(Mob mob) {
+    public @Nullable EntitySpawnReason getMobSpawnType(Mob mob) {
         return mob.getSpawnType();
     }
 
@@ -114,7 +115,7 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
     }
 
     @Override
-    public boolean onExplosionStart(Level level, Explosion explosion) {
-        return EventHooks.onExplosionStart(level, explosion);
+    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
+        return EventHooks.onExplosionStart(serverLevel, explosion);
     }
 }

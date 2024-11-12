@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,8 +42,8 @@ abstract class PlayerFabricMixin extends LivingEntity {
         FabricPlayerEvents.PLAYER_TICK_END.invoker().onEndPlayerTick(Player.class.cast(this));
     }
 
-    @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
-    public void hurt(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
+    public void hurtServer(ServerLevel serverLevel, DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
         EventResult result = FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(this, source, amount);
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
@@ -52,8 +53,9 @@ abstract class PlayerFabricMixin extends LivingEntity {
             at = @At("TAIL")
     )
     public ItemEntity drop(@Nullable ItemEntity itemEntity) {
-        if (itemEntity != null &&
-                FabricPlayerEvents.ITEM_TOSS.invoker().onItemToss(Player.class.cast(this), itemEntity).isInterrupt()) {
+        if (itemEntity != null && FabricPlayerEvents.ITEM_TOSS.invoker()
+                .onItemToss(Player.class.cast(this), itemEntity)
+                .isInterrupt()) {
             return null;
         } else {
             return itemEntity;
@@ -86,22 +88,24 @@ abstract class PlayerFabricMixin extends LivingEntity {
     }
 
     @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
-    protected void actuallyHurt(DamageSource damageSource, float damageAmount, CallbackInfo callback, @Share(
+    protected void actuallyHurt(ServerLevel serverLevel, DamageSource damageSource, float damageAmount, CallbackInfo callback, @Share(
             "damageAmount"
     ) LocalRef<DefaultedFloat> damageAmountRef) {
-        if (!this.isInvulnerableTo(damageSource)) {
+        if (!this.isInvulnerableTo(serverLevel, damageSource)) {
             damageAmountRef.set(DefaultedFloat.fromValue(damageAmount));
-            if (FabricLivingEvents.LIVING_HURT.invoker()
-                    .onLivingHurt(LivingEntity.class.cast(this), damageSource, damageAmountRef.get())
-                    .isInterrupt()) {
+            if (FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(LivingEntity.class.cast(this), damageSource,
+                    damageAmountRef.get()
+            ).isInterrupt()) {
                 callback.cancel();
             }
         }
     }
 
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    protected float actuallyHurt(float damageAmount, DamageSource damageSource, @Share("damageAmount") LocalRef<DefaultedFloat> damageAmountRef) {
-        if (!this.isInvulnerableTo(damageSource)) {
+    protected float actuallyHurt(ServerLevel serverLevel, float damageAmount, DamageSource damageSource, @Share(
+            "damageAmount"
+    ) LocalRef<DefaultedFloat> damageAmountRef) {
+        if (!this.isInvulnerableTo(serverLevel, damageSource)) {
             Objects.requireNonNull(damageAmountRef.get(), "damage amount is null");
             damageAmount = damageAmountRef.get().getAsOptionalFloat().orElse(damageAmount);
         }

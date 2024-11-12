@@ -22,7 +22,7 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
     }
 
     protected static SoundDefinition.Sound sound(SoundEvent soundEvent) {
-        return sound(soundEvent.getLocation(), SoundDefinition.SoundType.EVENT);
+        return sound(soundEvent.location(), SoundDefinition.SoundType.EVENT);
     }
 
     @Override
@@ -57,7 +57,7 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
     }
 
     protected void add(final SoundEvent soundEvent, final SoundDefinition.Sound... sounds) {
-        this.add(soundEvent.getLocation(), definition().with(sounds));
+        this.add(soundEvent.location(), definition().with(sounds));
     }
 
     @Override

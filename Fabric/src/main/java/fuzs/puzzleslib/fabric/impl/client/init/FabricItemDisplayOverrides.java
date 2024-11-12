@@ -2,10 +2,7 @@ package fuzs.puzzleslib.fabric.impl.client.init;
 
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import fuzs.puzzleslib.impl.client.init.ItemDisplayOverridesImpl;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 
@@ -43,7 +40,7 @@ public final class FabricItemDisplayOverrides extends ItemDisplayOverridesImpl<B
         // we cannot use Fabric's ForwardingBakedModel as it does not include the current ItemDisplayContext
         FabricClientEvents.COMPLETE_MODEL_LOADING.register(
                 (Supplier<ModelManager> modelManagerSupplier, Supplier<ModelBakery> modelBakerySupplier) -> {
-                    BakedModel missingModel = modelManagerSupplier.get().getModel(ModelBakery.MISSING_MODEL_VARIANT);
+                    BakedModel missingModel = modelManagerSupplier.get().getModel(MissingBlockModel.VARIANT);
                     Objects.requireNonNull(missingModel, "missing model is null");
                     this.overrideModels = this.computeOverrideModels(new BakedModelResolver() {
                         @Override

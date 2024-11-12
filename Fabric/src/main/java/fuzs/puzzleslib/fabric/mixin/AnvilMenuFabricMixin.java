@@ -36,8 +36,8 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
     @Final
     private DataSlot cost;
 
-    public AnvilMenuFabricMixin(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess) {
-        super(menuType, i, inventory, containerLevelAccess);
+    public AnvilMenuFabricMixin(@Nullable MenuType<?> menuType, int i, Inventory inventory, ContainerLevelAccess containerLevelAccess, ItemCombinerMenuSlotDefinition itemCombinerMenuSlotDefinition) {
+        super(menuType, i, inventory, containerLevelAccess, itemCombinerMenuSlotDefinition);
     }
 
     @Inject(
@@ -48,13 +48,9 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
     protected void onTake$0(Player player, ItemStack itemStack, CallbackInfo callback, @Share("breakChance") LocalRef<MutableFloat> breakChanceRef) {
         if (!player.level().isClientSide) {
             breakChanceRef.set(MutableFloat.fromValue(0.12F));
-            FabricPlayerEvents.ANVIL_USE.invoker()
-                    .onAnvilUse(player,
-                            this.inputSlots.getItem(0),
-                            this.inputSlots.getItem(1),
-                            itemStack,
-                            breakChanceRef.get()
-                    );
+            FabricPlayerEvents.ANVIL_USE.invoker().onAnvilUse(player, this.inputSlots.getItem(0),
+                    this.inputSlots.getItem(1), itemStack, breakChanceRef.get()
+            );
         }
     }
 
@@ -97,15 +93,9 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
         MutableInt enchantmentCost = MutableInt.fromValue(leftInput.getOrDefault(DataComponents.REPAIR_COST, 0) +
                 rightInput.getOrDefault(DataComponents.REPAIR_COST, 0));
         MutableInt materialCost = MutableInt.fromValue(0);
-        EventResult result = FabricPlayerEvents.ANVIL_UPDATE.invoker()
-                .onAnvilUpdate(leftInput,
-                        rightInput,
-                        output,
-                        this.itemName,
-                        enchantmentCost,
-                        materialCost,
-                        this.player
-                );
+        EventResult result = FabricPlayerEvents.ANVIL_UPDATE.invoker().onAnvilUpdate(leftInput, rightInput, output,
+                this.itemName, enchantmentCost, materialCost, this.player
+        );
         if (result.isPass()) return;
         callback.cancel();
         if (!result.getAsBoolean()) return;

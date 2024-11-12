@@ -61,6 +61,8 @@ transitive-accessible   class   net/minecraft/world/item/enchantment/Enchantment
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor
 transitive-accessible   method  net/minecraft/client/renderer/LevelRenderer renderHitOutline    (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V
 transitive-accessible   field   net/minecraft/client/gui/Gui    minecraft   Lnet/minecraft/client/Minecraft;
+transitive-accessible   method  net/minecraft/data/recipes/ShapedRecipeBuilder  <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;I)V
+transitive-accessible   method  net/minecraft/data/recipes/ShapelessRecipeBuilder   <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/item/ItemStack;)V
 accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
@@ -92,6 +94,7 @@ accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees getToolt
 accessible  class   net/minecraft/client/multiplayer/SessionSearchTrees$Key
 accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees$Key <init>  ()V
 accessible  field   net/minecraft/client/resources/model/ModelBakery    topModels   Ljava/util/Map;
+accessible  field   net/minecraft/client/resources/model/ModelBakery    unbakedModels   Ljava/util/Map;
 # accessible  method  net/minecraft/client/resources/model/ModelBakery    getModel    (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/UnbakedModel;
 accessible  field   net/minecraft/client/resources/model/ModelBakery    ITEM_MODEL_GENERATOR    Lnet/minecraft/client/renderer/block/model/ItemModelGenerator;
 accessible  class   net/minecraft/client/resources/model/ModelBakery$BakedCacheKey
@@ -116,6 +119,14 @@ accessible  field   net/minecraft/client/gui/screens/LoadingOverlay fadeOutStart
 accessible  method  net/minecraft/client/renderer/LevelRenderer addParticleInternal (Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)Lnet/minecraft/client/particle/Particle;
 accessible  method  net/minecraft/world/entity/Entity   canRide (Lnet/minecraft/world/entity/Entity;)Z
 accessible  method  net/minecraft/world/entity/Entity   canAddPassenger (Lnet/minecraft/world/entity/Entity;)Z
+accessible  field   net/minecraft/data/recipes/RecipeProvider   registries  Lnet/minecraft/core/HolderLookup$Provider;
+mutable field   net/minecraft/data/recipes/RecipeProvider   registries  Lnet/minecraft/core/HolderLookup$Provider;
+accessible  field   net/minecraft/data/recipes/RecipeProvider   items   Lnet/minecraft/core/HolderGetter;
+mutable field   net/minecraft/data/recipes/RecipeProvider   items   Lnet/minecraft/core/HolderGetter;
+accessible  field   net/minecraft/data/recipes/RecipeProvider   output  Lnet/minecraft/data/recipes/RecipeOutput;
+mutable field   net/minecraft/data/recipes/RecipeProvider   output  Lnet/minecraft/data/recipes/RecipeOutput;
+accessible  method  net/minecraft/client/resources/model/ModelDiscovery listMandatoryModels ()Ljava/util/Set;
+accessible  method  net/minecraft/client/renderer/entity/ItemRenderer   shouldRenderItemFlat    (Lnet/minecraft/world/item/ItemDisplayContext;)Z
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	logProperties	(Lnet/minecraft/world/level/material/MapColor;Lnet/minecraft/world/level/material/MapColor;Lnet/minecraft/world/level/block/SoundType;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;

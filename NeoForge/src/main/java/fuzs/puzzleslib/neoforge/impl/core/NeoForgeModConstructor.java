@@ -5,7 +5,7 @@ import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.impl.item.CopyComponentsRecipe;
+import fuzs.puzzleslib.impl.item.CustomTransmuteRecipe;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.core.context.*;
 import net.minecraft.core.registries.Registries;
@@ -42,10 +42,10 @@ public final class NeoForgeModConstructor {
         if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             NeoForgeBiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
-        if (flagsToHandle.contains(ContentRegistrationFlags.COPY_RECIPES)) {
+        if (flagsToHandle.contains(ContentRegistrationFlags.CRAFTING_TRANSMUTE)) {
             DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER, modId);
             deferredRegister.register(modEventBus);
-            CopyComponentsRecipe.registerSerializers(deferredRegister::register);
+            CustomTransmuteRecipe.registerSerializers(deferredRegister::register);
         }
     }
 
@@ -53,7 +53,6 @@ public final class NeoForgeModConstructor {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
-                constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextNeoForgeImpl());
                 constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(biomeModifications, availableFlags));
                 constructor.onRegisterFlammableBlocks(new FlammableBlocksContextNeoForgeImpl());
                 constructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());

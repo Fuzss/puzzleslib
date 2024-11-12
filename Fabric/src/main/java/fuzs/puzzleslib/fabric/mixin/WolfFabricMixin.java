@@ -17,7 +17,10 @@ abstract class WolfFabricMixin extends TamableAnimal {
         super(entityType, level);
     }
 
-    @ModifyExpressionValue(method = "tryToTame", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I"))
+    @ModifyExpressionValue(
+            method = "tryToTame",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/RandomSource;nextInt(I)I")
+    )
     public int tryToTame(int intValue, Player player) {
         return FabricEventImplHelper.onAnimalTame(this, player, intValue);
     }

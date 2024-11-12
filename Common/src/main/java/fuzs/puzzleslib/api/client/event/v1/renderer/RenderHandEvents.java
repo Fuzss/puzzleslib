@@ -2,10 +2,12 @@ package fuzs.puzzleslib.api.client.event.v1.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -13,6 +15,10 @@ import net.minecraft.world.item.ItemStack;
 public final class RenderHandEvents {
     public static final EventInvoker<MainHand> MAIN_HAND = EventInvoker.lookup(MainHand.class);
     public static final EventInvoker<OffHand> OFF_HAND = EventInvoker.lookup(OffHand.class);
+    public static final EventInvoker<MainHand> BOTH = (EventPhase phase, MainHand callback) -> {
+        MAIN_HAND.register(phase, callback);
+        OFF_HAND.register(phase, callback::onRenderMainHand);
+    };
 
     private RenderHandEvents() {
         // NO-OP
@@ -28,11 +34,12 @@ public final class RenderHandEvents {
          * Allows for cancelling rendering of the hand.
          *
          * @param itemInHandRenderer the item in hand renderer instance
+         * @param interactionHand    the player hand
          * @param player             the local player instance used for first-person rendering
          * @param humanoidArm        the screen side the arm is rendering at
          * @param itemStack          the {@link ItemStack} held in the hand
          * @param poseStack          the current {@link PoseStack}
-         * @param multiBufferSource  the current {@link MultiBufferSource}
+         * @param bufferSource       the current {@link MultiBufferSource}
          * @param combinedLight      packet light the hand is rendered with
          * @param partialTick        current partial tick time
          * @param interpolatedPitch  the pitch interpolated for current tick delta from {@link Player#getXRot()}
@@ -46,7 +53,7 @@ public final class RenderHandEvents {
          *         <li>{@link EventResult#PASS} to allow the hand to render normally</li>
          *         </ul>
          */
-        EventResult onRenderMainHand(ItemInHandRenderer itemInHandRenderer, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, MultiBufferSource multiBufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
+        EventResult onRenderMainHand(ItemInHandRenderer itemInHandRenderer, InteractionHand interactionHand, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
     }
 
     @FunctionalInterface
@@ -59,11 +66,12 @@ public final class RenderHandEvents {
          * Allows for cancelling rendering of the hand.
          *
          * @param itemInHandRenderer the item in hand renderer instance
+         * @param interactionHand    the player hand
          * @param player             the local player instance used for first-person rendering
          * @param humanoidArm        the screen side the arm is rendering at
          * @param itemStack          the {@link ItemStack} held in the hand
          * @param poseStack          the current {@link PoseStack}
-         * @param multiBufferSource  the current {@link MultiBufferSource}
+         * @param bufferSource       the current {@link MultiBufferSource}
          * @param combinedLight      packet light the hand is rendered with
          * @param partialTick        current partial tick time
          * @param interpolatedPitch  the pitch interpolated for current tick delta from {@link Player#getXRot()}
@@ -77,6 +85,6 @@ public final class RenderHandEvents {
          *         <li>{@link EventResult#PASS} to allow the hand to render normally</li>
          *         </ul>
          */
-        EventResult onRenderOffHand(ItemInHandRenderer itemInHandRenderer, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, MultiBufferSource multiBufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
+        EventResult onRenderOffHand(ItemInHandRenderer itemInHandRenderer, InteractionHand interactionHand, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, MultiBufferSource bufferSource, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
     }
 }

@@ -19,13 +19,9 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -57,15 +53,6 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
         // Fabric Api should already do this for us, but better safe than sorry ¯\_(ツ)_/¯
         if (!holder.isBound()) holder.bindValue(value);
         return holder;
-    }
-
-    @Override
-    public Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.registerItem(entityType.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
-                (Item.Properties itemProperties) -> new SpawnEggItem(entityType.value(), backgroundColor,
-                        highlightColor, itemProperties
-                ), itemPropertiesSupplier
-        );
     }
 
     @Override

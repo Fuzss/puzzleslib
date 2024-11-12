@@ -29,7 +29,6 @@ import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
@@ -48,6 +47,7 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -55,6 +55,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
+import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.bus.api.Event;
@@ -70,6 +71,7 @@ import net.neoforged.neoforge.event.entity.*;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.*;
+import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.neoforged.neoforge.event.level.*;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -87,7 +89,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvokerRegistry {
     private static boolean frozenModBusEvents;
@@ -392,15 +397,16 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(TagsUpdatedCallback.class, TagsUpdatedEvent.class, (TagsUpdatedCallback callback, TagsUpdatedEvent evt) -> {
-            callback.onTagsUpdated(evt.getRegistryAccess(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
+            callback.onTagsUpdated(evt.getLookupProvider(), evt.getUpdateCause() == TagsUpdatedEvent.UpdateCause.CLIENT_PACKET_RECEIVED);
         });
         INSTANCE.register(ExplosionEvents.Start.class, ExplosionEvent.Start.class, (ExplosionEvents.Start callback, ExplosionEvent.Start evt) -> {
-            if (callback.onExplosionStart(evt.getLevel(), evt.getExplosion()).isInterrupt()) {
+            if (callback.onExplosionStart((ServerLevel) evt.getLevel(), evt.getExplosion()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(ExplosionEvents.Detonate.class, ExplosionEvent.Detonate.class, (ExplosionEvents.Detonate callback, ExplosionEvent.Detonate evt) -> {
-            callback.onExplosionDetonate(evt.getLevel(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
+            // TODO fix empty list when parameter is back in NeoForge
+            callback.onExplosionDetonate((ServerLevel) evt.getLevel(), evt.getExplosion(), Collections.emptyList(), evt.getAffectedEntities());
         });
         INSTANCE.register(SyncDataPackContentsCallback.class, OnDatapackSyncEvent.class, (SyncDataPackContentsCallback callback, OnDatapackSyncEvent evt) -> {
             evt.getRelevantPlayers().forEach((ServerPlayer player) -> {
@@ -721,11 +727,25 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, RegisterBrewingRecipesEvent.class, (RegisterPotionBrewingMixesCallback callback, RegisterBrewingRecipesEvent evt) -> {
             callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(evt.getBuilder()));
         });
+        FuelValues[] fuelValues = new FuelValues[1];
+        INSTANCE.register(RegisterFuelValuesCallback.class, AddReloadListenerEvent.class, (RegisterFuelValuesCallback callback, AddReloadListenerEvent evt) -> {
+            FuelValues.Builder builder = new FuelValues.Builder(evt.getRegistryAccess(),
+                    FeatureFlags.REGISTRY.allFlags()
+            );
+            callback.onRegisterFuelValues(builder, 200);
+            fuelValues[0] = builder.build();
+        }, true);
+        INSTANCE.register(RegisterFuelValuesCallback.class, FurnaceFuelBurnTimeEvent.class, (RegisterFuelValuesCallback callback, FurnaceFuelBurnTimeEvent evt) -> {
+            Objects.requireNonNull(fuelValues[0], "fuel values is null");
+            if (fuelValues[0].isFuel(evt.getItemStack())) {
+                int burnTime = evt.getItemStack().getBurnTime(evt.getRecipeType(), fuelValues[0]);
+                evt.setBurnTime(burnTime);
+            }
+        }, true);
         INSTANCE.register(AddDataPackReloadListenersCallback.class, AddReloadListenerEvent.class, (AddDataPackReloadListenersCallback callback, AddReloadListenerEvent evt) -> {
-            callback.onAddDataPackReloadListeners((ResourceLocation resourceLocation, BiFunction<HolderLookup.Provider, RegistryAccess, PreparableReloadListener> factory) -> {
-                HolderLookup.Provider registryLookup = evt.getServerResources().getRegistryLookup();
+            callback.onAddDataPackReloadListeners((ResourceLocation resourceLocation, Function<HolderLookup.Provider, PreparableReloadListener> factory) -> {
                 evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, factory.apply(
-                        registryLookup, evt.getRegistryAccess())));
+                        evt.getServerResources().getRegistryLookup())));
             });
         });
         INSTANCE.register(

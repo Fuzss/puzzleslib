@@ -1,16 +1,16 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.client.player.Input;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -30,7 +30,7 @@ import java.util.Objects;
 @Mixin(LocalPlayer.class)
 abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
     @Shadow
-    public Input input;
+    public ClientInput input;
     @Unique
     private DefaultedValue<Holder<SoundEvent>> puzzleslib$sound;
     @Unique
@@ -42,9 +42,14 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
         super(clientLevel, gameProfile);
     }
 
-    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(ZF)V", shift = At.Shift.AFTER))
+    @Inject(
+            method = "aiStep",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/Input;tick(ZF)V", shift = At.Shift.AFTER)
+    )
     public void aiStep(CallbackInfo callback) {
-        FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this), this.input);
+        FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this),
+                this.input
+        );
     }
 
     @Inject(method = "hurt", at = @At("HEAD"), cancellable = true)
@@ -58,7 +63,10 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
         this.puzzleslib$sound = DefaultedValue.fromValue(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent));
         this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
         this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this.level(), this, this.puzzleslib$sound, MutableValue.fromValue(this.getSoundSource()), this.puzzleslib$volume, this.puzzleslib$pitch);
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this.level(),
+                this, this.puzzleslib$sound, MutableValue.fromValue(this.getSoundSource()), this.puzzleslib$volume,
+                this.puzzleslib$pitch
+        );
         if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
     }
 

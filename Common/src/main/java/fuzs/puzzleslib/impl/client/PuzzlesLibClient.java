@@ -11,7 +11,7 @@ import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenSkipper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.minecraft.client.Minecraft;
@@ -57,14 +57,14 @@ public class PuzzlesLibClient implements ClientModConstructor {
         if (ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
             setupGameOptions();
         }
-        ScreenOpeningCallback.EVENT.register((@Nullable Screen oldScreen, DefaultedValue<Screen> newScreen) -> {
-            if (newScreen.get() instanceof TitleScreen screen) {
+        ScreenOpeningCallback.EVENT.register((@Nullable Screen oldScreen, @Nullable Screen newScreen) -> {
+            if (newScreen instanceof TitleScreen screen) {
                 screen.fading = false;
-            } else if (newScreen.get() instanceof CreateWorldScreen screen) {
+            } else if (newScreen instanceof CreateWorldScreen screen) {
                 screen.getUiState().setGameMode(WorldCreationUiState.SelectedGameMode.CREATIVE);
                 screen.getUiState().setAllowCommands(true);
             }
-            return EventResult.PASS;
+            return EventResultHolder.pass();
         });
         ScreenEvents.beforeInit(TitleScreen.class).register(
                 (Minecraft minecraft, TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {

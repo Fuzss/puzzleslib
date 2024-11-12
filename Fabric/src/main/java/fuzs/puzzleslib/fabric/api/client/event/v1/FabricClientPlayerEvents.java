@@ -6,7 +6,6 @@ import fuzs.puzzleslib.api.client.event.v1.entity.player.ComputeFovModifierCallb
 import fuzs.puzzleslib.api.client.event.v1.entity.player.MovementInputUpdateCallback;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
-import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -31,9 +30,11 @@ public final class FabricClientPlayerEvents {
     /**
      * Called when the local player is replaced from respawning.
      */
-    public static final Event<ClientPlayerCopyCallback> PLAYER_COPY = FabricEventFactory.create(ClientPlayerCopyCallback.class);
+    public static final Event<ClientPlayerCopyCallback> PLAYER_COPY = FabricEventFactory.create(
+            ClientPlayerCopyCallback.class);
     /**
-     * Called after {@link Input#tick(boolean, float)} has run for the {@link LocalPlayer}.
+     * Called after {@link net.minecraft.client.player.ClientInput#tick(boolean, float)} has run for the
+     * {@link LocalPlayer}.
      */
     public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(
             MovementInputUpdateCallback.class);

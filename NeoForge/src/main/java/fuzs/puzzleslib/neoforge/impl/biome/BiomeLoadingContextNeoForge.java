@@ -16,7 +16,8 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 
 import java.util.Optional;
 
-public record BiomeLoadingContextNeoForge(RegistryAccess registryAccess, Holder<Biome> holder) implements BiomeLoadingContext {
+public record BiomeLoadingContextNeoForge(RegistryAccess registryAccess,
+                                          Holder<Biome> holder) implements BiomeLoadingContext {
 
     public BiomeLoadingContextNeoForge(RegistryAccess registryAccess, Holder<Biome> holder) {
         this.registryAccess = registryAccess;
@@ -39,37 +40,38 @@ public record BiomeLoadingContextNeoForge(RegistryAccess registryAccess, Holder<
 
     @Override
     public Optional<ResourceKey<ConfiguredFeature<?, ?>>> getFeatureKey(ConfiguredFeature<?, ?> configuredFeature) {
-        Registry<ConfiguredFeature<?, ?>> registry = this.registryAccess.registryOrThrow(Registries.CONFIGURED_FEATURE);
+        Registry<ConfiguredFeature<?, ?>> registry = this.registryAccess.lookupOrThrow(Registries.CONFIGURED_FEATURE);
         return registry.getResourceKey(configuredFeature);
     }
 
     @Override
     public Optional<ResourceKey<PlacedFeature>> getPlacedFeatureKey(PlacedFeature placedFeature) {
-        Registry<PlacedFeature> registry = this.registryAccess.registryOrThrow(Registries.PLACED_FEATURE);
+        Registry<PlacedFeature> registry = this.registryAccess.lookupOrThrow(Registries.PLACED_FEATURE);
         return registry.getResourceKey(placedFeature);
     }
 
     @Override
     public boolean validForStructure(ResourceKey<Structure> key) {
-        Structure instance = this.registryAccess.registryOrThrow(Registries.STRUCTURE).get(key);
-        return instance != null && instance.biomes().contains(this.holder());
+        Structure structure = this.registryAccess.lookupOrThrow(Registries.STRUCTURE).getValue(key);
+        return structure != null && structure.biomes().contains(this.holder());
     }
 
     @Override
     public Optional<ResourceKey<Structure>> getStructureKey(Structure structure) {
-        Registry<Structure> registry = this.registryAccess.registryOrThrow(Registries.STRUCTURE);
+        Registry<Structure> registry = this.registryAccess.lookupOrThrow(Registries.STRUCTURE);
         return registry.getResourceKey(structure);
     }
 
     @Override
     public boolean canGenerateIn(ResourceKey<LevelStem> dimensionKey) {
-        LevelStem dimension = this.registryAccess.registryOrThrow(Registries.LEVEL_STEM).get(dimensionKey);
-        return dimension != null && dimension.generator().getBiomeSource().possibleBiomes().stream().anyMatch(entry -> entry.value() == this.getBiome());
+        LevelStem levelStem = this.registryAccess.lookupOrThrow(Registries.LEVEL_STEM).getValue(dimensionKey);
+        return levelStem != null && levelStem.generator().getBiomeSource().possibleBiomes().stream().anyMatch(
+                entry -> entry.value() == this.getBiome());
     }
 
     @Override
     public boolean is(TagKey<Biome> tag) {
-        Registry<Biome> biomeRegistry = this.registryAccess.registryOrThrow(Registries.BIOME);
-        return biomeRegistry.getHolderOrThrow(this.getResourceKey()).is(tag);
+        Registry<Biome> registry = this.registryAccess.lookupOrThrow(Registries.BIOME);
+        return registry.getOrThrow(this.getResourceKey()).is(tag);
     }
 }

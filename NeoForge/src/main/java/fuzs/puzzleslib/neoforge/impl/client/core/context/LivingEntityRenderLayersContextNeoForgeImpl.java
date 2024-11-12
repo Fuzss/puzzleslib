@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,15 +25,15 @@ import java.util.function.Predicate;
 public record LivingEntityRenderLayersContextNeoForgeImpl(EntityRenderersEvent.AddLayers evt) implements LivingEntityRenderLayersContext {
 
     @Override
-    public <E extends LivingEntity, T extends E, M extends EntityModel<T>> void registerRenderLayer(Predicate<EntityType<E>> filter, BiFunction<RenderLayerParent<T, M>, EntityRendererProvider.Context, RenderLayer<T, M>> factory) {
+    public <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(Predicate<EntityType<? extends LivingEntity>> filter, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, RenderLayer<S, M>> factory) {
         Objects.requireNonNull(filter, "filter is null");
         Objects.requireNonNull(factory, "render layer factory is null");
         EntityRendererProvider.Context context = this.evt.getContext();
         for (EntityType<?> entityType : this.getEntityTypes()) {
-            if (filter.test((EntityType<E>) entityType)) {
-                for (EntityRenderer<?> entityRenderer : this.getEntityRenderer(entityType)) {
-                    if (entityRenderer instanceof LivingEntityRenderer<?, ?>) {
-                        LivingEntityRenderer<T, M> livingEntityRenderer = (LivingEntityRenderer<T, M>) entityRenderer;
+            if (filter.test((EntityType<? extends LivingEntity>) entityType)) {
+                for (EntityRenderer<?, ?> entityRenderer : this.getEntityRenderer(entityType)) {
+                    if (entityRenderer instanceof LivingEntityRenderer<?, ?, ?>) {
+                        LivingEntityRenderer<?, S, M> livingEntityRenderer = (LivingEntityRenderer<?, S, M>) entityRenderer;
                         livingEntityRenderer.addLayer(factory.apply(livingEntityRenderer, context));
                     }
                 }
@@ -46,11 +47,11 @@ public record LivingEntityRenderLayersContextNeoForgeImpl(EntityRenderersEvent.A
         return entityTypes;
     }
 
-    private Collection<EntityRenderer<?>> getEntityRenderer(EntityType<?> entityType) {
+    private Collection<EntityRenderer<?, ?>> getEntityRenderer(EntityType<?> entityType) {
         if (entityType == EntityType.PLAYER) {
-            ImmutableSet.Builder<EntityRenderer<?>> builder = ImmutableSet.builder();
+            ImmutableSet.Builder<EntityRenderer<?, ?>> builder = ImmutableSet.builder();
             for (PlayerSkin.Model model : this.evt.getSkins()) {
-                EntityRenderer<? extends Player> entityRenderer = this.evt.getSkin(model);
+                EntityRenderer<? extends Player, ?> entityRenderer = this.evt.getSkin(model);
                 if (entityRenderer != null) {
                     builder.add(entityRenderer);
                 }
