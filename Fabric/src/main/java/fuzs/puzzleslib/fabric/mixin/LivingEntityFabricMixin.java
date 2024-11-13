@@ -345,9 +345,9 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Nullable
     public abstract MobEffectInstance getEffect(Holder<MobEffect> effect);
 
-    @Inject(method = "removeEffect", at = @At("HEAD"))
+    @Inject(method = "removeAllEffects", at = @At("HEAD"))
     public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {
-        if (this.level().isClientSide) return;
+        if (this.level().isClientSide || this.activeEffects.isEmpty()) return;
         Set<MobEffectInstance> activeEffectsToKeep = Sets.newIdentityHashSet();
         for (MobEffectInstance mobEffectInstance : this.activeEffects.values()) {
             EventResult result = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker().onMobEffectRemove(LivingEntity.class.cast(this), mobEffectInstance);
