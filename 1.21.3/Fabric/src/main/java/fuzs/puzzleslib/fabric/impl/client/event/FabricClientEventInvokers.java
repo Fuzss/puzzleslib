@@ -2,6 +2,7 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.Maps;
 import com.mojang.authlib.GameProfile;
+import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
@@ -46,10 +47,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.client.multiplayer.chat.ChatTrustLevel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
@@ -61,6 +68,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -277,19 +285,43 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InputEvents.KeyPress.class, FabricClientEvents.KEY_PRESS);
         INSTANCE.register(RenderLivingEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING);
         INSTANCE.register(RenderLivingEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING);
-        INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_PLAYER);
-        INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_PLAYER);
+        INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING, callback -> {
+            return new RenderLivingEvents.Before() {
+                @Override
+                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S renderState, LivingEntityRenderer<T, S, M> renderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+                    if (renderState instanceof PlayerRenderState playerRenderState && renderer instanceof PlayerRenderer playerRenderer) {
+                        return callback.onBeforeRenderPlayer(playerRenderState, playerRenderer, partialTick, poseStack,
+                                bufferSource, packedLight
+                        );
+                    } else {
+                        return EventResult.PASS;
+                    }
+                }
+            };
+        });
+        INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING, callback -> {
+            return new RenderLivingEvents.After() {
+                @Override
+                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S renderState, LivingEntityRenderer<T, S, M> renderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+                    if (renderState instanceof PlayerRenderState playerRenderState && renderer instanceof PlayerRenderer playerRenderer) {
+                        callback.onAfterRenderPlayer(playerRenderState, playerRenderer, partialTick, poseStack,
+                                bufferSource, packedLight
+                        );
+                    }
+                }
+            };
+        });
         INSTANCE.register(RenderHandEvents.MainHand.class, FabricRendererEvents.RENDER_MAIN_HAND);
         INSTANCE.register(RenderHandEvents.OffHand.class, FabricRendererEvents.RENDER_OFF_HAND);
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricRendererEvents.COMPUTE_CAMERA_ANGLES);
         INSTANCE.register(ClientLevelTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK, callback -> {
-            return (ClientLevel world) -> {
-                callback.onStartLevelTick(Minecraft.getInstance(), world);
+            return (ClientLevel clientLevel) -> {
+                callback.onStartLevelTick(Minecraft.getInstance(), clientLevel);
             };
         });
         INSTANCE.register(ClientLevelTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_WORLD_TICK, callback -> {
-            return (ClientLevel world) -> {
-                callback.onEndLevelTick(Minecraft.getInstance(), world);
+            return (ClientLevel clientLevel) -> {
+                callback.onEndLevelTick(Minecraft.getInstance(), clientLevel);
             };
         });
         INSTANCE.register(ClientChunkEvents.Load.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_LOAD, callback -> {

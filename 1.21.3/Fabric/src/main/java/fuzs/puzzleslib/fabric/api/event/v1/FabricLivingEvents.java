@@ -162,13 +162,7 @@ public final class FabricLivingEvents {
     public static final Event<LivingBreathEvents.Drown> LIVING_DROWN = FabricEventFactory.createResult(
             LivingBreathEvents.Drown.class);
     /**
-     * Fires whenever equipment changes are detected on an entity in {@link LivingEntity#collectEquipmentChanges()} from
-     * {@link LivingEntity#tick()}.
-     */
-    public static final Event<LivingEquipmentChangeCallback> LIVING_EQUIPMENT_CHANGE = FabricEventFactory.create(
-            LivingEquipmentChangeCallback.class);
-    /**
-     * Called in {@link EnderMan#isLookingAtMe(Player)}, to allow for custom behavior when looking at an enderman.
+     * Called in {@link EnderMan#isBeingStaredBy(Player)}, to allow for custom behavior when looking at an enderman.
      */
     public static final Event<LookingAtEndermanCallback> LOOKING_AT_ENDERMAN = FabricEventFactory.createResult(
             LookingAtEndermanCallback.class);

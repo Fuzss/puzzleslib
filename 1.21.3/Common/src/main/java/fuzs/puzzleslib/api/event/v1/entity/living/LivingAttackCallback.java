@@ -11,13 +11,14 @@ public interface LivingAttackCallback {
 
     /**
      * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
-     * <p>This event runs at the beginning of {@link LivingEntity#hurt(DamageSource, float)}.
      *
      * @param entity the entity that is attacked
-     * @param source the {@link DamageSource} {@code entity} has been attacked by
-     * @param amount the amount of damage {@code entity} is attacked with
-     * @return {@link EventResult#INTERRUPT} to prevent the attack from happening, dealing no damage,
-     * {@link EventResult#PASS} to allow the entity to be attacked and to take damage
+     * @param source the {@link DamageSource} the entity has been attacked by
+     * @param amount the amount of damage the entity is attacked with
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the attack from happening, dealing no damage</li>
+     *         <li>{@link EventResult#PASS} to allow the entity to be attacked and to take damage</li>
+     *         </ul>
      */
     EventResult onLivingAttack(LivingEntity entity, DamageSource source, float amount);
 }

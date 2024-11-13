@@ -390,9 +390,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onUseItemFinish(evt.getEntity(), stack, evt.getDuration(), evt.getItem());
         });
         INSTANCE.register(ShieldBlockCallback.class, LivingShieldBlockEvent.class, (ShieldBlockCallback callback, LivingShieldBlockEvent evt) -> {
-            DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(evt::setBlockedDamage, evt::getBlockedDamage, evt::getOriginalBlockedDamage);
-            // Forge event can also prevent the shield taking durability damage, but that's hard to implement...
-            if (callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), blockedDamage).isInterrupt()) {
+            if (callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), evt.getBlockedDamage()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });

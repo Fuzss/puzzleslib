@@ -32,18 +32,6 @@ public final class FabricRendererEvents {
     public static final Event<RenderLivingEvents.After> AFTER_RENDER_LIVING = FabricEventFactory.create(
             RenderLivingEvents.After.class);
     /**
-     * Called before the player model is rendered, allows for applying transformations to the {@link PoseStack}, or for
-     * completely taking over rendering as a whole.
-     */
-    public static final Event<RenderPlayerEvents.Before> BEFORE_RENDER_PLAYER = FabricEventFactory.createResult(
-            RenderPlayerEvents.Before.class);
-    /**
-     * Called after the player model is rendered, allows for cleaning up transformations applied to the
-     * {@link PoseStack}.
-     */
-    public static final Event<RenderPlayerEvents.After> AFTER_RENDER_PLAYER = FabricEventFactory.create(
-            RenderPlayerEvents.After.class);
-    /**
      * Called before the player's main hand is rendered in first-person mode.
      */
     public static final Event<RenderHandEvents.MainHand> RENDER_MAIN_HAND = FabricEventFactory.createResult(

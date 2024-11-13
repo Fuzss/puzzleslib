@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
@@ -20,8 +19,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-
-import java.util.Optional;
 
 @Mixin(value = Gui.class, priority = 500)
 abstract class GuiFabricMixin {
@@ -102,13 +99,9 @@ abstract class GuiFabricMixin {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.FOOD_LEVEL, callback);
     }
 
-    @ModifyExpressionValue(
-            method = "renderPlayerHealth",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAirSupply()I")
-    )
-    private int renderPlayerHealth(int airSupply, GuiGraphics guiGraphics) {
-        return FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, () -> Optional.of(0)).orElse(
-                airSupply);
+    @Inject(method = "renderAirBubbles", at = @At("HEAD"), cancellable = true)
+    private void renderAirBubbles(GuiGraphics guiGraphics, Player player, int i, int j, int k, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, callback);
     }
 
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)

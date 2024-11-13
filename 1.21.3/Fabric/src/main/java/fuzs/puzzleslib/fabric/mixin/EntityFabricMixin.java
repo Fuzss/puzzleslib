@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -73,13 +74,13 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     }
 
     @WrapWithCondition(
-            method = "spawnAtLocation(Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
+                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
             )
     )
-    public boolean spawnAtLocation(Level level, Entity entity) {
+    public boolean spawnAtLocation(ServerLevel serverLevel, Entity entity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
             capturedDrops.add((ItemEntity) entity);

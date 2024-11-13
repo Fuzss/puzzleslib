@@ -19,9 +19,7 @@ import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Supplier;
 
 /**
  * The keys are to be used with Fabric's {@link net.fabricmc.loader.api.ObjectShare}.
@@ -62,14 +60,9 @@ public final class FabricGuiEventHelper {
     }
 
     public static void cancelIfNecessary(ResourceLocation resourceLocation, CallbackInfo callback) {
-        cancelIfNecessary(resourceLocation, () -> {
+        if (CANCELLED_GUI_LAYERS.contains(resourceLocation)) {
             callback.cancel();
-            return Optional.empty();
-        });
-    }
-
-    public static <T> Optional<T> cancelIfNecessary(ResourceLocation resourceLocation, Supplier<Optional<T>> supplier) {
-        return CANCELLED_GUI_LAYERS.contains(resourceLocation) ? supplier.get() : Optional.empty();
+        }
     }
 
     public static int getGuiLeftHeight() {

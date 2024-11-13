@@ -7,6 +7,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,31 +33,31 @@ public final class RenderGuiLayerEvents {
     private static final List<ResourceLocation> VANILLA_GUI_LAYERS = new ArrayList<>();
     public static final List<ResourceLocation> VANILLA_GUI_LAYERS_VIEW = Collections.unmodifiableList(
             VANILLA_GUI_LAYERS);
-    public static final ResourceLocation CAMERA_OVERLAYS = register("camera_overlays");
-    public static final ResourceLocation CROSSHAIR = register("crosshair");
-    public static final ResourceLocation HOTBAR = register("hotbar");
-    public static final ResourceLocation JUMP_METER = register("jump_meter");
-    public static final ResourceLocation EXPERIENCE_BAR = register("experience_bar");
-    public static final ResourceLocation PLAYER_HEALTH = register("player_health");
-    public static final ResourceLocation ARMOR_LEVEL = register("armor_level");
-    public static final ResourceLocation FOOD_LEVEL = register("food_level");
-    public static final ResourceLocation VEHICLE_HEALTH = register("vehicle_health");
-    public static final ResourceLocation AIR_LEVEL = register("air_level");
-    public static final ResourceLocation SELECTED_ITEM_NAME = register("selected_item_name");
-    public static final ResourceLocation SPECTATOR_TOOLTIP = register("spectator_tooltip");
-    public static final ResourceLocation EXPERIENCE_LEVEL = register("experience_level");
-    public static final ResourceLocation EFFECTS = register("effects");
-    public static final ResourceLocation BOSS_OVERLAY = register("boss_overlay");
-    public static final ResourceLocation SLEEP_OVERLAY = register("sleep_overlay");
-    public static final ResourceLocation DEMO_OVERLAY = register("demo_overlay");
-    public static final ResourceLocation DEBUG_OVERLAY = register("debug_overlay");
-    public static final ResourceLocation SCOREBOARD_SIDEBAR = register("scoreboard_sidebar");
-    public static final ResourceLocation OVERLAY_MESSAGE = register("overlay_message");
-    public static final ResourceLocation TITLE = register("title");
-    public static final ResourceLocation CHAT = register("chat");
-    public static final ResourceLocation TAB_LIST = register("tab_list");
-    public static final ResourceLocation SUBTITLE_OVERLAY = register("subtitle_overlay");
-    public static final ResourceLocation SAVING_INDICATOR = register("saving_indicator");
+    public static final ResourceLocation CAMERA_OVERLAYS = registerGuiLayer("camera_overlays");
+    public static final ResourceLocation CROSSHAIR = registerGuiLayer("crosshair");
+    public static final ResourceLocation HOTBAR = registerGuiLayer("hotbar");
+    public static final ResourceLocation JUMP_METER = registerGuiLayer("jump_meter");
+    public static final ResourceLocation EXPERIENCE_BAR = registerGuiLayer("experience_bar");
+    public static final ResourceLocation PLAYER_HEALTH = registerGuiLayer("player_health");
+    public static final ResourceLocation ARMOR_LEVEL = registerGuiLayer("armor_level");
+    public static final ResourceLocation FOOD_LEVEL = registerGuiLayer("food_level");
+    public static final ResourceLocation VEHICLE_HEALTH = registerGuiLayer("vehicle_health");
+    public static final ResourceLocation AIR_LEVEL = registerGuiLayer("air_level");
+    public static final ResourceLocation SELECTED_ITEM_NAME = registerGuiLayer("selected_item_name");
+    public static final ResourceLocation SPECTATOR_TOOLTIP = registerGuiLayer("spectator_tooltip");
+    public static final ResourceLocation EXPERIENCE_LEVEL = registerGuiLayer("experience_level");
+    public static final ResourceLocation EFFECTS = registerGuiLayer("effects");
+    public static final ResourceLocation BOSS_OVERLAY = registerGuiLayer("boss_overlay");
+    public static final ResourceLocation SLEEP_OVERLAY = registerGuiLayer("sleep_overlay");
+    public static final ResourceLocation DEMO_OVERLAY = registerGuiLayer("demo_overlay");
+    public static final ResourceLocation DEBUG_OVERLAY = registerGuiLayer("debug_overlay");
+    public static final ResourceLocation SCOREBOARD_SIDEBAR = registerGuiLayer("scoreboard_sidebar");
+    public static final ResourceLocation OVERLAY_MESSAGE = registerGuiLayer("overlay_message");
+    public static final ResourceLocation TITLE = registerGuiLayer("title");
+    public static final ResourceLocation CHAT = registerGuiLayer("chat");
+    public static final ResourceLocation TAB_LIST = registerGuiLayer("tab_list");
+    public static final ResourceLocation SUBTITLE_OVERLAY = registerGuiLayer("subtitle_overlay");
+    public static final ResourceLocation SAVING_INDICATOR = registerGuiLayer("saving_indicator");
 
     private RenderGuiLayerEvents() {
         // NO-OP
@@ -72,13 +73,42 @@ public final class RenderGuiLayerEvents {
         return EventInvoker.lookup(After.class, resourceLocation);
     }
 
-    private static ResourceLocation register(String path) {
-        return register(ResourceLocationHelper.withDefaultNamespace(path));
+    private static ResourceLocation registerGuiLayer(String path) {
+        return registerGuiLayer(ResourceLocationHelper.withDefaultNamespace(path));
     }
 
-    private static ResourceLocation register(ResourceLocation resourceLocation) {
-        VANILLA_GUI_LAYERS.add(resourceLocation);
-        return resourceLocation;
+    public static ResourceLocation registerGuiLayer(ResourceLocation resourceLocation) {
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        return register(resourceLocation, null);
+    }
+
+    public static ResourceLocation registerGuiLayer(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation) {
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        Objects.requireNonNull(otherResourceLocation, "other resource location is null");
+        return register(resourceLocation, otherResourceLocation);
+    }
+
+    private static ResourceLocation register(ResourceLocation resourceLocation, @Nullable ResourceLocation otherResourceLocation) {
+        if (resourceLocation != null && otherResourceLocation == null) {
+            VANILLA_GUI_LAYERS.add(resourceLocation);
+            return resourceLocation;
+        } else {
+            int resourceLocationIndex = VANILLA_GUI_LAYERS.indexOf(resourceLocation);
+            int otherResourceLocationIndex = VANILLA_GUI_LAYERS.indexOf(otherResourceLocation);
+            if (resourceLocationIndex != -1 && otherResourceLocationIndex == -1) {
+                // resourceLocation exists, otherResourceLocation should be added afterward
+                VANILLA_GUI_LAYERS.add(resourceLocationIndex + 1, otherResourceLocation);
+                return otherResourceLocation;
+            } else if (resourceLocationIndex == -1 && otherResourceLocationIndex != -1) {
+                // otherResourceLocation exists, resourceLocation should be added before
+                VANILLA_GUI_LAYERS.add(otherResourceLocationIndex, resourceLocation);
+                return resourceLocation;
+            } else {
+                throw new RuntimeException(
+                        "Invalid resource location indices: " + resourceLocation + "=" + resourceLocationIndex + ", " +
+                                otherResourceLocation + "=" + otherResourceLocationIndex);
+            }
+        }
     }
 
     @FunctionalInterface

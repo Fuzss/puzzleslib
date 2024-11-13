@@ -19,7 +19,6 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -35,7 +34,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
-import java.util.function.Supplier;
 
 @Mixin(ClientLevel.class)
 abstract class ClientLevelFabricMixin extends Level {
@@ -53,7 +51,7 @@ abstract class ClientLevelFabricMixin extends Level {
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(ClientPacketListener clientPacketListener, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> resourceKey, Holder<DimensionType> holder, int i, int j, Supplier<ProfilerFiller> supplier, LevelRenderer levelRenderer, boolean bl, long l, CallbackInfo callback) {
+    public void init(ClientPacketListener clientPacketListener, ClientLevel.ClientLevelData clientLevelData, ResourceKey<Level> resourceKey, Holder<DimensionType> holder, int i, int j, LevelRenderer levelRenderer, boolean bl, long l, int k, CallbackInfo callback) {
         FabricClientLevelEvents.LOAD_LEVEL.invoker().onLevelLoad(Minecraft.getInstance(), ClientLevel.class.cast(this));
     }
 

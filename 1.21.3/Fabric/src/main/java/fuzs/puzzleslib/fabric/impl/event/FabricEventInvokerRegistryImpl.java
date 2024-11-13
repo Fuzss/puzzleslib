@@ -460,7 +460,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingBreathEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
-        INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
+        INSTANCE.register(LivingEquipmentChangeCallback.class, ServerEntityEvents.EQUIPMENT_CHANGE, callback -> {
+            return callback::onLivingEquipmentChange;
+        });
         INSTANCE.register(LivingConversionCallback.class, ServerLivingEntityEvents.MOB_CONVERSION, (LivingConversionCallback callback) -> {
             return (Mob previous, Mob converted, ConversionParams conversionContext) -> {
                 callback.onLivingConversion(previous, converted);
