@@ -71,8 +71,6 @@
     "client.MouseHandlerFabricMixin",
     "client.OptionsFabricMixin",
     "client.PackSelectionScreenFabricMixin",
-    "client.PlayerRendererFabricMixin",
-    "client.RemotePlayerMixin",
     "client.RenderBuffersFabricMixin",
     "client.ScreenEffectRendererFabricMixin",
     "client.ScreenFabricMixin",

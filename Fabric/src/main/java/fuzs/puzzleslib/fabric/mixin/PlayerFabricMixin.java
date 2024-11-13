@@ -1,12 +1,12 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.sugar.Share;
-import com.llamalad7.mixinextras.sugar.ref.LocalRef;
+import com.llamalad7.mixinextras.sugar.Cancellable;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -15,15 +15,13 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-
-import java.util.Objects;
 
 @Mixin(Player.class)
 abstract class PlayerFabricMixin extends LivingEntity {
@@ -40,12 +38,6 @@ abstract class PlayerFabricMixin extends LivingEntity {
     @Inject(method = "tick", at = @At("TAIL"))
     public void tick$1(CallbackInfo callback) {
         FabricPlayerEvents.PLAYER_TICK_END.invoker().onEndPlayerTick(Player.class.cast(this));
-    }
-
-    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
-    public void hurtServer(ServerLevel serverLevel, DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
-        EventResult result = FabricLivingEvents.LIVING_ATTACK.invoker().onLivingAttack(this, source, amount);
-        if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
     @ModifyReturnValue(
@@ -87,28 +79,16 @@ abstract class PlayerFabricMixin extends LivingEntity {
         if (result.isInterrupt()) callback.cancel();
     }
 
-    @Inject(method = "actuallyHurt", at = @At("HEAD"), cancellable = true)
-    protected void actuallyHurt(ServerLevel serverLevel, DamageSource damageSource, float damageAmount, CallbackInfo callback, @Share(
-            "damageAmount"
-    ) LocalRef<DefaultedFloat> damageAmountRef) {
-        if (!this.isInvulnerableTo(serverLevel, damageSource)) {
-            damageAmountRef.set(DefaultedFloat.fromValue(damageAmount));
-            if (FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(LivingEntity.class.cast(this), damageSource,
-                    damageAmountRef.get()
-            ).isInterrupt()) {
-                callback.cancel();
-            }
-        }
-    }
-
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
-    protected float actuallyHurt(ServerLevel serverLevel, float damageAmount, DamageSource damageSource, @Share(
-            "damageAmount"
-    ) LocalRef<DefaultedFloat> damageAmountRef) {
+    protected float actuallyHurt(float damageAmount, ServerLevel serverLevel, DamageSource damageSource, @Cancellable CallbackInfo callback) {
         if (!this.isInvulnerableTo(serverLevel, damageSource)) {
-            Objects.requireNonNull(damageAmountRef.get(), "damage amount is null");
-            damageAmount = damageAmountRef.get().getAsOptionalFloat().orElse(damageAmount);
+            MutableBoolean cancelInjection = new MutableBoolean();
+            damageAmount = FabricEventImplHelper.onLivingHurt(this, serverLevel, damageSource, damageAmount,
+                    cancelInjection
+            );
+            if (cancelInjection.booleanValue()) callback.cancel();
         }
+
         return damageAmount;
     }
 }

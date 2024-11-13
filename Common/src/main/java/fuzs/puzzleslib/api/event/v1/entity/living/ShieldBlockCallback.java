@@ -12,13 +12,15 @@ public interface ShieldBlockCallback {
 
     /**
      * Called right before damage from an incoming attack is negated via blocking using a shield.
-     * <p>The <code>shieldTakesDamage</code> parameter from Forge is not implemented.
      *
-     * @param blocker           the entity that is using a shield to block an incoming attack
-     * @param source            the damage source attacking the <code>blocker</code>
-     * @param blockedDamage     the amount of damage that will be blocked, the original state is the full damage amount the <code>blocker</code> is attacked with
-     * @return {@link EventResult#INTERRUPT} to prevent the shield block from happening, the attacked entity will receive the full damage,
-     * {@link EventResult#PASS} to allow the block to happen with values from <code>blockedDamage</code> and <code>shieldTakesDamage</code>
+     * @param livingEntity the entity that is using a shield to block an incoming attack
+     * @param damageSource the damage source attacking the blocking entity
+     * @param damageAmount the amount of damage that will be blocked, i.e. the full damage amount the entity is attacked
+     *                     with
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the shield block from happening, the attacked entity will receive the full damage amount</li>
+     *         <li>{@link EventResult#PASS PASS} to allow the block to happen with the entity taking no damage</li>
+     *         </ul>
      */
-    EventResult onShieldBlock(LivingEntity blocker, DamageSource source, DefaultedFloat blockedDamage);
+    EventResult onShieldBlock(LivingEntity livingEntity, DamageSource damageSource, float damageAmount);
 }

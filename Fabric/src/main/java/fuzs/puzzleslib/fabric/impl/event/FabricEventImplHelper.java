@@ -1,11 +1,13 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.Entity;
@@ -17,6 +19,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.Vec3;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -37,6 +40,21 @@ public final class FabricEventImplHelper {
             return returnValue;
         } else {
             return intValue;
+        }
+    }
+
+    public static float onLivingHurt(LivingEntity livingEntity, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, MutableBoolean cancelInjection) {
+        if (!livingEntity.isInvulnerableTo(serverLevel, damageSource)) {
+            DefaultedFloat damageAmountValue = DefaultedFloat.fromValue(damageAmount);
+            EventResult result = FabricLivingEvents.LIVING_HURT.invoker().onLivingHurt(livingEntity,
+                    damageSource, damageAmountValue
+            );
+            if (result.isInterrupt()) {
+                cancelInjection.setTrue();
+            }
+            return damageAmountValue.getAsOptionalFloat().orElse(damageAmount);
+        } else {
+            return damageAmount;
         }
     }
 

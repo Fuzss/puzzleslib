@@ -38,7 +38,7 @@ public final class FabricGuiEvents {
      * {@link net.minecraft.client.Minecraft#setScreen}, allows for exchanging the new screen with a different one, or
      * can prevent a new screen from opening, effectively forcing the old screen to remain.
      */
-    public static final Event<ScreenOpeningCallback> SCREEN_OPENING = FabricEventFactory.createResult(
+    public static final Event<ScreenOpeningCallback> SCREEN_OPENING = FabricEventFactory.createResultHolder(
             ScreenOpeningCallback.class);
     /**
      * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
@@ -52,7 +52,7 @@ public final class FabricGuiEvents {
             CustomizeChatPanelCallback.class);
     /**
      * Fires when a {@link Toast} is about to be queued in
-     * {@link net.minecraft.client.gui.components.toasts.ToastComponent#addToast(Toast)}.
+     * {@link net.minecraft.client.gui.components.toasts.ToastManager#addToast(Toast)}.
      */
     public static final Event<AddToastCallback> ADD_TOAST = FabricEventFactory.createResult(AddToastCallback.class);
     /**

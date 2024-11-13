@@ -6,7 +6,6 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import fuzs.puzzleslib.fabric.impl.client.event.EntitySpectatorShaderRegistryImpl;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
@@ -24,19 +23,18 @@ abstract class GameRendererFabricMixin {
     private Camera mainCamera;
     @Shadow
     @Nullable
-    private PostChain postEffect;
+    private ResourceLocation postEffectId;
 
     @Inject(method = "checkEntityPostEffect", at = @At("TAIL"))
     public void checkEntityPostEffect(@Nullable Entity entity, CallbackInfo callback) {
-        if (this.postEffect == null && entity != null) {
-            EntitySpectatorShaderRegistryImpl.getEntityShader(entity).ifPresent(this::loadEffect);
+        // no effect has been set by vanilla, same behavior as NeoForge
+        if (this.postEffectId == null) {
+            EntitySpectatorShaderRegistryImpl.getEntityShader(entity).ifPresent(this::setPostEffect);
         }
     }
 
     @Shadow
-    private void loadEffect(ResourceLocation resourceLocation) {
-        throw new RuntimeException();
-    }
+    public abstract void setPostEffect(ResourceLocation resourceLocation);
 
     @ModifyReturnValue(method = "getFov", at = @At("TAIL"))
     private float getFov(float fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {

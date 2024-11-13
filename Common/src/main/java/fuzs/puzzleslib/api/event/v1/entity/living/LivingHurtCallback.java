@@ -13,14 +13,15 @@ public interface LivingHurtCallback {
     /**
      * Called right before any reduction on damage due to e.g. armor are done, cancelling prevents any damage / armor
      * durability being taken.
-     * <p>
-     * This event runs at the beginning of {@link LivingEntity#actuallyHurt(DamageSource, float)}.
      *
-     * @param entity       the entity being hurt
-     * @param damageSource damage source entity is hurt by
-     * @param damageAmount amount hurt, can be modified and will only be applied when the event is not interrupted
-     * @return {@link EventResult#INTERRUPT} to prevent this entity from being hurt, {@link EventResult#PASS} will make
-     *         vanilla continue to execute
+     * @param livingEntity the entity being hurt
+     * @param damageSource the damage source the entity is hurt by
+     * @param damageAmount the amount the entity is hurt by; can be modified and will only be applied when the event is
+     *                     not interrupted
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent this entity from being hurt</li>
+     *         <li>{@link EventResult#PASS PASS} will make vanilla continue to execute</li>
+     *         </ul>
      */
-    EventResult onLivingHurt(LivingEntity entity, DamageSource damageSource, MutableFloat damageAmount);
+    EventResult onLivingHurt(LivingEntity livingEntity, DamageSource damageSource, MutableFloat damageAmount);
 }
