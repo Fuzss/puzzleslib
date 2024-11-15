@@ -29,6 +29,8 @@ accessible  field   net/minecraft/world/SimpleContainer size    I
 mutable field   net/minecraft/world/SimpleContainer size    I
 transitive-accessible   field   net/minecraft/world/level/ServerExplosion   damageSource    Lnet/minecraft/world/damagesource/DamageSource;
 transitive-accessible   field   net/minecraft/world/level/ServerExplosion   damageCalculator    Lnet/minecraft/world/level/ExplosionDamageCalculator;
+transitive-accessible   field   net/minecraft/world/level/ServerExplosion   blockInteraction    Lnet/minecraft/world/level/Explosion$BlockInteraction;
+transitive-mutable  field   net/minecraft/world/level/ServerExplosion   blockInteraction    Lnet/minecraft/world/level/Explosion$BlockInteraction;
 transitive-accessible	field	net/minecraft/client/Minecraft	missTime	I
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  slotClicked (Lnet/minecraft/world/inventory/Slot;IILnet/minecraft/world/inventory/ClickType;)V
 transitive-accessible   method  net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  getHoveredSlot  (DD)Lnet/minecraft/world/inventory/Slot;
@@ -78,10 +80,6 @@ mutable field   net/minecraft/world/level/GameRules$Type    constructor Ljava/ut
 accessible	field   net/minecraft/client/Minecraft  running Z
 accessible	field   net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen  selectedTab Lnet/minecraft/world/item/CreativeModeTab;
 accessible  method  net/minecraft/world/inventory/AbstractContainerMenu addSlot (Lnet/minecraft/world/inventory/Slot;)Lnet/minecraft/world/inventory/Slot;
-accessible  field   net/minecraft/client/multiplayer/chat/ChatListener  previousMessageTime J
-accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  evaluateTrustLevel  (Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/network/chat/Component;Ljava/time/Instant;)Lnet/minecraft/client/multiplayer/chat/ChatTrustLevel;
-accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  logPlayerMessage    (Lnet/minecraft/network/chat/PlayerChatMessage;Lnet/minecraft/network/chat/ChatType$Bound;Lcom/mojang/authlib/GameProfile;Lnet/minecraft/client/multiplayer/chat/ChatTrustLevel;)V
-accessible  method  net/minecraft/client/multiplayer/chat/ChatListener  logSystemMessage    (Lnet/minecraft/network/chat/Component;Ljava/time/Instant;)V
 mutable field	net/minecraft/data/loot/BlockLootSubProvider	registries  Lnet/minecraft/core/HolderLookup$Provider;
 mutable field	net/minecraft/data/loot/EntityLootSubProvider   registries  Lnet/minecraft/core/HolderLookup$Provider;
 accessible  class   net/minecraft/world/item/alchemy/PotionBrewing$Mix
@@ -95,7 +93,6 @@ accessible  class   net/minecraft/client/multiplayer/SessionSearchTrees$Key
 accessible  method  net/minecraft/client/multiplayer/SessionSearchTrees$Key <init>  ()V
 accessible  field   net/minecraft/client/resources/model/ModelBakery    topModels   Ljava/util/Map;
 accessible  field   net/minecraft/client/resources/model/ModelBakery    unbakedModels   Ljava/util/Map;
-# accessible  method  net/minecraft/client/resources/model/ModelBakery    getModel    (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/UnbakedModel;
 accessible  field   net/minecraft/client/resources/model/ModelBakery    ITEM_MODEL_GENERATOR    Lnet/minecraft/client/renderer/block/model/ItemModelGenerator;
 accessible  class   net/minecraft/client/resources/model/ModelBakery$BakedCacheKey
 accessible  method  net/minecraft/client/resources/model/ModelBakery$BakedCacheKey  <init> (Lnet/minecraft/resources/ResourceLocation;Lcom/mojang/math/Transformation;Z)V

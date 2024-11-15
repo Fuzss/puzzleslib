@@ -1,12 +1,17 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 
 /**
  * Controls how capability data should be handled when entity data is copied.
- * <p>This happens in {@link net.minecraft.world.entity.Mob#convertTo(EntityType, boolean)} and when the player is being respawned.
+ * <p>
+ * This happens in
+ * {@link net.minecraft.world.entity.Mob#convertTo(EntityType, ConversionParams, EntitySpawnReason,
+ * ConversionParams.AfterConversion)} and when the player is being respawned.
  */
 public enum CopyStrategy {
     /**
@@ -19,7 +24,8 @@ public enum CopyStrategy {
         }
     },
     /**
-     * Do not copy entity data, allows for manual handling if desired. Data is still copied for players returning from the End dimension.
+     * Do not copy entity data, allows for manual handling if desired. Data is still copied for players returning from
+     * the End dimension.
      */
     NEVER {
         @Override
@@ -28,12 +34,13 @@ public enum CopyStrategy {
         }
     },
     /**
-     * Copy entity data when inventory contents of a player are copied, which is the case after dying when the <code>keepInventory</code> game rule is active.
+     * Copy entity data when inventory contents of a player are copied, which is the case after dying when the
+     * <code>keepInventory</code> game rule is active.
      *
-     * @deprecated will no longer be supported in upcoming versions to allow migrating to Fabric Api's / NeoForge's native implementation
+     * @deprecated will no longer be supported in upcoming versions to allow migrating to Fabric Api's / NeoForge's
+     *         native implementation
      */
-    @Deprecated
-    KEEP_PLAYER_INVENTORY {
+    @Deprecated KEEP_PLAYER_INVENTORY {
         @Override
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
             NEVER.copy(oldEntity, oldCapability, newEntity, newCapability, originalStillAlive);

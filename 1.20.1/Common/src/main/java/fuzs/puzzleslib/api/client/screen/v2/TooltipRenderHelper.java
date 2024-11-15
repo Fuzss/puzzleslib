@@ -177,7 +177,7 @@ public final class TooltipRenderHelper {
         if (insertAt == -1) {
             clientComponents.addAll(clientImageComponents);
         } else {
-            clientComponents.addAll(insertAt, clientImageComponents);
+            clientComponents.addAll(Math.min(clientComponents.size(), insertAt), clientImageComponents);
         }
         return ImmutableList.copyOf(clientComponents);
     }

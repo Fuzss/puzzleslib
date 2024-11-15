@@ -32,6 +32,7 @@ import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
@@ -528,24 +529,17 @@ public final class NeoForgeClientEventInvokers {
             MutableFloat fieldOfView = MutableFloat.fromEvent(evt::setFOV, evt::getFOV);
             callback.onComputeFieldOfView(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), fieldOfView);
         });
-        INSTANCE.register(ChatMessageReceivedEvents.System.class, ClientChatReceivedEvent.System.class, (ChatMessageReceivedEvents.System callback, ClientChatReceivedEvent.System evt) -> {
-            MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
-            // vanilla system messages have no chat type bound
-            EventResult result = callback.onSystemMessageReceived(message, evt.isOverlay());
-            if (result.isInterrupt()) evt.setCanceled(true);
-        });
-        INSTANCE.register(ChatMessageReceivedEvents.Player.class, ClientChatReceivedEvent.class, (ChatMessageReceivedEvents.Player callback, ClientChatReceivedEvent evt) -> {
-            MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
-            EventResult result = callback.onPlayerMessageReceived(evt.getBoundChatType(), message, null);
-            if (result.isInterrupt()) evt.setCanceled(true);
-        }, true);
-        INSTANCE.register(ChatMessageReceivedEvents.Player.class, ClientChatReceivedEvent.Player.class, (ChatMessageReceivedEvents.Player callback, ClientChatReceivedEvent.Player evt) -> {
-            MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
-            EventResult result = callback.onPlayerMessageReceived(evt.getBoundChatType(), message,
-                    evt.getPlayerChatMessage()
-            );
-            if (result.isInterrupt()) evt.setCanceled(true);
-        }, true);
+        INSTANCE.register(
+                ChatMessageReceivedCallback.class, ClientChatReceivedEvent.class, (ChatMessageReceivedCallback callback, ClientChatReceivedEvent evt) -> {
+                    MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
+                    PlayerChatMessage playerChatMessage = evt instanceof ClientChatReceivedEvent.Player player ? player.getPlayerChatMessage() : null;
+                    boolean isOverlay = evt instanceof ClientChatReceivedEvent.System system && system.isOverlay();
+                    EventResult result = callback.onChatMessageReceived(message, evt.getBoundChatType(),
+                            playerChatMessage,
+                            isOverlay
+                    );
+                    if (result.isInterrupt()) evt.setCanceled(true);
+                });
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, GatherEffectScreenTooltipsEvent.class, (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent evt) -> {
             callback.onGatherEffectScreenTooltip(evt.getScreen(), evt.getEffectInstance(), evt.getTooltip());
         });

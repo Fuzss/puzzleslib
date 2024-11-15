@@ -13,8 +13,6 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
@@ -64,9 +62,8 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
     }
 
     @Override
-    public void registerConfigurationScreen(String modId) {
-        ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
-        modContainer.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+    protected void registerConfigurationScreen(String modId) {
+        super.registerConfigurationScreen(modId);
         ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
             if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
                 ConfigTranslationsManager.addModConfig(modConfig.getModId(), modConfig.getType().extension(),

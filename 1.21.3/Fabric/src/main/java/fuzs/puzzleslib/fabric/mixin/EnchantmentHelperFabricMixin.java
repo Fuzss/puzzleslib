@@ -17,13 +17,13 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 @Mixin(EnchantmentHelper.class)
 abstract class EnchantmentHelperFabricMixin {
 
-    @ModifyVariable(method = "lambda$processEquipmentDropChance$24", at = @At("HEAD"), argsOnly = true)
-    private static int processEquipmentDropChance$0(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int enchantmentLevelX, EnchantedItemInUse enchantedItemInUse) {
+    @ModifyVariable(method = "lambda$processEquipmentDropChance$25", at = @At("HEAD"), argsOnly = true)
+    private static int processEquipmentDropChance$0(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int _enchantmentLevel, EnchantedItemInUse enchantedItemInUse) {
         return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, entity, damageSource);
     }
 
-    @ModifyVariable(method = "lambda$processEquipmentDropChance$26", at = @At("HEAD"), argsOnly = true)
-    private static int processEquipmentDropChance$1(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int enchantmentLevelX, EnchantedItemInUse enchantedItemInUse) {
+    @ModifyVariable(method = "lambda$processEquipmentDropChance$27", at = @At("HEAD"), argsOnly = true)
+    private static int processEquipmentDropChance$1(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int _enchantmentLevel, EnchantedItemInUse enchantedItemInUse) {
         return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, entity, damageSource);
     }
 }

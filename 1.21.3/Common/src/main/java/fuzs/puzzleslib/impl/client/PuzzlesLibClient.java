@@ -12,6 +12,7 @@ import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenSkipper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.minecraft.client.Minecraft;
@@ -50,10 +51,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() ||
-                ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
-            return;
-        }
+        if (!PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) return;
         if (ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
             setupGameOptions();
         }
@@ -160,8 +158,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
     @Override
     public void onClientSetup() {
         EventHandlerProvider.tryRegister(ClientAbstractions.INSTANCE);
-        if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() &&
-                !ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+        if (PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) {
             CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(
                     CreativeModeTabs.SEARCH);
         }

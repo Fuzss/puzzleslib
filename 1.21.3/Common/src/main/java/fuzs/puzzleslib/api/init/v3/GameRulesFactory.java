@@ -3,13 +3,13 @@ package fuzs.puzzleslib.api.init.v3;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
-import net.minecraft.world.level.Level;
 
 import java.util.function.BiConsumer;
 
 /**
  * Helper class for registering custom game rules.
- * <p>Fabric has many custom options for game rules (mainly double and enum rules), but since they don't exist on Forge we don't support them.
+ * <p>Fabric has many custom options for game rules (mainly double and enum rules), but since they don't exist on Forge
+ * we don't support them.
  */
 public interface GameRulesFactory {
     /**
@@ -23,7 +23,7 @@ public interface GameRulesFactory {
      * @param name         name of the rule, used for the <code>/gamerule</code> command
      * @param category     category for the game rules screen shown during world creation
      * @param defaultValue the default value for the game rule
-     * @return key for accessing the game rule via {@link Level#getGameRules()}
+     * @return key for accessing the game rule via {@link net.minecraft.server.level.ServerLevel#getGameRules()}
      */
     default GameRules.Key<GameRules.BooleanValue> registerBooleanRule(String name, GameRules.Category category, boolean defaultValue) {
         return this.register(name, category, this.createBooleanRule(defaultValue));
@@ -35,7 +35,7 @@ public interface GameRulesFactory {
      * @param name         name of the rule, used for the <code>/gamerule</code> command
      * @param category     category for the game rules screen shown during world creation
      * @param defaultValue the default value for the game rule
-     * @return key for accessing the game rule via {@link Level#getGameRules()}
+     * @return key for accessing the game rule via {@link net.minecraft.server.level.ServerLevel#getGameRules()}
      */
     default GameRules.Key<GameRules.IntegerValue> registerIntRule(String name, GameRules.Category category, int defaultValue) {
         return this.register(name, category, this.createIntRule(defaultValue));
@@ -48,7 +48,7 @@ public interface GameRulesFactory {
      * @param category category for the game rules screen shown during world creation
      * @param type     game rule type from one of the factory methods
      * @param <T>      rule value type (boolean or int)
-     * @return key for accessing the game rule via {@link Level#getGameRules()}
+     * @return key for accessing the game rule via {@link net.minecraft.server.level.ServerLevel#getGameRules()}
      */
     <T extends GameRules.Value<T>> GameRules.Key<T> register(String name, GameRules.Category category, GameRules.Type<T> type);
 
@@ -85,7 +85,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}
@@ -97,7 +98,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}
@@ -105,9 +107,11 @@ public interface GameRulesFactory {
      * @return the game rule
      */
     default GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, int minimumValue, int maximumValue) {
-        return this.createIntRule(defaultValue, minimumValue, maximumValue, (MinecraftServer server, GameRules.IntegerValue integerValue) -> {
-            // NO-OP
-        });
+        return this.createIntRule(defaultValue, minimumValue, maximumValue,
+                (MinecraftServer server, GameRules.IntegerValue integerValue) -> {
+                    // NO-OP
+                }
+        );
     }
 
     /**
@@ -123,7 +127,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}
@@ -136,7 +141,8 @@ public interface GameRulesFactory {
 
     /**
      * Create a new {@link net.minecraft.world.level.GameRules.IntegerValue}.
-     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game rule.
+     * <p>Note that any bounds are not supported on Forge and are therefore simply ignored when creating the new game
+     * rule.
      *
      * @param defaultValue the default value for the game rule
      * @param minimumValue the minimum value for this rule, usually {@link Integer#MIN_VALUE}

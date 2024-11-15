@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.init.v3.override;
 
 import com.google.common.collect.Maps;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
@@ -31,7 +30,7 @@ public final class CommandOverrides {
             CommandEnvironment.class);
 
     private CommandOverrides() {
-
+        // NO-OP
     }
 
     /**
@@ -41,16 +40,16 @@ public final class CommandOverrides {
      * @param onlyDedicated run commands only on a dedicated server
      */
     public static void registerServerCommand(String command, boolean onlyDedicated) {
-        CommandEnvironment commandEnvironment = onlyDedicated ?
-                CommandEnvironment.DEDICATED_SERVER :
-                CommandEnvironment.SERVER;
+        CommandEnvironment commandEnvironment =
+                onlyDedicated ? CommandEnvironment.DEDICATED_SERVER : CommandEnvironment.SERVER;
         COMMAND_OVERRIDES.computeIfAbsent(commandEnvironment, $ -> new LinkedHashSet<>()).add(command);
     }
 
     /**
      * Registers an <code>/effect</code> command to run for when a player joins the world for the very first time.
      * <p>
-     * Players will be marked with a value retrievable via <code>/tag</code> to prevent running commands a second time.
+     * Players will be marked with a value retrievable via <code>/tag</code> to prevent running commands again
+     * afterward.
      *
      * @param holder mob effects to apply
      */
@@ -67,34 +66,28 @@ public final class CommandOverrides {
      * @param onlyDedicated run commands only on a dedicated server
      */
     public static void registerPlayerCommand(String command, boolean onlyDedicated) {
-        CommandEnvironment commandEnvironment = onlyDedicated ?
-                CommandEnvironment.DEDICATED_PLAYER :
-                CommandEnvironment.PLAYER;
+        CommandEnvironment commandEnvironment =
+                onlyDedicated ? CommandEnvironment.DEDICATED_PLAYER : CommandEnvironment.PLAYER;
         COMMAND_OVERRIDES.computeIfAbsent(commandEnvironment, $ -> new LinkedHashSet<>()).add(command);
     }
 
     @ApiStatus.Internal
-    public static void registerHandlers() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
+    public static void registerEventHandlers() {
         ServerLifecycleEvents.STARTED.register((MinecraftServer server) -> {
             if (server.overworld().getGameTime() == 0) {
-                executeCommandOverrides(server,
-                        CommandEnvironment.SERVER,
-                        CommandEnvironment.DEDICATED_SERVER,
+                executeCommandOverrides(server, CommandEnvironment.SERVER, CommandEnvironment.DEDICATED_SERVER,
                         UnaryOperator.identity()
                 );
             }
         });
         ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel level) -> {
             // idea from Serilum's Starter Kit mod
-            if (entity instanceof ServerPlayer serverPlayer &&
-                    !serverPlayer.getTags().contains(KEY_PLAYER_SEEN_WORLD)) {
+            if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags().contains(
+                    KEY_PLAYER_SEEN_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
                 String playerName = serverPlayer.getGameProfile().getName();
-                executeCommandOverrides(serverPlayer.server,
-                        CommandEnvironment.PLAYER,
-                        CommandEnvironment.DEDICATED_PLAYER,
-                        s -> s.replaceAll("@[sp]", playerName)
+                executeCommandOverrides(serverPlayer.server, CommandEnvironment.PLAYER,
+                        CommandEnvironment.DEDICATED_PLAYER, s -> s.replaceAll("@[sp]", playerName)
                 );
             }
             return EventResult.PASS;
@@ -107,8 +100,9 @@ public final class CommandOverrides {
         }
         if (server instanceof DedicatedServer) {
             for (String command : COMMAND_OVERRIDES.getOrDefault(dedicatedCommandEnvironment, Collections.emptySet())) {
-                server.getCommands()
-                        .performPrefixedCommand(server.createCommandSourceStack(), formatter.apply(command));
+                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
+                        formatter.apply(command)
+                );
             }
         }
     }

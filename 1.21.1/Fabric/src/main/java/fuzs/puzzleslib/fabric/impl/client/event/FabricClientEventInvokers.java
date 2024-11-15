@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.Maps;
-import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
@@ -16,14 +15,11 @@ import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelResolver;
@@ -39,22 +35,15 @@ import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.GuiMessageTag;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.multiplayer.chat.ChatListener;
-import net.minecraft.client.multiplayer.chat.ChatTrustLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.resources.model.*;
-import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FilterMask;
-import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -73,8 +62,10 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import org.jetbrains.annotations.Nullable;
 
-import java.time.Instant;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -417,42 +408,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GatherDebugTextEvents.Left.class, FabricGuiEvents.GATHER_LEFT_DEBUG_TEXT);
         INSTANCE.register(GatherDebugTextEvents.Right.class, FabricGuiEvents.GATHER_RIGHT_DEBUG_TEXT);
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
-        INSTANCE.register(ChatMessageReceivedEvents.System.class, ClientReceiveMessageEvents.ALLOW_GAME, callback -> {
-            return (Component component, boolean overlay) -> {
-                return callback.onSystemMessageReceived(MutableValue.fromValue(component), overlay).isPass();
-            };
-        }, true);
-        INSTANCE.register(ChatMessageReceivedEvents.System.class, ClientReceiveMessageEvents.MODIFY_GAME, callback -> {
-            return (Component component, boolean overlay) -> {
-                DefaultedValue<Component> message = DefaultedValue.fromValue(component);
-                callback.onSystemMessageReceived(message, overlay);
-                return message.getAsOptional().orElse(component);
-            };
-        }, true);
-        INSTANCE.register(ChatMessageReceivedEvents.Player.class, ClientReceiveMessageEvents.ALLOW_CHAT, callback -> {
-            return (Component component, @Nullable PlayerChatMessage chatMessage, @Nullable GameProfile gameProfile, ChatType.Bound chatTypeBound, Instant timestamp) -> {
-                Component chatComponent = getChatComponent(component, chatMessage);
-                DefaultedValue<Component> message = DefaultedValue.fromValue(chatTypeBound.decorate(chatComponent));
-                if (callback.onPlayerMessageReceived(chatTypeBound, message, chatMessage).isPass()) {
-                    Optional<Component> optional = message.getAsOptional();
-                    if (optional.isPresent()) {
-                        addMessage(chatComponent, component, optional.get(), chatMessage,
-                                gameProfile,
-                                chatTypeBound,
-                                timestamp
-                        );
-
-                        // we need to cancel vanilla adding the message, so we can add our custom message ourselves
-                        return false;
-                    }
-
-                    return true;
-                } else {
-
-                    return false;
-                }
-            };
-        });
+        INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
     }
 
@@ -469,41 +425,5 @@ public final class FabricClientEventInvokers {
                 if (((Class<?>) context).isInstance(screen)) removeInvoker.accept(eventGetter.apply(screen));
             });
         });
-    }
-
-    private static Component getChatComponent(Component component, @Nullable PlayerChatMessage chatMessage) {
-        if (chatMessage != null) {
-            // ChatListener::showMessageToPlayer
-            FilterMask filterMask = chatMessage.filterMask();
-            if (filterMask.isEmpty()) {
-                return chatMessage.decoratedContent();
-            } else {
-                return filterMask.applyWithFormatting(chatMessage.signedContent());
-            }
-        } else {
-            // ChatListener::handleDisguisedChatMessage
-            return component;
-        }
-    }
-
-    private static void addMessage(Component chatComponent, Component oldDecoratedComponent, Component newDecoratedComponent, @Nullable PlayerChatMessage chatMessage, @Nullable GameProfile gameProfile, ChatType.Bound chatTypeBound, Instant timestamp) {
-        Minecraft minecraft = Minecraft.getInstance();
-        ChatListener chatListener = minecraft.getChatListener();
-
-        if (chatMessage != null) {
-            // ChatListener::showMessageToPlayer
-            ChatTrustLevel chatTrustLevel = chatListener
-                    .evaluateTrustLevel(chatMessage, oldDecoratedComponent, timestamp);
-            GuiMessageTag guiMessageTag = chatTrustLevel.createTag(chatMessage);
-            minecraft.gui.getChat().addMessage(newDecoratedComponent, chatMessage.signature(), guiMessageTag);
-            chatListener.logPlayerMessage(chatMessage, chatTypeBound, gameProfile, chatTrustLevel);
-        } else {
-            // ChatListener::handleDisguisedChatMessage
-            minecraft.gui.getChat().addMessage(newDecoratedComponent);
-            chatListener.logSystemMessage(newDecoratedComponent, timestamp);
-        }
-
-        minecraft.getNarrator().sayChat(chatTypeBound.decorateNarration(chatComponent));
-        chatListener.previousMessageTime = Util.getMillis();
     }
 }
