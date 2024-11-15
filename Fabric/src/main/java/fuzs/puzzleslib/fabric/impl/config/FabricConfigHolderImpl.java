@@ -3,7 +3,6 @@ package fuzs.puzzleslib.fabric.impl.config;
 import com.electronwill.nightconfig.core.file.FileWatcher;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
 import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -12,7 +11,6 @@ import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
@@ -60,8 +58,8 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
     }
 
     @Override
-    public void registerConfigurationScreen(String modId) {
-        ConfigScreenFactoryRegistry.INSTANCE.register(modId, ConfigurationScreen::new);
+    protected void registerConfigurationScreen(String modId) {
+        super.registerConfigurationScreen(modId);
         ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
             if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
                 ConfigTranslationsManager.addModConfig(modConfig.getModId(), modConfig.getType().extension(),

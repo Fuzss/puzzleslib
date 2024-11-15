@@ -403,8 +403,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(ExplosionEvents.Detonate.class, ExplosionEvent.Detonate.class, (ExplosionEvents.Detonate callback, ExplosionEvent.Detonate evt) -> {
-            // TODO fix empty list when parameter is back in NeoForge
-            callback.onExplosionDetonate((ServerLevel) evt.getLevel(), evt.getExplosion(), Collections.emptyList(), evt.getAffectedEntities());
+            callback.onExplosionDetonate((ServerLevel) evt.getLevel(), evt.getExplosion(), evt.getAffectedBlocks(), evt.getAffectedEntities());
         });
         INSTANCE.register(SyncDataPackContentsCallback.class, OnDatapackSyncEvent.class, (SyncDataPackContentsCallback callback, OnDatapackSyncEvent evt) -> {
             evt.getRelevantPlayers().forEach((ServerPlayer player) -> {

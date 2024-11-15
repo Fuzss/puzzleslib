@@ -65,6 +65,10 @@ public interface ConfigHolder {
         return (String modId) -> Paths.get(directory, getDefaultNameFactory(configType).apply(modId)).toString();
     }
 
+    static void registerForwardingConfigScreenFactory(String modId, String forwardedModId) {
+
+    }
+
     /**
      * builder interface for registering configs, not needed anymore after initial registration is complete, but no new
      * instance is created, so we only store the super type {@link ConfigHolder}

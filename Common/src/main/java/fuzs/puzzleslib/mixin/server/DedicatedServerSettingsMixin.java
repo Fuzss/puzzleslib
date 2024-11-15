@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.mixin.server;
 
 import com.mojang.logging.LogUtils;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.dedicated.DedicatedServerSettings;
 import net.minecraft.server.dedicated.Settings;
@@ -23,7 +22,7 @@ abstract class DedicatedServerSettingsMixin {
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(Path path, CallbackInfo callback) {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment() || !this.properties.serverIp.isEmpty()) return;
+        if (!this.properties.serverIp.isEmpty()) return;
         Logger logger = LogUtils.getLogger();
         // will print the FileNotFoundException twice, but ¯\_(ツ)_/¯
         this.properties = new DedicatedServerProperties(Settings.loadFromFile(path)) {

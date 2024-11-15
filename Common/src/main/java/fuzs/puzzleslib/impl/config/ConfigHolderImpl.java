@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.impl.config;
 
 import com.google.common.collect.ImmutableMap;
+import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -96,5 +98,8 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
 
-    protected abstract void registerConfigurationScreen(String modId);
+    @MustBeInvokedByOverriders
+    protected void registerConfigurationScreen(String modId) {
+        ClientAbstractions.INSTANCE.registerConfigScreenFactory(modId, null);
+    }
 }

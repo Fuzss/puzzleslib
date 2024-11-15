@@ -20,6 +20,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -175,4 +176,18 @@ public interface ClientAbstractions {
      * @param rightHeight the additional hotbar decorations render height
      */
     void addGuiRightHeight(Gui gui, int rightHeight);
+
+    /**
+     * Registers a config screen factory. Will create an empty screen for mods without any config, so registering for
+     * those mods is fine.
+     * <p>
+     * Allows for registering a config screen that shows the config of another mod. Useful for mods that have all of
+     * their relevant configuration as part of an underlying library.
+     * <p>
+     * When the other mod is provided, but not present, no config screen is registered.
+     *
+     * @param modId         the mod id to register the config screen for
+     * @param modIdOverride a mod id to pull configs from, defaults to the mod id the config screen is registered for
+     */
+    void registerConfigScreenFactory(String modId, @Nullable String modIdOverride);
 }

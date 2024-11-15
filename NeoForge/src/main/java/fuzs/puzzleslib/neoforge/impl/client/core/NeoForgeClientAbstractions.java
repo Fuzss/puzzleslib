@@ -2,10 +2,12 @@ package fuzs.puzzleslib.neoforge.impl.client.core;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
+import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -20,8 +22,12 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.ClientHooks;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -91,5 +97,19 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
     @Override
     public void addGuiRightHeight(Gui gui, int rightHeight) {
         gui.rightHeight += rightHeight;
+    }
+
+    @Override
+    public void registerConfigScreenFactory(String modId, @Nullable String modIdOverride) {
+        ModContainer modContainerOverride = NeoForgeModContainerHelper.getOptionalModContainer(modIdOverride).orElse(
+                null);
+        if (modIdOverride == null || modContainerOverride != null) {
+            NeoForgeModContainerHelper.getModContainer(modId).registerExtensionPoint(IConfigScreenFactory.class,
+                    (ModContainer modContainer, Screen lastScreen) -> {
+                        return new ConfigurationScreen(
+                                modContainerOverride != null ? modContainerOverride : modContainer, lastScreen);
+                    }
+            );
+        }
     }
 }

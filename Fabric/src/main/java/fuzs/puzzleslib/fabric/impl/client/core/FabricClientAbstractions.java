@@ -1,6 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
+import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
@@ -11,6 +13,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -23,6 +26,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -91,6 +96,24 @@ public final class FabricClientAbstractions implements ClientAbstractions, Event
     @Override
     public void addGuiRightHeight(Gui gui, int rightHeight) {
         FabricGuiEventHelper.setGuiRightHeight(this.getGuiRightHeight(gui) + rightHeight);
+    }
+
+    @Override
+    public void registerConfigScreenFactory(String modId, @Nullable String modIdOverride) {
+        // cannot check for configs to be present for the mod, as they might not be registered yet
+        // checking if the mod is present seems good enough though
+        boolean registerConfigScreenFactory;
+        if (modIdOverride != null) {
+            registerConfigScreenFactory = ModLoaderEnvironment.INSTANCE.isModLoaded(modIdOverride);
+        } else {
+            registerConfigScreenFactory = true;
+        }
+        if (registerConfigScreenFactory) {
+            ConfigScreenFactoryRegistry.INSTANCE.register(modId,
+                    (String configScreenModId, Screen lastScreen) -> new ConfigurationScreen(
+                            modIdOverride != null ? modIdOverride : configScreenModId, lastScreen)
+            );
+        }
     }
 
     @Override

@@ -10,7 +10,7 @@ public interface LookingAtEndermanCallback {
     EventInvoker<LookingAtEndermanCallback> EVENT = EventInvoker.lookup(LookingAtEndermanCallback.class);
 
     /**
-     * Called in {@link EnderMan#isLookingAtMe(Player)}, to allow for custom behavior when looking at an enderman.
+     * Called in {@link EnderMan#isBeingStaredBy(Player)}, to allow for custom behavior when looking at an enderman.
      * <p>
      * Mainly useful for supporting custom mask blocks for safely looking at an enderman.
      * <p>
