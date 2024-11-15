@@ -22,14 +22,31 @@ abstract class ClientPacketListenerFabricMixin extends ClientCommonPacketListene
         super(minecraft, connection, commonListenerCookie);
     }
 
-    @Inject(method = "handleLogin", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetPos()V", shift = At.Shift.AFTER))
+    @Inject(
+            method = "handleLogin",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/player/LocalPlayer;resetPos()V",
+                    shift = At.Shift.AFTER
+            )
+    )
     public void handleLogin(ClientboundLoginPacket packet, CallbackInfo callback) {
-        FabricClientPlayerEvents.PLAYER_LOGGED_IN.invoker().onLoggedIn(this.minecraft.player, this.minecraft.gameMode, this.minecraft.getConnection().getConnection());
+        FabricClientPlayerEvents.PLAYER_LOGGED_IN.invoker().onLoggedIn(this.minecraft.player, this.minecraft.gameMode,
+                this.minecraft.getConnection().getConnection()
+        );
     }
 
-    @Inject(method = "handleRespawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;resetPos()V", shift = At.Shift.AFTER))
-    public LocalPlayer handleRespawn(ClientboundRespawnPacket packet, CallbackInfo callback, @Local(ordinal = 0) LocalPlayer oldPlayer) {
-        FabricClientPlayerEvents.PLAYER_COPY.invoker().onCopy(oldPlayer, this.minecraft.player, this.minecraft.gameMode, this.minecraft.player.connection.getConnection());
-        return oldPlayer;
+    @Inject(
+            method = "handleRespawn",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/player/LocalPlayer;resetPos()V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    public void handleRespawn(ClientboundRespawnPacket packet, CallbackInfo callback, @Local(ordinal = 0) LocalPlayer oldPlayer) {
+        FabricClientPlayerEvents.PLAYER_COPY.invoker().onCopy(oldPlayer, this.minecraft.player, this.minecraft.gameMode,
+                this.minecraft.player.connection.getConnection()
+        );
     }
 }

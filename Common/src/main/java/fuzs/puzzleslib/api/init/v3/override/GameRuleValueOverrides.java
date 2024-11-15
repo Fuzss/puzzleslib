@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.init.v3.override;
 
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import net.minecraft.world.level.GameRules;
 
 import java.util.function.Consumer;
@@ -41,14 +40,14 @@ public final class GameRuleValueOverrides {
     }
 
     /**
-     * Get a game rules by the corresponding key and adjust the game rule value constructor to immediately set a new value after initialization.
+     * Get a game rules by the corresponding key and adjust the game rule value constructor to immediately set a new
+     * value after initialization.
      *
      * @param key         game rule key
      * @param valueSetter implementation for setting the value
      * @param <T>         game rule value type
      */
     public static <T extends GameRules.Value<T>> void setValue(GameRules.Key<T> key, Consumer<T> valueSetter) {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) return;
         GameRules.Type<T> type = (GameRules.Type<T>) GameRules.GAME_RULE_TYPES.get(key);
         Function<GameRules.Type<T>, T> originalConstructor = type.constructor;
         type.constructor = (GameRules.Type<T> factoryType) -> {

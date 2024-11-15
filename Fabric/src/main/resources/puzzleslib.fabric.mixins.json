@@ -52,6 +52,7 @@
     "client.AbstractClientPlayerFabricMixin",
     "client.AbstractContainerScreenFabricMixin",
     "client.CameraFabricMixin",
+    "client.ChatListenerFabricMixin",
     "client.ClientLevelFabricMixin",
     "client.ClientPacketListenerFabricMixin",
     "client.DebugScreenOverlayMixin",
