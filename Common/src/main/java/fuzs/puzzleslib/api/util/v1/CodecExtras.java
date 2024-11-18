@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.codec.v1;
+package fuzs.puzzleslib.api.util.v1;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;

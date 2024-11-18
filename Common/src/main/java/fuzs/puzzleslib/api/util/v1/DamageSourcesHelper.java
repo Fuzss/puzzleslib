@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.damagesource.v1;
+package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import net.minecraft.core.RegistryAccess;

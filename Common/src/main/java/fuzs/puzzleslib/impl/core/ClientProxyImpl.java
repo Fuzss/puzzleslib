@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
-import fuzs.puzzleslib.api.chat.v1.ComponentHelper;
+import fuzs.puzzleslib.api.util.v1.ComponentHelper;
 import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;

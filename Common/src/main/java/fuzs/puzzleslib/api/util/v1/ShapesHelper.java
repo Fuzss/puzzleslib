@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.shape.v1;
+package fuzs.puzzleslib.api.util.v1;
 
 import com.google.common.collect.Maps;
 import net.minecraft.core.Direction;
