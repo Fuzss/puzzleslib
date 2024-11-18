@@ -10,7 +10,7 @@ public class PuzzlesLib {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
     public static boolean isDevelopmentEnvironmentWithoutDataGeneration() {
-        if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
+        if (ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
             return false;
         } else {
             return isDevelopmentEnvironment();

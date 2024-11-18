@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.chat.v1;
+package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.impl.chat.FormattedContentSink;
 import net.minecraft.network.chat.Component;
