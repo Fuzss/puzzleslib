@@ -31,6 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
@@ -74,8 +75,15 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
     @Override
     public boolean onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
-        return ClientHooks.onRenderTooltipPre(ItemStack.EMPTY, guiGraphics, mouseX, mouseY, guiGraphics.guiWidth(),
-                guiGraphics.guiHeight(), components, font, positioner
+        return ClientHooks.onRenderTooltipPre(ItemStack.EMPTY,
+                guiGraphics,
+                mouseX,
+                mouseY,
+                guiGraphics.guiWidth(),
+                guiGraphics.guiHeight(),
+                components,
+                font,
+                positioner
         ).isCanceled();
     }
 
@@ -101,8 +109,9 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
     @Override
     public void registerConfigScreenFactory(String modId, @Nullable String modIdOverride) {
-        ModContainer modContainerOverride = NeoForgeModContainerHelper.getOptionalModContainer(modIdOverride).orElse(
-                null);
+        ModContainer modContainerOverride = Optional.ofNullable(modIdOverride)
+                .flatMap(NeoForgeModContainerHelper::getOptionalModContainer)
+                .orElse(null);
         if (modIdOverride == null || modContainerOverride != null) {
             NeoForgeModContainerHelper.getModContainer(modId).registerExtensionPoint(IConfigScreenFactory.class,
                     (ModContainer modContainer, Screen lastScreen) -> {
