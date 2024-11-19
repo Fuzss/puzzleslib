@@ -127,4 +127,15 @@ public final class InteractionResultHelper {
     public static InteractionResult skipDefaultBlockInteraction() {
         return InteractionResult.PASS;
     }
+
+    /**
+     * An abstraction for {@code InteractionResult::shouldSwing}.
+     *
+     * @param interactionResult the interaction result
+     * @return should the player arm be swung via Player::swing
+     */
+    public static boolean shouldSwing(InteractionResult interactionResult) {
+        // there is no need for distinguishing between client and server swing sources
+        return interactionResult instanceof InteractionResult.Success success && success.swingSource() != InteractionResult.SwingSource.NONE;
+    }
 }
