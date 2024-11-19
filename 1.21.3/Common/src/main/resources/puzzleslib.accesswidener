@@ -124,6 +124,7 @@ accessible  field   net/minecraft/data/recipes/RecipeProvider   output  Lnet/min
 mutable field   net/minecraft/data/recipes/RecipeProvider   output  Lnet/minecraft/data/recipes/RecipeOutput;
 accessible  method  net/minecraft/client/resources/model/ModelDiscovery listMandatoryModels ()Ljava/util/Set;
 accessible  method  net/minecraft/client/renderer/entity/ItemRenderer   shouldRenderItemFlat    (Lnet/minecraft/world/item/ItemDisplayContext;)Z
+accessible  method  com/mojang/blaze3d/platform/NativeImage writeToChannel  (Ljava/nio/channels/WritableByteChannel;)Z
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	logProperties	(Lnet/minecraft/world/level/material/MapColor;Lnet/minecraft/world/level/material/MapColor;Lnet/minecraft/world/level/block/SoundType;)Lnet/minecraft/world/level/block/state/BlockBehaviour$Properties;

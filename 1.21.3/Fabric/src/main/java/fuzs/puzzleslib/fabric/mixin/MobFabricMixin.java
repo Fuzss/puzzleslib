@@ -17,7 +17,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -50,11 +49,16 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         this.puzzleslib$spawnType = mobSpawnType;
     }
 
-    @ModifyVariable(method = "setTarget", at = @At("HEAD"), ordinal = 0)
-    public LivingEntity setTarget(@Nullable LivingEntity entity) {
-        DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(entity);
+    @Inject(method = "setTarget", at = @At("HEAD"))
+    public void setTarget(@Nullable LivingEntity livingEntity, CallbackInfo callback) {
+        DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(livingEntity);
         EventResult result = FabricLivingEvents.LIVING_CHANGE_TARGET.invoker().onLivingChangeTarget(this, target);
-        return result.isInterrupt() ? this.target : target.getAsOptional().orElse(entity);
+        if (result.isInterrupt()) {
+            callback.cancel();
+        } else if (target.getAsOptional().isPresent()) {
+            this.target = target.get();
+            callback.cancel();
+        }
     }
 
     @Inject(
