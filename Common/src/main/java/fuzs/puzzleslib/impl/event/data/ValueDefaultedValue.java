@@ -26,6 +26,6 @@ public class ValueDefaultedValue<T> extends ValueMutableValue<T> implements Defa
 
     @Override
     public Optional<T> getAsOptional() {
-        return this.dirty ? Optional.of(this.get()) : Optional.empty();
+        return this.dirty ? Optional.ofNullable(this.get()) : Optional.empty();
     }
 }
