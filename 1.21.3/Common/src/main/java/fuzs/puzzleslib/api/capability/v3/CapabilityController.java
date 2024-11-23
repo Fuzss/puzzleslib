@@ -28,20 +28,20 @@ public interface CapabilityController {
     }
 
     /**
-     * Get a registered capability key. Will throw if identifier is invalid.
+     * Get a registered capability key. Will throw if resourceLocation is invalid.
      *
-     * @param identifier identifier used during registration
+     * @param resourceLocation resource location used during registration
      * @return capability key
      */
     @NotNull
-    static CapabilityKey<?, ?> get(ResourceLocation identifier) {
-        return GlobalCapabilityRegister.get(identifier);
+    static CapabilityKey<?, ?> get(ResourceLocation resourceLocation) {
+        return GlobalCapabilityRegister.get(resourceLocation);
     }
 
     /**
      * Register capability to {@link Entity} objects.
      *
-     * @param identifier        path for internal identifier, used for serialization
+     * @param id                path for internal resource location, used for serialization
      * @param capabilityType    class type for this capability
      * @param capabilityFactory capability factory called when attaching to an object
      * @param entityType        entity class to match
@@ -49,12 +49,12 @@ public interface CapabilityController {
      * @param <C>               capability component type
      * @return capability key
      */
-    <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType);
+    <T extends Entity, C extends CapabilityComponent<T>> EntityCapabilityKey.Mutable<T, C> registerEntityCapability(String id, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> entityType);
 
     /**
      * Register capability to {@link BlockEntity} objects.
      *
-     * @param identifier        path for internal identifier, used for serialization
+     * @param id                path for internal resource location, used for serialization
      * @param capabilityType    class type for this capability
      * @param capabilityFactory capability factory called when attaching to an object
      * @param blockEntityType   block entity class to match
@@ -62,27 +62,27 @@ public interface CapabilityController {
      * @param <C>               capability component type
      * @return capability key
      */
-    <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> blockEntityType);
+    <T extends BlockEntity, C extends CapabilityComponent<T>> BlockEntityCapabilityKey<T, C> registerBlockEntityCapability(String id, Class<C> capabilityType, Supplier<C> capabilityFactory, Class<T> blockEntityType);
 
     /**
      * Register capability to {@link LevelChunk} objects.
      *
-     * @param identifier        path for internal identifier, used for serialization
+     * @param id                path for internal resource location, used for serialization
      * @param capabilityType    interface for this capability
      * @param capabilityFactory capability factory called when attaching to an object
      * @param <C>               capability component type
      * @return capability key
      */
-    <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory);
+    <C extends CapabilityComponent<LevelChunk>> LevelChunkCapabilityKey<C> registerLevelChunkCapability(String id, Class<C> capabilityType, Supplier<C> capabilityFactory);
 
     /**
      * Register capability to {@link Level} objects.
      *
-     * @param identifier        path for internal identifier, used for serialization
+     * @param id                path for internal resource location, used for serialization
      * @param capabilityType    class type for this capability
      * @param capabilityFactory capability factory called when attaching to an object
      * @param <C>               capability component type
      * @return capability key
      */
-    <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String identifier, Class<C> capabilityType, Supplier<C> capabilityFactory);
+    <C extends CapabilityComponent<Level>> LevelCapabilityKey<C> registerLevelCapability(String id, Class<C> capabilityType, Supplier<C> capabilityFactory);
 }

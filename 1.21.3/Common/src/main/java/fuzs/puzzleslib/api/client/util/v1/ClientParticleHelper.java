@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.particle.v1;
+package fuzs.puzzleslib.api.client.util.v1;
 
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;

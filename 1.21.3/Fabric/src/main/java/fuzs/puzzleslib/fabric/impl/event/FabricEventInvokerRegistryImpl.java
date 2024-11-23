@@ -532,7 +532,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             } else {
                 // make sure phase has consumer phase ordering, we keep track of phases we have already added an ordering for in this event in #knownEventPhases
                 this.testEventPhase(phase);
-                this.event.register(phase.identifier(), this.converter.apply(callback, context));
+                this.event.register(phase.resourceLocation(), this.converter.apply(callback, context));
             }
         }
 
