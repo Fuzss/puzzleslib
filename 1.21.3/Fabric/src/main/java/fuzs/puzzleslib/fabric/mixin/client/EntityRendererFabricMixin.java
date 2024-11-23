@@ -13,7 +13,9 @@ import net.minecraft.world.entity.Entity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(EntityRenderer.class)
 abstract class EntityRendererFabricMixin<T extends Entity, S extends EntityRenderState> {
@@ -25,16 +27,25 @@ abstract class EntityRendererFabricMixin<T extends Entity, S extends EntityRende
     )
     )
     public boolean render(EntityRenderer<T, S> entityRenderer, S entityRenderState, Component content, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        return FabricRendererEvents.RENDER_NAME_TAG.invoker().onRenderNameTag(entityRenderState, content,
-                entityRenderer, poseStack, bufferSource, packedLight, Mth.frac(entityRenderState.ageInTicks)
-        ).isPass();
+        return FabricRendererEvents.RENDER_NAME_TAG.invoker()
+                .onRenderNameTag(entityRenderState, content, entityRenderer, poseStack, bufferSource, packedLight, Mth.frac(entityRenderState.ageInTicks))
+                .isPass();
+    }
+
+    @Inject(
+            method = "createRenderState(Lnet/minecraft/world/entity/Entity;F)Lnet/minecraft/client/renderer/entity/state/EntityRenderState;",
+            at = @At("TAIL")
+    )
+    public void createRenderState(T entity, float partialTick, CallbackInfoReturnable<S> callback) {
+        S renderState = callback.getReturnValue();
+        FabricRendererEvents.EXTRACT_RENDER_STATE.invoker()
+                .onExtractRenderState(entity, renderState, EntityRenderer.class.cast(this), partialTick);
     }
 
     @ModifyVariable(method = "extractRenderState", at = @At("STORE"))
     public boolean extractRenderState(boolean renderNameTag, T entity, S entityRenderState, float partialTick) {
-        EventResult result = FabricRendererEvents.ALLOW_NAME_TAG.invoker().onAllowNameTag(entity, entityRenderState,
-                this.getNameTag(entity), EntityRenderer.class.cast(this), partialTick
-        );
+        EventResult result = FabricRendererEvents.ALLOW_NAME_TAG.invoker()
+                .onAllowNameTag(entity, entityRenderState, this.getNameTag(entity), EntityRenderer.class.cast(this), partialTick);
         return result.isInterrupt() ? result.getAsBoolean() : renderNameTag;
     }
 

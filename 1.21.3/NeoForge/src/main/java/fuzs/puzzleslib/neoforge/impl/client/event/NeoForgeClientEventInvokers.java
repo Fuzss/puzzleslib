@@ -546,7 +546,7 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(ExtractRenderStateCallback.class, RenderNameTagEvent.CanRender.class, (ExtractRenderStateCallback callback, RenderNameTagEvent.CanRender evt, @Nullable Object context) -> {
             callback.onExtractRenderState(evt.getEntity(), evt.getEntityRenderState(), evt.getEntityRenderer(), evt.getPartialTick());
-        }, EventPhase::early, false);
+        }, EventPhase::late, false);
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
