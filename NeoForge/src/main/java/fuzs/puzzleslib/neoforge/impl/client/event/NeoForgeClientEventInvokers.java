@@ -15,6 +15,7 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -543,6 +544,9 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, GatherEffectScreenTooltipsEvent.class, (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent evt) -> {
             callback.onGatherEffectScreenTooltip(evt.getScreen(), evt.getEffectInstance(), evt.getTooltip());
         });
+        INSTANCE.register(ExtractRenderStateCallback.class, RenderNameTagEvent.CanRender.class, (ExtractRenderStateCallback callback, RenderNameTagEvent.CanRender evt, @Nullable Object context) -> {
+            callback.onExtractRenderState(evt.getEntity(), evt.getEntityRenderState(), evt.getEntityRenderer(), evt.getPartialTick());
+        }, EventPhase::early, false);
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {

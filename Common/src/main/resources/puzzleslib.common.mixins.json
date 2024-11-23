@@ -7,7 +7,8 @@
   "mixins": [
   ],
   "client": [
-    "client.EditBoxMixin"
+    "client.EditBoxMixin",
+    "client.EntityRenderStateMixin"
   ],
   "server": [
     "server.DedicatedServerSettingsMixin",

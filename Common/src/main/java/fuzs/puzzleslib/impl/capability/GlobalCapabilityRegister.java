@@ -28,12 +28,12 @@ public final class GlobalCapabilityRegister {
     }
 
     @NotNull
-    public static CapabilityKey<?, ?> get(ResourceLocation identifier) {
-        CapabilityKey<?, ?> capabilityKey = REGISTER.get(identifier);
+    public static CapabilityKey<?, ?> get(ResourceLocation resourceLocation) {
+        CapabilityKey<?, ?> capabilityKey = REGISTER.get(resourceLocation);
         if (capabilityKey != null) {
             return capabilityKey;
         } else {
-            throw new IllegalStateException("No capability registered for identifier " + identifier);
+            throw new IllegalStateException("No capability registered for resource location " + resourceLocation);
         }
     }
 

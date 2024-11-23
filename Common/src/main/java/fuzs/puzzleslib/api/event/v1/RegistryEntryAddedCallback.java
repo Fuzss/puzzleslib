@@ -23,7 +23,7 @@ public interface RegistryEntryAddedCallback<T> {
      * <p>Note that the implementation is only designed for built-in registries and probably will not work with dynamic registries.
      *
      * @param registry  the read-only registry
-     * @param id        the identifier for the added entry
+     * @param id        the resource location for the added entry
      * @param entry     the added entry
      * @param registrar access to the registry for adding additional entries
      */

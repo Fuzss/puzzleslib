@@ -40,6 +40,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ByIdMap;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
@@ -89,10 +90,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvokerRegistry {
     private static boolean frozenModBusEvents;
@@ -757,7 +755,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
     }
 
     @Override
-    public <T, E extends Event> void register(Class<T> clazz, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, boolean joinInvokers) {
+    public <T, E extends Event> void register(Class<T> clazz, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(event, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
@@ -772,11 +770,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         } else {
             eventBus = NeoForge.EVENT_BUS;
         }
-        EventInvokerImpl.register(clazz, new ForgeEventInvoker<>(eventBus, event, converter), joinInvokers);
+        EventInvokerImpl.register(clazz, new NeoForgeEventInvoker<>(eventBus, event, converter, eventPhaseConverter), joinInvokers);
     }
 
-    private record ForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, NeoForgeEventContextConsumer<T, E> converter) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
+    private record NeoForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
         private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = Map.of(EventPhase.FIRST, EventPriority.HIGHEST, EventPhase.BEFORE, EventPriority.HIGH, EventPhase.DEFAULT, EventPriority.NORMAL, EventPhase.AFTER, EventPriority.LOW, EventPhase.LAST, EventPriority.LOWEST);
+        private static final IntFunction<EventPriority> PRIORITY_IDS = ByIdMap.continuous(Enum::ordinal, EventPriority.values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
 
         @Override
         public EventInvoker<T> asEventInvoker(@Nullable Object context) {
@@ -793,8 +792,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         private void register(EventPhase phase, T callback, @Nullable Object context) {
             Objects.requireNonNull(phase, "phase is null");
             Objects.requireNonNull(callback, "callback is null");
+            phase = this.eventPhaseConverter.apply(phase);
             IEventBus eventBus = this.getEventBus(context);
-            EventPriority eventPriority = PHASE_TO_PRIORITY.getOrDefault(phase, EventPriority.NORMAL);
+            EventPriority eventPriority = this.getEventPriority(phase);
             // filter out mod id which has been used to retrieve a missing mod event bus
             Object eventContext = this.eventBus != eventBus ? null : context;
             // we don't support receiving cancelled events since the event api on Fabric is not designed for it
@@ -807,6 +807,16 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 return NeoForgeModContainerHelper.getModEventBus((String) context);
             } else {
                 return this.eventBus;
+            }
+        }
+
+        private EventPriority getEventPriority(EventPhase eventPhase) {
+            if (PHASE_TO_PRIORITY.containsKey(eventPhase)) {
+                return PHASE_TO_PRIORITY.get(eventPhase);
+            } else {
+                Objects.requireNonNull(eventPhase.parent(), "parent is null");
+                EventPriority eventPriority = PHASE_TO_PRIORITY.getOrDefault(eventPhase.parent(), EventPriority.NORMAL);
+                return PRIORITY_IDS.apply(eventPriority.ordinal() + eventPhase.getOrderingValue());
             }
         }
     }
