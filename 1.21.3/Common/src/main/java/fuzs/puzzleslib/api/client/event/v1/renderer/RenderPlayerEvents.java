@@ -7,6 +7,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 
+/**
+ * @deprecated {@link RenderLivingEvents} is functionally equivalent now
+ */
+@Deprecated
 public final class RenderPlayerEvents {
     public static final EventInvoker<Before> BEFORE = EventInvoker.lookup(Before.class);
     public static final EventInvoker<After> AFTER = EventInvoker.lookup(After.class);
@@ -23,7 +27,7 @@ public final class RenderPlayerEvents {
          * for completely taking over rendering as a whole.
          *
          * @param renderState       the player state that is rendering
-         * @param renderer          the used {@link PlayerRenderer} instance
+         * @param playerRenderer    the used {@link PlayerRenderer} instance
          * @param partialTick       current partial tick time
          * @param poseStack         the current {@link PoseStack}
          * @param multiBufferSource the current {@link MultiBufferSource}
@@ -33,7 +37,7 @@ public final class RenderPlayerEvents {
          *         <p>
          *         {@link EventResult#PASS} to allow the player model to render
          */
-        EventResult onBeforeRenderPlayer(PlayerRenderState renderState, PlayerRenderer renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
+        EventResult onBeforeRenderPlayer(PlayerRenderState renderState, PlayerRenderer playerRenderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
     }
 
     @FunctionalInterface
@@ -44,12 +48,12 @@ public final class RenderPlayerEvents {
          * {@link PoseStack}.
          *
          * @param renderState       the player state that is rendering
-         * @param renderer          the used {@link PlayerRenderer} instance
+         * @param playerRenderer    the used {@link PlayerRenderer} instance
          * @param partialTick       current partial tick time
          * @param poseStack         the current {@link PoseStack}
          * @param multiBufferSource the current {@link MultiBufferSource}
          * @param packedLight       packet light the entity is rendered with
          */
-        void onAfterRenderPlayer(PlayerRenderState renderState, PlayerRenderer renderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
+        void onAfterRenderPlayer(PlayerRenderState renderState, PlayerRenderer playerRenderer, float partialTick, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight);
     }
 }

@@ -279,8 +279,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING, callback -> {
             return new RenderLivingEvents.Before() {
                 @Override
-                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S renderState, LivingEntityRenderer<T, S, M> renderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-                    if (renderState instanceof PlayerRenderState playerRenderState && renderer instanceof PlayerRenderer playerRenderer) {
+                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+                    if (renderState instanceof PlayerRenderState playerRenderState && entityRenderer instanceof PlayerRenderer playerRenderer) {
                         return callback.onBeforeRenderPlayer(playerRenderState, playerRenderer, partialTick, poseStack,
                                 bufferSource, packedLight
                         );
@@ -293,8 +293,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING, callback -> {
             return new RenderLivingEvents.After() {
                 @Override
-                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S renderState, LivingEntityRenderer<T, S, M> renderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-                    if (renderState instanceof PlayerRenderState playerRenderState && renderer instanceof PlayerRenderer playerRenderer) {
+                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+                    if (renderState instanceof PlayerRenderState playerRenderState && entityRenderer instanceof PlayerRenderer playerRenderer) {
                         callback.onAfterRenderPlayer(playerRenderState, playerRenderer, partialTick, poseStack,
                                 bufferSource, packedLight
                         );

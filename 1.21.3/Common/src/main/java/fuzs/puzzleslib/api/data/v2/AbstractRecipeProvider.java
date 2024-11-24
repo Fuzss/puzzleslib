@@ -14,10 +14,7 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -26,6 +23,7 @@ import net.minecraft.data.recipes.*;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
@@ -174,6 +172,16 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
         super.output = recipeOutput;
     }
 
+    public final HolderLookup.Provider registries() {
+        Preconditions.checkState(super.registries != EMPTY_REGISTRY_ACCESS, "registry access is empty");
+        return super.registries;
+    }
+
+    public final HolderGetter<Item> items() {
+        Preconditions.checkState(super.registries != EMPTY_REGISTRY_ACCESS, "registry access is empty");
+        return super.items;
+    }
+
     public CompletableFuture<?> run(CachedOutput output, HolderLookup.Provider registries) {
         List<CompletableFuture<?>> completableFutures = new ArrayList<>();
         this.addRecipes(new RecipeOutputImpl(output, registries, completableFutures::add));
@@ -186,6 +194,11 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public abstract void addRecipes(RecipeOutput recipeOutput);
+
+    @Override
+    public String getName() {
+        return "Recipes";
+    }
 
     private class RecipeOutputImpl implements RecipeOutput {
         private final CachedOutput output;
