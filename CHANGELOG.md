@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.3.6-1.21.3] - 2024-11-24
 ### Changed
 - Implement missing methods for `AbstractRecipeProvider`
+### Fixed
+- Fix clearing all effects crashing on Fabric
 
 ## [v21.3.5-1.21.3] - 2024-11-23
 ### Changed
