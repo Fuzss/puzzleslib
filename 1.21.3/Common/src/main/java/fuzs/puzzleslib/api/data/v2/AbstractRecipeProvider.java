@@ -135,7 +135,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public Criterion<InventoryChangeTrigger.TriggerInstance> has(Ingredient ingredient) {
-        return has(ingredient.items().stream().map(Holder::value).toArray(ItemLike[]::new));
+        return this.has(ingredient.items().stream().map(Holder::value).toArray(ItemLike[]::new));
     }
 
     public Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike... items) {
@@ -144,7 +144,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material) {
-        stonecutterResultFromBase(recipeOutput, category, result, material, 1);
+        this.stonecutterResultFromBase(recipeOutput, category, result, material, 1);
     }
 
     public void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material, int count) {
