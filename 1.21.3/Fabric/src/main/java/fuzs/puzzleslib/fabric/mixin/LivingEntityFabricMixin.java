@@ -55,7 +55,7 @@ abstract class LivingEntityFabricMixin extends Entity {
     protected int lastHurtByPlayerTime;
     @Shadow
     @Final
-    private Map<MobEffect, MobEffectInstance> activeEffects;
+    private Map<Holder<MobEffect>, MobEffectInstance> activeEffects;
     @Unique
     private DefaultedFloat puzzleslib$fallDistance;
     @Unique
@@ -360,8 +360,8 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(method = "removeAllEffects", at = @At("HEAD"))
     public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {
         if (this.level().isClientSide || this.activeEffects.isEmpty()) return;
-        Map<MobEffect, MobEffectInstance> removedActiveEffects = new HashMap<>();
-        for (Map.Entry<MobEffect, MobEffectInstance> entry : this.activeEffects.entrySet()) {
+        Map<Holder<MobEffect>, MobEffectInstance> removedActiveEffects = new HashMap<>();
+        for (Map.Entry<Holder<MobEffect>, MobEffectInstance> entry : this.activeEffects.entrySet()) {
             EventResult result = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker().onMobEffectRemove(
                     LivingEntity.class.cast(this), entry.getValue());
             if (result.isPass()) removedActiveEffects.put(entry.getKey(), entry.getValue());
