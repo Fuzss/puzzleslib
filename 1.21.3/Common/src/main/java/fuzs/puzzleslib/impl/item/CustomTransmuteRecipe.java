@@ -55,7 +55,7 @@ public interface CustomTransmuteRecipe {
         for (int i = 0; i < craftingInput.size(); i++) {
             ItemStack itemStack = craftingInput.getItem(i);
             if (this.getInput().test(itemStack)) {
-                result.applyComponents(itemStack.getComponents());
+                result.applyComponents(itemStack.getComponentsPatch());
                 return;
             }
         }
