@@ -544,6 +544,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, GatherEffectScreenTooltipsEvent.class, (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent evt) -> {
             callback.onGatherEffectScreenTooltip(evt.getScreen(), evt.getEffectInstance(), evt.getTooltip());
         });
+        // TODO migrate this to NeoForge's upcoming RegisterRenderStateModifiersEvent
         INSTANCE.register(ExtractRenderStateCallback.class, RenderNameTagEvent.CanRender.class, (ExtractRenderStateCallback callback, RenderNameTagEvent.CanRender evt, @Nullable Object context) -> {
             callback.onExtractRenderState(evt.getEntity(), evt.getEntityRenderState(), evt.getEntityRenderer(), evt.getPartialTick());
         }, EventPhase::late, false);
