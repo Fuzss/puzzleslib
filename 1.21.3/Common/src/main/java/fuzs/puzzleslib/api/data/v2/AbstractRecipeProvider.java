@@ -142,14 +142,24 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
         return inventoryTrigger(ItemPredicate.Builder.item().of(this.items, items).build());
     }
 
+    @Deprecated(forRemoval = true)
     public void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material) {
-        this.stonecutterResultFromBase(recipeOutput, category, result, material, 1);
+        this.stonecutterResultFromBase(category, result, material);
     }
 
+    public void stonecutterResultFromBase(RecipeCategory category, ItemLike result, Ingredient material) {
+        this.stonecutterResultFromBase(category, result, material, 1);
+    }
+
+    @Deprecated(forRemoval = true)
     public void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material, int count) {
+        this.stonecutterResultFromBase(category, result, material, count);
+    }
+
+    public void stonecutterResultFromBase(RecipeCategory category, ItemLike result, Ingredient material, int count) {
         SingleItemRecipeBuilder.stonecutting(material, category, result, count)
                 .unlockedBy(getHasName(material), this.has(material))
-                .save(recipeOutput, getConversionRecipeName(result, material) + "_stonecutting");
+                .save(this.output, getConversionRecipeName(result, material) + "_stonecutting");
     }
 
     @Override
