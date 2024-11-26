@@ -56,9 +56,7 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.loot.LootTable;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -337,6 +335,19 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block entity type.
      *
+     * @param path       path for new entry
+     * @param factory    factory for every newly created block entity instance
+     * @param validBlock block allowed to use this block entity
+     * @param <T>        block entity type parameter
+     * @return holder reference
+     */
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block> validBlock) {
+        return this.registerBlockEntityType(path, factory, () -> Collections.singleton(validBlock.value()));
+    }
+
+    /**
+     * Register a block entity type.
+     *
      * @param path        path for new entry
      * @param factory     factory for every newly created block entity instance
      * @param validBlocks blocks allowed to use this block entity
@@ -388,8 +399,22 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a poi type.
      *
+     * @param path          path for new entry
+     * @param matchingBlock block valid for this poi type
+     * @return holder reference
+     */
+    default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> matchingBlock) {
+        return this.registerPoiType(path,
+                0,
+                1,
+                () -> new HashSet<>(matchingBlock.value().getStateDefinition().getPossibleStates()));
+    }
+
+    /**
+     * Register a poi type.
+     *
      * @param path           path for new entry
-     * @param matchingBlocks block valid for this poi type
+     * @param matchingBlocks blocks valid for this poi type
      * @return holder reference
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block>... matchingBlocks) {
