@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.ModContext;
 
 import java.nio.file.Path;
@@ -63,6 +64,30 @@ public interface ModLoaderEnvironment {
      * @return is this running from a data generation configuration
      */
     boolean isDataGeneration();
+
+    /**
+     * @return is this running in a development environment with the system property
+     *         {@code puzzleslib.isDevelopmentEnvironment=true} set
+     */
+    default boolean isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration() {
+        if (this.isDataGeneration()) {
+            return false;
+        } else {
+            return this.isPuzzlesLibDevelopmentEnvironment();
+        }
+    }
+
+    /**
+     * @return is this running in a development environment with the system property
+     *         {@code puzzleslib.isDevelopmentEnvironment=true} set
+     */
+    default boolean isPuzzlesLibDevelopmentEnvironment() {
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) {
+            return false;
+        } else {
+            return Boolean.getBoolean(PuzzlesLib.MOD_ID + ".isDevelopmentEnvironment");
+        }
+    }
 
     /**
      * @return a wrapped mod list

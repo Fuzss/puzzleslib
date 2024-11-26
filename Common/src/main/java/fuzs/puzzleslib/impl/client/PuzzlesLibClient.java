@@ -14,7 +14,6 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.util.EntityRenderStateExtension;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
@@ -53,13 +52,14 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     private static void registerEventHandlers() {
         AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
-        ExtractRenderStateCallback.EVENT.register(EventPhase.FIRST, (Entity entity, EntityRenderState renderState, EntityRenderer<?, ?> entityRenderer, float partialTick) -> {
-            ((EntityRenderStateExtension) renderState).mobplaques$clearRenderProperties();
-        });
+        ExtractRenderStateCallback.EVENT.register(EventPhase.FIRST,
+                (Entity entity, EntityRenderState renderState, EntityRenderer<?, ?> entityRenderer, float partialTick) -> {
+                    ((EntityRenderStateExtension) renderState).mobplaques$clearRenderProperties();
+                });
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration()) return;
         if (ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
             setupGameOptions();
         }
@@ -171,8 +171,9 @@ public class PuzzlesLibClient implements ClientModConstructor {
     @Override
     public void onClientSetup() {
         EventHandlerProvider.tryRegister(ClientAbstractions.INSTANCE);
-        if (PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) {
-            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(CreativeModeTabs.SEARCH);
+        if (ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration()) {
+            CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(
+                    CreativeModeTabs.SEARCH);
         }
     }
 }
