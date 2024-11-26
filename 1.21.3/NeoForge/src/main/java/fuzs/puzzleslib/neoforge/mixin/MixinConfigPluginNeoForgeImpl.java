@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.mixin;
 
-import fuzs.puzzleslib.impl.PuzzlesLib;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
@@ -11,8 +11,7 @@ import java.util.Set;
 
 public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
     private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("AbstractPackResourcesNeoForgeMixin",
-            "DatagenModLoaderNeoForgeMixin"
-    );
+            "DatagenModLoaderNeoForgeMixin");
 
     @Override
     public void onLoad(String mixinPackage) {
@@ -26,8 +25,8 @@ public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return PuzzlesLib.isDevelopmentEnvironment() || !DEVELOPMENT_MIXINS.contains(
-                mixinClassName.replaceAll(".+\\.mixin\\.", ""));
+        return ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironment() ||
+                !DEVELOPMENT_MIXINS.contains(mixinClassName.replaceAll(".+\\.mixin\\.", ""));
     }
 
     @Override

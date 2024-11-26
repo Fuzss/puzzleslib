@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
@@ -21,8 +22,10 @@ import net.minecraft.world.level.GameRules;
  * in {@link PuzzlesLib} early.
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
-    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID).optional().registerClientbound(
-            ClientboundEntityCapabilityMessage.class).registerClientbound(ClientboundModListMessage.class);
+    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID)
+            .optional()
+            .registerClientbound(ClientboundEntityCapabilityMessage.class)
+            .registerClientbound(ClientboundModListMessage.class);
 
     @Override
     public void onConstructMod() {
@@ -37,7 +40,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!PuzzlesLib.isDevelopmentEnvironmentWithoutDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration()) return;
         CommandOverrides.registerEventHandlers();
         initializeGameRules();
         initializeCommands();

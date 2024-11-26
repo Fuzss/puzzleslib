@@ -9,19 +9,13 @@ public class PuzzlesLib {
     public static final String MOD_NAME = "Puzzles Lib";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_NAME);
 
+    @Deprecated(forRemoval = true)
     public static boolean isDevelopmentEnvironmentWithoutDataGeneration() {
-        if (ModLoaderEnvironment.INSTANCE.isDataGeneration()) {
-            return false;
-        } else {
-            return isDevelopmentEnvironment();
-        }
+        return ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration();
     }
 
+    @Deprecated(forRemoval = true)
     public static boolean isDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) {
-            return false;
-        } else {
-            return Boolean.getBoolean(MOD_ID + ".isDevelopmentEnvironment");
-        }
+        return ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironment();
     }
 }
