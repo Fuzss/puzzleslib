@@ -154,9 +154,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<Block> registerBlock(String path, Function<BlockBehaviour.Properties, Block> factory, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
-        return this.register(Registries.BLOCK, path,
-                () -> factory.apply(blockPropertiesSupplier.get().setId(this.makeResourceKey(Registries.BLOCK, path)))
-        );
+        return this.register(Registries.BLOCK,
+                path,
+                () -> factory.apply(blockPropertiesSupplier.get().setId(this.makeResourceKey(Registries.BLOCK, path))));
     }
 
     /**
@@ -189,9 +189,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.register(Registries.ITEM, path,
-                () -> factory.apply(itemPropertiesSupplier.get().setId(this.makeResourceKey(Registries.ITEM, path)))
-        );
+        return this.register(Registries.ITEM,
+                path,
+                () -> factory.apply(itemPropertiesSupplier.get().setId(this.makeResourceKey(Registries.ITEM, path))));
     }
 
     /**
@@ -215,8 +215,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
         return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
                 (Item.Properties itemProperties) -> {
                     return new BlockItem(block.value(), itemProperties);
-                }, itemPropertiesSupplier
-        );
+                },
+                () -> itemPropertiesSupplier.get().useBlockDescriptionPrefix());
     }
 
     /**
@@ -242,10 +242,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerItem(entityType.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
-                (Item.Properties itemProperties) -> new SpawnEggItem(entityType.value(), backgroundColor,
-                        highlightColor, itemProperties
-                ), itemPropertiesSupplier
-        );
+                (Item.Properties itemProperties) -> new SpawnEggItem(entityType.value(),
+                        backgroundColor,
+                        highlightColor,
+                        itemProperties),
+                itemPropertiesSupplier);
     }
 
     /**
@@ -256,9 +257,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> entry) {
-        return this.register(Registries.DATA_COMPONENT_TYPE, path,
-                () -> entry.apply(DataComponentType.builder()).build()
-        );
+        return this.register(Registries.DATA_COMPONENT_TYPE,
+                path,
+                () -> entry.apply(DataComponentType.builder()).build());
     }
 
     /**
@@ -326,11 +327,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     @SuppressWarnings("unchecked")
     default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
-        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE, path,
+        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE,
+                path,
                 () -> {
                     return entry.get().build(this.makeResourceKey(Registries.ENTITY_TYPE, path));
-                }
-        );
+                });
     }
 
     /**
@@ -343,9 +344,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block>... validBlocks) {
-        return this.registerBlockEntityType(path, factory, () -> Stream.of(validBlocks)
-                .map(Holder::value)
-                .collect(Collectors.toSet()));
+        return this.registerBlockEntityType(path,
+                factory,
+                () -> Stream.of(validBlocks).map(Holder::value).collect(Collectors.toSet()));
     }
 
     /**
@@ -393,8 +394,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block>... matchingBlocks) {
         return this.registerPoiType(path, 0, 1, () -> {
-            return Stream.of(matchingBlocks).map(Holder::value).flatMap(
-                    block -> block.getStateDefinition().getPossibleStates().stream()).collect(Collectors.toSet());
+            return Stream.of(matchingBlocks)
+                    .map(Holder::value)
+                    .flatMap(block -> block.getStateDefinition().getPossibleStates().stream())
+                    .collect(Collectors.toSet());
         });
     }
 
@@ -529,9 +532,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue, boolean syncable, Attribute.Sentiment sentiment) {
         Objects.requireNonNull(sentiment, "sentiment is null");
         return this.register(Registries.ATTRIBUTE, path, () -> {
-            return new RangedAttribute(this.makeDescriptionId(Registries.ATTRIBUTE, path), defaultValue, minValue,
-                    maxValue
-            ).setSyncable(syncable).setSentiment(sentiment);
+            return new RangedAttribute(this.makeDescriptionId(Registries.ATTRIBUTE, path),
+                    defaultValue,
+                    minValue,
+                    maxValue).setSyncable(syncable).setSentiment(sentiment);
         });
     }
 
@@ -555,9 +559,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, TagKey<Item> repairIngredient) {
-        return this.registerArmorMaterial(path, 0, ItemEquipmentFactories.toArmorTypeMapWithFallback(1), 0,
-                repairIngredient
-        );
+        return this.registerArmorMaterial(path,
+                0,
+                ItemEquipmentFactories.toArmorTypeMapWithFallback(1),
+                0,
+                repairIngredient);
     }
 
     /**
@@ -574,9 +580,14 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, int durabilityMultiplier, Map<ArmorType, Integer> protectionAmounts, int enchantmentValue, TagKey<Item> repairIngredient) {
-        return this.registerArmorMaterial(path, durabilityMultiplier, protectionAmounts, enchantmentValue,
-                SoundEvents.ARMOR_EQUIP_GENERIC, repairIngredient, 0.0F, 0.0F
-        );
+        return this.registerArmorMaterial(path,
+                durabilityMultiplier,
+                protectionAmounts,
+                enchantmentValue,
+                SoundEvents.ARMOR_EQUIP_GENERIC,
+                repairIngredient,
+                0.0F,
+                0.0F);
     }
 
     /**
@@ -596,13 +607,17 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, int durabilityMultiplier, Map<ArmorType, Integer> protectionAmounts, int enchantmentValue, Holder<SoundEvent> equipSound, TagKey<Item> repairIngredient, float toughness, float knockbackResistance) {
-        ResourceKey<Registry<ArmorMaterial>> registryKey = ResourceKey.createRegistryKey(
-                ResourceLocationHelper.withDefaultNamespace("armor_material"));
+        ResourceKey<Registry<ArmorMaterial>> registryKey = ResourceKey.createRegistryKey(ResourceLocationHelper.withDefaultNamespace(
+                "armor_material"));
         return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path),
-                new ArmorMaterial(durabilityMultiplier, protectionAmounts, enchantmentValue, equipSound, toughness,
-                        knockbackResistance, repairIngredient, this.makeKey(path)
-                )
-        );
+                new ArmorMaterial(durabilityMultiplier,
+                        protectionAmounts,
+                        enchantmentValue,
+                        equipSound,
+                        toughness,
+                        knockbackResistance,
+                        repairIngredient,
+                        this.makeKey(path)));
     }
 
     /**
