@@ -18,7 +18,6 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
-import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -44,10 +43,8 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
@@ -64,8 +61,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.ConversionParams;
@@ -103,15 +98,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.LOAD_COMPLETE);
         INSTANCE.register(RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
-        INSTANCE.register(AddDataPackReloadListenersCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, (AddDataPackReloadListenersCallback callback) -> {
-            return () -> {
-                callback.onAddDataPackReloadListeners((ResourceLocation resourceLocation, Function<HolderLookup.Provider, PreparableReloadListener> factory) -> {
-                    ResourceManagerHelper.get(PackType.SERVER_DATA).registerReloadListener(resourceLocation, (HolderLookup.Provider registries) -> {
-                        return new FabricReloadListener(resourceLocation, factory.apply(registries));
-                    });
-                });
-            };
-        });
         INSTANCE.register(FinalizeItemComponentsCallback.class, DefaultItemComponentEvents.MODIFY, (FinalizeItemComponentsCallback callback) -> {
             return (DefaultItemComponentEvents.ModifyContext context) -> {
                 for (Item item : BuiltInRegistries.ITEM) {
@@ -173,6 +159,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     public static void registerEventHandlers() {
+        INSTANCE.register(AddDataPackReloadListenersCallback.class, FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS);
         INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
             return callback::onTagsUpdated;
         });
