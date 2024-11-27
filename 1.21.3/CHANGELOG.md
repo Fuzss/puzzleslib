@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.3.9-1.21.3] - 2024-11-27
+### Added
+- Add additional overloads for `RegistryManager::registerBlockItem`, `RegistryManager::registerBlockEntityType`, and `RegistryManager::registerPoiType`
+- Add `ModLoaderEnvironment::isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration` and `ModLoaderEnvironment::isPuzzlesLibDevelopmentEnvironment`
+### Fixed
+- Fix `RegistryManager::registerBlockItem` failing to copy a block's name for the corresponding item
+
 ## [v21.3.8-1.21.3] - 2024-11-25
 ### Fixed
 - Fix transmute crafting recipes copying all input components

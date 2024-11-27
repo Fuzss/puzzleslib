@@ -210,9 +210,21 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<Item> registerBlockItem(Holder<Block> block, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerBlockItem(block, BlockItem::new, itemPropertiesSupplier);
+    }
+
+    /**
+     * Registers a block item for a block.
+     *
+     * @param block                  reference for block to register item variant for
+     * @param factory                factory for new item
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
                 (Item.Properties itemProperties) -> {
-                    return new BlockItem(block.value(), itemProperties);
+                    return factory.apply(block.value(), itemProperties);
                 },
                 () -> itemPropertiesSupplier.get().useBlockDescriptionPrefix());
     }
