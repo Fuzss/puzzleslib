@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.3.10-1.21.3] - 2024-11-27
+### Fixed
+- Fix `RegisterFuelValuesCallback` leading to an `OutOfMemoryError` on NeoForge
+
 ## [v21.3.9-1.21.3] - 2024-11-27
 ### Added
 - Add additional overloads for `RegistryManager::registerBlockItem`, `RegistryManager::registerBlockEntityType`, and `RegistryManager::registerPoiType`

@@ -733,8 +733,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegisterFuelValuesCallback.class, FurnaceFuelBurnTimeEvent.class, (RegisterFuelValuesCallback callback, FurnaceFuelBurnTimeEvent evt) -> {
             Objects.requireNonNull(fuelValues[0], "fuel values is null");
             if (fuelValues[0].isFuel(evt.getItemStack())) {
-                int burnTime = evt.getItemStack().getBurnTime(evt.getRecipeType(), fuelValues[0]);
-                evt.setBurnTime(burnTime);
+                evt.setBurnTime(fuelValues[0].burnDuration(evt.getItemStack()));
             }
         }, true);
         INSTANCE.register(AddDataPackReloadListenersCallback.class, AddReloadListenerEvent.class, (AddDataPackReloadListenersCallback callback, AddReloadListenerEvent evt) -> {
