@@ -37,6 +37,7 @@
     "PlayerChunkSenderFabricMixin",
     "PlayerFabricMixin",
     "ProjectileFabricMixin",
+    "ReloadableServerResourcesFabricMixin",
     "RunAroundLikeCrazyGoalFabricMixin",
     "ServerEntityFabricMixin",
     "ServerExplosionFabricMixin",

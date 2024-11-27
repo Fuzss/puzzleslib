@@ -27,7 +27,6 @@ import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootB
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
@@ -737,9 +736,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         }, true);
         INSTANCE.register(AddDataPackReloadListenersCallback.class, AddReloadListenerEvent.class, (AddDataPackReloadListenersCallback callback, AddReloadListenerEvent evt) -> {
-            callback.onAddDataPackReloadListeners((ResourceLocation resourceLocation, Function<HolderLookup.Provider, PreparableReloadListener> factory) -> {
-                evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, factory.apply(
-                        evt.getServerResources().getRegistryLookup())));
+            callback.onAddDataPackReloadListeners(evt.getRegistryAccess(), evt.getServerResources().getRegistryLookup(), (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
+                evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
             });
         });
         INSTANCE.register(
