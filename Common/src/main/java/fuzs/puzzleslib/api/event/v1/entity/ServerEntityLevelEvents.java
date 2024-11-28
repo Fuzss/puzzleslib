@@ -26,12 +26,12 @@ public final class ServerEntityLevelEvents {
          * Fired when an entity is added to the level on the server, either when being loaded from chunk storage or when
          * just having been spawned in.
          *
-         * @param entity the entity that is being loaded
-         * @param level  the level the entity is loaded in
+         * @param entity      the entity that is being loaded
+         * @param serverLevel the level the entity is loaded in
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
          *         discarding it, {@link EventResult#PASS} for the entity to be added normally
          */
-        EventResult onEntityLoad(Entity entity, ServerLevel level);
+        EventResult onEntityLoad(Entity entity, ServerLevel serverLevel);
     }
 
     @FunctionalInterface
@@ -40,16 +40,17 @@ public final class ServerEntityLevelEvents {
         /**
          * Fired when an entity is added to the level on the server when it has just been spawned in.
          *
-         * @param entity       the entity that is being spawned
-         * @param level        the level the entity is spawned in
-         * @param mobSpawnType this provides the spawn type which has been captured in
-         *                     {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor,
-         *                     DifficultyInstance, EntitySpawnReason, SpawnGroupData)} if it has been called, otherwise
-         *                     <code>null</code>
+         * @param entity            the entity that is being spawned
+         * @param serverLevel       the level the entity is spawned in
+         * @param entitySpawnReason this provides the spawn type which has been captured in
+         *                          {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor,
+         *                          DifficultyInstance, EntitySpawnReason, SpawnGroupData)} if it has been called,
+         *                          otherwise
+         *                          <code>null</code>
          * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
          *         discarding it, {@link EventResult#PASS} for the entity to be added normally
          */
-        EventResult onEntitySpawn(Entity entity, ServerLevel level, @Nullable EntitySpawnReason mobSpawnType);
+        EventResult onEntitySpawn(Entity entity, ServerLevel serverLevel, @Nullable EntitySpawnReason entitySpawnReason);
     }
 
     @FunctionalInterface
@@ -58,9 +59,9 @@ public final class ServerEntityLevelEvents {
         /**
          * Fired when an entity is removed from the level on the server.
          *
-         * @param entity the entity that is being unloaded
-         * @param level  the level the entity is unloaded in
+         * @param entity      the entity that is being unloaded
+         * @param serverLevel the level the entity is unloaded in
          */
-        void onEntityUnload(Entity entity, ServerLevel level);
+        void onEntityUnload(Entity entity, ServerLevel serverLevel);
     }
 }
