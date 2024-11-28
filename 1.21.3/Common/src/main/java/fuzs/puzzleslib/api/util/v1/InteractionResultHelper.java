@@ -136,6 +136,18 @@ public final class InteractionResultHelper {
      */
     public static boolean shouldSwing(InteractionResult interactionResult) {
         // there is no need for distinguishing between client and server swing sources
-        return interactionResult instanceof InteractionResult.Success success && success.swingSource() != InteractionResult.SwingSource.NONE;
+        return interactionResult instanceof InteractionResult.Success success &&
+                success.swingSource() != InteractionResult.SwingSource.NONE;
+    }
+
+    /**
+     * An abstraction for {@code InteractionResultHolder::getObject}.
+     *
+     * @param interactionResult the interaction result
+     * @return the new held item stack, possibly {@link ItemStack#EMPTY} if not available
+     */
+    public static ItemStack getObject(InteractionResult interactionResult) {
+        return interactionResult instanceof InteractionResult.Success success &&
+                success.heldItemTransformedTo() != null ? success.heldItemTransformedTo() : ItemStack.EMPTY;
     }
 }
