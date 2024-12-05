@@ -11,11 +11,11 @@ public class PuzzlesLib {
 
     @Deprecated(forRemoval = true)
     public static boolean isDevelopmentEnvironmentWithoutDataGeneration() {
-        return ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration();
+        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID);
     }
 
     @Deprecated(forRemoval = true)
     public static boolean isDevelopmentEnvironment() {
-        return ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironment();
+        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(PuzzlesLib.MOD_ID);
     }
 }

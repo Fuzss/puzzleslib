@@ -48,7 +48,7 @@ public interface ModLoaderEnvironment {
      * <ul>
      * <li><code>named</code> in a development environment and in production using NeoForge</li>
      * <li><code>intermediary</code> in production using Fabric</li>
-     * <li><code>srg</code> in production using Forge</li>
+     * <li><code>srg</code> in production using older Forge versions</li>
      * </ul>
      *
      * @return runtime mappings namespace
@@ -69,23 +69,43 @@ public interface ModLoaderEnvironment {
      * @return is this running in a development environment with the system property
      *         {@code puzzleslib.isDevelopmentEnvironment=true} set
      */
+    @Deprecated(forRemoval = true)
     default boolean isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration() {
-        if (this.isDataGeneration()) {
-            return false;
-        } else {
-            return this.isPuzzlesLibDevelopmentEnvironment();
-        }
+        return this.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID);
     }
 
     /**
      * @return is this running in a development environment with the system property
      *         {@code puzzleslib.isDevelopmentEnvironment=true} set
      */
+    @Deprecated(forRemoval = true)
     default boolean isPuzzlesLibDevelopmentEnvironment() {
+        return this.isDevelopmentEnvironment(PuzzlesLib.MOD_ID);
+    }
+
+    /**
+     * @param modId the mod id
+     * @return is this running in a development environment with the system property
+     *         {@code ${modId}.isDevelopmentEnvironment=true} set
+     */
+    default boolean isDevelopmentEnvironmentWithoutDataGeneration(String modId) {
+        if (this.isDataGeneration()) {
+            return false;
+        } else {
+            return this.isDevelopmentEnvironment(modId);
+        }
+    }
+
+    /**
+     * @param modId the mod id
+     * @return is this running in a development environment with the system property
+     *         {@code ${modId}.isDevelopmentEnvironment=true} set
+     */
+    default boolean isDevelopmentEnvironment(String modId) {
         if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) {
             return false;
         } else {
-            return Boolean.getBoolean(PuzzlesLib.MOD_ID + ".isDevelopmentEnvironment");
+            return Boolean.getBoolean(modId + ".isDevelopmentEnvironment");
         }
     }
 
