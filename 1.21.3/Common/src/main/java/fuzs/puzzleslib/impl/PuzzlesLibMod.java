@@ -40,7 +40,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void setupDevelopmentEnvironment() {
-        if (!ModLoaderEnvironment.INSTANCE.isPuzzlesLibDevelopmentEnvironmentWithoutDataGeneration()) return;
+        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) return;
         CommandOverrides.registerEventHandlers();
         initializeGameRules();
         initializeCommands();
