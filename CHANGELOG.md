@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.3.12-1.21.3] - 2024-12-06
+### Changed
+- Convert some methods back to fields in `InteractionResultHelper`
+- Allow `ModLoaderEnvironment::isDevelopmentEnvironment` and `ModLoaderEnvironment::isDevelopmentEnvironmentWithoutDataGeneration` to check any mod id
+### Fixed
+- Fix `ExplosionEvents$Start` failing to cancel on Fabric
+
 ## [v21.3.11-1.21.3] - 2024-11-27
 ### Changed
 - Supply missing registries to `AddDataPackReloadListenersCallback`
