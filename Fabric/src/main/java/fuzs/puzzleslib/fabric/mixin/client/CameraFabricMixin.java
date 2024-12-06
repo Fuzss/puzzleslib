@@ -13,6 +13,7 @@ import net.minecraft.world.level.BlockGetter;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Slice;
 
 @Mixin(Camera.class)
 abstract class CameraFabricMixin {
@@ -21,16 +22,21 @@ abstract class CameraFabricMixin {
 
     @WrapOperation(
             method = "setup",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Camera;setRotation(FF)V", ordinal = 0),
+            slice = @Slice(
+                    from = @At(
+                            value = "INVOKE",
+                            target = "Lnet/minecraft/client/Camera;setPosition(Lnet/minecraft/world/phys/Vec3;)V"
+                    )
+            )
     )
     public void setup(Camera camera, float xRot, float yRot, Operation<Void> operation, BlockGetter level, Entity entity, boolean detached, boolean thirdPersonReverse, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         MutableFloat pitch = MutableFloat.fromValue(yRot);
         MutableFloat yaw = MutableFloat.fromValue(xRot);
         MutableFloat roll = MutableFloat.fromValue(0.0F);
-        FabricRendererEvents.COMPUTE_CAMERA_ANGLES.invoker().onComputeCameraAngles(minecraft.gameRenderer, camera,
-                partialTick, pitch, yaw, roll
-        );
+        FabricRendererEvents.COMPUTE_CAMERA_ANGLES.invoker()
+                .onComputeCameraAngles(minecraft.gameRenderer, camera, partialTick, pitch, yaw, roll);
         this.puzzleslib$zRot = roll.getAsFloat();
         operation.call(camera, yaw.getAsFloat(), pitch.getAsFloat());
     }
