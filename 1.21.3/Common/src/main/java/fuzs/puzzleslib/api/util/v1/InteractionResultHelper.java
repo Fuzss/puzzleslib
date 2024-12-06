@@ -8,45 +8,33 @@ import net.minecraft.world.item.ItemStack;
  * {@code ItemInteractionResult}, and {@code InteractionResultHolder} implementations.
  */
 public final class InteractionResultHelper {
+    /**
+     * An abstraction for {@code InteractionResult#SUCCESS}.
+     */
+    public static final InteractionResult SUCCESS = InteractionResult.SUCCESS_SERVER;
+    /**
+     * An abstraction for {@code InteractionResult#CONSUME}.
+     */
+    public static final InteractionResult CONSUME = InteractionResult.CONSUME;
+    /**
+     * An abstraction for {@code InteractionResult#PASS}.
+     */
+    public static final InteractionResult PASS = InteractionResult.PASS;
+    /**
+     * An abstraction for {@code InteractionResult#FAIL}.
+     */
+    public static final InteractionResult FAIL = InteractionResult.FAIL;
+    /**
+     * An abstraction for {@code ItemInteractionResult#PASS_TO_DEFAULT_BLOCK_INTERACTION}.
+     */
+    public static final InteractionResult PASS_TO_DEFAULT_BLOCK_INTERACTION = InteractionResult.TRY_WITH_EMPTY_HAND;
+    /**
+     * An abstraction for {@code ItemInteractionResult#SKIP_DEFAULT_BLOCK_INTERACTION}.
+     */
+    public static final InteractionResult SKIP_DEFAULT_BLOCK_INTERACTION = InteractionResult.PASS;
 
     private InteractionResultHelper() {
         // NO-OP
-    }
-
-    /**
-     * An abstraction for {@code InteractionResult#SUCCESS}.
-     *
-     * @return the interaction result
-     */
-    public static InteractionResult success() {
-        return InteractionResult.SUCCESS_SERVER;
-    }
-
-    /**
-     * An abstraction for {@code InteractionResult#CONSUME}.
-     *
-     * @return the interaction result
-     */
-    public static InteractionResult consume() {
-        return InteractionResult.CONSUME;
-    }
-
-    /**
-     * An abstraction for {@code InteractionResult#PASS}.
-     *
-     * @return the interaction result
-     */
-    public static InteractionResult pass() {
-        return InteractionResult.PASS;
-    }
-
-    /**
-     * An abstraction for {@code InteractionResult#FAIL}.
-     *
-     * @return the interaction result
-     */
-    public static InteractionResult fail() {
-        return InteractionResult.FAIL;
     }
 
     /**
@@ -108,24 +96,6 @@ public final class InteractionResultHelper {
      */
     public static InteractionResult sidedSuccess(ItemStack itemStack, boolean isClientSide) {
         return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
-    }
-
-    /**
-     * An abstraction for {@code ItemInteractionResult#PASS_TO_DEFAULT_BLOCK_INTERACTION}.
-     *
-     * @return the interaction result
-     */
-    public static InteractionResult passToDefaultBlockInteraction() {
-        return InteractionResult.TRY_WITH_EMPTY_HAND;
-    }
-
-    /**
-     * An abstraction for {@code ItemInteractionResult#SKIP_DEFAULT_BLOCK_INTERACTION}.
-     *
-     * @return the interaction result
-     */
-    public static InteractionResult skipDefaultBlockInteraction() {
-        return InteractionResult.PASS;
     }
 
     /**

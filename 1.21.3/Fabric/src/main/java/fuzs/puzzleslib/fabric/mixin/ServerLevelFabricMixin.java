@@ -73,12 +73,12 @@ abstract class ServerLevelFabricMixin extends Level {
 
     @Inject(
             method = "explode",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;explode()V")
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/ServerExplosion;explode()V"),
+            cancellable = true
     )
     public void explode(@Nullable Entity entity, @Nullable DamageSource damageSource, @Nullable ExplosionDamageCalculator explosionDamageCalculator, double x, double y, double z, float radius, boolean fire, Level.ExplosionInteraction explosionInteraction, ParticleOptions smallExplosionParticles, ParticleOptions largeExplosionParticles, Holder<SoundEvent> explosionSound, CallbackInfo callback, @Local ServerExplosion explosion) {
-        EventResult result = FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(ServerLevel.class.cast(this),
-                explosion
-        );
+        EventResult result = FabricLevelEvents.EXPLOSION_START.invoker()
+                .onExplosionStart(ServerLevel.class.cast(this), explosion);
         if (result.isInterrupt()) callback.cancel();
     }
 
@@ -92,10 +92,13 @@ abstract class ServerLevelFabricMixin extends Level {
         this.puzzleslib$source.set(DefaultedValue.fromValue(source));
         this.puzzleslib$volume.set(DefaultedFloat.fromValue(volume));
         this.puzzleslib$pitch.set(DefaultedFloat.fromValue(pitch));
-        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker().onPlaySoundAtPosition(this,
-                new Vec3(x, y, z), this.puzzleslib$sound.get(), this.puzzleslib$source.get(),
-                this.puzzleslib$volume.get(), this.puzzleslib$pitch.get()
-        );
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker()
+                .onPlaySoundAtPosition(this,
+                        new Vec3(x, y, z),
+                        this.puzzleslib$sound.get(),
+                        this.puzzleslib$source.get(),
+                        this.puzzleslib$volume.get(),
+                        this.puzzleslib$pitch.get());
         if (result.isInterrupt() || this.puzzleslib$sound.get().get() == null) callback.cancel();
     }
 
@@ -109,10 +112,13 @@ abstract class ServerLevelFabricMixin extends Level {
         this.puzzleslib$source.set(DefaultedValue.fromValue(source));
         this.puzzleslib$volume.set(DefaultedFloat.fromValue(volume));
         this.puzzleslib$pitch.set(DefaultedFloat.fromValue(pitch));
-        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this, entity,
-                this.puzzleslib$sound.get(), this.puzzleslib$source.get(), this.puzzleslib$volume.get(),
-                this.puzzleslib$pitch.get()
-        );
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
+                .onPlaySoundAtEntity(this,
+                        entity,
+                        this.puzzleslib$sound.get(),
+                        this.puzzleslib$source.get(),
+                        this.puzzleslib$volume.get(),
+                        this.puzzleslib$pitch.get());
         if (result.isInterrupt() || this.puzzleslib$sound.get().get() == null) callback.cancel();
     }
 
