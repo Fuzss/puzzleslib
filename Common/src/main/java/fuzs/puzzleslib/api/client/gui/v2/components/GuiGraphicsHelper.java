@@ -135,7 +135,19 @@ public final class GuiGraphicsHelper {
      * @param vOffset          the sprite v-offset on the texture sheet
      */
     public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderSize, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, width, height, borderSize, borderSize, spriteWidth, spriteHeight, uOffset, vOffset);
+        blitNineSliced(guiGraphics,
+                renderType,
+                resourceLocation,
+                x,
+                y,
+                width,
+                height,
+                borderSize,
+                borderSize,
+                spriteWidth,
+                spriteHeight,
+                uOffset,
+                vOffset);
     }
 
     /**
@@ -159,7 +171,21 @@ public final class GuiGraphicsHelper {
      * @param vOffset          the sprite v-offset on the texture sheet
      */
     public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderWidth, int borderHeight, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, width, height, borderWidth, borderHeight, borderWidth, borderHeight, spriteWidth, spriteHeight, uOffset, vOffset);
+        blitNineSliced(guiGraphics,
+                renderType,
+                resourceLocation,
+                x,
+                y,
+                width,
+                height,
+                borderWidth,
+                borderHeight,
+                borderWidth,
+                borderHeight,
+                spriteWidth,
+                spriteHeight,
+                uOffset,
+                vOffset);
     }
 
     /**
@@ -185,7 +211,66 @@ public final class GuiGraphicsHelper {
      * @param vOffset          the sprite v-offset on the texture sheet
      */
     public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset) {
-        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, width, height, borderLeft, borderTop, borderRight, borderBottom, spriteWidth, spriteHeight, uOffset, vOffset, 256, 256, -1);
+        blitNineSliced(guiGraphics,
+                renderType,
+                resourceLocation,
+                x,
+                y,
+                width,
+                height,
+                borderLeft,
+                borderTop,
+                borderRight,
+                borderBottom,
+                spriteWidth,
+                spriteHeight,
+                uOffset,
+                vOffset,
+                -1);
+    }
+
+    /**
+     * Allows for drawing any sprite from a texture sheet in nine-sliced mode. This does not require the sprite to be
+     * stitched onto an atlas.
+     * <p>
+     * The width &amp; height dimensions are filled by repeatedly drawing pre-defined slices of the original sprite.
+     *
+     * @param guiGraphics      the gui graphics instance
+     * @param renderType       the render type, usually {@link RenderType#guiTextured(ResourceLocation)}
+     * @param resourceLocation the texture sheet resource location
+     * @param x                the x-position on the screen
+     * @param y                the y-position on the screen
+     * @param width            the width to draw
+     * @param height           the height to draw
+     * @param borderLeft       the border width on the left side of the sprite, for drawing the frame
+     * @param borderTop        the border height on the top side of the sprite, for drawing the frame
+     * @param borderRight      the border width on the right side of the sprite, for drawing the frame
+     * @param borderBottom     the border height on the bottom side of the sprite, for drawing the frame
+     * @param spriteWidth      the sprite texture width
+     * @param spriteHeight     the sprite texture height
+     * @param uOffset          the sprite u-offset on the texture sheet
+     * @param vOffset          the sprite v-offset on the texture sheet
+     * @param color            the vertex color, usually {@code -1}
+     */
+    public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
+        blitNineSliced(guiGraphics,
+                renderType,
+                resourceLocation,
+                x,
+                y,
+                width,
+                height,
+                borderLeft,
+                borderTop,
+                borderRight,
+                borderBottom,
+                spriteWidth,
+                spriteHeight,
+                uOffset,
+                vOffset,
+                256,
+                256,
+                color);
     }
 
     /**
@@ -213,7 +298,24 @@ public final class GuiGraphicsHelper {
      * @param textureHeight    the texture sheet height
      */
     public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight) {
-        blitNineSliced(guiGraphics, renderType, resourceLocation, x, y, width, height, borderLeft, borderTop, borderRight, borderBottom, spriteWidth, spriteHeight, uOffset, vOffset, textureWidth, textureHeight, -1);
+        blitNineSliced(guiGraphics,
+                renderType,
+                resourceLocation,
+                x,
+                y,
+                width,
+                height,
+                borderLeft,
+                borderTop,
+                borderRight,
+                borderBottom,
+                spriteWidth,
+                spriteHeight,
+                uOffset,
+                vOffset,
+                textureWidth,
+                textureHeight,
+                -1);
     }
 
     /**
@@ -242,8 +344,17 @@ public final class GuiGraphicsHelper {
      * @param color            the vertex color, usually {@code -1}
      */
     public static void blitNineSliced(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation resourceLocation, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int textureWidth, int textureHeight, int color) {
-        SingleTextureAtlasSprite textureAtlasSprite = new SingleTextureAtlasSprite(resourceLocation, spriteWidth, spriteHeight, uOffset, vOffset, textureWidth, textureHeight);
-        GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(spriteWidth, spriteHeight, new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom), false);
+        SingleTextureAtlasSprite textureAtlasSprite = new SingleTextureAtlasSprite(resourceLocation,
+                spriteWidth,
+                spriteHeight,
+                uOffset,
+                vOffset,
+                textureWidth,
+                textureHeight);
+        GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(spriteWidth,
+                spriteHeight,
+                new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom),
+                false);
         guiGraphics.blitNineSlicedSprite(renderType, textureAtlasSprite, nineSlice, x, y, width, height, color);
     }
 
@@ -262,7 +373,18 @@ public final class GuiGraphicsHelper {
      * @param borderSize  the border width &amp; height on the sides of the sprite, for drawing the frame
      */
     public static void blitNineSlicedSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int borderSize) {
-        blitNineSlicedSprite(guiGraphics, renderType, sprite, x, y, width, height, borderSize, borderSize, borderSize, borderSize, -1);
+        blitNineSlicedSprite(guiGraphics,
+                renderType,
+                sprite,
+                x,
+                y,
+                width,
+                height,
+                borderSize,
+                borderSize,
+                borderSize,
+                borderSize,
+                -1);
     }
 
     /**
@@ -283,7 +405,18 @@ public final class GuiGraphicsHelper {
      * @param borderBottom the border height on the bottom side of the sprite, for drawing the frame
      */
     public static void blitNineSlicedSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom) {
-        blitNineSlicedSprite(guiGraphics, renderType, sprite, x, y, width, height, borderLeft, borderTop, borderRight, borderBottom, -1);
+        blitNineSlicedSprite(guiGraphics,
+                renderType,
+                sprite,
+                x,
+                y,
+                width,
+                height,
+                borderLeft,
+                borderTop,
+                borderRight,
+                borderBottom,
+                -1);
     }
 
     /**
@@ -306,9 +439,10 @@ public final class GuiGraphicsHelper {
      */
     public static void blitNineSlicedSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int color) {
         TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getGuiSprites().getSprite(sprite);
-        GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents()
-                .width(), textureAtlasSprite.contents()
-                .height(), new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom), false);
+        GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents().width(),
+                textureAtlasSprite.contents().height(),
+                new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom),
+                false);
         guiGraphics.blitNineSlicedSprite(renderType, textureAtlasSprite, nineSlice, x, y, width, height, color);
     }
 
@@ -375,6 +509,18 @@ public final class GuiGraphicsHelper {
     public static void blitTiledSprite(GuiGraphics guiGraphics, Function<ResourceLocation, RenderType> renderType, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
         Minecraft minecraft = Minecraft.getInstance();
         TextureAtlasSprite textureatlassprite = minecraft.getGuiSprites().getSprite(sprite);
-        guiGraphics.blitTiledSprite(renderType, textureatlassprite, x, y, width, height, uOffset, vOffset, spriteWidth, spriteHeight, spriteWidth, spriteHeight, color);
+        guiGraphics.blitTiledSprite(renderType,
+                textureatlassprite,
+                x,
+                y,
+                width,
+                height,
+                uOffset,
+                vOffset,
+                spriteWidth,
+                spriteHeight,
+                spriteWidth,
+                spriteHeight,
+                color);
     }
 }
