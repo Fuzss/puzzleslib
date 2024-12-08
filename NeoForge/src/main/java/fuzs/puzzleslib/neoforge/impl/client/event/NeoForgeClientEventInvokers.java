@@ -178,6 +178,11 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.CompleteModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.CompleteModelLoading callback, ModelEvent.BakingCompleted evt) -> {
             callback.onCompleteModelLoading(evt::getModelManager, evt::getModelBakery);
         });
+        INSTANCE.register(ExtractRenderStateCallbackV2.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallbackV2 callback, RegisterRenderStateModifiersEvent evt) -> {
+            evt.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
+                callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
+            });
+        });
     }
 
     public static void registerEventHandlers() {
@@ -551,11 +556,6 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ExtractRenderStateCallback.class, RenderNameTagEvent.CanRender.class, (ExtractRenderStateCallback callback, RenderNameTagEvent.CanRender evt, @Nullable Object context) -> {
             callback.onExtractRenderState(evt.getEntity(), evt.getEntityRenderState(), evt.getEntityRenderer(), evt.getPartialTick());
         }, EventPhase::late, false);
-        INSTANCE.register(ExtractRenderStateCallbackV2.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallbackV2 callback, RegisterRenderStateModifiersEvent evt) -> {
-            evt.registerEntityModifier((Class<? extends EntityRenderer<Entity, EntityRenderState>>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
-                callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
-            });
-        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
