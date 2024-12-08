@@ -5,10 +5,9 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.world.entity.Entity;
 
-@Deprecated(forRemoval = true)
 @FunctionalInterface
-public interface ExtractRenderStateCallback {
-    EventInvoker<ExtractRenderStateCallback> EVENT = EventInvoker.lookup(ExtractRenderStateCallback.class);
+public interface ExtractRenderStateCallbackV2 {
+    EventInvoker<ExtractRenderStateCallbackV2> EVENT = EventInvoker.lookup(ExtractRenderStateCallbackV2.class);
 
     /**
      * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
@@ -18,9 +17,8 @@ public interface ExtractRenderStateCallback {
      * state data.
      *
      * @param entity            the entity
-     * @param entityRenderState the entity render state, might not be fully initialized
-     * @param entityRenderer    the entity renderer
+     * @param entityRenderState the entity render state
      * @param partialTick       the current partial tick
      */
-    void onExtractRenderState(Entity entity, EntityRenderState entityRenderState, EntityRenderer<?, ?> entityRenderer, float partialTick);
+    void onExtractRenderState(Entity entity, EntityRenderState entityRenderState, float partialTick);
 }

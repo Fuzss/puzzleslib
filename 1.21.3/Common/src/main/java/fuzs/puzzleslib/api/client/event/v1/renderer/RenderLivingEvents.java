@@ -24,16 +24,16 @@ public final class RenderLivingEvents {
          * Called before a living entity model is rendered, allows for applying transformations to the
          * {@link PoseStack}, or for completely taking over rendering as a whole.
          *
-         * @param renderState    the entity render state that is rendering
-         * @param entityRenderer the used {@link LivingEntityRenderer} instance
-         * @param poseStack      the current {@link PoseStack}
-         * @param bufferSource   the current {@link MultiBufferSource}
-         * @param packedLight    packet light the entity is rendered with
-         * @param partialTick    current partial tick time
+         * @param entityRenderState the entity render state that is rendering
+         * @param entityRenderer    the used {@link LivingEntityRenderer} instance
+         * @param poseStack         the current {@link PoseStack}
+         * @param bufferSource      the current {@link MultiBufferSource}
+         * @param packedLight       packet light the entity is rendered with
+         * @param partialTick       current partial tick time
          * @return {@link EventResult#INTERRUPT} to prevent the player model from rendering, this allows for taking over
          *         complete player rendering, {@link EventResult#PASS} to allow the player model to render
          */
-        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight);
+        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight);
     }
 
     @FunctionalInterface
@@ -43,13 +43,13 @@ public final class RenderLivingEvents {
          * Called after a living entity model is rendered, allows for cleaning up transformations applied to the
          * {@link PoseStack}.
          *
-         * @param renderState    the entity render state that is rendering
-         * @param entityRenderer the used {@link LivingEntityRenderer} instance
-         * @param poseStack      the current {@link PoseStack}
-         * @param bufferSource   the current {@link MultiBufferSource}
-         * @param packedLight    packet light the entity is rendered with
-         * @param partialTick    current partial tick time
+         * @param entityRenderState the entity render state that is rendering
+         * @param entityRenderer    the used {@link LivingEntityRenderer} instance
+         * @param poseStack         the current {@link PoseStack}
+         * @param bufferSource      the current {@link MultiBufferSource}
+         * @param packedLight       packet light the entity is rendered with
+         * @param partialTick       current partial tick time
          */
-        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight);
+        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight);
     }
 }
