@@ -58,6 +58,7 @@
     "client.DebugScreenOverlayMixin",
     "client.EffectsInInventoryFabricMixin",
     "client.EntityRendererFabricMixin",
+    "client.EntityRenderStateFabricMixin",
     "client.FogRendererFabricMixin",
     "client.GameRendererFabricMixin",
     "client.GuiFabricMixin",

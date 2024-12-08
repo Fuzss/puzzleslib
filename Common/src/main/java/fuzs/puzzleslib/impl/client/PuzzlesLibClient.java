@@ -8,14 +8,11 @@ import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
-import fuzs.puzzleslib.api.client.event.v1.renderer.ExtractRenderStateCallback;
 import fuzs.puzzleslib.api.client.gui.v2.screen.ScreenSkipper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.util.EntityRenderStateExtension;
 import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import net.minecraft.client.Minecraft;
@@ -32,12 +29,9 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,10 +47,6 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     private static void registerEventHandlers() {
         AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
-        ExtractRenderStateCallback.EVENT.register(EventPhase.FIRST,
-                (Entity entity, EntityRenderState renderState, EntityRenderer<?, ?> entityRenderer, float partialTick) -> {
-                    ((EntityRenderStateExtension) renderState).mobplaques$clearRenderProperties();
-                });
     }
 
     private static void setupDevelopmentEnvironment() {

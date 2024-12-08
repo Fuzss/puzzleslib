@@ -29,7 +29,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -38,12 +40,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
@@ -544,10 +548,14 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, GatherEffectScreenTooltipsEvent.class, (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent evt) -> {
             callback.onGatherEffectScreenTooltip(evt.getScreen(), evt.getEffectInstance(), evt.getTooltip());
         });
-        // TODO migrate this to NeoForge's upcoming RegisterRenderStateModifiersEvent
         INSTANCE.register(ExtractRenderStateCallback.class, RenderNameTagEvent.CanRender.class, (ExtractRenderStateCallback callback, RenderNameTagEvent.CanRender evt, @Nullable Object context) -> {
             callback.onExtractRenderState(evt.getEntity(), evt.getEntityRenderState(), evt.getEntityRenderer(), evt.getPartialTick());
         }, EventPhase::late, false);
+        INSTANCE.register(ExtractRenderStateCallbackV2.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallbackV2 callback, RegisterRenderStateModifiersEvent evt) -> {
+            evt.registerEntityModifier((Class<? extends EntityRenderer<Entity, EntityRenderState>>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
+                callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
+            });
+        });
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {
