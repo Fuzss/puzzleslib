@@ -66,7 +66,8 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
 
     @Override
     public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
-        return ServerPlayNetworking.canSend(serverPlayer, type);
+        // fake players will have no connection instance attached
+        return serverPlayer.connection != null && ServerPlayNetworking.canSend(serverPlayer, type);
     }
 
     @Override
