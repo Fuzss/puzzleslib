@@ -44,7 +44,8 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
 
     @Override
     public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
-        return serverPlayer.connection.hasChannel(type);
+        // fake players will have no connection instance attached
+        return serverPlayer.connection != null && serverPlayer.connection.hasChannel(type);
     }
 
     @Override
