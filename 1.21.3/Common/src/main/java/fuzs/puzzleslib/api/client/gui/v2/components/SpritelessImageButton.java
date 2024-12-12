@@ -55,6 +55,18 @@ public class SpritelessImageButton extends Button {
     public static final ToIntFunction<Button> SINGLE_TEXTURE_LAYOUT = (Button button) -> {
         return 0;
     };
+    /**
+     * The texture layout used in the old {@link net.minecraft.client.gui.components.ImageButton} for buttons that are
+     * always active.
+     * <p>The order from top to bottom is:
+     * <ul>
+     * <li>Active / Inactive</li>
+     * <li>Hovered</li>
+     * </ul>
+     */
+    public static final ToIntFunction<Button> NEVER_INACTIVE_TEXTURE_LAYOUT = (Button button) -> {
+        return button.isHoveredOrFocused() ? 1 : 0;
+    };
 
     public ResourceLocation resourceLocation;
     public int xTexStart;
@@ -74,9 +86,18 @@ public class SpritelessImageButton extends Button {
     }
 
     public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation resourceLocation, int textureWidth, int textureHeight, OnPress onPress) {
-        this(x, y, width, height, xTexStart, yTexStart, yDiffTex, resourceLocation, textureWidth, textureHeight,
-                onPress, CommonComponents.EMPTY
-        );
+        this(x,
+                y,
+                width,
+                height,
+                xTexStart,
+                yTexStart,
+                yDiffTex,
+                resourceLocation,
+                textureWidth,
+                textureHeight,
+                onPress,
+                CommonComponents.EMPTY);
     }
 
     public SpritelessImageButton(int x, int y, int width, int height, int xTexStart, int yTexStart, int yDiffTex, ResourceLocation resourceLocation, int textureWidth, int textureHeight, OnPress onPress, Component message) {
@@ -129,10 +150,17 @@ public class SpritelessImageButton extends Button {
         if (this.drawBackground) {
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         }
-        guiGraphics.blit(RenderType::guiTextured, this.resourceLocation, this.getX(), this.getY(), this.xTexStart,
-                this.yTexStart + this.yDiffTex * this.getTextureY(), this.width, this.height, this.textureWidth,
-                this.textureHeight, ARGB.white(this.alpha)
-        );
+        guiGraphics.blit(RenderType::guiTextured,
+                this.resourceLocation,
+                this.getX(),
+                this.getY(),
+                this.xTexStart,
+                this.yTexStart + this.yDiffTex * this.getTextureY(),
+                this.width,
+                this.height,
+                this.textureWidth,
+                this.textureHeight,
+                ARGB.white(this.alpha));
     }
 
     @Override
