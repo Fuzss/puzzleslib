@@ -60,19 +60,6 @@ public interface KeyedValueProvider<T> {
     }
 
     /**
-     * Converts a bunch of entries from a registry to their respective key as string.
-     *
-     * @param registryKey registry to get entry keys from
-     * @param entries     entries to convert to string
-     * @param <T>         type of value
-     * @return entries as string list
-     */
-    @SafeVarargs
-    static <T> List<String> toString(ResourceKey<? extends Registry<? super T>> registryKey, T... entries) {
-        return toString(KeyedValueProvider.registryEntries(registryKey), entries);
-    }
-
-    /**
      * Creates an {@link AbstractTagAppender} instance that can be converted to a string list by calling
      * {@link AbstractTagAppender#asStringList()}.
      *
@@ -85,6 +72,19 @@ public interface KeyedValueProvider<T> {
         Function<T, ResourceKey<T>> keyExtractor = registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(
                 registry, t) : null;
         return CommonFactories.INSTANCE.getTagAppender(new TagBuilder(), keyExtractor);
+    }
+
+    /**
+     * Converts a bunch of entries from a registry to their respective key as string.
+     *
+     * @param registryKey registry to get entry keys from
+     * @param entries     entries to convert to string
+     * @param <T>         type of value
+     * @return entries as string list
+     */
+    @SafeVarargs
+    static <T> List<String> toString(ResourceKey<? extends Registry<? super T>> registryKey, T... entries) {
+        return toString(KeyedValueProvider.registryEntries(registryKey), entries);
     }
 
     /**

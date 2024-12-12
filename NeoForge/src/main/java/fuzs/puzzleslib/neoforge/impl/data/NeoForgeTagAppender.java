@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.data;
 
-import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -9,6 +8,7 @@ import net.minecraft.tags.TagEntry;
 import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -38,15 +38,13 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
 
     @Override
     public List<String> asStringList() {
-        ImmutableList.Builder<String> builder = ImmutableList.builder();
+        List<String> list = new ArrayList<>();
         for (TagEntry tagEntry : this.tagBuilder.build()) {
-            builder.add(new ExtraCodecs.TagOrElementLocation(
-                    tagEntry.getId(), tagEntry.isTag()).toString());
+            list.add(new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()).toString());
         }
         for (TagEntry tagEntry : this.tagBuilder.getRemoveEntries().toList()) {
-            builder.add("!" + new ExtraCodecs.TagOrElementLocation(
-                    tagEntry.getId(), tagEntry.isTag()));
+            list.add("!" + new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()));
         }
-        return builder.build();
+        return list;
     }
 }

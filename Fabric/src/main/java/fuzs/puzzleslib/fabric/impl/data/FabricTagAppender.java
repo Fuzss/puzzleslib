@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.data;
 
-import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import net.fabricmc.fabric.impl.datagen.FabricTagBuilder;
 import net.minecraft.resources.ResourceKey;
@@ -43,13 +42,13 @@ public final class FabricTagAppender<T> extends AbstractTagAppender<T> {
 
     @Override
     public List<String> asStringList() {
-        ImmutableList.Builder<String> builder = ImmutableList.builder();
+        List<String> list = new ArrayList<>();
         for (TagEntry tagEntry : this.tagBuilder.build()) {
-            builder.add(tagEntry.toString());
+            list.add(tagEntry.toString());
         }
         for (TagEntry tagEntry : this.removeEntries) {
-            builder.add("!" + tagEntry);
+            list.add("!" + tagEntry);
         }
-        return builder.build();
+        return list;
     }
 }
