@@ -19,9 +19,9 @@ public final class ServerTickEvents {
         /**
          * Fires at the beginning of {@link MinecraftServer#tickServer(BooleanSupplier)}.
          *
-         * @param server the current minecraft server instance
+         * @param minecraftServer the current minecraft server instance
          */
-        void onStartServerTick(MinecraftServer server);
+        void onStartServerTick(MinecraftServer minecraftServer);
     }
 
     @FunctionalInterface
@@ -30,8 +30,8 @@ public final class ServerTickEvents {
         /**
          * Fires at the end of {@link MinecraftServer#tickServer(BooleanSupplier)}.
          *
-         * @param server the current minecraft server instance
+         * @param minecraftServer the current minecraft server instance
          */
-        void onEndServerTick(MinecraftServer server);
+        void onEndServerTick(MinecraftServer minecraftServer);
     }
 }

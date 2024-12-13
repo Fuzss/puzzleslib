@@ -15,12 +15,15 @@ public interface RegistryEntryAddedCallback<T> {
     @SuppressWarnings("unchecked")
     static <T> EventInvoker<RegistryEntryAddedCallback<T>> registryEntryAdded(ResourceKey<? extends Registry<T>> resourceKey) {
         Objects.requireNonNull(resourceKey, "resource key is null");
-        return EventInvoker.lookup((Class<RegistryEntryAddedCallback<T>>) (Class<?>) RegistryEntryAddedCallback.class, resourceKey);
+        return EventInvoker.lookup((Class<RegistryEntryAddedCallback<T>>) (Class<?>) RegistryEntryAddedCallback.class,
+                resourceKey);
     }
 
     /**
      * A callback that runs whenever a new entry is added to a {@link Registry}.
-     * <p>Note that the implementation is only designed for built-in registries and probably will not work with dynamic registries.
+     * <p>
+     * Note that the implementation is only designed for built-in registries and probably will not work with dynamic
+     * registries.
      *
      * @param registry  the read-only registry
      * @param id        the resource location for the added entry

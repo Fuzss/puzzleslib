@@ -19,9 +19,9 @@ public final class ServerLifecycleEvents {
         /**
          * Called before {@link Started}, allows for customization of the server.
          *
-         * @param server the current server instance
+         * @param minecraftServer the current server instance
          */
-        void onServerStarting(MinecraftServer server);
+        void onServerStarting(MinecraftServer minecraftServer);
     }
 
     @FunctionalInterface
@@ -30,9 +30,9 @@ public final class ServerLifecycleEvents {
         /**
          * Called after {@link Starting} when the server is available and ready to play.
          *
-         * @param server the current server instance
+         * @param minecraftServer the current server instance
          */
-        void onServerStarted(MinecraftServer server);
+        void onServerStarted(MinecraftServer minecraftServer);
     }
 
     @FunctionalInterface
@@ -41,20 +41,20 @@ public final class ServerLifecycleEvents {
         /**
          * Called before {@link Started} when the server is about to begin a shutdown.
          *
-         * @param server the current server instance
+         * @param minecraftServer the current server instance
          */
-        void onServerStopping(MinecraftServer server);
+        void onServerStopping(MinecraftServer minecraftServer);
     }
 
     @FunctionalInterface
     public interface Stopped {
 
         /**
-         * Called after {@link Stopping} when the server has completely shut down.
-         * On the client this happens immediately before returning to the main menu.
+         * Called after {@link Stopping} when the server has completely shut down. On the client this happens
+         * immediately before returning to the main menu.
          *
-         * @param server the current server instance
+         * @param minecraftServer the current server instance
          */
-        void onServerStopped(MinecraftServer server);
+        void onServerStopped(MinecraftServer minecraftServer);
     }
 }
