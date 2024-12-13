@@ -174,7 +174,7 @@ public final class TooltipRenderHelper {
     public static List<ClientTooltipComponent> createClientComponents(List<Component> components, List<TooltipComponent> imageComponents, int insertAt) {
         List<ClientTooltipComponent> clientComponents = components.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create).collect(Collectors.toList());
         List<ClientTooltipComponent> clientImageComponents = imageComponents.stream().map(ClientAbstractions.INSTANCE::createImageComponent).toList();
-        if (insertAt == -1) {
+        if (insertAt == -1 || insertAt >= clientComponents.size()) {
             clientComponents.addAll(clientImageComponents);
         } else {
             clientComponents.addAll(Math.min(clientComponents.size(), insertAt), clientImageComponents);
