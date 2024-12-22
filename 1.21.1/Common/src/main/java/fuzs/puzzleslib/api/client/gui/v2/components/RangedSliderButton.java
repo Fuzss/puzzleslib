@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.gui.v2.components;
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 /**
  * An extension to {@link AbstractSliderButton} that supports values within any range, therefore requiring minimum and
@@ -35,7 +36,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
     }
 
     /**
-     * The value in the proper range tracked by the slider.
+     * Gets the value adjusted for the full range of the slider.
      *
      * @return current value
      */
@@ -44,7 +45,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
     }
 
     /**
-     * Sets a new unscaled value, scaled down to a percentage internally.
+     * Sets a new unscaled value, which is then scaled down to a percentage internally.
      *
      * @param value new value to set
      */
@@ -63,12 +64,19 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
 
     /**
      * Sets the raw value for this slider (as a percentage), must be between <code>0.0</code> and <code>1.0</code>.
+     * <p>
+     * Copied from super class.
      *
      * @param value new value to set
      */
-    @Override
-    public void setValue(double value) {
-        super.setValue(value);
+    private void setValue(double value) {
+        double oldValue = this.value;
+        this.value = Mth.clamp(value, 0.0F, 1.0F);
+        if (oldValue != this.value) {
+            this.applyValue();
+        }
+
+        this.updateMessage();
     }
 
     @Override

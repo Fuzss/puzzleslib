@@ -63,7 +63,6 @@ transitive-accessible   method  net/minecraft/world/entity/projectile/AbstractAr
 transitive-accessible   field   net/minecraft/client/KeyMapping key Lcom/mojang/blaze3d/platform/InputConstants$Key;
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/CreativeModeInventoryScreen$SlotWrapper  target  Lnet/minecraft/world/inventory/Slot;
 transitive-accessible   field   net/minecraft/client/multiplayer/MultiPlayerGameMode    destroyDelay    I
-transitive-extendable   method  net/minecraft/client/gui/components/AbstractSliderButton    setValue    (D)V
 accessible  class   net/minecraft/server/ReloadableServerResources$ConfigurableRegistryLookup
 accessible  field   net/minecraft/server/ReloadableServerResources$ConfigurableRegistryLookup   registryAccess  Lnet/minecraft/core/RegistryAccess;
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderer entityRenderDispatcher  Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;
