@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.3.14-1.21.3] - 2024-12-24
 ### Changed
 - Adjust `RangedSliderButton` implementation to no longer require an access widener to help compatibility with the [Cloth Config](https://modrinth.com/mod/cloth-config) mod
-- `ClientAbstractions::registerConfigScreenFactory` now merges configs for all provided mod ids instead of overriding all configs of the original mod
+- `ClientAbstractions::registerConfigScreenFactory` now merges configs for all provided mod ids instead of overriding the configs of the original mod
 
 ## [v21.3.13-1.21.3] - 2024-12-08
 ### Changed
