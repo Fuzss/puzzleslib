@@ -100,6 +100,6 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     @MustBeInvokedByOverriders
     protected void registerConfigurationScreen(String modId) {
-        ClientAbstractions.INSTANCE.registerConfigScreenFactory(modId, null);
+        ClientAbstractions.INSTANCE.registerConfigScreenFactory(modId);
     }
 }

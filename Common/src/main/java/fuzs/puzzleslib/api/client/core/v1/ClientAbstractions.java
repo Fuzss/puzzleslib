@@ -177,17 +177,20 @@ public interface ClientAbstractions {
      */
     void addGuiRightHeight(Gui gui, int rightHeight);
 
+    @Deprecated(forRemoval = true)
+    default void registerConfigScreenFactory(String modId, @Nullable String modIdOverride) {
+        this.registerConfigScreenFactory(modId, modIdOverride != null ? new String[]{modIdOverride} : new String[0]);
+    }
+
     /**
      * Registers a config screen factory. Will create an empty screen for mods without any config, so registering for
-     * those mods is fine.
+     * those mods is fine and will not throw an exception.
      * <p>
-     * Allows for registering a config screen that shows the config of another mod. Useful for mods that have all of
-     * their relevant configuration as part of an underlying library.
-     * <p>
-     * When the other mod is provided, but not present, no config screen is registered.
+     * Allows for registering a config screen that collects and merges configs from multiple mods. Useful for mods that
+     * have some of their relevant configuration as part of an underlying library.
      *
-     * @param modId         the mod id to register the config screen for
-     * @param modIdOverride a mod id to pull configs from, defaults to the mod id the config screen is registered for
+     * @param modId        the mod id to register the config screen for
+     * @param mergedModIds additional mod ids to include configs from
      */
-    void registerConfigScreenFactory(String modId, @Nullable String modIdOverride);
+    void registerConfigScreenFactory(String modId, String... mergedModIds);
 }

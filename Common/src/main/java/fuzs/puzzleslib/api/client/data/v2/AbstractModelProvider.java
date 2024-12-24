@@ -84,8 +84,8 @@ public abstract class AbstractModelProvider implements DataProvider {
         List<Block> missingBlocks;
         if (!this.skipValidation()) {
             missingBlocks = BuiltInRegistries.BLOCK.entrySet().stream().filter(entry -> {
-                return entry.getKey().location().getNamespace().equals(this.modId) && !generators.containsKey(
-                        entry.getValue());
+                return entry.getKey().location().getNamespace().equals(this.modId) &&
+                        !generators.containsKey(entry.getValue());
             }).map(Map.Entry::getValue).filter(Predicate.not(this.skipValidation::contains)).toList();
         } else {
             missingBlocks = Collections.emptyList();
@@ -96,24 +96,23 @@ public abstract class AbstractModelProvider implements DataProvider {
             BuiltInRegistries.BLOCK.entrySet().forEach(entry -> {
                 Item item = Item.BY_BLOCK.get(entry.getValue());
                 if (item != null) {
-                    if (!entry.getKey().location().getNamespace().equals(this.modId) || skippedAutoModels.contains(
-                            item)) {
+                    if (!entry.getKey().location().getNamespace().equals(this.modId) ||
+                            skippedAutoModels.contains(item)) {
                         return;
                     }
 
                     ResourceLocation resourcelocation = ModelLocationUtils.getModelLocation(item);
                     if (!models.containsKey(resourcelocation)) {
                         models.put(resourcelocation,
-                                new DelegatedModel(ModelLocationUtils.getModelLocation(entry.getValue()))
-                        );
+                                new DelegatedModel(ModelLocationUtils.getModelLocation(entry.getValue())));
                     }
                 }
             });
             List<Item> missingItems;
             if (!this.skipValidation()) {
                 missingItems = BuiltInRegistries.ITEM.entrySet().stream().filter(entry -> {
-                    return entry.getKey().location().getNamespace().equals(this.modId) && !models.containsKey(
-                            decorateItemModelLocation(entry.getKey().location()));
+                    return entry.getKey().location().getNamespace().equals(this.modId) &&
+                            !models.containsKey(decorateItemModelLocation(entry.getKey().location()));
                 }).map(Map.Entry::getValue).filter(Predicate.not(this.skipValidation::contains)).toList();
             } else {
                 missingItems = Collections.emptyList();
@@ -195,9 +194,9 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     public static ModelTemplate createBlockModelTemplate(ResourceLocation blockModelLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(decorateBlockModelLocation(blockModelLocation)), Optional.of(suffix),
-                requiredSlots
-        );
+        return new ModelTemplate(Optional.of(decorateBlockModelLocation(blockModelLocation)),
+                Optional.of(suffix),
+                requiredSlots);
     }
 
     public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, TextureSlot... requiredSlots) {
@@ -205,20 +204,25 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)), Optional.of(suffix),
-                requiredSlots
-        );
+        return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)),
+                Optional.of(suffix),
+                requiredSlots);
     }
 
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+        return generateFlatItem(resourceLocation, resourceLocation, modelTemplate, modelOutput);
+    }
+
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layerResourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
         return modelTemplate.create(decorateItemModelLocation(resourceLocation),
-                TextureMapping.layer0(decorateItemModelLocation(resourceLocation)), modelOutput
-        );
+                TextureMapping.layer0(decorateItemModelLocation(layerResourceLocation)),
+                modelOutput);
     }
 
     public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return modelTemplate.create(ModelLocationUtils.getModelLocation(item), TextureMapping.layer0(item), modelOutput,
-                factory
-        );
+        return modelTemplate.create(ModelLocationUtils.getModelLocation(item),
+                TextureMapping.layer0(item),
+                modelOutput,
+                factory);
     }
 }
