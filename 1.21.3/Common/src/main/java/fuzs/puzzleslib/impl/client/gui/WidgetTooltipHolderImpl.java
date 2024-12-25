@@ -33,9 +33,11 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public WidgetTooltipHolderImpl(AbstractWidget abstractWidget, TooltipBuilderImpl builder) {
-        Preconditions.checkState(!builder.tooltipLines.isEmpty() || builder.tooltipLinesSupplier != null, "lines is empty");
+        Preconditions.checkState(!builder.tooltipLines.isEmpty() || builder.tooltipLinesSupplier != null,
+                "lines is empty");
         this.abstractWidget = abstractWidget;
-        this.tooltipLines = builder.tooltipLinesSupplier != null ? Collections.emptyList() : ImmutableList.copyOf(builder.tooltipLines);
+        this.tooltipLines = builder.tooltipLinesSupplier != null ? Collections.emptyList() :
+                ImmutableList.copyOf(builder.tooltipLines);
         this.tooltipLineProcessor = builder.tooltipLineProcessor;
         this.tooltipPositionerFactory = builder.tooltipPositionerFactory;
         this.tooltipLinesSupplier = builder.tooltipLinesSupplier;
@@ -81,20 +83,18 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     @Override
     public void refreshTooltipForNextRenderPass(boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
         this.refreshLines(this.getLinesForNextRenderPass());
-        Preconditions.checkState(!this.tooltipLines.isEmpty(), "lines is empty");
-        super.refreshTooltipForNextRenderPass(hovering, focused, screenRectangle);
-    }
-
-    private List<? extends FormattedText> getLinesForNextRenderPass() {
-        if (this.tooltipLinesSupplier != null) {
-            return this.tooltipLinesSupplier.get();
-        } else {
-            return Collections.emptyList();
+        if (!this.tooltipLines.isEmpty()) {
+            super.refreshTooltipForNextRenderPass(hovering, focused, screenRectangle);
         }
     }
 
-    private void refreshLines(List<? extends FormattedText> lines) {
-        if (!lines.isEmpty() && !Objects.equals(lines, this.tooltipLines)) {
+    @Nullable
+    private List<? extends FormattedText> getLinesForNextRenderPass() {
+        return this.tooltipLinesSupplier != null ? this.tooltipLinesSupplier.get() : null;
+    }
+
+    private void refreshLines(@Nullable List<? extends FormattedText> lines) {
+        if (lines != null && !Objects.equals(lines, this.tooltipLines)) {
             this.tooltipLines = lines;
             this.get().cachedTooltip = null;
         }
