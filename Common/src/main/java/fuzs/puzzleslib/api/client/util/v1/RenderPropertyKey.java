@@ -12,6 +12,8 @@ import java.util.Objects;
  * A key implementation for custom data attached to render states.
  * <p>
  * Implemented as a wrapper around resource location to allow for an additional type parameter.
+ * <p>
+ * TODO move to {@link fuzs.puzzleslib.api.client.renderer.v1}
  *
  * @param resourceLocation the resource location key
  * @param <T>              the stored object type

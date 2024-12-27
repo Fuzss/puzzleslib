@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
@@ -67,6 +68,11 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
     @Override
     public void registerRenderType(Fluid fluid, RenderType renderType) {
         ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
+    }
+
+    @Override
+    public float getPartialTick(EntityRenderState renderState) {
+        return renderState.partialTick;
     }
 
     @Override

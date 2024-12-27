@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -127,6 +128,14 @@ public interface ClientAbstractions {
     default float getPartialTick() {
         return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
+
+    /**
+     * Get the partial tick time from a render state instance.
+     *
+     * @param renderState the render state
+     * @return the partial tick time
+     */
+    float getPartialTick(EntityRenderState renderState);
 
     /**
      * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.

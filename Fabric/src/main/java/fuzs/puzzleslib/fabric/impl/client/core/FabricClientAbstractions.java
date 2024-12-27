@@ -18,10 +18,12 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -65,6 +67,11 @@ public final class FabricClientAbstractions implements ClientAbstractions, Event
     @Override
     public void registerRenderType(Fluid fluid, RenderType renderType) {
         BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
+    }
+
+    @Override
+    public float getPartialTick(EntityRenderState renderState) {
+        return Mth.frac(renderState.ageInTicks);
     }
 
     @Override
