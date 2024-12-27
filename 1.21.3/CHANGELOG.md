@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.3.16-1.21.3] - 2024-12-27
+### Added
+- Add `SingleChestRenderer`
+- Add `ClientAbstractions::getPartialTick` for extracting partial tick time from `EntityRenderState`
+### Changed
+- Pass potion name parameter in `RegistryManager::registerPotion`
+
 ## [v21.3.15-1.21.3] - 2024-12-25
 ### Changed
 - Allow setting empty lines for `TooltipBuilder` to prevent the tooltip from drawing
