@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `ModelLocationHelper` and `ModelTemplateHelper` from preparing to move some helper methods out of `AbstractModelProvider`
 ### Changed
 - Pass potion name parameter in `RegistryManager::registerPotion`
+### Fixed
+- Fix cancelling `InventoryMobEffectsCallback` leading to an exception on Fabric
 
 ## [v21.3.15-1.21.3] - 2024-12-25
 ### Changed
