@@ -32,7 +32,7 @@ abstract class EffectsInInventoryFabricMixin {
             method = "renderEffects", at = @At(
             value = "INVOKE",
             target = "Lnet/minecraft/client/gui/screens/inventory/EffectsInInventory;renderBackgrounds(Lnet/minecraft/client/gui/GuiGraphics;IILjava/lang/Iterable;Z)V"
-    )
+    ), cancellable = true
     )
     private void renderEffects$0(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo callback, @Local(ordinal = 2) int horizontalOffset, @Local(
             ordinal = 3
@@ -41,9 +41,8 @@ abstract class EffectsInInventoryFabricMixin {
     ) LocalRef<DefaultedInt> horizontalOffsetRef) {
         smallWidgetsRef.set(DefaultedBoolean.fromValue(!fullSizedWidgets));
         horizontalOffsetRef.set(DefaultedInt.fromValue(horizontalOffset));
-        EventResult result = FabricGuiEvents.INVENTORY_MOB_EFFECTS.invoker().onInventoryMobEffects(this.screen,
-                availableSpace, smallWidgetsRef.get(), horizontalOffsetRef.get()
-        );
+        EventResult result = FabricGuiEvents.INVENTORY_MOB_EFFECTS.invoker()
+                .onInventoryMobEffects(this.screen, availableSpace, smallWidgetsRef.get(), horizontalOffsetRef.get());
         if (result.isInterrupt()) {
             callback.cancel();
         }
@@ -73,9 +72,8 @@ abstract class EffectsInInventoryFabricMixin {
 
     @ModifyVariable(method = "renderEffects", at = @At("STORE"))
     private List<Component> renderEffects(List<Component> tooltipLines, @Local(ordinal = 0) MobEffectInstance mobEffectInstance) {
-        FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP.invoker().onGatherEffectScreenTooltip(this.screen,
-                mobEffectInstance, tooltipLines
-        );
+        FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP.invoker()
+                .onGatherEffectScreenTooltip(this.screen, mobEffectInstance, tooltipLines);
         return tooltipLines;
     }
 }
