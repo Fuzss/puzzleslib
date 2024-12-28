@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add `SingleChestRenderer`
 - Add `ClientAbstractions::getPartialTick` for extracting partial tick time from `EntityRenderState`
+- Add `ModelLocationHelper` and `ModelTemplateHelper` from preparing to move some helper methods out of `AbstractModelProvider`
 ### Changed
 - Pass potion name parameter in `RegistryManager::registerPotion`
 

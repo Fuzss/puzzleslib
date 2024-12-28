@@ -3,6 +3,8 @@ package fuzs.puzzleslib.api.client.data.v2;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonElement;
+import fuzs.puzzleslib.api.client.data.v2.models.ModelLocationHelper;
+import fuzs.puzzleslib.api.client.data.v2.models.ModelTemplateHelper;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -18,13 +20,18 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.*;
 
 public abstract class AbstractModelProvider implements DataProvider {
-    public static final String BLOCK_PATH = "block";
-    public static final String ITEM_PATH = "item";
+    @Deprecated(forRemoval = true)
+    public static final String BLOCK_PATH = ModelLocationHelper.BLOCK_PATH;
+    @Deprecated(forRemoval = true)
+    public static final String ITEM_PATH = ModelLocationHelper.ITEM_PATH;
     public static final ModelTemplate SPAWN_EGG = ModelTemplates.createItem("template_spawn_egg");
 
     private final String modId;
@@ -112,7 +119,7 @@ public abstract class AbstractModelProvider implements DataProvider {
             if (!this.skipValidation()) {
                 missingItems = BuiltInRegistries.ITEM.entrySet().stream().filter(entry -> {
                     return entry.getKey().location().getNamespace().equals(this.modId) &&
-                            !models.containsKey(decorateItemModelLocation(entry.getKey().location()));
+                            !models.containsKey(ModelLocationHelper.getItemModel(entry.getKey().location()));
                 }).map(Map.Entry::getValue).filter(Predicate.not(this.skipValidation::contains)).toList();
             } else {
                 missingItems = Collections.emptyList();
@@ -127,11 +134,6 @@ public abstract class AbstractModelProvider implements DataProvider {
         }
     }
 
-    @Override
-    public final String getName() {
-        return "Model Definitions";
-    }
-
     private static <T> CompletableFuture<?> saveCollection(CachedOutput output, Map<T, ? extends Supplier<JsonElement>> map, Function<T, Path> pathExtractor) {
         return CompletableFuture.allOf(map.entrySet().stream().map((entry) -> {
             Path path = pathExtractor.apply(entry.getKey());
@@ -140,36 +142,49 @@ public abstract class AbstractModelProvider implements DataProvider {
         }).toArray(CompletableFuture[]::new));
     }
 
+    @Override
+    public final String getName() {
+        return "Model Definitions";
+    }
+
+    @Deprecated(forRemoval = true)
     public static ResourceLocation getModelLocation(Block block) {
-        return decorateBlockModelLocation(getLocation(block));
+        return ModelLocationHelper.getBlockModel(block);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation decorateBlockModelLocation(ResourceLocation resourceLocation) {
-        return resourceLocation.withPrefix(BLOCK_PATH + "/");
+        return ModelLocationHelper.getBlockModel(resourceLocation);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation getLocation(Block block) {
-        return BuiltInRegistries.BLOCK.getKey(block);
+        return ModelLocationHelper.getBlockLocation(block);
     }
 
+    @Deprecated(forRemoval = true)
     public static String getName(Block block) {
-        return getLocation(block).getPath();
+        return ModelLocationHelper.getBlockName(block);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation getModelLocation(Item item) {
-        return decorateItemModelLocation(getLocation(item));
+        return ModelLocationHelper.getItemModel(item);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation decorateItemModelLocation(ResourceLocation resourceLocation) {
-        return resourceLocation.withPrefix(ITEM_PATH + "/");
+        return ModelLocationHelper.getItemModel(resourceLocation);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation getLocation(Item item) {
-        return BuiltInRegistries.ITEM.getKey(item);
+        return ModelLocationHelper.getItemLocation(item);
     }
 
+    @Deprecated(forRemoval = true)
     public static String getName(Item item) {
-        return getLocation(item).getPath();
+        return ModelLocationHelper.getItemName(item);
     }
 
     /**
@@ -179,6 +194,7 @@ public abstract class AbstractModelProvider implements DataProvider {
      * Useful for e.g. removing directories from a path, like <code>minecraft:item/stick</code> ->
      * <code>minecraft:stick</code> by passing <code>/</code>.
      */
+    @Deprecated(forRemoval = true)
     public static ResourceLocation stripUntil(ResourceLocation resourceLocation, String s) {
         String path = resourceLocation.getPath();
         if (path.contains(s)) {
@@ -189,40 +205,38 @@ public abstract class AbstractModelProvider implements DataProvider {
         }
     }
 
-    public static ModelTemplate createBlockModelTemplate(ResourceLocation blockModelLocation, TextureSlot... requiredSlots) {
-        return createBlockModelTemplate(blockModelLocation, "", requiredSlots);
+    @Deprecated(forRemoval = true)
+    public static ModelTemplate createBlockModelTemplate(ResourceLocation resourceLocation, TextureSlot... requiredSlots) {
+        return ModelTemplateHelper.createBlockModelTemplate(resourceLocation, requiredSlots);
     }
 
-    public static ModelTemplate createBlockModelTemplate(ResourceLocation blockModelLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(decorateBlockModelLocation(blockModelLocation)),
-                Optional.of(suffix),
-                requiredSlots);
+    @Deprecated(forRemoval = true)
+    public static ModelTemplate createBlockModelTemplate(ResourceLocation resourceLocation, String suffix, TextureSlot... requiredSlots) {
+        return ModelTemplateHelper.createBlockModelTemplate(resourceLocation, suffix, requiredSlots);
     }
 
-    public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, TextureSlot... requiredSlots) {
-        return createItemModelTemplate(itemModelLocation, "", requiredSlots);
+    @Deprecated(forRemoval = true)
+    public static ModelTemplate createItemModelTemplate(ResourceLocation resourceLocation, TextureSlot... requiredSlots) {
+        return ModelTemplateHelper.createItemModelTemplate(resourceLocation, requiredSlots);
     }
 
-    public static ModelTemplate createItemModelTemplate(ResourceLocation itemModelLocation, String suffix, TextureSlot... requiredSlots) {
-        return new ModelTemplate(Optional.of(decorateItemModelLocation(itemModelLocation)),
-                Optional.of(suffix),
-                requiredSlots);
+    @Deprecated(forRemoval = true)
+    public static ModelTemplate createItemModelTemplate(ResourceLocation resourceLocation, String suffix, TextureSlot... requiredSlots) {
+        return ModelTemplateHelper.createItemModelTemplate(resourceLocation, suffix, requiredSlots);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
-        return generateFlatItem(resourceLocation, resourceLocation, modelTemplate, modelOutput);
+        return ModelTemplateHelper.generateFlatItem(resourceLocation, modelTemplate, modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layerResourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
-        return modelTemplate.create(decorateItemModelLocation(resourceLocation),
-                TextureMapping.layer0(decorateItemModelLocation(layerResourceLocation)),
-                modelOutput);
+    @Deprecated(forRemoval = true)
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+        return ModelTemplateHelper.generateFlatItem(resourceLocation, layer0, modelTemplate, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return modelTemplate.create(ModelLocationUtils.getModelLocation(item),
-                TextureMapping.layer0(item),
-                modelOutput,
-                factory);
+        return ModelTemplateHelper.generateFlatItem(item, modelTemplate, modelOutput, factory);
     }
 }
