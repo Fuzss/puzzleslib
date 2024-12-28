@@ -12,6 +12,9 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+/**
+ * TODO move to {@link fuzs.puzzleslib.api.client.data.v2.models}
+ */
 public record ItemModelProperties(ResourceLocation modelLocation, Map<ResourceLocation, Float> modelPredicates) {
 
     public ItemModelProperties(ResourceLocation modelLocation) {
@@ -28,15 +31,19 @@ public record ItemModelProperties(ResourceLocation modelLocation, Map<ResourceLo
     }
 
     public static ItemModelProperties twoOverrides(ResourceLocation modelLocation, ResourceLocation modelPropertyLocation1, float modelPropertyValue1, ResourceLocation modelPropertyLocation2, float modelPropertyValue2) {
-        return new ItemModelProperties(modelLocation).put(modelPropertyLocation1, modelPropertyValue1).put(modelPropertyLocation2, modelPropertyValue2);
+        return new ItemModelProperties(modelLocation).put(modelPropertyLocation1, modelPropertyValue1)
+                .put(modelPropertyLocation2, modelPropertyValue2);
     }
 
     public static ItemModelProperties threeOverrides(ResourceLocation modelLocation, ResourceLocation modelPropertyLocation1, float modelPropertyValue1, ResourceLocation modelPropertyLocation2, float modelPropertyValue2, ResourceLocation modelPropertyLocation3, float modelPropertyValue3) {
-        return new ItemModelProperties(modelLocation).put(modelPropertyLocation1, modelPropertyValue1).put(modelPropertyLocation2, modelPropertyValue2).put(modelPropertyLocation3, modelPropertyValue3);
+        return new ItemModelProperties(modelLocation).put(modelPropertyLocation1, modelPropertyValue1)
+                .put(modelPropertyLocation2, modelPropertyValue2)
+                .put(modelPropertyLocation3, modelPropertyValue3);
     }
 
     /**
-     * Use in conjunction with {@link ModelTemplate#create(ResourceLocation, TextureMapping, BiConsumer, ModelTemplate.JsonFactory)}.
+     * Use in conjunction with
+     * {@link ModelTemplate#create(ResourceLocation, TextureMapping, BiConsumer, ModelTemplate.JsonFactory)}.
      */
     public static ModelTemplate.JsonFactory overridesFactory(ModelTemplate modelTemplate, ItemModelProperties... allItemModelOverrides) {
         return (ResourceLocation resourceLocation, Map<TextureSlot, ResourceLocation> map) -> {
