@@ -313,9 +313,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param entry supplier for entry to register
      * @return holder reference
      */
-    @Deprecated(forRemoval = true)
     default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> entry) {
-        return this.register(Registries.POTION, path, entry);
+        return this.registerPotion(path, (String s) -> entry.get());
     }
 
     /**
