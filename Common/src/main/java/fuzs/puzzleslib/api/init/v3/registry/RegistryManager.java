@@ -181,6 +181,17 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an item.
      *
+     * @param path    path for new entry
+     * @param factory factory for new item
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory) {
+        return this.registerItem(path, factory, Item.Properties::new);
+    }
+
+    /**
+     * Register an item.
+     *
      * @param path                   path for new entry
      * @param factory                factory for new item
      * @param itemPropertiesSupplier supplier for new item properties

@@ -16,7 +16,7 @@ public final class UseItemEvents {
     public static final EventInvoker<Finish> FINISH = EventInvoker.lookup(Finish.class);
 
     private UseItemEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -88,6 +88,8 @@ public final class UseItemEvents {
          * <p>
          * In that case {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)} is called
          * for applying effects to the user, such as restoring food points or applying mob effects.
+         * <p>
+         * TODO remove {@code remainingUseDuration}, it is always zero
          *
          * @param livingEntity         the entity using the item
          * @param itemStack            the item that is set to the entity's use hand after {@link LivingEntity#useItem}

@@ -124,7 +124,8 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(TagKey<?> tagKey, String value) {
-            this.add("tag." + tagKey.location().toLanguageKey(tagKey.registry().location().getPath()), value);
+            String descriptionId = Util.makeDescriptionId(Registries.elementsDirPath(tagKey.registry()), tagKey.location());
+            this.add("tag." + descriptionId, value);
         }
 
         default void addBlock(Holder<Block> block, String value) {
