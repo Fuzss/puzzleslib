@@ -26,7 +26,7 @@ public final class PlayerInteractEvents {
     public static final EventInvoker<AttackEntity> ATTACK_ENTITY = EventInvoker.lookup(AttackEntity.class);
 
     private PlayerInteractEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
