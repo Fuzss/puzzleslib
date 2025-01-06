@@ -70,6 +70,7 @@ transitive-accessible   field   net/minecraft/client/renderer/entity/AgeableMobR
 transitive-mutable  field   net/minecraft/client/renderer/entity/AgeableMobRenderer babyModel   Lnet/minecraft/client/model/EntityModel;
 transitive-accessible   field   net/minecraft/client/model/geom/builders/LayerDefinition    mesh    Lnet/minecraft/client/model/geom/builders/MeshDefinition;
 transitive-accessible   field   net/minecraft/client/model/geom/builders/LayerDefinition    material    Lnet/minecraft/client/model/geom/builders/MaterialDefinition;
+transitive-accessible   field   net/minecraft/client/renderer/entity/LivingEntityRenderer   layers  Ljava/util/List;
 accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
