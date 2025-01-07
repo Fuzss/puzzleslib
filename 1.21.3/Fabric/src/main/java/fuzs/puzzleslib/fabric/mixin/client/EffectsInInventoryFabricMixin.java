@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedBoolean;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
+import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
@@ -72,8 +73,9 @@ abstract class EffectsInInventoryFabricMixin {
 
     @ModifyVariable(method = "renderEffects", at = @At("STORE"))
     private List<Component> renderEffects(List<Component> tooltipLines, @Local(ordinal = 0) MobEffectInstance mobEffectInstance) {
+        CopyOnWriteForwardingList<Component> list = new CopyOnWriteForwardingList<>(tooltipLines);
         FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP.invoker()
-                .onGatherEffectScreenTooltip(this.screen, mobEffectInstance, tooltipLines);
-        return tooltipLines;
+                .onGatherEffectScreenTooltip(this.screen, mobEffectInstance, list);
+        return list.delegate();
     }
 }

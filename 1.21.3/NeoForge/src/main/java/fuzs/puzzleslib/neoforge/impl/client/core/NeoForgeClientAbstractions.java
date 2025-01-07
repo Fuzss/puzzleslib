@@ -19,12 +19,14 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.ClientHooks;
+import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
 import java.util.List;
@@ -113,5 +115,15 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
         NeoForgeModContainerHelper.getModContainer(modId)
                 .registerExtensionPoint(IConfigScreenFactory.class,
                         MultiConfigurationScreen.getFactory(mergedModIds)::apply);
+    }
+
+    @Override
+    public boolean isEffectVisibleInInventory(MobEffectInstance mobEffect) {
+        return IClientMobEffectExtensions.of(mobEffect).isVisibleInInventory(mobEffect);
+    }
+
+    @Override
+    public boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {
+        return IClientMobEffectExtensions.of(mobEffect).isVisibleInGui(mobEffect);
     }
 }

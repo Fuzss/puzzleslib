@@ -18,6 +18,7 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -202,4 +203,21 @@ public interface ClientAbstractions {
      * @param mergedModIds additional mod ids to include configs from
      */
     void registerConfigScreenFactory(String modId, String... mergedModIds);
+
+    /**
+     * Can a mob effect render in the player inventory via
+     * {@link net.minecraft.client.gui.screens.inventory.EffectsInInventory}.
+     *
+     * @param mobEffect the mob effect instance
+     * @return is rendering permitted
+     */
+    boolean isEffectVisibleInInventory(MobEffectInstance mobEffect);
+
+    /**
+     * Can a mob effect render in the {@link Gui}.
+     *
+     * @param mobEffect the mob effect instance
+     * @return is rendering permitted
+     */
+    boolean isEffectVisibleInGui(MobEffectInstance mobEffect);
 }

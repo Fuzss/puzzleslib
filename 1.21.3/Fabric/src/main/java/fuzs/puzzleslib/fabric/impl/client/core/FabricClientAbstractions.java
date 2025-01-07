@@ -24,6 +24,7 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -109,5 +110,15 @@ public final class FabricClientAbstractions implements ClientAbstractions, Event
     @Override
     public void registerEventHandlers() {
         FabricGuiEventHelper.registerEventHandlers();
+    }
+
+    @Override
+    public boolean isEffectVisibleInInventory(MobEffectInstance mobEffect) {
+        return true;
+    }
+
+    @Override
+    public boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {
+        return true;
     }
 }
