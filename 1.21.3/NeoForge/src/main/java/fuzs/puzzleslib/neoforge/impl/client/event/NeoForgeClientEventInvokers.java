@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.google.common.base.Stopwatch;
-import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
@@ -43,6 +42,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -64,7 +64,6 @@ import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerReg
 
 @SuppressWarnings("unchecked")
 public final class NeoForgeClientEventInvokers {
-    private static final Supplier<Set<ModelResourceLocation>> TOP_LEVEL_MODEL_LOCATIONS = Suppliers.memoize(NeoForgeClientEventInvokers::getTopLevelModelLocations);
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(AddResourcePackReloadListenersCallback.class, RegisterClientReloadListenersEvent.class, (AddResourcePackReloadListenersCallback callback, RegisterClientReloadListenersEvent evt) -> {
@@ -104,7 +103,7 @@ public final class NeoForgeClientEventInvokers {
             // Forge does not grant access to unbaked models, so lookup every unbaked model and replace the baked model if necessary
             // this also means the event is limited to top level models which should be fine though, the same restriction is applied on Fabric
             // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
-            for (ModelResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
+            for (ModelResourceLocation modelLocation : getTopLevelModelLocations()) {
                 try {
                     EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, () -> {
                         return modelGetter.apply(modelLocation);
@@ -142,7 +141,7 @@ public final class NeoForgeClientEventInvokers {
             // Forge has no event firing for every baked model like Fabric,
             // instead go through the baked models map and fire the event for every model manually
             // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
-            for (ModelResourceLocation modelLocation : TOP_LEVEL_MODEL_LOCATIONS.get()) {
+            for (ModelResourceLocation modelLocation : getTopLevelModelLocations()) {
                 try {
                     EventResultHolder<BakedModel> result = callback.onModifyBakedModel(modelLocation, () -> {
                         return modelGetter.apply(modelLocation);
@@ -567,13 +566,14 @@ public final class NeoForgeClientEventInvokers {
     }
 
     private static Set<ModelResourceLocation> getTopLevelModelLocations() {
-        Set<ModelResourceLocation> modelLocations = new HashSet<>(List.of(MissingBlockModel.VARIANT));
+        Set<ModelResourceLocation> modelLocations = new HashSet<>();
+        modelLocations.add(MissingBlockModel.VARIANT);
         for (Block block : BuiltInRegistries.BLOCK) {
-            block.getStateDefinition().getPossibleStates().forEach(blockState -> {
+            block.getStateDefinition().getPossibleStates().forEach((BlockState blockState) -> {
                 modelLocations.add(BlockModelShaper.stateToModelLocation(blockState));
             });
         }
         modelLocations.addAll(ModelDiscovery.listMandatoryModels());
-        return Collections.unmodifiableSet(modelLocations);
+        return modelLocations;
     }
 }
