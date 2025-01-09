@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 
 public final class RenderNameTagEvents {
+    @Deprecated(forRemoval = true)
     public static final EventInvoker<Allow> ALLOW = EventInvoker.lookup(Allow.class);
     public static final EventInvoker<Render> RENDER = EventInvoker.lookup(Render.class);
 
@@ -17,6 +18,10 @@ public final class RenderNameTagEvents {
         // NO-OP
     }
 
+    /**
+     * @deprecated {@link ExtractRenderStateCallbackV2} offers the same functionality
+     */
+    @Deprecated(forRemoval = true)
     public interface Allow {
 
         /**
@@ -40,9 +45,11 @@ public final class RenderNameTagEvents {
 
         /**
          * Fires before the name tag of an entity is rendered.
+         * <p>
+         * TODO remove partial tick parameter
          *
          * @param renderState    the entity render state
-         * @param content        the entity display name retrieved from {@link EntityRenderer#getNameTag(Entity)}
+         * @param component        the entity display name retrieved from {@link EntityRenderer#getNameTag(Entity)}
          * @param entityRenderer the entity renderer instance
          * @param poseStack      the pose stack
          * @param bufferSource   the buffer source
@@ -53,6 +60,6 @@ public final class RenderNameTagEvents {
          *         <li>{@link EventResult#PASS} to allow the name tag to render if present</li>
          *         </ul>
          */
-        EventResult onRenderNameTag(EntityRenderState renderState, Component content, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float partialTick);
+        EventResult onRenderNameTag(EntityRenderState renderState, Component component, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float partialTick);
     }
 }

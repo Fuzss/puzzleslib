@@ -32,12 +32,12 @@ public final class FabricClientFactories implements ClientFactories {
     }
 
     @Override
-    public <T> @Nullable T getRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key) {
-        return ((EntityRenderStateExtension) entityRenderState).puzzleslib$getRenderProperty(key);
+    public <T> @Nullable T getRenderProperty(EntityRenderState renderState, RenderPropertyKey<T> key) {
+        return ((EntityRenderStateExtension) renderState).puzzleslib$getRenderProperty(key);
     }
 
     @Override
-    public <T> void setRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key, @Nullable T t) {
-        ((EntityRenderStateExtension) entityRenderState).puzzleslib$setRenderProperty(key, t);
+    public <T> void setRenderProperty(EntityRenderState renderState, RenderPropertyKey<T> key, @Nullable T t) {
+        ((EntityRenderStateExtension) renderState).puzzleslib$setRenderProperty(key, t);
     }
 }

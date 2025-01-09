@@ -17,10 +17,10 @@ public interface ExtractRenderStateCallback {
      * Use methods found in {@link fuzs.puzzleslib.api.client.util.v1.RenderPropertyKey} for attaching custom render
      * state data.
      *
-     * @param entity            the entity
-     * @param entityRenderState the entity render state, might not be fully initialized
-     * @param entityRenderer    the entity renderer
-     * @param partialTick       the current partial tick
+     * @param entity         the entity
+     * @param renderState    the entity render state, might not be fully initialized
+     * @param entityRenderer the entity renderer
+     * @param partialTick    the current partial tick
      */
-    void onExtractRenderState(Entity entity, EntityRenderState entityRenderState, EntityRenderer<?, ?> entityRenderer, float partialTick);
+    void onExtractRenderState(Entity entity, EntityRenderState renderState, EntityRenderer<?, ?> entityRenderer, float partialTick);
 }
