@@ -98,7 +98,10 @@ public final class ItemEquipmentFactories {
      * @param protectionAmounts protection value for each slot type; order is boots, leggings, chest plate, helmet,
      *                          body
      * @return armor type defense values map
+     *
+     * @deprecated superseded by {@link ArmorMaterialBuilder}
      */
+    @Deprecated(forRemoval = true)
     public static Map<ArmorType, Integer> toArmorTypeMap(int... protectionAmounts) {
         return toArmorTypeMapWithFallback(0, protectionAmounts);
     }
@@ -110,7 +113,10 @@ public final class ItemEquipmentFactories {
      * @param protectionAmounts        protection value for each slot type; order is boots, leggings, chest plate,
      *                                 helmet, body
      * @return armor type defense values map
+     *
+     * @deprecated superseded by {@link ArmorMaterialBuilder}
      */
+    @Deprecated(forRemoval = true)
     public static Map<ArmorType, Integer> toArmorTypeMapWithFallback(int protectionAmountFallback, int... protectionAmounts) {
         Map<ArmorType, Integer> map = new EnumMap<>(ArmorType.class);
         for (int i = 0; i < ARMOR_TYPES.length; i++) {
