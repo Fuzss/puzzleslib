@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.item.v2.ArmorMaterialBuilder;
 import fuzs.puzzleslib.api.item.v2.ItemEquipmentFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
@@ -616,7 +617,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path             path for new entry
      * @param repairIngredient the repair material used in an anvil for restoring item durability
      * @return holder reference
+     *
+     * @deprecated superseded by {@link ArmorMaterialBuilder}
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, TagKey<Item> repairIngredient) {
         return this.registerArmorMaterial(path,
                 0,
@@ -637,7 +641,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *                             netherite: 15)
      * @param repairIngredient     the repair material used in an anvil for restoring item durability
      * @return holder reference
+     *
+     * @deprecated superseded by {@link ArmorMaterialBuilder}
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, int durabilityMultiplier, Map<ArmorType, Integer> protectionAmounts, int enchantmentValue, TagKey<Item> repairIngredient) {
         return this.registerArmorMaterial(path,
                 durabilityMultiplier,
@@ -664,7 +671,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param toughness            armor toughness value for all slot types of this armor set
      * @param knockbackResistance  knockback resistance value for all slot types of this armor set
      * @return holder reference
+     *
+     * @deprecated superseded by {@link ArmorMaterialBuilder}
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, int durabilityMultiplier, Map<ArmorType, Integer> protectionAmounts, int enchantmentValue, Holder<SoundEvent> equipSound, TagKey<Item> repairIngredient, float toughness, float knockbackResistance) {
         ResourceKey<Registry<ArmorMaterial>> registryKey = ResourceKey.createRegistryKey(ResourceLocationHelper.withDefaultNamespace(
                 "armor_material"));
