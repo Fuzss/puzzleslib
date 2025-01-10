@@ -12,7 +12,7 @@ abstract class ModelBakeryMixin {
 
     @ModifyVariable(method = "<init>", at = @At(value = "STORE", ordinal = 0))
     public BlockStateModelLoader init(BlockStateModelLoader blockStateModelLoader) {
-        ModelLoadingHelper.setBlockStateModelLoader(blockStateModelLoader);
+        ModelLoadingHelper.setModelLoader(blockStateModelLoader);
         return blockStateModelLoader;
     }
 }
