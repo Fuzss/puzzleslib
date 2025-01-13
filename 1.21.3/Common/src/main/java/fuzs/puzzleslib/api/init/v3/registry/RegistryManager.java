@@ -43,6 +43,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.equipment.ArmorMaterial;
@@ -510,7 +511,25 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
             return new RecipeType<>() {
                 @Override
                 public String toString() {
-                    return resourceLocation.toString();
+                    return "RecipeType[" + resourceLocation + "]";
+                }
+            };
+        });
+    }
+
+    /**
+     * Register a recipe book category.
+     *
+     * @param path path for new entry
+     * @return holder reference
+     */
+    default Holder.Reference<RecipeBookCategory> registerRecipeBookCategory(String path) {
+        return this.register(Registries.RECIPE_BOOK_CATEGORY, path, () -> {
+            ResourceLocation resourceLocation = this.makeKey(path);
+            return new RecipeBookCategory() {
+                @Override
+                public String toString() {
+                    return "RecipeBookCategory[" + resourceLocation + "]";
                 }
             };
         });
