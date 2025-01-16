@@ -32,7 +32,6 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
     }
 
     private static void printModList() {
-        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) return;
         Collection<ModContainer> mods = ModLoaderEnvironment.INSTANCE.getModList().values();
         PuzzlesLib.LOGGER.info(dumpModList(mods));
     }

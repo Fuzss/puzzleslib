@@ -71,6 +71,8 @@ transitive-accessible   field   net/minecraft/client/renderer/entity/LivingEntit
 transitive-accessible   field   net/minecraft/world/level/storage/loot/parameters/LootContextParamSets  REGISTRY    Lcom/google/common/collect/BiMap;
 transitive-accessible   field   net/minecraft/world/entity/Mob  lootTable   Ljava/util/Optional;
 transitive-accessible   method  net/minecraft/world/entity/Entity   considersEntityAsAlly   (Lnet/minecraft/world/entity/Entity;)Z
+transitive-accessible   method  net/minecraft/client/gui/components/AbstractWidget  renderScrollingString   (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIII)V
+transitive-accessible   method  net/minecraft/client/gui/components/AbstractWidget  renderScrollingString   (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V
 accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
