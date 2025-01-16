@@ -28,11 +28,10 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
         }
         // we print the mod list to the log as early as possible
         // this greatly helps with diagnosing issues where only a log has been provided and should otherwise be unobtrusive
-        printModList();
+//        printModList();
     }
 
     private static void printModList() {
-        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) return;
         Collection<ModContainer> mods = ModLoaderEnvironment.INSTANCE.getModList().values();
         PuzzlesLib.LOGGER.info(dumpModList(mods));
     }
