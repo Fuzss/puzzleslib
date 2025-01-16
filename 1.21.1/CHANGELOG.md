@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.26-1.21.1] - 2025-01-16
+### Changed
+- Allow setting empty lines for `TooltipBuilder` to prevent the tooltip from drawing
+### Fixed
+- Fix unable to set a new widget tooltip using vanilla methods when `TooltipBuilder` has been used for the widget
+
 ## [v21.1.25-1.21.1] - 2025-01-10
 ### Fixed
 - Avoid unnecessarily high memory usage from holding on to top level model locations after model events have completed

@@ -14,9 +14,6 @@ transitive-accessible   class   net/minecraft/client/particle/ParticleEngine$Spr
 transitive-accessible   field   net/minecraft/client/renderer/entity/EntityRenderDispatcher renderers   Ljava/util/Map;
 transitive-accessible	class	net/minecraft/data/tags/TagsProvider$TagAppender
 transitive-accessible	class	net/minecraft/data/tags/IntrinsicHolderTagsProvider$IntrinsicTagAppender
-extendable  method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
-accessible  field   net/minecraft/client/gui/components/Tooltip cachedTooltip   Ljava/util/List;
-accessible  field   net/minecraft/client/gui/components/Tooltip splitWithLanguage   Lnet/minecraft/locale/Language;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  ([Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  create  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
 transitive-accessible   method  net/minecraft/data/models/model/ModelTemplates  createItem  (Ljava/lang/String;[Lnet/minecraft/data/models/model/TextureSlot;)Lnet/minecraft/data/models/model/ModelTemplate;
@@ -77,6 +74,9 @@ transitive-accessible   method  net/minecraft/world/entity/Entity   considersEnt
 accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
+extendable  method  net/minecraft/client/gui/components/Tooltip <init>  (Lnet/minecraft/network/chat/Component;Lnet/minecraft/network/chat/Component;)V
+accessible  field   net/minecraft/client/gui/components/Tooltip cachedTooltip   Ljava/util/List;
+accessible  field   net/minecraft/client/gui/components/Tooltip splitWithLanguage   Lnet/minecraft/locale/Language;
 accessible  method  net/minecraft/core/Holder$Reference bindValue   (Ljava/lang/Object;)V
 accessible  method  net/minecraft/core/Holder$Reference bindTags    (Ljava/util/Collection;)V
 accessible	field   net/minecraft/world/item/crafting/ShapedRecipe  pattern Lnet/minecraft/world/item/crafting/ShapedRecipePattern;
