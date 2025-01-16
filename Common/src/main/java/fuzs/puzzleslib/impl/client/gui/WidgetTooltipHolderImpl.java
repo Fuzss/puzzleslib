@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
@@ -33,11 +32,9 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     private final Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public WidgetTooltipHolderImpl(AbstractWidget abstractWidget, TooltipBuilderImpl builder) {
-        Preconditions.checkState(!builder.tooltipLines.isEmpty() || builder.tooltipLinesSupplier != null,
-                "lines is empty");
         this.abstractWidget = abstractWidget;
-        this.tooltipLines = builder.tooltipLinesSupplier != null ? Collections.emptyList() :
-                ImmutableList.copyOf(builder.tooltipLines);
+        this.tooltipLines =
+                builder.tooltipLinesSupplier != null ? Collections.emptyList() : List.copyOf(builder.tooltipLines);
         this.tooltipLineProcessor = builder.tooltipLineProcessor;
         this.tooltipPositionerFactory = builder.tooltipPositionerFactory;
         this.tooltipLinesSupplier = builder.tooltipLinesSupplier;
@@ -64,12 +61,18 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
 
     @Override
     public void setDelay(Duration delay) {
-        // NO-OP
+        // our tooltip implementation is immutable, when something tries to change it reset to vanilla
+        WidgetTooltipHolder holder = new WidgetTooltipHolder();
+        this.abstractWidget.tooltip = holder;
+        holder.setDelay(delay);
     }
 
     @Override
     public void set(@Nullable Tooltip tooltip) {
-        // NO-OP
+        // our tooltip implementation is immutable, when something tries to change it reset to vanilla
+        WidgetTooltipHolder holder = new WidgetTooltipHolder();
+        this.abstractWidget.tooltip = holder;
+        holder.set(tooltip);
     }
 
     @NotNull
