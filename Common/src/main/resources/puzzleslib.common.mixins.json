@@ -5,6 +5,7 @@
   "package": "${modGroup}.mixin",
   "plugin": "${modGroup}.mixin.MixinConfigPluginImpl",
   "mixins": [
+    "EnchantCommandMixin"
   ],
   "client": [
     "client.EditBoxMixin"

@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("client.EditBoxMixin",
+    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("EnchantCommandMixin",
+            "client.EditBoxMixin",
             "server.DedicatedServerSettingsMixin",
             "server.EulaMixin");
 
