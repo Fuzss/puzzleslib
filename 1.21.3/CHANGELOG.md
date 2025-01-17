@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `QuickMoveRuleSet`
 - Add `ArmorMaterialBuilder`
 - Add `RegistryManager::registerRecipeBookCategory`
+- Add internal `ModEnchantCommand`
 - Add a few new transitive access wideners
 ### Fixed
 - Avoid unnecessarily high memory usage from holding on to top level model locations after model events have completed
