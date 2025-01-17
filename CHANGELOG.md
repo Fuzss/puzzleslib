@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Avoid unnecessarily high memory usage from holding on to top level model locations after model events have completed
 - Fix setting empty lines for `TooltipBuilder` throwing an exception under some circumstances
 - Fix unable to set a new widget tooltip using vanilla methods when `TooltipBuilder` has been used for the widget
+- Fix network packets executing with one tick delay on Fabric
 
 ## [v21.3.17-1.21.3] - 2025-01-07
 ### Added

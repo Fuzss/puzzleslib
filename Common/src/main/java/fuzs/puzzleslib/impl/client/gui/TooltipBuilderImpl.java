@@ -20,14 +20,16 @@ import java.util.function.Supplier;
 
 public final class TooltipBuilderImpl implements TooltipBuilder {
     final List<FormattedText> tooltipLines = new ArrayList<>();
-    Duration tooltipDelay = Duration.ZERO;
-    @Nullable
-    BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
+    /**
+     * Negative default delay, as vanilla only checks if time passed is greater, but not equal. This guarantees tooltips
+     * display instantly.
+     */
+    Duration tooltipDelay = Duration.ofMillis(-1L);
+    @Nullable BiFunction<ClientTooltipPositioner, AbstractWidget, ClientTooltipPositioner> tooltipPositionerFactory;
     Function<List<? extends FormattedText>, List<FormattedCharSequence>> tooltipLineProcessor = (List<? extends FormattedText> tooltipLines) -> {
         return ClientComponentSplitter.processTooltipLines(tooltipLines).toList();
     };
-    @Nullable
-    Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
+    @Nullable Supplier<List<? extends FormattedText>> tooltipLinesSupplier;
 
     public TooltipBuilderImpl() {
         this(new FormattedText[0]);
@@ -84,8 +86,7 @@ public final class TooltipBuilderImpl implements TooltipBuilder {
     public TooltipBuilder splitLines(int maxWidth) {
         Preconditions.checkArgument(maxWidth >= 0, "max line width is negative");
         return this.setTooltipLineProcessor((List<? extends FormattedText> tooltipLines) -> {
-            return ClientComponentSplitter.splitTooltipLines(maxWidth, tooltipLines)
-                    .toList();
+            return ClientComponentSplitter.splitTooltipLines(maxWidth, tooltipLines).toList();
         });
     }
 
