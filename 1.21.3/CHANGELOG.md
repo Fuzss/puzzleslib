@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v21.3.18-1.21.3] - 2025-01-17
 ### Added
+- Add `QuickMoveRuleSet`
 - Add `ArmorMaterialBuilder`
 - Add `RegistryManager::registerRecipeBookCategory`
 - Add a few new transitive access wideners
