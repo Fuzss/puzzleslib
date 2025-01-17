@@ -26,7 +26,7 @@ public class FabricClientProxy extends FabricServerProxy implements ClientProxyI
     public <M1, M2> void registerClientReceiver(CustomPacketPayload.Type<CustomPacketPayloadAdapter<M1>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally, Function<M1, ClientboundMessage<M2>> messageAdapter) {
         ClientPlayNetworking.registerGlobalReceiver(type,
                 (CustomPacketPayloadAdapter<M1> payload, ClientPlayNetworking.Context context) -> {
-                    context.client().submit(() -> {
+                    try {
                         Objects.requireNonNull(context.player(), "player is null");
                         ClientboundMessage<M2> message = messageAdapter.apply(payload.unwrap());
                         message.getHandler()
@@ -34,14 +34,11 @@ public class FabricClientProxy extends FabricServerProxy implements ClientProxyI
                                         context.client(),
                                         context.player().connection,
                                         context.player(),
-                                        context.client().level
-                                );
-                    }).exceptionally((Throwable throwable) -> {
+                                        context.client().level);
+                    } catch (Throwable throwable) {
                         disconnectExceptionally.accept(throwable, context.responseSender()::disconnect);
-                        return null;
-                    });
-                }
-        );
+                    }
+                });
     }
 
     @Override
@@ -53,7 +50,6 @@ public class FabricClientProxy extends FabricServerProxy implements ClientProxyI
     @Override
     public void startClientPrediction(Level level, IntFunction<Packet<ServerGamePacketListener>> predictiveAction) {
         ((MultiPlayerGameModeFabricAccessor) Minecraft.getInstance().gameMode).puzzleslib$callStartPrediction((ClientLevel) level,
-                predictiveAction::apply
-        );
+                predictiveAction::apply);
     }
 }
