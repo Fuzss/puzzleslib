@@ -23,7 +23,7 @@ public interface ConfigDataHolder<T extends ConfigCore> {
      * @param callback add a callback for this config, like data that has to be processed after every reload
      */
     default void addCallback(Runnable callback) {
-        this.addCallback(config -> callback.run());
+        this.addCallback((T config) -> callback.run());
     }
 
     /**

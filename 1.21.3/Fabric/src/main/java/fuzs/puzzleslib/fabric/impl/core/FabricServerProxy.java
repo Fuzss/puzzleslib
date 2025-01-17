@@ -22,20 +22,17 @@ public class FabricServerProxy implements FabricProxy {
     public <M1, M2> void registerServerReceiver(CustomPacketPayload.Type<CustomPacketPayloadAdapter<M1>> type, BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally, Function<M1, ServerboundMessage<M2>> messageAdapter) {
         ServerPlayNetworking.registerGlobalReceiver(type,
                 (CustomPacketPayloadAdapter<M1> payload, ServerPlayNetworking.Context context) -> {
-                    context.server().submit(() -> {
+                    try {
                         ServerboundMessage<M2> message = messageAdapter.apply(payload.unwrap());
                         message.getHandler()
                                 .handle(message.unwrap(),
                                         context.server(),
                                         context.player().connection,
                                         context.player(),
-                                        context.player().serverLevel()
-                                );
-                    }).exceptionally((Throwable throwable) -> {
+                                        context.player().serverLevel());
+                    } catch (Throwable throwable) {
                         disconnectExceptionally.accept(throwable, context.responseSender()::disconnect);
-                        return null;
-                    });
-                }
-        );
+                    }
+                });
     }
 }

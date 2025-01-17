@@ -79,7 +79,6 @@
     "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.ToastComponentFabricMixin",
-    "client.accessor.AbstractContainerScreenFabricAccessor",
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "server": [
