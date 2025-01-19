@@ -20,8 +20,11 @@ public interface UseBoneMealCallback {
      * @param blockPos   position bone meal is applied to
      * @param blockState block state bone meal is applied to
      * @param itemStack  the bone meal stack
-     * @return {@link EventResult#PASS} to continue with vanilla, {@link EventResult#ALLOW} to set as handled and let
-     *         vanilla show particles + arm swing animation, {@link EventResult#DENY} to not do anything
+     * @return <ul>
+     *         <li>{@link EventResult#PASS PASS} to continue with vanilla</li>
+     *         <li>{@link EventResult#ALLOW ALLOW} to set as handled and let vanilla show particles + arm swing animation</li>
+     *         <li>{@link EventResult#DENY DENY} to not do anything</li>
+     *         </ul>
      */
     EventResult onUseBoneMeal(Level level, BlockPos blockPos, BlockState blockState, ItemStack itemStack);
 }

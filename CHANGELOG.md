@@ -28,6 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support instruments in `AbstractRegistriesDatapackGenerator`
 ### Fixed
 - Fix `GatherEffectScreenTooltipCallback` on Fabric
+### Removed
+- Remove `LivingBreathEvents` as the implementation is too invasive to maintain on Fabric
 
 ## [v21.3.16-1.21.3] - 2024-12-27
 ### Added

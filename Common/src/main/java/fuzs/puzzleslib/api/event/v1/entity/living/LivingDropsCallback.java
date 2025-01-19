@@ -20,7 +20,7 @@ public interface LivingDropsCallback {
      * The looting level can be obtained via
      * {@link fuzs.puzzleslib.api.core.v1.CommonAbstractions#getMobLootingLevel(Entity, Entity, DamageSource)}.
      *
-     * @param entity       the entity that has been killed
+     * @param livingEntity the entity that has been killed
      * @param damageSource damage source that killed the entity
      * @param itemDrops    all drops, including equipment, so not just drops from the entity's loot table; this can be
      *                     modified
@@ -30,5 +30,5 @@ public interface LivingDropsCallback {
      *         to be spawned in the world; will have the same result as {@link EventResult#INTERRUPT} if drops are
      *         empty
      */
-    EventResult onLivingDrops(LivingEntity entity, DamageSource damageSource, Collection<ItemEntity> itemDrops, boolean recentlyHit);
+    EventResult onLivingDrops(LivingEntity livingEntity, DamageSource damageSource, Collection<ItemEntity> itemDrops, boolean recentlyHit);
 }

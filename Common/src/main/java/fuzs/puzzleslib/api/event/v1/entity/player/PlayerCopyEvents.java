@@ -19,7 +19,8 @@ public final class PlayerCopyEvents {
          *
          * @param originalPlayer     the old player
          * @param newPlayer          the new player
-         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused
+         *                           by the old player having died
          */
         void onCopy(ServerPlayer originalPlayer, ServerPlayer newPlayer, boolean originalStillAlive);
     }
@@ -30,9 +31,10 @@ public final class PlayerCopyEvents {
         /**
          * Called after player a has been respawned.
          *
-         * @param player             the new player
-         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused by the old player having died
+         * @param serverPlayer       the new player
+         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused
+         *                           by the old player having died
          */
-        void onRespawn(ServerPlayer player, boolean originalStillAlive);
+        void onRespawn(ServerPlayer serverPlayer, boolean originalStillAlive);
     }
 }

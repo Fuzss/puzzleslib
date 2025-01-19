@@ -58,12 +58,12 @@ public final class PlayerInteractEvents {
          * @param player          the player interacting with the block
          * @param level           the level the interaction is happening in
          * @param interactionHand the hand the player is using to interact
-         * @param pos             the position of the block in the <code>level</code>
+         * @param blockPos        the position of the block in the <code>level</code>
          * @param direction       the direction the block is clicked at
          * @return {@link EventResult#INTERRUPT} to prevent the player from beginning to mine the block,
          *         {@link EventResult#PASS} to allow the vanilla behavior for this interaction to proceed
          */
-        EventResult onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction);
+        EventResult onAttackBlock(Player player, Level level, InteractionHand interactionHand, BlockPos blockPos, Direction direction);
     }
 
     @FunctionalInterface

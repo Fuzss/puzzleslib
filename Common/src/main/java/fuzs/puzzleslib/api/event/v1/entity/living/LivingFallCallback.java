@@ -16,7 +16,7 @@ public interface LivingFallCallback {
      * Can also be used to modify the distance the entity has fallen used for damage calculation, as well as the damage
      * multiplier defined by the block the entity is falling on to.
      *
-     * @param entity           the falling entity
+     * @param livingEntity     the falling entity
      * @param fallDistance     the distance the entity has fallen for calculating fall damage
      * @param damageMultiplier damage multiplier depending on the type of block the entity is falling on
      * @return <ul>
@@ -24,5 +24,5 @@ public interface LivingFallCallback {
      *         <li>{@link EventResult#PASS PASS} to allow vanilla behavior to continue executing with values set by the event</li>
      *         </ul>
      */
-    EventResult onLivingFall(LivingEntity entity, MutableFloat fallDistance, MutableFloat damageMultiplier);
+    EventResult onLivingFall(LivingEntity livingEntity, MutableFloat fallDistance, MutableFloat damageMultiplier);
 }

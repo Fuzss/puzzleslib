@@ -9,19 +9,20 @@ public final class PlayerTrackingEvents {
     public static final EventInvoker<Stop> STOP = EventInvoker.lookup(Stop.class);
 
     private PlayerTrackingEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
     public interface Start {
 
         /**
-         * Called before an entity starts being tracked by a player, meaning the player receives updates about the entity like its motion.
+         * Called before an entity starts being tracked by a player, meaning the player receives updates about the
+         * entity like its motion.
          *
          * @param trackedEntity the entity that will be tracked
-         * @param player        the player that will track the entity
+         * @param serverPlayer  the player that will track the entity
          */
-        void onStartTracking(Entity trackedEntity, ServerPlayer player);
+        void onStartTracking(Entity trackedEntity, ServerPlayer serverPlayer);
     }
 
     @FunctionalInterface
@@ -31,8 +32,8 @@ public final class PlayerTrackingEvents {
          * Called after an entity stops being tracked by a player.
          *
          * @param trackedEntity the entity that is no longer being tracked
-         * @param player        the player that is no longer tracking the entity
+         * @param serverPlayer  the player that is no longer tracking the entity
          */
-        void onStopTracking(Entity trackedEntity, ServerPlayer player);
+        void onStopTracking(Entity trackedEntity, ServerPlayer serverPlayer);
     }
 }
