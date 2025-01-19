@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
@@ -13,6 +14,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.mutable.MutableBoolean;
@@ -90,5 +93,16 @@ abstract class PlayerFabricMixin extends LivingEntity {
         }
 
         return damageAmount;
+    }
+
+    @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
+        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+            DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
+            FabricLivingEvents.GET_PROJECTILE.invoker().onGetProjectile(this, weaponItemStack, projectileItemStackValue);
+            return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
+        } else {
+            return projectileItemStack;
+        }
     }
 }

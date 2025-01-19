@@ -142,6 +142,10 @@ public final class FabricLivingEvents {
      */
     public static final Event<LookingAtEndermanCallback> LOOKING_AT_ENDERMAN = FabricEventFactory.createResult(
             LookingAtEndermanCallback.class);
+    /**
+     * Fired when an entity attempts to find a valid projectile via {@link LivingEntity#getProjectile(ItemStack)}.
+     */
+    public static final Event<GetProjectileCallback> GET_PROJECTILE = FabricEventFactory.create(GetProjectileCallback.class);
 
     private FabricLivingEvents() {
         // NO-OP

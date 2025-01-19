@@ -29,6 +29,7 @@
     "LootItemRandomChanceWithEnchantedBonusConditionFabricMixin",
     "MagmaCubeFabricMixin",
     "MobFabricMixin",
+    "MonsterFabricMixin",
     "NaturalSpawnerFabricMixin",
     "OcelotFabricMixin",
     "PackRepositoryFabricMixin",

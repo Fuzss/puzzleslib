@@ -9,7 +9,7 @@ public final class ServerLevelEvents {
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
     private ServerLevelEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -18,10 +18,10 @@ public final class ServerLevelEvents {
         /**
          * Fires before a server level is loaded on the minecraft server.
          *
-         * @param server the current minecraft server instance
-         * @param level  the server level that is being loaded
+         * @param minecraftServer the current minecraft server instance
+         * @param serverLevel     the server level that is being loaded
          */
-        void onLevelLoad(MinecraftServer server, ServerLevel level);
+        void onLevelLoad(MinecraftServer minecraftServer, ServerLevel serverLevel);
     }
 
     @FunctionalInterface
@@ -30,9 +30,9 @@ public final class ServerLevelEvents {
         /**
          * Fires before a server level is unloaded on the minecraft server.
          *
-         * @param server the current minecraft server instance
-         * @param level  the server level that is being unloaded
+         * @param minecraftServer the current minecraft server instance
+         * @param serverLevel     the server level that is being unloaded
          */
-        void onLevelUnload(MinecraftServer server, ServerLevel level);
+        void onLevelUnload(MinecraftServer minecraftServer, ServerLevel serverLevel);
     }
 }

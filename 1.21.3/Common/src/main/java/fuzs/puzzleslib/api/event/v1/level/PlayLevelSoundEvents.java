@@ -16,40 +16,46 @@ public final class PlayLevelSoundEvents {
     public static final EventInvoker<AtEntity> ENTITY = EventInvoker.lookup(AtEntity.class);
 
     private PlayLevelSoundEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
     public interface AtPosition {
 
         /**
-         * Called when a sound event is played at a specific position in the world, allows for cancelling the sound.
+         * Called when a sound event is played at a specific position in a level.
          *
-         * @param level         the current level
-         * @param position      the position the sound is to be played at
-         * @param sound         the sound event, can be exchanged here
-         * @param source        sound category
-         * @param volume        volume
-         * @param pitch         pitch
-         * @return              if present the sound will be cancelled
+         * @param level       the current level
+         * @param position    the position the sound is to be played at
+         * @param soundEvent  the sound event, can be replaced
+         * @param soundSource the sound source
+         * @param soundVolume the sound volume
+         * @param soundPitch  the sound pitch
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the sound from playing</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the sound to play normally</li>
+         *         </ul>
          */
-        EventResult onPlaySoundAtPosition(Level level, Vec3 position, MutableValue<Holder<SoundEvent>> sound, MutableValue<SoundSource> source, DefaultedFloat volume, DefaultedFloat pitch);
+        EventResult onPlaySoundAtPosition(Level level, Vec3 position, MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, DefaultedFloat soundVolume, DefaultedFloat soundPitch);
     }
 
     @FunctionalInterface
     public interface AtEntity {
 
         /**
-         * Called when a sound event is played at a specific entity, allows for cancelling the sound.
+         * Called when a sound event is played from a specific entity.
          *
-         * @param level         the current level
-         * @param entity        the entity the sound is playing from
-         * @param sound         the sound event, can be exchanged here
-         * @param source        sound category
-         * @param volume        volume
-         * @param pitch         pitch
-         * @return              if present the sound will be cancelled
+         * @param level       the current level
+         * @param entity      the entity the sound is playing from
+         * @param soundEvent  the sound event, can be replaced
+         * @param soundSource the sound source
+         * @param soundVolume the sound volume
+         * @param soundPitch  the sound pitch
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the sound from playing</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the sound to play normally</li>
+         *         </ul>
          */
-        EventResult onPlaySoundAtEntity(Level level, Entity entity, MutableValue<Holder<SoundEvent>> sound, MutableValue<SoundSource> source, DefaultedFloat volume, DefaultedFloat pitch);
+        EventResult onPlaySoundAtEntity(Level level, Entity entity, MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, DefaultedFloat soundVolume, DefaultedFloat soundPitch);
     }
 }

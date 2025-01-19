@@ -13,7 +13,7 @@ public final class ServerChunkEvents {
     public static final EventInvoker<Unwatch> UNWATCH = EventInvoker.lookup(Unwatch.class);
 
     private ServerChunkEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -22,10 +22,10 @@ public final class ServerChunkEvents {
         /**
          * Fires before a server chunk is loaded.
          *
-         * @param level the server level the chunk is in
-         * @param chunk the chunk being loaded
+         * @param serverLevel the server level the chunk is in
+         * @param levelChunk  the chunk being loaded
          */
-        void onChunkLoad(ServerLevel level, LevelChunk chunk);
+        void onChunkLoad(ServerLevel serverLevel, LevelChunk levelChunk);
     }
 
     @FunctionalInterface
@@ -34,10 +34,10 @@ public final class ServerChunkEvents {
         /**
          * Fires before a server chunk is unloaded.
          *
-         * @param level the server level the chunk is in
-         * @param chunk the chunk being unloaded
+         * @param serverLevel the server level the chunk is in
+         * @param levelChunk  the chunk being unloaded
          */
-        void onChunkUnload(ServerLevel level, LevelChunk chunk);
+        void onChunkUnload(ServerLevel serverLevel, LevelChunk levelChunk);
     }
 
     @FunctionalInterface
@@ -47,11 +47,11 @@ public final class ServerChunkEvents {
          * Fires when a server player begins watching a chunk, and it has just been sent to a client.
          * <p>Useful for syncing additional chunk data.
          *
-         * @param player the player watching the chunk
-         * @param chunk  the chunk
-         * @param level  the level the chunk is in
+         * @param serverPlayer the player watching the chunk
+         * @param levelChunk   the chunk
+         * @param serverLevel  the level the chunk is in
          */
-        void onChunkWatch(ServerPlayer player, LevelChunk chunk, ServerLevel level);
+        void onChunkWatch(ServerPlayer serverPlayer, LevelChunk levelChunk, ServerLevel serverLevel);
     }
 
     @FunctionalInterface
@@ -60,10 +60,10 @@ public final class ServerChunkEvents {
         /**
          * Fires when a server player stops watching a chunk.
          *
-         * @param player the player watching the chunk
-         * @param chunkPos  the chunk position
-         * @param level  the level the chunk is in
+         * @param serverPlayer the player watching the chunk
+         * @param chunkPos     the chunk position
+         * @param serverLevel  the level the chunk is in
          */
-        void onChunkUnwatch(ServerPlayer player, ChunkPos chunkPos, ServerLevel level);
+        void onChunkUnwatch(ServerPlayer serverPlayer, ChunkPos chunkPos, ServerLevel serverLevel);
     }
 }
