@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-@SuppressWarnings({"unchecked", "UnusedReturnValue"})
 public abstract class AbstractTagAppender<T> {
     protected final TagBuilder tagBuilder;
     @Nullable
@@ -56,7 +55,8 @@ public abstract class AbstractTagAppender<T> {
         return this.add(resourceKey.location());
     }
 
-    public AbstractTagAppender<T> add(ResourceKey<? extends T>... resourceKeys) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> add(ResourceKey<? extends T>... resourceKeys) {
         for (ResourceKey<? extends T> resourceKey : resourceKeys) {
             this.add(resourceKey);
         }
@@ -67,7 +67,8 @@ public abstract class AbstractTagAppender<T> {
         return this.add(this.keyExtractor().apply(value));
     }
 
-    public AbstractTagAppender<T> add(T... values) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> add(T... values) {
         for (T value : values) {
             this.add(value);
         }
@@ -78,7 +79,8 @@ public abstract class AbstractTagAppender<T> {
         return this.add(holder.key());
     }
 
-    public AbstractTagAppender<T> add(Holder.Reference<? extends T>... holders) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> add(Holder.Reference<? extends T>... holders) {
         for (Holder.Reference<? extends T> holder : holders) {
             this.add(holder);
         }
@@ -112,7 +114,8 @@ public abstract class AbstractTagAppender<T> {
         return this.addOptional(resourceKey.location());
     }
 
-    public AbstractTagAppender<T> addOptional(ResourceKey<? extends T>... resourceKeys) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> addOptional(ResourceKey<? extends T>... resourceKeys) {
         for (ResourceKey<? extends T> resourceKey : resourceKeys) {
             this.addOptional(resourceKey);
         }
@@ -146,7 +149,8 @@ public abstract class AbstractTagAppender<T> {
         return this.addTag(tagKey.location());
     }
 
-    public AbstractTagAppender<T> addTag(TagKey<T>... tagKeys) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> addTag(TagKey<T>... tagKeys) {
         for (TagKey<T> tagKey : tagKeys) {
             this.addTag(tagKey);
         }
@@ -180,7 +184,8 @@ public abstract class AbstractTagAppender<T> {
         return this.addOptionalTag(tagKey.location());
     }
 
-    public AbstractTagAppender<T> addOptionalTag(TagKey<T>... tagKeys) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> addOptionalTag(TagKey<T>... tagKeys) {
         for (TagKey<T> tagKey : tagKeys) {
             this.addOptionalTag(tagKey);
         }
@@ -211,7 +216,8 @@ public abstract class AbstractTagAppender<T> {
         return this.remove(resourceKey.location());
     }
 
-    public AbstractTagAppender<T> remove(ResourceKey<? extends T>... resourceKeys) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> remove(ResourceKey<? extends T>... resourceKeys) {
         for (ResourceKey<? extends T> resourceKey : resourceKeys) {
             this.remove(resourceKey);
         }
@@ -222,7 +228,8 @@ public abstract class AbstractTagAppender<T> {
         return this.remove(this.keyExtractor().apply(value));
     }
 
-    public AbstractTagAppender<T> remove(T... values) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> remove(T... values) {
         for (T value : values) {
             this.remove(value);
         }
@@ -253,7 +260,8 @@ public abstract class AbstractTagAppender<T> {
         return this.removeTag(tagKey.location());
     }
 
-    public AbstractTagAppender<T> removeTag(TagKey<T>... tagKeys) {
+    @SafeVarargs
+    public final AbstractTagAppender<T> removeTag(TagKey<T>... tagKeys) {
         for (TagKey<T> tagKey : tagKeys) {
             this.removeTag(tagKey);
         }
