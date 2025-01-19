@@ -27,8 +27,10 @@ public final class ExplosionEvents {
          *
          * @param serverLevel the level the explosion is happening in
          * @param explosion   the explosion that is about to start
-         * @return {@link EventResult#INTERRUPT} prevents to explosion from happening, {@link EventResult#PASS} allows
-         *         the explosion to continue forward
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} prevents to explosion from happening</li>
+         *         <li>{@link EventResult#PASS PASS} allows the explosion to continue forward</li>
+         *         </ul>
          */
         EventResult onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion);
     }

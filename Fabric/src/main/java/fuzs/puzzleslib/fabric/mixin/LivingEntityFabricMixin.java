@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
@@ -24,6 +25,7 @@ import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
@@ -395,5 +397,16 @@ abstract class LivingEntityFabricMixin extends Entity {
                 visibilityPercentage
         );
         return visibilityPercentage.getAsOptionalDouble().stream().map((double visibilityPercentageValue) -> Math.max(visibilityPercentageValue, 0.0)).findAny().orElse(value);
+    }
+
+    @ModifyReturnValue(method = "getProjectile", at = @At("RETURN"))
+    public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
+        if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
+            DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
+            FabricLivingEvents.GET_PROJECTILE.invoker().onGetProjectile(LivingEntity.class.cast(this), weaponItemStack, projectileItemStackValue);
+            return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
+        } else {
+            return projectileItemStack;
+        }
     }
 }

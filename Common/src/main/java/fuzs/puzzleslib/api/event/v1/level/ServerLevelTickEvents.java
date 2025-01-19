@@ -11,7 +11,7 @@ public final class ServerLevelTickEvents {
     public static final EventInvoker<End> END = EventInvoker.lookup(End.class);
 
     private ServerLevelTickEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -20,10 +20,10 @@ public final class ServerLevelTickEvents {
         /**
          * Fires before ticking the server level in {@link MinecraftServer#tickChildren(BooleanSupplier)}.
          *
-         * @param server the current minecraft server instance
-         * @param level  the server level that is being ticked
+         * @param minecraftServer the current minecraft server instance
+         * @param serverLevel     the server level that is being ticked
          */
-        void onStartLevelTick(MinecraftServer server, ServerLevel level);
+        void onStartLevelTick(MinecraftServer minecraftServer, ServerLevel serverLevel);
     }
 
     @FunctionalInterface
@@ -32,9 +32,9 @@ public final class ServerLevelTickEvents {
         /**
          * Fires after ticking the server level in {@link MinecraftServer#tickChildren(BooleanSupplier)}.
          *
-         * @param server the current minecraft server instance
-         * @param level  the server level that is being ticked
+         * @param minecraftServer the current minecraft server instance
+         * @param serverLevel     the server level that is being ticked
          */
-        void onEndLevelTick(MinecraftServer server, ServerLevel level);
+        void onEndLevelTick(MinecraftServer minecraftServer, ServerLevel serverLevel);
     }
 }

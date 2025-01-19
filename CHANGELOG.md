@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Add `QuickMoveRuleSet`
 - Add `ArmorMaterialBuilder`
+- Add `GetProjectileCallback`
 - Add `RegistryManager::registerRecipeBookCategory`
 - Add internal `ModEnchantCommand`
 - Add a few new transitive access wideners

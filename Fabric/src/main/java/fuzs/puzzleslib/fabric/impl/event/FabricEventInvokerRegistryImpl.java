@@ -467,6 +467,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             };
         });
         INSTANCE.register(ChangeEntitySizeCallback.class, FabricEntityEvents.CHANGE_ENTITY_SIZE);
+        INSTANCE.register(GetProjectileCallback.class, FabricLivingEvents.GET_PROJECTILE);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }

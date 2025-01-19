@@ -704,6 +704,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     evt.getEntity(), evt.getPose(), evt.getOldSize());
             result.ifInterrupt(evt::setNewSize);
         });
+        INSTANCE.register(GetProjectileCallback.class, LivingGetProjectileEvent.class, (GetProjectileCallback callback, LivingGetProjectileEvent evt) -> {
+            MutableValue<ItemStack> ammoItemStack = MutableValue.fromEvent(evt::setProjectileItemStack,
+                    evt::getProjectileItemStack);
+            callback.onGetProjectile(evt.getEntity(), evt.getProjectileWeaponItemStack(), ammoItemStack);
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();
         }
