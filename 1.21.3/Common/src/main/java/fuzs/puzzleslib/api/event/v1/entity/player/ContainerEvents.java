@@ -11,7 +11,7 @@ public final class ContainerEvents {
     public static final EventInvoker<Close> CLOSE = EventInvoker.lookup(Close.class);
 
     private ContainerEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -21,10 +21,10 @@ public final class ContainerEvents {
          * Called after the player has opened a container, which is when the new {@link AbstractContainerMenu} has been
          * set to {@link Player#containerMenu} in {@link Player#openMenu(MenuProvider)}.
          *
-         * @param player        the server player
-         * @param containerMenu the container
+         * @param serverPlayer  the server player
+         * @param containerMenu the container menu
          */
-        void onContainerOpen(ServerPlayer player, AbstractContainerMenu containerMenu);
+        void onContainerOpen(ServerPlayer serverPlayer, AbstractContainerMenu containerMenu);
     }
 
     @FunctionalInterface
@@ -34,9 +34,9 @@ public final class ContainerEvents {
          * Called when the player is closing an open container, where {@link Player#containerMenu} is reset to
          * {@link Player#inventoryMenu} in {@link Player#doCloseContainer()}.
          *
-         * @param player        the server player
-         * @param containerMenu the container
+         * @param serverPlayer  the server player
+         * @param containerMenu the container menu
          */
-        void onContainerClose(ServerPlayer player, AbstractContainerMenu containerMenu);
+        void onContainerClose(ServerPlayer serverPlayer, AbstractContainerMenu containerMenu);
     }
 }

@@ -10,36 +10,42 @@ public final class EntityRidingEvents {
     public static final EventInvoker<Stop> STOP = EventInvoker.lookup(Stop.class);
 
     private EntityRidingEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
     public interface Start {
 
         /**
-         * Runs when an entity starts riding another entity in {@link Entity#startRiding(Entity, boolean)}, allows for preventing that.
+         * Runs when an entity starts riding another entity in {@link Entity#startRiding(Entity, boolean)}, allows for
+         * preventing that.
          *
-         * @param level   the level both entities are in
-         * @param rider   the rider trying to start riding the vehicle
-         * @param vehicle the vehicle the rider is trying start riding
-         * @return {@link EventResult#INTERRUPT} to prevent the rider from starting to ride on the vehicle,
-         * {@link EventResult#PASS} to allow vanilla behavior to continue and for riding to begin
+         * @param level           the level both entities are in
+         * @param passengerEntity the rider trying to start riding the vehicle
+         * @param vehicleEntity   the vehicle the rider is trying start riding
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the rider from starting to ride on the vehicle</li>
+         *         <li>{@link EventResult#PASS PASS} to allow vanilla behavior to continue and for riding to begin</li>
+         *         </ul>
          */
-        EventResult onStartRiding(Level level, Entity rider, Entity vehicle);
+        EventResult onStartRiding(Level level, Entity passengerEntity, Entity vehicleEntity);
     }
 
     @FunctionalInterface
     public interface Stop {
 
         /**
-         * Runs when an entity stops riding another entity in {@link Entity#removeVehicle()}, allows for preventing that.
+         * Runs when an entity stops riding another entity in {@link Entity#removeVehicle()}, allows for preventing
+         * that.
          *
-         * @param level   the level both entities are in
-         * @param rider   the rider trying to stop riding the vehicle
-         * @param vehicle the vehicle the rider is trying stop riding
-         * @return {@link EventResult#INTERRUPT} to prevent the rider from dismounting,
-         * {@link EventResult#PASS} to allow vanilla behavior to continue and for riding to stop
+         * @param level           the level both entities are in
+         * @param passengerEntity the rider trying to stop riding the vehicle
+         * @param vehicleEntity   the vehicle the rider is trying stop riding
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the rider from dismounting</li>
+         *         <li>{@link EventResult#PASS PASS} to allow vanilla behavior to continue and for riding to stop</li>
+         *         </ul>
          */
-        EventResult onStopRiding(Level level, Entity rider, Entity vehicle);
+        EventResult onStopRiding(Level level, Entity passengerEntity, Entity vehicleEntity);
     }
 }

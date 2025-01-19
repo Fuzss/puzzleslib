@@ -443,8 +443,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(EntityRidingEvents.Stop.class, FabricEntityEvents.ENTITY_STOP_RIDING);
         INSTANCE.register(GrindstoneEvents.Update.class, FabricPlayerEvents.GRINDSTONE_UPDATE);
         INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
-        INSTANCE.register(LivingBreathEvents.Breathe.class, FabricLivingEvents.LIVING_BREATHE);
-        INSTANCE.register(LivingBreathEvents.Drown.class, FabricLivingEvents.LIVING_DROWN);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, ServerEntityEvents.EQUIPMENT_CHANGE, callback -> {

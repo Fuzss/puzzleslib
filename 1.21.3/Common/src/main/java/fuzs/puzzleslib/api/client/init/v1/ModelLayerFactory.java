@@ -6,7 +6,7 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 /**
  * A helper class for creating {@link ModelLayerLocation ModelLayerLocations} with a provided namespace.
  * <p>
- * TODO add ModelLayer suffix to method names to make the interface more usable in other context implementations
+ * TODO add ModelLayer suffix to method names to make the interface more usable in other context implementations (maybe only deprecate old methods though?)
  */
 @FunctionalInterface
 public interface ModelLayerFactory {

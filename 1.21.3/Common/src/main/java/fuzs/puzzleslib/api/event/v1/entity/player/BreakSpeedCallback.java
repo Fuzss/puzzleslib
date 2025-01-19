@@ -14,10 +14,12 @@ public interface BreakSpeedCallback {
      * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
      *
      * @param player     the player breaking <code>state</code>
-     * @param state      the block state being broken
+     * @param blockState the block state being broken
      * @param breakSpeed the speed at which the block is broken, usually a value around 1.0
-     * @return {@link EventResult#INTERRUPT} to prevent the block from breaking, effectively setting the break speed to -1.0,
-     * {@link EventResult#PASS} to allow the block to be broken at the defined break speed
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the block from breaking, effectively setting the break speed to -1.0</li>
+     *         <li>{@link EventResult#PASS PASS} to allow the block to be broken at the defined break speed</li>
+     *         </ul>
      */
-    EventResult onBreakSpeed(Player player, BlockState state, DefaultedFloat breakSpeed);
+    EventResult onBreakSpeed(Player player, BlockState blockState, DefaultedFloat breakSpeed);
 }

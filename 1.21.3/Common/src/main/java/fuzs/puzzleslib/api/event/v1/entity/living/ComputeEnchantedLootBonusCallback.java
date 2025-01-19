@@ -10,8 +10,7 @@ import org.jetbrains.annotations.Nullable;
 
 @FunctionalInterface
 public interface ComputeEnchantedLootBonusCallback {
-    EventInvoker<ComputeEnchantedLootBonusCallback> EVENT = EventInvoker.lookup(
-            ComputeEnchantedLootBonusCallback.class);
+    EventInvoker<ComputeEnchantedLootBonusCallback> EVENT = EventInvoker.lookup(ComputeEnchantedLootBonusCallback.class);
 
     /**
      * Called just before a {@link LivingEntity} drops all its loot for determining the level of a loot bonus
@@ -25,10 +24,10 @@ public interface ComputeEnchantedLootBonusCallback {
      *     <li>enchantment effect component <code>minecraft:equipment_drops</code></li>
      * </ul>
      *
-     * @param entity           the entity that is about to drop all its loot
+     * @param livingEntity     the entity that is about to drop all its loot
      * @param damageSource     the damage source that caused the entity to drop its loot
      * @param enchantment      the enchantment
      * @param enchantmentLevel the current enchantment level
      */
-    void onComputeEnchantedLootBonus(LivingEntity entity, @Nullable DamageSource damageSource, Holder<Enchantment> enchantment, MutableInt enchantmentLevel);
+    void onComputeEnchantedLootBonus(LivingEntity livingEntity, @Nullable DamageSource damageSource, Holder<Enchantment> enchantment, MutableInt enchantmentLevel);
 }

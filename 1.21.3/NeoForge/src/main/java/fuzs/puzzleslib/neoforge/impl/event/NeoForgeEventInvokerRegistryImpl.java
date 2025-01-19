@@ -41,7 +41,6 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffectUtil;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
@@ -653,47 +652,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onGrindstoneUse(topInput, bottomInput, player);
             topInput.getAsOptional().ifPresent(evt::setNewTopItem);
             bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
-        });
-        INSTANCE.register(LivingBreathEvents.Breathe.class, LivingBreatheEvent.class, (LivingBreathEvents.Breathe callback, LivingBreatheEvent evt) -> {
-            final int airAmountValue;
-            if (evt.canBreathe()) {
-                airAmountValue = evt.getRefillAirAmount();
-            } else {
-                airAmountValue = -evt.getConsumeAirAmount();
-            }
-            DefaultedInt airAmount = DefaultedInt.fromValue(airAmountValue);
-            LivingEntity entity = evt.getEntity();
-            // do not use LivingBreatheEvent::canBreathe, it is merged with LivingBreatheEvent::canRefillAir, so recalculate the value
-            boolean canLoseAir = !entity.canDrownInFluidType(entity.getEyeInFluidType()) && !MobEffectUtil.hasWaterBreathing(entity) && (!(entity instanceof Player) || !((Player) entity).getAbilities().invulnerable);
-            EventResult result = callback.onLivingBreathe(entity, airAmount, true, canLoseAir);
-            if (result.isInterrupt()) {
-                // just some trickery so the event does nothing
-                evt.setConsumeAirAmount(0);
-                evt.setRefillAirAmount(0);
-            } else {
-                OptionalInt optional = airAmount.getAsOptionalInt();
-                if (optional.isPresent()) {
-                    if (optional.getAsInt() < 0) {
-                        evt.setCanBreathe(false);
-                        evt.setConsumeAirAmount(Math.abs(optional.getAsInt()));
-                        evt.setRefillAirAmount(0);
-                    } else {
-                        evt.setCanBreathe(true);
-                        evt.setConsumeAirAmount(0);
-                        evt.setRefillAirAmount(Math.abs(optional.getAsInt()));
-                    }
-                }
-            }
-        });
-        INSTANCE.register(LivingBreathEvents.Drown.class, LivingDrownEvent.class, (LivingBreathEvents.Drown callback, LivingDrownEvent evt) -> {
-            EventResult result = callback.onLivingDrown(evt.getEntity(), evt.getEntity().getAirSupply(), evt.isDrowning());
-            if (result.isInterrupt()) {
-                if (result.getAsBoolean()) {
-                    evt.setDrowning(true);
-                } else {
-                    evt.setCanceled(true);
-                }
-            }
         });
         INSTANCE.register(ServerChunkEvents.Watch.class, ChunkWatchEvent.Watch.class, (ServerChunkEvents.Watch callback, ChunkWatchEvent.Watch evt) -> {
             callback.onChunkWatch(evt.getPlayer(), evt.getChunk(), evt.getLevel());

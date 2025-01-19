@@ -9,11 +9,11 @@ public interface AfterChangeDimensionCallback {
     EventInvoker<AfterChangeDimensionCallback> EVENT = EventInvoker.lookup(AfterChangeDimensionCallback.class);
 
     /**
-     * Called after a player has been moved to different world.
+     * Called after a player has been moved to different level.
      *
-     * @param player the player
-     * @param from   the original world the player was in
-     * @param to     the new world the player was moved to
+     * @param serverPlayer  the player
+     * @param originalLevel the original level the player was in
+     * @param newLevel      the new level the player was moved to
      */
-    void onAfterChangeDimension(ServerPlayer player, ServerLevel from, ServerLevel to);
+    void onAfterChangeDimension(ServerPlayer serverPlayer, ServerLevel originalLevel, ServerLevel newLevel);
 }

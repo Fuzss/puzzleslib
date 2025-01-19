@@ -14,7 +14,7 @@ public interface LivingExperienceDropCallback {
     /**
      * Called right before xp drops are spawned in the world. Allows for cancelling drops or changing the amount.
      *
-     * @param entity            the entity that died
+     * @param livingEntity      the entity that died
      * @param attackingPlayer   the player that killed the entity
      * @param droppedExperience amount of xp dropped by vanilla, allows for setting a custom amount
      * @return <ul>
@@ -22,5 +22,5 @@ public interface LivingExperienceDropCallback {
      *         <li>{@link EventResult#PASS PASS} to drop the experience amount set via the event</li>
      *         </ul>
      */
-    EventResult onLivingExperienceDrop(LivingEntity entity, @Nullable Player attackingPlayer, DefaultedInt droppedExperience);
+    EventResult onLivingExperienceDrop(LivingEntity livingEntity, @Nullable Player attackingPlayer, DefaultedInt droppedExperience);
 }

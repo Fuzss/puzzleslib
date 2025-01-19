@@ -12,7 +12,7 @@ public final class ItemEntityEvents {
     public static final EventInvoker<Touch> TOUCH = EventInvoker.lookup(Touch.class);
 
     private ItemEntityEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

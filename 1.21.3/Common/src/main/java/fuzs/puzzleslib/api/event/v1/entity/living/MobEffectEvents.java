@@ -28,13 +28,13 @@ public final class MobEffectEvents {
          * This is used for mobs such as spiders to make them immune to poison, or wither mobs to make them immune to
          * the wither effect.
          *
-         * @param entity the entity the check is run for
-         * @param effect the effect instance to check
+         * @param livingEntity the entity the check is run for
+         * @param mobEffect    the effect instance to check
          * @return {@link EventResult#ALLOW} to allow this effect to be applied to the entity, {@link EventResult#DENY}
          *         to prevent this effect from being applied to the entity, {@link EventResult#PASS} to let vanilla
          *         logic handle this case
          */
-        EventResult onMobEffectAffects(LivingEntity entity, MobEffectInstance effect);
+        EventResult onMobEffectAffects(LivingEntity livingEntity, MobEffectInstance mobEffect);
     }
 
     @FunctionalInterface
@@ -47,12 +47,12 @@ public final class MobEffectEvents {
          * If another effect with the same {@link net.minecraft.world.effect.MobEffect} is already present, the existing
          * effect instance will be updated.
          *
-         * @param entity       the living entity the effect instance is added to
-         * @param effect       the effect instance being added
-         * @param oldEffect    a potentially already existing effect instance with the same mob effect type
-         * @param effectSource a potential other entity responsible for inflicting this new effect
+         * @param livingEntity the living entity the effect instance is added to
+         * @param mobEffect    the effect instance being added
+         * @param oldMobEffect a potentially already existing effect instance with the same mob effect type
+         * @param sourceEntity a potential other entity responsible for inflicting this new effect
          */
-        void onMobEffectApply(LivingEntity entity, MobEffectInstance effect, @Nullable MobEffectInstance oldEffect, @Nullable Entity effectSource);
+        void onMobEffectApply(LivingEntity livingEntity, MobEffectInstance mobEffect, @Nullable MobEffectInstance oldMobEffect, @Nullable Entity sourceEntity);
     }
 
     @FunctionalInterface
@@ -65,12 +65,12 @@ public final class MobEffectEvents {
          * Most notable this event runs when finishing drinking milk, and allows for preventing certain effects from
          * being removed as a result.
          *
-         * @param entity the entity the effect instance is to be removed from
-         * @param effect the effect instance to remove
+         * @param livingEntity the entity the effect instance is to be removed from
+         * @param mobEffect    the effect instance to remove
          * @return {@link EventResult#INTERRUPT} to prevent this effect instance from being removed,
          *         {@link EventResult#PASS} to let vanilla logic handle this case
          */
-        EventResult onMobEffectRemove(LivingEntity entity, MobEffectInstance effect);
+        EventResult onMobEffectRemove(LivingEntity livingEntity, MobEffectInstance mobEffect);
     }
 
     @FunctionalInterface
@@ -84,9 +84,9 @@ public final class MobEffectEvents {
          * This is the case when <code>net.minecraft.world.effect.MobEffectInstance#hasRemainingDuration()</code>
          * returns <code>false</code>.
          *
-         * @param entity the living entity the effect instance has run out on
-         * @param effect the mob effect instance that has run out
+         * @param livingEntity the living entity the effect instance has run out on
+         * @param mobEffect    the mob effect instance that has run out
          */
-        void onMobEffectExpire(LivingEntity entity, MobEffectInstance effect);
+        void onMobEffectExpire(LivingEntity livingEntity, MobEffectInstance mobEffect);
     }
 }
