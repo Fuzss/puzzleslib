@@ -6,16 +6,21 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
+import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class RegistryManagerImpl implements RegistryManager {
@@ -73,4 +78,18 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     }
 
     protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration);
+
+    @Override
+    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Consumer<CreativeModeTab.Builder> tabConfigurator) {
+        return this.register(Registries.CREATIVE_MODE_TAB, path, () -> {
+            CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder();
+            ResourceLocation resourceLocation = this.makeKey(path);
+            Component component = CreativeModeTabHelper.getTitle(resourceLocation);
+            builder.title(component);
+            tabConfigurator.accept(builder);
+            return builder.build();
+        });
+    }
+
+    protected abstract CreativeModeTab.Builder getCreativeModeTabBuilder();
 }

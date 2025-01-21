@@ -36,6 +36,8 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
+import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
@@ -51,6 +53,7 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.protocol.game.ServerboundInteractPacket;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
@@ -67,6 +70,7 @@ import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -83,14 +87,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 
 public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerRegistry {
 
@@ -172,7 +172,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, (PlayerInteractEvents.UseBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                 EventResultHolder<InteractionResult> result = callback.onUseBlock(player, level, hand, hitResult);
-                return result.getInterrupt().map(interactionResult -> {
+                return result.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -210,7 +210,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 }
 
                 EventResultHolder<InteractionResult> result = callback.onUseItem(player, level, hand);
-                return result.getInterrupt().map(interactionResult -> {
+                return result.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -244,7 +244,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult != null) return InteractionResult.PASS;
                 EventResultHolder<InteractionResult> result = callback.onUseEntity(player, level, hand, entity);
-                return result.getInterrupt().map(interactionResult -> {
+                return result.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -270,7 +270,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                         entity,
                         hitResult.getLocation()
                 );
-                return result.getInterrupt().map(interactionResult -> {
+                return result.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -445,7 +445,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(GrindstoneEvents.Use.class, FabricPlayerEvents.GRINDSTONE_USE);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
-        INSTANCE.register(LivingEquipmentChangeCallback.class, ServerEntityEvents.EQUIPMENT_CHANGE, callback -> {
+        INSTANCE.register(LivingEquipmentChangeCallback.class, ServerEntityEvents.EQUIPMENT_CHANGE, (LivingEquipmentChangeCallback callback) -> {
             return callback::onLivingEquipmentChange;
         });
         INSTANCE.register(LivingConversionCallback.class, ServerLivingEntityEvents.MOB_CONVERSION, (LivingConversionCallback callback) -> {
@@ -461,13 +461,31 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
             };
         });
-        INSTANCE.register(RegisterFuelValuesCallback.class, FuelRegistryEvents.BUILD, callback -> {
+        INSTANCE.register(RegisterFuelValuesCallback.class, FuelRegistryEvents.BUILD, (RegisterFuelValuesCallback callback) -> {
             return (FuelValues.Builder builder, FuelRegistryEvents.Context context) -> {
                 callback.onRegisterFuelValues(builder, context.baseSmeltTime());
             };
         });
         INSTANCE.register(ChangeEntitySizeCallback.class, FabricEntityEvents.CHANGE_ENTITY_SIZE);
-        INSTANCE.register(GetProjectileCallback.class, FabricLivingEvents.GET_PROJECTILE);
+        INSTANCE.register(PickProjectileCallback.class, FabricLivingEvents.PICK_PROJECTILE);
+        INSTANCE.register(EnderPearlTeleportCallback.class, FabricEntityEvents.ENDER_PEARL_TELEPORT);
+        INSTANCE.register(BuildCreativeModeTabContentsCallback.class,
+                ItemGroupEvents.ModifyEntries.class, (BuildCreativeModeTabContentsCallback callback, @Nullable Object context) -> {
+            return (FabricItemGroupEntries entries) -> {
+                Objects.requireNonNull(context, "context is null");
+                ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
+                CreativeModeTab creativeModeTab = entries.getContext()
+                        .holders()
+                        .lookupOrThrow(Registries.CREATIVE_MODE_TAB)
+                        .getOrThrow(resourceKey)
+                        .value();
+                callback.onBuildCreativeModeTabContents(creativeModeTab, entries.getContext(), entries);
+            };
+                }, (Object context, Consumer<Event<ItemGroupEvents.ModifyEntries>> applyToInvoker, Consumer<Event<ItemGroupEvents.ModifyEntries>> removeInvoker) -> {
+            Objects.requireNonNull(context, "context is null");
+            ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
+            applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
+        }, UnaryOperator.identity(), false);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }
@@ -482,12 +500,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     @Override
-    public <T, E> void register(Class<T> clazz, Class<E> eventType, Function<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
+    public <T, E> void register(Class<T> clazz, Class<E> eventType, FabricEventContextConverter<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
         Objects.requireNonNull(eventType, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        EventInvokerImpl.register(clazz, new FabricForwardingEventInvoker<>((T callback, @Nullable Object context) -> converter.apply(callback), consumer, eventPhaseConverter), joinInvokers);
+        EventInvokerImpl.register(clazz, new FabricForwardingEventInvoker<>(converter, consumer, eventPhaseConverter), joinInvokers);
     }
 
     private record FabricEventInvoker<T, E>(Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
@@ -538,20 +556,20 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
     }
 
-    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvoker<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvoker<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
+    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvokerImpl.EventInvokerLike<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvokerImpl.EventInvokerLike<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricForwardingEventInvoker(FabricEventContextConverter<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter) {
             this((Event<E> event) -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().concurrencyLevel(1).makeMap());
         }
 
         @Override
-        public EventInvoker<T> asEventInvoker(@NotNull Object context) {
+        public EventInvoker<T> asEventInvoker(Object context) {
             Objects.requireNonNull(context, "context is null");
             // keeping track of events and corresponding invoker is not so important since there is only ever one event per context anyway which is guaranteed by the underlying implementation
             // but for managing event phases it becomes necessary to use our FabricEventInvoker to keep track
             return (EventPhase phase, T callback) -> {
                 this.consumer.accept(context, (Event<E> event) -> {
-                    this.events.computeIfAbsent(event, this.factory).register(phase, callback);
+                    this.events.computeIfAbsent(event, this.factory).asEventInvoker(context).register(phase, callback);
                 }, this.events::remove);
             };
         }

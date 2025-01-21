@@ -14,8 +14,11 @@ import java.util.Map;
 /**
  * A class containing factory methods for default {@link ToolMaterial} and
  * {@link net.minecraft.world.item.equipment.ArmorMaterial} implementations.
+ * <p>
+ * TODO rename to tier related class
  */
 public final class ItemEquipmentFactories {
+    @Deprecated(forRemoval = true)
     private static final ArmorType[] ARMOR_TYPES = {
             ArmorType.BOOTS, ArmorType.LEGGINGS, ArmorType.CHESTPLATE, ArmorType.HELMET, ArmorType.BODY
     };
@@ -34,15 +37,18 @@ public final class ItemEquipmentFactories {
      *                          netherite is 9
      * @param attackDamageBonus attack damage bonus for added on top of base item damage; this mostly depends on the
      *                          specific item, as the base value is different for each one since Minecraft 1.9
-     * @param enchantability    enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
+     * @param enchantmentValue  enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
      *                          netherite is 15
      * @param repairItems       the repair material used in an anvil for restoring item durability
      * @return the new {@link ToolMaterial}
      */
-    public static ToolMaterial registerTier(int miningLevel, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, TagKey<Item> repairItems) {
-        return registerTier(getVanillaMiningLevelBlockTag(miningLevel), itemDurability, miningSpeed, attackDamageBonus,
-                enchantability, repairItems
-        );
+    public static ToolMaterial registerTier(int miningLevel, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantmentValue, TagKey<Item> repairItems) {
+        return registerTier(getVanillaMiningLevelBlockTag(miningLevel),
+                itemDurability,
+                miningSpeed,
+                attackDamageBonus,
+                enchantmentValue,
+                repairItems);
     }
 
     /**
@@ -81,15 +87,18 @@ public final class ItemEquipmentFactories {
      * @param attackDamageBonus       attack damage bonus for added on top of base item damage; this mostly depends on
      *                                the specific item, as the base value is different for each one since Minecraft
      *                                1.9
-     * @param enchantability          enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
+     * @param enchantmentValue        enchantment value, wood is 15, gold is 22, stone is 5, iron is 14, diamond is 14,
      *                                netherite is 15
      * @param repairItems             the repair material used in an anvil for restoring item durability
      * @return the new {@link ToolMaterial}
      */
-    public static ToolMaterial registerTier(TagKey<Block> incorrectBlocksForDrops, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantability, TagKey<Item> repairItems) {
-        return new ToolMaterial(incorrectBlocksForDrops, itemDurability, miningSpeed, attackDamageBonus, enchantability,
-                repairItems
-        );
+    public static ToolMaterial registerTier(TagKey<Block> incorrectBlocksForDrops, int itemDurability, float miningSpeed, float attackDamageBonus, int enchantmentValue, TagKey<Item> repairItems) {
+        return new ToolMaterial(incorrectBlocksForDrops,
+                itemDurability,
+                miningSpeed,
+                attackDamageBonus,
+                enchantmentValue,
+                repairItems);
     }
 
     /**

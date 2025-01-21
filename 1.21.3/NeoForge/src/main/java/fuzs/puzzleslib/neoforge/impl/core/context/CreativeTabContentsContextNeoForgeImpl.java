@@ -10,11 +10,11 @@ import java.util.Objects;
 public record CreativeTabContentsContextNeoForgeImpl(BuildCreativeModeTabContentsEvent evt) implements BuildCreativeModeTabContentsContext {
 
     @Override
-    public void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
+    public void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator displayItems) {
         Objects.requireNonNull(resourceKey, "resource key is null");
-        Objects.requireNonNull(itemsGenerator, "display items generator is null");
+        Objects.requireNonNull(displayItems, "display items generator is null");
         if (resourceKey == this.evt.getTabKey()) {
-            itemsGenerator.accept(this.evt.getParameters(), this.evt);
+            displayItems.accept(this.evt.getParameters(), this.evt);
         }
     }
 }

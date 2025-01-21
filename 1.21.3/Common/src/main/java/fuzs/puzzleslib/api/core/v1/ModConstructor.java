@@ -101,6 +101,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context register new creative mode tabs via the respective builder
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {
         // NO-OP
     }
@@ -108,6 +109,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context add items to a creative tab
      */
+    @Deprecated(forRemoval = true)
     default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
         // NO-OP
     }

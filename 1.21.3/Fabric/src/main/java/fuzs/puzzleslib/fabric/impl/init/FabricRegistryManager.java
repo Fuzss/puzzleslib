@@ -7,7 +7,9 @@ import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.api.network.v3.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
+import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
@@ -22,6 +24,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -56,30 +60,47 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
+    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
+        return this.registerCreativeModeTab("main", (CreativeModeTab.Builder builder) -> {
+            builder.icon(iconSupplier);
+            CreativeModeTab.DisplayItemsGenerator displayItems = CreativeModeTabHelper.getDisplayItems(this.modId);
+            builder.displayItems(displayItems);
+        });
+    }
+
+    @Override
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder() {
+        return FabricItemGroup.builder();
+    }
+
+    @Override
     public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
-                path, () -> {
+                path,
+                () -> {
                     return FabricBlockEntityTypeBuilder.create(factory::apply, validBlocks.get().toArray(Block[]::new))
                             .build();
-                }
-        );
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path,
-                () -> new ExtendedScreenHandlerType<>(entry.get()::create, ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF)
-        );
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU,
+                path,
+                () -> new ExtendedScreenHandlerType<>(entry.get()::create,
+                        ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF));
     }
 
     @Override
     public Holder.Reference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Supplier<Set<BlockState>> matchingBlockStates) {
-        return this.register(Registries.POINT_OF_INTEREST_TYPE, path,
-                () -> PointOfInterestHelper.register(this.makeKey(path), maxTickets, validRange,
-                        matchingBlockStates.get()
-                ), true
-        );
+        return this.register(Registries.POINT_OF_INTEREST_TYPE,
+                path,
+                () -> PointOfInterestHelper.register(this.makeKey(path),
+                        maxTickets,
+                        validRange,
+                        matchingBlockStates.get()),
+                true);
     }
 
     @Override

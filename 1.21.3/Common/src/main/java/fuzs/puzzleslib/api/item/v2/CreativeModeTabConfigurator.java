@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  * <p>
  * Some features are only available on NeoForge, on Fabric they'll simply do nothing.
  */
+@Deprecated(forRemoval = true)
 public interface CreativeModeTabConfigurator {
 
     /**

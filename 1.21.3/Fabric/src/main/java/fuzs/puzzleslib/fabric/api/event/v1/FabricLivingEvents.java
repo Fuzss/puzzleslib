@@ -145,7 +145,7 @@ public final class FabricLivingEvents {
     /**
      * Fired when an entity attempts to find a valid projectile via {@link LivingEntity#getProjectile(ItemStack)}.
      */
-    public static final Event<GetProjectileCallback> GET_PROJECTILE = FabricEventFactory.create(GetProjectileCallback.class);
+    public static final Event<PickProjectileCallback> PICK_PROJECTILE = FabricEventFactory.create(PickProjectileCallback.class);
 
     private FabricLivingEvents() {
         // NO-OP

@@ -47,6 +47,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlags;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -125,6 +126,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(AddBlockEntityTypeBlocksCallback.class, BlockEntityTypeAddBlocksEvent.class, (AddBlockEntityTypeBlocksCallback callback, BlockEntityTypeAddBlocksEvent evt) -> {
             callback.onAddBlockEntityTypeBlocks(evt::modify);
+        });
+        INSTANCE.register(BuildCreativeModeTabContentsCallback.class, BuildCreativeModeTabContentsEvent.class, (BuildCreativeModeTabContentsCallback callback, BuildCreativeModeTabContentsEvent evt, @Nullable Object context) -> {
+            Objects.requireNonNull(context, "context is null");
+            ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
+            if (resourceKey == evt.getTabKey()) {
+                callback.onBuildCreativeModeTabContents(evt.getTab(), evt.getParameters(), evt);
+            }
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerLoadingHandlers();
@@ -704,10 +712,18 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     evt.getEntity(), evt.getPose(), evt.getOldSize());
             result.ifInterrupt(evt::setNewSize);
         });
-        INSTANCE.register(GetProjectileCallback.class, LivingGetProjectileEvent.class, (GetProjectileCallback callback, LivingGetProjectileEvent evt) -> {
+        INSTANCE.register(PickProjectileCallback.class, LivingGetProjectileEvent.class, (PickProjectileCallback callback, LivingGetProjectileEvent evt) -> {
             MutableValue<ItemStack> ammoItemStack = MutableValue.fromEvent(evt::setProjectileItemStack,
                     evt::getProjectileItemStack);
-            callback.onGetProjectile(evt.getEntity(), evt.getProjectileWeaponItemStack(), ammoItemStack);
+            callback.onPickProjectile(evt.getEntity(), evt.getProjectileWeaponItemStack(), ammoItemStack);
+        });
+        INSTANCE.register(EnderPearlTeleportCallback.class, EntityTeleportEvent.EnderPearl.class, (EnderPearlTeleportCallback callback, EntityTeleportEvent.EnderPearl evt) -> {
+            EventResult result = callback.onEnderPearlTeleport(evt.getPlayer(),
+                    evt.getTarget(),
+                    evt.getPearlEntity(),
+                    MutableFloat.fromEvent(evt::setAttackDamage, evt::getAttackDamage),
+                    evt.getHitResult());
+            if (result.isInterrupt()) evt.setCanceled(true);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();

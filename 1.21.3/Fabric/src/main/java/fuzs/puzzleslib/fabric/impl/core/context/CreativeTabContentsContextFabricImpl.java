@@ -10,9 +10,9 @@ import java.util.Objects;
 public final class CreativeTabContentsContextFabricImpl implements BuildCreativeModeTabContentsContext {
 
     @Override
-    public void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
+    public void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator displayItems) {
         Objects.requireNonNull(resourceKey, "resource key is null");
-        Objects.requireNonNull(itemsGenerator, "display items generator is null");
-        ItemGroupEvents.modifyEntriesEvent(resourceKey).register(entries -> itemsGenerator.accept(entries.getContext(), entries));
+        Objects.requireNonNull(displayItems, "display items generator is null");
+        ItemGroupEvents.modifyEntriesEvent(resourceKey).register(entries -> displayItems.accept(entries.getContext(), entries));
     }
 }

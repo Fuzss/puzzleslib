@@ -92,7 +92,7 @@ public final class FabricClientEventInvokers {
     }
 
     public static void registerLoadingHandlers() {
-        INSTANCE.register(AddResourcePackReloadListenersCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, callback -> {
+        INSTANCE.register(AddResourcePackReloadListenersCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, (AddResourcePackReloadListenersCallback callback) -> {
             return () -> {
                 callback.onAddResourcePackReloadListeners((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
                     ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(new FabricReloadListener(resourceLocation, reloadListener));
@@ -157,19 +157,19 @@ public final class FabricClientEventInvokers {
     }
 
     public static void registerEventHandlers() {
-        INSTANCE.register(ClientTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK, callback -> {
+        INSTANCE.register(ClientTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_CLIENT_TICK, (ClientTickEvents.Start callback) -> {
             return callback::onStartClientTick;
         });
-        INSTANCE.register(ClientTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK, callback -> {
+        INSTANCE.register(ClientTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK, (ClientTickEvents.End callback) -> {
             return callback::onEndClientTick;
         });
         INSTANCE.register(RenderGuiEvents.Before.class, FabricGuiEvents.BEFORE_RENDER_GUI);
-        INSTANCE.register(RenderGuiEvents.After.class, HudRenderCallback.EVENT, callback -> {
+        INSTANCE.register(RenderGuiEvents.After.class, HudRenderCallback.EVENT, (RenderGuiEvents.After callback) -> {
             return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
                 callback.onAfterRenderGui(Minecraft.getInstance().gui, drawContext, tickCounter);
             };
         });
-        INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, callback -> {
+        INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, (ItemTooltipCallback callback) -> {
             return (ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag context, List<Component> lines) -> {
                 callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
             };
@@ -211,7 +211,7 @@ public final class FabricClientEventInvokers {
             return callback::onAfterRender;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterRender);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseClick.class, callback -> {
-            return (screen, mouseX, mouseY, button) -> {
+            return (Screen screen, double mouseX, double mouseY, int button) -> {
                 return callback.onBeforeMouseClick(screen, mouseX, mouseY, button).isPass();
             };
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseClick);
@@ -219,7 +219,7 @@ public final class FabricClientEventInvokers {
             return callback::onAfterMouseClick;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseClick);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseRelease.class, callback -> {
-            return (screen, mouseX, mouseY, button) -> {
+            return (Screen screen, double mouseX, double mouseY, int button) -> {
                 return callback.onBeforeMouseRelease(screen, mouseX, mouseY, button).isPass();
             };
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseRelease);
@@ -258,17 +258,17 @@ public final class FabricClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AfterKeyRelease.class, callback -> {
             return callback::onAfterKeyRelease;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
-        INSTANCE.register(RenderGuiLayerEvents.Before.class, (context, applyToInvoker, removeInvoker) -> {
+        INSTANCE.register(RenderGuiLayerEvents.Before.class, (Object context, Consumer<Event<RenderGuiLayerEvents.Before>> applyToInvoker, Consumer<Event<RenderGuiLayerEvents.Before>> removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
             applyToInvoker.accept(FabricGuiEvents.beforeRenderGuiElement(((ResourceLocation) context)));
         });
-        INSTANCE.register(RenderGuiLayerEvents.After.class, (context, applyToInvoker, removeInvoker) -> {
+        INSTANCE.register(RenderGuiLayerEvents.After.class, (Object context, Consumer<Event<RenderGuiLayerEvents.After>> applyToInvoker, Consumer<Event<RenderGuiLayerEvents.After>> removeInvoker) -> {
             Objects.requireNonNull(context, "context is null");
             applyToInvoker.accept(FabricGuiEvents.afterRenderGuiElement(((ResourceLocation) context)));
         });
         INSTANCE.register(CustomizeChatPanelCallback.class, FabricGuiEvents.CUSTOMIZE_CHAT_PANEL);
         INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEntityEvents.ENTITY_LOAD);
-        INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, callback -> {
+        INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, (ClientEntityLevelEvents.Unload callback) -> {
             return callback::onEntityUnload;
         });
         INSTANCE.register(InputEvents.MouseClick.class, FabricClientEvents.MOUSE_CLICK);
@@ -276,7 +276,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InputEvents.KeyPress.class, FabricClientEvents.KEY_PRESS);
         INSTANCE.register(RenderLivingEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING);
         INSTANCE.register(RenderLivingEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING);
-        INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING, callback -> {
+        INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING, (RenderPlayerEvents.Before callback) -> {
             return new RenderLivingEvents.Before() {
                 @Override
                 public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
@@ -290,7 +290,7 @@ public final class FabricClientEventInvokers {
                 }
             };
         });
-        INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING, callback -> {
+        INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING, (RenderPlayerEvents.After callback) -> {
             return new RenderLivingEvents.After() {
                 @Override
                 public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
@@ -305,26 +305,26 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(RenderHandEvents.MainHand.class, FabricRendererEvents.RENDER_MAIN_HAND);
         INSTANCE.register(RenderHandEvents.OffHand.class, FabricRendererEvents.RENDER_OFF_HAND);
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricRendererEvents.COMPUTE_CAMERA_ANGLES);
-        INSTANCE.register(ClientLevelTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK, callback -> {
+        INSTANCE.register(ClientLevelTickEvents.Start.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.START_WORLD_TICK, (ClientLevelTickEvents.Start callback) -> {
             return (ClientLevel clientLevel) -> {
                 callback.onStartLevelTick(Minecraft.getInstance(), clientLevel);
             };
         });
-        INSTANCE.register(ClientLevelTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_WORLD_TICK, callback -> {
+        INSTANCE.register(ClientLevelTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_WORLD_TICK, (ClientLevelTickEvents.End callback) -> {
             return (ClientLevel clientLevel) -> {
                 callback.onEndLevelTick(Minecraft.getInstance(), clientLevel);
             };
         });
-        INSTANCE.register(ClientChunkEvents.Load.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_LOAD, callback -> {
+        INSTANCE.register(ClientChunkEvents.Load.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_LOAD, (ClientChunkEvents.Load callback) -> {
             return callback::onChunkLoad;
         });
-        INSTANCE.register(ClientChunkEvents.Unload.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD, callback -> {
+        INSTANCE.register(ClientChunkEvents.Unload.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD, (ClientChunkEvents.Unload callback) -> {
             return callback::onChunkUnload;
         });
         INSTANCE.register(ClientPlayerNetworkEvents.LoggedIn.class, FabricClientPlayerEvents.PLAYER_LOGGED_IN);
         INSTANCE.register(ClientPlayerNetworkEvents.LoggedOut.class, FabricClientPlayerEvents.PLAYER_LOGGED_OUT);
         INSTANCE.register(ClientPlayerCopyCallback.class, FabricClientPlayerEvents.PLAYER_COPY);
-        INSTANCE.register(InteractionInputEvents.Attack.class, ClientPreAttackCallback.EVENT, callback -> {
+        INSTANCE.register(InteractionInputEvents.Attack.class, ClientPreAttackCallback.EVENT, (InteractionInputEvents.Attack callback) -> {
             return (Minecraft minecraft, LocalPlayer player, int clickCount) -> {
                 if (minecraft.missTime <= 0 && minecraft.hitResult != null) {
                     if (clickCount != 0) {
@@ -345,7 +345,7 @@ public final class FabricClientEventInvokers {
                 return false;
             };
         });
-        INSTANCE.register(InteractionInputEvents.Use.class, UseBlockCallback.EVENT, (callback, context) -> {
+        INSTANCE.register(InteractionInputEvents.Use.class, UseBlockCallback.EVENT, (InteractionInputEvents.Use callback, @Nullable Object context) -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
@@ -356,7 +356,7 @@ public final class FabricClientEventInvokers {
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
-        INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, (callback, context) -> {
+        INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, (InteractionInputEvents.Use callback, @Nullable Object context) -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
@@ -367,7 +367,7 @@ public final class FabricClientEventInvokers {
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
-        INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, (callback, context) -> {
+        INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, (InteractionInputEvents.Use callback, @Nullable Object context) -> {
             return (Player player, Level level, InteractionHand hand) -> {
                 // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
@@ -378,7 +378,7 @@ public final class FabricClientEventInvokers {
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
-        INSTANCE.register(InteractionInputEvents.Pick.class, ClientPickBlockGatherCallback.EVENT, callback -> {
+        INSTANCE.register(InteractionInputEvents.Pick.class, ClientPickBlockGatherCallback.EVENT, (InteractionInputEvents.Pick callback) -> {
             return (Player player, HitResult hitResult) -> {
                 // add in more checks that also run on Forge
                 if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
@@ -398,7 +398,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(FogEvents.Render.class, FabricRendererEvents.RENDER_FOG);
         INSTANCE.register(FogEvents.ComputeColor.class, FabricRendererEvents.COMPUTE_FOG_COLOR);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
-        INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, callback -> {
+        INSTANCE.register(RenderHighlightCallback.class, WorldRenderEvents.BEFORE_BLOCK_OUTLINE, (RenderHighlightCallback callback) -> {
             return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
                 if (hitResult == null || hitResult.getType() == HitResult.Type.MISS || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) {
                     return true;
@@ -409,22 +409,22 @@ public final class FabricClientEventInvokers {
                 return result.isPass();
             };
         });
-        INSTANCE.register(RenderLevelEvents.AfterTerrain.class, WorldRenderEvents.BEFORE_ENTITIES, callback -> {
+        INSTANCE.register(RenderLevelEvents.AfterTerrain.class, WorldRenderEvents.BEFORE_ENTITIES, (RenderLevelEvents.AfterTerrain callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevelAfterTerrain(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
-        INSTANCE.register(RenderLevelEvents.AfterEntities.class, WorldRenderEvents.AFTER_ENTITIES, callback -> {
+        INSTANCE.register(RenderLevelEvents.AfterEntities.class, WorldRenderEvents.AFTER_ENTITIES, (RenderLevelEvents.AfterEntities callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevelAfterEntities(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
-        INSTANCE.register(RenderLevelEvents.AfterTranslucent.class, WorldRenderEvents.AFTER_TRANSLUCENT, callback -> {
+        INSTANCE.register(RenderLevelEvents.AfterTranslucent.class, WorldRenderEvents.AFTER_TRANSLUCENT, (RenderLevelEvents.AfterTranslucent callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevelAfterTranslucent(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };
         });
-        INSTANCE.register(RenderLevelEvents.AfterLevel.class, WorldRenderEvents.END, callback -> {
+        INSTANCE.register(RenderLevelEvents.AfterLevel.class, WorldRenderEvents.END, (RenderLevelEvents.AfterLevel callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevelAfterLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(), context.projectionMatrix(), context.frustum(), context.world());
             };

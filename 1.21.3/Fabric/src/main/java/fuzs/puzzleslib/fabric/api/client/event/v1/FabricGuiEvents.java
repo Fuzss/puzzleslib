@@ -92,7 +92,7 @@ public final class FabricGuiEvents {
      */
     public static Event<RenderGuiLayerEvents.Before> beforeRenderGuiElement(ResourceLocation resourceLocation) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
-        return BEFORE_RENDER_GUI_ELEMENT_EVENTS.computeIfAbsent(resourceLocation.toString().intern(), $ -> {
+        return BEFORE_RENDER_GUI_ELEMENT_EVENTS.computeIfAbsent(resourceLocation.toString().intern(), (String s) -> {
             return FabricEventFactory.createResult(RenderGuiLayerEvents.Before.class);
         });
     }
@@ -105,7 +105,7 @@ public final class FabricGuiEvents {
      */
     public static Event<RenderGuiLayerEvents.After> afterRenderGuiElement(ResourceLocation resourceLocation) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
-        return AFTER_RENDER_GUI_ELEMENT_EVENTS.computeIfAbsent(resourceLocation.toString().intern(), $ -> {
+        return AFTER_RENDER_GUI_ELEMENT_EVENTS.computeIfAbsent(resourceLocation.toString().intern(), (String s) -> {
             return FabricEventFactory.create(RenderGuiLayerEvents.After.class);
         });
     }

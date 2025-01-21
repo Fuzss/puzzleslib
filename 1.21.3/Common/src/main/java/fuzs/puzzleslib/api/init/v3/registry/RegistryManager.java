@@ -38,9 +38,7 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SpawnEggItem;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
@@ -49,6 +47,7 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -59,10 +58,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -245,32 +241,59 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Registers a spawn egg item for an entity type.
      *
-     * @param entityType      reference for the entity type to register a spawn egg for
-     * @param backgroundColor background color of the spawn egg item
-     * @param highlightColor  spots color pf the spawn egg item
+     * @param entityTypeHolder entity type holder to register a spawn egg for
+     * @param backgroundColor  background color of the spawn egg item
+     * @param highlightColor   spots color pf the spawn egg item
      * @return holder reference
      */
-    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor) {
-        return this.registerSpawnEggItem(entityType, backgroundColor, highlightColor, Item.Properties::new);
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor) {
+        return this.registerSpawnEggItem(entityTypeHolder, backgroundColor, highlightColor, Item.Properties::new);
     }
 
     /**
      * Registers a spawn egg item for an entity type.
      *
-     * @param entityType             reference for the entity type to register a spawn egg for
+     * @param entityTypeHolder       entity type holder to register a spawn egg for
      * @param backgroundColor        background color of the spawn egg item
      * @param highlightColor         spots color pf the spawn egg item
      * @param itemPropertiesSupplier supplier for new item properties
      * @return holder reference
      */
-    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityType, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.registerItem(entityType.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
-                (Item.Properties itemProperties) -> new SpawnEggItem(entityType.value(),
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerItem(entityTypeHolder.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
+                (Item.Properties itemProperties) -> new SpawnEggItem(entityTypeHolder.value(),
                         backgroundColor,
                         highlightColor,
                         itemProperties),
                 itemPropertiesSupplier);
     }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param iconSupplier the tab icon item stack
+     * @return holder reference
+     */
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Holder<? extends ItemLike> iconHolder) {
+        return this.registerCreativeModeTab(() -> new ItemStack(iconHolder.value()));
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param iconSupplier the tab icon item stack
+     * @return holder reference
+     */
+    Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier);
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param path            path for new entry
+     * @param tabConfigurator access to the creative mode tab builder instance
+     * @return holder reference
+     */
+    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Consumer<CreativeModeTab.Builder> tabConfigurator);
 
     /**
      * Register a data component type.

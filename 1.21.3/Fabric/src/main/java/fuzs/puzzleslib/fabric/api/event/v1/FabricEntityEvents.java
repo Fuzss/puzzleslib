@@ -47,13 +47,17 @@ public final class FabricEntityEvents {
     /**
      * Called after {@link Entity#tick()}.
      */
-    public static final Event<EntityTickEvents.End> ENTITY_TICK_END = FabricEventFactory.create(
-            EntityTickEvents.End.class);
+    public static final Event<EntityTickEvents.End> ENTITY_TICK_END = FabricEventFactory.create(EntityTickEvents.End.class);
     /**
      * Called when the size of an entity changes, usually from switching to a different {@link Pose}.
      */
     public static final Event<ChangeEntitySizeCallback> CHANGE_ENTITY_SIZE = FabricEventFactory.createResultHolder(
             ChangeEntitySizeCallback.class);
+    /**
+     * Fires when an ender pearl lands and is about to teleport the player that threw it.
+     */
+    public static final Event<EnderPearlTeleportCallback> ENDER_PEARL_TELEPORT = FabricEventFactory.createResult(
+            EnderPearlTeleportCallback.class);
 
     private FabricEntityEvents() {
         // NO-OP

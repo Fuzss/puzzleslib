@@ -6,8 +6,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 @FunctionalInterface
-public interface GetProjectileCallback {
-    EventInvoker<GetProjectileCallback> EVENT = EventInvoker.lookup(GetProjectileCallback.class);
+public interface PickProjectileCallback {
+    EventInvoker<PickProjectileCallback> EVENT = EventInvoker.lookup(PickProjectileCallback.class);
 
     /**
      * Fired when an entity attempts to find a valid projectile via {@link LivingEntity#getProjectile(ItemStack)}.
@@ -16,5 +16,5 @@ public interface GetProjectileCallback {
      * @param weaponItemStack     the ranged weapon item stack
      * @param projectileItemStack the ammo item stack, possibly empty
      */
-    void onGetProjectile(LivingEntity livingEntity, ItemStack weaponItemStack, MutableValue<ItemStack> projectileItemStack);
+    void onPickProjectile(LivingEntity livingEntity, ItemStack weaponItemStack, MutableValue<ItemStack> projectileItemStack);
 }
