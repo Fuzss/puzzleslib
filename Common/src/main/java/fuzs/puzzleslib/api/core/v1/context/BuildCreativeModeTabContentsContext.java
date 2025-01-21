@@ -9,35 +9,37 @@ import net.minecraft.world.item.CreativeModeTab;
 /**
  * Add items to a creative tab.
  */
+@Deprecated(forRemoval = true)
+@FunctionalInterface
 public interface BuildCreativeModeTabContentsContext {
 
     /**
      * Add items to a creative tab referenced by internal id.
      *
-     * @param modId          the creative mode tab namespace to add items to, the default path 'main' will be used
-     * @param itemsGenerator context for adding items to the creative mode tab
+     * @param modId        the creative mode tab namespace to add items to, the default path 'main' will be used
+     * @param displayItems context for adding items to the creative mode tab
      */
-    default void registerBuildListener(String modId, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
+    default void registerBuildListener(String modId, CreativeModeTab.DisplayItemsGenerator displayItems) {
         ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(modId, "main");
-        this.registerBuildListener(resourceLocation, itemsGenerator);
+        this.registerBuildListener(resourceLocation, displayItems);
     }
 
     /**
      * Add items to a creative tab referenced by internal id.
      *
-     * @param identifier     the creative mode tab to add items to
-     * @param itemsGenerator context for adding items to the creative mode tab
+     * @param resourceLocation the creative mode tab to add items to
+     * @param displayItems     context for adding items to the creative mode tab
      */
-    default void registerBuildListener(ResourceLocation identifier, CreativeModeTab.DisplayItemsGenerator itemsGenerator) {
-        ResourceKey<CreativeModeTab> resourceKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, identifier);
-        this.registerBuildListener(resourceKey, itemsGenerator);
+    default void registerBuildListener(ResourceLocation resourceLocation, CreativeModeTab.DisplayItemsGenerator displayItems) {
+        ResourceKey<CreativeModeTab> resourceKey = ResourceKey.create(Registries.CREATIVE_MODE_TAB, resourceLocation);
+        this.registerBuildListener(resourceKey, displayItems);
     }
 
     /**
      * Add items to a creative tab referenced by instance.
      *
-     * @param resourceKey    the creative mode tab to add items to
-     * @param itemsGenerator context for adding items to the creative mode tab
+     * @param resourceKey  the creative mode tab to add items to
+     * @param displayItems context for adding items to the creative mode tab
      */
-    void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator itemsGenerator);
+    void registerBuildListener(ResourceKey<CreativeModeTab> resourceKey, CreativeModeTab.DisplayItemsGenerator displayItems);
 }

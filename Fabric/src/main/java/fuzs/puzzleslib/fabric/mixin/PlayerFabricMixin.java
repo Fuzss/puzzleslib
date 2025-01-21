@@ -99,7 +99,7 @@ abstract class PlayerFabricMixin extends LivingEntity {
     public ItemStack getProjectile(ItemStack projectileItemStack, ItemStack weaponItemStack) {
         if (weaponItemStack.getItem() instanceof ProjectileWeaponItem) {
             DefaultedValue<ItemStack> projectileItemStackValue = DefaultedValue.fromValue(projectileItemStack);
-            FabricLivingEvents.GET_PROJECTILE.invoker().onGetProjectile(this, weaponItemStack, projectileItemStackValue);
+            FabricLivingEvents.PICK_PROJECTILE.invoker().onPickProjectile(this, weaponItemStack, projectileItemStackValue);
             return projectileItemStackValue.getAsOptional().orElse(projectileItemStack);
         } else {
             return projectileItemStack;

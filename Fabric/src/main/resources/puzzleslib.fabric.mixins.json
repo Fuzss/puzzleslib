@@ -45,6 +45,7 @@
     "ServerLevelFabricMixin",
     "ServerPlayerFabricMixin",
     "StartAttackingFabricMixin",
+    "ThrownEnderpearlFabricMixin",
     "WolfFabricMixin",
     "accessor.GrindstoneMenuFabricAccessor",
     "accessor.PackRepositoryFabricAccessor"

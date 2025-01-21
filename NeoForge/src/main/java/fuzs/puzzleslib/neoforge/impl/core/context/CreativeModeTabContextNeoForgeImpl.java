@@ -27,7 +27,7 @@ public record CreativeModeTabContextNeoForgeImpl(IEventBus modEventBus) implemen
 
     private void finalizeCreativeModeTabBuilder(CreativeModeTab.Builder builder, CreativeModeTabConfiguratorImpl configuratorImpl) {
         configuratorImpl.configure(builder);
-        if (configuratorImpl.isHasSearchBar()) {
+        if (configuratorImpl.hasSearchBar()) {
             builder.withSearchBar();
         }
         if (configuratorImpl.getIcons() != null) {

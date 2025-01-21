@@ -4,11 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.3.18-1.21.3] - 2025-01-17
+## [v21.3.18-1.21.3] - 2025-01-21
 ### Added
 - Add `QuickMoveRuleSet`
 - Add `ArmorMaterialBuilder`
-- Add `GetProjectileCallback`
+- Add `PickProjectileCallback`
+- Add `EnderPearlTeleportCallback`
+- Add `BuildCreativeModeTabContentsCallback`
+- Add `RegistryManager::registerCreativeModeTab`
 - Add `RegistryManager::registerRecipeBookCategory`
 - Add internal `ModEnchantCommand`
 - Add a few new transitive access wideners
@@ -17,6 +20,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fix setting empty lines for `TooltipBuilder` throwing an exception under some circumstances
 - Fix unable to set a new widget tooltip using vanilla methods when `TooltipBuilder` has been used for the widget
 - Fix network packets executing with one tick delay on Fabric
+### Removed
+- Remove `LivingBreathEvents` as the implementation is too invasive to maintain on Fabric
 
 ## [v21.3.17-1.21.3] - 2025-01-07
 ### Added
@@ -29,8 +34,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support instruments in `AbstractRegistriesDatapackGenerator`
 ### Fixed
 - Fix `GatherEffectScreenTooltipCallback` on Fabric
-### Removed
-- Remove `LivingBreathEvents` as the implementation is too invasive to maintain on Fabric
 
 ## [v21.3.16-1.21.3] - 2024-12-27
 ### Added

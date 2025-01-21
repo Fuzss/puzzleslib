@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.item.v2.CreativeModeTabConfigurator;
 /**
  * Register new creative mode tabs via the respective builder.
  */
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface CreativeModeTabContext {
 

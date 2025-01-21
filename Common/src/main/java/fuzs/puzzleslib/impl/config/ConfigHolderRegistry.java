@@ -7,11 +7,11 @@ import org.jetbrains.annotations.ApiStatus;
 
 public interface ConfigHolderRegistry extends ConfigHolder {
 
-    @Deprecated
+    @ApiStatus.Internal
     @Override
     <T extends ConfigCore> ConfigDataHolder<T> getHolder(Class<T> clazz);
 
-    @Deprecated
+    @ApiStatus.Internal
     @Override
     default <T extends ConfigCore> T get(Class<T> clazz) {
         return ConfigHolder.super.get(clazz);

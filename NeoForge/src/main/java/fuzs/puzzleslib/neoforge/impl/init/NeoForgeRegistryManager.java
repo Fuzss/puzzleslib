@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.impl.init.LazyHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
+import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
@@ -19,6 +20,8 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -28,6 +31,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -56,8 +60,8 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     protected <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration) {
         Preconditions.checkState(!skipRegistration, "Skipping registration is not supported on NeoForge");
         DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
-            DeferredRegister<T> deferredRegister = DeferredRegister.create(
-                    (ResourceKey<? extends Registry<T>>) registryKey, this.modId);
+            DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey,
+                    this.modId);
             Objects.requireNonNull(this.eventBus, "mod event bus is null for " + this.modId);
             deferredRegister.register(this.eventBus);
             return deferredRegister;
@@ -70,27 +74,50 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
+    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
+        return this.registerCreativeModeTab("main", (CreativeModeTab.Builder builder) -> {
+            builder.icon(iconSupplier);
+            MutableInt mutableInt = new MutableInt();
+            CreativeModeTab.DisplayItemsGenerator displayItems = CreativeModeTabHelper.getDisplayItems(this.modId,
+                    (ItemStack itemStack) -> {
+                        mutableInt.increment();
+                        return true;
+                    });
+            builder.displayItems(displayItems);
+            // 45 is the amount of slots in a creative mode tab page, before the tab becomes scrollable
+            if (mutableInt.intValue() > 45) {
+                builder.withSearchBar();
+            }
+        });
+    }
+
+    @Override
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder() {
+        return CreativeModeTab.builder();
+    }
+
+    @Override
     public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
-                path, () -> {
+                path,
+                () -> {
                     return new BlockEntityType<>(factory::apply, ImmutableSet.copyOf(validBlocks.get()));
-                }
-        );
+                });
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path,
-                () -> IMenuTypeExtension.create(entry.get()::create)
-        );
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU,
+                path,
+                () -> IMenuTypeExtension.create(entry.get()::create));
     }
 
     @Override
     public Holder.Reference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Supplier<Set<BlockState>> matchingBlockStates) {
-        return this.register(Registries.POINT_OF_INTEREST_TYPE, path,
-                () -> new PoiType(matchingBlockStates.get(), maxTickets, validRange)
-        );
+        return this.register(Registries.POINT_OF_INTEREST_TYPE,
+                path,
+                () -> new PoiType(matchingBlockStates.get(), maxTickets, validRange));
     }
 
     @Override
