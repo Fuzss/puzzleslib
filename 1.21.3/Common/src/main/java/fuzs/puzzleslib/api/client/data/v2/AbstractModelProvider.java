@@ -20,10 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.*;
 
@@ -86,7 +83,13 @@ public abstract class AbstractModelProvider implements DataProvider {
                 throw new IllegalStateException("Duplicate model definition for " + resourceLocation);
             }
         };
-        this.addBlockModels(new BlockModelGenerators(blockStateOutput, modelOutput, skippedAutoModels::add));
+        BlockModelGenerators blockModelGenerators = new BlockModelGenerators(blockStateOutput,
+                modelOutput,
+                skippedAutoModels::add);
+        blockModelGenerators.nonOrientableTrapdoor = new ArrayList<>(blockModelGenerators.nonOrientableTrapdoor);
+        blockModelGenerators.fullBlockModelCustomGenerators = new HashMap<>(blockModelGenerators.fullBlockModelCustomGenerators);
+        blockModelGenerators.texturedModels = new HashMap<>(blockModelGenerators.texturedModels);
+        this.addBlockModels(blockModelGenerators);
         this.addItemModels(new ItemModelGenerators(modelOutput));
         List<Block> missingBlocks;
         if (!this.skipValidation()) {

@@ -73,6 +73,16 @@ transitive-accessible   field   net/minecraft/world/entity/Mob  lootTable   Ljav
 transitive-accessible   method  net/minecraft/world/entity/Entity   considersEntityAsAlly   (Lnet/minecraft/world/entity/Entity;)Z
 transitive-accessible   method  net/minecraft/client/gui/components/AbstractWidget  renderScrollingString   (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIII)V
 transitive-accessible   method  net/minecraft/client/gui/components/AbstractWidget  renderScrollingString   (Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/gui/Font;Lnet/minecraft/network/chat/Component;IIIIII)V
+transitive-accessible   method  net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider  fullBlockVariant    (Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider;
+transitive-accessible   method  net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider  door    (Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider;
+transitive-accessible   method  net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider  trapdoor    (Lnet/minecraft/world/level/block/Block;)V
+transitive-accessible   field   net/minecraft/data/models/BlockModelGenerators  nonOrientableTrapdoor   Ljava/util/List;
+mutable field   net/minecraft/data/models/BlockModelGenerators  nonOrientableTrapdoor   Ljava/util/List;
+transitive-accessible   field   net/minecraft/data/models/BlockModelGenerators  fullBlockModelCustomGenerators  Ljava/util/Map;
+mutable field   net/minecraft/data/models/BlockModelGenerators  fullBlockModelCustomGenerators  Ljava/util/Map;
+transitive-accessible   field   net/minecraft/data/models/BlockModelGenerators  texturedModels  Ljava/util/Map;
+mutable field   net/minecraft/data/models/BlockModelGenerators  texturedModels  Ljava/util/Map;
+transitive-accessible   field   net/minecraft/data/models/BlockModelGenerators  SHAPE_CONSUMERS Ljava/util/Map;
 accessible  field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 mutable field   net/minecraft/client/gui/components/AbstractWidget  tooltip Lnet/minecraft/client/gui/components/WidgetTooltipHolder;
 extendable  method  net/minecraft/client/gui/components/WidgetTooltipHolder createTooltipPositioner (Lnet/minecraft/client/gui/navigation/ScreenRectangle;ZZ)Lnet/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipPositioner;
