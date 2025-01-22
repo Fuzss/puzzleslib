@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
 import fuzs.puzzleslib.api.network.v3.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
-import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
@@ -25,7 +24,6 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -60,16 +58,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
-        return this.registerCreativeModeTab("main", (CreativeModeTab.Builder builder) -> {
-            builder.icon(iconSupplier);
-            CreativeModeTab.DisplayItemsGenerator displayItems = CreativeModeTabHelper.getDisplayItems(this.modId);
-            builder.displayItems(displayItems);
-        });
-    }
-
-    @Override
-    protected CreativeModeTab.Builder getCreativeModeTabBuilder() {
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar) {
         return FabricItemGroup.builder();
     }
 

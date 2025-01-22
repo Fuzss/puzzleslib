@@ -10,17 +10,16 @@ import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public abstract class RegistryManagerImpl implements RegistryManager {
@@ -80,16 +79,24 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration);
 
     @Override
-    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Consumer<CreativeModeTab.Builder> tabConfigurator) {
+    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
+        return this.registerCreativeModeTab("main",
+                iconSupplier,
+                CreativeModeTabHelper.getDisplayItems(this.modId),
+                false);
+    }
+
+    @Override
+    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar) {
         return this.register(Registries.CREATIVE_MODE_TAB, path, () -> {
-            CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder();
+            CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder(withSearchBar);
             ResourceLocation resourceLocation = this.makeKey(path);
-            Component component = CreativeModeTabHelper.getTitle(resourceLocation);
-            builder.title(component);
-            tabConfigurator.accept(builder);
+            builder.title(CreativeModeTabHelper.getTitle(resourceLocation));
+            builder.icon(iconSupplier);
+            builder.displayItems(displayItems);
             return builder.build();
         });
     }
 
-    protected abstract CreativeModeTab.Builder getCreativeModeTabBuilder();
+    protected abstract CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar);
 }
