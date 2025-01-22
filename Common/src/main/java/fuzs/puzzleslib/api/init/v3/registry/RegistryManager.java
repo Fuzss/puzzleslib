@@ -58,7 +58,10 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -293,7 +296,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param tabConfigurator access to the creative mode tab builder instance
      * @return holder reference
      */
-    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Consumer<CreativeModeTab.Builder> tabConfigurator);
+    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar);
 
     /**
      * Register a data component type.

@@ -7,7 +7,6 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.impl.init.LazyHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
-import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
@@ -21,7 +20,6 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -31,7 +29,6 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -74,26 +71,8 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
-        return this.registerCreativeModeTab("main", (CreativeModeTab.Builder builder) -> {
-            builder.icon(iconSupplier);
-            MutableInt mutableInt = new MutableInt();
-            CreativeModeTab.DisplayItemsGenerator displayItems = CreativeModeTabHelper.getDisplayItems(this.modId,
-                    (ItemStack itemStack) -> {
-                        mutableInt.increment();
-                        return true;
-                    });
-            builder.displayItems(displayItems);
-            // 45 is the amount of slots in a creative mode tab page, before the tab becomes scrollable
-            if (mutableInt.intValue() > 45) {
-                builder.withSearchBar();
-            }
-        });
-    }
-
-    @Override
-    protected CreativeModeTab.Builder getCreativeModeTabBuilder() {
-        return CreativeModeTab.builder();
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar) {
+        return withSearchBar ? CreativeModeTab.builder().withSearchBar() : CreativeModeTab.builder();
     }
 
     @Override
