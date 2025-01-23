@@ -18,6 +18,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+/**
+ * TODO rename to {@code AbstractParticleProvider} and also rename {@link #addParticleDescriptions()}
+ */
 public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvider<List<ResourceLocation>> {
     private static final Codec<List<ResourceLocation>> CODEC = ResourceLocation.CODEC.listOf()
             .fieldOf("textures")

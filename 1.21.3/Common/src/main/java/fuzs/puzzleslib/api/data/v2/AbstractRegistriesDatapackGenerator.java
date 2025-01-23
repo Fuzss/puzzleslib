@@ -27,9 +27,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * TODO rename to {@code AbstractDataPackRegistriesProvider}
- */
+@Deprecated(forRemoval = true)
 public abstract class AbstractRegistriesDatapackGenerator<T> extends RegistriesDatapackGenerator implements RegistriesDataProvider {
     private final CompletableFuture<HolderLookup.Provider> fullRegistries;
     private final ResourceKey<? extends Registry<T>> registryKey;

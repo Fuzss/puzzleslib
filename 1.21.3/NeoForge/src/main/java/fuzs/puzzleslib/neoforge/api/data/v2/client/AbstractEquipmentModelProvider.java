@@ -10,6 +10,9 @@ import net.neoforged.neoforge.common.data.JsonCodecProvider;
 
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * TODO rename to {@code AbstractEquipmentProvider} and also rename {@link #addEquipmentModels()}
+ */
 public abstract class AbstractEquipmentModelProvider extends JsonCodecProvider<EquipmentModel> {
 
     public AbstractEquipmentModelProvider(NeoForgeDataProviderContext context) {

@@ -58,8 +58,7 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
                 advancementType,
                 true,
                 true,
-                hidden
-        );
+                hidden);
     }
 
     @Override
@@ -68,13 +67,13 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
             Set<ResourceLocation> set = new HashSet<>();
             List<CompletableFuture<?>> list = new ArrayList<>();
             Consumer<AdvancementHolder> consumer = (AdvancementHolder holder) -> {
-                ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId, holder.id().getPath());
+                ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(this.modId,
+                        holder.id().getPath());
                 if (!set.add(resourceLocation)) {
                     throw new IllegalStateException("Duplicate advancement " + resourceLocation);
                 } else {
                     Path path = this.pathProvider.json(resourceLocation);
-                    list.add(DataProvider.saveStable(output,
-                            registries, Advancement.CODEC, holder.value(), path));
+                    list.add(DataProvider.saveStable(output, registries, Advancement.CODEC, holder.value(), path));
                 }
             };
 

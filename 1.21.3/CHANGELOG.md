@@ -32,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add one more `RegistryManager::registerItem` overload
 ### Changed
 - Support instruments in `AbstractRegistriesDatapackGenerator`
+- Overhaul `AbstractRegistriesDatapackGenerator` into `AbstractDatapackRegistriesProvider`
 ### Fixed
 - Fix `GatherEffectScreenTooltipCallback` on Fabric
 
