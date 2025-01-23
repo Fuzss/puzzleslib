@@ -9,6 +9,9 @@ import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
+/**
+ * TODO rename to {@code AbstractSoundProvider} and also rename {@link #addSoundDefinitions()}
+ */
 public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
     protected final String modId;
 
