@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.data.v2;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,6 +17,7 @@ import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.*;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
@@ -24,16 +26,21 @@ import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider implements DataProvider {
     static final RegistryAccess EMPTY_REGISTRY_ACCESS = new RegistryAccess.ImmutableRegistryAccess(List.of(new MappedRegistry<>(
@@ -55,6 +62,33 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
             throw new UnsupportedOperationException();
         }
     };
+    private static final Map<BlockFamily.Variant, BiFunction<ItemLike, ItemLike, RecipeBuilder>> STONECUTTING_BUILDERS = ImmutableMap.<BlockFamily.Variant, BiFunction<ItemLike, ItemLike, RecipeBuilder>>builder()
+            .put(BlockFamily.Variant.CHISELED,
+                    (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
+                            RecipeCategory.BUILDING_BLOCKS,
+                            itemLike))
+            .put(BlockFamily.Variant.CUT,
+                    (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
+                            RecipeCategory.BUILDING_BLOCKS,
+                            itemLike))
+            .put(BlockFamily.Variant.SLAB,
+                    (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
+                            RecipeCategory.BUILDING_BLOCKS,
+                            itemLike,
+                            2))
+            .put(BlockFamily.Variant.STAIRS,
+                    (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
+                            RecipeCategory.BUILDING_BLOCKS,
+                            itemLike))
+            .put(BlockFamily.Variant.POLISHED,
+                    (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
+                            RecipeCategory.BUILDING_BLOCKS,
+                            itemLike))
+            .put(BlockFamily.Variant.WALL,
+                    (itemLike, itemLike2) -> SingleItemRecipeBuilder.stonecutting(Ingredient.of(itemLike2),
+                            RecipeCategory.DECORATIONS,
+                            itemLike))
+            .build();
 
     private final PackOutput packOutput;
     private final CompletableFuture<HolderLookup.Provider> registries;
@@ -105,6 +139,29 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
             }
         }
         return jsonElement;
+    }
+
+    public void generateForBlockFamilies(Stream<BlockFamily> blockFamilies) {
+        blockFamilies.filter(BlockFamily::shouldGenerateRecipe)
+                .forEach(blockFamily -> this.generateRecipes(blockFamily, FeatureFlags.DEFAULT_FLAGS));
+    }
+
+    @Override
+    public void generateRecipes(BlockFamily blockFamily, FeatureFlagSet requiredFeatures) {
+        super.generateRecipes(blockFamily, requiredFeatures);
+        // also automatically generate stone-cutting recipes
+        blockFamily.getVariants().forEach((BlockFamily.Variant variant, Block block) -> {
+            if (block.requiredFeatures().isSubsetOf(requiredFeatures)) {
+                BiFunction<ItemLike, ItemLike, RecipeBuilder> biFunction = STONECUTTING_BUILDERS.get(variant);
+                ItemLike itemLike = this.getBaseBlock(blockFamily, variant);
+                if (biFunction != null) {
+                    RecipeBuilder recipeBuilder = biFunction.apply(block, itemLike);
+                    recipeBuilder.unlockedBy(blockFamily.getRecipeUnlockedBy().orElseGet(() -> getHasName(itemLike)),
+                            this.has(itemLike));
+                    recipeBuilder.save(this.output, getStonecuttingRecipeName(block, itemLike));
+                }
+            }
+        });
     }
 
     public void stair(RecipeCategory recipeCategory, ItemLike result, ItemLike material) {
