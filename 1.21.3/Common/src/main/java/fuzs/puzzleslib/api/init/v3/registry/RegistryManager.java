@@ -274,7 +274,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a creative mode tab.
      *
-     * @param iconSupplier the tab icon item stack
+     * @param iconHolder the tab icon item stack
      * @return holder reference
      */
     default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Holder<? extends ItemLike> iconHolder) {
@@ -292,8 +292,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a creative mode tab.
      *
-     * @param path            path for new entry
-     * @param tabConfigurator access to the creative mode tab builder instance
+     * @param path          path for new entry
+     * @param iconSupplier  the tab icon item stack
+     * @param displayItems  the display items generator
+     * @param withSearchBar should the tab include a search bar (only supported for NeoForge)
      * @return holder reference
      */
     Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar);
