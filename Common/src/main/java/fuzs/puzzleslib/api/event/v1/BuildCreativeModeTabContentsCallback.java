@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.CreativeModeTab;
 
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @FunctionalInterface
 public interface BuildCreativeModeTabContentsCallback {
@@ -20,7 +20,8 @@ public interface BuildCreativeModeTabContentsCallback {
      * supported.
      * <p>
      * For creating brand-new creative mode tabs see
-     * {@link fuzs.puzzleslib.api.init.v3.registry.RegistryManager#registerCreativeModeTab(String, Consumer)}.
+     * {@link fuzs.puzzleslib.api.init.v3.registry.RegistryManager#registerCreativeModeTab(String, Supplier,
+     * CreativeModeTab.DisplayItemsGenerator, boolean)}.
      *
      * @param creativeModeTab       the creative mode tab instance
      * @param itemDisplayParameters the item display parameters
