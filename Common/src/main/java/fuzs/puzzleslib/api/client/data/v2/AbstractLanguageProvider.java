@@ -351,7 +351,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
                 .put(BlockFamily.Variant.POLISHED, BlockFamilyBuilder::polished)
                 .put(BlockFamily.Variant.TRAPDOOR, BlockFamilyBuilder::trapdoor)
                 .put(BlockFamily.Variant.WALL, BlockFamilyBuilder::wall)
-                .put(BlockFamily.Variant.WALL_SIGN, BlockFamilyBuilder::wallSign)
                 .build();
         private final BiConsumer<Block, String> valueConsumer;
         private final String blockValue;
@@ -455,11 +454,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         public BlockFamilyBuilder wall(Block block) {
             this.valueConsumer.accept(block, this.blockValue + " Wall");
-            return this;
-        }
-
-        public BlockFamilyBuilder wallSign(Block block) {
-            this.valueConsumer.accept(block, this.blockValue + " Wall Sign");
             return this;
         }
     }
