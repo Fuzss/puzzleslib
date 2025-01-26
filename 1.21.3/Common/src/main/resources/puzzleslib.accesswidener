@@ -77,6 +77,12 @@ transitive-accessible   method  net/minecraft/data/models/BlockModelGenerators$B
 transitive-accessible   method  net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider  door    (Lnet/minecraft/world/level/block/Block;)Lnet/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider;
 transitive-accessible   method  net/minecraft/data/models/BlockModelGenerators$BlockFamilyProvider  trapdoor    (Lnet/minecraft/world/level/block/Block;)V
 transitive-accessible   field   net/minecraft/data/models/BlockModelGenerators  nonOrientableTrapdoor   Ljava/util/List;
+transitive-accessible   method  net/minecraft/world/level/block/state/properties/BlockSetType   register    (Lnet/minecraft/world/level/block/state/properties/BlockSetType;)Lnet/minecraft/world/level/block/state/properties/BlockSetType;
+transitive-accessible   method  net/minecraft/world/level/block/state/properties/WoodType   register    (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/world/level/block/state/properties/WoodType;
+accessible  field   net/minecraft/client/renderer/Sheets    SIGN_MATERIALS  Ljava/util/Map;
+accessible  field   net/minecraft/client/renderer/Sheets    HANGING_SIGN_MATERIALS  Ljava/util/Map;
+accessible  method  net/minecraft/client/renderer/Sheets    createSignMaterial  (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
+accessible  method  net/minecraft/client/renderer/Sheets    createHangingSignMaterial   (Lnet/minecraft/world/level/block/state/properties/WoodType;)Lnet/minecraft/client/resources/model/Material;
 mutable field   net/minecraft/data/models/BlockModelGenerators  nonOrientableTrapdoor   Ljava/util/List;
 transitive-accessible   field   net/minecraft/data/models/BlockModelGenerators  fullBlockModelCustomGenerators  Ljava/util/Map;
 mutable field   net/minecraft/data/models/BlockModelGenerators  fullBlockModelCustomGenerators  Ljava/util/Map;

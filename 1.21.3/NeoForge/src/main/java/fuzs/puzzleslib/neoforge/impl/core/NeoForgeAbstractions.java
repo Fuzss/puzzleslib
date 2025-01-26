@@ -80,9 +80,10 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
         int enchantmentLevel = CommonAbstractions.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
         Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, livingEntity,
-                damageSource
-        );
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment,
+                enchantmentLevel,
+                livingEntity,
+                damageSource);
     }
 
     @Override

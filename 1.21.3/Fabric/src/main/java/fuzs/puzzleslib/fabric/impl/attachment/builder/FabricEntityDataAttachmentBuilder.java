@@ -39,24 +39,22 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
     @Override
     public void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
         StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
-                type, this.streamCodec);
+                type,
+                this.streamCodec);
         PayloadTypeRegistry.playS2C().register(type, messageStreamCodec);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ClientPlayNetworking.registerGlobalReceiver(type,
                     (ClientboundEntityDataAttachmentMessage<V> message, ClientPlayNetworking.Context context) -> {
-                        context.client().submit(() -> {
-                            LocalPlayer player = context.player();
-                            Entity entity = player.clientLevel.getEntity(message.entityId());
-                            if (entity != null) {
-                                if (message.value().isPresent()) {
-                                    attachmentType.setData(entity, message.value().get());
-                                } else {
-                                    attachmentType.removeData(entity);
-                                }
+                        LocalPlayer player = context.player();
+                        Entity entity = player.clientLevel.getEntity(message.entityId());
+                        if (entity != null) {
+                            if (message.value().isPresent()) {
+                                attachmentType.setData(entity, message.value().get());
+                            } else {
+                                attachmentType.removeData(entity);
                             }
-                        });
-                    }
-            );
+                        }
+                    });
         }
     }
 

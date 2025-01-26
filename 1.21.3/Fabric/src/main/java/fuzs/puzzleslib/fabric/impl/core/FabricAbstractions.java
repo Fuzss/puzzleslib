@@ -120,9 +120,10 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
         int enchantmentLevel = CommonAbstractions.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
         Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
-        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, livingEntity,
-                damageSource
-        );
+        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment,
+                enchantmentLevel,
+                livingEntity,
+                damageSource);
     }
 
     @Override
