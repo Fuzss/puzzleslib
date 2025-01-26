@@ -13,6 +13,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -23,6 +24,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.ClientHooks;
@@ -125,5 +127,10 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
     @Override
     public boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {
         return IClientMobEffectExtensions.of(mobEffect).isVisibleInGui(mobEffect);
+    }
+
+    @Override
+    public void registerWoodType(WoodType woodType) {
+        Sheets.addWoodType(woodType);
     }
 }

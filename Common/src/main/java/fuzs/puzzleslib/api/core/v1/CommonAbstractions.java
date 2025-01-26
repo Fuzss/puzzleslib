@@ -154,8 +154,7 @@ public interface CommonAbstractions {
      * @param mob the mob
      * @return the spawn type or null if none has been set
      */
-    @Nullable
-    EntitySpawnReason getMobSpawnType(Mob mob);
+    @Nullable EntitySpawnReason getMobSpawnType(Mob mob);
 
     /**
      * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.

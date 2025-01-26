@@ -21,6 +21,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
@@ -220,4 +221,14 @@ public interface ClientAbstractions {
      * @return is rendering permitted
      */
     boolean isEffectVisibleInGui(MobEffectInstance mobEffect);
+
+    /**
+     * Registers a {@link WoodType} to the {@link net.minecraft.client.renderer.Sheets} class for creating sign
+     * materials.
+     * <p>
+     * Note that underlying maps are not concurrent, so this must be called from synchronized code.
+     *
+     * @param woodType the wood type
+     */
+    void registerWoodType(WoodType woodType);
 }
