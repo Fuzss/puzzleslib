@@ -11,7 +11,7 @@ public final class InteractionResultHelper {
     /**
      * An abstraction for {@code InteractionResult#SUCCESS}.
      */
-    public static final InteractionResult SUCCESS = InteractionResult.SUCCESS_SERVER;
+    public static final InteractionResult SUCCESS = InteractionResult.SUCCESS;
     /**
      * An abstraction for {@code InteractionResult#CONSUME}.
      */
@@ -66,7 +66,8 @@ public final class InteractionResultHelper {
      * @return should {@link net.minecraft.stats.Stats#ITEM_USED} be awarded
      */
     public static boolean indicateItemUse(InteractionResult interactionResult) {
-        return interactionResult instanceof InteractionResult.Success success && success.itemContext().wasItemInteraction();
+        return interactionResult instanceof InteractionResult.Success success &&
+                success.itemContext().wasItemInteraction();
     }
 
     /**
@@ -97,7 +98,7 @@ public final class InteractionResultHelper {
      * @return the interaction result
      */
     public static InteractionResult success(ItemStack itemStack) {
-        return InteractionResult.SUCCESS_SERVER.heldItemTransformedTo(itemStack);
+        return InteractionResult.SUCCESS.heldItemTransformedTo(itemStack);
     }
 
     /**
