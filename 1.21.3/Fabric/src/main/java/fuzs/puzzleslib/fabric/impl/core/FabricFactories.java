@@ -20,9 +20,12 @@ import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.ProxyImpl;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class FabricFactories implements CommonFactories {
@@ -85,5 +88,10 @@ public final class FabricFactories implements CommonFactories {
     @Override
     public DataAttachmentRegistryImpl getDataAttachmentRegistry() {
         return new FabricDataAttachmentRegistryImpl();
+    }
+
+    @Override
+    public void forEachPool(LootTable.Builder lootTable, Consumer<? super LootPool.Builder> consumer) {
+        lootTable.modifyPools(consumer);
     }
 }

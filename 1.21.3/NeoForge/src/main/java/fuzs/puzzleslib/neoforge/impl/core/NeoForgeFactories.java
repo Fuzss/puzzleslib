@@ -11,6 +11,8 @@ import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.ProxyImpl;
+import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;
+import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootTableBuilder;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
@@ -20,9 +22,12 @@ import fuzs.puzzleslib.neoforge.impl.item.NeoForgeToolTypeHelper;
 import fuzs.puzzleslib.neoforge.impl.item.crafting.NeoForgeCombinedIngredients;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class NeoForgeFactories implements CommonFactories {
@@ -86,5 +91,16 @@ public final class NeoForgeFactories implements CommonFactories {
     @Override
     public DataAttachmentRegistryImpl getDataAttachmentRegistry() {
         return new NeoForgeDataAttachmentRegistryImpl();
+    }
+
+    @Override
+    public void forEachPool(LootTable.Builder lootTable, Consumer<? super LootPool.Builder> consumer) {
+        if (lootTable instanceof ForwardingLootTableBuilder) {
+            for (LootPool lootPool : lootTable.build().pools) {
+                consumer.accept(new ForwardingLootPoolBuilder(lootPool));
+            }
+        } else {
+            throw new UnsupportedOperationException("Must be ForwardingLootTableBuilder");
+        }
     }
 }

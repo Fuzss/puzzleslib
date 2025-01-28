@@ -9,6 +9,7 @@ import net.minecraft.world.level.storage.loot.LootTable;
 import java.util.function.Consumer;
 import java.util.function.IntPredicate;
 
+@Deprecated(forRemoval = true)
 public final class LootTableLoadEvents {
     public static final EventInvoker<Replace> REPLACE = EventInvoker.lookup(Replace.class);
     public static final EventInvoker<Modify> MODIFY = EventInvoker.lookup(Modify.class);

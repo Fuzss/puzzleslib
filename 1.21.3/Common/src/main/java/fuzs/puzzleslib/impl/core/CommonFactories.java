@@ -11,9 +11,12 @@ import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagBuilder;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface CommonFactories {
@@ -42,4 +45,6 @@ public interface CommonFactories {
     <T> AbstractTagAppender<T> getTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor);
 
     DataAttachmentRegistryImpl getDataAttachmentRegistry();
+
+    void forEachPool(LootTable.Builder lootTable, Consumer<? super LootPool.Builder> consumer);
 }

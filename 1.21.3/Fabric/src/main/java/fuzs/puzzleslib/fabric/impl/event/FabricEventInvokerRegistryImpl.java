@@ -38,8 +38,8 @@ import net.fabricmc.fabric.api.event.player.*;
 import net.fabricmc.fabric.api.item.v1.DefaultItemComponentEvents;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroupEntries;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
-import net.fabricmc.fabric.api.loot.v2.LootTableSource;
+import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
@@ -47,6 +47,7 @@ import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
@@ -309,16 +310,16 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
         INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, (LootTableLoadEvents.Replace callback) -> {
-            return (ResourceKey<LootTable> id, LootTable original, LootTableSource source) -> {
+            return (ResourceKey<LootTable> key, LootTable original, LootTableSource source, HolderLookup.Provider registries) -> {
                 DefaultedValue<LootTable> lootTable = DefaultedValue.fromValue(original);
-                callback.onReplaceLootTable(id.location(), lootTable);
+                callback.onReplaceLootTable(key.location(), lootTable);
                 // returning null will prompt no change
                 return lootTable.getAsOptional().orElse(null);
             };
         });
         INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, (LootTableLoadEvents.Modify callback) -> {
-            return (ResourceKey<LootTable> id, LootTable.Builder tableBuilder, LootTableSource source) -> {
-                callback.onModifyLootTable(id.location(), tableBuilder::pool, (int index) -> {
+            return (ResourceKey<LootTable> key, LootTable.Builder tableBuilder, LootTableSource source, HolderLookup.Provider registries) -> {
+                callback.onModifyLootTable(key.location(), tableBuilder::pool, (int index) -> {
                     MutableInt currentIndex = new MutableInt();
                     MutableBoolean result = new MutableBoolean();
                     tableBuilder.modifyPools((LootPool.Builder builder) -> {
@@ -331,6 +332,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     });
                     return result.booleanValue();
                 });
+            };
+        });
+        INSTANCE.register(LootTableLoadCallback.class, LootTableEvents.MODIFY, (LootTableLoadCallback callback) -> {
+            return (ResourceKey<LootTable> key, LootTable.Builder tableBuilder, LootTableSource source, HolderLookup.Provider registries) -> {
+                callback.onLootTableLoad(key.location(), tableBuilder, registries);
             };
         });
         INSTANCE.register(AnvilEvents.Use.class, FabricPlayerEvents.ANVIL_USE);
