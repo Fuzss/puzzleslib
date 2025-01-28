@@ -2,8 +2,6 @@ package fuzs.puzzleslib.api.data.v2.recipes;
 
 import fuzs.puzzleslib.impl.item.CustomTransmuteRecipe;
 import fuzs.puzzleslib.impl.item.TransmuteShapelessRecipe;
-import net.minecraft.advancements.Advancement;
-import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Criterion;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -20,6 +18,8 @@ import net.minecraft.world.item.crafting.ShapelessRecipe;
 import net.minecraft.world.level.ItemLike;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     private final RecipeSerializer<?> recipeSerializer;
     private Ingredient input;
@@ -34,15 +34,15 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     public static TransmuteShapelessRecipeBuilder shapeless(RecipeSerializer<?> recipeSerializer, HolderGetter<Item> holderGetter, RecipeCategory category, ItemLike result, int count) {
-        return new TransmuteShapelessRecipeBuilder(recipeSerializer, holderGetter, category,
-                result.asItem().getDefaultInstance().copyWithCount(count)
-        );
+        return new TransmuteShapelessRecipeBuilder(recipeSerializer,
+                holderGetter,
+                category,
+                result.asItem().getDefaultInstance().copyWithCount(count));
     }
 
     public static RecipeSerializer<?> getRecipeSerializer(String modId) {
         return CustomTransmuteRecipe.getModSerializer(modId,
-                CustomTransmuteRecipe.TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID
-        );
+                CustomTransmuteRecipe.TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID);
     }
 
     @Override
@@ -92,31 +92,18 @@ public class TransmuteShapelessRecipeBuilder extends ShapelessRecipeBuilder {
     }
 
     public TransmuteShapelessRecipeBuilder input(Ingredient input) {
+        Objects.requireNonNull(input, "input is null");
         this.input = input;
         return this;
     }
 
     @Override
     public void save(RecipeOutput recipeOutput, ResourceKey<Recipe<?>> resourceKey) {
-        super.save(new RecipeOutput() {
-
-            @Override
-            public void accept(ResourceKey<Recipe<?>> resourceKey, Recipe<?> recipe, @Nullable AdvancementHolder advancementHolder) {
-                recipe = new TransmuteShapelessRecipe(TransmuteShapelessRecipeBuilder.this.recipeSerializer,
-                        (ShapelessRecipe) recipe, TransmuteShapelessRecipeBuilder.this.input
-                );
-                recipeOutput.accept(resourceKey, recipe, advancementHolder);
-            }
-
-            @Override
-            public Advancement.Builder advancement() {
-                return recipeOutput.advancement();
-            }
-
-            @Override
-            public void includeRootAdvancement() {
-                // NO-OP
-            }
-        }, resourceKey);
+        Objects.requireNonNull(this.input, "input is null");
+        super.save(new TransformingRecipeOutput(recipeOutput, (Recipe<?> recipe) -> {
+            return new TransmuteShapelessRecipe(TransmuteShapelessRecipeBuilder.this.recipeSerializer,
+                    (ShapelessRecipe) recipe,
+                    TransmuteShapelessRecipeBuilder.this.input);
+        }), resourceKey);
     }
 }

@@ -308,6 +308,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 }
             });
         });
+        INSTANCE.register(LootTableLoadCallback.class, LootTableLoadEvent.class, (LootTableLoadCallback callback, LootTableLoadEvent evt) -> {
+            callback.onLootTableLoad(evt.getName(), new ForwardingLootTableBuilder(evt.getTable()), null);
+        });
         INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
             if (evt.getEntity().level().isClientSide) return;
             MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
