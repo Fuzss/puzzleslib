@@ -26,20 +26,21 @@ import java.util.Set;
 public final class NeoForgeModConstructor {
 
     private NeoForgeModConstructor() {
-
+        // NO-OP
     }
 
     public static void construct(ModConstructor constructor, String modId, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent(modEventBus -> {
-            Multimap<BiomeLoadingPhase, NeoForgeBiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
-            registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
-            registerLoadingHandlers(constructor, modId, modEventBus, biomeModifications, availableFlags, flagsToHandle);
+        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             constructor.onConstructMod();
+            Multimap<BiomeLoadingPhase, NeoForgeBiomeLoadingHandler.BiomeModification> biomeModifications = HashMultimap.create();
+            registerContent(constructor, modId, eventBus, biomeModifications, flagsToHandle);
+            registerLoadingHandlers(constructor, modId, eventBus, biomeModifications, availableFlags, flagsToHandle);
         });
     }
 
     private static void registerContent(ModConstructor constructor, String modId, IEventBus modEventBus, Multimap<BiomeLoadingPhase, NeoForgeBiomeLoadingHandler.BiomeModification> biomeModifications, Set<ContentRegistrationFlags> flagsToHandle) {
         constructor.onRegisterCreativeModeTabs(new CreativeModeTabContextNeoForgeImpl(modEventBus));
+        constructor.onRegisterCompostableBlocks(new CompostableBlocksContextNeoForgeImpl(modId));
         if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
             NeoForgeBiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }

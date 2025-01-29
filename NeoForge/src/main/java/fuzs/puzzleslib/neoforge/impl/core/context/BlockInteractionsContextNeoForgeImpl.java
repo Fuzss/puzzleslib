@@ -97,7 +97,7 @@ public final class BlockInteractionsContextNeoForgeImpl implements BlockInteract
         if (this.abilities.isEmpty()) {
             NeoForge.EVENT_BUS.addListener(this::onBlockToolModification);
         }
-        return this.abilities.computeIfAbsent(itemAbility, $ -> Maps.newIdentityHashMap());
+        return this.abilities.computeIfAbsent(itemAbility, (ItemAbility itemAbilityX) -> new IdentityHashMap<>());
     }
 
     private void onBlockToolModification(final BlockEvent.BlockToolModificationEvent evt) {

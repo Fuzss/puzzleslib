@@ -46,6 +46,6 @@ public final class NeoForgeClientFactories implements ClientFactories {
 
     private <T> ContextKey<T> getContextKey(RenderPropertyKey<T> key) {
         return (ContextKey<T>) this.entityRenderStateKeys.computeIfAbsent(key,
-                keyX -> new ContextKey<>(keyX.resourceLocation()));
+                (RenderPropertyKey<?> keyX) -> new ContextKey<>(keyX.resourceLocation()));
     }
 }
