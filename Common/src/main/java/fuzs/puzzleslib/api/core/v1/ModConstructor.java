@@ -120,4 +120,11 @@ public interface ModConstructor extends BaseModConstructor {
     default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
         // NO-OP
     }
+
+    /**
+     * @param context register data pack-driven dynamic registries
+     */
+    default void onDataPackRegistriesContext(final DataPackRegistriesContext context) {
+        // NO-OP
+    }
 }

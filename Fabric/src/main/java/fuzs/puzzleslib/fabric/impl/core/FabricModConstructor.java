@@ -27,8 +27,8 @@ public final class FabricModConstructor {
         if (flagsToHandle.contains(ContentRegistrationFlags.CRAFTING_TRANSMUTE)) {
             CustomTransmuteRecipe.registerSerializers((String s, Supplier<RecipeSerializer<?>> supplier) -> {
                 Registry.register(BuiltInRegistries.RECIPE_SERIALIZER,
-                        ResourceLocationHelper.fromNamespaceAndPath(modId, s), supplier.get()
-                );
+                        ResourceLocationHelper.fromNamespaceAndPath(modId, s),
+                        supplier.get());
             });
         }
     }
@@ -45,5 +45,6 @@ public final class FabricModConstructor {
         constructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
         constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId, availableFlags));
         constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
+        constructor.onDataPackRegistriesContext(new DataPackRegistriesContextFabricImpl());
     }
 }
