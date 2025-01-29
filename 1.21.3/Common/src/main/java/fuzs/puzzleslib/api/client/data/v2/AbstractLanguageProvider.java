@@ -432,6 +432,11 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             return this;
         }
 
+        public BlockFamilyBuilder hangingSign(Block block) {
+            this.valueConsumer.accept(block, this.blockValue + " Hanging Sign");
+            return this;
+        }
+
         public BlockFamilyBuilder stairs(Block block) {
             this.valueConsumer.accept(block, this.blockValue + " Stairs");
             return this;

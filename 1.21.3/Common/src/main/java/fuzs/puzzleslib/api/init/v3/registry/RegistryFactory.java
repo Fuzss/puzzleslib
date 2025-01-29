@@ -7,6 +7,8 @@ import net.minecraft.resources.ResourceLocation;
 
 /**
  * Create and register new {@link Registry Registries}.
+ * <p>
+ * TODO rework this to use a ModConstructor event, also make creating synced registries separate methods instead of parameter, so {@code createSynced} not just {@code create} without the parameter
  */
 public interface RegistryFactory {
     /**

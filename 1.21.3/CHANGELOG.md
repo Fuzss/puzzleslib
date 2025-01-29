@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.3.21-1.21.3] - 2025-01-29
+### Added
+- Add `DataPackRegistriesContext`
+- Add `AbstractRecipeProvider::foodCooking`
+- Add `BlockFamilyBuilder::hangingSign`
+
 ## [v21.3.20-1.21.3] - 2025-01-28
 ### Added
 - Add `LootTableLoadCallback`, deprecating `LootTableLoadEvents`

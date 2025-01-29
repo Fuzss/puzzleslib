@@ -178,6 +178,16 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                 .pattern("###");
     }
 
+    public void foodCooking(ItemLike result, ItemLike ingredient) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient),
+                        RecipeCategory.FOOD,
+                        result,
+                        0.35F,
+                        200)
+                .unlockedBy(getHasName(ingredient), this.has(ingredient))
+                .save(this.output);
+    }
+
     public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike result, Ingredient material) {
         return this.stonecutterResultFromBaseBuilder(recipeCategory, result, material, 1);
     }

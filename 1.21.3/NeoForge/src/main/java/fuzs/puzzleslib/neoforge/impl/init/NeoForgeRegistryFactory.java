@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.init;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
 import fuzs.puzzleslib.neoforge.mixin.accessor.NewRegistryEventNeoForgeAccessor;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.NewRegistryEvent;
@@ -29,9 +30,11 @@ public final class NeoForgeRegistryFactory implements RegistryFactory {
     public <T> Registry<T> register(Registry<T> registry) {
         // the event is very odd and might as well just be a static method as it does not require any context
         // so just invoke it manually to utilize the methods it provides
-        NewRegistryEvent evt = NewRegistryEventNeoForgeAccessor.puzzleslib$callInit();
-        evt.register(registry);
-        ((NewRegistryEventNeoForgeAccessor) evt).puzzleslib$callFill();
+        synchronized (BuiltInRegistries.REGISTRY) {
+            NewRegistryEvent evt = NewRegistryEventNeoForgeAccessor.puzzleslib$callInit();
+            evt.register(registry);
+            ((NewRegistryEventNeoForgeAccessor) evt).puzzleslib$callFill();
+        }
         return registry;
     }
 }

@@ -18,6 +18,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
+import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.Set;
@@ -43,7 +44,8 @@ public final class NeoForgeModConstructor {
             NeoForgeBiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
         if (flagsToHandle.contains(ContentRegistrationFlags.CRAFTING_TRANSMUTE)) {
-            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER, modId);
+            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER,
+                    modId);
             deferredRegister.register(modEventBus);
             CustomTransmuteRecipe.registerSerializers(deferredRegister::register);
         }
@@ -53,7 +55,8 @@ public final class NeoForgeModConstructor {
         eventBus.addListener((final FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
-                constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(biomeModifications, availableFlags));
+                constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(biomeModifications,
+                        availableFlags));
                 constructor.onRegisterFlammableBlocks(new FlammableBlocksContextNeoForgeImpl());
                 constructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());
             });
@@ -77,6 +80,9 @@ public final class NeoForgeModConstructor {
                     evt.addRepositorySource(NeoForgeBiomeLoadingHandler.buildPack(modId));
                 }
             }
+        });
+        eventBus.addListener((final DataPackRegistryEvent.NewRegistry evt) -> {
+            constructor.onDataPackRegistriesContext(new DataPackRegistriesContextNeoForgeImpl(evt));
         });
     }
 }
