@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.core.v1.context;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.ItemLike;
 
 /**
@@ -15,5 +16,5 @@ public interface CompostableBlocksContext {
      *                         {@code 1.0} inclusive
      * @param items            the items to add with the provided chance
      */
-    void registerCompostable(float compostingChance, ItemLike... items);
+    void registerCompostable(float compostingChance, Holder<? extends ItemLike>... items);
 }
