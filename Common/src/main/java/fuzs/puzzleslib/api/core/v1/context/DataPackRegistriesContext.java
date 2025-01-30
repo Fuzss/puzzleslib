@@ -6,6 +6,8 @@ import net.minecraft.resources.ResourceKey;
 
 /**
  * Register data pack-driven dynamic registries.
+ * <p>
+ * TODO merge normal registry registration into this
  */
 public interface DataPackRegistriesContext {
 
