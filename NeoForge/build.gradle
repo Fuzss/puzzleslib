@@ -4,32 +4,3 @@ dependencies {
     // Puzzles Lib
 //    modApi libs.puzzleslib.neoforge
 }
-
-loom {
-//    accessWidenerPath = project(":Common").loom.accessWidenerPath
-
-    runs {
-//        configureEach {
-//            ideConfigGenerated(true)
-//            runDir("../run")
-//            vmArgs("-Xms1G", "-Xmx4G", "-Dmixin.debug.export=true")
-//            vmArgs("-Dpuzzleslib.isDevelopmentEnvironment=true", "-D${modId}.isDevelopmentEnvironment=true")
-//        }
-//        client {
-//            client()
-//            setConfigName("NeoForge Client ${libs.versions.minecraft.get()}")
-//            programArgs("--username", "Player####")
-//        }
-//        server {
-//            server()
-//            setConfigName("NeoForge Server ${libs.versions.minecraft.get()}")
-//        }
-        data {
-            client()
-            setConfigName("NeoForge Data ${libs.versions.minecraft.get()}")
-            programArgs("--all", "--mod", modId)
-            programArgs("--existing", project(":Common").file("src/main/resources").absolutePath)
-            programArgs("--output", project(":Common").file("src/generated/resources").absolutePath)
-        }
-    }
-}
