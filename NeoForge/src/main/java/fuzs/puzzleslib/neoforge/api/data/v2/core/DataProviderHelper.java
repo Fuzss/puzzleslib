@@ -3,9 +3,9 @@ package fuzs.puzzleslib.neoforge.api.data.v2.core;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
-import fuzs.puzzleslib.neoforge.impl.data.FileHelperDataProvider;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.neoforged.bus.api.IEventBus;
@@ -33,25 +33,12 @@ public final class DataProviderHelper {
      * @param modId     the current mod id
      * @param factories all data provider factories to run
      */
-    public static void registerDataProviders(String modId, NeoForgeDataProviderContext.Factory... factories) {
-        registerDataProviders(modId, factories, (NeoForgeDataProviderContext.Factory factory) -> {
+    public static void registerDataProviders(String modId, DataProviderContext.Factory... factories) {
+        registerDataProviders(modId, factories, (DataProviderContext.Factory factory) -> {
             return (GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) -> {
-                return factory.apply(NeoForgeDataProviderContext.fromEvent(modId, evt, registries));
-            };
-        });
-    }
-
-    /**
-     * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
-     * {@link GatherDataEvent} fires.
-     *
-     * @param modId     the current mod id
-     * @param factories all data provider factories to run
-     */
-    public static void registerDataProviders(String modId, NeoForgeDataProviderContext.LegacyFactory... factories) {
-        registerDataProviders(modId, factories, (NeoForgeDataProviderContext.LegacyFactory factory) -> {
-            return (GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) -> {
-                return factory.apply(evt, modId);
+                return factory.apply(DataProviderContext.fromEvent(modId,
+                        evt.getGenerator().getPackOutput(),
+                        registries));
             };
         });
     }
@@ -72,9 +59,6 @@ public final class DataProviderHelper {
             DataProvider dataProvider = factory.apply(evt, registries);
             if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
                 registries = registriesDataProvider.getRegistries();
-            }
-            if (dataProvider instanceof FileHelperDataProvider fileHelperDataProvider) {
-                fileHelperDataProvider.puzzleslib$setExistingFileHelper(evt.getExistingFileHelper());
             }
             evt.getGenerator().addProvider(true, dataProvider);
         }

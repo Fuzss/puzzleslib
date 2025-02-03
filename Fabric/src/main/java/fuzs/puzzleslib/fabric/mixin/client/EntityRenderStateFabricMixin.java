@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.api.client.util.v1.RenderPropertyKey;
+import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.fabric.impl.client.util.EntityRenderStateExtension;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import org.jetbrains.annotations.Nullable;

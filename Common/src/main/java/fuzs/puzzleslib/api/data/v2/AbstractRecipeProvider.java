@@ -12,10 +12,10 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.advancements.Criterion;
-import net.minecraft.advancements.critereon.InventoryChangeTrigger;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.core.*;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.MappedRegistry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
@@ -39,7 +39,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public abstract class AbstractRecipeProvider extends RecipeProvider implements DataProvider {
@@ -179,11 +178,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
     }
 
     public void foodCooking(ItemLike result, ItemLike ingredient) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient),
-                        RecipeCategory.FOOD,
-                        result,
-                        0.35F,
-                        200)
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient), RecipeCategory.FOOD, result, 0.35F, 200)
                 .unlockedBy(getHasName(ingredient), this.has(ingredient))
                 .save(this.output);
     }
@@ -202,76 +197,6 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
 
     public static String getHasName(TagKey<Item> tagKey) {
         return "has_" + tagKey.location().getPath();
-    }
-
-    // supporting Ingredient was a bad idea, the name will be messy for tags
-    // also we do not need to combine inventory triggers,
-    // multiple RecipeBuilder::unlockedBy calls are supported and will work as alternatives
-
-    @Deprecated(forRemoval = true)
-    public static String getItemName(Ingredient ingredient) {
-        return getItemName(ingredient.items().stream().map(Holder::value).toArray(ItemLike[]::new));
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String getItemName(ItemLike... items) {
-        Preconditions.checkState(items.length > 0, "items is empty");
-        return Arrays.stream(items).map(RecipeProvider::getItemName).collect(Collectors.joining("_or_"));
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String getConversionRecipeName(ItemLike result, Ingredient ingredient) {
-        return getConversionRecipeName(result, ingredient.items().stream().map(Holder::value).toArray(ItemLike[]::new));
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String getConversionRecipeName(ItemLike result, ItemLike... items) {
-        Preconditions.checkState(items.length > 0, "items is empty");
-        return getItemName(result) + "_from_" + getItemName(items);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String getHasName(Ingredient ingredient) {
-        return getHasName(ingredient.items().stream().map(Holder::value).toArray(ItemLike[]::new));
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String getHasName(ItemLike... items) {
-        Preconditions.checkState(items.length > 0, "items is empty");
-        return "has_" + getItemName(items);
-    }
-
-    @Deprecated(forRemoval = true)
-    public Criterion<InventoryChangeTrigger.TriggerInstance> has(Ingredient ingredient) {
-        return this.has(ingredient.items().stream().map(Holder::value).toArray(ItemLike[]::new));
-    }
-
-    @Deprecated(forRemoval = true)
-    public Criterion<InventoryChangeTrigger.TriggerInstance> has(ItemLike... items) {
-        Preconditions.checkState(items.length > 0, "items is empty");
-        return inventoryTrigger(ItemPredicate.Builder.item().of(this.items, items).build());
-    }
-
-    @Deprecated(forRemoval = true)
-    public void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material) {
-        this.stonecutterResultFromBase(category, result, material);
-    }
-
-    @Deprecated(forRemoval = true)
-    public void stonecutterResultFromBase(RecipeCategory category, ItemLike result, Ingredient material) {
-        this.stonecutterResultFromBase(category, result, material, 1);
-    }
-
-    @Deprecated(forRemoval = true)
-    public void stonecutterResultFromBase(RecipeOutput recipeOutput, RecipeCategory category, ItemLike result, Ingredient material, int count) {
-        this.stonecutterResultFromBase(category, result, material, count);
-    }
-
-    @Deprecated(forRemoval = true)
-    public void stonecutterResultFromBase(RecipeCategory category, ItemLike result, Ingredient material, int count) {
-        SingleItemRecipeBuilder.stonecutting(material, category, result, count)
-                .unlockedBy(getHasName(material), this.has(material))
-                .save(this.output, getConversionRecipeName(result, material) + "_stonecutting");
     }
 
     @Override

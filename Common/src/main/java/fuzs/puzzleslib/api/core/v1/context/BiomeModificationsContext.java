@@ -16,9 +16,9 @@ public interface BiomeModificationsContext {
     /**
      * Add a modification to this context.
      *
-     * @param phase    the loading phase, mainly to separate additions and removals
-     * @param selector selection context for current biome
-     * @param modifier modification context
+     * @param biomeLoadingPhase the loading phase, useful to separate additions and removals
+     * @param biomeSelector     the selection context for current biome
+     * @param biomeModifier     the modification context
      */
-    void register(BiomeLoadingPhase phase, Predicate<BiomeLoadingContext> selector, Consumer<BiomeModificationContext> modifier);
+    void registerBiomeModification(BiomeLoadingPhase biomeLoadingPhase, Predicate<BiomeLoadingContext> biomeSelector, Consumer<BiomeModificationContext> biomeModifier);
 }

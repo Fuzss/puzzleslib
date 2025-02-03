@@ -210,7 +210,7 @@ abstract class EditBoxMixin extends AbstractWidget {
         if (this.doubleClick) {
             // double click drag across text to select individual words
             // dragging outside the edit box will select everything until beginning / end
-            if (this.clicked(mouseX, mouseY)) {
+            if (this.isMouseOver(mouseX, mouseY)) {
                 int rightBoundary = this.getWordPosition(1, mousePosition, false);
                 this.moveCursorTo(Math.max(this.doubleClickHighlightPos, rightBoundary), false);
                 int leftBoundary = this.getWordPosition(-1, mousePosition, false);
@@ -230,7 +230,7 @@ abstract class EditBoxMixin extends AbstractWidget {
         } else {
             // drag across text to select individual letters
             // dragging outside the edit box will select everything until beginning / end
-            if (this.clicked(mouseX, mouseY)) {
+            if (this.isMouseOver(mouseX, mouseY)) {
                 this.moveCursorTo(mousePosition, true);
             } else if (this.highlightPos < mousePosition) {
                 this.moveCursorToEnd(true);

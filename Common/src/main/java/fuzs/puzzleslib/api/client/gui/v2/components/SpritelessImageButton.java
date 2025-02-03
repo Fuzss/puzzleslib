@@ -64,19 +64,6 @@ public class SpritelessImageButton extends Button {
      * <li>Hovered</li>
      * </ul>
      */
-    @Deprecated(forRemoval = true)
-    public static final ToIntFunction<Button> NEVER_INACTIVE_TEXTURE_LAYOUT = (Button button) -> {
-        return button.isHoveredOrFocused() ? 1 : 0;
-    };
-    /**
-     * The texture layout used in the old {@link net.minecraft.client.gui.components.ImageButton} for buttons that are
-     * always active.
-     * <p>The order from top to bottom is:
-     * <ul>
-     * <li>Active / Inactive</li>
-     * <li>Hovered</li>
-     * </ul>
-     */
     public static final ToIntFunction<Button> ALWAYS_ACTIVE_TEXTURE_LAYOUT = (Button button) -> {
         return button.isHoveredOrFocused() ? 1 : 0;
     };

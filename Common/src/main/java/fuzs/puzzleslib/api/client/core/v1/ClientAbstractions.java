@@ -23,7 +23,6 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -187,11 +186,6 @@ public interface ClientAbstractions {
      * @param rightHeight the additional hotbar decorations render height
      */
     void addGuiRightHeight(Gui gui, int rightHeight);
-
-    @Deprecated(forRemoval = true)
-    default void registerConfigScreenFactory(String modId, @Nullable String modIdOverride) {
-        this.registerConfigScreenFactory(modId, modIdOverride != null ? new String[]{modIdOverride} : new String[0]);
-    }
 
     /**
      * Registers a config screen factory. Will create an empty screen for mods without any config, so registering for

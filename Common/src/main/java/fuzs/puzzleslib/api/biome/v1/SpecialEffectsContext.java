@@ -3,11 +3,11 @@ package fuzs.puzzleslib.api.biome.v1;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -15,8 +15,10 @@ import java.util.Optional;
 /**
  * The modification context for the biomes effects.
  *
- * <p>Mostly copied from Fabric API's Biome API, specifically <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext$GenerationSettingsContext</code>
- * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification system.
+ * <p>Mostly copied from Fabric API's Biome API, specifically
+ * <code>net.fabricmc.fabric.api.biome.v1.BiomeModificationContext$GenerationSettingsContext</code>
+ * to allow for use in common project and to allow reimplementation on Forge using Forge's native biome modification
+ * system.
  *
  * <p>Copyright (c) FabricMC
  * <p>SPDX-License-Identifier: Apache-2.0
@@ -132,7 +134,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getGrassColorModifier()
      * @see BiomeSpecialEffects.Builder#grassColorModifier(BiomeSpecialEffects.GrassColorModifier)
      */
-    void setGrassColorModifier(@NotNull BiomeSpecialEffects.GrassColorModifier grassColorModifier);
+    void setGrassColorModifier(BiomeSpecialEffects.GrassColorModifier grassColorModifier);
 
     /**
      * @see BiomeSpecialEffects#getGrassColorModifier()
@@ -156,7 +158,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientParticleSettings()
      * @see BiomeSpecialEffects.Builder#ambientParticle(AmbientParticleSettings)
      */
-    default void setAmbientParticleSettings(@NotNull AmbientParticleSettings ambientParticleSettings) {
+    default void setAmbientParticleSettings(AmbientParticleSettings ambientParticleSettings) {
         Objects.requireNonNull(ambientParticleSettings, "ambient particle settings is null");
         this.setAmbientParticleSettings(Optional.of(ambientParticleSettings));
     }
@@ -185,7 +187,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientLoopSoundEvent()
      * @see BiomeSpecialEffects.Builder#ambientLoopSound(Holder)
      */
-    default void setAmbientLoopSoundEvent(@NotNull Holder<SoundEvent> ambientLoopSoundEvent) {
+    default void setAmbientLoopSoundEvent(Holder<SoundEvent> ambientLoopSoundEvent) {
         Objects.requireNonNull(ambientLoopSoundEvent, "ambient loop sound event is null");
         this.setAmbientLoopSoundEvent(Optional.of(ambientLoopSoundEvent));
     }
@@ -214,7 +216,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientMoodSettings()
      * @see BiomeSpecialEffects.Builder#ambientMoodSound(AmbientMoodSettings)
      */
-    default void setAmbientMoodSettings(@NotNull AmbientMoodSettings ambientMoodSettings) {
+    default void setAmbientMoodSettings(AmbientMoodSettings ambientMoodSettings) {
         Objects.requireNonNull(ambientMoodSettings, "ambient mood settings is null");
         this.setAmbientMoodSettings(Optional.of(ambientMoodSettings));
     }
@@ -243,7 +245,7 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getAmbientAdditionsSettings()
      * @see BiomeSpecialEffects.Builder#ambientAdditionsSound(AmbientAdditionsSettings)
      */
-    default void setAmbientAdditionsSettings(@NotNull AmbientAdditionsSettings ambientAdditionsSettings) {
+    default void setAmbientAdditionsSettings(AmbientAdditionsSettings ambientAdditionsSettings) {
         Objects.requireNonNull(ambientAdditionsSettings, "ambient additions settings is null");
         this.setAmbientAdditionsSettings(Optional.of(ambientAdditionsSettings));
     }
@@ -260,19 +262,19 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    void setBackgroundMusic(Optional<Music> backgroundMusic);
+    void setBackgroundMusic(Optional<SimpleWeightedRandomList<Music>> backgroundMusic);
 
     /**
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    Optional<Music> getBackgroundMusic();
+    Optional<SimpleWeightedRandomList<Music>> getBackgroundMusic();
 
     /**
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    default void setBackgroundMusic(@NotNull Music backgroundMusic) {
+    default void setBackgroundMusic(SimpleWeightedRandomList<Music> backgroundMusic) {
         Objects.requireNonNull(backgroundMusic, "background music is null");
         this.setBackgroundMusic(Optional.of(backgroundMusic));
     }

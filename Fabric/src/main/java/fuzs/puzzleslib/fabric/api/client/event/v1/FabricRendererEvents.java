@@ -12,28 +12,16 @@ import net.minecraft.world.entity.Entity;
 
 public final class FabricRendererEvents {
     /**
-     * Fires during construction of {@link EntityRenderState}, allows control over the set name tag.
-     */
-    public static final Event<RenderNameTagEvents.Allow> ALLOW_NAME_TAG = FabricEventFactory.createResult(
-            RenderNameTagEvents.Allow.class);
-    /**
      * Fires before the name tag of an entity is rendered.
      */
-    public static final Event<RenderNameTagEvents.Render> RENDER_NAME_TAG = FabricEventFactory.createResult(
-            RenderNameTagEvents.Render.class);
+    public static final Event<RenderNameTagCallback> RENDER_NAME_TAG = FabricEventFactory.createResult(
+            RenderNameTagCallback.class);
     /**
      * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
      * render state of an entity for future rendering.
      */
-    @Deprecated(forRemoval = true)
     public static final Event<ExtractRenderStateCallback> EXTRACT_RENDER_STATE = FabricEventFactory.create(
             ExtractRenderStateCallback.class);
-    /**
-     * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
-     * render state of an entity for future rendering.
-     */
-    public static final Event<ExtractRenderStateCallbackV2> EXTRACT_RENDER_STATE_V2 = FabricEventFactory.create(
-            ExtractRenderStateCallbackV2.class);
     /**
      * Called before a living entity model is rendered, allows for applying transformations to the {@link PoseStack}, or
      * for completely taking over rendering as a whole.

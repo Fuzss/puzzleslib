@@ -2,7 +2,6 @@ package fuzs.puzzleslib.neoforge.impl.init;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.impl.init.LazyHolder;
@@ -31,6 +30,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     @Nullable
     private final IEventBus eventBus;
-    private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> registers = Maps.newIdentityHashMap();
+    private final Map<ResourceKey<? extends Registry<?>>, DeferredRegister<?>> registers = new IdentityHashMap<>();
 
     public NeoForgeRegistryManager(String modId) {
         super(modId);

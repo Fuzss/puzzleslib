@@ -7,7 +7,6 @@ import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.Set;
 import java.util.function.Supplier;
 
 /**
@@ -17,24 +16,21 @@ import java.util.function.Supplier;
 public interface ModConstructor extends BaseModConstructor {
 
     /**
-     * Construct the main {@link ModConstructor} instance provided as <code>supplier</code> to begin initialization of a
-     * mod.
+     * Construct the main {@link ModConstructor} instance to begin initialization of a mod.
      *
-     * @param modId          the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructor the main mod instance for mod setup
+     * @param modId                  the mod id for registering events on Forge to the correct mod event bus
+     * @param modConstructorSupplier the main mod instance for mod setup
      */
-    static void construct(String modId, Supplier<ModConstructor> modConstructor) {
+    static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
         if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
         // build first to force class being loaded for executing buildables
-        ModConstructor instance = modConstructor.get();
-        ResourceLocation identifier = ModContext.getPairingIdentifier(modId, instance);
-        PuzzlesLib.LOGGER.info("Constructing common components for {}", identifier);
+        ModConstructor modConstructor = modConstructorSupplier.get();
+        ResourceLocation resourceLocation = ModContext.getPairingIdentifier(modId, modConstructor);
+        PuzzlesLib.LOGGER.info("Constructing common components for {}", resourceLocation);
         ModContext modContext = ModContext.get(modId);
-        Set<ContentRegistrationFlags> availableFlags = Set.of(instance.getContentRegistrationFlags());
-        Set<ContentRegistrationFlags> flagsToHandle = modContext.getFlagsToHandle(availableFlags);
         modContext.beforeModConstruction();
-        CommonFactories.INSTANCE.constructMod(modId, instance, availableFlags, flagsToHandle);
-        modContext.afterModConstruction(identifier);
+        CommonFactories.INSTANCE.constructMod(modId, modConstructor);
+        modContext.afterModConstruction(resourceLocation);
     }
 
     /**
@@ -106,25 +102,16 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context register new creative mode tabs via the respective builder
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context add items to a creative tab
-     */
-    @Deprecated(forRemoval = true)
-    default void onBuildCreativeModeTabContents(final BuildCreativeModeTabContentsContext context) {
-        // NO-OP
-    }
-
-    /**
      * @param context register additional data pack sources
      */
     default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register built-in static registries
+     */
+    default void onGameRegistriesContext(final GameRegistriesContext context) {
         // NO-OP
     }
 

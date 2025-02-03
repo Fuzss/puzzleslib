@@ -32,19 +32,6 @@ public enum CopyStrategy {
         public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
             if (originalStillAlive) this.copy(newEntity.registryAccess(), oldCapability, newCapability);
         }
-    },
-    /**
-     * Copy entity data when inventory contents of a player are copied, which is the case after dying when the
-     * <code>keepInventory</code> game rule is active.
-     *
-     * @deprecated will no longer be supported in upcoming versions to allow migrating to Fabric Api's / NeoForge's
-     *         native implementation
-     */
-    @Deprecated KEEP_PLAYER_INVENTORY {
-        @Override
-        public void copy(Entity oldEntity, CapabilityComponent<?> oldCapability, Entity newEntity, CapabilityComponent<?> newCapability, boolean originalStillAlive) {
-            NEVER.copy(oldEntity, oldCapability, newEntity, newCapability, originalStillAlive);
-        }
     };
 
     /**

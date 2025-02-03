@@ -7,6 +7,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.joml.Quaternionf;
 import org.joml.Vector3d;
 
+import java.util.EnumMap;
 import java.util.Map;
 
 /**
@@ -28,7 +29,7 @@ public final class ShapesHelper {
      * @return the rotated shapes
      */
     public static Map<Direction, VoxelShape> rotate(VoxelShape voxelShape) {
-        Map<Direction, VoxelShape> shapes = Maps.newEnumMap(Direction.class);
+        Map<Direction, VoxelShape> shapes = new EnumMap<>(Direction.class);
         for (Direction direction : Direction.values()) {
             shapes.put(direction, rotate(direction.getRotation(), voxelShape));
         }
@@ -45,7 +46,7 @@ public final class ShapesHelper {
      * @return the rotated shapes
      */
     public static Map<Direction, VoxelShape> rotateHorizontally(VoxelShape voxelShape) {
-        Map<Direction, VoxelShape> shapes = Maps.newEnumMap(Direction.class);
+        Map<Direction, VoxelShape> shapes = new EnumMap<>(Direction.class);
         for (Direction direction : Direction.Plane.HORIZONTAL) {
             Quaternionf rotation = getHorizontalRotation(direction);
             shapes.put(direction, rotate(rotation, voxelShape));
@@ -116,8 +117,11 @@ public final class ShapesHelper {
      * @return the new shape
      */
     public static VoxelShape box(double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        return Shapes.box(Math.min(startX, endX), Math.min(startY, endY), Math.min(startZ, endZ),
-                Math.max(startX, endX), Math.max(startY, endY), Math.max(startZ, endZ)
-        );
+        return Shapes.box(Math.min(startX, endX),
+                Math.min(startY, endY),
+                Math.min(startZ, endZ),
+                Math.max(startX, endX),
+                Math.max(startY, endY),
+                Math.max(startZ, endZ));
     }
 }

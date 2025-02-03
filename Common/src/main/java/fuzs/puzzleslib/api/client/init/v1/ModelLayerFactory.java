@@ -5,8 +5,6 @@ import net.minecraft.client.model.geom.ModelLayerLocation;
 
 /**
  * A helper class for creating {@link ModelLayerLocation ModelLayerLocations} with a provided namespace.
- * <p>
- * TODO add ModelLayer suffix to method names to make the interface more usable in other context implementations (maybe only deprecate old methods though?)
  */
 @FunctionalInterface
 public interface ModelLayerFactory {
@@ -33,7 +31,7 @@ public interface ModelLayerFactory {
      * @param layer the layer name
      * @return the new model layer location
      */
-    default ModelLayerLocation register(String path, String layer) {
+    default ModelLayerLocation registerModelLayer(String path, String layer) {
         return new ModelLayerLocation(ResourceLocationHelper.fromNamespaceAndPath(this.modId(), path), layer);
     }
 
@@ -43,8 +41,8 @@ public interface ModelLayerFactory {
      * @param path the entity name
      * @return the new model layer location
      */
-    default ModelLayerLocation register(String path) {
-        return this.register(path, "main");
+    default ModelLayerLocation registerModelLayer(String path) {
+        return this.registerModelLayer(path, "main");
     }
 
     /**
@@ -53,8 +51,8 @@ public interface ModelLayerFactory {
      * @param path the entity name
      * @return the new model layer location
      */
-    default ModelLayerLocation registerInnerArmor(String path) {
-        return this.register(path, "inner_armor");
+    default ModelLayerLocation registerInnerArmorModelLayer(String path) {
+        return this.registerModelLayer(path, "inner_armor");
     }
 
     /**
@@ -63,7 +61,7 @@ public interface ModelLayerFactory {
      * @param path the entity name
      * @return the new model layer location
      */
-    default ModelLayerLocation registerOuterArmor(String path) {
-        return this.register(path, "outer_armor");
+    default ModelLayerLocation registerOuterArmorModelLayer(String path) {
+        return this.registerModelLayer(path, "outer_armor");
     }
 }

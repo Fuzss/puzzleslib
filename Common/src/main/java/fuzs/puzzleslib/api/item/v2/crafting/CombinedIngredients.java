@@ -10,8 +10,9 @@ import java.util.Objects;
 
 /**
  * A helper class for obtaining platform specific {@link Ingredient} implementations.
- * <p>Note that when using those ingredients in recipes not all ingredients might serialize to a vanilla-compatible
- * format, meaning they will not be readable on other mod loaders as well.
+ * <p>
+ * Note that when using those ingredients in recipes not all ingredients might serialize to a vanilla-compatible format,
+ * meaning they will not be readable on other mod loaders as well.
  */
 public interface CombinedIngredients {
     CombinedIngredients INSTANCE = CommonFactories.INSTANCE.getCombinedIngredients();

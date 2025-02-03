@@ -22,7 +22,8 @@ import java.util.function.UnaryOperator;
 
 /**
  * Allows for registering commands that run when a world or a player are first created in a development environment.
- * <p>Will not apply any changes in a production environment.
+ * <p>
+ * Will not apply any changes in a production environment.
  */
 public final class CommandOverrides {
     private static final String KEY_PLAYER_SEEN_WORLD = PuzzlesLibMod.id("has_seen_world").toLanguageKey();
@@ -75,20 +76,22 @@ public final class CommandOverrides {
     public static void registerEventHandlers() {
         ServerLifecycleEvents.STARTED.register((MinecraftServer server) -> {
             if (server.overworld().getGameTime() == 0) {
-                executeCommandOverrides(server, CommandEnvironment.SERVER, CommandEnvironment.DEDICATED_SERVER,
-                        UnaryOperator.identity()
-                );
+                executeCommandOverrides(server,
+                        CommandEnvironment.SERVER,
+                        CommandEnvironment.DEDICATED_SERVER,
+                        UnaryOperator.identity());
             }
         });
         ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel level) -> {
             // idea from Serilum's Starter Kit mod
-            if (entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags().contains(
-                    KEY_PLAYER_SEEN_WORLD)) {
+            if (entity instanceof ServerPlayer serverPlayer &&
+                    !serverPlayer.getTags().contains(KEY_PLAYER_SEEN_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
                 String playerName = serverPlayer.getGameProfile().getName();
-                executeCommandOverrides(serverPlayer.server, CommandEnvironment.PLAYER,
-                        CommandEnvironment.DEDICATED_PLAYER, s -> s.replaceAll("@[sp]", playerName)
-                );
+                executeCommandOverrides(serverPlayer.server,
+                        CommandEnvironment.PLAYER,
+                        CommandEnvironment.DEDICATED_PLAYER,
+                        s -> s.replaceAll("@[sp]", playerName));
             }
             return EventResult.PASS;
         });
@@ -100,9 +103,8 @@ public final class CommandOverrides {
         }
         if (server instanceof DedicatedServer) {
             for (String command : COMMAND_OVERRIDES.getOrDefault(dedicatedCommandEnvironment, Collections.emptySet())) {
-                server.getCommands().performPrefixedCommand(server.createCommandSourceStack(),
-                        formatter.apply(command)
-                );
+                server.getCommands()
+                        .performPrefixedCommand(server.createCommandSourceStack(), formatter.apply(command));
             }
         }
     }

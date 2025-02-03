@@ -72,7 +72,7 @@ public final class ItemHelper {
     }
 
     private static ItemStack copyItemStackIfNecessary(ItemStack itemStack, @Nullable ServerPlayer serverPlayer) {
-        // the Forge item destroy event uses a copy of the original item stack, so make sure we keep this here
+        // the NeoForge item destroy event uses a copy of the original item stack, so make sure we keep this here
         if (serverPlayer != null && ModLoaderEnvironment.INSTANCE.getModLoader().isForgeLike()) {
             return itemStack.copy();
         } else {

@@ -2,8 +2,8 @@ package fuzs.puzzleslib.neoforge.impl.core.context;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.context.CompostableBlocksContext;
+import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.Item;
@@ -37,7 +37,7 @@ public record CompostableBlocksContextNeoForgeImpl(String modId,
 
     private void registerCompostable(Holder<? extends ItemLike> item, float compostingChance) {
         if (this.compostingChances.isEmpty()) {
-            DataProviderHelper.registerDataProviders(this.modId, (NeoForgeDataProviderContext context) -> {
+            DataProviderHelper.registerDataProviders(this.modId, (DataProviderContext context) -> {
                 return new DataMapProvider(context.getPackOutput(), context.getRegistries()) {
                     @Override
                     protected void gather(HolderLookup.Provider registries) {

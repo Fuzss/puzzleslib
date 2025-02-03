@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.Maps;
-import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
@@ -41,14 +40,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -57,7 +50,6 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -141,7 +133,7 @@ public final class FabricClientEventInvokers {
                 pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
                     // all we want is access to the top level baked models map to be able to insert our own models
                     // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
-                    if (context.topLevelId().equals(MissingBlockModel.VARIANT)) {
+                    if (context.id().equals(MissingBlockModel.LOCATION)) {
                         Map<ModelResourceLocation, BakedModel> models = ModelLoadingHelper.getModelBakery(context.baker()).getBakedTopLevelModels();
                         // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
                         callback.onAddAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
@@ -174,8 +166,7 @@ public final class FabricClientEventInvokers {
                 callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
             };
         });
-        INSTANCE.register(RenderNameTagEvents.Allow.class, FabricRendererEvents.ALLOW_NAME_TAG);
-        INSTANCE.register(RenderNameTagEvents.Render.class, FabricRendererEvents.RENDER_NAME_TAG);
+        INSTANCE.register(RenderNameTagCallback.class, FabricRendererEvents.RENDER_NAME_TAG);
         INSTANCE.register(ContainerScreenEvents.Background.class, FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND);
         INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricGuiEvents.CONTAINER_SCREEN_FOREGROUND);
         INSTANCE.register(InventoryMobEffectsCallback.class, FabricGuiEvents.INVENTORY_MOB_EFFECTS);
@@ -276,32 +267,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(InputEvents.KeyPress.class, FabricClientEvents.KEY_PRESS);
         INSTANCE.register(RenderLivingEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING);
         INSTANCE.register(RenderLivingEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING);
-        INSTANCE.register(RenderPlayerEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING, (RenderPlayerEvents.Before callback) -> {
-            return new RenderLivingEvents.Before() {
-                @Override
-                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-                    if (entityRenderState instanceof PlayerRenderState playerRenderState && entityRenderer instanceof PlayerRenderer playerRenderer) {
-                        return callback.onBeforeRenderPlayer(playerRenderState, playerRenderer, partialTick, poseStack,
-                                bufferSource, packedLight
-                        );
-                    } else {
-                        return EventResult.PASS;
-                    }
-                }
-            };
-        });
-        INSTANCE.register(RenderPlayerEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING, (RenderPlayerEvents.After callback) -> {
-            return new RenderLivingEvents.After() {
-                @Override
-                public <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-                    if (entityRenderState instanceof PlayerRenderState playerRenderState && entityRenderer instanceof PlayerRenderer playerRenderer) {
-                        callback.onAfterRenderPlayer(playerRenderState, playerRenderer, partialTick, poseStack,
-                                bufferSource, packedLight
-                        );
-                    }
-                }
-            };
-        });
         INSTANCE.register(RenderHandEvents.MainHand.class, FabricRendererEvents.RENDER_MAIN_HAND);
         INSTANCE.register(RenderHandEvents.OffHand.class, FabricRendererEvents.RENDER_OFF_HAND);
         INSTANCE.register(ComputeCameraAnglesCallback.class, FabricRendererEvents.COMPUTE_CAMERA_ANGLES);
@@ -438,7 +403,6 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);
         INSTANCE.register(ExtractRenderStateCallback.class, FabricRendererEvents.EXTRACT_RENDER_STATE);
-        INSTANCE.register(ExtractRenderStateCallbackV2.class, FabricRendererEvents.EXTRACT_RENDER_STATE_V2);
     }
 
     private static <T, E> void registerScreenEvent(Class<T> clazz, Class<E> eventType, Function<T, E> converter, Function<Screen, Event<E>> eventGetter) {

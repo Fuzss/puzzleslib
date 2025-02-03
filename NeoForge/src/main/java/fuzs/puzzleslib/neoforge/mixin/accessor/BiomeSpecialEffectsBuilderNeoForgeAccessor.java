@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.mixin.accessor;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
@@ -35,5 +36,5 @@ public interface BiomeSpecialEffectsBuilderNeoForgeAccessor {
     void puzzleslib$setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings);
 
     @Accessor("backgroundMusic")
-    void puzzleslib$setBackgroundMusic(Optional<Music> backgroundMusic);
+    void puzzleslib$setBackgroundMusic(Optional<SimpleWeightedRandomList<Music>> backgroundMusic);
 }

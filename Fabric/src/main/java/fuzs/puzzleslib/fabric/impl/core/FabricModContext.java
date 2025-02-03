@@ -18,8 +18,8 @@ public final class FabricModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandler.Builder getNetworkHandler(ResourceLocation channelName) {
-        return this.addBuildable(new FabricNetworkHandler(channelName));
+    public NetworkHandler.Builder getNetworkHandler(ResourceLocation resourceLocation) {
+        return this.addBuildable(new FabricNetworkHandler(resourceLocation));
     }
 
     @Override

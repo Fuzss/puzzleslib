@@ -1,14 +1,10 @@
 package fuzs.puzzleslib.impl.core;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
@@ -26,19 +22,19 @@ import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
+import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class ModContext {
-    private static final Map<String, ModContext> MOD_CONTEXTS = Maps.newConcurrentMap();
+    private static final Map<String, ModContext> MOD_CONTEXTS = new ConcurrentHashMap<>();
 
     protected final String modId;
     private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
-    private final Map<ResourceLocation, Runnable> clientModConstructors = Maps.newConcurrentMap();
-    private final Set<ResourceLocation> constructedPairings = Sets.newConcurrentHashSet();
-    private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
-    @Nullable protected RegistryManager registryManager;
-    @Nullable protected CapabilityController capabilityController;
+    private final Map<ResourceLocation, Runnable> clientModConstructors = new ConcurrentHashMap<>();
+    private final Set<ResourceLocation> constructedPairings = ConcurrentHashMap.newKeySet();
+    @Nullable
+    protected RegistryManager registryManager;
+    @Nullable
+    protected CapabilityController capabilityController;
     // true by default for dedicated servers, is reset on client when joining new world
     private boolean presentServerside = true;
 
@@ -50,15 +46,19 @@ public abstract class ModContext {
         LoadCompleteCallback.EVENT.register(() -> {
             for (ModContext context : MOD_CONTEXTS.values()) {
                 if (!context.buildables.isEmpty()) {
-                    throw new IllegalStateException("Mod context for %s has %s remaining buildable(s)".formatted(context.modId, context.buildables.size()));
+                    throw new IllegalStateException("Mod context for %s has %s remaining buildable(s)".formatted(context.modId,
+                            context.buildables.size()));
                 }
                 if (!context.clientModConstructors.isEmpty()) {
-                    throw new IllegalStateException("Mod context for %s has remaining client mod constructor(s): %s".formatted(context.modId, context.clientModConstructors.keySet()));
+                    throw new IllegalStateException("Mod context for %s has remaining client mod constructor(s): %s".formatted(
+                            context.modId,
+                            context.clientModConstructors.keySet()));
                 }
             }
         });
         PlayerNetworkEvents.LOGGED_IN.register((ServerPlayer serverPlayer) -> {
-            PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer), new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
+            PuzzlesLibMod.NETWORK.sendMessage(PlayerSet.ofPlayer(serverPlayer),
+                    new ClientboundModListMessage(MOD_CONTEXTS.keySet()));
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ClientPlayerNetworkEvents.LOGGED_IN.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
@@ -73,24 +73,23 @@ public abstract class ModContext {
         return MOD_CONTEXTS.computeIfAbsent(modId, CommonFactories.INSTANCE::getModContext);
     }
 
-    public static Stream<CapabilityController> getCapabilityControllers() {
-        return MOD_CONTEXTS.values().stream().map(context -> context.capabilityController).filter(Objects::nonNull);
-    }
-
     public static ResourceLocation getPairingIdentifier(String modId, BaseModConstructor modConstructor) {
         ResourceLocation identifier = modConstructor.getPairingIdentifier();
         return identifier != null ? identifier : ResourceLocationHelper.fromNamespaceAndPath(modId, "main");
     }
 
     public static void acceptServersideMods(Collection<String> modList) {
-        modList.stream().map(MOD_CONTEXTS::get).filter(Objects::nonNull).forEach(context -> context.presentServerside = true);
+        modList.stream()
+                .map(MOD_CONTEXTS::get)
+                .filter(Objects::nonNull)
+                .forEach(context -> context.presentServerside = true);
     }
 
     public static boolean isPresentServerside(String modId) {
         return MOD_CONTEXTS.containsKey(modId) && MOD_CONTEXTS.get(modId).presentServerside;
     }
 
-    public abstract NetworkHandler.Builder getNetworkHandler(ResourceLocation channelName);
+    public abstract NetworkHandler.Builder getNetworkHandler(ResourceLocation resourceLocation);
 
     public abstract ConfigHolder.Builder getConfigHolder();
 
@@ -104,11 +103,11 @@ public abstract class ModContext {
         return buildable;
     }
 
-    public final void scheduleClientModConstruction(ResourceLocation identifier, Runnable runnable) {
-        if (this.constructedPairings.contains(identifier)) {
+    public final void scheduleClientModConstruction(ResourceLocation resourceLocation, Runnable runnable) {
+        if (this.constructedPairings.contains(resourceLocation)) {
             runnable.run();
         } else {
-            this.clientModConstructors.put(identifier, runnable);
+            this.clientModConstructors.put(resourceLocation, runnable);
         }
     }
 
@@ -118,13 +117,11 @@ public abstract class ModContext {
         }
     }
 
-    public final void afterModConstruction(ResourceLocation identifier) {
-        this.constructedPairings.add(identifier);
-        Runnable runnable = this.clientModConstructors.remove(identifier);
-        if (runnable != null) runnable.run();
-    }
-
-    public final Set<ContentRegistrationFlags> getFlagsToHandle(Set<ContentRegistrationFlags> availableFlags) {
-        return availableFlags.stream().filter(Predicate.not(this.handledFlags::contains)).peek(this.handledFlags::add).collect(ImmutableSet.toImmutableSet());
+    public final void afterModConstruction(ResourceLocation resourceLocation) {
+        this.constructedPairings.add(resourceLocation);
+        Runnable runnable = this.clientModConstructors.remove(resourceLocation);
+        if (runnable != null) {
+            runnable.run();
+        }
     }
 }

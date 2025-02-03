@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.util;
 
-import fuzs.puzzleslib.api.client.util.v1.RenderPropertyKey;
+import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import org.jetbrains.annotations.Nullable;
 
 public interface EntityRenderStateExtension {

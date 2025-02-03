@@ -72,7 +72,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
      * @param packedOverlay the packed overlay
      */
     protected void renderModel(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        VertexConsumer vertexConsumer = this.getChestMaterial(blockEntity, this.xmasTextures())
+        VertexConsumer vertexConsumer = this.getChestMaterial(blockEntity, this.getXmasTextures())
                 .buffer(bufferSource, RenderType::entityCutout);
         this.model.renderToBuffer(poseStack, vertexConsumer, packedLight, packedOverlay);
     }
@@ -89,7 +89,7 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
     /**
      * @return should use holiday textures
      */
-    protected boolean xmasTextures() {
+    protected boolean getXmasTextures() {
         return this.xmasTextures;
     }
 }

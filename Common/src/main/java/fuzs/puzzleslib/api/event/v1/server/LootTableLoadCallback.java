@@ -6,7 +6,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
 
@@ -16,14 +15,12 @@ public interface LootTableLoadCallback {
 
     /**
      * Runs for every loot table upon loading, allows for modifying the loot table.
-     * <p>
-     * TODO remove nullable annotation, provide registries on NeoForge
      *
      * @param resourceLocation the loot table id
      * @param lootTable        the loot table builder instance
      * @param registries       the registry access
      */
-    void onLootTableLoad(ResourceLocation resourceLocation, LootTable.Builder lootTable, @Nullable HolderLookup.Provider registries);
+    void onLootTableLoad(ResourceLocation resourceLocation, LootTable.Builder lootTable, HolderLookup.Provider registries);
 
     /**
      * Allows for modifying each existing loot pool in a loot table.

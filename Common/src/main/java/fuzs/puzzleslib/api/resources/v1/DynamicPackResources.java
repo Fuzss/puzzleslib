@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -31,8 +32,8 @@ public class DynamicPackResources extends AbstractModPackResources {
     /**
      * Helper map for quickly turning a pack type directory back into the {@link PackType}.
      */
-    public static final Map<String, PackType> PATHS_FOR_TYPE = Arrays.stream(PackType.values()).collect(
-            ImmutableMap.toImmutableMap(PackType::getDirectory, Function.identity()));
+    public static final Map<String, PackType> PATHS_FOR_TYPE = Arrays.stream(PackType.values())
+            .collect(ImmutableMap.toImmutableMap(PackType::getDirectory, Function.identity()));
 
     /**
      * The {@link net.minecraft.data.DataProvider} factories used by this pack resources instances.
@@ -76,7 +77,7 @@ public class DynamicPackResources extends AbstractModPackResources {
             // start with a map for each type, as data generation below runs on a thread pool,
             // they will override each other when creating the maps
             Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = Arrays.stream(PackType.values())
-                    .collect(Collectors.toMap(Function.identity(), $ -> Maps.newConcurrentMap()));
+                    .collect(Collectors.toMap(Function.identity(), (PackType packType) -> new ConcurrentHashMap<>()));
             DataProviderContext context = DataProviderContext.fromModId(modId);
             for (DataProviderContext.Factory factory : factories) {
                 DataProvider dataProvider = factory.apply(context);
@@ -85,14 +86,13 @@ public class DynamicPackResources extends AbstractModPackResources {
                 }
                 dataProvider.run((Path filePath, byte[] data, HashCode hashCode) -> {
                     // good times with Windows...
-                    List<String> strings = FileUtil.decomposePath(
-                            filePath.normalize().toString().replace(File.separator, "/")).result().filter(
-                            list -> list.size() >= 2).orElse(null);
+                    List<String> strings = FileUtil.decomposePath(filePath.normalize()
+                            .toString()
+                            .replace(File.separator, "/")).result().filter(list -> list.size() >= 2).orElse(null);
                     if (strings != null) {
                         PackType packType = PATHS_FOR_TYPE.get(strings.getFirst());
                         Objects.requireNonNull(packType,
-                                () -> "pack type for directory %s is null".formatted(strings.getFirst())
-                        );
+                                () -> "pack type for directory %s is null".formatted(strings.getFirst()));
                         String path = strings.stream().skip(2).collect(Collectors.joining("/"));
                         ResourceLocation resourceLocation = ResourceLocation.tryBuild(strings.get(1), path);
                         if (resourceLocation != null) {
@@ -111,14 +111,14 @@ public class DynamicPackResources extends AbstractModPackResources {
                     iterator.remove();
                 }
             }
-            PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms", modId,
-                    stopwatch.stop().elapsed().toMillis()
-            );
+            PuzzlesLib.LOGGER.info("Data generation for dynamic pack resources provided by '{}' took {}ms",
+                    modId,
+                    stopwatch.stop().elapsed().toMillis());
             return Maps.immutableEnumMap(paths);
         } catch (Throwable throwable) {
             PuzzlesLib.LOGGER.warn("Unable to complete data generation for dynamic pack resources provided by '{}'",
-                    modId, throwable
-            );
+                    modId,
+                    throwable);
             return Collections.emptyMap();
         }
     }
@@ -143,17 +143,23 @@ public class DynamicPackResources extends AbstractModPackResources {
 
     @Override
     public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-        this.getPathsForType(packType).entrySet().stream().filter(
-                (Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
+        this.getPathsForType(packType)
+                .entrySet()
+                .stream()
+                .filter((Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
                     return entry.getKey().getNamespace().equals(namespace) && entry.getKey().getPath().startsWith(path);
-                }).forEach((Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
-            resourceOutput.accept(entry.getKey(), entry.getValue());
-        });
+                })
+                .forEach((Map.Entry<ResourceLocation, IoSupplier<InputStream>> entry) -> {
+                    resourceOutput.accept(entry.getKey(), entry.getValue());
+                });
     }
 
     @Override
     public Set<String> getNamespaces(PackType packType) {
-        return this.getPathsForType(packType).keySet().stream().map(ResourceLocation::getNamespace).collect(
-                Collectors.toSet());
+        return this.getPathsForType(packType)
+                .keySet()
+                .stream()
+                .map(ResourceLocation::getNamespace)
+                .collect(Collectors.toSet());
     }
 }
