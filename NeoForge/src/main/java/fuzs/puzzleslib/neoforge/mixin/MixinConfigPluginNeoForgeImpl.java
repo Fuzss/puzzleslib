@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.mixin;
 
+import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.objectweb.asm.tree.ClassNode;
@@ -11,8 +12,10 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("AbstractPackResourcesNeoForgeMixin",
-            "DatagenModLoaderNeoForgeMixin");
+    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("AbstractPackResourcesNeoForgeMixin",
+            "DatagenModLoaderNeoForgeMixin",
+            "client.ClientDataMainNeoForgeMixin",
+            "client.ClientMainNeoForgeMixin");
 
     @Override
     public void onLoad(String mixinPackage) {
