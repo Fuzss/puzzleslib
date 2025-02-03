@@ -36,9 +36,9 @@ abstract class EnchantedCountIncreaseFunctionNeoForgeMixin {
 
     @ModifyVariable(method = "run", at = @At("STORE"), ordinal = 0)
     public int run(int enchantmentLevel, ItemStack itemStack, LootContext lootContext) {
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment, enchantmentLevel,
-                lootContext
-        );
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment,
+                enchantmentLevel,
+                lootContext);
     }
 
     @Inject(method = "run", at = @At("HEAD"))
@@ -47,9 +47,9 @@ abstract class EnchantedCountIncreaseFunctionNeoForgeMixin {
         // or being present at all (like when damage is coming from a block)
         // no need to cancel, vanilla does nothing but returning the item stack in the case of a non-living attacker
         if (!(context.getOptionalParameter(LootContextParams.ATTACKING_ENTITY) instanceof LivingEntity)) {
-            int enchantmentLevel = ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment, 0,
-                    context
-            );
+            int enchantmentLevel = ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(this.enchantment,
+                    0,
+                    context);
             if (enchantmentLevel != 0) {
                 float f = (float) enchantmentLevel * this.value.getFloat(context);
                 stack.grow(Math.round(f));

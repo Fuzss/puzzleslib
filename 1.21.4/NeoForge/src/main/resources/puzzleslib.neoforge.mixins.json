@@ -16,6 +16,8 @@
     "accessor.NewRegistryEventNeoForgeAccessor"
   ],
   "client": [
+    "client.ClientDataMainNeoForgeMixin",
+    "client.ClientMainNeoForgeMixin",
     "client.accessor.BlockColorsNeoForgeAccessor"
   ],
   "injectors": {

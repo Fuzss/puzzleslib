@@ -19,15 +19,17 @@ abstract class EnchantmentHelperNeoForgeMixin {
 
     @ModifyVariable(method = "lambda$processEquipmentDropChance$25", at = @At("HEAD"), argsOnly = true)
     private static int processEquipmentDropChance$0(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int enchantmentLevelX, EnchantedItemInUse enchantedItemInUse) {
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, entity,
-                damageSource
-        );
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment,
+                enchantmentLevel,
+                entity,
+                damageSource);
     }
 
     @ModifyVariable(method = "lambda$processEquipmentDropChance$27", at = @At("HEAD"), argsOnly = true)
     private static int processEquipmentDropChance$1(int enchantmentLevel, ServerLevel level, LivingEntity entity, DamageSource damageSource, MutableFloat mutableFloat, RandomSource randomSource, Holder<Enchantment> enchantment, int enchantmentLevelX, EnchantedItemInUse enchantedItemInUse) {
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, entity,
-                damageSource
-        );
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment,
+                enchantmentLevel,
+                entity,
+                damageSource);
     }
 }
