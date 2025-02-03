@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
@@ -13,7 +14,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
-public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects, BiomeModificationContext.EffectsContext context) implements SpecialEffectsContext {
+public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects,
+                                          BiomeModificationContext.EffectsContext context) implements SpecialEffectsContext {
 
     @Override
     public void setFogColor(int fogColor) {
@@ -126,12 +128,12 @@ public record SpecialEffectsContextFabric(BiomeSpecialEffects specialEffects, Bi
     }
 
     @Override
-    public void setBackgroundMusic(Optional<Music> backgroundMusic) {
+    public void setBackgroundMusic(Optional<SimpleWeightedRandomList<Music>> backgroundMusic) {
         this.context.setMusic(backgroundMusic);
     }
 
     @Override
-    public Optional<Music> getBackgroundMusic() {
+    public Optional<SimpleWeightedRandomList<Music>> getBackgroundMusic() {
         return this.specialEffects.getBackgroundMusic();
     }
 }

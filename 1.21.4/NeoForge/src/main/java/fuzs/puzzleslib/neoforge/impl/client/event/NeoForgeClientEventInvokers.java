@@ -14,7 +14,6 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
@@ -29,7 +28,6 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -48,7 +46,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
-import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -177,7 +174,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ModelEvents.CompleteModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.CompleteModelLoading callback, ModelEvent.BakingCompleted evt) -> {
             callback.onCompleteModelLoading(evt::getModelManager, evt::getModelBakery);
         });
-        INSTANCE.register(ExtractRenderStateCallbackV2.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallbackV2 callback, RegisterRenderStateModifiersEvent evt) -> {
+        INSTANCE.register(ExtractRenderStateCallback.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallback callback, RegisterRenderStateModifiersEvent evt) -> {
             evt.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
                 callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
             });
@@ -201,13 +198,8 @@ public final class NeoForgeClientEventInvokers {
             callback.onItemTooltip(evt.getItemStack(), evt.getToolTip(), evt.getContext(), evt.getEntity(), evt.getFlags());
         });
         INSTANCE.register(
-                RenderNameTagEvents.Allow.class, RenderNameTagEvent.CanRender.class, (RenderNameTagEvents.Allow callback, RenderNameTagEvent.CanRender evt) -> {
-            EventResult result = callback.onAllowNameTag(evt.getEntity(), evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPartialTick());
-            if (result.isInterrupt()) evt.setCanRender(result.getAsBoolean() ? TriState.TRUE : TriState.FALSE);
-        });
-        INSTANCE.register(
-                RenderNameTagEvents.Render.class, RenderNameTagEvent.DoRender.class, (RenderNameTagEvents.Render callback, RenderNameTagEvent.DoRender evt) -> {
-                    EventResult result = callback.onRenderNameTag(evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick());
+                RenderNameTagCallback.class, RenderNameTagEvent.DoRender.class, (RenderNameTagCallback callback, RenderNameTagEvent.DoRender evt) -> {
+                    EventResult result = callback.onRenderNameTag(evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
                     if (result.isInterrupt()) evt.setCanceled(true);
                 });
         INSTANCE.register(ContainerScreenEvents.Background.class, ContainerScreenEvent.Render.Background.class, (ContainerScreenEvents.Background callback, ContainerScreenEvent.Render.Background evt) -> {
@@ -352,13 +344,6 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(RenderLivingEvents.After.class, RenderLivingEvent.Post.class, (callback, evt) -> {
             callback.onAfterRenderEntity(evt.getRenderState(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
-        });
-        INSTANCE.register(RenderPlayerEvents.Before.class, RenderPlayerEvent.Pre.class, (RenderPlayerEvents.Before callback, RenderPlayerEvent.Pre evt) -> {
-            EventResult result = callback.onBeforeRenderPlayer(evt.getRenderState(), (PlayerRenderer) evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
-            if (result.isInterrupt()) evt.setCanceled(true);
-        });
-        INSTANCE.register(RenderPlayerEvents.After.class, RenderPlayerEvent.Post.class, (RenderPlayerEvents.After callback, RenderPlayerEvent.Post evt) -> {
-            callback.onAfterRenderPlayer(evt.getRenderState(), (PlayerRenderer) evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
         });
         INSTANCE.register(RenderHandEvents.MainHand.class, RenderHandEvent.class, (RenderHandEvents.MainHand callback, RenderHandEvent evt) -> {
             if (evt.getHand() != InteractionHand.MAIN_HAND) return;
@@ -552,9 +537,6 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, GatherEffectScreenTooltipsEvent.class, (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent evt) -> {
             callback.onGatherEffectScreenTooltip(evt.getScreen(), evt.getEffectInstance(), evt.getTooltip());
         });
-        INSTANCE.register(ExtractRenderStateCallback.class, RenderNameTagEvent.CanRender.class, (ExtractRenderStateCallback callback, RenderNameTagEvent.CanRender evt, @Nullable Object context) -> {
-            callback.onExtractRenderState(evt.getEntity(), evt.getEntityRenderState(), evt.getEntityRenderer(), evt.getPartialTick());
-        }, EventPhase::late, false);
     }
 
     private static <T, E extends ScreenEvent> void registerScreenEvent(Class<T> clazz, Class<E> event, BiConsumer<T, E> converter) {

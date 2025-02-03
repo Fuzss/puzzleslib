@@ -5,6 +5,7 @@ import fuzs.puzzleslib.neoforge.mixin.accessor.BiomeSpecialEffectsBuilderNeoForg
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.random.SimpleWeightedRandomList;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
@@ -16,8 +17,8 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * This implementation uses an accessor mixin to directly set {@link Optional}s to valid fields to allow for clearing certain options that are already present.
- * Resetting a value to an empty optional would otherwise not be possible.
+ * This implementation uses an accessor mixin to directly set {@link Optional Optional} to valid fields to allow for clearing
+ * certain options that are already present. Resetting a value to an empty optional would otherwise not be possible.
  */
 public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) implements SpecialEffectsContext {
 
@@ -63,7 +64,8 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setFoliageColorOverride(Optional<Integer> foliageColorOverride) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(foliageColorOverride);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setFoliageColorOverride(
+                foliageColorOverride);
     }
 
     @Override
@@ -94,7 +96,8 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientParticleSettings(Optional<AmbientParticleSettings> ambientParticleSettings) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientParticle(ambientParticleSettings);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientParticle(
+                ambientParticleSettings);
     }
 
     @Override
@@ -104,7 +107,8 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientLoopSoundEvent(Optional<Holder<SoundEvent>> ambientLoopSoundEvent) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(ambientLoopSoundEvent);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientLoopSoundEvent(
+                ambientLoopSoundEvent);
     }
 
     @Override
@@ -114,7 +118,8 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientMoodSettings(Optional<AmbientMoodSettings> ambientMoodSettings) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(ambientMoodSettings);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientMoodSettings(
+                ambientMoodSettings);
     }
 
     @Override
@@ -124,7 +129,8 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
 
     @Override
     public void setAmbientAdditionsSettings(Optional<AmbientAdditionsSettings> ambientAdditionsSettings) {
-        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(ambientAdditionsSettings);
+        ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setAmbientAdditionsSettings(
+                ambientAdditionsSettings);
     }
 
     @Override
@@ -133,12 +139,12 @@ public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) 
     }
 
     @Override
-    public void setBackgroundMusic(Optional<Music> backgroundMusic) {
+    public void setBackgroundMusic(Optional<SimpleWeightedRandomList<Music>> backgroundMusic) {
         ((BiomeSpecialEffectsBuilderNeoForgeAccessor) this.context).puzzleslib$setBackgroundMusic(backgroundMusic);
     }
 
     @Override
-    public Optional<Music> getBackgroundMusic() {
+    public Optional<SimpleWeightedRandomList<Music>> getBackgroundMusic() {
         return this.context.getBackgroundMusic();
     }
 }

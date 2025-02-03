@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
@@ -24,15 +23,14 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class FabricFactories implements CommonFactories {
 
     @Override
-    public void constructMod(String modId, ModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        FabricModConstructor.construct(modConstructor, modId, availableFlags, flagsToHandle);
+    public void constructMod(String modId, ModConstructor modConstructor) {
+        FabricModConstructor.construct(modConstructor, modId);
     }
 
     @Override

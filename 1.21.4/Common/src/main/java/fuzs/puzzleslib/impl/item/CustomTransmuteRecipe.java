@@ -2,14 +2,15 @@ package fuzs.puzzleslib.impl.item;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -25,8 +26,10 @@ public interface CustomTransmuteRecipe {
 
     /**
      * Finds the mod-specific {@link RecipeSerializer} in the registry.
-     * <p>{@link fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags#CRAFTING_TRANSMUTE} must be enabled so the
-     * serializer is registered.
+     * <p>
+     * The serializer must manually be registered via
+     * {@link
+     * fuzs.puzzleslib.api.init.v3.registry.TransmuteRecipeHelper#registerTransmuteRecipeSerializers(RegistryManager)}.
      *
      * @param modId              the mod id to find the serializer for
      * @param recipeSerializerId the serializer string id, either {@link #TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID} or
@@ -34,19 +37,20 @@ public interface CustomTransmuteRecipe {
      * @return the serializer
      */
     static RecipeSerializer<?> getModSerializer(String modId, String recipeSerializerId) {
-        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(
-                ResourceLocationHelper.fromNamespaceAndPath(modId, recipeSerializerId));
-        if (recipeSerializer == null) ContentRegistrationFlags.throwForFlag(ContentRegistrationFlags.CRAFTING_TRANSMUTE);
+        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(ResourceLocationHelper.fromNamespaceAndPath(
+                modId,
+                recipeSerializerId));
+        Objects.requireNonNull(recipeSerializer,
+                "recipe serializer '" + ResourceLocationHelper.fromNamespaceAndPath(modId, recipeSerializerId) +
+                        "' not registered");
         return recipeSerializer;
     }
 
     static void registerSerializers(BiConsumer<String, Supplier<RecipeSerializer<?>>> registrar) {
         registrar.accept(TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID,
-                () -> new Serializer<>(new ShapedRecipe.Serializer(), TransmuteShapedRecipe::new)
-        );
+                () -> new Serializer<>(new ShapedRecipe.Serializer(), TransmuteShapedRecipe::new));
         registrar.accept(TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID,
-                () -> new Serializer<>(new ShapelessRecipe.Serializer(), TransmuteShapelessRecipe::new)
-        );
+                () -> new Serializer<>(new ShapelessRecipe.Serializer(), TransmuteShapelessRecipe::new));
     }
 
     Ingredient getInput();
@@ -74,11 +78,12 @@ public interface CustomTransmuteRecipe {
         public MapCodec<R2> codec() {
             return RecordCodecBuilder.mapCodec((instance) -> {
                 return instance.group(this.serializer.codec().forGetter((R2 arg) -> {
-                    return (R1) arg;
-                }), Ingredient.CODEC.fieldOf("input").forGetter(CustomTransmuteRecipe::getInput)).apply(
-                        instance, (R1 craftingRecipe, Ingredient ingredient) -> this.factory.apply(this, craftingRecipe,
-                                ingredient
-                        ));
+                            return (R1) arg;
+                        }), Ingredient.CODEC.fieldOf("input").forGetter(CustomTransmuteRecipe::getInput))
+                        .apply(instance,
+                                (R1 craftingRecipe, Ingredient ingredient) -> this.factory.apply(this,
+                                        craftingRecipe,
+                                        ingredient));
             });
         }
 

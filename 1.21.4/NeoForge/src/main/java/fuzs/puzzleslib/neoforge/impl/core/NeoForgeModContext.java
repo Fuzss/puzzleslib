@@ -18,8 +18,8 @@ public final class NeoForgeModContext extends ModContext {
     }
 
     @Override
-    public NetworkHandler.Builder getNetworkHandler(ResourceLocation channelName) {
-        return this.addBuildable(new NeoForgeNetworkHandler(channelName));
+    public NetworkHandler.Builder getNetworkHandler(ResourceLocation resourceLocation) {
+        return this.addBuildable(new NeoForgeNetworkHandler(resourceLocation));
     }
 
     @Override

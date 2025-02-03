@@ -57,7 +57,6 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.storage.loot.LootTable;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -295,21 +294,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegisterCommandsCallback.class, RegisterCommandsEvent.class, (RegisterCommandsCallback callback, RegisterCommandsEvent evt) -> {
             callback.onRegisterCommands(evt.getDispatcher(), evt.getBuildContext(), evt.getCommandSelection());
         });
-        INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableLoadEvent.class, (LootTableLoadEvents.Replace callback, LootTableLoadEvent evt) -> {
-            MutableValue<LootTable> table = MutableValue.fromEvent(evt::setTable, evt::getTable);
-            callback.onReplaceLootTable(evt.getName(), table);
-        });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableLoadEvent.class, (LootTableLoadEvents.Modify callback, LootTableLoadEvent evt) -> {
-            callback.onModifyLootTable(evt.getName(), evt.getTable()::addPool, (int index) -> {
-                if (index == 0 && evt.getTable().removePool("main") != null) {
-                    return true;
-                } else {
-                    return evt.getTable().removePool("pool" + index) != null;
-                }
-            });
-        });
         INSTANCE.register(LootTableLoadCallback.class, LootTableLoadEvent.class, (LootTableLoadCallback callback, LootTableLoadEvent evt) -> {
-            callback.onLootTableLoad(evt.getName(), new ForwardingLootTableBuilder(evt.getTable()), null);
+            callback.onLootTableLoad(evt.getName(), new ForwardingLootTableBuilder(evt.getTable()), evt.getRegistries());
         });
         INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
             if (evt.getEntity().level().isClientSide) return;
@@ -393,8 +379,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(UseItemEvents.Finish.class, LivingEntityUseItemEvent.Finish.class, (UseItemEvents.Finish callback, LivingEntityUseItemEvent.Finish evt) -> {
-            MutableValue<ItemStack> stack = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
-            callback.onUseItemFinish(evt.getEntity(), stack, evt.getDuration(), evt.getItem());
+            MutableValue<ItemStack> itemStack = MutableValue.fromEvent(evt::setResultStack, evt::getResultStack);
+            callback.onUseItemFinish(evt.getEntity(), itemStack, evt.getItem());
         });
         INSTANCE.register(ShieldBlockCallback.class, LivingShieldBlockEvent.class, (ShieldBlockCallback callback, LivingShieldBlockEvent evt) -> {
             if (callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), evt.getBlockedDamage()).isInterrupt()) {

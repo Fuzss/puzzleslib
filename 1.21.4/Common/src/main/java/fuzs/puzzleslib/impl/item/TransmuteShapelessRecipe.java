@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.item;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -13,16 +12,12 @@ public class TransmuteShapelessRecipe extends ShapelessRecipe implements CustomT
     private final Ingredient input;
 
     public TransmuteShapelessRecipe(String modId, ShapelessRecipe shapelessRecipe, Ingredient input) {
-        this(CustomTransmuteRecipe.getModSerializer(modId, CustomTransmuteRecipe.TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID),
-                shapelessRecipe, input
-        );
+        this(CustomTransmuteRecipe.getModSerializer(modId,
+                CustomTransmuteRecipe.TRANSMUTE_SHAPELESS_RECIPE_SERIALIZER_ID), shapelessRecipe, input);
     }
 
     public TransmuteShapelessRecipe(RecipeSerializer<?> recipeSerializer, ShapelessRecipe shapelessRecipe, Ingredient input) {
-        super(shapelessRecipe.group(), shapelessRecipe.category(),
-                shapelessRecipe.assemble(CraftingInput.EMPTY, RegistryAccess.EMPTY),
-                shapelessRecipe.placementInfo().ingredients()
-        );
+        super(shapelessRecipe.group(), shapelessRecipe.category(), shapelessRecipe.result, shapelessRecipe.ingredients);
         this.recipeSerializer = recipeSerializer;
         this.input = input;
     }

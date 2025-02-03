@@ -1,12 +1,9 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.init.v1.ItemModelDisplayOverrides;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.api.client.util.v1.RenderPropertyKey;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
+import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.impl.client.core.ClientFactories;
-import fuzs.puzzleslib.neoforge.impl.client.init.NeoForgeItemDisplayOverrides;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.util.context.ContextKey;
@@ -14,19 +11,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.Set;
 
 public final class NeoForgeClientFactories implements ClientFactories {
     private final Map<RenderPropertyKey<?>, ContextKey<?>> entityRenderStateKeys = new IdentityHashMap<>();
 
     @Override
-    public void constructClientMod(String modId, ClientModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle) {
-        NeoForgeClientModConstructor.construct(modConstructor, modId, availableFlags, flagsToHandle);
-    }
-
-    @Override
-    public ItemModelDisplayOverrides getItemModelDisplayOverrides() {
-        return new NeoForgeItemDisplayOverrides();
+    public void constructClientMod(String modId, ClientModConstructor modConstructor) {
+        NeoForgeClientModConstructor.construct(modConstructor, modId);
     }
 
     @Override

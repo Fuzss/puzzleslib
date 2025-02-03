@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
-import fuzs.puzzleslib.api.core.v1.ContentRegistrationFlags;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
@@ -15,14 +14,13 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
 public interface CommonFactories {
     CommonFactories INSTANCE = ServiceProviderHelper.load(CommonFactories.class);
 
-    void constructMod(String modId, ModConstructor modConstructor, Set<ContentRegistrationFlags> availableFlags, Set<ContentRegistrationFlags> flagsToHandle);
+    void constructMod(String modId, ModConstructor modConstructor);
 
     ModContext getModContext(String modId);
 

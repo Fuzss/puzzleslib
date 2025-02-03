@@ -17,7 +17,6 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -54,7 +53,7 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
 
     @Override
     public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
-        return modelManager.getModel(ModelResourceLocation.standalone(resourceLocation));
+        return modelManager.getStandaloneModel(resourceLocation);
     }
 
     @SuppressWarnings("deprecation")

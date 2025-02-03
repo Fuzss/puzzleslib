@@ -88,8 +88,6 @@ public final class UseItemEvents {
          * <p>
          * In that case {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)} is called
          * for applying effects to the user, such as restoring food points or applying mob effects.
-         * <p>
-         * TODO remove {@code remainingUseDuration}, it is always zero
          *
          * @param livingEntity         the entity using the item
          * @param itemStack            the item that is set to the entity's use hand after {@link LivingEntity#useItem}
@@ -99,6 +97,6 @@ public final class UseItemEvents {
          * @param remainingUseDuration the duration in ticks the stack has already been in use for
          * @param originalItemStack    a copy of the item stack being used, made before using finished
          */
-        void onUseItemFinish(LivingEntity livingEntity, MutableValue<ItemStack> itemStack, int remainingUseDuration, ItemStack originalItemStack);
+        void onUseItemFinish(LivingEntity livingEntity, MutableValue<ItemStack> itemStack, ItemStack originalItemStack);
     }
 }

@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * <p>
  * Very similar to Forge's <code>net.minecraftforge.data.event.GatherDataEvent</code>.
  */
-public class DataProviderContext {
+public final class DataProviderContext {
     /**
      * The generating mod id.
      */
@@ -36,7 +36,7 @@ public class DataProviderContext {
      * @param packOutput the pack output instance
      * @param registries registry lookup provider
      */
-    public DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+    private DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         this(modId, packOutput, () -> registries);
     }
 
@@ -52,7 +52,7 @@ public class DataProviderContext {
     }
 
     /**
-     * Creates a dummy-like context instance useful for runtime generation in conjunction with
+     * Creates a context instance useful for runtime generation in conjunction with
      * {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
      *
      * @param modId the generating mod id
@@ -63,7 +63,7 @@ public class DataProviderContext {
     }
 
     /**
-     * Creates a dummy-like context instance useful for runtime generation in conjunction with
+     * Creates a context instance useful for runtime generation in conjunction with
      * {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
      *
      * @param modId the generating mod id
@@ -74,9 +74,19 @@ public class DataProviderContext {
         return new DataProviderContext(modId,
                 new PackOutput(path),
                 Suppliers.memoize(() -> CompletableFuture.supplyAsync(VanillaRegistries::createLookup,
-                        Util.backgroundExecutor()
-                ))
-        );
+                        Util.backgroundExecutor())));
+    }
+
+    /**
+     * Creates a context instance from the corresponding Forge event usable in actual data-generation.
+     *
+     * @param modId      the generating mod id
+     * @param evt        the event
+     * @param registries the registry lookup provider
+     * @return new context instance
+     */
+    public static DataProviderContext fromEvent(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        return new DataProviderContext(modId, packOutput, registries);
     }
 
     /**

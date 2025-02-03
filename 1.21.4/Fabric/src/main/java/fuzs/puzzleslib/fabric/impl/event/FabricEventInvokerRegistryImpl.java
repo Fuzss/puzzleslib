@@ -11,7 +11,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
@@ -81,13 +80,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -309,31 +304,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTickEvents.Start.class, FabricPlayerEvents.PLAYER_TICK_START);
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
-        INSTANCE.register(LootTableLoadEvents.Replace.class, LootTableEvents.REPLACE, (LootTableLoadEvents.Replace callback) -> {
-            return (ResourceKey<LootTable> key, LootTable original, LootTableSource source, HolderLookup.Provider registries) -> {
-                DefaultedValue<LootTable> lootTable = DefaultedValue.fromValue(original);
-                callback.onReplaceLootTable(key.location(), lootTable);
-                // returning null will prompt no change
-                return lootTable.getAsOptional().orElse(null);
-            };
-        });
-        INSTANCE.register(LootTableLoadEvents.Modify.class, LootTableEvents.MODIFY, (LootTableLoadEvents.Modify callback) -> {
-            return (ResourceKey<LootTable> key, LootTable.Builder tableBuilder, LootTableSource source, HolderLookup.Provider registries) -> {
-                callback.onModifyLootTable(key.location(), tableBuilder::pool, (int index) -> {
-                    MutableInt currentIndex = new MutableInt();
-                    MutableBoolean result = new MutableBoolean();
-                    tableBuilder.modifyPools((LootPool.Builder builder) -> {
-                        if (index == currentIndex.getAndIncrement()) {
-                            // there is no way in Fabric Api to remove loot pools, but this seems to work for disabling at least
-                            builder.setRolls(ConstantValue.exactly(0.0F));
-                            builder.setBonusRolls(ConstantValue.exactly(0.0F));
-                            result.setTrue();
-                        }
-                    });
-                    return result.booleanValue();
-                });
-            };
-        });
         INSTANCE.register(LootTableLoadCallback.class, LootTableEvents.MODIFY, (LootTableLoadCallback callback) -> {
             return (ResourceKey<LootTable> key, LootTable.Builder tableBuilder, LootTableSource source, HolderLookup.Provider registries) -> {
                 callback.onLootTableLoad(key.location(), tableBuilder, registries);

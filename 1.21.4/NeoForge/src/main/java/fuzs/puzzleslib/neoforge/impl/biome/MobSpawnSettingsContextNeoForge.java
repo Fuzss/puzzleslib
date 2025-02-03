@@ -21,8 +21,8 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
     }
 
     @Override
-    public void addSpawn(MobCategory spawnGroup, MobSpawnSettings.SpawnerData spawnEntry) {
-        this.context.addSpawn(spawnGroup, spawnEntry);
+    public void addSpawn(MobCategory mobCategory, MobSpawnSettings.SpawnerData spawnerData) {
+        this.context.addSpawn(mobCategory, spawnerData);
     }
 
     @Override
@@ -56,8 +56,8 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
     }
 
     @Override
-    public List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory type) {
-        return this.context.getSpawner(type);
+    public List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory mobCategory) {
+        return this.context.getSpawner(mobCategory);
     }
 
     @Override
@@ -66,8 +66,8 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
     }
 
     @Override
-    public @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> type) {
-        return this.context.getCost(type);
+    public @Nullable MobSpawnSettings.MobSpawnCost getSpawnCost(EntityType<?> entityType) {
+        return this.context.getCost(entityType);
     }
 
     @Override

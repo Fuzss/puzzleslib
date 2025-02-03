@@ -1,59 +1,62 @@
-package fuzs.puzzleslib.neoforge.api.data.v2.client;
+package fuzs.puzzleslib.neoforge.api.client.data.v2;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
+import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import net.minecraft.client.particle.ParticleDescription;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
+import net.minecraft.server.packs.resources.CloseableResourceManager;
 import net.neoforged.neoforge.common.data.JsonCodecProvider;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/**
- * TODO rename to {@code AbstractParticleProvider} and also rename {@link #addParticleDescriptions()}
- */
-public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvider<List<ResourceLocation>> {
-    private static final Codec<List<ResourceLocation>> CODEC = ResourceLocation.CODEC.listOf()
+public abstract class AbstractParticleProvider extends JsonCodecProvider<ParticleDescription> {
+    public static final Codec<ParticleDescription> CODEC = ResourceLocation.CODEC.listOf()
             .fieldOf("textures")
+            .xmap(ParticleDescription::new, ParticleDescription::getTextures)
             .codec();
 
-    private final ExistingFileHelper.ResourceType textureResourceType;
+    @Nullable
+    private CloseableResourceManager resourceManager;
 
-    public AbstractParticleDescriptionProvider(NeoForgeDataProviderContext context) {
-        this(context.getModId(), context.getPackOutput(), context.getRegistries(), context.getFileHelper());
+
+    public AbstractParticleProvider(DataProviderContext context) {
+        this(context.getModId(), context.getPackOutput(), context.getRegistries());
     }
 
-    public AbstractParticleDescriptionProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ExistingFileHelper fileHelper) {
-        super(packOutput,
-                PackOutput.Target.RESOURCE_PACK,
-                "particles",
-                PackType.CLIENT_RESOURCES,
-                CODEC,
-                lookupProvider,
-                modId,
-                fileHelper
-        );
-        this.textureResourceType = new ExistingFileHelper.ResourceType(PackType.CLIENT_RESOURCES,
-                ".png",
-                "textures/particle"
-        );
+    public AbstractParticleProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(packOutput, PackOutput.Target.RESOURCE_PACK, "particles", CODEC, lookupProvider, modId);
+    }
+
+    @Override
+    public CompletableFuture<?> run(CachedOutput output) {
+        return CompletableFuture.supplyAsync(() -> {
+            return this.resourceManager = ExistingFilesHelper.createResourceManager(this.modid);
+        }).thenApply((CloseableResourceManager resourceManager) -> {
+            return super.run(output).thenRun(() -> {
+                resourceManager.close();
+                this.resourceManager = null;
+            });
+        });
     }
 
     @Override
     protected final void gather() {
-        this.addParticleDescriptions();
+        this.addParticles();
     }
 
-    public abstract void addParticleDescriptions();
+    public abstract void addParticles();
 
     protected void add(ParticleType<?> particleType) {
         this.add(particleType, -1);
@@ -81,38 +84,35 @@ public abstract class AbstractParticleDescriptionProvider extends JsonCodecProvi
 
     protected void add(ResourceLocation id, ResourceLocation resourceLocation, int indexStart, int indexEnd) {
         if (indexEnd == -1) {
-            this.unconditional(id, List.of(resourceLocation));
+            this.unconditional(id, new ParticleDescription(Collections.singletonList(resourceLocation)));
         } else {
             List<ResourceLocation> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd),
-                            Math.max(indexStart, indexEnd)
-                    )
+                            Math.max(indexStart, indexEnd))
                     .mapToObj(index -> ResourceLocationHelper.fromNamespaceAndPath(resourceLocation.getNamespace(),
-                            resourceLocation.getPath() + "_" + index
-                    ))
+                            resourceLocation.getPath() + "_" + index))
                     .collect(Collectors.toList());
             if (indexEnd < indexStart) Collections.reverse(textures);
-            this.unconditional(id, textures);
+            this.unconditional(id, new ParticleDescription(textures));
         }
     }
 
     @Override
-    public void unconditional(ResourceLocation id, List<ResourceLocation> value) {
-        List<String> missing = value.stream()
-                .filter(resourceLocation -> !this.existingFileHelper.exists(resourceLocation, this.textureResourceType))
-                .map(ResourceLocation::toString)
-                .toList();
+    public void unconditional(ResourceLocation id, ParticleDescription value) {
+        List<String> missing = value.getTextures().stream().filter((ResourceLocation resourceLocation) -> {
+            Objects.requireNonNull(this.resourceManager, "resource manager is null");
+            return this.resourceManager.getResource(resourceLocation.withPath((String string) -> "textures/particle" +
+                    string + ".png")).isEmpty();
+        }).map(ResourceLocation::toString).toList();
         if (!missing.isEmpty()) {
             throw new IllegalArgumentException(
                     "Couldn't define particle description %s as it is missing following texture(s): %s".formatted(id,
-                            String.join(",", missing)
-                    ));
+                            String.join(",", missing)));
         }
-
         super.unconditional(id, value);
     }
 
     @Override
     public String getName() {
-        return "Particle Descriptions";
+        return "Particles";
     }
 }

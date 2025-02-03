@@ -1,18 +1,14 @@
 package fuzs.puzzleslib.api.client.data.v2.models;
 
-import com.google.gson.JsonElement;
-import net.minecraft.data.models.model.ModelTemplate;
-import net.minecraft.data.models.model.ModelTemplates;
-import net.minecraft.data.models.model.TextureMapping;
-import net.minecraft.data.models.model.TextureSlot;
+import net.minecraft.client.data.models.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public final class ModelTemplateHelper {
+    public static final ModelTemplate SPAWN_EGG = ModelTemplates.createItem("template_spawn_egg");
 
     private ModelTemplateHelper() {
         // NO-OP
@@ -38,75 +34,50 @@ public final class ModelTemplateHelper {
                 requiredSlots);
     }
 
-    public static ResourceLocation generateFlatItem(Item item, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(Item item, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item), modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item), modelTemplate, modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return generateFlatItem(ModelLocationHelper.getItemLocation(item), modelTemplate, modelOutput, factory);
-    }
-
-    public static ResourceLocation generateFlatItem(Item item, Item layerItem, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(Item item, Item layerItem, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item),
                 ModelLocationHelper.getItemLocation(layerItem),
                 modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item),
                 ModelLocationHelper.getItemLocation(layerItem),
                 modelTemplate,
                 modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return generateFlatItem(ModelLocationHelper.getItemLocation(item),
-                ModelLocationHelper.getItemLocation(layerItem),
-                modelTemplate,
-                modelOutput,
-                factory);
-    }
-
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(resourceLocation, resourceLocation, modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(resourceLocation, resourceLocation, modelTemplate, modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return generateFlatItem(resourceLocation, resourceLocation, modelTemplate, modelOutput, factory);
-    }
-
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(resourceLocation, layer0, ModelTemplates.FLAT_ITEM, modelOutput);
     }
 
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
-        return generateFlatItem(resourceLocation,
-                layer0,
-                modelTemplate,
-                modelOutput,
-                modelTemplate::createBaseTemplate);
-    }
-
-    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
+    public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return modelTemplate.create(ModelLocationHelper.getItemModel(resourceLocation),
                 TextureMapping.layer0(ModelLocationHelper.getItemTexture(layer0)),
-                modelOutput,
-                factory);
+                modelOutput);
     }
 
-    public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateLayeredItem(ModelLocationHelper.getItemLocation(item), layer0, layer1, modelOutput);
     }
 
-    public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateLayeredItem(ModelLocationHelper.getItemLocation(item),
                 layer0,
                 layer1,
@@ -114,33 +85,14 @@ public final class ModelTemplateHelper {
                 modelOutput);
     }
 
-    public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
-        return generateLayeredItem(ModelLocationHelper.getItemLocation(item),
-                layer0,
-                layer1,
-                modelTemplate,
-                modelOutput,
-                factory);
-    }
-
-    public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
+    public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateLayeredItem(resourceLocation, layer0, layer1, ModelTemplates.TWO_LAYERED_ITEM, modelOutput);
     }
 
-    public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput) {
-        return generateLayeredItem(resourceLocation,
-                layer0,
-                layer1,
-                modelTemplate,
-                modelOutput,
-                modelTemplate::createBaseTemplate);
-    }
-
-    public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, Supplier<JsonElement>> modelOutput, ModelTemplate.JsonFactory factory) {
+    public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return modelTemplate.create(ModelLocationHelper.getItemModel(resourceLocation),
                 TextureMapping.layered(ModelLocationHelper.getItemTexture(layer0),
                         ModelLocationHelper.getItemTexture(layer1)),
-                modelOutput,
-                factory);
+                modelOutput);
     }
 }

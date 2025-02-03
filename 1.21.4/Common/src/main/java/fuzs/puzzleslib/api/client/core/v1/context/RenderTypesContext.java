@@ -5,7 +5,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
 /**
- * Register custom {@link RenderType}s for blocks and fluids.
+ * Register custom {@link RenderType RenderTypes} for blocks and fluids.
  *
  * @param <T> object type supported by provider, either {@link Block} or {@link Fluid}
  */

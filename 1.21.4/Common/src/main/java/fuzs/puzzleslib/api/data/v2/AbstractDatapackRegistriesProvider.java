@@ -12,7 +12,6 @@ import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageEffects;
 import net.minecraft.world.damagesource.DamageType;
@@ -20,6 +19,7 @@ import net.minecraft.world.item.Instrument;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 
 import java.util.Collections;
@@ -63,23 +63,17 @@ public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatap
         context.register(resourceKey, new DamageType(resourceKey.location().getPath(), 0.1F, damageEffects));
     }
 
-    public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex) {
-        registerTrimMaterial(context,
-                resourceKey,
-                ingredient,
-                descriptionColor,
-                itemModelIndex,
-                Collections.emptyMap());
+    public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor) {
+        registerTrimMaterial(context, resourceKey, ingredient, descriptionColor, Collections.emptyMap());
     }
 
-    public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, float itemModelIndex, Map<ResourceLocation, String> overrideArmorMaterials) {
+    public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, Map<ResourceKey<EquipmentAsset>, String> overrideArmorAssets) {
         Component component = ResourceKeyHelper.getComponent(resourceKey)
                 .withStyle(Style.EMPTY.withColor(descriptionColor));
         TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(),
                 ingredient,
-                itemModelIndex,
                 component,
-                overrideArmorMaterials);
+                overrideArmorAssets);
         context.register(resourceKey, trimMaterial);
     }
 

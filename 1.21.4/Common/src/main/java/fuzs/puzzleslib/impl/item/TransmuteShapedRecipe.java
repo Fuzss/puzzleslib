@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.item;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -14,14 +13,16 @@ public class TransmuteShapedRecipe extends ShapedRecipe implements CustomTransmu
 
     public TransmuteShapedRecipe(String modId, ShapedRecipe shapedRecipe, Ingredient input) {
         this(CustomTransmuteRecipe.getModSerializer(modId, CustomTransmuteRecipe.TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID),
-                shapedRecipe, input
-        );
+                shapedRecipe,
+                input);
     }
 
     public TransmuteShapedRecipe(RecipeSerializer<?> recipeSerializer, ShapedRecipe shapedRecipe, Ingredient input) {
-        super(shapedRecipe.group(), shapedRecipe.category(), shapedRecipe.pattern,
-                shapedRecipe.assemble(CraftingInput.EMPTY, RegistryAccess.EMPTY), shapedRecipe.showNotification()
-        );
+        super(shapedRecipe.group(),
+                shapedRecipe.category(),
+                shapedRecipe.pattern,
+                shapedRecipe.result,
+                shapedRecipe.showNotification());
         this.recipeSerializer = recipeSerializer;
         this.input = input;
     }

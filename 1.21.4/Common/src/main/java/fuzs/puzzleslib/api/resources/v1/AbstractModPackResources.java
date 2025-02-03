@@ -7,7 +7,7 @@ import fuzs.puzzleslib.impl.resources.ModPackResourcesSupplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.*;
-import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
@@ -17,6 +17,7 @@ import net.minecraft.world.flag.FeatureFlagSet;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.Collections;
@@ -100,11 +101,10 @@ public class AbstractModPackResources implements PackResources {
         return this.packType == type ? Collections.singleton(this.getNamespace()) : Collections.emptySet();
     }
 
-    @Nullable
     @Override
-    public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) {
+    public @Nullable <T> T getMetadataSection(MetadataSectionType<T> type) throws IOException {
         Objects.requireNonNull(this.metadata, "metadata is null");
-        return this.metadata.get(deserializer);
+        return this.metadata.get(type);
     }
 
     @Override
@@ -157,14 +157,12 @@ public class AbstractModPackResources implements PackResources {
         Pack.ResourcesSupplier resourcesSupplier = ModPackResourcesSupplier.create(packType,
                 info,
                 createSupplier(factory),
-                description
-        );
+                description);
         Pack.Metadata metadata = CommonAbstractions.INSTANCE.createPackInfo(id,
                 description,
                 PackCompatibility.COMPATIBLE,
                 features,
-                hidden
-        );
+                hidden);
         PackSelectionConfig config = new PackSelectionConfig(required, position, fixedPosition);
         return new Pack(info, resourcesSupplier, metadata, config);
     }

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.impl.network.codec;
 
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.api.network.v3.codec.ExtraStreamCodecs;
@@ -55,9 +54,9 @@ import java.util.function.IntFunction;
 
 public final class StreamCodecRegistryImpl implements StreamCodecRegistry<StreamCodecRegistryImpl> {
     public static final StreamCodecRegistry<?> INSTANCE = new StreamCodecRegistryImpl();
-    private static final Map<Class<?>, StreamCodec<?, ?>> SERIALIZERS = Collections.synchronizedMap(Maps.newIdentityHashMap());
+    private static final Map<Class<?>, StreamCodec<?, ?>> SERIALIZERS = Collections.synchronizedMap(new IdentityHashMap<>());
     private static final Map<Class<?>, Function<Type[], StreamCodec<?, ?>>> CONTAINER_PROVIDERS = Collections.synchronizedMap(
-            Maps.newLinkedHashMap());
+            new LinkedHashMap<>());
 
     @Override
     public <B extends ByteBuf, V> StreamCodecRegistryImpl registerSerializer(Class<V> type, StreamCodec<? super B, V> streamCodec) {
@@ -136,8 +135,7 @@ public final class StreamCodecRegistryImpl implements StreamCodecRegistry<Stream
             if (Collection.class.isAssignableFrom(clazz)) {
 
                 return (StreamCodec<B, V>) createCollectionSerializer(typeArguments,
-                        Sets::newLinkedHashSetWithExpectedSize
-                );
+                        Sets::newLinkedHashSetWithExpectedSize);
             }
 
             return fromType((Class<V>) clazz);
@@ -249,11 +247,9 @@ public final class StreamCodecRegistryImpl implements StreamCodecRegistry<Stream
         INSTANCE.registerSerializer(ChunkPos.class, ExtraStreamCodecs.CHUNK_POS);
         INSTANCE.registerSerializer(ResourceLocation.class, ResourceLocation.STREAM_CODEC);
         INSTANCE.registerSerializer((Class<ResourceKey<?>>) (Class<?>) ResourceKey.class,
-                ExtraStreamCodecs.DIRECT_RESOURCE_KEY
-        );
+                ExtraStreamCodecs.DIRECT_RESOURCE_KEY);
         INSTANCE.registerSerializer((Class<TypedDataComponent<?>>) (Class<?>) TypedDataComponent.class,
-                TypedDataComponent.STREAM_CODEC
-        );
+                TypedDataComponent.STREAM_CODEC);
         INSTANCE.registerSerializer(BlockHitResult.class, ExtraStreamCodecs.BLOCK_HIT_RESULT);
         INSTANCE.registerSerializer(BitSet.class, ExtraStreamCodecs.BIT_SET);
         INSTANCE.registerSerializer(GameProfile.class, ByteBufCodecs.GAME_PROFILE);
@@ -280,8 +276,7 @@ public final class StreamCodecRegistryImpl implements StreamCodecRegistry<Stream
 
         INSTANCE.registerContainerProvider(Map.class, StreamCodecRegistryImpl::createMapSerializer);
         INSTANCE.registerContainerProvider(List.class,
-                (Type[] typeArguments) -> createCollectionSerializer(typeArguments, ArrayList::new)
-        );
+                (Type[] typeArguments) -> createCollectionSerializer(typeArguments, ArrayList::new));
         INSTANCE.registerContainerProvider(Optional.class, StreamCodecRegistryImpl::createOptionalSerializer);
         INSTANCE.registerContainerProvider(Holder.class, StreamCodecRegistryImpl::createHolderSerializer);
     }

@@ -1,26 +1,22 @@
-package fuzs.puzzleslib.neoforge.api.data.v2.client;
+package fuzs.puzzleslib.neoforge.api.client.data.v2;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
+import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
-/**
- * TODO rename to {@code AbstractSoundProvider} and also rename {@link #addSoundDefinitions()}
- */
-public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsProvider {
+public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
     protected final String modId;
 
-    public AbstractSoundDefinitionProvider(NeoForgeDataProviderContext context) {
-        this(context.getModId(), context.getPackOutput(), context.getFileHelper());
+    public AbstractSoundProvider(DataProviderContext context) {
+        this(context.getModId(), context.getPackOutput());
     }
 
-    public AbstractSoundDefinitionProvider(String modId, PackOutput packOutput, ExistingFileHelper fileHelper) {
-        super(packOutput, modId, fileHelper);
+    public AbstractSoundProvider(String modId, PackOutput packOutput) {
+        super(packOutput, modId);
         this.modId = modId;
     }
 
@@ -30,10 +26,10 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
 
     @Override
     public final void registerSounds() {
-        this.addSoundDefinitions();
+        this.addSounds();
     }
 
-    public abstract void addSoundDefinitions();
+    public abstract void addSounds();
 
     protected void add(SoundEvent soundEvent, String... sounds) {
         SoundDefinition definition = definition();
@@ -74,5 +70,10 @@ public abstract class AbstractSoundDefinitionProvider extends SoundDefinitionsPr
 
     protected ResourceLocation vanilla(String path) {
         return ResourceLocationHelper.withDefaultNamespace(path);
+    }
+
+    @Override
+    public String getName() {
+        return "Sounds";
     }
 }

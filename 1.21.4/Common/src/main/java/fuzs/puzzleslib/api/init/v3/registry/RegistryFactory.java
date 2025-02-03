@@ -4,11 +4,10 @@ import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Create and register new {@link Registry Registries}.
- * <p>
- * TODO rework this to use a ModConstructor event, also make creating synced registries separate methods instead of parameter, so {@code createSynced} not just {@code create} without the parameter
+ * Create new {@link Registry Registries}.
  */
 public interface RegistryFactory {
     /**
@@ -17,82 +16,71 @@ public interface RegistryFactory {
     RegistryFactory INSTANCE = CommonFactories.INSTANCE.getRegistryFactory();
 
     /**
-     * Create and register a {@link net.minecraft.core.MappedRegistry}.
-     * <p>
-     * Calls {@link #register(Registry)} as part of the implementation.
-     * <p>
-     * Registry contents are synced to clients.
+     * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.
      *
      * @param registryKey the registry key
-     * @param <T>         registry values type
+     * @param <T>         the registry value type
      * @return the new registry
      */
     default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey) {
-        return this.create(registryKey, true);
+        return this.create(registryKey, (String) null);
     }
 
     /**
-     * Create and register a {@link net.minecraft.core.MappedRegistry}.
-     * <p>
-     * Calls {@link #register(Registry)} as part of the implementation.
+     * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
+     * used in networking.
      *
      * @param registryKey the registry key
-     * @param synced      sync registry contents to clients, so that numeric registry ids can be used in networking
-     * @param <T>         registry values type
+     * @param <T>         the registry value type
      * @return the new registry
      */
-    <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, boolean synced);
-
-    /**
-     * Create and register a {@link net.minecraft.core.DefaultedMappedRegistry}.
-     * <p>
-     * Calls {@link #register(Registry)} as part of the implementation.
-     * <p>
-     * Registry contents are synced to clients.
-     *
-     * @param registryKey the registry key
-     * @param defaultKey  the default value key
-     * @param <T>         registry values type
-     * @return the new registry
-     */
-    default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, String defaultKey) {
-        return this.create(registryKey, defaultKey, true);
+    default <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey) {
+        return this.createSynced(registryKey, (String) null);
     }
 
     /**
-     * Create and register a {@link net.minecraft.core.DefaultedMappedRegistry}.
-     * <p>
-     * Calls {@link #register(Registry)} as part of the implementation.
+     * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.
      *
      * @param registryKey the registry key
      * @param defaultKey  the default value key
-     * @param synced      sync registry contents to clients, so that numeric registry ids can be used in networking
-     * @param <T>         registry values type
+     * @param <T>         the registry value type
      * @return the new registry
      */
-    default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, String defaultKey, boolean synced) {
-        return this.create(registryKey, registryKey.location().withPath(defaultKey), synced);
+    default <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable String defaultKey) {
+        return this.create(registryKey, defaultKey != null ? registryKey.location().withPath(defaultKey) : null);
     }
 
     /**
-     * Create and register a {@link net.minecraft.core.DefaultedMappedRegistry}.
-     * <p>
-     * Calls {@link #register(Registry)} as part of the implementation.
+     * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
+     * used in networking.
      *
      * @param registryKey the registry key
      * @param defaultKey  the default value key
-     * @param synced      sync registry contents to clients, so that numeric registry ids can be used in networking
-     * @param <T>         registry values type
+     * @param <T>         the registry value type
      * @return the new registry
      */
-    <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, ResourceLocation defaultKey, boolean synced);
+    default <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable String defaultKey) {
+        return this.createSynced(registryKey, defaultKey != null ? registryKey.location().withPath(defaultKey) : null);
+    }
 
     /**
-     * Register an already constructed {@link Registry}.
+     * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.
      *
-     * @param registry the registry
-     * @param <T>      registry values type
-     * @return the registry
+     * @param registryKey the registry key
+     * @param defaultKey  the default value key
+     * @param <T>         the registry value type
+     * @return the new registry
      */
-    <T> Registry<T> register(Registry<T> registry);
+    <T> Registry<T> create(ResourceKey<Registry<T>> registryKey, @Nullable ResourceLocation defaultKey);
+
+    /**
+     * Create a synchronized {@link net.minecraft.core.DefaultedMappedRegistry}, so that numeric registry ids can be
+     * used in networking.
+     *
+     * @param registryKey the registry key
+     * @param defaultKey  the default value key
+     * @param <T>         the registry value type
+     * @return the new registry
+     */
+    <T> Registry<T> createSynced(ResourceKey<Registry<T>> registryKey, @Nullable ResourceLocation defaultKey);
 }

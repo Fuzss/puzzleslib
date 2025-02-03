@@ -4,13 +4,15 @@ import com.google.common.collect.Maps;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -20,7 +22,8 @@ import java.util.Objects;
  * A builder class for {@link ArmorMaterial}.
  */
 public final class ArmorMaterialBuilder {
-    private static final ResourceLocation NO_RENDER_MODEL_ID = PuzzlesLibMod.id("no_render");
+    private static final ResourceKey<EquipmentAsset> NO_RENDER_ASSET_ID = ResourceKey.create(EquipmentAssets.ROOT_ID,
+            PuzzlesLibMod.id("no_render"));
 
     private int durability;
     private Map<ArmorType, Integer> defense = Util.make(new EnumMap<>(ArmorType.class),
@@ -34,7 +37,7 @@ public final class ArmorMaterialBuilder {
     private float toughness;
     private float knockbackResistance;
     private TagKey<Item> repairIngredient;
-    private ResourceLocation modelId;
+    private ResourceKey<EquipmentAsset> assetId;
 
     private ArmorMaterialBuilder() {
         // NO-OP
@@ -46,8 +49,8 @@ public final class ArmorMaterialBuilder {
      * @param repairIngredient the repair material used in an anvil for restoring item durability
      * @return the builder
      */
-    public static ArmorMaterialBuilder of(ResourceLocation modelId, TagKey<Item> repairIngredient) {
-        return new ArmorMaterialBuilder().setModelId(modelId).setRepairIngredient(repairIngredient);
+    public static ArmorMaterialBuilder of(ResourceKey<EquipmentAsset> assetId, TagKey<Item> repairIngredient) {
+        return new ArmorMaterialBuilder().setAssetId(assetId).setRepairIngredient(repairIngredient);
     }
 
     /**
@@ -55,7 +58,7 @@ public final class ArmorMaterialBuilder {
      * @return the builder
      */
     public static ArmorMaterialBuilder copyOf(ArmorMaterial armorMaterial) {
-        return of(armorMaterial.modelId(), armorMaterial.repairIngredient()).setDurability(armorMaterial.durability())
+        return of(armorMaterial.assetId(), armorMaterial.repairIngredient()).setDurability(armorMaterial.durability())
                 .setDefense(armorMaterial.defense())
                 .setEnchantmentValue(armorMaterial.enchantmentValue())
                 .setEquipSound(armorMaterial.equipSound())
@@ -174,9 +177,9 @@ public final class ArmorMaterialBuilder {
      *                {@code assets/<namespace>/models/equipment/<path>.json}
      * @return the builder
      */
-    public ArmorMaterialBuilder setModelId(ResourceLocation modelId) {
-        Objects.requireNonNull(modelId, "model id is null");
-        this.modelId = modelId;
+    public ArmorMaterialBuilder setAssetId(ResourceKey<EquipmentAsset> assetId) {
+        Objects.requireNonNull(assetId, "asset id is null");
+        this.assetId = assetId;
         return this;
     }
 
@@ -186,7 +189,7 @@ public final class ArmorMaterialBuilder {
      * @return the builder
      */
     public ArmorMaterialBuilder setNoModelId() {
-        return this.setModelId(NO_RENDER_MODEL_ID);
+        return this.setAssetId(NO_RENDER_ASSET_ID);
     }
 
     /**
@@ -200,6 +203,6 @@ public final class ArmorMaterialBuilder {
                 this.toughness,
                 this.knockbackResistance,
                 this.repairIngredient,
-                this.modelId);
+                this.assetId);
     }
 }
