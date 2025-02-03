@@ -1,24 +1,21 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
-import com.google.common.base.Stopwatch;
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
-import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompletedCallback;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
-import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -26,11 +23,8 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
-import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.resources.model.*;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
@@ -39,8 +33,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -54,8 +46,11 @@ import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Objects;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry.INSTANCE;
 
@@ -81,98 +76,8 @@ public final class NeoForgeClientEventInvokers {
                 }
             });
         });
-        INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyUnbakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            BakedModel missingModel = models.get(MissingBlockModel.VARIANT);
-            Objects.requireNonNull(missingModel, "missing model is null");
-            Map<ModelResourceLocation, UnbakedModel> additionalModels = new HashMap<>();
-            Function<ModelResourceLocation, UnbakedModel> modelGetter = (ModelResourceLocation modelResourceLocation) -> {
-                if (additionalModels.containsKey(modelResourceLocation)) {
-                    return additionalModels.get(modelResourceLocation);
-                } else {
-                    return ModelLoadingHelper.getUnbakedTopLevelModel(evt.getModelBakery()).apply(modelResourceLocation);
-                }
-            };
-            // do not use resource location keys or rely on the baked cache used by the model baker, it will rebake different block states even though the model is the same
-            // this also means we cannot use baked models as keys since they are different instances despite having been baked from the same unbaked model
-            Map<UnbakedModel, BakedModel> unbakedCache = new IdentityHashMap<>();
-            // Forge does not grant access to unbaked models, so lookup every unbaked model and replace the baked model if necessary
-            // this also means the event is limited to top level models which should be fine though, the same restriction is applied on Fabric
-            // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
-            for (ModelResourceLocation modelLocation : getTopLevelModelLocations()) {
-                try {
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(modelLocation, () -> {
-                        return modelGetter.apply(modelLocation);
-                    }, modelGetter, (ResourceLocation resourceLocation, UnbakedModel unbakedModel) -> {
-                        additionalModels.put(ModelResourceLocation.standalone(resourceLocation), unbakedModel);
-                    });
-                    if (result.isInterrupt()) {
-                        UnbakedModel unbakedModel = result.getInterrupt().get();
-                        additionalModels.put(modelLocation, unbakedModel);
-                        BakedModel bakedModel = unbakedCache.computeIfAbsent(unbakedModel, $ -> {
-                            NeoForgeModelBakerImpl modelBaker = NeoForgeModelBakerImpl.create(evt, missingModel, additionalModels);
-                            return modelBaker.bake(unbakedModel, modelLocation.id());
-                        });
-                        models.put(modelLocation, bakedModel);
-                    }
-                } catch (Exception exception) {
-                    PuzzlesLib.LOGGER.error("Failed to modify unbaked model", exception);
-                }
-            }
-            PuzzlesLib.LOGGER.info("Modifying unbaked models took {}ms", stopwatch.stop().elapsed().toMillis());
-        });
-        INSTANCE.register(ModelEvents.ModifyBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.ModifyBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            BakedModel missingModel = models.get(MissingBlockModel.VARIANT);
-            Objects.requireNonNull(missingModel, "missing model is null");
-            Function<ModelResourceLocation, BakedModel> modelGetter = (ModelResourceLocation resourceLocation) -> {
-                if (models.containsKey(resourceLocation)) {
-                    return models.get(resourceLocation);
-                } else {
-                    ModelBaker modelBaker = NeoForgeModelBakerImpl.create(evt, missingModel);
-                    return modelBaker.bake(resourceLocation.id(), BlockModelRotation.X0_Y0, evt.getTextureGetter());
-                }
-            };
-            // Forge has no event firing for every baked model like Fabric,
-            // instead go through the baked models map and fire the event for every model manually
-            // do not iterate over the models map provided by the event, when Modern Fix is installed it will be almost empty as models are loaded dynamically
-            for (ModelResourceLocation modelLocation : getTopLevelModelLocations()) {
-                try {
-                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(modelLocation, () -> {
-                        return modelGetter.apply(modelLocation);
-                    }, () -> {
-                        return NeoForgeModelBakerImpl.create(evt, missingModel);
-                    }, modelGetter, models::putIfAbsent);
-                    result.getInterrupt().ifPresent(bakedModel -> {
-                        models.put(modelLocation, bakedModel);
-                    });
-                } catch (Exception exception) {
-                    PuzzlesLib.LOGGER.error("Failed to modify baked model", exception);
-                }
-            }
-            PuzzlesLib.LOGGER.info("Modifying baked models took {}ms", stopwatch.stop().elapsed().toMillis());
-        });
-        INSTANCE.register(
-                ModelEvents.AddAdditionalBakedModel.class, ModelEvent.ModifyBakingResult.class, (ModelEvents.AddAdditionalBakedModel callback, ModelEvent.ModifyBakingResult evt) -> {
-            Stopwatch stopwatch = Stopwatch.createStarted();
-            Map<ModelResourceLocation, BakedModel> models = evt.getModels();
-            BakedModel missingModel = models.get(MissingBlockModel.VARIANT);
-            Objects.requireNonNull(missingModel, "missing model is null");
-            try {
-                callback.onAddAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
-                    return models.getOrDefault(resourceLocation, missingModel);
-                }, () -> {
-                    return NeoForgeModelBakerImpl.create(evt, missingModel);
-                });
-            } catch (Exception exception) {
-                PuzzlesLib.LOGGER.error("Failed to add additional baked models", exception);
-            }
-            PuzzlesLib.LOGGER.info("Adding additional baked models took {}ms", stopwatch.stop().elapsed().toMillis());
-        });
-        INSTANCE.register(ModelEvents.CompleteModelLoading.class, ModelEvent.BakingCompleted.class, (ModelEvents.CompleteModelLoading callback, ModelEvent.BakingCompleted evt) -> {
-            callback.onCompleteModelLoading(evt::getModelManager, evt::getModelBakery);
+        INSTANCE.register(ModelBakingCompletedCallback.class, ModelEvent.BakingCompleted.class, (ModelBakingCompletedCallback callback, ModelEvent.BakingCompleted evt) -> {
+            callback.onModelBakingCompleted(evt.getModelManager(), evt.getBakingResult());
         });
         INSTANCE.register(ExtractRenderStateCallback.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallback callback, RegisterRenderStateModifiersEvent evt) -> {
             evt.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
@@ -435,20 +340,21 @@ public final class NeoForgeClientEventInvokers {
             callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
         });
         INSTANCE.register(RenderBlockOverlayCallback.class, RenderBlockScreenEffectEvent.class, (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent evt) -> {
-            EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), evt.getBlockState());
+            EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), Minecraft.getInstance().renderBuffers()
+                    .bufferSource(), evt.getBlockState());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(FogEvents.Render.class, ViewportEvent.RenderFog.class, (FogEvents.Render callback, ViewportEvent.RenderFog evt) -> {
-            MutableFloat nearPlaneDistance = MutableFloat.fromEvent(t -> {
-                evt.setNearPlaneDistance(t);
+            MutableFloat nearPlaneDistance = MutableFloat.fromEvent(nearPlaneDistanceValue -> {
+                evt.setNearPlaneDistance(nearPlaneDistanceValue);
                 evt.setCanceled(true);
             }, evt::getNearPlaneDistance);
-            MutableFloat farPlaneDistance = MutableFloat.fromEvent(t -> {
-                evt.setFarPlaneDistance(t);
+            MutableFloat farPlaneDistance = MutableFloat.fromEvent(farPlaneDistanceValue -> {
+                evt.setFarPlaneDistance(farPlaneDistanceValue);
                 evt.setCanceled(true);
             }, evt::getFarPlaneDistance);
-            MutableValue<FogShape> fogShape = MutableValue.fromEvent(t -> {
-                evt.setFogShape(t);
+            MutableValue<FogShape> fogShape = MutableValue.fromEvent(fogShapeValue -> {
+                evt.setFogShape(fogShapeValue);
                 evt.setCanceled(true);
             }, evt::getFogShape);
             callback.onRenderFog(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), evt.getMode(), evt.getType(), nearPlaneDistance, farPlaneDistance, fogShape);
@@ -545,17 +451,5 @@ public final class NeoForgeClientEventInvokers {
             if (!((Class<?>) context).isInstance(evt.getScreen())) return;
             converter.accept(callback, evt);
         });
-    }
-
-    private static Set<ModelResourceLocation> getTopLevelModelLocations() {
-        Set<ModelResourceLocation> modelLocations = new HashSet<>();
-        modelLocations.add(MissingBlockModel.VARIANT);
-        for (Block block : BuiltInRegistries.BLOCK) {
-            block.getStateDefinition().getPossibleStates().forEach((BlockState blockState) -> {
-                modelLocations.add(BlockModelShaper.stateToModelLocation(blockState));
-            });
-        }
-        modelLocations.addAll(ModelDiscovery.listMandatoryModels());
-        return modelLocations;
     }
 }

@@ -54,7 +54,8 @@ public interface BlockInteractionsContext {
 
     /**
      * A conversion usually used for turning dirt-like blocks into farmland. Requires a hoe.
-     * <p>An air block is required above the untilled block.
+     * <p>
+     * An air block is required above the untilled block.
      *
      * @param tilledBlock    the block after tilling
      * @param untilledBlocks the block before tilling
@@ -65,7 +66,8 @@ public interface BlockInteractionsContext {
 
     /**
      * A conversion usually used for turning dirt-like blocks into farmland. Requires a hoe.
-     * <p>No air block is required above the untilled block.
+     * <p>
+     * No air block is required above the untilled block.
      *
      * @param tilledBlock    the block after tilling
      * @param droppedItem    a potential item dropped during the tilling interaction
@@ -78,10 +80,10 @@ public interface BlockInteractionsContext {
     /**
      * A conversion usually used for turning dirt-like blocks into farmland. Requires a hoe.
      *
-     * @param tilledBlock    the block after tilling
-     * @param droppedItem    a potential item dropped during the tilling interaction
-     * @param onlyIfAirAbove is an air block required above the untilled block for the interaction to be possible
-     * @param untilledBlocks the block before tilling
+     * @param tilledBlock     the block after tilling
+     * @param droppedItem     a potential item dropped during the tilling interaction
+     * @param requireAirAbove is an air block required above the untilled block for the interaction to be possible
+     * @param untilledBlocks  the block before tilling
      */
-    void registerTillable(BlockState tilledBlock, @Nullable ItemLike droppedItem, boolean onlyIfAirAbove, Block... untilledBlocks);
+    void registerTillable(BlockState tilledBlock, @Nullable ItemLike droppedItem, boolean requireAirAbove, Block... untilledBlocks);
 }

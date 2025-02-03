@@ -16,8 +16,7 @@
     "accessor.NewRegistryEventNeoForgeAccessor"
   ],
   "client": [
-    "client.accessor.BlockColorsNeoForgeAccessor",
-    "client.accessor.ItemColorsNeoForgeAccessor"
+    "client.accessor.BlockColorsNeoForgeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

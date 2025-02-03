@@ -7,7 +7,7 @@ import net.minecraft.world.level.ItemLike;
  * register additional renders to run after stack count and durability have been drawn for an item stack
  */
 @FunctionalInterface
-public interface ItemDecorationContext {
+public interface ItemDecorationsContext {
 
     /**
      * register a {@link DynamicItemDecorator} for an <code>item</code>

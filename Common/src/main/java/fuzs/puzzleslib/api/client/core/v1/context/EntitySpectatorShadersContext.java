@@ -7,7 +7,7 @@ import net.minecraft.world.entity.EntityType;
  * register a custom shader that is applied when spectating a certain entity type
  */
 @FunctionalInterface
-public interface EntitySpectatorShaderContext {
+public interface EntitySpectatorShadersContext {
 
     /**
      * Register the custom shader.

@@ -1,11 +1,10 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1;
 
-import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerCopyCallback;
-import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
-import fuzs.puzzleslib.api.client.event.v1.entity.player.ComputeFovModifierCallback;
-import fuzs.puzzleslib.api.client.event.v1.entity.player.MovementInputUpdateCallback;
+import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
@@ -30,14 +29,18 @@ public final class FabricClientPlayerEvents {
     /**
      * Called when the local player is replaced from respawning.
      */
-    public static final Event<ClientPlayerCopyCallback> PLAYER_COPY = FabricEventFactory.create(
-            ClientPlayerCopyCallback.class);
+    public static final Event<ClientPlayerCopyCallback> PLAYER_COPY = FabricEventFactory.create(ClientPlayerCopyCallback.class);
     /**
-     * Called after {@link net.minecraft.client.player.ClientInput#tick(boolean, float)} has run for the
-     * {@link LocalPlayer}.
+     * Called after the {@link ClientInput} has ticked for the {@link LocalPlayer}.
      */
     public static final Event<MovementInputUpdateCallback> MOVEMENT_INPUT_UPDATE = FabricEventFactory.create(
             MovementInputUpdateCallback.class);
+    /**
+     * Runs before the client performs a pick interaction based on {@link Minecraft#hitResult}, setting a new item stack
+     * to the main hand if possible.
+     */
+    public static final Event<InteractionInputEvents.Pick> PICK_INTERACTION_INPUT = FabricEventFactory.createResult(
+            InteractionInputEvents.Pick.class);
 
     private FabricClientPlayerEvents() {
         // NO-OP

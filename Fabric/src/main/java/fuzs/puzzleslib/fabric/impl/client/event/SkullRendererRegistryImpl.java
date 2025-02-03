@@ -1,28 +1,29 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.fabric.api.client.event.v1.registry.SkullRendererRegistry;
-import fuzs.puzzleslib.api.client.init.v1.SkullRenderersFactory;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.world.level.block.SkullBlock;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.function.Function;
 
 public final class SkullRendererRegistryImpl implements SkullRendererRegistry {
-    private static final Set<SkullRenderersFactory> FACTORIES = Sets.newLinkedHashSet();
+    private static final Map<SkullBlock.Type, Function<EntityModelSet, SkullModelBase>> SKULL_MODEL_FACTORIES = new IdentityHashMap<>();
 
     @Override
-    public void register(SkullRenderersFactory factory) {
-        Objects.requireNonNull(factory, "factory is null");
-        FACTORIES.add(factory);
+    public void register(SkullBlock.Type skullBlockType, Function<EntityModelSet, SkullModelBase> skullModelFactory) {
+        Objects.requireNonNull(skullBlockType, "skull block type is null");
+        Objects.requireNonNull(skullModelFactory, "skull model factory is null");
+        SKULL_MODEL_FACTORIES.put(skullBlockType, skullModelFactory);
     }
 
-    public static void addAll(EntityModelSet entityModelSet, ImmutableMap.Builder<SkullBlock.Type, SkullModelBase> builder) {
-        for (SkullRenderersFactory factory : FACTORIES) {
-            factory.createSkullRenderers(entityModelSet, builder::put);
-        }
+    @Nullable
+    public static SkullModelBase createSkullModel(SkullBlock.Type skullBlockType, EntityModelSet entityModelSet) {
+        Function<EntityModelSet, SkullModelBase> skullModelFactory = SKULL_MODEL_FACTORIES.get(skullBlockType);
+        return skullModelFactory != null ? skullModelFactory.apply(entityModelSet) : null;
     }
 }

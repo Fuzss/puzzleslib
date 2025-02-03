@@ -1,17 +1,20 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import fuzs.puzzleslib.api.client.init.v1.SkullRenderersFactory;
+import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.world.level.block.SkullBlock;
+
+import java.util.function.Function;
 
 /**
- * register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations
+ * Register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations.
  */
 @FunctionalInterface
 public interface SkullRenderersContext {
 
     /**
-     * add models for specific skull types
-     *
-     * @param factory factory for the model(s)
+     * @param skullBlockType    the skull block type
+     * @param skullModelFactory thue skull model factory
      */
-    void registerSkullRenderer(SkullRenderersFactory factory);
+    void registerSkullRenderer(SkullBlock.Type skullBlockType, Function<EntityModelSet, SkullModelBase> skullModelFactory);
 }

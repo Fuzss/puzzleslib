@@ -7,18 +7,19 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 
 /**
- * Register a client-side screen factory to be constructed when opening a menu.
+ * Register a client-side screen factory to be constructed when opening an {@link AbstractContainerMenu}.
  */
 @FunctionalInterface
 public interface MenuScreensContext {
 
     /**
-     * Register a factory for creating a {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen} for a corresponding {@link MenuType}.
+     * Register a factory for creating a {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen} for
+     * a corresponding {@link MenuType}.
      *
      * @param menuType the menu type
      * @param factory  the screen factory
-     * @param <M>      type of menu
-     * @param <S>      type of screen
+     * @param <M>      the type of menu
+     * @param <S>      the type of screen
      */
     <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, S> factory);
 }

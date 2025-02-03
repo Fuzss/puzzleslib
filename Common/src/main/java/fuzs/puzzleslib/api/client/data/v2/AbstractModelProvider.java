@@ -49,7 +49,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         this.addBlockModels(this.setupBlockModelGenerators(new BlockModelGenerators(blockStateOutput,
                 itemModelOutput,
                 modelOutput)));
-        this.addItemModels(new ItemModelGenerators(itemModelOutput, modelOutput), itemModelOutput);
+        this.addItemModels(new ItemModelGenerators(itemModelOutput, modelOutput));
         blockStateOutput.validate();
         itemModelOutput.finalizeAndValidate();
         return CompletableFuture.allOf(blockStateOutput.save(output, this.blockStatePathProvider),
@@ -81,7 +81,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         // NO-OP
     }
 
-    public void addItemModels(ItemModelGenerators itemModelGenerators, ExtendedItemModelOutput itemModelOutput) {
+    public void addItemModels(ItemModelGenerators itemModelGenerators) {
         // NO-OP
     }
 
@@ -102,7 +102,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         return "Model Definitions";
     }
 
-    public interface ExtendedItemModelOutput extends ItemModelOutput {
+    public interface CustomItemModelOutput extends ItemModelOutput {
 
         void accept(Item item, ItemModel.Unbaked model, ClientItem.Properties properties);
     }
@@ -128,7 +128,7 @@ public abstract class AbstractModelProvider implements DataProvider {
         }
     }
 
-    static class ItemModelOutputImpl extends ModelProvider.ItemInfoCollector implements ExtendedItemModelOutput {
+    static class ItemModelOutputImpl extends ModelProvider.ItemInfoCollector implements CustomItemModelOutput {
         private final Predicate<Holder.Reference<Item>> filter;
 
         public ItemModelOutputImpl(Predicate<Holder.Reference<Item>> filter) {

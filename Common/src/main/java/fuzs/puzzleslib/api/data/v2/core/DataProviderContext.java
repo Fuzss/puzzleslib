@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 /**
  * A context class for providing instances required by a {@link DataProvider}.
  * <p>
- * Very similar to Forge's <code>net.minecraftforge.data.event.GatherDataEvent</code>.
+ * Offers similar capabilities as NeoForge's {@code net.neoforged.neoforge.data.event.GatherDataEvent}.
  */
 public final class DataProviderContext {
     /**
@@ -23,18 +23,18 @@ public final class DataProviderContext {
      */
     private final String modId;
     /**
-     * The pack output instance.
+     * The pack output.
      */
     private final PackOutput packOutput;
     /**
-     * Registry lookup provider.
+     * The registry lookup provider.
      */
     private final Supplier<CompletableFuture<HolderLookup.Provider>> registries;
 
     /**
      * @param modId      the generating mod id
-     * @param packOutput the pack output instance
-     * @param registries registry lookup provider
+     * @param packOutput the pack output
+     * @param registries the registry lookup provider
      */
     private DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         this(modId, packOutput, () -> registries);
@@ -42,8 +42,8 @@ public final class DataProviderContext {
 
     /**
      * @param modId      the generating mod id
-     * @param packOutput the pack output instance
-     * @param registries registry lookup provider
+     * @param packOutput the pack output
+     * @param registries the registry lookup provider
      */
     private DataProviderContext(String modId, PackOutput packOutput, Supplier<CompletableFuture<HolderLookup.Provider>> registries) {
         this.modId = modId;
@@ -52,25 +52,25 @@ public final class DataProviderContext {
     }
 
     /**
-     * Creates a context instance useful for runtime generation in conjunction with
+     * Creates a data provider context useful for runtime generation in conjunction with
      * {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
      *
      * @param modId the generating mod id
-     * @return new context instance
+     * @return the new data provider context
      */
-    public static DataProviderContext fromModId(String modId) {
-        return fromModId(modId, Path.of(""));
+    public static DataProviderContext ofPath(String modId) {
+        return ofPath(modId, Path.of(""));
     }
 
     /**
-     * Creates a context instance useful for runtime generation in conjunction with
+     * Creates a data provider context useful for runtime generation in conjunction with
      * {@link fuzs.puzzleslib.api.resources.v1.DynamicPackResources}.
      *
      * @param modId the generating mod id
      * @param path  output path
-     * @return new context instance
+     * @return the new data provider context
      */
-    public static DataProviderContext fromModId(String modId, Path path) {
+    public static DataProviderContext ofPath(String modId, Path path) {
         return new DataProviderContext(modId,
                 new PackOutput(path),
                 Suppliers.memoize(() -> CompletableFuture.supplyAsync(VanillaRegistries::createLookup,
@@ -78,14 +78,14 @@ public final class DataProviderContext {
     }
 
     /**
-     * Creates a context instance from the corresponding Forge event usable in actual data-generation.
+     * Creates a data provider context from the corresponding NeoForge event usable in actual data-generation.
      *
      * @param modId      the generating mod id
-     * @param evt        the event
+     * @param packOutput the pack output
      * @param registries the registry lookup provider
-     * @return new context instance
+     * @return the new data provider context
      */
-    public static DataProviderContext fromEvent(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+    public static DataProviderContext ofPackOutput(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         return new DataProviderContext(modId, packOutput, registries);
     }
 

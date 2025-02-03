@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.client.core.v1.context.ItemDecorationContext;
+import fuzs.puzzleslib.api.client.core.v1.context.ItemDecorationsContext;
 import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.client.IItemDecorator;
@@ -9,7 +9,7 @@ import net.neoforged.neoforge.client.IItemDecorator;
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
-public record ItemDecorationContextNeoForgeImpl(BiConsumer<ItemLike, IItemDecorator> consumer) implements ItemDecorationContext {
+public record ItemDecorationsContextNeoForgeImpl(BiConsumer<ItemLike, IItemDecorator> consumer) implements ItemDecorationsContext {
 
     @Override
     public void registerItemDecorator(DynamicItemDecorator decorator, ItemLike... items) {

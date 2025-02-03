@@ -1,16 +1,17 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
-import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
-import fuzs.puzzleslib.api.client.event.v1.ModelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.model.BlockModelLoadingEvents;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompletedCallback;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelLoadingEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -18,18 +19,14 @@ import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
-import fuzs.puzzleslib.impl.client.event.ModelLoadingHelper;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelResolver;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
-import net.fabricmc.fabric.api.event.client.player.ClientPickBlockApplyCallback;
-import net.fabricmc.fabric.api.event.client.player.ClientPickBlockGatherCallback;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
@@ -42,7 +39,9 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.resources.model.*;
+import net.minecraft.client.renderer.block.model.UnbakedBlockStateModel;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -53,7 +52,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -63,7 +61,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -73,15 +70,6 @@ import static fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistr
 
 @SuppressWarnings("unchecked")
 public final class FabricClientEventInvokers {
-    // a custom item stack used for identity matching to be able to cancel our pick block event
-    private static final ItemStack INTERRUPT_PICK_ITEM_STACK = new ItemStack(Items.STONE);
-
-    static {
-        ClientPickBlockApplyCallback.EVENT.register((Player player, HitResult result, ItemStack stack) -> {
-            // match via reference identity so this can only be our dummy stack
-            return stack == INTERRUPT_PICK_ITEM_STACK ? ItemStack.EMPTY : stack;
-        });
-    }
 
     public static void registerLoadingHandlers() {
         INSTANCE.register(AddResourcePackReloadListenersCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, (AddResourcePackReloadListenersCallback callback) -> {
@@ -92,60 +80,76 @@ public final class FabricClientEventInvokers {
             };
         });
         INSTANCE.register(ScreenOpeningCallback.class, FabricGuiEvents.SCREEN_OPENING);
-        INSTANCE.register(ModelEvents.ModifyUnbakedModel.class, (ModelEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelLoadingEvents.LoadModel.class, (ModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                Map<ResourceLocation, UnbakedModel> additionalModels = Maps.newHashMap();
+                pluginContext.modifyModelOnLoad().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.OnLoad.Context context) -> {
+                    EventResultHolder<UnbakedModel> result = callback.onLoadModel(
+                            context.id(),
+                            model);
+                    return result.getInterrupt().orElse(model);
+                });
+            });
+        });
+        INSTANCE.register(ModelLoadingEvents.ModifyUnbakedModel.class, (ModelLoadingEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
                 pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
-                    // no need to include additional models in the model getter like on Forge, this is done automatically on Fabric via the model resolving callback
-                    if (context.topLevelId() != null) {
-                        EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(context.topLevelId(),
-                                () -> model,
-                                ModelLoadingHelper.getUnbakedTopLevelModel(ModelLoadingHelper.getModelBakery(context.baker())),
-                                additionalModels::put
-                        );
-                        return result.getInterrupt().orElse(model);
-                    } else {
-                        return model;
-                    }
-                });
-                pluginContext.resolveModel().register((ModelResolver.Context context) -> {
-                    return additionalModels.get(context.id());
+                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(
+                            context.id(),
+                            model,
+                            context.settings(),
+                            context.baker());
+                    return result.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(ModelEvents.ModifyBakedModel.class, (ModelEvents.ModifyBakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelLoadingEvents.ModifyBakedModel.class, (ModelLoadingEvents.ModifyBakedModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
-                    if (model != null) {
-                        Map<ModelResourceLocation, BakedModel> models = ModelLoadingHelper.getModelBakery(context.baker()).getBakedTopLevelModels();
-                        EventResultHolder<BakedModel> result = callback.onModifyBakedModel(context.topLevelId(), () -> model, context::baker, (ModelResourceLocation resourceLocation) -> {
-                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
-                        }, models::putIfAbsent);
-                        return result.getInterrupt().orElse(model);
-                    } else {
-                        return null;
-                    }
+                pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (BakedModel model, ModelModifier.AfterBake.Context context) -> {
+                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(
+                            context.id(),
+                            model,
+                            context.sourceModel(),
+                            context.settings(),
+                            context.baker());
+                    return result.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(ModelEvents.AddAdditionalBakedModel.class, (ModelEvents.AddAdditionalBakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(BlockModelLoadingEvents.LoadModel.class, (BlockModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyModelAfterBake().register((@Nullable BakedModel model, ModelModifier.AfterBake.Context context) -> {
-                    // all we want is access to the top level baked models map to be able to insert our own models
-                    // since the missing model is guaranteed to be baked at some point hijack the event to get to the map
-                    if (context.id().equals(MissingBlockModel.LOCATION)) {
-                        Map<ModelResourceLocation, BakedModel> models = ModelLoadingHelper.getModelBakery(context.baker()).getBakedTopLevelModels();
-                        // using the baker from the context will print the wrong model for missing textures (missing model), but that's how it is
-                        callback.onAddAdditionalBakedModel(models::putIfAbsent, (ModelResourceLocation resourceLocation) -> {
-                            return models.containsKey(resourceLocation) ? models.get(resourceLocation) : context.baker().bake(resourceLocation.id(), BlockModelRotation.X0_Y0);
-                        }, context::baker);
-                    }
-
-                    return model;
+                pluginContext.modifyBlockModelOnLoad().register(ModelModifier.OVERRIDE_PHASE, (UnbakedBlockStateModel model, ModelModifier.OnLoadBlock.Context context) -> {
+                    EventResultHolder<UnbakedBlockStateModel> result = callback.onLoadModel(
+                            context.id(),
+                            model,
+                            context.state());
+                    return result.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(ModelEvents.CompleteModelLoading.class, FabricClientEvents.COMPLETE_MODEL_LOADING);
+        INSTANCE.register(BlockModelLoadingEvents.ModifyUnbakedModel.class, (BlockModelLoadingEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+                pluginContext.modifyBlockModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedBlockStateModel model, ModelModifier.BeforeBakeBlock.Context context) -> {
+                    EventResultHolder<UnbakedBlockStateModel> result = callback.onModifyUnbakedModel(
+                            context.id(),
+                            model,
+                            context.baker());
+                    return result.getInterrupt().orElse(model);
+                });
+            });
+        });
+        INSTANCE.register(BlockModelLoadingEvents.ModifyBakedModel.class, (BlockModelLoadingEvents.ModifyBakedModel callback, @Nullable Object o) -> {
+            ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
+                pluginContext.modifyBlockModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (BakedModel model, ModelModifier.AfterBakeBlock.Context context) -> {
+                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(
+                            context.id(),
+                            model,
+                            context.sourceModel(),
+                            context.baker());
+                    return result.getInterrupt().orElse(model);
+                });
+            });
+        });
+        INSTANCE.register(ModelBakingCompletedCallback.class, FabricClientEvents.MODEL_BAKING_COMPLETED);
     }
 
     public static void registerEventHandlers() {
@@ -343,19 +347,7 @@ public final class FabricClientEventInvokers {
                 return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
-        INSTANCE.register(InteractionInputEvents.Pick.class, ClientPickBlockGatherCallback.EVENT, (InteractionInputEvents.Pick callback) -> {
-            return (Player player, HitResult hitResult) -> {
-                // add in more checks that also run on Forge
-                if (hitResult != null && hitResult.getType() != HitResult.Type.MISS) {
-                    Minecraft minecraft = Minecraft.getInstance();
-                    EventResult result = callback.onPickInteraction(minecraft, (LocalPlayer) player, hitResult);
-                    // this uses a second event to filter out this custom item stack again to be able to cancel the interaction
-                    // otherwise just returning empty will do nothing and let the behavior continue
-                    return result.isInterrupt() ? INTERRUPT_PICK_ITEM_STACK : ItemStack.EMPTY;
-                }
-                return ItemStack.EMPTY;
-            };
-        });
+        INSTANCE.register(InteractionInputEvents.Pick.class, FabricClientPlayerEvents.PICK_INTERACTION_INPUT);
         INSTANCE.register(ClientLevelEvents.Load.class, FabricClientLevelEvents.LOAD_LEVEL);
         INSTANCE.register(ClientLevelEvents.Unload.class, FabricClientLevelEvents.UNLOAD_LEVEL);
         INSTANCE.register(MovementInputUpdateCallback.class, FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE);

@@ -9,7 +9,7 @@ public interface MovementInputUpdateCallback {
     EventInvoker<MovementInputUpdateCallback> EVENT = EventInvoker.lookup(MovementInputUpdateCallback.class);
 
     /**
-     * Called after {@link ClientInput#tick(boolean, float)} has run for the {@link LocalPlayer}.
+     * Called after the {@link ClientInput} has ticked for the {@link LocalPlayer}.
      *
      * @param player the local player instance
      * @param input  the input instance for that player

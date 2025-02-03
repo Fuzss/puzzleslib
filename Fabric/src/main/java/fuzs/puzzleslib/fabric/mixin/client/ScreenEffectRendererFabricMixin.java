@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,20 +19,30 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 abstract class ScreenEffectRendererFabricMixin {
 
     @ModifyVariable(method = "renderScreenEffect", at = @At("STORE"))
-    private static @Nullable BlockState renderScreenEffect(@Nullable BlockState blockState, Minecraft minecraft, PoseStack poseStack) {
-        EventResult result = FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker().onRenderBlockOverlay(minecraft.player, poseStack, blockState);
-        return result.isInterrupt() ? null : blockState;
+    private static @Nullable BlockState renderScreenEffect(@Nullable BlockState blockState, Minecraft minecraft, PoseStack poseStack, MultiBufferSource bufferSource) {
+        if (blockState != null) {
+            EventResult result = FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
+                    .onRenderBlockOverlay(minecraft.player, poseStack, bufferSource, blockState);
+            return result.isInterrupt() ? null : blockState;
+        } else {
+            return null;
+        }
     }
 
     @Inject(method = "renderWater", at = @At("HEAD"), cancellable = true)
-    private static void renderWater(Minecraft minecraft, PoseStack poseStack, CallbackInfo callback) {
-        EventResult result = FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker().onRenderBlockOverlay(minecraft.player, poseStack, Blocks.WATER.defaultBlockState());
+    private static void renderWater(Minecraft minecraft, PoseStack poseStack, MultiBufferSource bufferSource, CallbackInfo callback) {
+        EventResult result = FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
+                .onRenderBlockOverlay(minecraft.player, poseStack, bufferSource, Blocks.WATER.defaultBlockState());
         if (result.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "renderFire", at = @At("HEAD"), cancellable = true)
-    private static void renderFire(Minecraft minecraft, PoseStack poseStack, CallbackInfo callback) {
-        EventResult result = FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker().onRenderBlockOverlay(minecraft.player, poseStack, Blocks.FIRE.defaultBlockState());
+    private static void renderFire(PoseStack poseStack, MultiBufferSource bufferSource, CallbackInfo callback) {
+        EventResult result = FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
+                .onRenderBlockOverlay(Minecraft.getInstance().player,
+                        poseStack,
+                        bufferSource,
+                        Blocks.FIRE.defaultBlockState());
         if (result.isInterrupt()) callback.cancel();
     }
 }

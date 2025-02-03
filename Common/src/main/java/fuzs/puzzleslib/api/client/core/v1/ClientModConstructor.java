@@ -10,6 +10,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
@@ -109,14 +110,28 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register additional renders to run after stack count and durability have been drawn for an item
      *                stack
      */
-    default void onRegisterItemDecorations(final ItemDecorationContext context) {
+    default void onRegisterItemDecorations(final ItemDecorationsContext context) {
         // NO-OP
     }
 
     /**
      * @param context register a custom shader that is applied when spectating a certain entity type
      */
-    default void onRegisterEntitySpectatorShaders(final EntitySpectatorShaderContext context) {
+    default void onRegisterEntitySpectatorShaders(final EntitySpectatorShadersContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register a codec for a custom {@link SpecialModelRenderer.Unbaked} implementation
+     */
+    default void onRegisterSpecialBlockModelTypes(final SpecialBlockModelTypesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register a custom unbaked special model renderer implementation
+     */
+    default void onRegisterSpecialBlockModelRenderers(final SpecialBlockModelRenderersContext context) {
         // NO-OP
     }
 

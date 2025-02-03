@@ -14,8 +14,9 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A helper class for particle related methods found in {@link net.minecraft.client.multiplayer.ClientLevel} returning
- * the created particle. Particles will be spawned when a {@link net.minecraft.client.multiplayer.ClientLevel} is
- * provided.
+ * the created particle.
+ * <p>
+ * Particles will only be spawned when a client level instance is provided.
  */
 public final class ClientParticleHelper {
 
@@ -30,21 +31,35 @@ public final class ClientParticleHelper {
      */
     @Nullable
     public static Particle addParticle(Level level, ParticleOptions particleData, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        return addParticle(level, particleData, particleData.getType().getOverrideLimiter(), false, x, y, z, xSpeed,
-                ySpeed, zSpeed
-        );
+        return addParticle(level,
+                particleData,
+                particleData.getType().getOverrideLimiter(),
+                false,
+                x,
+                y,
+                z,
+                xSpeed,
+                ySpeed,
+                zSpeed);
     }
 
     /**
      * Copied from
-     * {@link net.minecraft.client.multiplayer.ClientLevel#addParticle(ParticleOptions, boolean, double, double, double,
-     * double, double, double)}.
+     * {@link net.minecraft.client.multiplayer.ClientLevel#addParticle(ParticleOptions, boolean, boolean, double,
+     * double, double, double, double, double)}.
      */
     @Nullable
     public static Particle addParticle(Level level, ParticleOptions particleData, boolean forceAlwaysRender, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        return addParticle(level, particleData, particleData.getType().getOverrideLimiter() || forceAlwaysRender, false,
-                x, y, z, xSpeed, ySpeed, zSpeed
-        );
+        return addParticle(level,
+                particleData,
+                particleData.getType().getOverrideLimiter() || forceAlwaysRender,
+                false,
+                x,
+                y,
+                z,
+                xSpeed,
+                ySpeed,
+                zSpeed);
     }
 
     /**
@@ -64,9 +79,16 @@ public final class ClientParticleHelper {
      */
     @Nullable
     public static Particle addAlwaysVisibleParticle(Level level, ParticleOptions particleData, boolean ignoreRange, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        return addParticle(level, particleData, particleData.getType().getOverrideLimiter() || ignoreRange, true, x, y,
-                z, xSpeed, ySpeed, zSpeed
-        );
+        return addParticle(level,
+                particleData,
+                particleData.getType().getOverrideLimiter() || ignoreRange,
+                true,
+                x,
+                y,
+                z,
+                xSpeed,
+                ySpeed,
+                zSpeed);
     }
 
     /**
@@ -78,15 +100,22 @@ public final class ClientParticleHelper {
     public static Particle addParticle(Level level, ParticleOptions options, boolean force, boolean decreased, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         if (level.isClientSide) {
             try {
-                return Minecraft.getInstance().levelRenderer.addParticleInternal(options, force, decreased, x, y, z,
-                        xSpeed, ySpeed, zSpeed
-                );
+                return Minecraft.getInstance().levelRenderer.addParticleInternal(options,
+                        force,
+                        decreased,
+                        x,
+                        y,
+                        z,
+                        xSpeed,
+                        ySpeed,
+                        zSpeed);
             } catch (Throwable var19) {
                 CrashReport crashReport = CrashReport.forThrowable(var19, "Exception while adding particle");
                 CrashReportCategory crashReportCategory = crashReport.addCategory("Particle being added");
                 crashReportCategory.setDetail("ID", BuiltInRegistries.PARTICLE_TYPE.getKey(options.getType()));
-                crashReportCategory.setDetail("Parameters", () -> ParticleTypes.CODEC.encodeStart(
-                        level.registryAccess().createSerializationContext(NbtOps.INSTANCE), options).toString());
+                crashReportCategory.setDetail("Parameters",
+                        () -> ParticleTypes.CODEC.encodeStart(level.registryAccess()
+                                .createSerializationContext(NbtOps.INSTANCE), options).toString());
                 crashReportCategory.setDetail("Position", () -> CrashReportCategory.formatLocation(level, x, y, z));
                 throw new ReportedException(crashReport);
             }
