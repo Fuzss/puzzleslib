@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.core.Holder;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
@@ -12,12 +13,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
-public abstract class AbstractTagAppender<T> {
+public abstract class AbstractTagAppender<T> extends TagsProvider.TagAppender<T> {
     protected final TagBuilder tagBuilder;
     @Nullable
     private final Function<T, ResourceKey<T>> keyExtractor;
 
     protected AbstractTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+        super(tagBuilder);
         this.tagBuilder = tagBuilder;
         this.keyExtractor = keyExtractor;
     }
@@ -51,13 +53,15 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
-    public AbstractTagAppender<T> add(ResourceKey<? extends T> resourceKey) {
+    @Override
+    public AbstractTagAppender<T> add(ResourceKey<T> resourceKey) {
         return this.add(resourceKey.location());
     }
 
     @SafeVarargs
-    public final AbstractTagAppender<T> add(ResourceKey<? extends T>... resourceKeys) {
-        for (ResourceKey<? extends T> resourceKey : resourceKeys) {
+    @Override
+    public final AbstractTagAppender<T> add(ResourceKey<T>... resourceKeys) {
+        for (ResourceKey<T> resourceKey : resourceKeys) {
             this.add(resourceKey);
         }
         return this;
@@ -76,7 +80,7 @@ public abstract class AbstractTagAppender<T> {
     }
 
     public AbstractTagAppender<T> add(Holder.Reference<? extends T> holder) {
-        return this.add(holder.key());
+        return this.add((ResourceKey<T>) holder.key());
     }
 
     @SafeVarargs
@@ -98,6 +102,7 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
+    @Override
     public AbstractTagAppender<T> addOptional(ResourceLocation resourceLocation) {
         this.tagBuilder.addOptionalElement(resourceLocation);
         return this;
@@ -145,6 +150,7 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
+    @Override
     public AbstractTagAppender<T> addTag(TagKey<T> tagKey) {
         return this.addTag(tagKey.location());
     }
@@ -168,6 +174,7 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
+    @Override
     public AbstractTagAppender<T> addOptionalTag(ResourceLocation resourceLocation) {
         this.tagBuilder.addOptionalTag(resourceLocation);
         return this;
@@ -212,13 +219,13 @@ public abstract class AbstractTagAppender<T> {
         return this;
     }
 
-    public AbstractTagAppender<T> remove(ResourceKey<? extends T> resourceKey) {
+    public AbstractTagAppender<T> remove(ResourceKey<T> resourceKey) {
         return this.remove(resourceKey.location());
     }
 
     @SafeVarargs
-    public final AbstractTagAppender<T> remove(ResourceKey<? extends T>... resourceKeys) {
-        for (ResourceKey<? extends T> resourceKey : resourceKeys) {
+    public final AbstractTagAppender<T> remove(ResourceKey<T>... resourceKeys) {
+        for (ResourceKey<T> resourceKey : resourceKeys) {
             this.remove(resourceKey);
         }
         return this;

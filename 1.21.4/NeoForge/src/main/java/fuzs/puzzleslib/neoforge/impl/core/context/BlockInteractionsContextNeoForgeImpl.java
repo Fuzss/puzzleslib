@@ -79,11 +79,11 @@ public final class BlockInteractionsContextNeoForgeImpl implements BlockInteract
     }
 
     @Override
-    public void registerTillable(BlockState tilledBlock, @Nullable ItemLike droppedItem, boolean onlyIfAirAbove, Block... untilledBlocks) {
+    public void registerTillable(BlockState tilledBlock, @Nullable ItemLike droppedItem, boolean requireAirAbove, Block... untilledBlocks) {
         Objects.requireNonNull(tilledBlock, "tilled block is null");
         Objects.requireNonNull(untilledBlocks, "untilled blocks is null");
         Preconditions.checkState(untilledBlocks.length > 0, "untilled blocks is empty");
-        Predicate<UseOnContext> usagePredicate = onlyIfAirAbove ? HoeItem::onlyIfAirAbove : $ -> true;
+        Predicate<UseOnContext> usagePredicate = requireAirAbove ? HoeItem::onlyIfAirAbove : $ -> true;
         Consumer<UseOnContext> tillingAction = droppedItem != null ? HoeItem.changeIntoStateAndDropItem(tilledBlock, droppedItem) : HoeItem.changeIntoState(tilledBlock);
         BlockInteraction interaction = new BlockInteraction(usagePredicate, tillingAction, $ -> tilledBlock);
         Map<Block, BlockInteraction> interactions = this.getAbilitiesMap(ItemAbilities.HOE_TILL);

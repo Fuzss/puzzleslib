@@ -44,7 +44,7 @@ public final class ArmorMaterialBuilder {
     }
 
     /**
-     * @param modelId          the location for the equipment model definition file at
+     * @param assetId          the location for the equipment model definition file at
      *                         {@code assets/<namespace>/models/equipment/<path>.json}
      * @param repairIngredient the repair material used in an anvil for restoring item durability
      * @return the builder
@@ -173,7 +173,7 @@ public final class ArmorMaterialBuilder {
     }
 
     /**
-     * @param modelId the location for the equipment model definition file at
+     * @param assetId the location for the equipment model definition file at
      *                {@code assets/<namespace>/models/equipment/<path>.json}
      * @return the builder
      */

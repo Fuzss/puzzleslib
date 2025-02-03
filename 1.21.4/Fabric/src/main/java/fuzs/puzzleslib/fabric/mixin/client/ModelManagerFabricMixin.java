@@ -17,12 +17,12 @@ abstract class ModelManagerFabricMixin {
     @Inject(
             method = "apply", at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/client/resources/model/ModelManager;missingModel:Lnet/minecraft/client/resources/model/BakedModel;",
+            target = "Lnet/minecraft/client/resources/model/ModelManager;missingItemModel:Lnet/minecraft/client/renderer/item/ItemModel;",
             shift = At.Shift.AFTER
     )
     )
-    private void apply(@Coerce Object reloadState, ProfilerFiller profiler, CallbackInfo callback, @Local ModelBakery modelBakery) {
-        FabricClientEvents.COMPLETE_MODEL_LOADING.invoker()
-                .onCompleteModelLoading(() -> ModelManager.class.cast(this), () -> modelBakery);
+    private void apply(@Coerce Object reloadState, ProfilerFiller profiler, CallbackInfo callback, @Local ModelBakery.BakingResult bakingResult) {
+        FabricClientEvents.MODEL_BAKING_COMPLETED.invoker()
+                .onModelBakingCompleted(ModelManager.class.cast(this), bakingResult);
     }
 }

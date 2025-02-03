@@ -6,16 +6,14 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import java.util.function.Supplier;
 
 /**
- * register layer definitions for entity models
+ * Register layer definitions for entity models.
  */
 @FunctionalInterface
 public interface LayerDefinitionsContext {
 
     /**
-     * registers a new layer definition (used for entity model parts)
-     *
-     * @param layerLocation model location
-     * @param supplier      layer definition supplier
+     * @param modelLayerLocation      the model layer location
+     * @param layerDefinitionSupplier the layer definition supplier
      */
-    void registerLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier);
+    void registerLayerDefinition(ModelLayerLocation modelLayerLocation, Supplier<LayerDefinition> layerDefinitionSupplier);
 }

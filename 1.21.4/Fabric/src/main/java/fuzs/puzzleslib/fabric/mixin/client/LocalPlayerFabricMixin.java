@@ -40,17 +40,13 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
     }
 
     @Inject(
-            method = "aiStep",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/client/player/ClientInput;tick(ZF)V",
-                    shift = At.Shift.AFTER
-            )
+            method = "aiStep", at = @At(
+            value = "INVOKE", target = "Lnet/minecraft/client/player/ClientInput;tick()V", shift = At.Shift.AFTER
+    )
     )
     public void aiStep(CallbackInfo callback) {
-        FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE.invoker().onMovementInputUpdate(LocalPlayer.class.cast(this),
-                this.input
-        );
+        FabricClientPlayerEvents.MOVEMENT_INPUT_UPDATE.invoker()
+                .onMovementInputUpdate(LocalPlayer.class.cast(this), this.input);
     }
 
     @Inject(method = "playSound(Lnet/minecraft/sounds/SoundEvent;FF)V", at = @At("HEAD"), cancellable = true)
@@ -58,10 +54,13 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
         this.puzzleslib$sound = DefaultedValue.fromValue(BuiltInRegistries.SOUND_EVENT.wrapAsHolder(soundEvent));
         this.puzzleslib$volume = DefaultedFloat.fromValue(volume);
         this.puzzleslib$pitch = DefaultedFloat.fromValue(pitch);
-        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker().onPlaySoundAtEntity(this.level(),
-                this, this.puzzleslib$sound, MutableValue.fromValue(this.getSoundSource()), this.puzzleslib$volume,
-                this.puzzleslib$pitch
-        );
+        EventResult result = FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
+                .onPlaySoundAtEntity(this.level(),
+                        this,
+                        this.puzzleslib$sound,
+                        MutableValue.fromValue(this.getSoundSource()),
+                        this.puzzleslib$volume,
+                        this.puzzleslib$pitch);
         if (result.isInterrupt() || this.puzzleslib$sound.get() == null) callback.cancel();
     }
 

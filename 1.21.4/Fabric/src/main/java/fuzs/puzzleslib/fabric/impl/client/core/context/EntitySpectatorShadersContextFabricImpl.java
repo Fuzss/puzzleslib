@@ -1,15 +1,14 @@
-package fuzs.puzzleslib.neoforge.impl.client.core.context;
+package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.client.core.v1.context.EntitySpectatorShaderContext;
+import fuzs.puzzleslib.api.client.core.v1.context.EntitySpectatorShadersContext;
+import fuzs.puzzleslib.fabric.api.client.event.v1.registry.EntitySpectatorShaderRegistry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
 
-public record EntitySpectatorShaderContextNeoForgeImpl(
-        BiConsumer<EntityType<?>, ResourceLocation> consumer) implements EntitySpectatorShaderContext {
+public final class EntitySpectatorShadersContextFabricImpl implements EntitySpectatorShadersContext {
 
     @Override
     public void registerSpectatorShader(ResourceLocation shaderLocation, EntityType<?>... entityTypes) {
@@ -18,7 +17,7 @@ public record EntitySpectatorShaderContextNeoForgeImpl(
         Preconditions.checkState(entityTypes.length > 0, "entity types is empty");
         for (EntityType<?> entityType : entityTypes) {
             Objects.requireNonNull(entityType, "entity type is null");
-            this.consumer.accept(entityType, shaderLocation);
+            EntitySpectatorShaderRegistry.INSTANCE.register(entityType, shaderLocation);
         }
     }
 }

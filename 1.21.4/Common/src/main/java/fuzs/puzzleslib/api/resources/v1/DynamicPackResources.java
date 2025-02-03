@@ -78,7 +78,7 @@ public class DynamicPackResources extends AbstractModPackResources {
             // they will override each other when creating the maps
             Map<PackType, Map<ResourceLocation, IoSupplier<InputStream>>> paths = Arrays.stream(PackType.values())
                     .collect(Collectors.toMap(Function.identity(), (PackType packType) -> new ConcurrentHashMap<>()));
-            DataProviderContext context = DataProviderContext.fromModId(modId);
+            DataProviderContext context = DataProviderContext.ofPath(modId);
             for (DataProviderContext.Factory factory : factories) {
                 DataProvider dataProvider = factory.apply(context);
                 if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {

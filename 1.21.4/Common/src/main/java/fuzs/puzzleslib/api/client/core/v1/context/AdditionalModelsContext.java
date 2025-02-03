@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import com.google.common.base.Preconditions;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
@@ -16,18 +15,15 @@ public interface AdditionalModelsContext {
      *
      * @param resourceLocation the resource location for an additional model
      */
-    void registerAdditionalModel(ResourceLocation resourceLocation);
+    default void registerAdditionalModel(ResourceLocation resourceLocation) {
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        this.registerAdditionalModel(new ResourceLocation[]{resourceLocation});
+    }
 
     /**
      * Register a model that is referenced nowhere and would normally not be loaded.
      *
-     * @param resourceLocation the resource locations for additional models
+     * @param resourceLocations the resource locations for an additional models
      */
-    default void registerAdditionalModel(ResourceLocation... resourceLocations) {
-        Objects.requireNonNull(resourceLocations, "models is null");
-        Preconditions.checkState(resourceLocations.length > 0, "models is empty");
-        for (ResourceLocation resourceLocation : resourceLocations) {
-            this.registerAdditionalModel(resourceLocation);
-        }
-    }
+    void registerAdditionalModel(ResourceLocation... resourceLocations);
 }

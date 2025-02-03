@@ -9,8 +9,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -39,24 +39,18 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     @Override
     public abstract void addTags(HolderLookup.Provider registries);
 
-    @ApiStatus.Internal
+    public AbstractTagAppender<T> tag(String string) {
+        return this.tag(ResourceLocation.parse(string));
+    }
+
+    public AbstractTagAppender<T> tag(ResourceLocation resourceLocation) {
+        return this.tag(TagKey.create(this.registryKey, resourceLocation));
+    }
+
     @Override
-    public TagAppender<T> tag(TagKey<T> tagKey) {
-        // we do not extend TagAppender to work around some type parameter restrictions,
-        // so use differently named methods with our custom TagAppender implementation
-        throw new UnsupportedOperationException();
-    }
-
-    public AbstractTagAppender<T> add(String string) {
-        return this.add(ResourceLocation.parse(string));
-    }
-
-    public AbstractTagAppender<T> add(ResourceLocation resourceLocation) {
-        return this.add(TagKey.create(this.registryKey, resourceLocation));
-    }
-
-    public AbstractTagAppender<T> add(TagKey<T> tagKey) {
-        return CommonFactories.INSTANCE.getTagAppender(this.getOrCreateRawBuilder(tagKey), this.keyExtractor);
+    public AbstractTagAppender<T> tag(TagKey<T> tagKey) {
+        TagBuilder tagBuilder = this.getOrCreateRawBuilder(tagKey);
+        return CommonFactories.INSTANCE.getTagAppender(tagBuilder, this.keyExtractor);
     }
 
     protected Registry<T> registry() {

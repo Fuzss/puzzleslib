@@ -12,9 +12,9 @@ public record LayerDefinitionsContextNeoForgeImpl(
         BiConsumer<ModelLayerLocation, Supplier<LayerDefinition>> consumer) implements LayerDefinitionsContext {
 
     @Override
-    public void registerLayerDefinition(ModelLayerLocation layerLocation, Supplier<LayerDefinition> supplier) {
-        Objects.requireNonNull(layerLocation, "layer location is null");
-        Objects.requireNonNull(supplier, "layer supplier is null");
-        this.consumer.accept(layerLocation, supplier);
+    public void registerLayerDefinition(ModelLayerLocation modelLayerLocation, Supplier<LayerDefinition> layerDefinitionSupplier) {
+        Objects.requireNonNull(modelLayerLocation, "layer location is null");
+        Objects.requireNonNull(layerDefinitionSupplier, "layer supplier is null");
+        this.consumer.accept(modelLayerLocation, layerDefinitionSupplier);
     }
 }

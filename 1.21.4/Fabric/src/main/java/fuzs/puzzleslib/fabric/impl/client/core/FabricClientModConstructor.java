@@ -23,14 +23,16 @@ public final class FabricClientModConstructor {
         modConstructor.onRegisterMenuScreens(new MenuScreensContextFabricImpl());
         modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
-        modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
-        modConstructor.onRegisterRenderBuffers(new RenderBuffersContextFabricImpl());
-        modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
-        modConstructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
+        modConstructor.onRegisterItemDecorations(new ItemDecorationsContextFabricImpl());
+        modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextFabricImpl());
+        modConstructor.onRegisterSpecialBlockModelTypes(new SpecialBlockModelTypesContextFabricImpl());
+        modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextFabricImpl());
         modConstructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
+        modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
         modConstructor.onRegisterKeyMappings(new KeyMappingsContextFabricImpl());
         modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
         modConstructor.onRegisterCoreShaders(new CoreShadersContextFabricImpl());
+        modConstructor.onRegisterRenderBuffers(new RenderBuffersContextFabricImpl());
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft client) -> {
             // run this as late as possible and not during client init so that maps are already fully populated with vanilla content
             modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());

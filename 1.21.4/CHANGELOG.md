@@ -7,12 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.4.0-1.21.4] - 2025-02-03
 - Port to Minecraft 1.21.4
 ### Added
+- Add `SpecialBlockModelTypesContext`
+- Add `SpecialBlockModelRenderersContext`
 - Add `GameRegistriesContext`
 - Add `TransmuteRecipeHelper`
 - Add `ExistingFilesHelper`
 ### Changed
 - Replace `RenderNameTagEvents` with `RenderNameTagCallback`
 - Replace `ExtractRenderStateCallback` with `ExtractRenderStateCallbackV2`
+- Rework `ModelEvents` into `ModelLoadingEvents`, `BlockModelLoadingEvents`, and `ModelBakingCompletedCallback`
+- Refactor `ColorProvidersContext` into `BlockColorsContext`
 ### Removed
 - Remove `ContentRegistrationFlags`
 - Remove `NeoForgeDataProviderContext`

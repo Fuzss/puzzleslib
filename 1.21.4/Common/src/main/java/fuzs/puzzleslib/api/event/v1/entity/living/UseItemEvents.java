@@ -89,13 +89,12 @@ public final class UseItemEvents {
          * In that case {@link net.minecraft.world.item.Item#finishUsingItem(ItemStack, Level, LivingEntity)} is called
          * for applying effects to the user, such as restoring food points or applying mob effects.
          *
-         * @param livingEntity         the entity using the item
-         * @param itemStack            the item that is set to the entity's use hand after {@link LivingEntity#useItem}
-         *                             has finished, like a bowl from eating stew, but most of the time when an item is
-         *                             fully consumed like when eating normal food, {@link LivingEntity#useItem} is
-         *                             simply returned and reduced by one item in the process
-         * @param remainingUseDuration the duration in ticks the stack has already been in use for
-         * @param originalItemStack    a copy of the item stack being used, made before using finished
+         * @param livingEntity      the entity using the item
+         * @param itemStack         the item that is set to the entity's use hand after {@link LivingEntity#useItem} has
+         *                          finished, like a bowl from eating stew, but most of the time when an item is fully
+         *                          consumed like when eating normal food, {@link LivingEntity#useItem} is simply
+         *                          returned and reduced by one item in the process
+         * @param originalItemStack a copy of the item stack being used, made before using finished
          */
         void onUseItemFinish(LivingEntity livingEntity, MutableValue<ItemStack> itemStack, ItemStack originalItemStack);
     }

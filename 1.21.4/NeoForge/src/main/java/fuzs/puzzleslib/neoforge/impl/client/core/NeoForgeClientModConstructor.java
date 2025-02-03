@@ -48,14 +48,20 @@ public final class NeoForgeClientModConstructor {
                 modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterItemDecorationsEvent evt) -> {
-                modConstructor.onRegisterItemDecorations(new ItemDecorationContextNeoForgeImpl(evt::register));
+                modConstructor.onRegisterItemDecorations(new ItemDecorationsContextNeoForgeImpl(evt::register));
             });
             eventBus.addListener((final RegisterEntitySpectatorShadersEvent evt) -> {
-                modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextNeoForgeImpl(evt::register));
+                modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(evt::register));
+            });
+            eventBus.addListener((final RegisterSpecialModelRendererEvent evt) -> {
+                modConstructor.onRegisterSpecialBlockModelTypes(new SpecialBlockModelTypesContextNeoForgeImpl(evt));
+            });
+            eventBus.addListener((final RegisterSpecialBlockModelRendererEvent evt) -> {
+                modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextNeoForgeImpl(
+                        evt));
             });
             eventBus.addListener((final EntityRenderersEvent.CreateSkullModels evt) -> {
-                modConstructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(evt.getEntityModelSet(),
-                        evt::registerSkullModel));
+                modConstructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
                 modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextNeoForgeImpl(evt));

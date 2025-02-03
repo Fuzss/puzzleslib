@@ -36,7 +36,7 @@ public final class DataProviderHelper {
     public static void registerDataProviders(String modId, DataProviderContext.Factory... factories) {
         registerDataProviders(modId, factories, (DataProviderContext.Factory factory) -> {
             return (GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) -> {
-                return factory.apply(DataProviderContext.fromEvent(modId,
+                return factory.apply(DataProviderContext.ofPackOutput(modId,
                         evt.getGenerator().getPackOutput(),
                         registries));
             };
