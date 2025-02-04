@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
+import fuzs.puzzleslib.api.client.event.v1.ClientStartedCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
@@ -10,7 +11,7 @@ import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompletedCallback;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompleteCallback;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -36,6 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -76,13 +78,16 @@ public final class NeoForgeClientEventInvokers {
                 }
             });
         });
-        INSTANCE.register(ModelBakingCompletedCallback.class, ModelEvent.BakingCompleted.class, (ModelBakingCompletedCallback callback, ModelEvent.BakingCompleted evt) -> {
-            callback.onModelBakingCompleted(evt.getModelManager(), evt.getBakingResult());
+        INSTANCE.register(ModelBakingCompleteCallback.class, ModelEvent.BakingCompleted.class, (ModelBakingCompleteCallback callback, ModelEvent.BakingCompleted evt) -> {
+            callback.onModelBakingComplete(evt.getModelManager(), evt.getBakingResult());
         });
         INSTANCE.register(ExtractRenderStateCallback.class, RegisterRenderStateModifiersEvent.class, (ExtractRenderStateCallback callback, RegisterRenderStateModifiersEvent evt) -> {
             evt.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
                 callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
             });
+        });
+        INSTANCE.register(ClientStartedCallback.class, FMLLoadCompleteEvent.class, (ClientStartedCallback callback, FMLLoadCompleteEvent evt) -> {
+            evt.enqueueWork(() -> callback.onClientStarted(Minecraft.getInstance()));
         });
     }
 

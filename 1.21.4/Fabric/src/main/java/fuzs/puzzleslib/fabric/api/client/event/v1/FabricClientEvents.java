@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1;
 
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
-import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompletedCallback;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompleteCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ChatMessageReceivedCallback;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
@@ -22,8 +22,8 @@ public final class FabricClientEvents {
     /**
      * Fired after the resource manager has reloaded models.
      */
-    public static final Event<ModelBakingCompletedCallback> MODEL_BAKING_COMPLETED = FabricEventFactory.create(
-            ModelBakingCompletedCallback.class);
+    public static final Event<ModelBakingCompleteCallback> MODEL_BAKING_COMPLETE = FabricEventFactory.create(
+            ModelBakingCompleteCallback.class);
     /**
      * Runs in {@link net.minecraft.client.multiplayer.chat.ChatListener} when a new chat message is about to be added
      * to the client chat. Allows for filtering out or adjusting received messages.

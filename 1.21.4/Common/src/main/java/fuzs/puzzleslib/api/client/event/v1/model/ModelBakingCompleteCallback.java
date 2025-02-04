@@ -5,8 +5,8 @@ import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 
 @FunctionalInterface
-public interface ModelBakingCompletedCallback {
-    EventInvoker<ModelBakingCompletedCallback> EVENT = EventInvoker.lookup(ModelBakingCompletedCallback.class);
+public interface ModelBakingCompleteCallback {
+    EventInvoker<ModelBakingCompleteCallback> EVENT = EventInvoker.lookup(ModelBakingCompleteCallback.class);
 
     /**
      * Fires after the {@link net.minecraft.server.packs.resources.ResourceManager} has reloaded all models.
@@ -14,5 +14,5 @@ public interface ModelBakingCompletedCallback {
      * @param modelManager the model manager
      * @param bakingResult the baking result
      */
-    void onModelBakingCompleted(ModelManager modelManager, ModelBakery.BakingResult bakingResult);
+    void onModelBakingComplete(ModelManager modelManager, ModelBakery.BakingResult bakingResult);
 }

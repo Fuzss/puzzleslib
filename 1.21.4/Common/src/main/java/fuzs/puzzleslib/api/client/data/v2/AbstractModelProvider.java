@@ -142,9 +142,10 @@ public abstract class AbstractModelProvider implements DataProvider {
 
         @Override
         public void finalizeAndValidate() {
-            BuiltInRegistries.ITEM.forEach((Item item) -> {
-                if (!this.copies.containsKey(item)) {
-                    if (item instanceof BlockItem blockItem && !this.itemInfos.containsKey(blockItem)) {
+            // apply a filter, so we only consider our own content
+            BuiltInRegistries.ITEM.listElements().filter(this.filter).forEach((Holder.Reference<Item> item) -> {
+                if (!this.copies.containsKey(item.value())) {
+                    if (item.value() instanceof BlockItem blockItem && !this.itemInfos.containsKey(blockItem)) {
                         ResourceLocation resourceLocation = ModelLocationUtils.getModelLocation(blockItem.getBlock());
                         this.accept(blockItem, ItemModelUtils.plainModel(resourceLocation));
                     }

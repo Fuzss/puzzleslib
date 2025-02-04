@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import org.apache.logging.log4j.util.Strings;
 
@@ -103,6 +104,14 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context add external models to be loaded
      */
     default void onRegisterAdditionalModels(final AdditionalModelsContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an *
+     *                {@link UnbakedBlockStateModel}
+     */
+    default void onRegisterBlockStateResolver(final BlockStateResolverContext context) {
         // NO-OP
     }
 
