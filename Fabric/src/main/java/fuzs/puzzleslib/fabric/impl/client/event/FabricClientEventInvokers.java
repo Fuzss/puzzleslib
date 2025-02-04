@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
+import fuzs.puzzleslib.api.client.event.v1.ClientStartedCallback;
 import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
@@ -10,7 +11,7 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.model.BlockModelLoadingEvents;
-import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompletedCallback;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompleteCallback;
 import fuzs.puzzleslib.api.client.event.v1.model.ModelLoadingEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -20,6 +21,7 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -149,7 +151,10 @@ public final class FabricClientEventInvokers {
                 });
             });
         });
-        INSTANCE.register(ModelBakingCompletedCallback.class, FabricClientEvents.MODEL_BAKING_COMPLETED);
+        INSTANCE.register(ModelBakingCompleteCallback.class, FabricClientEvents.MODEL_BAKING_COMPLETE);
+        INSTANCE.register(ClientStartedCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
+            return callback::onClientStarted;
+        });
     }
 
     public static void registerEventHandlers() {

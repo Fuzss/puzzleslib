@@ -22,7 +22,7 @@ abstract class ModelManagerFabricMixin {
     )
     )
     private void apply(@Coerce Object reloadState, ProfilerFiller profiler, CallbackInfo callback, @Local ModelBakery.BakingResult bakingResult) {
-        FabricClientEvents.MODEL_BAKING_COMPLETED.invoker()
-                .onModelBakingCompleted(ModelManager.class.cast(this), bakingResult);
+        FabricClientEvents.MODEL_BAKING_COMPLETE.invoker()
+                .onModelBakingComplete(ModelManager.class.cast(this), bakingResult);
     }
 }

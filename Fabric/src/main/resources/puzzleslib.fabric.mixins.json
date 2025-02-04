@@ -83,7 +83,7 @@
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "server": [
-    "server.MainFabricMixin"
+    "server.ServerMainFabricMixin"
   ],
   "injectors": {
     "defaultRequire": 1

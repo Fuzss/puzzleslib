@@ -17,7 +17,7 @@ public final class ClientTickEvents {
         /**
          * Fires at the beginning of {@link Minecraft#tick()}.
          *
-         * @param minecraft minecraft singleton instance
+         * @param minecraft the minecraft singleton instance
          */
         void onStartClientTick(Minecraft minecraft);
     }
@@ -28,7 +28,7 @@ public final class ClientTickEvents {
         /**
          * Fires at the end of {@link Minecraft#tick()}.
          *
-         * @param minecraft minecraft singleton instance
+         * @param minecraft the minecraft singleton instance
          */
         void onEndClientTick(Minecraft minecraft);
     }

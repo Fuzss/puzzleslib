@@ -5,6 +5,7 @@ import fuzs.puzzleslib.fabric.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.Minecraft;
 
 public final class FabricClientModConstructor {
@@ -22,7 +23,10 @@ public final class FabricClientModConstructor {
         modConstructor.onRegisterParticleProviders(new ParticleProvidersContextFabricImpl());
         modConstructor.onRegisterMenuScreens(new MenuScreensContextFabricImpl());
         modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
-        modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl());
+        ModelLoadingPlugin.register((ModelLoadingPlugin.Context context) -> {
+            modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl(context));
+            modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl(context));
+        });
         modConstructor.onRegisterItemDecorations(new ItemDecorationsContextFabricImpl());
         modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextFabricImpl());
         modConstructor.onRegisterSpecialBlockModelTypes(new SpecialBlockModelTypesContextFabricImpl());

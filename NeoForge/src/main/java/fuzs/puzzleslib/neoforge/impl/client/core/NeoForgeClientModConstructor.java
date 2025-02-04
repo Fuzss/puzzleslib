@@ -47,6 +47,9 @@ public final class NeoForgeClientModConstructor {
             eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
                 modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextNeoForgeImpl(evt));
             });
+            eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
+                modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextNeoForgeImpl(evt));
+            });
             eventBus.addListener((final RegisterItemDecorationsEvent evt) -> {
                 modConstructor.onRegisterItemDecorations(new ItemDecorationsContextNeoForgeImpl(evt::register));
             });
