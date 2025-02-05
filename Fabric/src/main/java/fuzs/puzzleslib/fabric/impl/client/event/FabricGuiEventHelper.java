@@ -45,14 +45,15 @@ public final class FabricGuiEventHelper {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 50.0F);
         for (ResourceLocation resourceLocation : RenderGuiLayerEvents.VANILLA_GUI_LAYERS_VIEW) {
-            if (FabricGuiEvents.beforeRenderGuiElement(resourceLocation).invoker().onBeforeRenderGuiLayer(gui,
-                    guiGraphics, deltaTracker
-            ).isInterrupt()) {
+            if (FabricGuiEvents.beforeRenderGuiElement(resourceLocation)
+                    .invoker()
+                    .onBeforeRenderGuiLayer(gui, guiGraphics, deltaTracker)
+                    .isInterrupt()) {
                 CANCELLED_GUI_LAYERS.add(resourceLocation);
             } else {
-                FabricGuiEvents.afterRenderGuiElement(resourceLocation).invoker().onAfterRenderGuiLayer(gui,
-                        guiGraphics, deltaTracker
-                );
+                FabricGuiEvents.afterRenderGuiElement(resourceLocation)
+                        .invoker()
+                        .onAfterRenderGuiLayer(gui, guiGraphics, deltaTracker);
             }
             guiGraphics.pose().translate(0.0F, 0.0F, LayeredDraw.Z_SEPARATION);
         }
@@ -88,56 +89,53 @@ public final class FabricGuiEventHelper {
             setGuiRightHeight(39);
         });
         RenderGuiEvents.BEFORE.register(EventPhase.AFTER, FabricGuiEventHelper::invokeGuiLayerEvents);
-        RenderGuiLayerEvents.after(RenderGuiLayerEvents.PLAYER_HEALTH).register(EventPhase.FIRST,
-                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    if (gui.minecraft.getCameraEntity() instanceof Player player) {
+        RenderGuiLayerEvents.after(RenderGuiLayerEvents.PLAYER_HEALTH)
+                .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    if (gui.minecraft.gameMode.canHurtPlayer() &&
+                            gui.minecraft.getCameraEntity() instanceof Player player) {
                         int playerHealth = Mth.ceil(player.getHealth());
                         float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH),
-                                (float) Math.max(gui.displayHealth, playerHealth)
-                        );
+                                (float) Math.max(gui.displayHealth, playerHealth));
                         int absorptionAmount = Mth.ceil(player.getAbsorptionAmount());
                         int healthRows = Mth.ceil((maxHealth + (float) absorptionAmount) / 2.0F / 10.0F);
                         int healthRowShift = Math.max(10 - (healthRows - 2), 3);
                         setGuiLeftHeight(getGuiLeftHeight() + 10 + (healthRows - 1) * healthRowShift);
                     }
-                }
-        );
-        RenderGuiLayerEvents.after(RenderGuiLayerEvents.ARMOR_LEVEL).register(EventPhase.FIRST,
-                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    if (gui.minecraft.getCameraEntity() instanceof Player player && player.getArmorValue() > 0) {
+                });
+        RenderGuiLayerEvents.after(RenderGuiLayerEvents.ARMOR_LEVEL)
+                .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    if (gui.minecraft.gameMode.canHurtPlayer() &&
+                            gui.minecraft.getCameraEntity() instanceof Player player && player.getArmorValue() > 0) {
                         setGuiLeftHeight(getGuiLeftHeight() + 10);
                     }
-                }
-        );
-        RenderGuiLayerEvents.after(RenderGuiLayerEvents.FOOD_LEVEL).register(EventPhase.FIRST,
-                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    if (gui.minecraft.getCameraEntity() instanceof Player) {
+                });
+        RenderGuiLayerEvents.after(RenderGuiLayerEvents.FOOD_LEVEL)
+                .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player) {
                         LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
                         if (gui.getVehicleMaxHearts(livingEntity) == 0) {
                             setGuiRightHeight(getGuiRightHeight() + 10);
                         }
                     }
-                }
-        );
-        RenderGuiLayerEvents.after(RenderGuiLayerEvents.AIR_LEVEL).register(EventPhase.FIRST,
-                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    if (gui.minecraft.getCameraEntity() instanceof Player player) {
+                });
+        RenderGuiLayerEvents.after(RenderGuiLayerEvents.AIR_LEVEL)
+                .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    if (gui.minecraft.gameMode.canHurtPlayer() &&
+                            gui.minecraft.getCameraEntity() instanceof Player player) {
                         int maxAirSupply = player.getMaxAirSupply();
                         int airSupply = Math.min(player.getAirSupply(), maxAirSupply);
                         if (player.isEyeInFluid(FluidTags.WATER) || airSupply < maxAirSupply) {
                             setGuiRightHeight(getGuiRightHeight() + 10);
                         }
                     }
-                }
-        );
-        RenderGuiLayerEvents.after(RenderGuiLayerEvents.VEHICLE_HEALTH).register(EventPhase.FIRST,
-                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                });
+        RenderGuiLayerEvents.after(RenderGuiLayerEvents.VEHICLE_HEALTH)
+                .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     if (gui.minecraft.getCameraEntity() instanceof Player) {
                         LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
                         int maxHearts = gui.getVehicleMaxHearts(livingEntity);
                         setGuiRightHeight(getGuiRightHeight() + 10 * Mth.ceil(maxHearts / 10.0F));
                     }
-                }
-        );
+                });
     }
 }

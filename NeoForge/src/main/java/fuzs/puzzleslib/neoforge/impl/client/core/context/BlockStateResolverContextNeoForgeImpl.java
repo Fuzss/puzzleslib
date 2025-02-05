@@ -8,6 +8,7 @@ import fuzs.puzzleslib.api.client.util.v1.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.SpecialBlockModelRenderer;
@@ -26,10 +27,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public final class BlockStateResolverContextNeoForgeImpl implements BlockStateResolverContext {
@@ -74,6 +74,14 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
                 this.modelBakery,
                 this.missingSprite);
         bakingResult.blockStateModels().forEach(this.blockStateModelOutput);
+    }
+
+    @Override
+    public <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer) {
+        this.registerBlockStateResolver(block, (BiConsumer<BlockState, UnbakedBlockStateModel> consumer) -> {
+            blockStateConsumer.accept(resourceLoader.apply(this.resourceManager, Util.backgroundExecutor()).join(),
+                    consumer);
+        });
     }
 
     /**
@@ -143,7 +151,6 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
                     unbakedModel.resolveDependencies(this);
                     this.stack.remove(resourceLocation);
                 }
-
                 return unbakedModel;
             }
         }
