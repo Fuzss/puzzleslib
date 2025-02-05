@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.util.v1;
 
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import net.minecraft.Util;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.BlockModelDefinition;
 import net.minecraft.client.renderer.block.model.UnbakedBlockStateModel;
@@ -19,7 +20,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 
 public final class ModelLoadingHelper {
     public static final FileToIdConverter BLOCKSTATE_LISTER = FileToIdConverter.json("blockstates");
@@ -29,52 +32,71 @@ public final class ModelLoadingHelper {
         // NO-OP
     }
 
+    @Deprecated
     public static BlockStateModelLoader.LoadedModels loadBlockState(ResourceManager resourceManager, Block block) {
-        return loadBlockState(resourceManager, BuiltInRegistries.BLOCK.getKey(block), block.getStateDefinition());
+        return loadBlockState(resourceManager, block, Util.backgroundExecutor()).join();
     }
 
+    public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(ResourceManager resourceManager, Block block, Executor executor) {
+        return loadBlockState(resourceManager,
+                BuiltInRegistries.BLOCK.getKey(block),
+                block.getStateDefinition(),
+                executor);
+    }
+
+    @Deprecated
     public static BlockStateModelLoader.LoadedModels loadBlockState(ResourceManager resourceManager, ResourceLocation resourceLocation, StateDefinition<Block, BlockState> stateDefinition) {
-        Objects.requireNonNull(resourceManager, "resource location is null");
-        Objects.requireNonNull(stateDefinition, "state definition is null");
-        List<Resource> resourceStack = resourceManager.getResourceStack(BLOCKSTATE_LISTER.idToFile(resourceLocation));
-        List<BlockStateModelLoader.LoadedBlockModelDefinition> blockModelDefinitions = new ArrayList<>(resourceStack.size());
-
-        for (Resource resource : resourceStack) {
-            try (Reader reader = resource.openAsReader()) {
-                JsonObject jsonObject = GsonHelper.parse(reader);
-                BlockModelDefinition blockModelDefinition = BlockModelDefinition.fromJsonElement(jsonObject);
-                blockModelDefinitions.add(new BlockStateModelLoader.LoadedBlockModelDefinition(resource.sourcePackId(),
-                        blockModelDefinition));
-            } catch (Exception exception) {
-                PuzzlesLib.LOGGER.error("Failed to load blockstate definition {} from pack {}",
-                        resourceLocation,
-                        resource.sourcePackId(),
-                        exception);
-            }
-        }
-
-        try {
-            return BlockStateModelLoader.loadBlockStateDefinitionStack(resourceLocation,
-                    stateDefinition,
-                    blockModelDefinitions,
-                    MissingBlockModel.missingModel());
-        } catch (Exception exception) {
-            PuzzlesLib.LOGGER.error("Failed to load blockstate definition {}", resourceLocation, exception);
-            return null;
-        }
+        return loadBlockState(resourceManager, resourceLocation, stateDefinition, Util.backgroundExecutor()).join();
     }
 
+    public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(ResourceManager resourceManager, ResourceLocation resourceLocation, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> resourceManager.getResourceStack(BLOCKSTATE_LISTER.idToFile(
+                resourceLocation)), executor).thenApply((List<Resource> resourceStack) -> {
+            List<BlockStateModelLoader.LoadedBlockModelDefinition> blockModelDefinitions = new ArrayList<>(resourceStack.size());
+
+            for (Resource resource : resourceStack) {
+                try (Reader reader = resource.openAsReader()) {
+                    JsonObject jsonObject = GsonHelper.parse(reader);
+                    BlockModelDefinition blockModelDefinition = BlockModelDefinition.fromJsonElement(jsonObject);
+                    blockModelDefinitions.add(new BlockStateModelLoader.LoadedBlockModelDefinition(resource.sourcePackId(),
+                            blockModelDefinition));
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to load blockstate definition {} from pack {}",
+                            resourceLocation,
+                            resource.sourcePackId(),
+                            exception);
+                }
+            }
+
+            try {
+                return BlockStateModelLoader.loadBlockStateDefinitionStack(resourceLocation,
+                        stateDefinition,
+                        blockModelDefinitions,
+                        MissingBlockModel.missingModel());
+            } catch (Exception exception) {
+                PuzzlesLib.LOGGER.error("Failed to load blockstate definition {}", resourceLocation, exception);
+                return null;
+            }
+        });
+    }
+
+    @Deprecated
     public static UnbakedModel loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation) {
-        return resourceManager.getResource(MODEL_LISTER.idToFile(resourceLocation))
-                .<UnbakedModel>map((Resource resource) -> {
-                    try (Reader reader = resource.openAsReader()) {
-                        return BlockModel.fromStream(reader);
-                    } catch (Exception exception) {
-                        PuzzlesLib.LOGGER.error("Failed to load model {}", resourceLocation, exception);
-                        return null;
-                    }
-                })
-                .orElse(MissingBlockModel.missingModel());
+        return loadBlockModel(resourceManager, resourceLocation, Util.backgroundExecutor()).join();
+    }
+
+    public static CompletableFuture<UnbakedModel> loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> resourceManager.getResource(MODEL_LISTER.idToFile(resourceLocation)),
+                executor).thenApply((Optional<Resource> optional) -> {
+            return optional.<UnbakedModel>map((Resource resource) -> {
+                try (Reader reader = resource.openAsReader()) {
+                    return BlockModel.fromStream(reader);
+                } catch (Exception exception) {
+                    PuzzlesLib.LOGGER.error("Failed to load model {}", resourceLocation, exception);
+                    return null;
+                }
+            }).orElse(MissingBlockModel.missingModel());
+        });
     }
 
     public static UnbakedBlockStateModel missingModel() {

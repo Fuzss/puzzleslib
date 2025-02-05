@@ -25,8 +25,8 @@ public final class FabricClientModConstructor {
         modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextFabricImpl());
         ModelLoadingPlugin.register((ModelLoadingPlugin.Context context) -> {
             modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextFabricImpl(context));
-            modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl(context));
         });
+        modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl());
         modConstructor.onRegisterItemDecorations(new ItemDecorationsContextFabricImpl());
         modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextFabricImpl());
         modConstructor.onRegisterSpecialBlockModelTypes(new SpecialBlockModelTypesContextFabricImpl());

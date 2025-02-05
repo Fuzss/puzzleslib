@@ -108,7 +108,7 @@ public interface ClientModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an *
+     * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an
      *                {@link net.minecraft.client.renderer.block.model.UnbakedBlockStateModel}
      */
     default void onRegisterBlockStateResolver(final BlockStateResolverContext context) {

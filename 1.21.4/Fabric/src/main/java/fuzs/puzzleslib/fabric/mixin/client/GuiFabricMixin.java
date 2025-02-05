@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
@@ -112,6 +113,16 @@ abstract class GuiFabricMixin {
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo callback) {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.SELECTED_ITEM_NAME, callback);
+    }
+
+    @ModifyExpressionValue(
+            method = "renderSelectedItemName",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;guiHeight()I")
+    )
+    public int renderSelectedItemName(int guiHeight) {
+        // offset selected item name depending on gui height values, NeoForge also does this
+        return guiHeight + 59 - Math.max(59,
+                Math.max(FabricGuiEventHelper.getGuiLeftHeight(), FabricGuiEventHelper.getGuiRightHeight()));
     }
 
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)

@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.4.3-1.21.4] - 2025-02-05
+### Added
+- Add an alternative `BlockStateResolverContext::registerBlockStateResolver` implementation for preparing asynchronously loaded resources 
+### Changed
+- Rework methods in `ModelLoadingHelper` to return `CompletableFuture` instances
+- Move selected item name together with gui height variables on Fabric just as NeoForge does
+### Fixed
+- Fix `ShieldBlockCallback` firing when the entity is not blocking on NeoForge
+- Fix `ClientAbstractions::getGuiRightHeight` and `ClientAbstractions::getGuiLeftHeight` providing incorrect values for creative players on Fabric
+
 ## [v21.4.2-1.21.4] - 2025-02-04
 ### Added
 - Add `BlockStateResolverContext`
