@@ -50,7 +50,19 @@ public final class ModelLoadingHelper {
     }
 
     public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(ResourceManager resourceManager, ResourceLocation resourceLocation, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
-        return CompletableFuture.supplyAsync(() -> resourceManager.getResourceStack(BLOCKSTATE_LISTER.idToFile(
+        return loadBlockState(resourceManager, resourceLocation, resourceLocation, stateDefinition, executor);
+    }
+
+    public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(ResourceManager resourceManager, ResourceLocation oldResourceLocation, ResourceLocation newResourceLocation, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
+        return loadBlockState(resourceManager,
+                oldResourceLocation,
+                executor).thenCompose((List<BlockStateModelLoader.LoadedBlockModelDefinition> loadedBlockModelDefinitions) -> {
+            return loadBlockState(loadedBlockModelDefinitions, newResourceLocation, stateDefinition, executor);
+        });
+    }
+
+    public static CompletableFuture<List<BlockStateModelLoader.LoadedBlockModelDefinition>> loadBlockState(ResourceManager resourceManager, ResourceLocation resourceLocation, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> resourceManager.getResourceStack(ModelLoadingHelper.BLOCKSTATE_LISTER.idToFile(
                 resourceLocation)), executor).thenApply((List<Resource> resourceStack) -> {
             List<BlockStateModelLoader.LoadedBlockModelDefinition> blockModelDefinitions = new ArrayList<>(resourceStack.size());
 
@@ -68,24 +80,30 @@ public final class ModelLoadingHelper {
                 }
             }
 
+            return blockModelDefinitions;
+        });
+    }
+
+    public static CompletableFuture<BlockStateModelLoader.LoadedModels> loadBlockState(List<BlockStateModelLoader.LoadedBlockModelDefinition> loadedBlockModelDefinitions, ResourceLocation resourceLocation, StateDefinition<Block, BlockState> stateDefinition, Executor executor) {
+        return CompletableFuture.supplyAsync(() -> {
             try {
                 return BlockStateModelLoader.loadBlockStateDefinitionStack(resourceLocation,
                         stateDefinition,
-                        blockModelDefinitions,
-                        MissingBlockModel.missingModel());
+                        loadedBlockModelDefinitions,
+                        null);
             } catch (Exception exception) {
                 PuzzlesLib.LOGGER.error("Failed to load blockstate definition {}", resourceLocation, exception);
                 return null;
             }
-        });
+        }, executor);
     }
 
     @Deprecated
-    public static UnbakedModel loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation) {
-        return loadBlockModel(resourceManager, resourceLocation, Util.backgroundExecutor()).join();
+    public static UnbakedModel loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation, UnbakedModel missingModel) {
+        return loadBlockModel(resourceManager, resourceLocation, Util.backgroundExecutor(), missingModel).join();
     }
 
-    public static CompletableFuture<UnbakedModel> loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation, Executor executor) {
+    public static CompletableFuture<UnbakedModel> loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation, Executor executor, UnbakedModel missingModel) {
         return CompletableFuture.supplyAsync(() -> resourceManager.getResource(MODEL_LISTER.idToFile(resourceLocation)),
                 executor).thenApply((Optional<Resource> optional) -> {
             return optional.<UnbakedModel>map((Resource resource) -> {
@@ -95,7 +113,7 @@ public final class ModelLoadingHelper {
                     PuzzlesLib.LOGGER.error("Failed to load model {}", resourceLocation, exception);
                     return null;
                 }
-            }).orElse(MissingBlockModel.missingModel());
+            }).orElse(missingModel);
         });
     }
 

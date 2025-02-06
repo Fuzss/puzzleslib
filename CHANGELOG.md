@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.4.4-1.21.4] - 2025-02-06
+### Changed
+- Allow `BlockStateResolverContext` to add `UnbakedModel` instances
+### Fixed
+- Fix `BlockStateResolverContext` not caching manually loaded `UnbakedModel` instances on NeoForge
+- Fix `BlockStateResolverContext` constantly re-baking all previously located `UnbakedBlockStateModel` instances on NeoForge
+
 ## [v21.4.3-1.21.4] - 2025-02-05
 ### Added
 - Add an alternative `BlockStateResolverContext::registerBlockStateResolver` implementation for preparing asynchronously loaded resources 
