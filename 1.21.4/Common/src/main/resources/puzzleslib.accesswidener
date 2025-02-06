@@ -186,9 +186,11 @@ accessible  class   net/minecraft/client/data/models/ModelProvider$SimpleModelCo
 accessible  method  net/minecraft/client/data/models/ModelProvider$SimpleModelCollector <init>  ()V
 accessible  field   net/minecraft/client/resources/model/ModelManager   VANILLA_ATLASES Ljava/util/Map;
 accessible  field   net/minecraft/client/resources/model/ModelBakery    unbakedPlainModels  Ljava/util/Map;
+accessible  field   net/minecraft/client/resources/model/ModelBakery    missingModel    Lnet/minecraft/client/resources/model/UnbakedModel;
 accessible  method  net/minecraft/client/resources/model/BlockStateModelLoader  loadBlockStateDefinitionStack   (Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/world/level/block/state/StateDefinition;Ljava/util/List;Lnet/minecraft/client/resources/model/UnbakedModel;)Lnet/minecraft/client/resources/model/BlockStateModelLoader$LoadedModels;
 accessible  class   net/minecraft/client/resources/model/BlockStateModelLoader$LoadedBlockModelDefinition
 accessible  method  net/minecraft/client/resources/model/BlockStateModelLoader$LoadedBlockModelDefinition   <init>  (Ljava/lang/String;Lnet/minecraft/client/renderer/block/model/BlockModelDefinition;)V
+extendable  method  net/minecraft/client/resources/model/ModelDiscovery loadBlockModel  (Lnet/minecraft/resources/ResourceLocation;)Lnet/minecraft/client/resources/model/UnbakedModel;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

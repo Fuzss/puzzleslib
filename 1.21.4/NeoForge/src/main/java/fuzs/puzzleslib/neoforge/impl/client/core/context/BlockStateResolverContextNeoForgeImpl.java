@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.client.core.v1.context.BlockStateResolverContext;
 import fuzs.puzzleslib.api.client.util.v1.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
+import fuzs.puzzleslib.impl.client.core.context.ResourceLoaderContextImpl;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -26,10 +27,15 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.function.*;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public final class BlockStateResolverContextNeoForgeImpl implements BlockStateResolverContext {
@@ -37,50 +43,62 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
     private final Function<Material, TextureAtlasSprite> textureGetter;
     private final UnbakedModel missingModel;
     private final Supplier<TextureAtlasSprite> missingSprite;
-    private final Map<ModelResourceLocation, UnbakedBlockStateModel> unbakedBlockStateModels;
     private final Map<ResourceLocation, UnbakedModel> unbakedPlainModels;
-    private final ModelBakery modelBakery;
     private final BiConsumer<ModelResourceLocation, BakedModel> blockStateModelOutput;
 
     public BlockStateResolverContextNeoForgeImpl(ModelEvent.ModifyBakingResult evt) {
         this.textureGetter = evt.getTextureGetter();
-        this.missingModel = MissingBlockModel.missingModel();
+        this.missingModel = evt.getModelBakery().missingModel;
         this.missingSprite = Suppliers.memoize(() -> {
             Material material = new Material(TextureAtlas.LOCATION_BLOCKS, MissingTextureAtlasSprite.getLocation());
             TextureAtlasSprite textureAtlasSprite = evt.getTextureGetter().apply(material);
             Objects.requireNonNull(textureAtlasSprite, "missing sprite is null");
             return textureAtlasSprite;
         });
-        this.unbakedBlockStateModels = new HashMap<>();
         this.unbakedPlainModels = new HashMap<>(evt.getModelBakery().unbakedPlainModels);
-        this.modelBakery = new ModelBakery(EntityModelSet.EMPTY,
-                this.unbakedBlockStateModels,
-                Collections.emptyMap(),
-                this.unbakedPlainModels,
-                this.missingModel,
-                Collections.emptyMap());
         this.blockStateModelOutput = evt.getBakingResult().blockStateModels()::put;
     }
 
     @Override
     public void registerBlockStateResolver(Block block, Consumer<BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer) {
-        ResolvableModel.Resolver resolver = new ModelLoadingResolver();
+        ModelDiscovery modelDiscovery = new ModelDiscovery(Collections.emptyMap(), this.missingModel) {
+            @Override
+            protected UnbakedModel loadBlockModel(ResourceLocation modelLocation) {
+                return BlockStateResolverContextNeoForgeImpl.this.getBlockModel(modelLocation);
+            }
+        };
+        Map<ModelResourceLocation, UnbakedBlockStateModel> unbakedBlockStateModels = new HashMap<>();
         blockStateConsumer.accept((BlockState blockState, UnbakedBlockStateModel unbakedBlockStateModel) -> {
-            unbakedBlockStateModel.resolveDependencies(resolver);
-            this.unbakedBlockStateModels.put(BlockModelShaper.stateToModelLocation(blockState), unbakedBlockStateModel);
+            modelDiscovery.addRoot(unbakedBlockStateModel);
+            unbakedBlockStateModels.put(BlockModelShaper.stateToModelLocation(blockState), unbakedBlockStateModel);
         });
-        ModelBakery.BakingResult bakingResult = loadModels(Profiler.get(),
-                this.textureGetter,
-                this.modelBakery,
-                this.missingSprite);
-        bakingResult.blockStateModels().forEach(this.blockStateModelOutput);
+        modelDiscovery.discoverDependencies();
+        this.loadModels(unbakedBlockStateModels).blockStateModels().forEach(this.blockStateModelOutput);
+    }
+
+    UnbakedModel getBlockModel(ResourceLocation resourceLocation) {
+        return this.unbakedPlainModels.computeIfAbsent(resourceLocation,
+                (ResourceLocation resourceLocationX) -> ModelLoadingHelper.loadBlockModel(this.resourceManager,
+                        resourceLocationX,
+                        this.missingModel));
+    }
+
+    ModelBakery.BakingResult loadModels(Map<ModelResourceLocation, UnbakedBlockStateModel> unbakedBlockStateModels) {
+        ModelBakery modelBakery = new ModelBakery(EntityModelSet.EMPTY,
+                unbakedBlockStateModels,
+                Collections.emptyMap(),
+                this.unbakedPlainModels,
+                this.missingModel,
+                Collections.emptyMap());
+        return loadModels(Profiler.get(), this.textureGetter, modelBakery, this.missingSprite);
     }
 
     @Override
-    public <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer) {
+    public <T> void registerBlockStateResolver(Block block, Function<BlockStateResolverContext.ResourceLoaderContext, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer) {
         this.registerBlockStateResolver(block, (BiConsumer<BlockState, UnbakedBlockStateModel> consumer) -> {
-            blockStateConsumer.accept(resourceLoader.apply(this.resourceManager, Util.backgroundExecutor()).join(),
-                    consumer);
+            blockStateConsumer.accept(resourceLoader.apply(new ResourceLoaderContextImpl(this.resourceManager,
+                    Util.backgroundExecutor(),
+                    this.unbakedPlainModels)).join(), consumer);
         });
     }
 
@@ -127,36 +145,5 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
                                 .collect(Collectors.joining("\n"))));
         profiler.pop();
         return bakingResult;
-    }
-
-    /**
-     * Mostly copied from {@link ModelDiscovery.ResolverImpl}.
-     */
-    class ModelLoadingResolver implements ResolvableModel.Resolver {
-        private final List<ResourceLocation> stack = new ArrayList<>();
-        private final Map<ResourceLocation, UnbakedModel> resolvedModels = BlockStateResolverContextNeoForgeImpl.this.unbakedPlainModels;
-
-        @Override
-        public UnbakedModel resolve(ResourceLocation resourceLocation) {
-            if (this.stack.contains(resourceLocation)) {
-                PuzzlesLib.LOGGER.warn("Detected model loading loop: {}->{}",
-                        this.stacktraceToString(),
-                        resourceLocation);
-                return BlockStateResolverContextNeoForgeImpl.this.missingModel;
-            } else {
-                UnbakedModel unbakedModel = ModelLoadingHelper.loadBlockModel(BlockStateResolverContextNeoForgeImpl.this.resourceManager,
-                        resourceLocation);
-                if (this.resolvedModels.putIfAbsent(resourceLocation, unbakedModel) == null) {
-                    this.stack.add(resourceLocation);
-                    unbakedModel.resolveDependencies(this);
-                    this.stack.remove(resourceLocation);
-                }
-                return unbakedModel;
-            }
-        }
-
-        private String stacktraceToString() {
-            return this.stack.stream().map(ResourceLocation::toString).collect(Collectors.joining("->"));
-        }
     }
 }
