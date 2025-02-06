@@ -33,6 +33,7 @@ public interface BlockStateResolverContext {
      * @param blockStateConsumer the consumer resolving block states to individual unbaked block state models
      * @param <T>                the loaded data type
      */
+    @Deprecated
     default <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer) {
         this.registerBlockStateResolver(block, (ResourceLoaderContext context) -> {
             return resourceLoader.apply(context.resourceManager(), context.executor());
