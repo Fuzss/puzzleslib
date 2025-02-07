@@ -16,6 +16,7 @@ public final class FabricModConstructor {
         constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
         constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
         constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
+        constructor.onRegisterFuelValues(new FuelValuesContextFabricImpl());
         constructor.onRegisterCompostableBlocks(new CompostableBlocksContextFabricImpl());
         constructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
         constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));

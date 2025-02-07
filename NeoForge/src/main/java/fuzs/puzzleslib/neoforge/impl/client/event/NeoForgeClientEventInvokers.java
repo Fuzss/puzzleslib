@@ -60,9 +60,9 @@ import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerReg
 public final class NeoForgeClientEventInvokers {
 
     public static void registerLoadingHandlers() {
-        INSTANCE.register(AddResourcePackReloadListenersCallback.class, RegisterClientReloadListenersEvent.class, (AddResourcePackReloadListenersCallback callback, RegisterClientReloadListenersEvent evt) -> {
+        INSTANCE.register(AddResourcePackReloadListenersCallback.class, AddClientReloadListenersEvent.class, (AddResourcePackReloadListenersCallback callback, AddClientReloadListenersEvent evt) -> {
             callback.onAddResourcePackReloadListeners((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-                evt.registerReloadListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
+                evt.addListener(resourceLocation, ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
             });
         });
         INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {

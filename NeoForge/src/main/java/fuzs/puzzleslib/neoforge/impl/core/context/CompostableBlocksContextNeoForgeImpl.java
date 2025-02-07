@@ -44,8 +44,8 @@ public record CompostableBlocksContextNeoForgeImpl(String modId,
                         Builder<Compostable, Item> builder = this.builder(NeoForgeDataMaps.COMPOSTABLES);
                         for (Map.Entry<Holder<? extends ItemLike>, Compostable> entry : CompostableBlocksContextNeoForgeImpl.this.compostingChances()
                                 .entrySet()) {
-                            Holder.Reference<Item> item = entry.getKey().value().asItem().builtInRegistryHolder();
-                            builder.add(item, entry.getValue(), false);
+                            Holder.Reference<Item> holder = entry.getKey().value().asItem().builtInRegistryHolder();
+                            builder.add(holder, entry.getValue(), false);
                         }
                     }
                 };
