@@ -64,6 +64,7 @@ import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.TriState;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.*;
@@ -676,23 +677,26 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, RegisterBrewingRecipesEvent.class, (RegisterPotionBrewingMixesCallback callback, RegisterBrewingRecipesEvent evt) -> {
             callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(evt.getBuilder()));
         });
-        FuelValues[] fuelValues = new FuelValues[1];
-        INSTANCE.register(RegisterFuelValuesCallback.class, AddReloadListenerEvent.class, (RegisterFuelValuesCallback callback, AddReloadListenerEvent evt) -> {
-            FuelValues.Builder builder = new FuelValues.Builder(evt.getRegistryAccess(),
-                    FeatureFlags.REGISTRY.allFlags()
-            );
-            callback.onRegisterFuelValues(builder, 200);
-            fuelValues[0] = builder.build();
-        }, true);
-        INSTANCE.register(RegisterFuelValuesCallback.class, FurnaceFuelBurnTimeEvent.class, (RegisterFuelValuesCallback callback, FurnaceFuelBurnTimeEvent evt) -> {
-            Objects.requireNonNull(fuelValues[0], "fuel values is null");
-            if (fuelValues[0].isFuel(evt.getItemStack())) {
-                evt.setBurnTime(fuelValues[0].burnDuration(evt.getItemStack()));
-            }
-        }, true);
-        INSTANCE.register(AddDataPackReloadListenersCallback.class, AddReloadListenerEvent.class, (AddDataPackReloadListenersCallback callback, AddReloadListenerEvent evt) -> {
+        INSTANCE.register(RegisterFuelValuesCallback.class, (RegisterFuelValuesCallback callback, @Nullable Object context) -> {
+            FuelValues[] fuelValues = new FuelValues[1];
+            NeoForge.EVENT_BUS.addListener((final AddServerReloadListenersEvent evt) -> {
+                FuelValues.Builder builder = new FuelValues.Builder(evt.getRegistryAccess(),
+                        FeatureFlags.REGISTRY.allFlags()
+                );
+                callback.onRegisterFuelValues(builder, 200);
+                fuelValues[0] = builder.build();
+            });
+            NeoForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
+                Objects.requireNonNull(fuelValues[0], "fuel values is null");
+                if (fuelValues[0].isFuel(evt.getItemStack())) {
+                    evt.setBurnTime(fuelValues[0].burnDuration(evt.getItemStack()));
+                    evt.setCanceled(true);
+                }
+            });
+        });
+        INSTANCE.register(AddDataPackReloadListenersCallback.class, AddServerReloadListenersEvent.class, (AddDataPackReloadListenersCallback callback, AddServerReloadListenersEvent evt) -> {
             callback.onAddDataPackReloadListeners(evt.getRegistryAccess(), evt.getServerResources().getRegistryLookup(), (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-                evt.addListener(ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
+                evt.addListener(resourceLocation, ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
             });
         });
         INSTANCE.register(

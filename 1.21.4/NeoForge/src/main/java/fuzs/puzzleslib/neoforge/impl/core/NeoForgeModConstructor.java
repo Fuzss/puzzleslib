@@ -25,6 +25,7 @@ public final class NeoForgeModConstructor {
             // these need to run immediately, as they register content for data generation,
             // which cannot be added during common setup, as it does not run during data generation
             constructor.onRegisterCompostableBlocks(new CompostableBlocksContextNeoForgeImpl(modId));
+            constructor.onRegisterFuelValues(new FuelValuesContextNeoForgeImpl(modId));
             constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(modId, eventBus));
             eventBus.addListener((final FMLCommonSetupEvent evt) -> {
                 evt.enqueueWork(() -> {

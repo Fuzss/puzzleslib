@@ -15,6 +15,6 @@ public record SkullRenderersContextNeoForgeImpl(EntityRenderersEvent.CreateSkull
     public void registerSkullRenderer(SkullBlock.Type skullBlockType, Function<EntityModelSet, SkullModelBase> skullModelFactory) {
         Objects.requireNonNull(skullBlockType, "skull block type is null");
         Objects.requireNonNull(skullModelFactory, "skull model factory is null");
-        this.evt.registerSkullModel(skullBlockType, skullModelFactory.apply(this.evt.getEntityModelSet()));
+        this.evt.registerSkullModel(skullBlockType, skullModelFactory);
     }
 }

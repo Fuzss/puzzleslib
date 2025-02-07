@@ -88,6 +88,13 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register items as furnace fuel
+     */
+    default void onRegisterFuelValues(final FuelValuesContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context register items for usage with the composter block
      */
     default void onRegisterCompostableBlocks(final CompostableBlocksContext context) {
