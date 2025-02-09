@@ -5,6 +5,7 @@ import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.TagKey;
@@ -22,8 +23,7 @@ import java.util.Objects;
  * A builder class for {@link ArmorMaterial}.
  */
 public final class ArmorMaterialBuilder {
-    private static final ResourceKey<EquipmentAsset> NO_RENDER_ASSET_ID = ResourceKey.create(EquipmentAssets.ROOT_ID,
-            PuzzlesLibMod.id("no_render"));
+    private static final ResourceLocation NO_RENDER_ASSET_ID = PuzzlesLibMod.id("no_render");
 
     private int durability;
     private Map<ArmorType, Integer> defense = Util.make(new EnumMap<>(ArmorType.class),
@@ -44,11 +44,30 @@ public final class ArmorMaterialBuilder {
     }
 
     /**
-     * @param assetId          the location for the equipment model definition file at
-     *                         {@code assets/<namespace>/models/equipment/<path>.json}
      * @param repairIngredient the repair material used in an anvil for restoring item durability
      * @return the builder
      */
+    public static ArmorMaterialBuilder of(TagKey<Item> repairIngredient) {
+        return new ArmorMaterialBuilder().setRepairIngredient(repairIngredient);
+    }
+
+    /**
+     * @param assetId          the location for the equipment model definition file at
+     *                         {@code assets/<namespace>/equipment/<path>.json}
+     * @param repairIngredient the repair material used in an anvil for restoring item durability
+     * @return the builder
+     */
+    public static ArmorMaterialBuilder of(ResourceLocation assetId, TagKey<Item> repairIngredient) {
+        return new ArmorMaterialBuilder().setAssetId(assetId).setRepairIngredient(repairIngredient);
+    }
+
+    /**
+     * @param assetId          the location for the equipment model definition file at
+     *                         {@code assets/<namespace>/equipment/<path>.json}
+     * @param repairIngredient the repair material used in an anvil for restoring item durability
+     * @return the builder
+     */
+    @Deprecated(forRemoval = true)
     public static ArmorMaterialBuilder of(ResourceKey<EquipmentAsset> assetId, TagKey<Item> repairIngredient) {
         return new ArmorMaterialBuilder().setAssetId(assetId).setRepairIngredient(repairIngredient);
     }
@@ -174,7 +193,17 @@ public final class ArmorMaterialBuilder {
 
     /**
      * @param assetId the location for the equipment model definition file at
-     *                {@code assets/<namespace>/models/equipment/<path>.json}
+     *                {@code assets/<namespace>/equipment/<path>.json}
+     * @return the builder
+     */
+    public ArmorMaterialBuilder setAssetId(ResourceLocation assetId) {
+        Objects.requireNonNull(assetId, "asset id is null");
+        return this.setAssetId(ResourceKey.create(EquipmentAssets.ROOT_ID, assetId));
+    }
+
+    /**
+     * @param assetId the location for the equipment model definition file at
+     *                {@code assets/<namespace>/equipment/<path>.json}
      * @return the builder
      */
     public ArmorMaterialBuilder setAssetId(ResourceKey<EquipmentAsset> assetId) {
@@ -188,7 +217,7 @@ public final class ArmorMaterialBuilder {
      *
      * @return the builder
      */
-    public ArmorMaterialBuilder setNoModelId() {
+    public ArmorMaterialBuilder setNoAssetId() {
         return this.setAssetId(NO_RENDER_ASSET_ID);
     }
 
@@ -196,6 +225,10 @@ public final class ArmorMaterialBuilder {
      * @return the armor material
      */
     public ArmorMaterial build() {
+        Objects.requireNonNull(this.defense, "defense map is null");
+        Objects.requireNonNull(this.equipSound, "equip sound is null");
+        Objects.requireNonNull(this.repairIngredient, "repair ingredient is null");
+        Objects.requireNonNull(this.assetId, "asset id is null");
         return new ArmorMaterial(this.durability,
                 Maps.immutableEnumMap(this.defense),
                 this.enchantmentValue,
