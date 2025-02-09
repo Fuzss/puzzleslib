@@ -28,6 +28,25 @@ public final class NeoForgeClientModConstructor {
                     modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
                 });
             });
+            ItemModelsContextNeoForgeImpl[] itemModelsContext = new ItemModelsContextNeoForgeImpl[1];
+            eventBus.addListener((final RegisterItemModelsEvent evt) -> {
+                ItemModelsContextNeoForgeImpl.computeIfAbsent(itemModelsContext, modConstructor).registerForEvent(evt);
+            });
+            eventBus.addListener((final RegisterSpecialModelRendererEvent evt) -> {
+                ItemModelsContextNeoForgeImpl.computeIfAbsent(itemModelsContext, modConstructor).registerForEvent(evt);
+            });
+            eventBus.addListener((final RegisterColorHandlersEvent.ItemTintSources evt) -> {
+                ItemModelsContextNeoForgeImpl.computeIfAbsent(itemModelsContext, modConstructor).registerForEvent(evt);
+            });
+            eventBus.addListener((final RegisterSelectItemModelPropertyEvent evt) -> {
+                ItemModelsContextNeoForgeImpl.computeIfAbsent(itemModelsContext, modConstructor).registerForEvent(evt);
+            });
+            eventBus.addListener((final RegisterConditionalItemModelPropertyEvent evt) -> {
+                ItemModelsContextNeoForgeImpl.computeIfAbsent(itemModelsContext, modConstructor).registerForEvent(evt);
+            });
+            eventBus.addListener((final RegisterRangeSelectItemModelPropertyEvent evt) -> {
+                ItemModelsContextNeoForgeImpl.computeIfAbsent(itemModelsContext, modConstructor).registerForEvent(evt);
+            });
             eventBus.addListener((final RegisterMenuScreensEvent evt) -> {
                 modConstructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl(evt));
             });

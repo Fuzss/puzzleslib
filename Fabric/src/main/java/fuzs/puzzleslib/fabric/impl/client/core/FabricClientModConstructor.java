@@ -17,6 +17,7 @@ public final class FabricClientModConstructor {
     public static void construct(ClientModConstructor modConstructor, String modId) {
         modConstructor.onConstructMod();
         modConstructor.onClientSetup();
+        modConstructor.onRegisterItemModels(new ItemModelsContextFabricImpl());
         modConstructor.onRegisterEntityRenderers(new EntityRenderersContextFabricImpl());
         modConstructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextFabricImpl());
         modConstructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextFabricImpl());
