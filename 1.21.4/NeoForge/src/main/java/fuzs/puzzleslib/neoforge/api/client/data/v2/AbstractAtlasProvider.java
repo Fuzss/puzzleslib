@@ -30,10 +30,23 @@ public abstract class AbstractAtlasProvider extends SpriteSourceProvider {
 
     public abstract void addAtlases();
 
+    protected SourceList sheet(ResourceLocation resourceLocation) {
+        ResourceLocation atlasLocation = ModelManager.VANILLA_ATLASES.get(resourceLocation);
+        Objects.requireNonNull(atlasLocation, "atlas for " + resourceLocation + " is null");
+        return this.atlas(atlasLocation);
+    }
+
+    @Deprecated(forRemoval = true)
     public void addMaterial(Material material) {
-        ResourceLocation resourceLocation = ModelManager.VANILLA_ATLASES.get(material.atlasLocation());
-        Objects.requireNonNull(resourceLocation, "atlas for " + material.atlasLocation() + " is null");
-        this.atlas(resourceLocation).addSource(new SingleFile(material.texture(), Optional.empty()));
+        this.material(material);
+    }
+
+    public void material(Material material) {
+        this.material(material.atlasLocation(), material.texture());
+    }
+
+    public void material(ResourceLocation atlasLocation, ResourceLocation textureLocation) {
+        this.sheet(atlasLocation).addSource(new SingleFile(textureLocation, Optional.empty()));
     }
 
     @Override

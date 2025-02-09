@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 public final class ModelTemplateHelper {
+    @Deprecated(forRemoval = true)
     public static final ModelTemplate SPAWN_EGG = ModelTemplates.createItem("template_spawn_egg");
 
     private ModelTemplateHelper() {
@@ -34,20 +35,24 @@ public final class ModelTemplateHelper {
                 requiredSlots);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(Item item, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item), modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(Item item, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item), modelTemplate, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(Item item, Item layerItem, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item),
                 ModelLocationHelper.getItemLocation(layerItem),
                 modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(Item item, Item layerItem, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(ModelLocationHelper.getItemLocation(item),
                 ModelLocationHelper.getItemLocation(layerItem),
@@ -55,28 +60,34 @@ public final class ModelTemplateHelper {
                 modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(resourceLocation, resourceLocation, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(resourceLocation, resourceLocation, modelTemplate, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateFlatItem(resourceLocation, layer0, ModelTemplates.FLAT_ITEM, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateFlatItem(ResourceLocation resourceLocation, ResourceLocation layer0, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return modelTemplate.create(ModelLocationHelper.getItemModel(resourceLocation),
                 TextureMapping.layer0(ModelLocationHelper.getItemTexture(layer0)),
                 modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateLayeredItem(ModelLocationHelper.getItemLocation(item), layer0, layer1, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateLayeredItem(Item item, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateLayeredItem(ModelLocationHelper.getItemLocation(item),
                 layer0,
@@ -85,10 +96,12 @@ public final class ModelTemplateHelper {
                 modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return generateLayeredItem(resourceLocation, layer0, layer1, ModelTemplates.TWO_LAYERED_ITEM, modelOutput);
     }
 
+    @Deprecated(forRemoval = true)
     public static ResourceLocation generateLayeredItem(ResourceLocation resourceLocation, ResourceLocation layer0, ResourceLocation layer1, ModelTemplate modelTemplate, BiConsumer<ResourceLocation, ModelInstance> modelOutput) {
         return modelTemplate.create(ModelLocationHelper.getItemModel(resourceLocation),
                 TextureMapping.layered(ModelLocationHelper.getItemTexture(layer0),

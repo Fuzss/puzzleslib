@@ -100,7 +100,7 @@ public abstract class AbstractParticleProvider extends JsonCodecProvider<Particl
     public void unconditional(ResourceLocation id, ParticleDescription value) {
         List<String> missing = value.getTextures().stream().filter((ResourceLocation resourceLocation) -> {
             Objects.requireNonNull(this.resourceManager, "resource manager is null");
-            return this.resourceManager.getResource(resourceLocation.withPath((String string) -> "textures/particle" +
+            return this.resourceManager.getResource(resourceLocation.withPath((String string) -> "textures/particle/" +
                     string + ".png")).isEmpty();
         }).map(ResourceLocation::toString).toList();
         if (!missing.isEmpty()) {
