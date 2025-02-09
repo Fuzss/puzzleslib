@@ -4,6 +4,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.ResourceLocation;
 
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface SpecialBlockModelTypesContext {
 

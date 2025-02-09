@@ -4,18 +4,15 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
-/**
- * register a renderer for an entity
- */
 @FunctionalInterface
 public interface EntityRenderersContext {
 
     /**
-     * registers an {@link net.minecraft.client.renderer.entity.EntityRenderer} for a given entity
+     * Register an {@link net.minecraft.client.renderer.entity.EntityRenderer} for an entity.
      *
-     * @param entityType             entity type token to render for
-     * @param entityRendererProvider entity renderer provider
-     * @param <T>                    type of entity
+     * @param entityType             the entity type
+     * @param entityRendererProvider the entity renderer provider
+     * @param <T>                    the type of entity
      */
     <T extends Entity> void registerEntityRenderer(EntityType<? extends T> entityType, EntityRendererProvider<T> entityRendererProvider);
 }

@@ -59,7 +59,7 @@ public interface ClientModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context add a renderer to an entity
+     * @param context register an {@link net.minecraft.client.renderer.entity.EntityRenderer} for an entity
      */
     default void onRegisterEntityRenderers(final EntityRenderersContext context) {
         // NO-OP
@@ -131,14 +131,23 @@ public interface ClientModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register codecs for handling custom item model types and properties
+     */
+    default void onRegisterItemModels(final ItemModelsContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context register a codec for a custom {@link SpecialModelRenderer.Unbaked} implementation
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterSpecialBlockModelTypes(final SpecialBlockModelTypesContext context) {
         // NO-OP
     }
 
     /**
-     * @param context register a custom unbaked special model renderer implementation
+     * @param context register a custom unbaked special model renderer implementation to be used for statically rendered
+     *                blocks, such as blocks visually appearing in minecarts and held by enderman
      */
     default void onRegisterSpecialBlockModelRenderers(final SpecialBlockModelRenderersContext context) {
         // NO-OP
