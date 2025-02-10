@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add additional methods to `ModelLocationHelper`
 ### Fixed
 - Fix `AbstractParticleProvider` being unable to properly locate existing textures
+- Fix `AbstractParticleProvider` failing to create particle definition files
 
 ## [v21.4.6-1.21.4] - 2025-02-09
 ### Added

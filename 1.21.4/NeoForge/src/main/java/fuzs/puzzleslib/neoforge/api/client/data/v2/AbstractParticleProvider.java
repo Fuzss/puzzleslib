@@ -43,7 +43,7 @@ public abstract class AbstractParticleProvider extends JsonCodecProvider<Particl
     public CompletableFuture<?> run(CachedOutput output) {
         return CompletableFuture.supplyAsync(() -> {
             return this.resourceManager = ExistingFilesHelper.createResourceManager(this.modid);
-        }).thenApply((CloseableResourceManager resourceManager) -> {
+        }).thenComposeAsync((CloseableResourceManager resourceManager) -> {
             return super.run(output).thenRun(() -> {
                 resourceManager.close();
                 this.resourceManager = null;
