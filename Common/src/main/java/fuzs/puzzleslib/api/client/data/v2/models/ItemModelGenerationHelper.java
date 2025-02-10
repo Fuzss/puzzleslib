@@ -1,11 +1,14 @@
 package fuzs.puzzleslib.api.client.data.v2.models;
 
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
+import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SkullBlock;
 
 import java.util.function.BiConsumer;
 
@@ -98,5 +101,12 @@ public final class ItemModelGenerationHelper {
                 item,
                 "_tooting"), ModelLocationHelper.getItemModel(item), TOOTING_HORN, itemModelGenerators.modelOutput));
         itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), trueModel, falseModel);
+    }
+
+    public static void createHead(Block headBlock, Block wallHeadBlock, SkullBlock.Type type, BlockModelGenerators blockModelGenerators) {
+        blockModelGenerators.createHead(headBlock,
+                wallHeadBlock,
+                type,
+                ModelLocationUtils.decorateItemModelLocation("template_skull"));
     }
 }
