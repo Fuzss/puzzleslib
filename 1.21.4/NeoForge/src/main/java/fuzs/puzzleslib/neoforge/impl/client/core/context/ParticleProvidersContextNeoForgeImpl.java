@@ -3,7 +3,6 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 import fuzs.puzzleslib.api.client.core.v1.context.ParticleProvidersContext;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -30,9 +29,6 @@ public record ParticleProvidersContextNeoForgeImpl(RegisterParticleProvidersEven
     public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> particleType, ParticleEngine.SpriteParticleRegistration<T> particleFactory) {
         Objects.requireNonNull(particleType, "particle type is null");
         Objects.requireNonNull(particleFactory, "particle provider factory is null");
-        this.evt.registerSpriteSet(particleType, (SpriteSet spriteSet) -> {
-            Objects.requireNonNull(spriteSet, "sprite set is null");
-            return particleFactory.create(spriteSet);
-        });
+        this.evt.registerSpriteSet(particleType, particleFactory);
     }
 }
