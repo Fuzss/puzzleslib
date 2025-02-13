@@ -54,21 +54,25 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context add to entity spawn placement register
      */
-    default void onRegisterSpawnPlacements(final SpawnPlacementsContext context) {
+    default void onRegisterSpawnPlacements(SpawnPlacementsContext context) {
         // NO-OP
     }
 
     /**
+     * TODO rename onCreateEntityAttributes along with context
+     *
      * @param context add default attributes for our own entities to entity attribute map
      */
-    default void onEntityAttributeCreation(final EntityAttributesCreateContext context) {
+    default void onEntityAttributeCreation(EntityAttributesCreateContext context) {
         // NO-OP
     }
 
     /**
+     * TODO rename onModifyEntityAttributes along with context
+     *
      * @param context replace or add attribute in entity attribute map
      */
-    default void onEntityAttributeModification(final EntityAttributesModifyContext context) {
+    default void onEntityAttributeModification(EntityAttributesModifyContext context) {
         // NO-OP
     }
 
@@ -76,28 +80,28 @@ public interface ModConstructor extends BaseModConstructor {
      * @param context allows for registering modifications (including additions and removals) to biomes loaded from the
      *                current data pack
      */
-    default void onRegisterBiomeModifications(final BiomeModificationsContext context) {
+    default void onRegisterBiomeModifications(BiomeModificationsContext context) {
         // NO-OP
     }
 
     /**
      * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
      */
-    default void onRegisterFlammableBlocks(final FlammableBlocksContext context) {
+    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
         // NO-OP
     }
 
     /**
      * @param context register items as furnace fuel
      */
-    default void onRegisterFuelValues(final FuelValuesContext context) {
+    default void onRegisterFuelValues(FuelValuesContext context) {
         // NO-OP
     }
 
     /**
      * @param context register items for usage with the composter block
      */
-    default void onRegisterCompostableBlocks(final CompostableBlocksContext context) {
+    default void onRegisterCompostableBlocks(CompostableBlocksContext context) {
         // NO-OP
     }
 
@@ -111,21 +115,25 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context register additional data pack sources
      */
-    default void onAddDataPackFinders(final PackRepositorySourcesContext context) {
+    default void onAddDataPackFinders(PackRepositorySourcesContext context) {
         // NO-OP
     }
 
     /**
+     * TODO rename onRegisterGameRegistriesContext
+     *
      * @param context register built-in static registries
      */
-    default void onGameRegistriesContext(final GameRegistriesContext context) {
+    default void onGameRegistriesContext(GameRegistriesContext context) {
         // NO-OP
     }
 
     /**
+     * TODO rename onRegisterDataPackRegistriesContext
+     *
      * @param context register data pack-driven dynamic registries
      */
-    default void onDataPackRegistriesContext(final DataPackRegistriesContext context) {
+    default void onDataPackRegistriesContext(DataPackRegistriesContext context) {
         // NO-OP
     }
 }

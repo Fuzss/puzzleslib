@@ -18,11 +18,11 @@ public abstract class ServerMessageListener<T> {
     /**
      * Called to handle the given message.
      *
-     * @param message the message to handle
-     * @param server  the minecraft server
-     * @param handler the server player packet handler
-     * @param player  the server player
-     * @param level   the level of the player
+     * @param message                  the message to handle
+     * @param minecraftServer          the minecraft server
+     * @param serverGamePacketListener the server player packet handler
+     * @param serverPlayer             the server player
+     * @param serverLevel              the level of the player
      */
-    public abstract void handle(T message, MinecraftServer server, ServerGamePacketListenerImpl handler, ServerPlayer player, ServerLevel level);
+    public abstract void handle(T message, MinecraftServer minecraftServer, ServerGamePacketListenerImpl serverGamePacketListener, ServerPlayer serverPlayer, ServerLevel serverLevel);
 }

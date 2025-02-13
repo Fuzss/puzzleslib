@@ -61,49 +61,49 @@ public interface ClientModConstructor extends BaseModConstructor {
     /**
      * @param context register an {@link net.minecraft.client.renderer.entity.EntityRenderer} for an entity
      */
-    default void onRegisterEntityRenderers(final EntityRenderersContext context) {
+    default void onRegisterEntityRenderers(EntityRenderersContext context) {
         // NO-OP
     }
 
     /**
      * @param context add a renderer to a block entity
      */
-    default void onRegisterBlockEntityRenderers(final BlockEntityRenderersContext context) {
+    default void onRegisterBlockEntityRenderers(BlockEntityRenderersContext context) {
         // NO-OP
     }
 
     /**
      * @param context add a client tooltip component to a common tooltip component
      */
-    default void onRegisterClientTooltipComponents(final ClientTooltipComponentsContext context) {
+    default void onRegisterClientTooltipComponents(ClientTooltipComponentsContext context) {
         // NO-OP
     }
 
     /**
      * @param context add particle providers for a particle type
      */
-    default void onRegisterParticleProviders(final ParticleProvidersContext context) {
+    default void onRegisterParticleProviders(ParticleProvidersContext context) {
         // NO-OP
     }
 
     /**
      * @param context register a screen for a menu type
      */
-    default void onRegisterMenuScreens(final MenuScreensContext context) {
+    default void onRegisterMenuScreens(MenuScreensContext context) {
         // NO-OP
     }
 
     /**
      * @param context add a layer definition for a {@link ModelLayerLocation}
      */
-    default void onRegisterLayerDefinitions(final LayerDefinitionsContext context) {
+    default void onRegisterLayerDefinitions(LayerDefinitionsContext context) {
         // NO-OP
     }
 
     /**
      * @param context add external models to be loaded
      */
-    default void onRegisterAdditionalModels(final AdditionalModelsContext context) {
+    default void onRegisterAdditionalModels(AdditionalModelsContext context) {
         // NO-OP
     }
 
@@ -111,7 +111,7 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an
      *                {@link net.minecraft.client.renderer.block.model.UnbakedBlockStateModel}
      */
-    default void onRegisterBlockStateResolver(final BlockStateResolverContext context) {
+    default void onRegisterBlockStateResolver(BlockStateResolverContext context) {
         // NO-OP
     }
 
@@ -119,21 +119,21 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register additional renders to run after stack count and durability have been drawn for an item
      *                stack
      */
-    default void onRegisterItemDecorations(final ItemDecorationsContext context) {
+    default void onRegisterItemDecorations(ItemDecorationsContext context) {
         // NO-OP
     }
 
     /**
      * @param context register a custom shader that is applied when spectating a certain entity type
      */
-    default void onRegisterEntitySpectatorShaders(final EntitySpectatorShadersContext context) {
+    default void onRegisterEntitySpectatorShaders(EntitySpectatorShadersContext context) {
         // NO-OP
     }
 
     /**
      * @param context register codecs for handling custom item model types and properties
      */
-    default void onRegisterItemModels(final ItemModelsContext context) {
+    default void onRegisterItemModels(ItemModelsContext context) {
         // NO-OP
     }
 
@@ -141,7 +141,7 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register a codec for a custom {@link SpecialModelRenderer.Unbaked} implementation
      */
     @Deprecated(forRemoval = true)
-    default void onRegisterSpecialBlockModelTypes(final SpecialBlockModelTypesContext context) {
+    default void onRegisterSpecialBlockModelTypes(SpecialBlockModelTypesContext context) {
         // NO-OP
     }
 
@@ -149,7 +149,7 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register a custom unbaked special model renderer implementation to be used for statically rendered
      *                blocks, such as blocks visually appearing in minecarts and held by enderman
      */
-    default void onRegisterSpecialBlockModelRenderers(final SpecialBlockModelRenderersContext context) {
+    default void onRegisterSpecialBlockModelRenderers(SpecialBlockModelRenderersContext context) {
         // NO-OP
     }
 
@@ -157,63 +157,63 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type}
      *                implementations
      */
-    default void onRegisterSkullRenderers(final SkullRenderersContext context) {
+    default void onRegisterSkullRenderers(SkullRenderersContext context) {
         // NO-OP
     }
 
     /**
      * @param context register additional {@link RenderLayer}s for a living entity
      */
-    default void onRegisterLivingEntityRenderLayers(final LivingEntityRenderLayersContext context) {
+    default void onRegisterLivingEntityRenderLayers(LivingEntityRenderLayersContext context) {
         // NO-OP
     }
 
     /**
      * @param context register a {@link KeyMapping} so it can be saved to and loaded from game options
      */
-    default void onRegisterKeyMappings(final KeyMappingsContext context) {
+    default void onRegisterKeyMappings(KeyMappingsContext context) {
         // NO-OP
     }
 
     /**
      * @param context register custom {@link RenderType}s for blocks
      */
-    default void onRegisterBlockRenderTypes(final RenderTypesContext<Block> context) {
+    default void onRegisterBlockRenderTypes(RenderTypesContext<Block> context) {
         // NO-OP
     }
 
     /**
      * @param context register custom {@link RenderType}s for fluids
      */
-    default void onRegisterFluidRenderTypes(final RenderTypesContext<Fluid> context) {
+    default void onRegisterFluidRenderTypes(RenderTypesContext<Fluid> context) {
         // NO-OP
     }
 
     /**
      * @param context register block color providers
      */
-    default void onRegisterBlockColorProviders(final BlockColorsContext context) {
+    default void onRegisterBlockColorProviders(BlockColorsContext context) {
         // NO-OP
     }
 
     /**
      * @param context register additional resource pack sources
      */
-    default void onAddResourcePackFinders(final PackRepositorySourcesContext context) {
+    default void onAddResourcePackFinders(PackRepositorySourcesContext context) {
         // NO-OP
     }
 
     /**
      * @param context register new resource pack provided shaders
      */
-    default void onRegisterCoreShaders(final CoreShadersContext context) {
+    default void onRegisterCoreShaders(CoreShadersContext context) {
         // NO-OP
     }
 
     /**
      * @param context register new render buffers to {@link net.minecraft.client.renderer.RenderBuffers}
      */
-    default void onRegisterRenderBuffers(final RenderBuffersContext context) {
+    default void onRegisterRenderBuffers(RenderBuffersContext context) {
         // NO-OP
     }
 }

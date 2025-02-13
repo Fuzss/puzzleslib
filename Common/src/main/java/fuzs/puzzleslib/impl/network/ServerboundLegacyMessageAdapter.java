@@ -15,8 +15,8 @@ public record ServerboundLegacyMessageAdapter<T extends MessageV2<T>>(T message)
         return new ServerMessageListener<>() {
 
             @Override
-            public void handle(T message, MinecraftServer server, ServerGamePacketListenerImpl handler, ServerPlayer player, ServerLevel level) {
-                message.makeHandler().handle(message, player, server);
+            public void handle(T message, MinecraftServer minecraftServer, ServerGamePacketListenerImpl serverGamePacketListener, ServerPlayer serverPlayer, ServerLevel serverLevel) {
+                message.makeHandler().handle(message, serverPlayer, minecraftServer);
             }
         };
     }

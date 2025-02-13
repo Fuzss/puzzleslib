@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.data.v2.models;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
 
 import java.util.Optional;
 import java.util.function.BiConsumer;
@@ -33,6 +34,20 @@ public final class ModelTemplateHelper {
         return new ModelTemplate(Optional.of(ModelLocationHelper.getItemModel(resourceLocation)),
                 Optional.of(suffix),
                 requiredSlots);
+    }
+
+    public static TextureMapping createParticleTextureMapping(Block block) {
+        return createParticleTextureMapping(block, "");
+    }
+
+    public static TextureMapping createParticleTextureMapping(Block block, String suffix) {
+        ResourceLocation resourceLocation = TextureMapping.getBlockTexture(block, suffix);
+        return new TextureMapping().put(TextureSlot.TEXTURE, resourceLocation)
+                .put(TextureSlot.PARTICLE, resourceLocation);
+    }
+
+    public static TextureMapping createSingleSlotMapping(TextureSlot textureSlot, Block block) {
+        return TextureMapping.singleSlot(textureSlot, TextureMapping.getBlockTexture(block));
     }
 
     @Deprecated(forRemoval = true)

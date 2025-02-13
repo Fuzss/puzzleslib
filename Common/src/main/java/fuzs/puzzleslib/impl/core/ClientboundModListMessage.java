@@ -16,7 +16,7 @@ public record ClientboundModListMessage(Collection<String> modList) implements C
         return new ClientMessageListener<>() {
 
             @Override
-            public void handle(ClientboundModListMessage message, Minecraft minecraft, ClientPacketListener handler, LocalPlayer player, ClientLevel level) {
+            public void handle(ClientboundModListMessage message, Minecraft minecraft, ClientPacketListener clientPacketListener, LocalPlayer player, ClientLevel clientLevel) {
                 ModContext.acceptServersideMods(message.modList);
             }
         };
