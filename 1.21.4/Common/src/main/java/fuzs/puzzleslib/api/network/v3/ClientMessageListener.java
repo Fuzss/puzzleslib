@@ -18,11 +18,11 @@ public abstract class ClientMessageListener<T> {
     /**
      * Called to handle the given message.
      *
-     * @param message   the message to handle
-     * @param minecraft the minecraft client
-     * @param handler   the client player packet handler
-     * @param player    the client player
-     * @param level     the local client level
+     * @param message              the message to handle
+     * @param minecraft            the minecraft client
+     * @param clientPacketListener the client player packet handler
+     * @param player               the client player
+     * @param clientLevel          the local client level
      */
-    public abstract void handle(T message, Minecraft minecraft, ClientPacketListener handler, LocalPlayer player, ClientLevel level);
+    public abstract void handle(T message, Minecraft minecraft, ClientPacketListener clientPacketListener, LocalPlayer player, ClientLevel clientLevel);
 }
