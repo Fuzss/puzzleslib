@@ -2,15 +2,15 @@ package fuzs.puzzleslib.impl.attachment;
 
 import net.minecraft.resources.ResourceLocation;
 
-public interface AttachmentTypeAdapter<T, A> {
+public interface AttachmentTypeAdapter<T, V> {
 
     ResourceLocation resourceLocation();
 
     boolean hasData(T holder);
 
-    A getData(T holder);
+    V getData(T holder);
 
-    A setData(T holder, A value);
+    V setData(T holder, V value);
 
-    A removeData(T holder);
+    V removeData(T holder);
 }

@@ -18,8 +18,7 @@ public interface DataAttachmentType<T, V> {
      * @param holder the attachment holder
      * @return the attachment value if present, or {@code null}
      */
-    @Nullable
-    V get(T holder);
+    @Nullable V get(T holder);
 
     /**
      * Get the value for the attachment type, if no value is present return the provided default value.

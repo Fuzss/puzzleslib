@@ -3,17 +3,16 @@ package fuzs.puzzleslib.impl.attachment;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 
 public interface DataAttachmentRegistryImpl {
     DataAttachmentRegistryImpl INSTANCE = CommonFactories.INSTANCE.getDataAttachmentRegistry();
 
-    <A> DataAttachmentRegistry.EntityBuilder<A> getEntityTypeBuilder();
+    <V> DataAttachmentRegistry.EntityBuilder<V> getEntityTypeBuilder();
 
-    <A> DataAttachmentRegistry.Builder<BlockEntity, A> getBlockEntityTypeBuilder();
+    <V> DataAttachmentRegistry.BlockEntityBuilder<V> getBlockEntityTypeBuilder();
 
-    <A> DataAttachmentRegistry.Builder<LevelChunk, A> getLevelChunkBuilder();
+    <V> DataAttachmentRegistry.Builder<LevelChunk, V> getLevelChunkBuilder();
 
-    <A> DataAttachmentRegistry.Builder<Level, A> getLevelBuilder();
+    <V> DataAttachmentRegistry.Builder<Level, V> getLevelBuilder();
 }

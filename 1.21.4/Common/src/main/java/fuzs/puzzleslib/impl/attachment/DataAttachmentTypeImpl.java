@@ -2,21 +2,25 @@ package fuzs.puzzleslib.impl.attachment;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
+import net.minecraft.core.RegistryAccess;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 
 public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T, V> {
     private final AttachmentTypeAdapter<T, V> attachmentType;
-    private final Map<Predicate<T>, V> defaultValues;
+    private final Function<T, RegistryAccess> registryAccessExtractor;
+    private final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues;
     private final BiConsumer<T, V> synchronizer;
 
-    public DataAttachmentTypeImpl(AttachmentTypeAdapter<T, V> attachmentType, Map<Predicate<T>, V> defaultValues, @Nullable BiConsumer<T, V> synchronizer) {
+    public DataAttachmentTypeImpl(AttachmentTypeAdapter<T, V> attachmentType, Function<T, RegistryAccess> registryAccessExtractor, Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues, @Nullable BiConsumer<T, V> synchronizer) {
         this.attachmentType = attachmentType;
+        this.registryAccessExtractor = registryAccessExtractor;
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
         this.synchronizer = synchronizer != null ? synchronizer : (T o1, V o2) -> {
             // NO-OP
@@ -25,9 +29,9 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
 
     @Nullable
     private V getDefaultValue(T holder) {
-        for (Map.Entry<Predicate<T>, V> entry : this.defaultValues.entrySet()) {
+        for (Map.Entry<Predicate<T>, Function<RegistryAccess, V>> entry : this.defaultValues.entrySet()) {
             if (entry.getKey().test(holder)) {
-                return entry.getValue();
+                return entry.getValue().apply(this.registryAccessExtractor.apply(holder));
             }
         }
         return null;
