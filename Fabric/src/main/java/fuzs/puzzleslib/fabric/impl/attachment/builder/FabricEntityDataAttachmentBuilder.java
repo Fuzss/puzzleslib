@@ -11,6 +11,7 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -29,6 +30,10 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
     @Nullable
     private Function<Entity, PlayerSet> synchronizationTargets;
     private boolean copyOnDeath;
+
+    public FabricEntityDataAttachmentBuilder() {
+        super(Entity::registryAccess);
+    }
 
     @Override
     @Nullable
@@ -78,10 +83,15 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, V defaultValue) {
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
+        return EntityDataAttachmentBuilder.super.defaultValue(defaultValueProvider);
+    }
+
+    @Override
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider) {
         Objects.requireNonNull(defaultFilter, "default filter is null");
-        Objects.requireNonNull(defaultValue, "default value is null");
-        this.defaultValues.put(defaultFilter, defaultValue);
+        Objects.requireNonNull(defaultValueProvider, "default value provider is null");
+        this.defaultValues.put(defaultFilter, defaultValueProvider);
         return this;
     }
 

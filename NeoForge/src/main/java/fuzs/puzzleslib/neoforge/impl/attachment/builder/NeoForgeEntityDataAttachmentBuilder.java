@@ -9,6 +9,7 @@ import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import fuzs.puzzleslib.impl.attachment.builder.EntityDataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -31,6 +32,10 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
     private Function<Entity, PlayerSet> synchronizationTargets;
     private boolean copyOnDeath;
 
+    public NeoForgeEntityDataAttachmentBuilder() {
+        super(Entity::registryAccess);
+    }
+
     @Override
     @Nullable
     public BiConsumer<Entity, V> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType) {
@@ -42,25 +47,26 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
         NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(eventBus -> {
             eventBus.addListener((final RegisterPayloadHandlersEvent evt) -> {
                 StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
-                        type, this.streamCodec);
-                evt.registrar(resourceLocation.withPath("attachments").toLanguageKey()).playToClient(type,
-                        messageStreamCodec,
-                        (ClientboundEntityDataAttachmentMessage<V> message, IPayloadContext context) -> {
-                            if (ModLoaderEnvironment.INSTANCE.isClient()) {
-                                context.enqueueWork(() -> {
-                                    LocalPlayer player = (LocalPlayer) context.player();
-                                    Entity entity = player.clientLevel.getEntity(message.entityId());
-                                    if (entity != null) {
-                                        if (message.value().isPresent()) {
-                                            attachmentType.setData(entity, message.value().get());
-                                        } else {
-                                            attachmentType.removeData(entity);
-                                        }
+                        type,
+                        this.streamCodec);
+                evt.registrar(resourceLocation.withPath("attachments").toLanguageKey())
+                        .playToClient(type,
+                                messageStreamCodec,
+                                (ClientboundEntityDataAttachmentMessage<V> message, IPayloadContext context) -> {
+                                    if (ModLoaderEnvironment.INSTANCE.isClient()) {
+                                        context.enqueueWork(() -> {
+                                            LocalPlayer player = (LocalPlayer) context.player();
+                                            Entity entity = player.clientLevel.getEntity(message.entityId());
+                                            if (entity != null) {
+                                                if (message.value().isPresent()) {
+                                                    attachmentType.setData(entity, message.value().get());
+                                                } else {
+                                                    attachmentType.removeData(entity);
+                                                }
+                                            }
+                                        });
                                     }
                                 });
-                            }
-                        }
-                );
             });
         });
     }
@@ -85,10 +91,15 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, V defaultValue) {
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
+        return EntityDataAttachmentBuilder.super.defaultValue(defaultValueProvider);
+    }
+
+    @Override
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider) {
         Objects.requireNonNull(defaultFilter, "default filter is null");
-        Objects.requireNonNull(defaultValue, "default value is null");
-        this.defaultValues.put(defaultFilter, defaultValue);
+        Objects.requireNonNull(defaultValueProvider, "default value provider is null");
+        this.defaultValues.put(defaultFilter, defaultValueProvider);
         return this;
     }
 

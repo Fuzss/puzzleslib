@@ -80,8 +80,8 @@ public interface EntityDataAttachmentBuilder<V> extends DataAttachmentRegistry.E
 
     private void broadcast(CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, Entity entity, PlayerSet playerSet, @Nullable V value) {
         ClientboundEntityDataAttachmentMessage<V> message = new ClientboundEntityDataAttachmentMessage<>(type,
-                entity.getId(), Optional.ofNullable(value)
-        );
+                entity.getId(),
+                Optional.ofNullable(value));
         playerSet.broadcast(type, new ClientboundCustomPayloadPacket(message));
     }
 }
