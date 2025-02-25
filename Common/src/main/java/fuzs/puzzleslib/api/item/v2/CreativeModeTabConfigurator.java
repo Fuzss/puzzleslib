@@ -15,6 +15,7 @@ import java.util.function.Supplier;
  * <p>
  * Some features are only available on NeoForge, on Fabric they'll simply do nothing.
  */
+@Deprecated
 public interface CreativeModeTabConfigurator {
 
     /**
@@ -39,7 +40,6 @@ public interface CreativeModeTabConfigurator {
      * @param icon  the item stack displayed as tab icon
      * @return the creative mode tab
      */
-    @Deprecated(forRemoval = true)
     static CreativeModeTabConfigurator from(String modId, Supplier<ItemStack> icon) {
         return from(modId).icon(icon);
     }

@@ -34,6 +34,9 @@ public final class NeoForgeModConstructor {
             registerContent(constructor, modId, modEventBus, biomeModifications, flagsToHandle);
             registerLoadingHandlers(constructor, modId, modEventBus, biomeModifications, availableFlags, flagsToHandle);
             constructor.onConstructMod();
+            // these need to run immediately, as they register content for data generation,
+            // which cannot be added during common setup, as it does not run during data generation
+            constructor.onRegisterCompostableBlocks(new CompostableBlocksContextNeoForgeImpl(modId));
         });
     }
 
@@ -43,7 +46,8 @@ public final class NeoForgeModConstructor {
             NeoForgeBiomeLoadingHandler.register(modId, modEventBus, biomeModifications);
         }
         if (flagsToHandle.contains(ContentRegistrationFlags.COPY_RECIPES)) {
-            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER, modId);
+            DeferredRegister<RecipeSerializer<?>> deferredRegister = DeferredRegister.create(Registries.RECIPE_SERIALIZER,
+                    modId);
             deferredRegister.register(modEventBus);
             CopyComponentsRecipe.registerSerializers(deferredRegister::register);
         }
@@ -54,7 +58,8 @@ public final class NeoForgeModConstructor {
             evt.enqueueWork(() -> {
                 constructor.onCommonSetup();
                 constructor.onRegisterFuelBurnTimes(new FuelBurnTimesContextNeoForgeImpl());
-                constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(biomeModifications, availableFlags));
+                constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(biomeModifications,
+                        availableFlags));
                 constructor.onRegisterFlammableBlocks(new FlammableBlocksContextNeoForgeImpl());
                 constructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());
             });

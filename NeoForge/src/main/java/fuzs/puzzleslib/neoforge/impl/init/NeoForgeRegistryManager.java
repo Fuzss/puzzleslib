@@ -19,6 +19,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
@@ -54,7 +55,8 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     protected <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration) {
         Preconditions.checkState(!skipRegistration, "Skipping registration is not supported on NeoForge");
         DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
-            DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey, this.modId);
+            DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey,
+                    this.modId);
             Objects.requireNonNull(this.eventBus, "mod event bus is null for " + this.modId);
             deferredRegister.register(this.eventBus);
             return deferredRegister;
@@ -67,19 +69,32 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
+    protected CreativeModeTab.Builder getCreativeModeTabBuilder(boolean withSearchBar) {
+        return withSearchBar ? CreativeModeTab.builder().withSearchBar() : CreativeModeTab.builder();
+    }
+
+    @Override
     public Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties) {
-        return this.registerItem(entityTypeReference.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg", () -> new DeferredSpawnEggItem(entityTypeReference::value, backgroundColor, highlightColor, itemProperties));
+        return this.registerItem(entityTypeReference.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
+                () -> new DeferredSpawnEggItem(entityTypeReference::value,
+                        backgroundColor,
+                        highlightColor,
+                        itemProperties));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> IMenuTypeExtension.create(entry.get()::create));
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU,
+                path,
+                () -> IMenuTypeExtension.create(entry.get()::create));
     }
 
     @Override
     public Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<BlockState>> matchingStates, int maxTickets, int validRange) {
-        return this.register(Registries.POINT_OF_INTEREST_TYPE, path, () -> new PoiType(matchingStates.get(), maxTickets, validRange));
+        return this.register(Registries.POINT_OF_INTEREST_TYPE,
+                path,
+                () -> new PoiType(matchingStates.get(), maxTickets, validRange));
     }
 
     @Override

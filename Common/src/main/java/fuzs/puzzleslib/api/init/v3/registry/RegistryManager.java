@@ -6,6 +6,7 @@ import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.api.item.v2.ItemEquipmentFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -34,19 +35,18 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.Fluid;
@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -131,10 +132,130 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block.
      *
+     * @param path                    path for new entry
+     * @param blockPropertiesSupplier supplier for block properties
+     * @return holder reference
+     */
+    default Holder.Reference<Block> registerSimpleBlock(String path, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
+        return this.registerBlock(path, Block::new, blockPropertiesSupplier);
+    }
+
+    /**
+     * Register a block.
+     *
+     * @param path                    path for new entry
+     * @param factory                 factory for new block
+     * @param blockPropertiesSupplier supplier for block properties
+     * @return holder reference
+     */
+    default Holder.Reference<Block> registerBlock(String path, Function<BlockBehaviour.Properties, Block> factory, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
+        return this.register(Registries.BLOCK, path, () -> factory.apply(blockPropertiesSupplier.get()));
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path path for new entry
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerItem(String path) {
+        return this.registerSimpleItem(path, Item.Properties::new);
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path                   path for new entry
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerSimpleItem(String path, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerItem(path, Item::new, itemPropertiesSupplier);
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path    path for new entry
+     * @param factory factory for new item
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory) {
+        return this.registerItem(path, factory, Item.Properties::new);
+    }
+
+    /**
+     * Register an item.
+     *
+     * @param path                   path for new entry
+     * @param factory                factory for new item
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.register(Registries.ITEM, path, () -> factory.apply(itemPropertiesSupplier.get()));
+    }
+
+    /**
+     * Registers a block item for a block.
+     *
+     * @param block reference for block to register item variant for
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block) {
+        return this.registerBlockItem(block, Item.Properties::new);
+    }
+
+    /**
+     * Registers a block item for a block.
+     *
+     * @param block                  reference for block to register item variant for
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerBlockItem(block, BlockItem::new, itemPropertiesSupplier);
+    }
+
+    /**
+     * Registers a block item for a block.
+     *
+     * @param block   reference for block to register item variant for
+     * @param factory factory for new item
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory) {
+        return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
+                (Item.Properties itemProperties) -> {
+                    return factory.apply(block.value(), itemProperties);
+                },
+                Item.Properties::new);
+    }
+
+    /**
+     * Registers a block item for a block.
+     *
+     * @param block                  reference for block to register item variant for
+     * @param factory                factory for new item
+     * @param itemPropertiesSupplier supplier for new item properties
+     * @return holder reference
+     */
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
+        return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
+                (Item.Properties itemProperties) -> {
+                    return factory.apply(block.value(), itemProperties);
+                },
+                itemPropertiesSupplier);
+    }
+
+    /**
+     * Register a block.
+     *
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @return holder reference
      */
+    @Deprecated
     default Holder.Reference<Block> registerBlock(String path, Supplier<Block> entry) {
         return this.register(Registries.BLOCK, path, entry);
     }
@@ -146,6 +267,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param entry supplier for entry to register
      * @return holder reference
      */
+    @Deprecated
     default Holder.Reference<Item> registerItem(String path, Supplier<Item> entry) {
         return this.register(Registries.ITEM, path, entry);
     }
@@ -154,35 +276,12 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Registers a block item for a block.
      *
      * @param blockReference reference for block to register item variant for
-     * @return holder reference
-     */
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference) {
-        return this.registerBlockItem(blockReference, new Item.Properties());
-    }
-
-    /**
-     * Registers a block item for a block.
-     *
-     * @param blockReference reference for block to register item variant for
      * @param itemProperties properties for item
      * @return holder reference
      */
-    @Deprecated(forRemoval = true)
+    @Deprecated
     default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Item.Properties itemProperties) {
         return this.registerBlockItem(blockReference, () -> itemProperties);
-    }
-
-    /**
-     * Registers a block item for a block.
-     *
-     * @param blockReference reference for block to register item variant for
-     * @param itemProperties properties for item
-     * @return holder reference
-     */
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> blockReference, Supplier<Item.Properties> itemProperties) {
-        return this.registerItem(blockReference.unwrapKey().orElseThrow().location().getPath(), () -> {
-            return new BlockItem(blockReference.value(), itemProperties.get());
-        });
     }
 
     /**
@@ -209,6 +308,49 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeReference, int backgroundColor, int highlightColor, Item.Properties itemProperties);
 
     /**
+     * Register a creative mode tab.
+     *
+     * @param iconHolder the tab icon item stack
+     * @return the holder reference
+     */
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Holder<? extends ItemLike> iconHolder) {
+        return this.registerCreativeModeTab(() -> new ItemStack(iconHolder.value()));
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param iconSupplier the tab icon item stack
+     * @return the holder reference
+     */
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
+        return this.registerCreativeModeTab(iconSupplier,
+                CreativeModeTabHelper.getDisplayItems(this.makeKey("main").getNamespace()));
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param iconSupplier the tab icon item stack
+     * @param displayItems the display items generator
+     * @return the holder reference
+     */
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems) {
+        return this.registerCreativeModeTab("main", iconSupplier, displayItems, false);
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param path          path for new entry
+     * @param iconSupplier  the tab icon item stack
+     * @param displayItems  the display items generator
+     * @param withSearchBar should the tab include a search bar (only supported for NeoForge)
+     * @return the holder reference
+     */
+    Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar);
+
+    /**
      * Register a data component type.
      *
      * @param path  path for new entry
@@ -216,9 +358,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> entry) {
-        return this.register(Registries.DATA_COMPONENT_TYPE, path,
-                () -> entry.apply(DataComponentType.builder()).build()
-        );
+        return this.register(Registries.DATA_COMPONENT_TYPE,
+                path,
+                () -> entry.apply(DataComponentType.builder()).build());
     }
 
     /**
@@ -286,11 +428,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     @SuppressWarnings("unchecked")
     default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
-        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE, path,
+        return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE,
+                path,
                 () -> {
                     return entry.get().build(path);
-                }
-        );
+                });
     }
 
     /**
@@ -304,10 +446,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     @SuppressWarnings("unchecked")
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, Supplier<BlockEntityType.Builder<T>> entry) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
-                path, () -> {
+                path,
+                () -> {
                     return entry.get().build(null);
-                }
-        );
+                });
     }
 
     /**
@@ -490,9 +632,10 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue, boolean syncable, Attribute.Sentiment sentiment) {
         Objects.requireNonNull(sentiment, "sentiment is null");
         return this.register(Registries.ATTRIBUTE, path, () -> {
-            return new RangedAttribute(this.makeDescriptionId(Registries.ATTRIBUTE, path), defaultValue, minValue,
-                    maxValue
-            ).setSyncable(syncable).setSentiment(sentiment);
+            return new RangedAttribute(this.makeDescriptionId(Registries.ATTRIBUTE, path),
+                    defaultValue,
+                    minValue,
+                    maxValue).setSyncable(syncable).setSentiment(sentiment);
         });
     }
 
@@ -532,9 +675,13 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<Item> repairItem) {
-        return this.registerArmorMaterial(path, defense, enchantmentValue, SoundEvents.ARMOR_EQUIP_GENERIC,
-                () -> Ingredient.of(repairItem.value()), 0.0F, 0.0F
-        );
+        return this.registerArmorMaterial(path,
+                defense,
+                enchantmentValue,
+                SoundEvents.ARMOR_EQUIP_GENERIC,
+                () -> Ingredient.of(repairItem.value()),
+                0.0F,
+                0.0F);
     }
 
     /**
@@ -553,12 +700,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return holder reference
      */
     default Holder.Reference<ArmorMaterial> registerArmorMaterial(String path, Map<ArmorItem.Type, Integer> defense, int enchantmentValue, Holder<SoundEvent> equipSound, Supplier<Ingredient> repairIngredient, float toughness, float knockbackResistance) {
-        return this.register(Registries.ARMOR_MATERIAL, path,
-                () -> new ArmorMaterial(defense, enchantmentValue, equipSound, repairIngredient,
-                        Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))), toughness,
-                        knockbackResistance
-                )
-        );
+        return this.register(Registries.ARMOR_MATERIAL,
+                path,
+                () -> new ArmorMaterial(defense,
+                        enchantmentValue,
+                        equipSound,
+                        repairIngredient,
+                        Collections.singletonList(new ArmorMaterial.Layer(this.makeKey(path))),
+                        toughness,
+                        knockbackResistance));
     }
 
     /**
