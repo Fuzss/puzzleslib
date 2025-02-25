@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
+import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -128,7 +129,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path        path for new entry
      * @param supplier    supplier for entry to register
      * @param <T>         registry type
-     * @return holder reference
+     * @return the holder reference
      */
     <T> Holder.Reference<T> register(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier);
 
@@ -137,7 +138,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path                    path for new entry
      * @param blockPropertiesSupplier supplier for block properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Block> registerBlock(String path, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
         return this.registerBlock(path, Block::new, blockPropertiesSupplier);
@@ -149,7 +150,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path                    path for new entry
      * @param factory                 factory for new block
      * @param blockPropertiesSupplier supplier for block properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Block> registerBlock(String path, Function<BlockBehaviour.Properties, Block> factory, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
         return this.register(Registries.BLOCK,
@@ -161,7 +162,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register an item.
      *
      * @param path path for new entry
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerItem(String path) {
         return this.registerItem(path, Item.Properties::new);
@@ -172,7 +173,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path                   path for new entry
      * @param itemPropertiesSupplier supplier for new item properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerItem(String path, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerItem(path, Item::new, itemPropertiesSupplier);
@@ -183,7 +184,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path    path for new entry
      * @param factory factory for new item
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory) {
         return this.registerItem(path, factory, Item.Properties::new);
@@ -195,7 +196,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path                   path for new entry
      * @param factory                factory for new item
      * @param itemPropertiesSupplier supplier for new item properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.register(Registries.ITEM,
@@ -207,7 +208,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Registers a block item for a block.
      *
      * @param block reference for block to register item variant for
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerBlockItem(Holder<Block> block) {
         return this.registerBlockItem(block, Item.Properties::new);
@@ -218,7 +219,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param block                  reference for block to register item variant for
      * @param itemPropertiesSupplier supplier for new item properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerBlockItem(Holder<Block> block, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerBlockItem(block, BlockItem::new, itemPropertiesSupplier);
@@ -229,7 +230,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param block   reference for block to register item variant for
      * @param factory factory for new item
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory) {
         return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
@@ -245,7 +246,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param block                  reference for block to register item variant for
      * @param factory                factory for new item
      * @param itemPropertiesSupplier supplier for new item properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
@@ -261,7 +262,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param entityTypeHolder entity type holder to register a spawn egg for
      * @param backgroundColor  background color of the spawn egg item
      * @param highlightColor   spots color pf the spawn egg item
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor) {
         return this.registerSpawnEggItem(entityTypeHolder, backgroundColor, highlightColor, Item.Properties::new);
@@ -274,7 +275,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param backgroundColor        background color of the spawn egg item
      * @param highlightColor         spots color pf the spawn egg item
      * @param itemPropertiesSupplier supplier for new item properties
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerItem(entityTypeHolder.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
@@ -289,7 +290,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a creative mode tab.
      *
      * @param iconHolder the tab icon item stack
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Holder<? extends ItemLike> iconHolder) {
         return this.registerCreativeModeTab(() -> new ItemStack(iconHolder.value()));
@@ -299,9 +300,26 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a creative mode tab.
      *
      * @param iconSupplier the tab icon item stack
-     * @return holder reference
+     * @return the holder reference
      */
-    Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier);
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
+        ResourceLocation resourceLocation = this.makeKey("main");
+        return this.registerCreativeModeTab(resourceLocation.getPath(),
+                iconSupplier,
+                CreativeModeTabHelper.getDisplayItems(resourceLocation.getNamespace()),
+                false);
+    }
+
+    /**
+     * Register a creative mode tab.
+     *
+     * @param iconSupplier the tab icon item stack
+     * @param displayItems the display items generator
+     * @return the holder reference
+     */
+    default Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems) {
+        return this.registerCreativeModeTab("main", iconSupplier, displayItems, false);
+    }
 
     /**
      * Register a creative mode tab.
@@ -310,7 +328,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param iconSupplier  the tab icon item stack
      * @param displayItems  the display items generator
      * @param withSearchBar should the tab include a search bar (only supported for NeoForge)
-     * @return holder reference
+     * @return the holder reference
      */
     Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar);
 
@@ -319,7 +337,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return holder reference
+     * @return the holder reference
      */
     default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> entry) {
         return this.register(Registries.DATA_COMPONENT_TYPE,
@@ -332,7 +350,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
         return this.register(Registries.FLUID, path, entry);
@@ -343,7 +361,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
         return this.register(Registries.MOB_EFFECT, path, entry);
@@ -353,7 +371,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a sound event.
      *
      * @param path path for new entry
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<SoundEvent> registerSoundEvent(String path) {
         return this.register(Registries.SOUND_EVENT, path, () -> {
@@ -366,7 +384,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> entry) {
         return this.registerPotion(path, (String s) -> entry.get());
@@ -377,7 +395,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path  path for new entry
      * @param entry function for entry to register, receiving the passed path parameter
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Potion> registerPotion(String path, Function<String, Potion> entry) {
         return this.register(Registries.POTION, path, () -> entry.apply(path));
@@ -387,7 +405,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register an enchantment.
      *
      * @param path path for new entry
-     * @return holder reference
+     * @return the holder reference
      */
     default ResourceKey<Enchantment> registerEnchantment(String path) {
         return this.makeResourceKey(Registries.ENCHANTMENT, path);
@@ -399,7 +417,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   entity type parameter
-     * @return holder reference
+     * @return the holder reference
      */
     @SuppressWarnings("unchecked")
     default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
@@ -417,7 +435,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param factory    factory for every newly created block entity instance
      * @param validBlock block allowed to use this block entity
      * @param <T>        block entity type parameter
-     * @return holder reference
+     * @return the holder reference
      */
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block> validBlock) {
         return this.registerBlockEntityType(path, factory, () -> Collections.singleton(validBlock.value()));
@@ -430,7 +448,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param factory     factory for every newly created block entity instance
      * @param validBlocks blocks allowed to use this block entity
      * @param <T>         block entity type parameter
-     * @return holder reference
+     * @return the holder reference
      */
     default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block>... validBlocks) {
         return this.registerBlockEntityType(path,
@@ -445,7 +463,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param factory     factory for every newly created block entity instance
      * @param validBlocks blocks allowed to use this block entity
      * @param <T>         block entity type parameter
-     * @return holder reference
+     * @return the holder reference
      */
     <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks);
 
@@ -455,7 +473,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   container menu type parameter
-     * @return holder reference
+     * @return the holder reference
      */
     @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
@@ -470,7 +488,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path  path for new entry
      * @param entry supplier for entry to register
      * @param <T>   container menu type
-     * @return holder reference
+     * @return the holder reference
      */
     <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
 
@@ -479,7 +497,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path          path for new entry
      * @param matchingBlock block valid for this poi type
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> matchingBlock) {
         return this.registerPoiType(path,
@@ -493,7 +511,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path           path for new entry
      * @param matchingBlocks blocks valid for this poi type
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block>... matchingBlocks) {
         return this.registerPoiType(path, 0, 1, () -> {
@@ -511,7 +529,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param maxTickets          max amount of accessor tickets
      * @param validRange          distance to search for this poi type
      * @param matchingBlockStates blocks states valid for this poi type
-     * @return holder reference
+     * @return the holder reference
      */
     Holder.Reference<PoiType> registerPoiType(String path, int maxTickets, int validRange, Supplier<Set<BlockState>> matchingBlockStates);
 
@@ -522,7 +540,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param argumentClass argument type class
      * @param argumentType  argument type factory
      * @param <A>           argument type
-     * @return holder reference
+     * @return the holder reference
      */
     default <A extends ArgumentType<?>> Holder.Reference<ArgumentTypeInfo<?, ?>> registerArgumentType(String path, Class<? extends A> argumentClass, Supplier<A> argumentType) {
         return this.registerArgumentType(path, argumentClass, SingletonArgumentInfo.contextFree(argumentType));
@@ -536,7 +554,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param argumentTypeInfo argument type info
      * @param <A>              argument type
      * @param <T>              argument type info
-     * @return holder reference
+     * @return the holder reference
      */
     <A extends ArgumentType<?>, T extends ArgumentTypeInfo.Template<A>> Holder.Reference<ArgumentTypeInfo<?, ?>> registerArgumentType(String path, Class<? extends A> argumentClass, ArgumentTypeInfo<A, T> argumentTypeInfo);
 
@@ -545,7 +563,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path path for new entry
      * @param <T>  recipe type
-     * @return holder reference
+     * @return the holder reference
      */
     default <T extends Recipe<?>> Holder.Reference<RecipeType<T>> registerRecipeType(String path) {
         return this.register(Registries.RECIPE_TYPE, path, () -> {
@@ -563,7 +581,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a recipe book category.
      *
      * @param path path for new entry
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<RecipeBookCategory> registerRecipeBookCategory(String path) {
         return this.register(Registries.RECIPE_BOOK_CATEGORY, path, () -> {
@@ -582,7 +600,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path               path for new entry
      * @param notificationRadius range in blocks in which this event will be listened to
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<GameEvent> registerGameEvent(String path, int notificationRadius) {
         return this.register(Registries.GAME_EVENT, path, () -> {
@@ -594,7 +612,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a simple particle type.
      *
      * @param path path for new entry
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<SimpleParticleType> registerParticleType(String path) {
         return this.register(Registries.PARTICLE_TYPE, path, () -> {
@@ -610,7 +628,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param codecGetter       the codec for serialization
      * @param streamCodecGetter the stream codec for network synchronization
      * @param <T>               the particle type
-     * @return holder reference
+     * @return the holder reference
      */
     default <T extends ParticleOptions> Holder.Reference<ParticleType<T>> registerParticleType(String path, boolean overrideLimiter, Function<ParticleType<T>, MapCodec<T>> codecGetter, Function<ParticleType<T>, StreamCodec<? super RegistryFriendlyByteBuf, T>> streamCodecGetter) {
         return this.register(Registries.PARTICLE_TYPE, path, () -> new ParticleType<T>(overrideLimiter) {
@@ -633,7 +651,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param defaultValue the default value when no base value is otherwise specified
      * @param minValue     the min value
      * @param maxValue     the max value
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue) {
         return this.registerAttribute(path, defaultValue, minValue, maxValue, true, Attribute.Sentiment.POSITIVE);
@@ -648,7 +666,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param maxValue     the max value
      * @param syncable     is this attribute synced to clients
      * @param sentiment    the sentiment used for the attribute color on tooltips
-     * @return holder reference
+     * @return the holder reference
      */
     default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue, boolean syncable, Attribute.Sentiment sentiment) {
         Objects.requireNonNull(sentiment, "sentiment is null");
@@ -668,7 +686,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param path  path for new entry
      * @param entry supplier for entry to register
-     * @return holder reference
+     * @return the holder reference
      */
     <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry);
 

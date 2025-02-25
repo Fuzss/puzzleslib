@@ -99,6 +99,13 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register items for usage with the composter block
+     */
+    default void onRegisterCompostableBlocks(CompostableBlocksContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context register various block transformations triggered by right-clicking with certain vanilla tools
      */
     default void onRegisterBlockInteractions(BlockInteractionsContext context) {
@@ -108,6 +115,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context register new creative mode tabs via the respective builder
      */
+    @Deprecated
     default void onRegisterCreativeModeTabs(final CreativeModeTabContext context) {
         // NO-OP
     }

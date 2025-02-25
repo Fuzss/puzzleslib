@@ -27,10 +27,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -130,18 +127,21 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
             }
         });
         multimap.asMap()
-                .forEach((string, collection) -> PuzzlesLib.LOGGER.warn("Missing textures in model {}:\n{}",
+                .forEach((String string, Collection<Material> collection) -> PuzzlesLib.LOGGER.warn(
+                        "Missing textures in model {}:\n{}",
                         string,
                         collection.stream()
                                 .sorted(Material.COMPARATOR)
-                                .map(arg -> "    " + arg.atlasLocation() + ":" + arg.texture())
+                                .map((Material material) -> "    " + material.atlasLocation() + ":" +
+                                        material.texture())
                                 .collect(Collectors.joining("\n"))));
         multimap1.asMap()
-                .forEach((string, collection) -> PuzzlesLib.LOGGER.warn("Missing texture references in model {}:\n{}",
+                .forEach((String string, Collection<String> collection) -> PuzzlesLib.LOGGER.warn(
+                        "Missing texture references in model {}:\n{}",
                         string,
                         collection.stream()
                                 .sorted()
-                                .map(stringx -> "    " + stringx)
+                                .map((String stringx) -> "    " + stringx)
                                 .collect(Collectors.joining("\n"))));
         profiler.pop();
         return bakingResult;

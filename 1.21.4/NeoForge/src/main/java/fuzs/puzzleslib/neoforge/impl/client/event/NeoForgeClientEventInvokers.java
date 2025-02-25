@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.shaders.FogShape;
-import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
-import fuzs.puzzleslib.api.client.event.v1.ClientStartedCallback;
-import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.InputEvents;
+import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
@@ -37,6 +34,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
@@ -88,6 +86,9 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(ClientStartedCallback.class, FMLLoadCompleteEvent.class, (ClientStartedCallback callback, FMLLoadCompleteEvent evt) -> {
             evt.enqueueWork(() -> callback.onClientStarted(Minecraft.getInstance()));
+        });
+        INSTANCE.register(ClientSetupCallback.class, FMLClientSetupEvent.class, (ClientSetupCallback callback, FMLClientSetupEvent evt) -> {
+            evt.enqueueWork(callback::onClientSetup);
         });
     }
 

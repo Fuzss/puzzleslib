@@ -1,9 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
-import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
-import fuzs.puzzleslib.api.client.event.v1.ClientStartedCallback;
-import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.InputEvents;
+import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
@@ -154,6 +151,9 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ModelBakingCompleteCallback.class, FabricClientEvents.MODEL_BAKING_COMPLETE);
         INSTANCE.register(ClientStartedCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
             return callback::onClientStarted;
+        });
+        INSTANCE.register(ClientSetupCallback.class, (ClientSetupCallback callback, @Nullable Object context) -> {
+            callback.onClientSetup();
         });
     }
 

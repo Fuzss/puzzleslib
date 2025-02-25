@@ -26,10 +26,10 @@ public final class FogEvents {
          *
          * @param gameRenderer the game renderer instance
          * @param camera       the camera instance
-         * @param partialTick  partial ticks for this rendering operation
-         * @param fogRed       red color component
-         * @param fogGreen     green color component
-         * @param fogBlue      blue color component
+         * @param partialTick  the partial tick
+         * @param fogRed       the red color component
+         * @param fogGreen     the green color component
+         * @param fogBlue      the blue color component
          */
         void onComputeFogColor(GameRenderer gameRenderer, Camera camera, float partialTick, MutableFloat fogRed, MutableFloat fogGreen, MutableFloat fogBlue);
     }
@@ -42,12 +42,12 @@ public final class FogEvents {
          *
          * @param gameRenderer the game renderer instance
          * @param camera       the camera instance
-         * @param partialTick  partial ticks for this rendering operation
-         * @param fogMode      fog mode
-         * @param fogType      fog type
-         * @param fogStart     distance from the camera for the fog to start
-         * @param fogEnd       distance from the camera for the fog to end
-         * @param fogShape     spherical or cylindrical fog shape
+         * @param partialTick  the partial tick
+         * @param fogMode      the fog mode
+         * @param fogType      the fog type
+         * @param fogStart     the distance from the camera for the fog to start
+         * @param fogEnd       the distance from the camera for the fog to end
+         * @param fogShape     the spherical or cylindrical fog shape
          */
         void onRenderFog(GameRenderer gameRenderer, Camera camera, float partialTick, FogRenderer.FogMode fogMode, FogType fogType, MutableFloat fogStart, MutableFloat fogEnd, MutableValue<FogShape> fogShape);
     }

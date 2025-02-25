@@ -19,9 +19,9 @@ public final class GameRenderEvents {
         /**
          * Fires before the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
          *
-         * @param minecraft    minecraft singleton instance
-         * @param gameRenderer game renderer instance
-         * @param deltaTracker partial tick time, different when the game is paused
+         * @param minecraft    the minecraft singleton
+         * @param gameRenderer the game renderer
+         * @param deltaTracker the delta tracker for retrieving partial tick time
          */
         void onBeforeGameRender(Minecraft minecraft, GameRenderer gameRenderer, DeltaTracker deltaTracker);
     }
@@ -32,9 +32,9 @@ public final class GameRenderEvents {
         /**
          * Fires after the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
          *
-         * @param minecraft    minecraft singleton instance
-         * @param gameRenderer game renderer instance
-         * @param deltaTracker partial tick time, different when the game is paused
+         * @param minecraft    the minecraft singleton
+         * @param gameRenderer the game renderer
+         * @param deltaTracker the delta tracker for retrieving partial tick time
          */
         void onAfterGameRender(Minecraft minecraft, GameRenderer gameRenderer, DeltaTracker deltaTracker);
     }
