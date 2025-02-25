@@ -15,7 +15,7 @@ public interface ComputeFieldOfViewCallback {
      *
      * @param renderer    the game renderer instance
      * @param camera      the client camera instance
-     * @param partialTick partial ticks
+     * @param partialTick the partial tick
      * @param fieldOfView the field of view value
      */
     void onComputeFieldOfView(GameRenderer renderer, Camera camera, float partialTick, MutableFloat fieldOfView);

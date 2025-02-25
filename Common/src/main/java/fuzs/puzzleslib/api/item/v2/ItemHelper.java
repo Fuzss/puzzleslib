@@ -27,26 +27,26 @@ public final class ItemHelper {
      *
      * @param itemStack       the item stack to be hurt
      * @param amount          the amount to damage the stack by
-     * @param entity          the entity using the stack
+     * @param livingEntity    the entity using the stack
      * @param interactionHand the hand using the stack
      */
-    public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity entity, InteractionHand interactionHand) {
-        hurtAndBreak(itemStack, amount, entity, LivingEntity.getSlotForHand(interactionHand));
+    public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity livingEntity, InteractionHand interactionHand) {
+        hurtAndBreak(itemStack, amount, livingEntity, LivingEntity.getSlotForHand(interactionHand));
     }
 
     /**
      * Called for damaging an item stack, potentially breaking it when it runs out of durability.
      *
-     * @param itemStack the item stack to be hurt
-     * @param amount    the amount to damage the stack by
-     * @param entity    the entity using the stack
-     * @param slot      the slot the stack is present in
+     * @param itemStack     the item stack to be hurt
+     * @param amount        the amount to damage the stack by
+     * @param livingEntity  the entity using the stack
+     * @param equipmentSlot the slot the stack is present in
      */
-    public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity entity, EquipmentSlot slot) {
-        if (entity.level() instanceof ServerLevel serverLevel) {
-            ServerPlayer serverPlayer = entity instanceof ServerPlayer ? (ServerPlayer) entity : null;
+    public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity livingEntity, EquipmentSlot equipmentSlot) {
+        if (livingEntity.level() instanceof ServerLevel serverLevel) {
+            ServerPlayer serverPlayer = livingEntity instanceof ServerPlayer ? (ServerPlayer) livingEntity : null;
             hurtAndBreak(itemStack, amount, serverLevel, serverPlayer, (Item item) -> {
-                entity.onEquippedItemBroken(item, slot);
+                livingEntity.onEquippedItemBroken(item, equipmentSlot);
             });
         }
     }
@@ -56,14 +56,14 @@ public final class ItemHelper {
      *
      * @param itemStack    the item stack to be hurt
      * @param amount       the amount to damage the stack by
-     * @param level        the level
+     * @param serverLevel  the level
      * @param serverPlayer the player using the stack
      * @param onBreak      what happens when the stack breaks, usually calls
      *                     {@link LivingEntity#onEquippedItemBroken(Item, EquipmentSlot)}
      */
-    public static void hurtAndBreak(ItemStack itemStack, int amount, ServerLevel level, @Nullable ServerPlayer serverPlayer, Consumer<Item> onBreak) {
+    public static void hurtAndBreak(ItemStack itemStack, int amount, ServerLevel serverLevel, @Nullable ServerPlayer serverPlayer, Consumer<Item> onBreak) {
         ItemStack originalItemStack = copyItemStackIfNecessary(itemStack, serverPlayer);
-        itemStack.hurtAndBreak(amount, level, serverPlayer, (Item item) -> {
+        itemStack.hurtAndBreak(amount, serverLevel, serverPlayer, (Item item) -> {
             onBreak.accept(item);
             if (serverPlayer != null) {
                 CommonAbstractions.INSTANCE.onPlayerDestroyItem(serverPlayer, originalItemStack, null);

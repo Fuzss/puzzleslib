@@ -3,6 +3,7 @@ package fuzs.puzzleslib.fabric.api.event.v1.core;
 import com.google.common.reflect.AbstractInvocationHandler;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.world.InteractionResult;
@@ -15,28 +16,31 @@ import java.lang.reflect.Proxy;
 /**
  * A helper class for avoiding boilerplate code when defining new events on Fabric.
  * <p>
- * Especially useful when converting events from common to dedicated Fabric {@link Event}s.
+ * Especially useful when converting events from common to dedicated {@link Event Fabric Events}.
  * <p>
  * Thanks a lot to <a
  * href="https://github.com/architectury/architectury-api/blob/1.19.3/common/src/main/java/dev/architectury/event/EventFactory.java">EventFactory.java</a>
- * from Architectury API for this implementation.
+ * from <a href="https://github.com/architectury/architectury-api">Architectury API</a> for this implementation.
  */
 @SuppressWarnings("unchecked")
 public final class FabricEventFactory {
 
+    private FabricEventFactory() {
+        // NO-OP
+    }
+
     /**
-     * Creates a new event from a functional interface without a result, meaning the interface method returns
-     * {@link Void}.
+     * Creates a new event from a {@link FunctionalInterface} returning {@link Void}.
      *
-     * @param type event type
-     * @param <T>  event type
-     * @return the Fabric event
+     * @param type the event type
+     * @param <T>  the event type
+     * @return the Fabric event implementation
      */
     public static <T> Event<T> create(Class<? super T> type) {
         return EventFactory.createArrayBacked(type,
-                events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type},
+                (T[] events) -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(),
+                        new Class[]{type},
                         new AbstractInvocationHandler() {
-
                             @Override
                             protected Object handleInvocation(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
                                 for (Object event : events) {
@@ -44,139 +48,135 @@ public final class FabricEventFactory {
                                 }
                                 return null;
                             }
-                        }
-                )
-        );
+                        }));
     }
 
     /**
-     * Creates a new event from a functional interface with an event result, meaning the interface method returns
-     * {@link EventResult}.
+     * Creates a new event from a {@link FunctionalInterface} returning {@link EventResult}.
+     * <p>
+     * The implementation stops for the first callback that does not return {@link EventResult#PASS}.
      *
-     * <p>The implementation stops for the first callback that does not return {@link EventResult#PASS}.
-     *
-     * @param type event type
-     * @param <T>  event type
-     * @return the Fabric event
+     * @param type the event type
+     * @param <T>  the event type
+     * @return the Fabric event implementation
      */
     public static <T> Event<T> createResult(Class<? super T> type) {
         return EventFactory.createArrayBacked(type,
-                events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type},
+                (T[] events) -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(),
+                        new Class[]{type},
                         new AbstractInvocationHandler() {
-
                             @Override
                             protected Object handleInvocation(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
                                 for (Object event : events) {
-                                    EventResult result = invokeFast(event, method, args);
-                                    if (result.isInterrupt()) {
-                                        return result;
+                                    Object o = invokeFast(event, method, args);
+                                    if (o instanceof EventResult result) {
+                                        if (result.isInterrupt()) {
+                                            return o;
+                                        }
+                                    } else {
+                                        PuzzlesLib.LOGGER.warn("Result mismatch for event {}", type.getName());
                                     }
                                 }
                                 return EventResult.PASS;
                             }
-                        }
-                )
-        );
+                        }));
     }
 
     /**
-     * Creates a new event from a functional interface with an event result holder, meaning the interface method returns
-     * an instance of {@link EventResultHolder}.
+     * Creates a new event from a {@link FunctionalInterface} returning {@link EventResultHolder}.
+     * <p>
+     * The implementation stops for the first callback that does not return {@link EventResultHolder#pass()}.
      *
-     * <p>The implementation stops for the first callback that does not return {@link EventResultHolder#pass()}.
-     *
-     * @param type event type
-     * @param <T>  event type
-     * @return the Fabric event
+     * @param type the event type
+     * @param <T>  the event type
+     * @return the Fabric event implementation
      */
     public static <T> Event<T> createResultHolder(Class<? super T> type) {
         return EventFactory.createArrayBacked(type,
-                events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type},
+                (T[] events) -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(),
+                        new Class[]{type},
                         new AbstractInvocationHandler() {
-
                             @Override
                             protected Object handleInvocation(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
                                 for (Object event : events) {
-                                    EventResultHolder<?> holder = invokeFast(event, method, args);
-                                    if (holder.isInterrupt()) {
-                                        return holder;
+                                    Object o = invokeFast(event, method, args);
+                                    if (o instanceof EventResultHolder<?> holder) {
+                                        if (holder.isInterrupt()) {
+                                            return o;
+                                        }
+                                    } else {
+                                        PuzzlesLib.LOGGER.warn("Result mismatch for event {}", type.getName());
                                     }
                                 }
                                 return EventResultHolder.pass();
                             }
-                        }
-                )
-        );
+                        }));
     }
 
     /**
-     * Creates a new event from a functional interface with a boolean result, meaning the interface method returns a
-     * primitive boolean.
+     * Creates a new event from a {@link FunctionalInterface} returning an {@link Boolean}.
+     * <p>
+     * The implementation stops for the first callback that does return a value different from the method parameter.
      *
-     * <p>The implementation stops for the first callback that returns the same value as provided by
-     * <code>inverted</code>.
-     *
-     * <p>This helper method exists to aid in creating events similar to implementations in Fabric Api.
-     *
-     * @param type     event type
-     * @param inverted should boolean result be inverted when determining when to interrupt event invocation
-     * @param <T>      event type
-     * @return the Fabric event
+     * @param type  the event type
+     * @param value the boolean value to match for an early return
+     * @param <T>   the event type
+     * @return the Fabric event implementation
      */
-    public static <T> Event<T> createBooleanResult(Class<? super T> type, boolean inverted) {
+    public static <T> Event<T> createBooleanResult(Class<? super T> type, boolean value) {
         return EventFactory.createArrayBacked(type,
-                events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type},
+                (T[] events) -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(),
+                        new Class[]{type},
                         new AbstractInvocationHandler() {
-
                             @Override
                             protected Object handleInvocation(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
                                 for (Object event : events) {
-                                    boolean result = invokeFast(event, method, args);
-                                    if (result == inverted) {
-                                        return result;
+                                    Object o = invokeFast(event, method, args);
+                                    if (o instanceof Boolean bool) {
+                                        if (bool == value) {
+                                            return o;
+                                        }
+                                    } else {
+                                        PuzzlesLib.LOGGER.warn("Result mismatch for event {}", type.getName());
                                     }
                                 }
-                                return !inverted;
+                                return !value;
                             }
-                        }
-                )
-        );
+                        }));
     }
 
     /**
-     * Creates a new event from a functional interface with a vanilla result, meaning the interface method returns
-     * {@link InteractionResult}.
+     * Creates a new event from a {@link FunctionalInterface} returning {@link InteractionResult}.
+     * <p>
+     * The implementation stops for the first callback that does not return {@link InteractionResult#PASS}.
      *
-     * <p>The implementation stops for the first callback that does not return {@link InteractionResult#PASS}.
-     *
-     * <p>This helper method exists to aid in creating events similar to implementations in Fabric Api.
-     *
-     * @param type event type
-     * @param <T>  event type
-     * @return the Fabric event
+     * @param type the event type
+     * @param <T>  the event type
+     * @return the Fabric event implementation
      */
     public static <T> Event<T> createInteractionResult(Class<? super T> type) {
         return EventFactory.createArrayBacked(type,
-                events -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(), new Class[]{type},
+                (T[] events) -> (T) Proxy.newProxyInstance(EventFactory.class.getClassLoader(),
+                        new Class[]{type},
                         new AbstractInvocationHandler() {
-
                             @Override
                             protected Object handleInvocation(Object proxy, Method method, @Nullable Object[] args) throws Throwable {
                                 for (Object event : events) {
-                                    InteractionResult result = invokeFast(event, method, args);
-                                    if (result != InteractionResult.PASS) {
-                                        return result;
+                                    Object o = invokeFast(event, method, args);
+                                    if (o instanceof InteractionResult interactionResult) {
+                                        if (interactionResult != InteractionResult.PASS) {
+                                            return o;
+                                        }
+                                    } else {
+                                        PuzzlesLib.LOGGER.warn("Result mismatch for event {}", type.getName());
                                     }
                                 }
                                 return InteractionResult.PASS;
                             }
-                        }
-                )
-        );
+                        }));
     }
 
-    @SuppressWarnings("unchecked")
-    private static <T> T invokeFast(Object object, Method method, Object[] args) throws Throwable {
-        return (T) MethodHandles.lookup().unreflect(method).bindTo(object).invokeWithArguments(args);
+    private static Object invokeFast(Object object, Method method, Object[] args) throws Throwable {
+        return MethodHandles.lookup().unreflect(method).bindTo(object).invokeWithArguments(args);
     }
 }

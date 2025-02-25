@@ -61,10 +61,10 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.IModBusEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.TriState;
-import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.*;
@@ -133,6 +133,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             if (resourceKey == evt.getTabKey()) {
                 callback.onBuildCreativeModeTabContents(evt.getTab(), evt.getParameters(), evt);
             }
+        });
+        INSTANCE.register(CommonSetupCallback.class, FMLCommonSetupEvent.class, (CommonSetupCallback callback, FMLCommonSetupEvent evt) -> {
+            evt.enqueueWork(callback::onCommonSetup);
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerLoadingHandlers();

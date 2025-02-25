@@ -130,6 +130,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 });
             };
         });
+        INSTANCE.register(CommonSetupCallback.class, (CommonSetupCallback callback, @Nullable Object context) -> {
+            callback.onCommonSetup();
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerLoadingHandlers();
         }

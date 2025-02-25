@@ -79,14 +79,6 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     protected abstract <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration);
 
     @Override
-    public Holder.Reference<CreativeModeTab> registerCreativeModeTab(Supplier<ItemStack> iconSupplier) {
-        return this.registerCreativeModeTab("main",
-                iconSupplier,
-                CreativeModeTabHelper.getDisplayItems(this.modId),
-                false);
-    }
-
-    @Override
     public Holder.Reference<CreativeModeTab> registerCreativeModeTab(String path, Supplier<ItemStack> iconSupplier, CreativeModeTab.DisplayItemsGenerator displayItems, boolean withSearchBar) {
         return this.register(Registries.CREATIVE_MODE_TAB, path, () -> {
             CreativeModeTab.Builder builder = this.getCreativeModeTabBuilder(withSearchBar);

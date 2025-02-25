@@ -16,9 +16,9 @@ public interface ExtendedMenuSupplier<T extends AbstractContainerMenu> {
     /**
      * Creates the supplied container menu.
      *
-     * @param containerId             menu id
-     * @param inventory               player inventory
-     * @param registryFriendlyByteBuf additional data to be sent to client
+     * @param containerId             the menu id
+     * @param inventory               the player inventory
+     * @param registryFriendlyByteBuf some additional data to be sent to client
      * @return the container menu
      */
     T create(int containerId, Inventory inventory, RegistryFriendlyByteBuf registryFriendlyByteBuf);

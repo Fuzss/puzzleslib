@@ -18,7 +18,7 @@ public interface ExtractRenderStateCallback {
      *
      * @param entity      the entity
      * @param renderState the entity render state
-     * @param partialTick the current partial tick
+     * @param partialTick the partial tick
      */
     void onExtractRenderState(Entity entity, EntityRenderState renderState, float partialTick);
 }
