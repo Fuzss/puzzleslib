@@ -5,6 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -206,4 +208,15 @@ public interface CommonAbstractions {
      * @return <code>true</code> to mark the explosion as handled, {@link ServerExplosion#explode()} is not called
      */
     boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion);
+
+    /**
+     * Creates a style for item names for a rarity.
+     * <p>
+     * Alternatively use {@link ItemStack#getStyledHoverName()} where possible.
+     *
+     * @param rarity the rarity
+     * @return the style for this rarity, apply via {@link net.minecraft.network.chat.MutableComponent#withStyle(Style)}
+     *         or {@link Style#applyTo(Style)}
+     */
+    Style getRarityStyle(Rarity rarity);
 }

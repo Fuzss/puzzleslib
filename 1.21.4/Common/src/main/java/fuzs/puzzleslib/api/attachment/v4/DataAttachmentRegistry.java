@@ -8,6 +8,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -196,6 +197,8 @@ public final class DataAttachmentRegistry {
 
         /**
          * Automatically synchronize the attachment value with remotes.
+         * <p>
+         * The internally used player set is equivalent to {@link PlayerSet#ofPlayer(ServerPlayer)}.
          *
          * @param streamCodec the attachment value stream codec
          * @return the builder instance
@@ -208,7 +211,8 @@ public final class DataAttachmentRegistry {
          * Automatically synchronize the attachment value with remotes.
          *
          * @param streamCodec            the attachment value stream codec
-         * @param synchronizationTargets the player targets to synchronize the attachment value with
+         * @param synchronizationTargets the player targets to synchronize the attachment value with, usually
+         *                               {@link PlayerSet#nearEntity(Entity)}
          * @return the builder instance
          */
         EntityBuilder<V> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets);
