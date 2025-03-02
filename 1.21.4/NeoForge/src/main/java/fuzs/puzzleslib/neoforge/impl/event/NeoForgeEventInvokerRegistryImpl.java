@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.event;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
+import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
@@ -27,10 +28,13 @@ import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootB
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -136,6 +140,33 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(CommonSetupCallback.class, FMLCommonSetupEvent.class, (CommonSetupCallback callback, FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(callback::onCommonSetup);
+        });
+        // TODO the solution is bad and only temporary until the deprecated callback is fully removed
+        INSTANCE.register(RegisterFuelValuesCallback.class, (RegisterFuelValuesCallback callback, @Nullable Object context) -> {
+            FuelValues[] fuelValues = new FuelValues[1];
+            NeoForgeModContainerHelper.getActiveModEventBus().addListener((final FMLLoadCompleteEvent evt) -> {
+                RegistryAccess.ImmutableRegistryAccess registries = new RegistryAccess.ImmutableRegistryAccess(
+                        List.of(new MappedRegistry<>(Registries.ITEM, Lifecycle.stable())));
+                FuelValues.Builder builder = new FuelValues.Builder(registries,
+                        FeatureFlags.REGISTRY.allFlags()
+                );
+                callback.onRegisterFuelValues(builder, 200);
+                fuelValues[0] = builder.build();
+            });
+            NeoForge.EVENT_BUS.addListener((final AddServerReloadListenersEvent evt) -> {
+                FuelValues.Builder builder = new FuelValues.Builder(evt.getRegistryAccess(),
+                        FeatureFlags.REGISTRY.allFlags()
+                );
+                callback.onRegisterFuelValues(builder, 200);
+                fuelValues[0] = builder.build();
+            });
+            NeoForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
+                Objects.requireNonNull(fuelValues[0], "fuel values is null when trying to lookup " + evt.getItemStack().getItem());
+                if (fuelValues[0].isFuel(evt.getItemStack())) {
+                    evt.setBurnTime(fuelValues[0].burnDuration(evt.getItemStack()));
+                    evt.setCanceled(true);
+                }
+            });
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerLoadingHandlers();
@@ -679,23 +710,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, RegisterBrewingRecipesEvent.class, (RegisterPotionBrewingMixesCallback callback, RegisterBrewingRecipesEvent evt) -> {
             callback.onRegisterPotionBrewingMixes(new NeoForgePotionBrewingBuilder(evt.getBuilder()));
-        });
-        INSTANCE.register(RegisterFuelValuesCallback.class, (RegisterFuelValuesCallback callback, @Nullable Object context) -> {
-            FuelValues[] fuelValues = new FuelValues[1];
-            NeoForge.EVENT_BUS.addListener((final AddServerReloadListenersEvent evt) -> {
-                FuelValues.Builder builder = new FuelValues.Builder(evt.getRegistryAccess(),
-                        FeatureFlags.REGISTRY.allFlags()
-                );
-                callback.onRegisterFuelValues(builder, 200);
-                fuelValues[0] = builder.build();
-            });
-            NeoForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
-                Objects.requireNonNull(fuelValues[0], "fuel values is null");
-                if (fuelValues[0].isFuel(evt.getItemStack())) {
-                    evt.setBurnTime(fuelValues[0].burnDuration(evt.getItemStack()));
-                    evt.setCanceled(true);
-                }
-            });
         });
         INSTANCE.register(AddDataPackReloadListenersCallback.class, AddServerReloadListenersEvent.class, (AddDataPackReloadListenersCallback callback, AddServerReloadListenersEvent evt) -> {
             callback.onAddDataPackReloadListeners(evt.getRegistryAccess(), evt.getServerResources().getRegistryLookup(), (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
