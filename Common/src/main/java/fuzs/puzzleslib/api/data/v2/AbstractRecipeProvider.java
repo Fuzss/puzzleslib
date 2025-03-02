@@ -16,6 +16,7 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.BlockFamily;
 import net.minecraft.data.CachedOutput;
@@ -31,6 +32,7 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
@@ -177,10 +179,59 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                 .pattern("###");
     }
 
-    public void foodCooking(ItemLike result, ItemLike ingredient) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient), RecipeCategory.FOOD, result, 0.35F, 200)
+    public void metalCooking(ItemLike result, ItemLike ingredient, float experience) {
+        this.metalCooking(result, ingredient, experience, 200);
+    }
+
+    public void metalCooking(ItemLike result, ItemLike ingredient, float experience, int baseCookingTime) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient),
+                RecipeCategory.MISC,
+                result,
+                experience,
+                baseCookingTime).unlockedBy(getHasName(ingredient), this.has(ingredient)).save(this.output);
+        SimpleCookingRecipeBuilder.blasting(Ingredient.of(ingredient),
+                        RecipeCategory.MISC,
+                        result,
+                        experience,
+                        baseCookingTime / 2)
                 .unlockedBy(getHasName(ingredient), this.has(ingredient))
-                .save(this.output);
+                .save(this.output, getBlastingRecipeName(result));
+    }
+
+    public void foodCooking(ItemLike result, ItemLike ingredient) {
+        this.foodCooking(result, ingredient, 0.35F, 200);
+    }
+
+    public void foodCooking(ItemLike result, ItemLike ingredient, float experience, int baseCookingTime) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient),
+                RecipeCategory.FOOD,
+                result,
+                experience,
+                baseCookingTime).unlockedBy(getHasName(ingredient), this.has(ingredient)).save(this.output);
+        SimpleCookingRecipeBuilder.smoking(Ingredient.of(ingredient),
+                        RecipeCategory.FOOD,
+                        result,
+                        experience,
+                        baseCookingTime / 2)
+                .unlockedBy(getHasName(ingredient), this.has(ingredient))
+                .save(this.output, getCraftingMethodRecipeName(result, RecipeSerializer.SMOKING_RECIPE));
+        SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(ingredient),
+                        RecipeCategory.FOOD,
+                        result,
+                        experience,
+                        baseCookingTime * 3)
+                .unlockedBy(getHasName(ingredient), this.has(ingredient))
+                .save(this.output, getCraftingMethodRecipeName(result, RecipeSerializer.CAMPFIRE_COOKING_RECIPE));
+    }
+
+    public static String getCraftingMethodRecipeName(ItemLike result, RecipeSerializer<?> recipeSerializer) {
+        ResourceLocation resourceLocation = BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipeSerializer);
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        return getCraftingMethodRecipeName(result, resourceLocation.getPath());
+    }
+
+    public static String getCraftingMethodRecipeName(ItemLike result, String craftingMethod) {
+        return getItemName(result) + "_from_" + craftingMethod;
     }
 
     public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike result, Ingredient material) {

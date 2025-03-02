@@ -31,8 +31,8 @@ public final class GiveItemHelper {
     /**
      * Gives an {@link ItemStack} to a {@link ServerPlayer} using the same mechanics as {@link GiveCommand}.
      *
-     * @param itemStack     the item stack to give to the player
-     * @param serverPlayers the player to give the item stack to
+     * @param itemStack    the item stack to give to the player
+     * @param serverPlayer the player to give the item stack to
      */
     public static void giveItem(ItemStack itemStack, ServerPlayer serverPlayer) {
         giveItem(createEmptyCommandSource(serverPlayer.serverLevel()), itemStack, Collections.singleton(serverPlayer));
