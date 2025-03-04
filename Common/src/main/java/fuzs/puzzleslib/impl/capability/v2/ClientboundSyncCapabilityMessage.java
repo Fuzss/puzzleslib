@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.capability;
+package fuzs.puzzleslib.impl.capability.v2;
 
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.network.v3.ClientMessageListener;

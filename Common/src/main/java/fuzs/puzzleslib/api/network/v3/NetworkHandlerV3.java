@@ -76,6 +76,16 @@ public interface NetworkHandlerV3 {
     <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message);
 
     /**
+     * Send message from server to clients.
+     *
+     * @param playerSet players to send to
+     * @param message   message to send
+     */
+    default <T extends Record & ClientboundMessage<T>> void sendMessage(PlayerSet playerSet, T message) {
+        playerSet.broadcast(this.toClientboundPacket(message));
+    }
+
+    /**
      * Send message from client to server.
      *
      * @param message message to send
@@ -184,7 +194,9 @@ public interface NetworkHandlerV3 {
      */
     default <T extends Record & ClientboundMessage<T>> void sendToAllNear(@Nullable ServerPlayer exclude, double posX, double posY, double posZ, double distance, ServerLevel level, T message) {
         Objects.requireNonNull(level, "level is null");
-        level.getServer().getPlayerList().broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
+        level.getServer()
+                .getPlayerList()
+                .broadcast(exclude, posX, posY, posZ, distance, level.dimension(), this.toClientboundPacket(message));
     }
 
     /**
@@ -307,8 +319,9 @@ public interface NetworkHandlerV3 {
     interface Builder extends NetworkHandlerRegistry, Buildable {
 
         /**
-         * Register a new {@link MessageSerializer} by providing a {@link net.minecraft.network.FriendlyByteBuf.Writer} and a {@link net.minecraft.network.FriendlyByteBuf.Reader},
-         * similarly to vanilla's {@link EntityDataSerializer}
+         * Register a new {@link MessageSerializer} by providing a {@link net.minecraft.network.FriendlyByteBuf.Writer}
+         * and a {@link net.minecraft.network.FriendlyByteBuf.Reader}, similarly to vanilla's
+         * {@link EntityDataSerializer}
          *
          * @param type   type to serialize, inheritance is not supported
          * @param writer writer to byte buffer
@@ -335,9 +348,11 @@ public interface NetworkHandlerV3 {
         }
 
         /**
-         * Register a custom serializer for container types. Subclasses are supported, meaning e.g. any map implementation will be handled by a provider registered for {@link Map}.
+         * Register a custom serializer for container types. Subclasses are supported, meaning e.g. any map
+         * implementation will be handled by a provider registered for {@link Map}.
          *
-         * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a specific collection type, a unique serializer must be registered.
+         * <p>All types extending collection are by default deserialized in a {@link LinkedHashSet}. To enable a
+         * specific collection type, a unique serializer must be registered.
          * This is already done for {@link List}s, which are deserialized as {@link ArrayList}.
          *
          * @param type    container type

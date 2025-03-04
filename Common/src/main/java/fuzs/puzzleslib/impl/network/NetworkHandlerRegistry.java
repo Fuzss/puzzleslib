@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.network;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
+import fuzs.puzzleslib.api.network.v3.PlayerSet;
 import fuzs.puzzleslib.api.network.v3.ServerboundMessage;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.protocol.Packet;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -27,6 +29,12 @@ public interface NetworkHandlerRegistry extends NetworkHandlerV3 {
     @Deprecated
     @Override
     <T extends Record & ServerboundMessage<T>> Packet<ServerGamePacketListener> toServerboundPacket(T message);
+
+    @Deprecated
+    @Override
+    default <T extends Record & ClientboundMessage<T>> void sendMessage(PlayerSet playerSet, T message) {
+        NetworkHandlerV3.super.sendMessage(playerSet, message);
+    }
 
     @Deprecated
     @Override

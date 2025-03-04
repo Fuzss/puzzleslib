@@ -40,7 +40,8 @@ public abstract class ModContext {
     private final Set<ContentRegistrationFlags> handledFlags = EnumSet.noneOf(ContentRegistrationFlags.class);
     @Nullable RegistryManager registryManagerV2;
     @Nullable fuzs.puzzleslib.api.init.v3.RegistryManager registryManagerV3;
-    @Nullable CapabilityController capabilityController;
+    @Nullable CapabilityController capabilityControllerV2;
+    @Nullable fuzs.puzzleslib.api.capability.v3.CapabilityController capabilityControllerV3;
     // true by default for dedicated servers, is reset on client when joining new world
     private boolean presentServerside = true;
 
@@ -74,7 +75,7 @@ public abstract class ModContext {
     }
 
     public static Stream<CapabilityController> getCapabilityControllers() {
-        return MOD_CONTEXTS.values().stream().map(context -> context.capabilityController).filter(Objects::nonNull);
+        return MOD_CONTEXTS.values().stream().map(context -> context.capabilityControllerV2).filter(Objects::nonNull);
     }
 
     public static ResourceLocation getPairingIdentifier(String modId, BaseModConstructor modConstructor) {
@@ -100,7 +101,9 @@ public abstract class ModContext {
 
     public abstract fuzs.puzzleslib.api.init.v3.RegistryManager getRegistryManagerV3();
 
-    public abstract CapabilityController getCapabilityController();
+    public abstract CapabilityController getCapabilityControllerV2();
+
+    public abstract fuzs.puzzleslib.api.capability.v3.CapabilityController getCapabilityControllerV3();
 
     <T extends Buildable> T addBuildable(T buildable) {
         Objects.requireNonNull(buildable, "buildable is null");

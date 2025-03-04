@@ -1,7 +1,7 @@
-package fuzs.puzzleslib.impl.capability;
+package fuzs.puzzleslib.impl.capability.v2;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.impl.capability.data.ComponentHolder;
+import fuzs.puzzleslib.impl.capability.v2.data.ComponentHolder;
 
 import java.util.function.Function;
 

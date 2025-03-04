@@ -5,7 +5,7 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.init.v2.RegistryManager;
 import fuzs.puzzleslib.api.network.v2.NetworkHandlerV2;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.impl.capability.FabricCapabilityController;
+import fuzs.puzzleslib.impl.capability.v2.FabricCapabilityController;
 import fuzs.puzzleslib.impl.config.FabricConfigHolderImpl;
 import fuzs.puzzleslib.impl.init.FabricRegistryManagerV2;
 import fuzs.puzzleslib.impl.init.FabricRegistryManagerV3;
@@ -54,10 +54,18 @@ public final class FabricModContext extends ModContext {
     }
 
     @Override
-    public CapabilityController getCapabilityController() {
-        if (this.capabilityController == null) {
-            this.capabilityController = new FabricCapabilityController(this.modId);
+    public CapabilityController getCapabilityControllerV2() {
+        if (this.capabilityControllerV2 == null) {
+            this.capabilityControllerV2 = new FabricCapabilityController(this.modId);
         }
-        return this.capabilityController;
+        return this.capabilityControllerV2;
+    }
+
+    @Override
+    public fuzs.puzzleslib.api.capability.v3.CapabilityController getCapabilityControllerV3() {
+        if (this.capabilityControllerV3 == null) {
+            this.capabilityControllerV3 = new fuzs.puzzleslib.impl.capability.v3.FabricCapabilityController(this.modId);
+        }
+        return this.capabilityControllerV3;
     }
 }
