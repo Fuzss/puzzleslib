@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.26-1.20.1] - 2025-03-04
+### Changed
+- Include [Mixin Extras](https://github.com/LlamaLad7/MixinExtras) library
+
 ## [v8.1.25-1.20.1] - 2024-11-15
 ### Fixed
 - Fix crash due to out of bounds index in `TooltipRenderHelper::createClientComponents`
