@@ -17,7 +17,7 @@ import java.util.Map;
 
 @Mixin(LootDataManager.class)
 abstract class LootDataManagerForgeMixin {
-    @Shadow
+    @Shadow(aliases = "elements")
     private Map<LootDataId<?>, ?> elements;
 
     @Inject(method = "apply", at = @At("TAIL"))

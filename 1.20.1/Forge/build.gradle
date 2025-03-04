@@ -13,6 +13,13 @@ dependencies {
         transitive = false
     })
 
+    // Mixin Extras
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.4.1")) {
+        jarJar.ranged(it, "[0.4.1,)")
+        transitive = false
+    }
+
     // Quality of Life Mods
     versionCatalog.findLibrary("bettermodsbutton.forge").ifPresent {
         runtimeOnly fg.deobf(it.get())
