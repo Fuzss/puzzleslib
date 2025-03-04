@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.capability;
+package fuzs.puzzleslib.impl.capability.v2;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -12,9 +12,9 @@ import fuzs.puzzleslib.api.capability.v2.initializer.BlockComponentInitializerIm
 import fuzs.puzzleslib.api.capability.v2.initializer.ChunkComponentInitializerImpl;
 import fuzs.puzzleslib.api.capability.v2.initializer.EntityComponentInitializerImpl;
 import fuzs.puzzleslib.api.capability.v2.initializer.WorldComponentInitializerImpl;
-import fuzs.puzzleslib.impl.capability.data.ComponentHolder;
-import fuzs.puzzleslib.impl.capability.data.FabricCapabilityKey;
-import fuzs.puzzleslib.impl.capability.data.FabricPlayerCapabilityKey;
+import fuzs.puzzleslib.impl.capability.v2.data.ComponentHolder;
+import fuzs.puzzleslib.impl.capability.v2.data.FabricCapabilityKey;
+import fuzs.puzzleslib.impl.capability.v2.data.FabricPlayerCapabilityKey;
 import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;

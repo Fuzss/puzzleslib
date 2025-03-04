@@ -4,7 +4,8 @@ import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.network.v3.NetworkHandlerV3;
-import fuzs.puzzleslib.impl.capability.ClientboundSyncCapabilityMessage;
+import fuzs.puzzleslib.impl.capability.v2.ClientboundSyncCapabilityMessage;
+import fuzs.puzzleslib.impl.capability.v3.ClientboundEntityCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -14,14 +15,18 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
 
 /**
- * This has been separated from {@link PuzzlesLib} to prevent issues with static initialization when accessing constants in {@link PuzzlesLib} early.
+ * This has been separated from {@link PuzzlesLib} to prevent issues with static initialization when accessing constants
+ * in {@link PuzzlesLib} early.
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     public static final NetworkHandlerV3 NETWORK = NetworkHandlerV3.builder(MOD_ID)
-            .registerSerializer(ClientboundAddEntityPacket.class, (FriendlyByteBuf friendlyByteBuf, ClientboundAddEntityPacket clientboundAddEntityPacket) -> {
-                clientboundAddEntityPacket.write(friendlyByteBuf);
-            }, ClientboundAddEntityPacket::new)
+            .registerSerializer(ClientboundAddEntityPacket.class,
+                    (FriendlyByteBuf friendlyByteBuf, ClientboundAddEntityPacket clientboundAddEntityPacket) -> {
+                        clientboundAddEntityPacket.write(friendlyByteBuf);
+                    },
+                    ClientboundAddEntityPacket::new)
             .allAcceptVanillaOrMissing()
+            .registerClientbound(ClientboundEntityCapabilityMessage.class)
             .registerClientbound(ClientboundSyncCapabilityMessage.class)
             .registerClientbound(ClientboundAddEntityDataMessage.class)
             .registerClientbound(ClientboundModListMessage.class);

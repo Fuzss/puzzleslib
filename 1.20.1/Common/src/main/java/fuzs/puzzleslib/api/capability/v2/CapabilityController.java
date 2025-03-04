@@ -61,7 +61,7 @@ public interface CapabilityController {
      * @return the mod specific capability controller
      */
     static CapabilityController from(String modId) {
-        return ModContext.get(modId).getCapabilityController();
+        return ModContext.get(modId).getCapabilityControllerV2();
     }
 
     /**

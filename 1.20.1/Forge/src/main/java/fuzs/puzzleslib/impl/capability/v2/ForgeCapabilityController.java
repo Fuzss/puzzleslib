@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.capability;
+package fuzs.puzzleslib.impl.capability.v2;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
@@ -8,9 +8,9 @@ import com.google.common.collect.Multimaps;
 import fuzs.puzzleslib.api.capability.v2.CapabilityController;
 import fuzs.puzzleslib.api.capability.v2.data.*;
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
-import fuzs.puzzleslib.impl.capability.data.CapabilityHolder;
-import fuzs.puzzleslib.impl.capability.data.ForgeCapabilityKey;
-import fuzs.puzzleslib.impl.capability.data.ForgePlayerCapabilityKey;
+import fuzs.puzzleslib.impl.capability.v2.data.CapabilityHolder;
+import fuzs.puzzleslib.impl.capability.v2.data.ForgeCapabilityKey;
+import fuzs.puzzleslib.impl.capability.v2.data.ForgePlayerCapabilityKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

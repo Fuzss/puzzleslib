@@ -3,9 +3,9 @@ package fuzs.puzzleslib.api.capability.v2.initializer;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentFactoryRegistry;
 import dev.onyxstudios.cca.api.v3.block.BlockComponentInitializer;
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
-import fuzs.puzzleslib.impl.capability.ComponentFactoryRegistry;
-import fuzs.puzzleslib.impl.capability.FabricCapabilityController;
-import fuzs.puzzleslib.impl.capability.data.ComponentHolder;
+import fuzs.puzzleslib.impl.capability.v2.ComponentFactoryRegistry;
+import fuzs.puzzleslib.impl.capability.v2.FabricCapabilityController;
+import fuzs.puzzleslib.impl.capability.v2.data.ComponentHolder;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.ApiStatus;
 

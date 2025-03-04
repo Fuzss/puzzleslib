@@ -17,6 +17,9 @@ import java.util.Map;
 
 @Mixin(LootDataManager.class)
 abstract class LootDataManagerForgeMixin {
+    /**
+     * Required for compatibility with our modern Architectury Loom based Gradle setup, as the shadowed field fails to remap.
+     */
     @Shadow(aliases = "elements")
     private Map<LootDataId<?>, ?> elements;
 

@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.capability.data;
+package fuzs.puzzleslib.impl.capability.v2.data;
 
 import fuzs.puzzleslib.api.capability.v2.data.CapabilityComponent;
 import net.minecraft.core.Direction;

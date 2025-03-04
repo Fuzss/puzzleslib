@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.capability.data;
+package fuzs.puzzleslib.impl.capability.v2.data;
 
 import dev.onyxstudios.cca.api.v3.component.ComponentKey;
 import dev.onyxstudios.cca.api.v3.component.ComponentV3;

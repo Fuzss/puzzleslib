@@ -21,6 +21,7 @@ import fuzs.puzzleslib.impl.core.FabricProxy;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.lifecycle.v1.CommonLifecycleEvents;
@@ -53,6 +54,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -398,6 +400,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
         INSTANCE.register(LivingEquipmentChangeCallback.class, FabricLivingEvents.LIVING_EQUIPMENT_CHANGE);
+        INSTANCE.register(LivingConversionCallback.class, ServerLivingEntityEvents.MOB_CONVERSION, (LivingConversionCallback callback) -> {
+            return (Mob previous, Mob converted, boolean keepEquipment) -> {
+                callback.onLivingConversion(previous, converted);
+            };
+        });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }

@@ -1,4 +1,146 @@
-apply from: 'https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/common.gradle'
+apply plugin: 'fabric-loom'
+//apply plugin: 'io.github.juuxel.loom-quiltflower'
+
+archivesBaseName = "${modName.replaceAll("[^a-zA-Z]", "")}"
+version = "v${modVersion}-${libs.versions.minecraft.get()}-Common"
+group = modMavenGroup
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "CurseForge"
+                url = "https://cursemaven.com"
+            }
+        }
+        filter {
+            includeGroup "curse.maven"
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = "Modrinth"
+                url = "https://api.modrinth.com/maven"
+            }
+        }
+        filter {
+            includeGroup "maven.modrinth"
+        }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${libs.versions.minecraft.get()}"
+    mappings loom.layered() {
+        parchment("org.parchmentmc.data:parchment-${libs.versions.parchment.minecraft.get()}:${libs.versions.parchment.version.get()}")
+        officialMojangMappings {
+            setNameSyntheticMembers(true)
+        }
+    }
+}
+
+loom {
+    mixin {
+        // not sure if this is necessary for common...
+        defaultRefmapName = "${modId}.refmap.json"
+        // fix for java.lang.NoClassDefFoundError: org/objectweb/asm/tree/MethodNode
+        useLegacyMixinAp = false
+    }
+
+    // this should hopeful prevent an empty run directory being generated in common during initial project setup
+    runs {
+        client {
+            client()
+            setConfigName("Common Client")
+            ideConfigGenerated(false)
+            runDir("../run")
+        }
+        server {
+            server()
+            setConfigName("Common Server")
+            ideConfigGenerated(false)
+            runDir("../run")
+        }
+    }
+}
+
+processResources {
+    duplicatesStrategy DuplicatesStrategy.INCLUDE
+
+    // this will ensure that this task is redone when a value changes
+    inputs.property "modDescription", modDescription
+    inputs.property "resourcePackFormat", libs.versions.resources.get()
+    inputs.property "dataPackFormat", libs.versions.data.get()
+
+    // replace stuff in pack.mcmeta
+    filesMatching('pack.mcmeta') {
+        expand(
+                'modDescription': modDescription,
+                "resourcePackFormat": libs.versions.resources.get(),
+                "dataPackFormat": libs.versions.data.get()
+        )
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = "${modId}-common"
+            version = modVersion
+            from components.java
+            pom {
+                name = "${modName} [Common]"
+                description = "${modDescription}"
+                url = "${modSourceUrl}"
+                scm {
+                    url = "${modSourceUrl}"
+                    connection = "${modSourceUrl}".replace("https", "scm:git:git").concat(".git")
+                    developerConnection = "${modSourceUrl}".replace("https://github.com/", "scm:git:git@github.com:").concat(".git")
+                }
+                issueManagement {
+                    system = 'github'
+                    url = "${modIssueUrl}"
+                }
+                licenses {
+                    license {
+                        name = "${modLicense}"
+                        url = "https://spdx.org/licenses/${modLicense}.html"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "${modAuthor}".toLowerCase()
+                        name = "${modAuthor}"
+                    }
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            name = 'FuzsModResources'
+            url "file://" + project.hasProperty('modResources') ? "${project.findProperty('modResources')}/maven" : System.getenv('local_maven')
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+task copyJarToDir(type: Copy) {
+    onlyIf { project.hasProperty('buildJarOutputDir') && project.hasProperty('uniqueBuildNumber') }
+    if (project.findProperty('copyBuildJar').toBoolean()) {
+        from remapJar
+        into project.findProperty('buildJarOutputDir')
+        // add build number to be able to distinguish jars when testing thorough official launcher
+        // build number is stored in global gradle.properties
+        rename { fileName -> fileName.replace("v${modVersion}", "v${modVersion}.${uniqueBuildNumber}") }
+    }
+}
+
+build.finalizedBy project.tasks.copyJarToDir, rootProject.tasks.incrementBuildNumber
 
 dependencies {
     // Fabric Loader

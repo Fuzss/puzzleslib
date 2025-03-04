@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.capability.v2.data;
 
 import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.capability.SyncStrategyImpl;
+import fuzs.puzzleslib.impl.capability.v2.SyncStrategyImpl;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
