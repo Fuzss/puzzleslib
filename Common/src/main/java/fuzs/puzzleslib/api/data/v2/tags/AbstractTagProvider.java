@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.impl.core.CommonFactories;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
@@ -11,18 +11,14 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     protected final String modId;
-    @Nullable
-    private final Registry<T> registry;
-    @Nullable
-    private final Function<T, ResourceKey<T>> keyExtractor;
 
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, DataProviderContext context) {
         this(registryKey, context.getModId(), context.getPackOutput(), context.getRegistries());
@@ -31,9 +27,16 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public AbstractTagProvider(ResourceKey<? extends Registry<T>> registryKey, String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         super(packOutput, registryKey, registries);
         this.modId = modId;
-        this.registry = RegistryHelper.findNullableBuiltInRegistry(registryKey);
-        this.keyExtractor =
-                this.registry != null ? (T t) -> RegistryHelper.getResourceKeyOrThrow(this.registry, t) : null;
+    }
+
+    @ApiStatus.Internal
+    public static <T> AbstractTagAppender<T> tagAppender(TagBuilder tagBuilder, ResourceKey<? extends Registry<? super T>> registryKey) {
+        Optional<Registry<T>> optional = LookupHelper.getRegistry(registryKey);
+        Function<T, ResourceKey<T>> keyExtractor = optional.isPresent() ?
+                (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
+                    return new IllegalStateException("Missing value in " + registryKey + ": " + t);
+                }) : null;
+        return CommonFactories.INSTANCE.getTagAppender(tagBuilder, keyExtractor);
     }
 
     @Override
@@ -49,17 +52,17 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
 
     @Override
     public AbstractTagAppender<T> tag(TagKey<T> tagKey) {
-        TagBuilder tagBuilder = this.getOrCreateRawBuilder(tagKey);
-        return CommonFactories.INSTANCE.getTagAppender(tagBuilder, this.keyExtractor);
+        return tagAppender(this.getOrCreateRawBuilder(tagKey), this.registryKey);
     }
 
+    @Deprecated(forRemoval = true)
     protected Registry<T> registry() {
-        Objects.requireNonNull(this.registry, "registry is null");
-        return this.registry;
+        return LookupHelper.getRegistry(this.registryKey).orElseThrow();
     }
 
+    @Deprecated(forRemoval = true)
     protected Function<T, ResourceKey<T>> keyExtractor() {
-        Objects.requireNonNull(this.keyExtractor, "key extractor is null");
-        return this.keyExtractor;
+        Registry<T> registry = this.registry();
+        return (T t) -> registry.getResourceKey(t).orElseThrow();
     }
 }

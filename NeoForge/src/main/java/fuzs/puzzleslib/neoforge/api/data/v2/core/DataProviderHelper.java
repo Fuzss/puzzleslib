@@ -60,7 +60,7 @@ public final class DataProviderHelper {
             if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
                 registries = registriesDataProvider.getRegistries();
             }
-            evt.getGenerator().addProvider(true, dataProvider);
+            evt.addProvider(dataProvider);
         }
     }
 
