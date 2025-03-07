@@ -16,7 +16,7 @@ import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -142,7 +142,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     private static <T> void onRegistryEntryAdded(RegistryEntryAddedCallback<T> callback, @Nullable Object context) {
         Objects.requireNonNull(context, "context is null");
         ResourceKey<? extends Registry<T>> resourceKey = (ResourceKey<? extends Registry<T>>) context;
-        Registry<T> registry = RegistryHelper.findBuiltInRegistry(resourceKey);
+        Registry<T> registry = LookupHelper.getRegistry(resourceKey).orElseThrow();
         BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
             Registry.register(registry, resourceLocation, supplier.get());
         };

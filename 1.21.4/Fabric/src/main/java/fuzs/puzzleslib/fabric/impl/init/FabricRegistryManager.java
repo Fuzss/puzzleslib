@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.impl.init;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryHelper;
+import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.network.v3.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
@@ -44,7 +44,7 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     protected <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration) {
         T value = supplier.get();
         Objects.requireNonNull(value, "value is null");
-        Registry<T> registry = RegistryHelper.findBuiltInRegistry(registryKey);
+        Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
         Holder.Reference<T> holder;
         if (skipRegistration) {
             holder = registry.getOrThrow(this.makeResourceKey(registryKey, path));
