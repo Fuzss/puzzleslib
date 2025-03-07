@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.data.v2.core;
 
 import fuzs.puzzleslib.api.core.v1.ModContainerHelper;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.impl.data.ExistingFileHelperHolder;
+import fuzs.puzzleslib.impl.data.FileHelperDataProvider;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -63,7 +63,7 @@ public final class DataProviderHelper {
         DataGenerator dataGenerator = evt.getGenerator();
         for (ForgeDataProviderContext.LegacyFactory factory : factories) {
             DataProvider dataProvider = factory.apply(evt, modId);
-            if (dataProvider instanceof ExistingFileHelperHolder holder) {
+            if (dataProvider instanceof FileHelperDataProvider holder) {
                 holder.puzzleslib$setExistingFileHelper(evt.getExistingFileHelper());
             }
             dataGenerator.addProvider(true, dataProvider);

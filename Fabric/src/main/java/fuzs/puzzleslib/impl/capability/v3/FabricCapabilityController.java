@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.impl.capability.v3;
 
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.Lifecycle;
 import dev.onyxstudios.cca.api.v3.component.ComponentAccess;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.capability.v3.data.*;
@@ -8,6 +11,9 @@ import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
 import fuzs.puzzleslib.impl.capability.v3.data.*;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -70,7 +76,15 @@ public final class FabricCapabilityController implements CapabilityController {
     private <T, C extends CapabilityComponent<T>, K extends CapabilityKey<T, C>> K registerCapability(Class<? extends ComponentAccess> holderType, String identifier, Supplier<C> capabilityFactory, Predicate<Object> filter, FabricCapabilityKey.Factory<T, C, K> capabilityKeyFactory) {
         GlobalCapabilityRegister.testHolderType(holderType);
         ResourceLocation capabilityName = new ResourceLocation(this.modId, identifier);
-        Codec<C> codec = NbtSerializable.codec(capabilityFactory);
+        Codec<C> codec = Codec.STRING.comapFlatMap(string -> {
+                    try {
+                        return DataResult.success(TagParser.parseTag(string), Lifecycle.stable());
+                    } catch (CommandSyntaxException exception) {
+                        return DataResult.error(exception::getMessage);
+                    }
+                }, CompoundTag::toString)
+                .xmap(NbtSerializable.fromCompoundTag(capabilityFactory, RegistryAccess.EMPTY),
+                        (C capabilityComponent) -> capabilityComponent.toCompoundTag(RegistryAccess.EMPTY));
         AttachmentType<C> attachmentType = AttachmentRegistry.<C>builder()
                 .persistent(codec)
                 .buildAndRegister(capabilityName);

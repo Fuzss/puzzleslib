@@ -7,8 +7,7 @@
   "plugin": "fuzs.puzzleslib.mixin.ModMixinConfigPlugin",
   "mixins": [
     "accessor.BlockAccessor",
-    "accessor.BlockItemAccessor",
-    "accessor.RegistryOpsAccessor"
+    "accessor.BlockItemAccessor"
   ],
   "client": [
     "client.accessor.TooltipAccessor"
