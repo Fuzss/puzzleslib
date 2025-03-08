@@ -14,9 +14,9 @@ dependencies {
     })
 
     // Mixin Extras
-    compileOnly(annotationProcessor(libs.mixinextras.common.get()))
-    implementation(jarJar(libs.mixinextras.forge.get())) {
-        jarJar.ranged(it, "[${libs.versions.mixinextras},)")
+    api(annotationProcessor(libs.mixinextras.common.get()))
+    jarJar(libs.mixinextras.forge.get()) {
+        jarJar.ranged(it, "[${libs.versions.mixinextras.version.get()},)")
         transitive = false
     }
 

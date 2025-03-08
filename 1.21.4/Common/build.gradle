@@ -6,7 +6,7 @@ dependencies {
     modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${libs.versions.fabricapi.version.get()}")
 
     // Forge Config Api Port
-    api libs.forgeconfigapiport.common
+    modApi libs.forgeconfigapiport.common
 
     // Puzzles Lib
 //    modApi libs.puzzleslib.common
