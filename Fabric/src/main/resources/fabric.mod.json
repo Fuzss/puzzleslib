@@ -41,6 +41,7 @@
     "fabricloader": ">=${minFabricVersion}",
     "fabric-api": ">=${minFabricApiVersion}",
     "forgeconfigapiport": "*",
+    "puzzlesaccessapi": "*",
     "minecraft": "${minecraftVersion}",
     "java": ">=17"
   },

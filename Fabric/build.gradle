@@ -305,18 +305,15 @@ dependencies {
     // Forge Config Api Port
     modApi libs.forgeconfigapiport.fabric
 
+    // Puzzles Access Api
+    modApi(include(libs.puzzlesaccessapi.fabric.get()))
+
     // Cardinal Components
     modApi(libs.cardinalcomponentsbase.fabric.get())
     modApi(libs.cardinalcomponentsentity.fabric.get())
     modApi(libs.cardinalcomponentsblock.fabric.get())
     modApi(libs.cardinalcomponentschunk.fabric.get())
     modApi(libs.cardinalcomponentsworld.fabric.get())
-
-    // Extensible Enums
-//    modApi(libs.extensibleenums.fabric.get()))
-
-    // Puzzles Access Api
-    modApi(include(libs.puzzlesaccessapi.fabric.get()))
 
     // Quality of Life Mods
     versionCatalog.findLibrary("modmenu.fabric").ifPresent {

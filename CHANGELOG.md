@@ -3,11 +3,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
-## [v8.1.27-1.20.1] - 2025-03-04
+## [v8.1.28-1.20.1] - 2025-03-08
+### Changed
+- Update bundled Puzzles Access Api mod to v20.1.1
+
+## [v8.1.27-1.20.1] - 2025-03-08
 ### Added
-- Backport Capability System v3 from 1.20.4 version that no longer requires the Cardinal Components mod
+- Backport Capability System v3 from 1.20.4 version so that the Cardinal Components mod is no longer required
 ### Changed
 - Update Fabric Loom to v1.9
+- Update bundled Puzzles Access Api mod
+- Update a bunch of data providers
 
 ## [v8.1.26-1.20.1] - 2025-03-04
 ### Changed
