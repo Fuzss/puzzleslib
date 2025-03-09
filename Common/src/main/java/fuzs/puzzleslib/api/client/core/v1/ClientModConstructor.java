@@ -119,6 +119,13 @@ public interface ClientModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register a screen for a menu type
+     */
+    default void onRegisterMenuScreens(MenuScreensContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context add a layer definition for a {@link ModelLayerLocation}
      */
     default void onRegisterLayerDefinitions(final LayerDefinitionsContext context) {

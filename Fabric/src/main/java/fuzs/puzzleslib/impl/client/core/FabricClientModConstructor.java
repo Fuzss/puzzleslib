@@ -50,7 +50,9 @@ public final class FabricClientModConstructor {
         constructor.onRegisterItemModelProperties(new ItemModelPropertiesContextFabricImpl());
         constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextFabricImpl());
         registerBuiltinModelItemRenderers(modId, constructor::onRegisterBuiltinModelItemRenderers, availableFlags);
-        constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.CLIENT_RESOURCES, modId));
+        constructor.onRegisterMenuScreens(new MenuScreensContextFabricImpl());
+        constructor.onRegisterResourcePackReloadListeners(new AddReloadListenersContextFabricImpl(PackType.CLIENT_RESOURCES,
+                modId));
         constructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());
         constructor.onRegisterItemDecorations(new ItemDecorationContextFabricImpl());
         constructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
@@ -65,14 +67,22 @@ public final class FabricClientModConstructor {
             try {
                 modifyBakingResultConsumer.accept(new DynamicModifyBakingResultContextImpl(models, modelBakery.get()));
             } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during modify baking result phase provided by {}", modId, e);
+                PuzzlesLib.LOGGER.error(
+                        "Unable to execute additional resource pack model processing during modify baking result phase provided by {}",
+                        modId,
+                        e);
             }
         });
         FabricClientEvents.BAKING_COMPLETED.register((Supplier<ModelManager> modelManager, Map<ResourceLocation, BakedModel> models, Supplier<ModelBakery> modelBakery) -> {
             try {
-                bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager.get(), models, modelBakery.get()));
+                bakingCompletedConsumer.accept(new DynamicBakingCompletedContextFabricImpl(modelManager.get(),
+                        models,
+                        modelBakery.get()));
             } catch (Exception e) {
-                PuzzlesLib.LOGGER.error("Unable to execute additional resource pack model processing during baking completed phase provided by {}", modId, e);
+                PuzzlesLib.LOGGER.error(
+                        "Unable to execute additional resource pack model processing during baking completed phase provided by {}",
+                        modId,
+                        e);
             }
         });
     }
@@ -81,7 +91,8 @@ public final class FabricClientModConstructor {
         consumer.accept(new ParticleProvidersContextFabricImpl());
         if (flagsToHandle.contains(ContentRegistrationFlags.CLIENT_PARTICLE_TYPES)) {
             ResourceLocation identifier = new ResourceLocation(modId, "client_particle_types");
-            IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(identifier, ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId));
+            IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(identifier,
+                    ((ClientParticleTypesImpl) ClientParticleTypes.INSTANCE).getParticleTypesManager(modId));
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         }
     }
@@ -92,7 +103,9 @@ public final class FabricClientModConstructor {
         // do not punish ContentRegistrationFlags#DYNAMIC_RENDERERS being absent as not every built-in item renderer needs to reload
         if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
             ResourceLocation identifier = new ResourceLocation(modId, "built_in_model_item_renderers");
-            IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(identifier, dynamicRenderers));
+            IdentifiableResourceReloadListener reloadListener = new FabricReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(
+                    identifier,
+                    dynamicRenderers));
             ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(reloadListener);
         }
     }
