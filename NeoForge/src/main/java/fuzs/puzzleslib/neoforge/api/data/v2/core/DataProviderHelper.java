@@ -50,7 +50,7 @@ public final class DataProviderHelper {
      * @param modId     the current mod id
      * @param factories the data provider factories to run
      */
-    public static void registerDataProviders(String modId, NeoForgeDataProviderContext.Factory... factories) {
+    public static void registerDataProvidersV2(String modId, NeoForgeDataProviderContext.Factory... factories) {
         registerDataProviders(modId, new RegistrySetBuilder(), factories);
     }
 
