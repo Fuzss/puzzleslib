@@ -12,7 +12,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 /**
- * An enhanced implementation of {@link DataProviderContext} that also holds an {@link ExistingFileHelper} instance.
+ * An enhanced implementation of {@link DataProviderContext} that provides various
+ * {@link ResourceManager ResourceManagers} for verifying the existence of used resources.
  */
 public class NeoForgeDataProviderContext extends DataProviderContext {
     /**
