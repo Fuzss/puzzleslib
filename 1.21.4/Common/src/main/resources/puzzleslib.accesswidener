@@ -214,6 +214,9 @@ transitive-accessible   method  net/minecraft/world/item/SmithingTemplateItem   
 transitive-accessible   method  net/minecraft/world/item/SmithingTemplateItem   createNetheriteUpgradeMaterialList  ()Ljava/util/List;
 accessible  field   net/minecraft/world/level/storage/loot/parameters/LootContextParamSets  REGISTRY    Lcom/google/common/collect/BiMap;
 transitive-accessible   method  net/minecraft/server/commands/GiveCommand   giveItem    (Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/commands/arguments/item/ItemInput;Ljava/util/Collection;I)I
+transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   biome   (ZFFLnet/minecraft/world/level/biome/MobSpawnSettings$Builder;Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;Lnet/minecraft/sounds/Music;)Lnet/minecraft/world/level/biome/Biome;
+transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   biome   (ZFFIILjava/lang/Integer;Ljava/lang/Integer;Lnet/minecraft/world/level/biome/MobSpawnSettings$Builder;Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;Lnet/minecraft/sounds/Music;)Lnet/minecraft/world/level/biome/Biome;
+transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   globalOverworldGeneration   (Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;)V
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

@@ -7,6 +7,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.neoforged.bus.api.ICancellableEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
 import org.jetbrains.annotations.ApiStatus;
@@ -22,6 +23,8 @@ import org.jetbrains.annotations.Nullable;
  *     <li>loot item condition <code>minecraft:random_chance_with_enchanted_bonus</code></li>
  *     <li>enchantment effect component <code>minecraft:equipment_drops</code></li>
  * </ul>
+ * <p>
+ * This event is not {@link ICancellableEvent}.
  * <p>
  * This event is fired on the {@link NeoForge#EVENT_BUS}.
  */
@@ -66,8 +69,9 @@ public class ComputeEnchantedLootBonusEvent extends LivingEvent {
 
     @ApiStatus.Internal
     public static int onComputeEnchantedLootBonus(Holder<Enchantment> enchantment, int enchantmentLevel, LivingEntity livingEntity, @Nullable DamageSource damageSource) {
-        return NeoForge.EVENT_BUS.post(
-                        new ComputeEnchantedLootBonusEvent(livingEntity, damageSource, enchantment, enchantmentLevel))
-                .getEnchantmentLevel();
+        return NeoForge.EVENT_BUS.post(new ComputeEnchantedLootBonusEvent(livingEntity,
+                damageSource,
+                enchantment,
+                enchantmentLevel)).getEnchantmentLevel();
     }
 }

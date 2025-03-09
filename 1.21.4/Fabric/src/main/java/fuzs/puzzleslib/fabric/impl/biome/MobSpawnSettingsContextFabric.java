@@ -2,8 +2,7 @@ package fuzs.puzzleslib.fabric.impl.biome;
 
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.utility.ReflectionHelper;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -11,6 +10,7 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.function.BiPredicate;
@@ -67,20 +67,24 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
         // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes.
         // Also note that vanilla only represents the initial state and does not reflect any changes made while the builder is 'active', so using the fallback is not desirable (it's not a view).
         Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> optional = this.getFabricSpawners();
-        return optional.map(map -> Collections.unmodifiableList(map.get(mobCategory)))
-                .orElseGet(() -> this.mobSpawnSettings.getMobs(mobCategory).unwrap());
+        return optional.map((EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>> map) -> Collections.unmodifiableList(
+                map.get(mobCategory))).orElseGet(() -> this.mobSpawnSettings.getMobs(mobCategory).unwrap());
     }
 
     private Optional<EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>> getFabricSpawners() {
-        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabric()) {
-            Field field = ReflectionHelper.findField(
-                    "net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl",
-                    "fabricSpawners",
-                    true);
-            return ReflectionHelper.getValue(field, this.context);
-        } else {
-            return Optional.empty();
+        try {
+            Class<?> clazz = Class.forName(
+                    "net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl");
+            Field field = clazz.getDeclaredField("fabricSpawners");
+            field.setAccessible(true);
+            Object o = MethodHandles.lookup().unreflectGetter(field).invoke(this.context);
+            return Optional.of((EnumMap<MobCategory, List<MobSpawnSettings.SpawnerData>>) o);
+        } catch (Throwable throwable) {
+            PuzzlesLib.LOGGER.warn("Unable to access Fabric mob spawn settings spawner data: {}",
+                    throwable.getMessage());
         }
+
+        return Optional.empty();
     }
 
     @Override

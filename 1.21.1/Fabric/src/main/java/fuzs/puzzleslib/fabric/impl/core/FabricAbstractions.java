@@ -10,6 +10,7 @@ import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -66,8 +67,7 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
 
     @Override
     public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
-        // fake players will have no connection instance attached
-        return serverPlayer.connection != null && ServerPlayNetworking.canSend(serverPlayer, type);
+        return !(serverPlayer instanceof FakePlayer) && ServerPlayNetworking.canSend(serverPlayer, type);
     }
 
     @Override
@@ -119,9 +119,10 @@ public final class FabricAbstractions implements CommonAbstractions, EventHandle
         int enchantmentLevel = CommonAbstractions.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
         Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
-        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, livingEntity,
-                damageSource
-        );
+        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment,
+                enchantmentLevel,
+                livingEntity,
+                damageSource);
     }
 
     @Override

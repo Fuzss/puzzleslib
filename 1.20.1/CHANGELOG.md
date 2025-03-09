@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.29-1.20.1] - 2025-03-09
+### Fixed
+- Fix crash when breaking blocks with some Tinkers' Construct tools
+
 ## [v8.1.28-1.20.1] - 2025-03-08
 ### Changed
 - Update bundled Puzzles Access Api mod to v20.1.1

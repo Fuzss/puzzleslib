@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 /**
  * helper class for reflection operations, similar to the Forge thing, but we want to use this on Fabric as well
  */
+@Deprecated(forRemoval = true)
 @SuppressWarnings("unchecked")
 public final class ReflectionHelper {
     /**

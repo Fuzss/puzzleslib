@@ -10,6 +10,7 @@
     "EnchantedCountIncreaseFunctionNeoForgeMixin",
     "EnchantmentHelperNeoForgeMixin",
     "LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin",
+    "MobNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
     "accessor.FireBlockNeoForgeAccessor",
     "accessor.MobSpawnSettingsBuilderNeoForgeAccessor",

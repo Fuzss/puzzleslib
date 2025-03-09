@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.data.DataProvider;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
@@ -31,23 +32,49 @@ public final class DataProviderHelper {
      * {@link GatherDataEvent} fires.
      *
      * @param modId     the current mod id
-     * @param factories all data provider factories to run
+     * @param factories the data provider factories to run
      */
+    @Deprecated(forRemoval = true)
     public static void registerDataProviders(String modId, DataProviderContext.Factory... factories) {
-        registerDataProviders(modId, factories, (DataProviderContext.Factory factory) -> {
+        registerDataProviders(modId, new RegistrySetBuilder(), factories, (DataProviderContext.Factory factory) -> {
             return (GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) -> {
-                return factory.apply(DataProviderContext.ofPackOutput(modId,
-                        evt.getGenerator().getPackOutput(),
-                        registries));
+                return factory.apply(NeoForgeDataProviderContext.fromEvent(evt, registries));
             };
         });
     }
 
-    static <T> void registerDataProviders(String modId, T[] factories, Function<T, Factory> factoryConverter) {
+    /**
+     * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
+     * {@link GatherDataEvent} fires.
+     *
+     * @param modId     the current mod id
+     * @param factories the data provider factories to run
+     */
+    public static void registerDataProviders(String modId, NeoForgeDataProviderContext.Factory... factories) {
+        registerDataProviders(modId, new RegistrySetBuilder(), factories);
+    }
+
+    /**
+     * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
+     * {@link GatherDataEvent} fires.
+     *
+     * @param modId     the current mod id
+     * @param factories the data provider factories to run
+     */
+    public static void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, NeoForgeDataProviderContext.Factory... factories) {
+        registerDataProviders(modId, registrySetBuilder, factories, (NeoForgeDataProviderContext.Factory factory) -> {
+            return (GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) -> {
+                return factory.apply(NeoForgeDataProviderContext.fromEvent(evt, registries));
+            };
+        });
+    }
+
+    static <T> void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, T[] factories, Function<T, Factory> factoryConverter) {
         if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
         Preconditions.checkState(factories.length > 0, "data provider factories is empty");
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final GatherDataEvent.Client evt) -> {
+                evt.createDatapackRegistryObjects(registrySetBuilder);
                 onGatherData(evt, Arrays.stream(factories).map(factoryConverter).toList());
             });
         });

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
+@Deprecated(forRemoval = true)
 public final class ExistingFilesHelper {
 
     private ExistingFilesHelper() {

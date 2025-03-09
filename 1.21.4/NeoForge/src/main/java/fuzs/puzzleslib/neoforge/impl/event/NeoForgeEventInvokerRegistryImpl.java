@@ -25,6 +25,7 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
+import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.SetupMobGoalsEvent;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
@@ -734,6 +735,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     MutableFloat.fromEvent(evt::setAttackDamage, evt::getAttackDamage),
                     evt.getHitResult());
             if (result.isInterrupt()) evt.setCanceled(true);
+        });
+        INSTANCE.register(SetupMobGoalsCallback.class, SetupMobGoalsEvent.class, (SetupMobGoalsCallback callback, SetupMobGoalsEvent evt) -> {
+            callback.onSetupMobGoals(evt.getEntity(), evt.getGoalSelector(), evt.getTargetSelector());
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerEventHandlers();

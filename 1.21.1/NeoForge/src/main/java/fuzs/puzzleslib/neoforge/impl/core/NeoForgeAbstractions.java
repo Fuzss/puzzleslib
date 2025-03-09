@@ -43,8 +43,7 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
 
     @Override
     public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
-        // fake players will have no connection instance attached
-        return serverPlayer.connection != null && serverPlayer.connection.hasChannel(type);
+        return !serverPlayer.isFakePlayer() && serverPlayer.connection.hasChannel(type);
     }
 
     @Override
@@ -79,9 +78,10 @@ public final class NeoForgeAbstractions implements CommonAbstractions {
         int enchantmentLevel = CommonAbstractions.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
         Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment, enchantmentLevel, livingEntity,
-                damageSource
-        );
+        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment,
+                enchantmentLevel,
+                livingEntity,
+                damageSource);
     }
 
     @Override

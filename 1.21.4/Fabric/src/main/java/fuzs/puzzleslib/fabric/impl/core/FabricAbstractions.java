@@ -10,6 +10,7 @@ import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import io.netty.buffer.Unpooled;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -52,25 +53,27 @@ import java.util.function.BiConsumer;
 
 public final class FabricAbstractions implements CommonAbstractions, EventHandlerProvider {
     private final Set<String> hiddenPacks = Sets.newConcurrentHashSet();
-    private MinecraftServer gameServer;
+    private MinecraftServer minecraftServer;
 
     @Override
     public void registerEventHandlers() {
-        // registers for game server starting and stopping, so we can keep an instance of the server here so that
-        // {@link FabricNetworkHandler} can be implemented much more similarly to Forge
-        ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, server -> this.gameServer = server);
-        ServerLifecycleEvents.STOPPED.register(EventPhase.LAST, server -> this.gameServer = null);
+        // registers for game server starting and stopping, so we can keep an instance of the server here
+        ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, (MinecraftServer minecraftServer) -> {
+            this.minecraftServer = minecraftServer;
+        });
+        ServerLifecycleEvents.STOPPED.register(EventPhase.LAST, (MinecraftServer minecraftServer) -> {
+            this.minecraftServer = null;
+        });
     }
 
     @Override
     public MinecraftServer getMinecraftServer() {
-        return this.gameServer;
+        return this.minecraftServer;
     }
 
     @Override
     public boolean hasChannel(ServerPlayer serverPlayer, CustomPacketPayload.Type<?> type) {
-        // fake players will have no connection instance attached
-        return serverPlayer.connection != null && ServerPlayNetworking.canSend(serverPlayer, type);
+        return !(serverPlayer instanceof FakePlayer) && ServerPlayNetworking.canSend(serverPlayer, type);
     }
 
     @Override
