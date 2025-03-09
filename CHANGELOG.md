@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.29-1.21.1] - 2025-03-09
+### Fixed
+- Fix CommonAbstractions::hasChannel crashing for invalid players on NeoForge
+
 ## [v21.1.28-1.21.1] - 2025-02-25
 ### Added
 - Backport new block, item and creative mode tab registration methods to `RegistryManager`
