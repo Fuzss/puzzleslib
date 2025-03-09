@@ -6,8 +6,10 @@
   "refmap": "puzzleslib.refmap.json",
   "plugin": "fuzs.puzzleslib.mixin.ModMixinConfigPlugin",
   "mixins": [
+    "accessor.AbstractContainerMenuAccessor",
     "accessor.BlockAccessor",
-    "accessor.BlockItemAccessor"
+    "accessor.BlockItemAccessor",
+    "accessor.SimpleContainerAccessor"
   ],
   "client": [
     "client.accessor.BlockModelGeneratorsAccessor",

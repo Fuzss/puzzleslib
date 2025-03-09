@@ -3,6 +3,11 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.30-1.20.1] - 2025-03-09
+### Added
+- Backport `MenuScreensContext`
+- Backport `ContainerMenuHelper`, `ContainerSerializationHelper`, `ListBackedContainer`, `QuickMoveRuleSet`
+
 ## [v8.1.29-1.20.1] - 2025-03-09
 ### Fixed
 - Fix crash when breaking blocks with some Tinkers' Construct tools

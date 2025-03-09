@@ -54,6 +54,7 @@ public final class ForgeClientModConstructor {
                 constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextForgeImpl(modId, dynamicRenderers));
                 constructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
                 constructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
+                constructor.onRegisterMenuScreens(new MenuScreensContextForgeImpl());
             });
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
