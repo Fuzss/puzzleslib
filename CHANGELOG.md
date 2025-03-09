@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.4.11-1.21.4] - 2025-03-02
 ### Added
 - Add `CommonAbstractions::getRarityStyle`
+- Add `SetupMobGoalsCallback`
+- Add back overhauled `NeoForgeDataProviderContext`
+### Changed
+- Allow `AbstractLanguageProvider` to check for missing translation keys
+- Support providing a separate `RegistrySetBuilder` outside of a dedicated `DataProvider` in `DataProviderHelper`
+### Fixed
+- Fix `CommonAbstractions::hasChannel` not properly checking for fake players
 
 ## [v21.4.10-1.21.4] - 2025-03-02
 ### Added

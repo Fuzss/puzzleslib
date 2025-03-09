@@ -465,6 +465,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
             applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
         }, UnaryOperator.identity(), false);
+        INSTANCE.register(SetupMobGoalsCallback.class, FabricLivingEvents.SETUP_MOB_GOALS);
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             FabricClientEventInvokers.registerEventHandlers();
         }

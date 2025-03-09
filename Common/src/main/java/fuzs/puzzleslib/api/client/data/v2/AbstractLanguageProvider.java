@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.BlockFamily;
@@ -41,6 +42,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
     protected final String languageCode;
@@ -69,20 +71,47 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
     @Override
     public CompletableFuture<?> run(CachedOutput writer) {
+
         JsonObject jsonObject = new JsonObject();
         this.addTranslations((String key, String value) -> {
             Objects.requireNonNull(key, "key is null");
             Objects.requireNonNull(value, "value is null");
             if (jsonObject.has(key)) {
-                throw new IllegalStateException("Duplicate translation key found: " + key);
+                throw new IllegalStateException("Created duplicate translation key: " + key);
             } else {
                 jsonObject.addProperty(key, value);
             }
         });
 
+        this.verifyRequiredTranslationKeys(jsonObject::has, BuiltInRegistries.BLOCK, TranslationBuilder::addBlock);
+        this.verifyRequiredTranslationKeys(jsonObject::has, BuiltInRegistries.ITEM, TranslationBuilder::addItem);
+        this.verifyRequiredTranslationKeys(jsonObject::has,
+                BuiltInRegistries.ENTITY_TYPE,
+                TranslationBuilder::addEntityType);
+        this.verifyRequiredTranslationKeys(jsonObject::has,
+                BuiltInRegistries.ATTRIBUTE,
+                TranslationBuilder::addAttribute);
+        this.verifyRequiredTranslationKeys(jsonObject::has,
+                BuiltInRegistries.MOB_EFFECT,
+                TranslationBuilder::addMobEffect);
+
         return DataProvider.saveStable(writer,
                 jsonObject,
                 this.pathProvider.json(ResourceLocationHelper.fromNamespaceAndPath(this.modId, this.languageCode)));
+    }
+
+    protected <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
+        registry.listElements()
+                .filter((Holder.Reference<T> holder) -> holder.key().location().getNamespace().equals(this.modId))
+                .forEach((Holder.Reference<T> holder) -> {
+                    holderTranslationCollector.accept((String translationKey, String value) -> {
+                        if (!predicate.test(translationKey)) {
+                            throw new IllegalStateException("Missing translation key '%s' for '%s'".formatted(
+                                    translationKey,
+                                    holder));
+                        }
+                    }, holder, "");
+                });
     }
 
     @Override
@@ -461,5 +490,11 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.valueConsumer.accept(block, this.blockValue + " Wall");
             return this;
         }
+    }
+
+    @FunctionalInterface
+    protected interface HolderTranslationCollector<T> {
+
+        void accept(TranslationBuilder translationBuilder, Holder<T> holder, String value);
     }
 }

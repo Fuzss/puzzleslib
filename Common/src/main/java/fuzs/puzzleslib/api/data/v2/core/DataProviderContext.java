@@ -17,7 +17,7 @@ import java.util.function.Supplier;
  * <p>
  * Offers similar capabilities as NeoForge's {@code net.neoforged.neoforge.data.event.GatherDataEvent}.
  */
-public final class DataProviderContext {
+public class DataProviderContext {
     /**
      * The generating mod id.
      */
@@ -36,7 +36,7 @@ public final class DataProviderContext {
      * @param packOutput the pack output
      * @param registries the registry lookup provider
      */
-    private DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+    protected DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         this(modId, packOutput, () -> registries);
     }
 
@@ -75,18 +75,6 @@ public final class DataProviderContext {
                 new PackOutput(path),
                 Suppliers.memoize(() -> CompletableFuture.supplyAsync(VanillaRegistries::createLookup,
                         Util.backgroundExecutor())));
-    }
-
-    /**
-     * Creates a data provider context from the corresponding NeoForge event usable in actual data-generation.
-     *
-     * @param modId      the generating mod id
-     * @param packOutput the pack output
-     * @param registries the registry lookup provider
-     * @return the new data provider context
-     */
-    public static DataProviderContext ofPackOutput(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-        return new DataProviderContext(modId, packOutput, registries);
     }
 
     /**
