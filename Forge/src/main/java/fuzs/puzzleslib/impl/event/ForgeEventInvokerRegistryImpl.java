@@ -253,9 +253,7 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             if (evt.getPlayer().blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
                 return;
             }
-            if (evt.getPlayer().getMainHandItem().onBlockStartBreak(evt.getPos(), evt.getPlayer())) {
-                return;
-            }
+            // no call to IForgeItemStack::onBlockStartBreak, as it may also invoke this event, leading to an infinite recursion
             EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
