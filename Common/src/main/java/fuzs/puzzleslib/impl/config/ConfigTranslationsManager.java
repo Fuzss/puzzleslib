@@ -14,11 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public final class ConfigTranslationsManager {
-    public static final Map<String, String> TRANSLATIONS = new HashMap<>();
+    public static final Map<String, String> TRANSLATIONS = new ConcurrentHashMap<>();
 
     private ConfigTranslationsManager() {
         // NO-OP
@@ -33,8 +34,7 @@ public final class ConfigTranslationsManager {
                         }
                         TRANSLATIONS.forEach(clientLanguage.storage::putIfAbsent);
                     }
-                }
-        );
+                });
     }
 
     public static void addModConfig(String modId, String configType, String fileName, ModConfigSpec configSpec) {
@@ -44,7 +44,7 @@ public final class ConfigTranslationsManager {
     }
 
     static void addConfigValues(String modId, UnmodifiableConfig config, List<String> path, Function<List<String>, @Nullable String> levelCommentGetter) {
-        for (Map.Entry<String, Object> entry : config.valueMap().entrySet()) {
+        for (UnmodifiableConfig.Entry entry : config.entrySet()) {
             addConfigValue(modId, entry.getKey());
             String comment;
             if (entry.getValue() instanceof ModConfigSpec.ValueSpec valueSpec) {
@@ -53,7 +53,7 @@ public final class ConfigTranslationsManager {
                 path = new ArrayList<>(path);
                 path.add(entry.getKey());
                 comment = levelCommentGetter.apply(path);
-                addConfigValues(modId, (UnmodifiableConfig) entry.getValue(), path, levelCommentGetter);
+                addConfigValues(modId, entry.getValue(), path, levelCommentGetter);
             } else {
                 comment = null;
             }
@@ -74,8 +74,7 @@ public final class ConfigTranslationsManager {
                 .toLowerCase();
         TRANSLATIONS.put(modId + ".configuration.section." + fileName, configType + " Settings");
         TRANSLATIONS.put(modId + ".configuration.section." + fileName + ".title",
-                "%s " + configType + " Configuration"
-        );
+                "%s " + configType + " Configuration");
     }
 
     public static void addConfigValue(String modId, String valueName) {
@@ -89,9 +88,9 @@ public final class ConfigTranslationsManager {
 
     public static void addConfigValueComment(String modId, String valueName, @Nullable String comment) {
         Objects.requireNonNull(valueName, "value name is null");
-        addConfigValueComment(modId, Collections.singletonList(valueName),
-                comment != null ? Arrays.asList(comment.split("\\R")) : Collections.emptyList()
-        );
+        addConfigValueComment(modId,
+                Collections.singletonList(valueName),
+                comment != null ? Arrays.asList(comment.split("\\R")) : Collections.emptyList());
     }
 
     public static void addConfigValueComment(String modId, List<String> valuePath, List<String> comments) {
