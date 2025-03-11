@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v21.4.12-1.21.4] - 2025-03-11
 ### Added
 - Add `ClientAbstractions::copyBakedQuad`
+- Add `BuiltinResourcePackHelper`
 ### Fixed
 - Fix rare start-up crash when registering generated config translations on NeoForge
 
