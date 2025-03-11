@@ -14,11 +14,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public final class ConfigTranslationsManager {
-    public static final Map<String, String> TRANSLATIONS = new HashMap<>();
+    public static final Map<String, String> TRANSLATIONS = new ConcurrentHashMap<>();
 
     private ConfigTranslationsManager() {
         // NO-OP
@@ -52,7 +53,7 @@ public final class ConfigTranslationsManager {
                 path = new ArrayList<>(path);
                 path.add(entry.getKey());
                 comment = levelCommentGetter.apply(path);
-                addConfigValues(modId, (UnmodifiableConfig) entry.getValue(), path, levelCommentGetter);
+                addConfigValues(modId, entry.getValue(), path, levelCommentGetter);
             } else {
                 comment = null;
             }
