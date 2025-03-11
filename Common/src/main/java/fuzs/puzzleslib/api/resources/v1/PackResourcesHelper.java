@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.resources.v1;
 
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -10,6 +9,7 @@ import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.flag.FeatureFlagSet;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -40,9 +40,12 @@ public final class PackResourcesHelper {
      * @return description component
      */
     public static Component getPackDescription(String modId) {
-        return ModLoaderEnvironment.INSTANCE.getModContainer(modId).map(ModContainer::getDisplayName).map(name -> {
-            return Component.literal(name + " Dynamic Resources");
-        }).orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
+        return ModLoaderEnvironment.INSTANCE.getModContainer(modId)
+                .map(ModContainer::getDisplayName)
+                .map((String name) -> {
+                    return Component.literal(name + " Dynamic Resources");
+                })
+                .orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
     }
 
     /**
@@ -78,7 +81,7 @@ public final class PackResourcesHelper {
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
-        return consumer -> {
+        return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES,
                     id,
                     factory,
@@ -88,8 +91,7 @@ public final class PackResourcesHelper {
                     position,
                     fixedPosition,
                     hidden,
-                    FeatureFlagSet.of()
-            ));
+                    FeatureFlagSet.of()));
         };
     }
 
@@ -112,7 +114,7 @@ public final class PackResourcesHelper {
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildClientPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
-        return consumer -> {
+        return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.CLIENT_RESOURCES,
                     id,
                     factory,
@@ -122,8 +124,7 @@ public final class PackResourcesHelper {
                     position,
                     fixedPosition,
                     hidden,
-                    FeatureFlagSet.of()
-            ));
+                    FeatureFlagSet.of()));
         };
     }
 
@@ -160,7 +161,7 @@ public final class PackResourcesHelper {
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
-        return consumer -> {
+        return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.SERVER_DATA,
                     id,
                     factory,
@@ -170,8 +171,7 @@ public final class PackResourcesHelper {
                     position,
                     fixedPosition,
                     hidden,
-                    FeatureFlagSet.of()
-            ));
+                    FeatureFlagSet.of()));
         };
     }
 
@@ -194,7 +194,7 @@ public final class PackResourcesHelper {
      *         {@link net.minecraft.server.packs.repository.PackRepository}
      */
     public static RepositorySource buildServerPack(ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden) {
-        return consumer -> {
+        return (Consumer<Pack> consumer) -> {
             consumer.accept(AbstractModPackResources.buildPack(PackType.SERVER_DATA,
                     id,
                     factory,
@@ -204,8 +204,7 @@ public final class PackResourcesHelper {
                     position,
                     fixedPosition,
                     hidden,
-                    FeatureFlagSet.of()
-            ));
+                    FeatureFlagSet.of()));
         };
     }
 }
