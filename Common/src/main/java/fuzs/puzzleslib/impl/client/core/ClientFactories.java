@@ -5,6 +5,8 @@ import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 public interface ClientFactories {
@@ -17,4 +19,6 @@ public interface ClientFactories {
     @Nullable <T> T getRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key);
 
     <T> void setRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key, @Nullable T t);
+
+    void registerBuiltinResourcePack(ResourceLocation resourceLocation, Component displayName, boolean required);
 }
