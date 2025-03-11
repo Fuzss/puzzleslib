@@ -12,6 +12,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -225,4 +226,12 @@ public interface ClientAbstractions {
      * @param woodType the wood type
      */
     void registerWoodType(WoodType woodType);
+
+    /**
+     * Creates a deep copy of a baked quad.
+     *
+     * @param bakedQuad the quad to copy
+     * @return the copied quad
+     */
+    BakedQuad copyBakedQuad(BakedQuad bakedQuad);
 }

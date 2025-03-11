@@ -21,6 +21,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -33,6 +34,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.Fluid;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -134,5 +136,16 @@ public final class FabricClientAbstractions implements ClientAbstractions, Event
             Sheets.SIGN_MATERIALS.put(woodType, Sheets.createSignMaterial(woodType));
             Sheets.HANGING_SIGN_MATERIALS.put(woodType, Sheets.createHangingSignMaterial(woodType));
         });
+    }
+
+    @Override
+    public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
+        int[] vertices = bakedQuad.getVertices();
+        return new BakedQuad(Arrays.copyOf(vertices, vertices.length),
+                bakedQuad.getTintIndex(),
+                bakedQuad.getDirection(),
+                bakedQuad.getSprite(),
+                bakedQuad.isShade(),
+                bakedQuad.getLightEmission());
     }
 }

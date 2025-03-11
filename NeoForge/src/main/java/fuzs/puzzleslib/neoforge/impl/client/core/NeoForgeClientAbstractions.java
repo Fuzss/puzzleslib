@@ -14,6 +14,7 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelManager;
@@ -30,6 +31,7 @@ import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -131,5 +133,17 @@ public final class NeoForgeClientAbstractions implements ClientAbstractions {
     @Override
     public void registerWoodType(WoodType woodType) {
         Sheets.addWoodType(woodType);
+    }
+
+    @Override
+    public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
+        int[] vertices = bakedQuad.getVertices();
+        return new BakedQuad(Arrays.copyOf(vertices, vertices.length),
+                bakedQuad.getTintIndex(),
+                bakedQuad.getDirection(),
+                bakedQuad.getSprite(),
+                bakedQuad.isShade(),
+                bakedQuad.getLightEmission(),
+                bakedQuad.hasAmbientOcclusion());
     }
 }
