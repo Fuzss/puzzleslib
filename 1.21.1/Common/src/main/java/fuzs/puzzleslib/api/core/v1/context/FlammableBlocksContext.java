@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.Block;
 /**
  * Register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to.
  */
+@Deprecated
 @FunctionalInterface
 public interface FlammableBlocksContext {
 

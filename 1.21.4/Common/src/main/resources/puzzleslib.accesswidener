@@ -212,6 +212,8 @@ transitive-accessible   method  net/minecraft/world/item/SmithingTemplateItem   
 transitive-accessible   method  net/minecraft/world/item/SmithingTemplateItem   createTrimmableMaterialIconList ()Ljava/util/List;
 transitive-accessible   method  net/minecraft/world/item/SmithingTemplateItem   createNetheriteUpgradeIconList  ()Ljava/util/List;
 transitive-accessible   method  net/minecraft/world/item/SmithingTemplateItem   createNetheriteUpgradeMaterialList  ()Ljava/util/List;
+transitive-accessible   field   net/minecraft/world/item/SmithingTemplateItem   appliesTo   Lnet/minecraft/network/chat/Component;
+transitive-accessible   field   net/minecraft/world/item/SmithingTemplateItem   ingredients Lnet/minecraft/network/chat/Component;
 accessible  field   net/minecraft/world/level/storage/loot/parameters/LootContextParamSets  REGISTRY    Lcom/google/common/collect/BiMap;
 transitive-accessible   method  net/minecraft/server/commands/GiveCommand   giveItem    (Lnet/minecraft/commands/CommandSourceStack;Lnet/minecraft/commands/arguments/item/ItemInput;Ljava/util/Collection;I)I
 transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   biome   (ZFFLnet/minecraft/world/level/biome/MobSpawnSettings$Builder;Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;Lnet/minecraft/sounds/Music;)Lnet/minecraft/world/level/biome/Biome;

@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.api.client.data.v2;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
@@ -55,12 +56,19 @@ public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
         this.add(soundEvent, definition);
     }
 
-    protected void add(final SoundEvent soundEvent, final SoundDefinition.Sound... sounds) {
+    protected void add(SoundEvent soundEvent, SoundDefinition.Sound... sounds) {
         this.add(soundEvent.location(), definition().with(sounds));
     }
 
+    protected void addRecord(Holder<SoundEvent> soundEvent) {
+        ResourceLocation resourceLocation = soundEvent.unwrap().orThrow().location().withPrefix("records/");
+        SoundDefinition soundDefinition = definition().with(sound(resourceLocation).stream());
+        this.add(soundEvent.value(), soundDefinition);
+        soundDefinition.subtitle(null);
+    }
+
     @Override
-    protected void add(final ResourceLocation soundEvent, final SoundDefinition definition) {
+    protected void add(ResourceLocation soundEvent, SoundDefinition definition) {
         super.add(soundEvent, definition.subtitle("subtitles." + soundEvent.getPath()));
     }
 

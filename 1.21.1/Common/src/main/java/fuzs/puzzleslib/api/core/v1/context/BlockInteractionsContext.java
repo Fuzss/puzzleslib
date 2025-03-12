@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Register various block transformations triggered by right-clicking with certain vanilla tools.
  */
+@Deprecated
 public interface BlockInteractionsContext {
 
     /**

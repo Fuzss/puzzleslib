@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.core.v1.context;
 
 import net.minecraft.world.level.block.Block;
 
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface FlammableBlocksContext {
 

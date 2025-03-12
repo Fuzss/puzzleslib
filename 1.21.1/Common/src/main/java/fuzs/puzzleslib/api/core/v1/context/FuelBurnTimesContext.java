@@ -5,6 +5,7 @@ import net.minecraft.world.level.ItemLike;
 /**
  * Applies fuel burn times instead of implementing this on the item side.
  */
+@Deprecated
 @FunctionalInterface
 public interface FuelBurnTimesContext {
 

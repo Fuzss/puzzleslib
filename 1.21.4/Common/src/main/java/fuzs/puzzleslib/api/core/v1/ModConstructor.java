@@ -85,22 +85,32 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
+     * @param context register content to various gameplay registries
      */
-    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
+    default void onRegisterGameplayContent(GameplayContentContext context) {
         // NO-OP
     }
 
     /**
      * @param context register items as furnace fuel
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterFuelValues(FuelValuesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
+     */
+    @Deprecated(forRemoval = true)
+    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
         // NO-OP
     }
 
     /**
      * @param context register items for usage with the composter block
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterCompostableBlocks(CompostableBlocksContext context) {
         // NO-OP
     }
@@ -108,6 +118,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context register various block transformations triggered by right-clicking with certain vanilla tools
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterBlockInteractions(BlockInteractionsContext context) {
         // NO-OP
     }

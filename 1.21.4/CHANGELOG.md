@@ -4,8 +4,9 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.4.12-1.21.4] - 2025-03-11
+## [v21.4.12-1.21.4] - 2025-03-13
 ### Added
+- Add `ModConstructor::onRegisterGameplayContent`
 - Add `ClientAbstractions::copyBakedQuad`
 - Add `BuiltinResourcePackHelper`
 ### Fixed

@@ -67,7 +67,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         this.pathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang");
     }
 
-    public abstract void addTranslations(TranslationBuilder builder);
+    public abstract void addTranslations(TranslationBuilder translationBuilder);
 
     @Override
     public CompletableFuture<?> run(CachedOutput writer) {
@@ -311,29 +311,38 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add("key.categories." + modId, value);
         }
 
+        @Deprecated(forRemoval = true)
         default void addCreativeModeTab(String modId, String value) {
             this.addCreativeModeTab(modId, "main", value);
         }
 
+        @Deprecated(forRemoval = true)
         default void addCreativeModeTab(String modId, String tabId, String value) {
             Objects.requireNonNull(modId, "mod id is null");
             Objects.requireNonNull(tabId, "tab id is null");
             this.addCreativeModeTab(ResourceLocationHelper.fromNamespaceAndPath(modId, tabId), value);
         }
 
+        @Deprecated(forRemoval = true)
         default void addCreativeModeTab(ResourceLocation resourceLocation, String value) {
             Objects.requireNonNull(resourceLocation, "resource location is null");
             this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, resourceLocation), value);
         }
 
+        @Deprecated(forRemoval = true)
         default void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
             Objects.requireNonNull(resourceKey, "resource key is null");
             this.add(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(resourceKey), value);
         }
 
-        default void add(CreativeModeTab tab, String value) {
-            Objects.requireNonNull(tab, "tab is null");
-            this.add(tab.getDisplayName(), value);
+        default void addCreativeModeTab(Holder<CreativeModeTab> creativeModeTab, String value) {
+            Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
+            this.add(creativeModeTab.value(), value);
+        }
+
+        default void add(CreativeModeTab creativeModeTab, String value) {
+            Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
+            this.add(creativeModeTab.getDisplayName(), value);
         }
 
         default void add(Component component, String value) {

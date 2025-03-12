@@ -12,9 +12,7 @@
     "LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin",
     "MobNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
-    "accessor.FireBlockNeoForgeAccessor",
-    "accessor.MobSpawnSettingsBuilderNeoForgeAccessor",
-    "accessor.NewRegistryEventNeoForgeAccessor"
+    "accessor.MobSpawnSettingsBuilderNeoForgeAccessor"
   ],
   "client": [
     "client.accessor.BlockColorsNeoForgeAccessor"

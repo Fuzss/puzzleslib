@@ -12,7 +12,6 @@
     "LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin",
     "TagsProviderNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
-    "accessor.FireBlockNeoForgeAccessor",
     "accessor.MobSpawnSettingsBuilderNeoForgeAccessor",
     "accessor.NewRegistryEventNeoForgeAccessor"
   ],
