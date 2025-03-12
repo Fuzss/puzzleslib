@@ -6,9 +6,11 @@ import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.data.DataMapProvider;
+import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import net.neoforged.neoforge.registries.datamaps.builtin.Compostable;
 import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 
@@ -47,6 +49,13 @@ public record CompostableBlocksContextNeoForgeImpl(String modId,
                             Holder.Reference<Item> holder = entry.getKey().value().asItem().builtInRegistryHolder();
                             builder.add(holder, entry.getValue(), false);
                         }
+                    }
+
+                    @Override
+                    public String getName() {
+                        DataMapType<?, ?> dataMapType = NeoForgeDataMaps.COMPOSTABLES;
+                        return super.getName() + " for " +
+                                ResourceKey.create(dataMapType.registryKey(), dataMapType.id());
                     }
                 };
             });

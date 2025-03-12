@@ -21,6 +21,8 @@ import java.util.Collections;
 /**
  * A helper class for giving items to the player just like the {@code /give} command does, meaning the item is either
  * added to the player inventory, or dropped on the ground if no available inventory space is found.
+ * <p>
+ * TODO move to item package
  */
 public final class GiveItemHelper {
 

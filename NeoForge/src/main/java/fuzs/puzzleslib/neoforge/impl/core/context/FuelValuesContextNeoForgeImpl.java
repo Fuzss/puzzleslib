@@ -6,10 +6,12 @@ import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.common.data.DataMapProvider;
+import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import net.neoforged.neoforge.registries.datamaps.builtin.FurnaceFuel;
 import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 
@@ -35,6 +37,13 @@ public final class FuelValuesContextNeoForgeImpl extends FuelValuesContextImpl {
                         for (Object2IntMap.Entry<TagKey<Item>> entry : FuelValuesContextNeoForgeImpl.this.itemTags.object2IntEntrySet()) {
                             builder.add(entry.getKey(), new FurnaceFuel(entry.getIntValue()), false);
                         }
+                    }
+
+                    @Override
+                    public String getName() {
+                        DataMapType<?, ?> dataMapType = NeoForgeDataMaps.FURNACE_FUELS;
+                        return super.getName() + " for " +
+                                ResourceKey.create(dataMapType.registryKey(), dataMapType.id());
                     }
                 };
             });

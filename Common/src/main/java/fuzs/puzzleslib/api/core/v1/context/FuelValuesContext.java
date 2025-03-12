@@ -8,6 +8,7 @@ import net.minecraft.world.level.ItemLike;
 /**
  * Register items as furnace fuel.
  */
+@Deprecated(forRemoval = true)
 public interface FuelValuesContext {
 
     /**

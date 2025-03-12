@@ -17,8 +17,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 /**
- * This implementation uses an accessor mixin to directly set {@link Optional Optional} to valid fields to allow for clearing
- * certain options that are already present. Resetting a value to an empty optional would otherwise not be possible.
+ * This implementation uses an accessor mixin to directly set {@link Optional Optional} to valid fields to allow for
+ * clearing certain options that are already present. Resetting a value to an empty optional would otherwise not be
+ * possible.
  */
 public record SpecialEffectsContextNeoForge(BiomeSpecialEffectsBuilder context) implements SpecialEffectsContext {
 

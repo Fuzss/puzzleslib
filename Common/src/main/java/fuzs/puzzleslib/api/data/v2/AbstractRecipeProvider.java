@@ -30,6 +30,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -165,85 +166,108 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
         });
     }
 
-    public void stair(RecipeCategory recipeCategory, ItemLike result, ItemLike material) {
-        this.stairBuilder(recipeCategory, result, Ingredient.of(material))
-                .unlockedBy(getHasName(material), this.has(material))
+    public void stair(RecipeCategory recipeCategory, ItemLike resultItem, ItemLike ingredientItem) {
+        this.stairBuilder(recipeCategory, resultItem, Ingredient.of(ingredientItem))
+                .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
                 .save(this.output);
     }
 
-    public RecipeBuilder stairBuilder(RecipeCategory recipeCategory, ItemLike result, Ingredient material) {
-        return this.shaped(recipeCategory, result, 4)
-                .define('#', material)
+    public RecipeBuilder stairBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient) {
+        return this.shaped(recipeCategory, resultItem, 4)
+                .define('#', ingredient)
                 .pattern("#  ")
                 .pattern("## ")
                 .pattern("###");
     }
 
-    public void metalCooking(ItemLike result, ItemLike ingredient, float experience) {
-        this.metalCooking(result, ingredient, experience, 200);
+    public void metalCooking(ItemLike resultItem, ItemLike ingredientItem, float experience) {
+        this.metalCooking(resultItem, ingredientItem, experience, 200);
     }
 
-    public void metalCooking(ItemLike result, ItemLike ingredient, float experience, int baseCookingTime) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient),
+    public void metalCooking(ItemLike resultItem, ItemLike ingredientItem, float experience, int baseCookingTime) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredientItem),
                 RecipeCategory.MISC,
-                result,
+                resultItem,
                 experience,
-                baseCookingTime).unlockedBy(getHasName(ingredient), this.has(ingredient)).save(this.output);
-        SimpleCookingRecipeBuilder.blasting(Ingredient.of(ingredient),
+                baseCookingTime).unlockedBy(getHasName(ingredientItem), this.has(ingredientItem)).save(this.output);
+        SimpleCookingRecipeBuilder.blasting(Ingredient.of(ingredientItem),
                         RecipeCategory.MISC,
-                        result,
+                        resultItem,
                         experience,
                         baseCookingTime / 2)
-                .unlockedBy(getHasName(ingredient), this.has(ingredient))
-                .save(this.output, getBlastingRecipeName(result));
+                .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
+                .save(this.output, getBlastingRecipeName(resultItem));
     }
 
-    public void foodCooking(ItemLike result, ItemLike ingredient) {
-        this.foodCooking(result, ingredient, 0.35F, 200);
+    public void foodCooking(ItemLike resultItem, ItemLike ingredientItem) {
+        this.foodCooking(resultItem, ingredientItem, 0.35F, 200);
     }
 
-    public void foodCooking(ItemLike result, ItemLike ingredient, float experience, int baseCookingTime) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredient),
+    public void foodCooking(ItemLike resultItem, ItemLike ingredientItem, float experienceReward, int baseCookingTime) {
+        SimpleCookingRecipeBuilder.smelting(Ingredient.of(ingredientItem),
                 RecipeCategory.FOOD,
-                result,
-                experience,
-                baseCookingTime).unlockedBy(getHasName(ingredient), this.has(ingredient)).save(this.output);
-        SimpleCookingRecipeBuilder.smoking(Ingredient.of(ingredient),
+                resultItem,
+                experienceReward,
+                baseCookingTime).unlockedBy(getHasName(ingredientItem), this.has(ingredientItem)).save(this.output);
+        SimpleCookingRecipeBuilder.smoking(Ingredient.of(ingredientItem),
                         RecipeCategory.FOOD,
-                        result,
-                        experience,
+                        resultItem,
+                        experienceReward,
                         baseCookingTime / 2)
-                .unlockedBy(getHasName(ingredient), this.has(ingredient))
-                .save(this.output, getCraftingMethodRecipeName(result, RecipeSerializer.SMOKING_RECIPE));
-        SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(ingredient),
+                .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
+                .save(this.output, getCraftingMethodRecipeName(resultItem, RecipeSerializer.SMOKING_RECIPE));
+        SimpleCookingRecipeBuilder.campfireCooking(Ingredient.of(ingredientItem),
                         RecipeCategory.FOOD,
-                        result,
-                        experience,
+                        resultItem,
+                        experienceReward,
                         baseCookingTime * 3)
-                .unlockedBy(getHasName(ingredient), this.has(ingredient))
-                .save(this.output, getCraftingMethodRecipeName(result, RecipeSerializer.CAMPFIRE_COOKING_RECIPE));
+                .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
+                .save(this.output, getCraftingMethodRecipeName(resultItem, RecipeSerializer.CAMPFIRE_COOKING_RECIPE));
     }
 
-    public static String getCraftingMethodRecipeName(ItemLike result, RecipeSerializer<?> recipeSerializer) {
+    public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient) {
+        return this.stonecutterResultFromBaseBuilder(recipeCategory, resultItem, ingredient, 1);
+    }
+
+    public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike resultItem, Ingredient ingredient, int count) {
+        return SingleItemRecipeBuilder.stonecutting(ingredient, recipeCategory, resultItem, count);
+    }
+
+    public void smithing(RecipeCategory recipeCategory, ItemLike resultItem, ItemLike templateItem, ItemLike baseItem, ItemLike materialItem) {
+        SmithingTransformRecipeBuilder.smithing(Ingredient.of(templateItem),
+                        Ingredient.of(baseItem),
+                        Ingredient.of(materialItem),
+                        recipeCategory,
+                        resultItem.asItem())
+                .unlocks(getHasName(materialItem), this.has(materialItem))
+                .save(this.output, getSmithingRecipeName(resultItem));
+    }
+
+    public void waxing(ItemLike resultItem, ItemLike ingredientItem) {
+        ShapelessRecipeBuilder.shapeless(this.items, RecipeCategory.BUILDING_BLOCKS, resultItem)
+                .requires(ingredientItem)
+                .requires(Items.HONEYCOMB)
+                .group(getItemName(resultItem))
+                .unlockedBy(getHasName(ingredientItem), this.has(ingredientItem))
+                .save(this.output, getConversionRecipeName(resultItem, Items.HONEYCOMB));
+    }
+
+    public static String getCraftingMethodRecipeName(ItemLike resultItem, RecipeSerializer<?> recipeSerializer) {
         ResourceLocation resourceLocation = BuiltInRegistries.RECIPE_SERIALIZER.getKey(recipeSerializer);
         Objects.requireNonNull(resourceLocation, "resource location is null");
-        return getCraftingMethodRecipeName(result, resourceLocation.getPath());
+        return getCraftingMethodRecipeName(resultItem, resourceLocation.getPath());
     }
 
-    public static String getCraftingMethodRecipeName(ItemLike result, String craftingMethod) {
-        return getItemName(result) + "_from_" + craftingMethod;
+    public static String getCraftingMethodRecipeName(ItemLike resultItem, String craftingMethod) {
+        return getItemName(resultItem) + "_from_" + craftingMethod;
     }
 
-    public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike result, Ingredient material) {
-        return this.stonecutterResultFromBaseBuilder(recipeCategory, result, material, 1);
+    public static String getStonecuttingRecipeName(ItemLike resultItem, ItemLike material) {
+        return getConversionRecipeName(resultItem, material) + "_stonecutting";
     }
 
-    public RecipeBuilder stonecutterResultFromBaseBuilder(RecipeCategory recipeCategory, ItemLike result, Ingredient material, int count) {
-        return SingleItemRecipeBuilder.stonecutting(material, recipeCategory, result, count);
-    }
-
-    public static String getStonecuttingRecipeName(ItemLike result, ItemLike material) {
-        return getConversionRecipeName(result, material) + "_stonecutting";
+    public static String getSmithingRecipeName(ItemLike resultItem) {
+        return getItemName(resultItem) + "_smithing";
     }
 
     public static String getHasName(TagKey<Item> tagKey) {
