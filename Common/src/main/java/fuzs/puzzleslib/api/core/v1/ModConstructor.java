@@ -77,13 +77,6 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context add fuel burn time for blocks and items, e.g. in a furnace
-     */
-    default void onRegisterFuelBurnTimes(final FuelBurnTimesContext context) {
-        // NO-OP
-    }
-
-    /**
      * @param context allows for registering modifications (including additions and removals) to biomes loaded from the
      *                current data pack
      */
@@ -92,8 +85,24 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register content to various gameplay registries
+     */
+    default void onRegisterGameplayContent(GameplayContentContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context add fuel burn time for blocks and items, e.g. in a furnace
+     */
+    @Deprecated
+    default void onRegisterFuelBurnTimes(final FuelBurnTimesContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
      */
+    @Deprecated
     default void onRegisterFlammableBlocks(final FlammableBlocksContext context) {
         // NO-OP
     }
@@ -101,6 +110,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context register items for usage with the composter block
      */
+    @Deprecated
     default void onRegisterCompostableBlocks(CompostableBlocksContext context) {
         // NO-OP
     }
@@ -108,6 +118,7 @@ public interface ModConstructor extends BaseModConstructor {
     /**
      * @param context register various block transformations triggered by right-clicking with certain vanilla tools
      */
+    @Deprecated
     default void onRegisterBlockInteractions(BlockInteractionsContext context) {
         // NO-OP
     }

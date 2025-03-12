@@ -6,6 +6,7 @@ import net.minecraft.world.level.ItemLike;
 /**
  * Register items for usage with the composter block.
  */
+@Deprecated
 @FunctionalInterface
 public interface CompostableBlocksContext {
 
