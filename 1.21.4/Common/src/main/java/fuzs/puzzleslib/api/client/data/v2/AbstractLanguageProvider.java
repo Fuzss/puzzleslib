@@ -139,16 +139,28 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(resourceLocation.toLanguageKey(), additionalKey, value);
         }
 
+        @Deprecated(forRemoval = true)
         default void add(String registry, Holder<?> holder, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(holder, "holder is null");
             this.add(registry, holder.unwrapKey().orElseThrow(), value);
         }
 
+        @Deprecated(forRemoval = true)
         default void add(String registry, ResourceKey<?> resourceKey, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(resourceKey, "resource key is null");
             this.add(registry, resourceKey.location(), value);
+        }
+
+        default void add(Holder<?> holder, String value) {
+            Objects.requireNonNull(holder, "holder is null");
+            this.add(holder.unwrapKey().orElseThrow(), value);
+        }
+
+        default void add(ResourceKey<?> resourceKey, String value) {
+            Objects.requireNonNull(resourceKey, "resource key is null");
+            this.add(Registries.elementsDirPath(resourceKey.registryKey()), resourceKey.location(), value);
         }
 
         default void add(String registry, ResourceLocation resourceLocation, String value) {
