@@ -17,12 +17,12 @@ public final class PlayerCopyEvents {
         /**
          * Called when player data is copied to a new player.
          *
-         * @param originalPlayer     the old player
-         * @param newPlayer          the new player
-         * @param originalStillAlive whether the copy was made when returning from the End dimension, otherwise caused
-         *                           by the old player having died
+         * @param originalServerPlayer the old player
+         * @param newServerPlayer      the new player
+         * @param originalStillAlive   whether the copy was made when returning from the End dimension, otherwise caused
+         *                             by the old player having died
          */
-        void onCopy(ServerPlayer originalPlayer, ServerPlayer newPlayer, boolean originalStillAlive);
+        void onCopy(ServerPlayer originalServerPlayer, ServerPlayer newServerPlayer, boolean originalStillAlive);
     }
 
     @FunctionalInterface

@@ -219,6 +219,33 @@ transitive-accessible   method  net/minecraft/server/commands/GiveCommand   give
 transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   biome   (ZFFLnet/minecraft/world/level/biome/MobSpawnSettings$Builder;Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;Lnet/minecraft/sounds/Music;)Lnet/minecraft/world/level/biome/Biome;
 transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   biome   (ZFFIILjava/lang/Integer;Ljava/lang/Integer;Lnet/minecraft/world/level/biome/MobSpawnSettings$Builder;Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;Lnet/minecraft/sounds/Music;)Lnet/minecraft/world/level/biome/Biome;
 transitive-accessible   method  net/minecraft/data/worldgen/biome/OverworldBiomes   globalOverworldGeneration   (Lnet/minecraft/world/level/biome/BiomeGenerationSettings$Builder;)V
+transitive-accessible   field   net/minecraft/client/particle/Particle  level   Lnet/minecraft/client/multiplayer/ClientLevel;
+transitive-accessible   field   net/minecraft/client/particle/Particle  xo  D
+transitive-accessible   field   net/minecraft/client/particle/Particle  yo  D
+transitive-accessible   field   net/minecraft/client/particle/Particle  zo  D
+transitive-accessible   field   net/minecraft/client/particle/Particle  x   D
+transitive-accessible   field   net/minecraft/client/particle/Particle  y   D
+transitive-accessible   field   net/minecraft/client/particle/Particle  z   D
+transitive-accessible   field   net/minecraft/client/particle/Particle  xd  D
+transitive-accessible   field   net/minecraft/client/particle/Particle  yd  D
+transitive-accessible   field   net/minecraft/client/particle/Particle  zd  D
+transitive-accessible   field   net/minecraft/client/particle/Particle  onGround    Z
+transitive-accessible   field   net/minecraft/client/particle/Particle  hasPhysics  Z
+transitive-accessible   field   net/minecraft/client/particle/Particle  removed Z
+transitive-accessible   field   net/minecraft/client/particle/Particle  bbWidth F
+transitive-accessible   field   net/minecraft/client/particle/Particle  bbHeight    F
+transitive-accessible   field   net/minecraft/client/particle/Particle  random  Lnet/minecraft/util/RandomSource;
+transitive-accessible   field   net/minecraft/client/particle/Particle  age I
+transitive-accessible   field   net/minecraft/client/particle/Particle  lifetime    I
+transitive-accessible   field   net/minecraft/client/particle/Particle  gravity F
+transitive-accessible   field   net/minecraft/client/particle/Particle  rCol    F
+transitive-accessible   field   net/minecraft/client/particle/Particle  gCol    F
+transitive-accessible   field   net/minecraft/client/particle/Particle  bCol    F
+transitive-accessible   field   net/minecraft/client/particle/Particle  alpha   F
+transitive-accessible   field   net/minecraft/client/particle/Particle  roll    F
+transitive-accessible   field   net/minecraft/client/particle/Particle  oRoll   F
+transitive-accessible   field   net/minecraft/client/particle/Particle  friction    F
+transitive-accessible   field   net/minecraft/client/particle/Particle  speedUpWhenYMotionIsBlocked Z
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.GenerationSettingsContext;
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -20,12 +19,8 @@ public record GenerationSettingsContextNeoForge(Registry<ConfiguredWorldCarver<?
 
     public GenerationSettingsContextNeoForge(RegistryAccess registryAccess, BiomeGenerationSettingsBuilder context) {
         this(registryAccess.lookupOrThrow(Registries.CONFIGURED_CARVER),
-                registryAccess.lookupOrThrow(Registries.PLACED_FEATURE), context
-        );
-    }
-
-    public GenerationSettingsContextNeoForge(BiomeGenerationSettingsBuilder context) {
-        this(CommonAbstractions.INSTANCE.getMinecraftServer().registryAccess(), context);
+                registryAccess.lookupOrThrow(Registries.PLACED_FEATURE),
+                context);
     }
 
     @Override

@@ -247,26 +247,29 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(BlockEvents.Break.class, BlockEvent.BreakEvent.class, (BlockEvents.Break callback, BlockEvent.BreakEvent evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (!(evt.getPlayer() instanceof ServerPlayer serverPlayer)) return;
             // match Fabric implementation
-            if (evt.getState().getBlock() instanceof GameMasterBlock && !evt.getPlayer().canUseGameMasterBlocks()) {
+            if (evt.getState().getBlock() instanceof GameMasterBlock && !serverPlayer.canUseGameMasterBlocks()) {
                 return;
             }
-            GameType gameType = ((ServerPlayer) evt.getPlayer()).gameMode.getGameModeForPlayer();
-            if (evt.getPlayer().blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
+            GameType gameType = serverPlayer.gameMode.getGameModeForPlayer();
+            if (serverPlayer.blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
                 return;
             }
-            EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
+            EventResult result = callback.onBreakBlock(serverLevel, evt.getPos(), evt.getState(), serverPlayer, serverPlayer.getMainHandItem());
             if (result.isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(BlockEvents.DropExperience.class, BlockDropsEvent.class, (BlockEvents.DropExperience callback, BlockDropsEvent evt) -> {
-            if (!(evt.getBreaker() instanceof Player player)) return;
+            if (!(evt.getBreaker() instanceof ServerPlayer serverPlayer)) return;
             MutableInt experienceAmount = MutableInt.fromEvent(evt::setDroppedExperience, evt::getDroppedExperience);
-            callback.onDropExperience(evt.getLevel(), evt.getPos(), evt.getState(), player, evt.getTool(), experienceAmount);
+            callback.onDropExperience(evt.getLevel(), evt.getPos(), evt.getState(), serverPlayer, evt.getTool(), experienceAmount);
         });
         INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
-            if (callback.onFarmlandTrample((Level) evt.getLevel(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (callback.onFarmlandTrample(serverLevel, evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -438,8 +441,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel()).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (callback.onEntityLoad(evt.getEntity(), serverLevel).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from loading in!");
@@ -449,8 +452,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Spawn.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Spawn callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide || evt.loadedFromDisk()) return;
-            if (callback.onEntitySpawn(evt.getEntity(), (ServerLevel) evt.getLevel(), evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel) || evt.loadedFromDisk()) return;
+            if (callback.onEntitySpawn(evt.getEntity(), serverLevel, evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -460,8 +463,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            callback.onEntityUnload(evt.getEntity(), (ServerLevel) evt.getLevel());
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            callback.onEntityUnload(evt.getEntity(), serverLevel);
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             if (callback.onLivingDeath(evt.getEntity(), evt.getSource()).isInterrupt()) {
@@ -469,24 +472,28 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(PlayerTrackingEvents.Start.class, PlayerEvent.StartTracking.class, (PlayerTrackingEvents.Start callback, PlayerEvent.StartTracking evt) -> {
-            callback.onStartTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onStartTracking(evt.getTarget(), serverPlayer);
         });
         INSTANCE.register(PlayerTrackingEvents.Stop.class, PlayerEvent.StopTracking.class, (PlayerTrackingEvents.Stop callback, PlayerEvent.StopTracking evt) -> {
-            callback.onStopTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onStopTracking(evt.getTarget(), serverPlayer);
         });
         INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, PlayerEvent.PlayerLoggedInEvent.class, (PlayerNetworkEvents.LoggedIn callback, PlayerEvent.PlayerLoggedInEvent evt) -> {
-            callback.onLoggedIn((ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onLoggedIn(serverPlayer);
         });
         INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, PlayerEvent.PlayerLoggedOutEvent.class, (PlayerNetworkEvents.LoggedOut callback, PlayerEvent.PlayerLoggedOutEvent evt) -> {
-            callback.onLoggedOut((ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onLoggedOut(serverPlayer);
         });
         INSTANCE.register(AfterChangeDimensionCallback.class, PlayerEvent.PlayerChangedDimensionEvent.class, (AfterChangeDimensionCallback callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
-            MinecraftServer server = CommonAbstractions.INSTANCE.getMinecraftServer();
-            ServerLevel from = server.getLevel(evt.getFrom());
-            ServerLevel to = server.getLevel(evt.getTo());
-            Objects.requireNonNull(from, "level origin is null");
-            Objects.requireNonNull(to, "level destination is null");
-            callback.onAfterChangeDimension((ServerPlayer) evt.getEntity(), from, to);
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            ServerLevel originalLevel = serverPlayer.server.getLevel(evt.getFrom());
+            ServerLevel newLevel = serverPlayer.server.getLevel(evt.getTo());
+            Objects.requireNonNull(originalLevel, "original level is null");
+            Objects.requireNonNull(newLevel, "new level is null");
+            callback.onAfterChangeDimension(serverPlayer, originalLevel, newLevel);
         });
         INSTANCE.register(BabyEntitySpawnCallback.class, BabyEntitySpawnEvent.class, (BabyEntitySpawnCallback callback, BabyEntitySpawnEvent evt) -> {
             MutableValue<AgeableMob> child = MutableValue.fromEvent(evt::setChild, evt::getChild);
@@ -505,10 +512,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(PlayerCopyEvents.Copy.class, PlayerEvent.Clone.class, (PlayerCopyEvents.Copy callback, PlayerEvent.Clone evt) -> {
-            callback.onCopy((ServerPlayer) evt.getOriginal(), (ServerPlayer) evt.getEntity(), !evt.isWasDeath());
+            if (!(evt.getOriginal() instanceof ServerPlayer originalServerPlayer)) return;
+            if (!(evt.getEntity() instanceof ServerPlayer newServerPlayer)) return;
+            callback.onCopy(originalServerPlayer, newServerPlayer, !evt.isWasDeath());
         });
         INSTANCE.register(PlayerCopyEvents.Respawn.class, PlayerEvent.PlayerRespawnEvent.class, (PlayerCopyEvents.Respawn callback, PlayerEvent.PlayerRespawnEvent evt) -> {
-            callback.onRespawn((ServerPlayer) evt.getEntity(), evt.isEndConquered());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onRespawn(serverPlayer, evt.isEndConquered());
         });
         INSTANCE.register(ServerTickEvents.Start.class, ServerTickEvent.Pre.class, (ServerTickEvents.Start callback, ServerTickEvent.Pre evt) -> {
             callback.onStartServerTick(evt.getServer());
@@ -517,28 +527,30 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onEndServerTick(evt.getServer());
         });
         INSTANCE.register(ServerLevelTickEvents.Start.class, LevelTickEvent.Pre.class, (ServerLevelTickEvents.Start callback, LevelTickEvent.Pre evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onStartLevelTick(level.getServer(), level);
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            callback.onStartLevelTick(serverLevel.getServer(), serverLevel);
         });
         INSTANCE.register(ServerLevelTickEvents.End.class, LevelTickEvent.Post.class, (ServerLevelTickEvents.End callback, LevelTickEvent.Post evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onEndLevelTick(level.getServer(), level);
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            callback.onEndLevelTick(serverLevel.getServer(), serverLevel);
         });
         INSTANCE.register(ServerLevelEvents.Load.class, LevelEvent.Load.class, (ServerLevelEvents.Load callback, LevelEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onLevelLoad(level.getServer(), level);
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            callback.onLevelLoad(serverLevel.getServer(), serverLevel);
         });
         INSTANCE.register(ServerLevelEvents.Unload.class, LevelEvent.Unload.class, (ServerLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onLevelUnload(level.getServer(), level);
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            callback.onLevelUnload(serverLevel.getServer(), serverLevel);
         });
         INSTANCE.register(ServerChunkEvents.Load.class, ChunkEvent.Load.class, (ServerChunkEvents.Load callback, ChunkEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onChunkLoad(level, (LevelChunk) evt.getChunk());
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (!(evt.getChunk() instanceof LevelChunk levelChunk)) return;
+            callback.onChunkLoad(serverLevel, levelChunk);
         });
         INSTANCE.register(ServerChunkEvents.Unload.class, ChunkEvent.Unload.class, (ServerChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel level)) return;
-            callback.onChunkUnload(level, (LevelChunk) evt.getChunk());
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (!(evt.getChunk() instanceof LevelChunk levelChunk)) return;
+            callback.onChunkUnload(serverLevel, levelChunk);
         });
         INSTANCE.register(ItemEntityEvents.Toss.class, ItemTossEvent.class, (ItemEntityEvents.Toss callback, ItemTossEvent evt) -> {
             if (callback.onItemToss(evt.getPlayer(), evt.getEntity()).isInterrupt()) {
@@ -596,18 +608,19 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(CheckMobDespawnCallback.class, MobDespawnEvent.class, (CheckMobDespawnCallback callback, MobDespawnEvent evt) -> {
-            EventResult result = callback.onCheckMobDespawn(evt.getEntity(), (ServerLevel) evt.getLevel());
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            EventResult result = callback.onCheckMobDespawn(evt.getEntity(), serverLevel);
             if (result.isInterrupt()) {
                 evt.setResult(result.getAsBoolean() ? MobDespawnEvent.Result.ALLOW : MobDespawnEvent.Result.DENY);
             }
         });
         INSTANCE.register(GatherPotentialSpawnsCallback.class, LevelEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, LevelEvent.PotentialSpawns evt) -> {
-            ServerLevel level = (ServerLevel) evt.getLevel();
-            List<MobSpawnSettings.SpawnerData> mobs = new PotentialSpawnsList<>(evt::getSpawnerDataList, spawnerData -> {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            List<MobSpawnSettings.SpawnerData> mobs = new PotentialSpawnsList<>(evt::getSpawnerDataList, (MobSpawnSettings.SpawnerData spawnerData) -> {
                 evt.addSpawnerData(spawnerData);
                 return true;
             }, evt::removeSpawnerData);
-            callback.onGatherPotentialSpawns(level, level.structureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobs);
+            callback.onGatherPotentialSpawns(serverLevel, serverLevel.structureManager(), serverLevel.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobs);
         });
         INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
             if (evt.isDismounting()) return;
@@ -708,10 +721,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onLivingConversion(evt.getEntity(), evt.getOutcome());
         });
         INSTANCE.register(ContainerEvents.Open.class, PlayerContainerEvent.Open.class, (ContainerEvents.Open callback, PlayerContainerEvent.Open evt) -> {
-            callback.onContainerOpen((ServerPlayer) evt.getEntity(), evt.getContainer());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onContainerOpen(serverPlayer, evt.getContainer());
         });
         INSTANCE.register(ContainerEvents.Close.class, PlayerContainerEvent.Close.class, (ContainerEvents.Close callback, PlayerContainerEvent.Close evt) -> {
-            callback.onContainerClose((ServerPlayer) evt.getEntity(), evt.getContainer());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onContainerClose(serverPlayer, evt.getContainer());
         });
         INSTANCE.register(LookingAtEndermanCallback.class, EnderManAngerEvent.class, (LookingAtEndermanCallback callback, EnderManAngerEvent evt) -> {
             if (callback.onLookingAtEnderManCallback(evt.getEntity(), evt.getPlayer()).isInterrupt()) {

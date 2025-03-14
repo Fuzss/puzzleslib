@@ -8,12 +8,15 @@ import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
+import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.impl.biome.*;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.data.PackOutput;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.biome.Biome;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.data.JsonCodecProvider;
@@ -85,14 +88,6 @@ public record BiomeModificationsContextNeoForgeImpl(String modId,
 
         private final MapCodec<? extends BiomeModifier> codec = MapCodec.unit(this);
 
-        static BiomeModificationContext createModificationContext(ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-            ClimateSettingsContextNeoForge climateSettings = new ClimateSettingsContextNeoForge(builder.getClimateSettings());
-            SpecialEffectsContextNeoForge specialEffects = new SpecialEffectsContextNeoForge(builder.getSpecialEffects());
-            GenerationSettingsContextNeoForge generationSettings = new GenerationSettingsContextNeoForge(builder.getGenerationSettings());
-            MobSpawnSettingsContextNeoForge mobSpawnSettings = new MobSpawnSettingsContextNeoForge(builder.getMobSpawnSettings());
-            return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
-        }
-
         @Override
         public void modify(Holder<Biome> holder, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             // no equivalent for BEFORE_EVERYTHING exists on Fabric, so we don't use it
@@ -102,8 +97,12 @@ public record BiomeModificationsContextNeoForgeImpl(String modId,
                 Collection<Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>>> biomeModification = BiomeModificationsContextNeoForgeImpl.this.biomeModifications.get(
                         biomeLoadingPhase);
                 if (!biomeModification.isEmpty()) {
-                    BiomeLoadingContext biomeLoadingContext = new BiomeLoadingContextNeoForge(holder);
-                    BiomeModificationContext biomeModificationContext = createModificationContext(builder);
+                    MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
+                    Objects.requireNonNull(minecraftServer, "minecraft server is null");
+                    RegistryAccess registryAccess = minecraftServer.registryAccess();
+                    BiomeLoadingContext biomeLoadingContext = new BiomeLoadingContextNeoForge(registryAccess, holder);
+                    BiomeModificationContext biomeModificationContext = createModificationContext(registryAccess,
+                            builder);
                     for (Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>> entry : biomeModification) {
                         if (entry.getKey().test(biomeLoadingContext)) {
                             entry.getValue().accept(biomeModificationContext);
@@ -111,6 +110,15 @@ public record BiomeModificationsContextNeoForgeImpl(String modId,
                     }
                 }
             }
+        }
+
+        static BiomeModificationContext createModificationContext(RegistryAccess registryAccess, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+            ClimateSettingsContextNeoForge climateSettings = new ClimateSettingsContextNeoForge(builder.getClimateSettings());
+            SpecialEffectsContextNeoForge specialEffects = new SpecialEffectsContextNeoForge(builder.getSpecialEffects());
+            GenerationSettingsContextNeoForge generationSettings = new GenerationSettingsContextNeoForge(registryAccess,
+                    builder.getGenerationSettings());
+            MobSpawnSettingsContextNeoForge mobSpawnSettings = new MobSpawnSettingsContextNeoForge(builder.getMobSpawnSettings());
+            return new BiomeModificationContext(climateSettings, specialEffects, generationSettings, mobSpawnSettings);
         }
 
         @Override
