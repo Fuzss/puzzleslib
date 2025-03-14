@@ -307,7 +307,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
-                EventResult result = callback.onBreakBlock((ServerLevel) level, pos, state, player, player.getMainHandItem());
+                if (!(level instanceof ServerLevel serverLevel)) return true;
+                EventResult result = callback.onBreakBlock(serverLevel, pos, state, player, player.getMainHandItem());
                 return result.isPass();
             };
         });
