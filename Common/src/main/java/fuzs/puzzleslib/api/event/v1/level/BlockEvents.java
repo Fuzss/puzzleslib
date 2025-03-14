@@ -25,6 +25,8 @@ public final class BlockEvents {
 
         /**
          * Fires before a block is about to be broken, allows for preventing just that.
+         * <p>
+         * TODO player should be server player
          *
          * @param serverLevel the level the block is being broken in
          * @param blockPos    the position of the block
@@ -44,8 +46,11 @@ public final class BlockEvents {
 
         /**
          * Fires when a block is about to drop experience after being broken.
-         * <p>While in vanilla only a few blocks will drop experience (mainly ore blocks),
-         * this callback runs for every block, allowing for potentially adding an experience drop.
+         * <p>
+         * While in vanilla only a few blocks will drop experience (mainly ore blocks), this callback runs for every
+         * block, allowing for potentially adding an experience drop.
+         * <p>
+         * TODO player should be server player
          *
          * @param serverLevel      the level the block is being broken in
          * @param blockPos         the position of the block
@@ -63,6 +68,8 @@ public final class BlockEvents {
         /**
          * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block
          * into dirt and destroying potential crops.
+         * <p>
+         * TODO level should be server level
          *
          * @param level         level farmland block is trampled in
          * @param blockPos      farmland block position

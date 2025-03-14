@@ -26,6 +26,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -214,8 +215,8 @@ public final class NeoForgeClientEventInvokers {
             callback.onRenderChatPanel(evt.getGuiGraphics(), evt.getPartialTick(), posX, posY);
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
-            if (!evt.getLevel().isClientSide) return;
-            EventResult result = callback.onEntityLoad(evt.getEntity(), (ClientLevel) evt.getLevel());
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            EventResult result = callback.onEntityLoad(evt.getEntity(), clientLevel);
             if (result.isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
@@ -226,8 +227,8 @@ public final class NeoForgeClientEventInvokers {
             }
         });
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, EntityLeaveLevelEvent.class, (ClientEntityLevelEvents.Unload callback, EntityLeaveLevelEvent evt) -> {
-            if (!evt.getLevel().isClientSide) return;
-            callback.onEntityUnload(evt.getEntity(), (ClientLevel) evt.getLevel());
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onEntityUnload(evt.getEntity(), clientLevel);
         });
         INSTANCE.register(
                 InputEvents.MouseClick.class, InputEvent.MouseButton.Pre.class, (InputEvents.MouseClick callback, InputEvent.MouseButton.Pre evt) -> {
@@ -271,20 +272,20 @@ public final class NeoForgeClientEventInvokers {
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ClientLevelTickEvents.Start.class, LevelTickEvent.Pre.class, (ClientLevelTickEvents.Start callback, LevelTickEvent.Pre evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onStartLevelTick(Minecraft.getInstance(), level);
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onStartLevelTick(Minecraft.getInstance(), clientLevel);
         });
         INSTANCE.register(ClientLevelTickEvents.End.class, LevelTickEvent.Post.class, (ClientLevelTickEvents.End callback, LevelTickEvent.Post evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onEndLevelTick(Minecraft.getInstance(), level);
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onEndLevelTick(Minecraft.getInstance(), clientLevel);
         });
         INSTANCE.register(ClientChunkEvents.Load.class, ChunkEvent.Load.class, (ClientChunkEvents.Load callback, ChunkEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onChunkLoad(level, (LevelChunk) evt.getChunk());
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onChunkLoad(clientLevel, evt.getChunk());
         });
         INSTANCE.register(ClientChunkEvents.Unload.class, ChunkEvent.Unload.class, (ClientChunkEvents.Unload callback, ChunkEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onChunkUnload(level, (LevelChunk) evt.getChunk());
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onChunkUnload(clientLevel, evt.getChunk());
         });
         INSTANCE.register(ClientPlayerNetworkEvents.LoggedIn.class, ClientPlayerNetworkEvent.LoggingIn.class, (ClientPlayerNetworkEvents.LoggedIn callback, ClientPlayerNetworkEvent.LoggingIn evt) -> {
             callback.onLoggedIn(evt.getPlayer(), evt.getMultiPlayerGameMode(), evt.getConnection());
@@ -335,12 +336,12 @@ public final class NeoForgeClientEventInvokers {
             }
         });
         INSTANCE.register(ClientLevelEvents.Load.class, LevelEvent.Load.class, (ClientLevelEvents.Load callback, LevelEvent.Load evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onLevelLoad(Minecraft.getInstance(), level);
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onLevelLoad(Minecraft.getInstance(), clientLevel);
         });
         INSTANCE.register(ClientLevelEvents.Unload.class, LevelEvent.Unload.class, (ClientLevelEvents.Unload callback, LevelEvent.Unload evt) -> {
-            if (!(evt.getLevel() instanceof ClientLevel level)) return;
-            callback.onLevelUnload(Minecraft.getInstance(), level);
+            if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
+            callback.onLevelUnload(Minecraft.getInstance(), clientLevel);
         });
         INSTANCE.register(MovementInputUpdateCallback.class, MovementInputUpdateEvent.class, (MovementInputUpdateCallback callback, MovementInputUpdateEvent evt) -> {
             callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());

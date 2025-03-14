@@ -298,7 +298,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
-                EventResult result = callback.onBreakBlock((ServerLevel) level, pos, state, player, player.getMainHandItem());
+                if (!(level instanceof ServerLevel serverLevel)) return true;
+                EventResult result = callback.onBreakBlock(serverLevel, pos, state, player, player.getMainHandItem());
                 return result.isPass();
             };
         });
@@ -384,13 +385,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return callback::onEndServerTick;
         });
         INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, (ServerLevelTickEvents.Start callback) -> {
-            return (ServerLevel level) -> {
-                callback.onStartLevelTick(level.getServer(), level);
+            return (ServerLevel serverLevel) -> {
+                callback.onStartLevelTick(serverLevel.getServer(), serverLevel);
             };
         });
         INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, (ServerLevelTickEvents.End callback) -> {
-            return (ServerLevel level) -> {
-                callback.onEndLevelTick(level.getServer(), level);
+            return (ServerLevel serverLevel) -> {
+                callback.onEndLevelTick(serverLevel.getServer(), serverLevel);
             };
         });
         INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, (ServerLevelEvents.Load callback) -> {

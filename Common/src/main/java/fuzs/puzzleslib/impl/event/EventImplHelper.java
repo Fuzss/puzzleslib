@@ -40,9 +40,9 @@ public final class EventImplHelper {
     public static Optional<Player> getGrindstoneUsingPlayer(ItemStack topInput, ItemStack bottomInput) {
         MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
         Optional<Player> optional = Optional.empty();
-        for (ServerPlayer player : minecraftServer.getPlayerList().getPlayers()) {
-            if (player.containerMenu instanceof GrindstoneMenu menu) {
-                optional = Optional.of(player);
+        for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
+            if (serverPlayer.containerMenu instanceof GrindstoneMenu menu) {
+                optional = Optional.of(serverPlayer);
                 if (menu.getSlot(0).getItem() == topInput && menu.getSlot(1).getItem() == bottomInput) {
                     break;
                 }
@@ -58,9 +58,9 @@ public final class EventImplHelper {
             }
         }
         MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
-        for (ServerPlayer player : minecraftServer.getPlayerList().getPlayers()) {
-            if (player.containerMenu == menu) {
-                return Optional.of(player);
+        for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
+            if (serverPlayer.containerMenu == menu) {
+                return Optional.of(serverPlayer);
             }
         }
         return Optional.empty();
