@@ -74,7 +74,9 @@ public final class DataProviderHelper {
         Preconditions.checkState(factories.length > 0, "data provider factories is empty");
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final GatherDataEvent.Client evt) -> {
-                evt.createDatapackRegistryObjects(registrySetBuilder);
+                if (!registrySetBuilder.getEntryKeys().isEmpty()) {
+                    evt.createDatapackRegistryObjects(registrySetBuilder);
+                }
                 onGatherData(evt, Arrays.stream(factories).map(factoryConverter).toList());
             });
         });
