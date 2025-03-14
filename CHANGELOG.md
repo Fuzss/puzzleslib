@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add a bunch of safety checks for casting in event invokers
 ### Fixed
 - Fix rare start-up crash when registering generated config translations on NeoForge
+- Fix `DataProviderHelper::registerDataProviders` failing when called multiple times 
 
 ## [v21.4.11-1.21.4] - 2025-03-02
 ### Added
