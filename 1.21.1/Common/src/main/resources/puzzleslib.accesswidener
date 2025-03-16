@@ -132,6 +132,8 @@ accessible  field   net/minecraft/client/gui/screens/LoadingOverlay fadeOutStart
 accessible  method  net/minecraft/client/renderer/LevelRenderer addParticleInternal (Lnet/minecraft/core/particles/ParticleOptions;ZZDDDDDD)Lnet/minecraft/client/particle/Particle;
 accessible  method  net/minecraft/world/entity/Entity   canRide (Lnet/minecraft/world/entity/Entity;)Z
 accessible  method  net/minecraft/world/entity/Entity   canAddPassenger (Lnet/minecraft/world/entity/Entity;)Z
+transitive-accessible	class	net/minecraft/client/model/geom/ModelPart$Vertex
+transitive-accessible	class	net/minecraft/client/model/geom/ModelPart$Polygon
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
