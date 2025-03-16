@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.init.v3.registry;
 
+import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
@@ -55,7 +56,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.loot.LootTable;
 
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -148,14 +148,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a block.
      *
      * @param path                    path for new entry
-     * @param factory                 factory for new block
+     * @param blockFactory            factory for new block
      * @param blockPropertiesSupplier supplier for block properties
      * @return the holder reference
      */
-    default Holder.Reference<Block> registerBlock(String path, Function<BlockBehaviour.Properties, Block> factory, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
+    default Holder.Reference<Block> registerBlock(String path, Function<BlockBehaviour.Properties, Block> blockFactory, Supplier<BlockBehaviour.Properties> blockPropertiesSupplier) {
         return this.register(Registries.BLOCK,
                 path,
-                () -> factory.apply(blockPropertiesSupplier.get().setId(this.makeResourceKey(Registries.BLOCK, path))));
+                () -> blockFactory.apply(blockPropertiesSupplier.get()
+                        .setId(this.makeResourceKey(Registries.BLOCK, path))));
     }
 
     /**
@@ -182,26 +183,27 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an item.
      *
-     * @param path    path for new entry
-     * @param factory factory for new item
+     * @param path        path for new entry
+     * @param itemFactory factory for new item
      * @return the holder reference
      */
-    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory) {
-        return this.registerItem(path, factory, Item.Properties::new);
+    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> itemFactory) {
+        return this.registerItem(path, itemFactory, Item.Properties::new);
     }
 
     /**
      * Register an item.
      *
      * @param path                   path for new entry
-     * @param factory                factory for new item
+     * @param itemFactory            factory for new item
      * @param itemPropertiesSupplier supplier for new item properties
      * @return the holder reference
      */
-    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
+    default Holder.Reference<Item> registerItem(String path, Function<Item.Properties, Item> itemFactory, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.register(Registries.ITEM,
                 path,
-                () -> factory.apply(itemPropertiesSupplier.get().setId(this.makeResourceKey(Registries.ITEM, path))));
+                () -> itemFactory.apply(itemPropertiesSupplier.get()
+                        .setId(this.makeResourceKey(Registries.ITEM, path))));
     }
 
     /**
@@ -228,30 +230,26 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Registers a block item for a block.
      *
-     * @param block   reference for block to register item variant for
-     * @param factory factory for new item
+     * @param block       reference for block to register item variant for
+     * @param itemFactory factory for new item
      * @return the holder reference
      */
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory) {
-        return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
-                (Item.Properties itemProperties) -> {
-                    return factory.apply(block.value(), itemProperties);
-                },
-                Item.Properties::new);
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> itemFactory) {
+        return this.registerBlockItem(block, itemFactory, Item.Properties::new);
     }
 
     /**
      * Registers a block item for a block.
      *
      * @param block                  reference for block to register item variant for
-     * @param factory                factory for new item
+     * @param itemFactory            factory for new item
      * @param itemPropertiesSupplier supplier for new item properties
      * @return the holder reference
      */
-    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> factory, Supplier<Item.Properties> itemPropertiesSupplier) {
+    default Holder.Reference<Item> registerBlockItem(Holder<Block> block, BiFunction<Block, Item.Properties, ? extends BlockItem> itemFactory, Supplier<Item.Properties> itemPropertiesSupplier) {
         return this.registerItem(block.unwrapKey().orElseThrow().location().getPath(),
                 (Item.Properties itemProperties) -> {
-                    return factory.apply(block.value(), itemProperties);
+                    return itemFactory.apply(block.value(), itemProperties);
                 },
                 () -> itemPropertiesSupplier.get().useBlockDescriptionPrefix());
     }
@@ -431,41 +429,42 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block entity type.
      *
-     * @param path       path for new entry
-     * @param factory    factory for every newly created block entity instance
-     * @param validBlock block allowed to use this block entity
-     * @param <T>        block entity type parameter
+     * @param path               path for new entry
+     * @param blockEntityFactory factory for every newly created block entity instance
+     * @param validBlock         block allowed to use this block entity
+     * @param <T>                block entity type parameter
      * @return the holder reference
      */
-    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block> validBlock) {
-        return this.registerBlockEntityType(path, factory, () -> Collections.singleton(validBlock.value()));
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Holder<Block> validBlock) {
+        return this.registerBlockEntityType(path, blockEntityFactory, () -> Collections.singleton(validBlock.value()));
     }
 
     /**
      * Register a block entity type.
      *
-     * @param path        path for new entry
-     * @param factory     factory for every newly created block entity instance
-     * @param validBlocks blocks allowed to use this block entity
-     * @param <T>         block entity type parameter
+     * @param path               path for new entry
+     * @param blockEntityFactory factory for every newly created block entity instance
+     * @param validBlocks        blocks allowed to use this block entity
+     * @param <T>                block entity type parameter
      * @return the holder reference
      */
-    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Holder<Block>... validBlocks) {
+    @Deprecated(forRemoval = true)
+    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Holder<Block>... validBlocks) {
         return this.registerBlockEntityType(path,
-                factory,
+                blockEntityFactory,
                 () -> Stream.of(validBlocks).map(Holder::value).collect(Collectors.toSet()));
     }
 
     /**
      * Register a block entity type.
      *
-     * @param path        path for new entry
-     * @param factory     factory for every newly created block entity instance
-     * @param validBlocks blocks allowed to use this block entity
-     * @param <T>         block entity type parameter
+     * @param path               path for new entry
+     * @param blockEntityFactory factory for every newly created block entity instance
+     * @param validBlocks        blocks allowed to use this block entity
+     * @param <T>                block entity type parameter
      * @return the holder reference
      */
-    <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks);
+    <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Supplier<Set<Block>> validBlocks);
 
     /**
      * Register a menu type.
@@ -500,10 +499,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return the holder reference
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> matchingBlock) {
-        return this.registerPoiType(path,
-                0,
-                1,
-                () -> new HashSet<>(matchingBlock.value().getStateDefinition().getPossibleStates()));
+        return this.registerPoiType(path, () -> Collections.singleton(matchingBlock.value()));
     }
 
     /**
@@ -513,12 +509,29 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param matchingBlocks blocks valid for this poi type
      * @return the holder reference
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block>... matchingBlocks) {
         return this.registerPoiType(path, 0, 1, () -> {
             return Stream.of(matchingBlocks)
                     .map(Holder::value)
                     .flatMap(block -> block.getStateDefinition().getPossibleStates().stream())
                     .collect(Collectors.toSet());
+        });
+    }
+
+    /**
+     * Register a poi type.
+     *
+     * @param path           path for new entry
+     * @param matchingBlocks blocks valid for this poi type
+     * @return the holder reference
+     */
+    default Holder.Reference<PoiType> registerPoiType(String path, Supplier<Set<Block>> matchingBlocks) {
+        return this.registerPoiType(path, 0, 1, () -> {
+            return matchingBlocks.get()
+                    .stream()
+                    .flatMap((Block block) -> block.getStateDefinition().getPossibleStates().stream())
+                    .collect(ImmutableSet.toImmutableSet());
         });
     }
 

@@ -76,11 +76,11 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks) {
+    public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Supplier<Set<Block>> validBlocks) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
                 path,
                 () -> {
-                    return new BlockEntityType<>(factory::apply, ImmutableSet.copyOf(validBlocks.get()));
+                    return new BlockEntityType<>(blockEntityFactory::apply, ImmutableSet.copyOf(validBlocks.get()));
                 });
     }
 

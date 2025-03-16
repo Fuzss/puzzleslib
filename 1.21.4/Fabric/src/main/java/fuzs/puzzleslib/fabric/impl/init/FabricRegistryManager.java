@@ -63,11 +63,11 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> factory, Supplier<Set<Block>> validBlocks) {
+    public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Supplier<Set<Block>> validBlocks) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
                 path,
                 () -> {
-                    return FabricBlockEntityTypeBuilder.create(factory::apply, validBlocks.get().toArray(Block[]::new))
+                    return FabricBlockEntityTypeBuilder.create(blockEntityFactory::apply, validBlocks.get().toArray(Block[]::new))
                             .build();
                 });
     }
