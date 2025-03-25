@@ -9,20 +9,15 @@ public final class FabricModConstructor {
         // NO-OP
     }
 
-    public static void construct(ModConstructor constructor, String modId) {
-        constructor.onConstructMod();
-        constructor.onCommonSetup();
-        constructor.onEntityAttributeCreation(new EntityAttributesCreateContextFabricImpl());
-        constructor.onEntityAttributeModification(new EntityAttributesModifyContextFabricImpl());
-        constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
-        constructor.onRegisterGameplayContent(new GameplayContentContextFabricImpl());
-        constructor.onRegisterFlammableBlocks(new FlammableBlocksContextFabricImpl());
-        constructor.onRegisterFuelValues(new FuelValuesContextFabricImpl());
-        constructor.onRegisterCompostableBlocks(new CompostableBlocksContextFabricImpl());
-        constructor.onRegisterBlockInteractions(new BlockInteractionsContextFabricImpl());
-        constructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
-        constructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
-        constructor.onGameRegistriesContext(new GameRegistriesContextFabricImpl());
-        constructor.onDataPackRegistriesContext(new DataPackRegistriesContextFabricImpl());
+    public static void construct(ModConstructor modConstructor, String modId) {
+        modConstructor.onConstructMod();
+        modConstructor.onCommonSetup();
+        modConstructor.onRegisterEntityAttributes(new EntityAttributesContextFabricImpl());
+        modConstructor.onRegisterSpawnPlacements(new SpawnPlacementsContextFabricImpl());
+        modConstructor.onRegisterGameplayContent(new GameplayContentContextFabricImpl());
+        modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextFabricImpl(modId));
+        modConstructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
+        modConstructor.onRegisterGameRegistriesContext(new GameRegistriesContextFabricImpl());
+        modConstructor.onRegisterDataPackRegistriesContext(new DataPackRegistriesContextFabricImpl());
     }
 }

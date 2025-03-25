@@ -2,7 +2,6 @@ package fuzs.puzzleslib.neoforge.impl.event;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.*;
@@ -28,13 +27,10 @@ import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.SetupMobGoalsEvent;
 import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
-import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -49,7 +45,6 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -58,7 +53,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.block.GameMasterBlock;
-import net.minecraft.world.level.block.entity.FuelValues;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
@@ -73,7 +67,6 @@ import net.neoforged.neoforge.event.entity.*;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.*;
-import net.neoforged.neoforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.neoforged.neoforge.event.level.*;
 import net.neoforged.neoforge.event.server.ServerAboutToStartEvent;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
@@ -138,33 +131,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(CommonSetupCallback.class, FMLCommonSetupEvent.class, (CommonSetupCallback callback, FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(callback::onCommonSetup);
-        });
-        // TODO the solution is bad and only temporary until the deprecated callback is fully removed
-        INSTANCE.register(RegisterFuelValuesCallback.class, (RegisterFuelValuesCallback callback, @Nullable Object context) -> {
-            FuelValues[] fuelValues = new FuelValues[1];
-            NeoForgeModContainerHelper.getActiveModEventBus().addListener((final FMLLoadCompleteEvent evt) -> {
-                RegistryAccess.ImmutableRegistryAccess registries = new RegistryAccess.ImmutableRegistryAccess(
-                        List.of(new MappedRegistry<>(Registries.ITEM, Lifecycle.stable())));
-                FuelValues.Builder builder = new FuelValues.Builder(registries,
-                        FeatureFlags.REGISTRY.allFlags()
-                );
-                callback.onRegisterFuelValues(builder, 200);
-                fuelValues[0] = builder.build();
-            });
-            NeoForge.EVENT_BUS.addListener((final AddServerReloadListenersEvent evt) -> {
-                FuelValues.Builder builder = new FuelValues.Builder(evt.getRegistryAccess(),
-                        FeatureFlags.REGISTRY.allFlags()
-                );
-                callback.onRegisterFuelValues(builder, 200);
-                fuelValues[0] = builder.build();
-            });
-            NeoForge.EVENT_BUS.addListener((final FurnaceFuelBurnTimeEvent evt) -> {
-                Objects.requireNonNull(fuelValues[0], "fuel values is null when trying to lookup " + evt.getItemStack().getItem());
-                if (fuelValues[0].isFuel(evt.getItemStack())) {
-                    evt.setBurnTime(fuelValues[0].burnDuration(evt.getItemStack()));
-                    evt.setCanceled(true);
-                }
-            });
         });
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             NeoForgeClientEventInvokers.registerLoadingHandlers();

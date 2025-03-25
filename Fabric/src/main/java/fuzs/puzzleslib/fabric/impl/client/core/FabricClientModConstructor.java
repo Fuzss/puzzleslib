@@ -30,7 +30,6 @@ public final class FabricClientModConstructor {
         modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextFabricImpl());
         modConstructor.onRegisterItemDecorations(new ItemDecorationsContextFabricImpl());
         modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextFabricImpl());
-        modConstructor.onRegisterSpecialBlockModelTypes(new SpecialBlockModelTypesContextFabricImpl());
         modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextFabricImpl());
         modConstructor.onRegisterSkullRenderers(new SkullRenderersContextFabricImpl());
         modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextFabricImpl());

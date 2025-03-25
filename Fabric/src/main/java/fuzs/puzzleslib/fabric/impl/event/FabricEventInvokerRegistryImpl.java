@@ -43,7 +43,6 @@ import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
-import net.fabricmc.fabric.api.registry.FuelRegistryEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -78,7 +77,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.entity.FuelValues;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.BlockHitResult;
@@ -299,7 +297,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
                 if (!(level instanceof ServerLevel serverLevel)) return true;
-                EventResult result = callback.onBreakBlock(serverLevel, pos, state, player, player.getMainHandItem());
+                if (!(player instanceof ServerPlayer serverPlayer)) return true;
+                EventResult result = callback.onBreakBlock(serverLevel, pos, state, serverPlayer, player.getMainHandItem());
                 return result.isPass();
             };
         });
@@ -439,11 +438,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(RegisterPotionBrewingMixesCallback.class, FabricBrewingRecipeRegistryBuilder.BUILD, (RegisterPotionBrewingMixesCallback callback) -> {
             return (PotionBrewing.Builder builder) -> {
                 callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
-            };
-        });
-        INSTANCE.register(RegisterFuelValuesCallback.class, FuelRegistryEvents.BUILD, (RegisterFuelValuesCallback callback) -> {
-            return (FuelValues.Builder builder, FuelRegistryEvents.Context context) -> {
-                callback.onRegisterFuelValues(builder, context.baseSmeltTime());
             };
         });
         INSTANCE.register(ChangeEntitySizeCallback.class, FabricEntityEvents.CHANGE_ENTITY_SIZE);

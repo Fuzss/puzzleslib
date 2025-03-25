@@ -58,18 +58,7 @@ public final class ArmorMaterialBuilder {
      * @return the builder
      */
     public static ArmorMaterialBuilder of(ResourceLocation assetId, TagKey<Item> repairIngredient) {
-        return new ArmorMaterialBuilder().setAssetId(assetId).setRepairIngredient(repairIngredient);
-    }
-
-    /**
-     * @param assetId          the location for the equipment model definition file at
-     *                         {@code assets/<namespace>/equipment/<path>.json}
-     * @param repairIngredient the repair material used in an anvil for restoring item durability
-     * @return the builder
-     */
-    @Deprecated(forRemoval = true)
-    public static ArmorMaterialBuilder of(ResourceKey<EquipmentAsset> assetId, TagKey<Item> repairIngredient) {
-        return new ArmorMaterialBuilder().setAssetId(assetId).setRepairIngredient(repairIngredient);
+        return new ArmorMaterialBuilder().setRepairIngredient(repairIngredient).setAssetId(assetId);
     }
 
     /**
@@ -77,7 +66,9 @@ public final class ArmorMaterialBuilder {
      * @return the builder
      */
     public static ArmorMaterialBuilder copyOf(ArmorMaterial armorMaterial) {
-        return of(armorMaterial.assetId(), armorMaterial.repairIngredient()).setDurability(armorMaterial.durability())
+        return new ArmorMaterialBuilder().setRepairIngredient(armorMaterial.repairIngredient())
+                .setAssetId(armorMaterial.assetId())
+                .setDurability(armorMaterial.durability())
                 .setDefense(armorMaterial.defense())
                 .setEnchantmentValue(armorMaterial.enchantmentValue())
                 .setEquipSound(armorMaterial.equipSound())

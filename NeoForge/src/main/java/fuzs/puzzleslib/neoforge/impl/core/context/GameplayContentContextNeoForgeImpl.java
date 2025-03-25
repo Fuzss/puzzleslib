@@ -5,7 +5,6 @@ import com.google.common.base.Predicates;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.core.v1.context.GameplayContentContext;
-import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.core.Holder;
@@ -17,6 +16,7 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FireBlock;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
@@ -44,10 +44,10 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
             HoeItem::onlyIfAirAbove);
     private final DataMapBuilder<Holder<Block>, Holder<Block>> oxidizables;
     private final DataMapBuilder<Holder<Block>, Holder<Block>> waxables;
-    private final String modId;
+    private final IEventBus eventBus;
 
-    public GameplayContentContextNeoForgeImpl(String modId) {
-        this.modId = modId;
+    public GameplayContentContextNeoForgeImpl(String modId, IEventBus eventBus) {
+        this.eventBus = eventBus;
         this.furnaceFuels = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.FURNACE_FUELS,
                 (Holder<? extends ItemLike> holder) -> holder.value().asItem().builtInRegistryHolder(),
@@ -82,7 +82,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
         Preconditions.checkArgument(flammability > 0, "flammability is non-positive");
         Objects.requireNonNull(flammableBlock, "flammable block is null");
         if (this.flammables.isEmpty()) {
-            NeoForgeModContainerHelper.getModEventBus(this.modId).addListener((final FMLCommonSetupEvent evt) -> {
+            this.eventBus.addListener((final FMLCommonSetupEvent evt) -> {
                 evt.enqueueWork(() -> {
                     this.flammables.forEach((Holder<Block> holder, Flammable flammable) -> {
                         ((FireBlock) Blocks.FIRE).setFlammable(holder.value(),
@@ -166,7 +166,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
 
         public void register(K key, V value) {
             if (this.values.isEmpty()) {
-                DataProviderHelper.registerDataProvidersV2(this.modId, this.factory);
+                DataProviderHelper.registerDataProviders(this.modId, this.factory);
             }
             this.values.put(key, value);
         }

@@ -3,7 +3,6 @@ package fuzs.puzzleslib.neoforge.api.data.v2.core;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import net.minecraft.core.HolderLookup;
@@ -34,23 +33,7 @@ public final class DataProviderHelper {
      * @param modId     the current mod id
      * @param factories the data provider factories to run
      */
-    @Deprecated(forRemoval = true)
-    public static void registerDataProviders(String modId, DataProviderContext.Factory... factories) {
-        registerDataProviders(modId, new RegistrySetBuilder(), factories, (DataProviderContext.Factory factory) -> {
-            return (GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) -> {
-                return factory.apply(NeoForgeDataProviderContext.fromEvent(evt, registries));
-            };
-        });
-    }
-
-    /**
-     * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
-     * {@link GatherDataEvent} fires.
-     *
-     * @param modId     the current mod id
-     * @param factories the data provider factories to run
-     */
-    public static void registerDataProvidersV2(String modId, NeoForgeDataProviderContext.Factory... factories) {
+    public static void registerDataProviders(String modId, NeoForgeDataProviderContext.Factory... factories) {
         registerDataProviders(modId, new RegistrySetBuilder(), factories);
     }
 

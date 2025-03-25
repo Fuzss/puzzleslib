@@ -36,16 +36,11 @@ public abstract class AbstractAtlasProvider extends SpriteSourceProvider {
         return this.atlas(atlasLocation);
     }
 
-    @Deprecated(forRemoval = true)
-    public void addMaterial(Material material) {
-        this.material(material);
-    }
-
-    public void material(Material material) {
+    protected void material(Material material) {
         this.material(material.atlasLocation(), material.texture());
     }
 
-    public void material(ResourceLocation atlasLocation, ResourceLocation textureLocation) {
+    protected void material(ResourceLocation atlasLocation, ResourceLocation textureLocation) {
         this.sheet(atlasLocation).addSource(new SingleFile(textureLocation, Optional.empty()));
     }
 

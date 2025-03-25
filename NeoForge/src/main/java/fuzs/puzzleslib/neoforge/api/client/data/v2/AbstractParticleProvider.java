@@ -2,54 +2,38 @@ package fuzs.puzzleslib.neoforge.api.client.data.v2;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.client.particle.ParticleDescription;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.CloseableResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.neoforged.neoforge.common.data.JsonCodecProvider;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Deprecated(forRemoval = true)
 public abstract class AbstractParticleProvider extends JsonCodecProvider<ParticleDescription> {
     public static final Codec<ParticleDescription> CODEC = ResourceLocation.CODEC.listOf()
             .fieldOf("textures")
             .xmap(ParticleDescription::new, ParticleDescription::getTextures)
             .codec();
 
-    @Nullable
-    private CloseableResourceManager resourceManager;
+    private final ResourceManager clientResourceManager;
 
 
-    public AbstractParticleProvider(DataProviderContext context) {
-        this(context.getModId(), context.getPackOutput(), context.getRegistries());
+    public AbstractParticleProvider(NeoForgeDataProviderContext context) {
+        this(context.getModId(), context.getPackOutput(), context.getRegistries(), context.getClientResourceManager());
     }
 
-    public AbstractParticleProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+    public AbstractParticleProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, ResourceManager clientResourceManager) {
         super(packOutput, PackOutput.Target.RESOURCE_PACK, "particles", CODEC, lookupProvider, modId);
-    }
-
-    @Override
-    public CompletableFuture<?> run(CachedOutput output) {
-        return CompletableFuture.supplyAsync(() -> {
-            return this.resourceManager = ExistingFilesHelper.createResourceManager(this.modid);
-        }).thenComposeAsync((CloseableResourceManager resourceManager) -> {
-            return super.run(output).thenRun(() -> {
-                resourceManager.close();
-                this.resourceManager = null;
-            });
-        });
+        this.clientResourceManager = clientResourceManager;
     }
 
     @Override
@@ -100,9 +84,8 @@ public abstract class AbstractParticleProvider extends JsonCodecProvider<Particl
     @Override
     public void unconditional(ResourceLocation id, ParticleDescription value) {
         List<String> missing = value.getTextures().stream().filter((ResourceLocation resourceLocation) -> {
-            Objects.requireNonNull(this.resourceManager, "resource manager is null");
-            return this.resourceManager.getResource(resourceLocation.withPath((String string) -> "textures/particle/" +
-                    string + ".png")).isEmpty();
+            return this.clientResourceManager.getResource(resourceLocation.withPath((String string) ->
+                    "textures/particle/" + string + ".png")).isEmpty();
         }).map(ResourceLocation::toString).toList();
         if (!missing.isEmpty()) {
             throw new IllegalArgumentException(

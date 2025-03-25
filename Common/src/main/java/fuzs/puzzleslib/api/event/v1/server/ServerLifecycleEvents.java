@@ -10,7 +10,7 @@ public final class ServerLifecycleEvents {
     public static final EventInvoker<Stopped> STOPPED = EventInvoker.lookup(Stopped.class);
 
     private ServerLifecycleEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -19,7 +19,7 @@ public final class ServerLifecycleEvents {
         /**
          * Called before {@link Started}, allows for customization of the server.
          *
-         * @param minecraftServer the current server instance
+         * @param minecraftServer the server instance
          */
         void onServerStarting(MinecraftServer minecraftServer);
     }
@@ -30,7 +30,7 @@ public final class ServerLifecycleEvents {
         /**
          * Called after {@link Starting} when the server is available and ready to play.
          *
-         * @param minecraftServer the current server instance
+         * @param minecraftServer the server instance
          */
         void onServerStarted(MinecraftServer minecraftServer);
     }
@@ -41,7 +41,7 @@ public final class ServerLifecycleEvents {
         /**
          * Called before {@link Started} when the server is about to begin a shutdown.
          *
-         * @param minecraftServer the current server instance
+         * @param minecraftServer the server instance
          */
         void onServerStopping(MinecraftServer minecraftServer);
     }
@@ -53,7 +53,7 @@ public final class ServerLifecycleEvents {
          * Called after {@link Stopping} when the server has completely shut down. On the client this happens
          * immediately before returning to the main menu.
          *
-         * @param minecraftServer the current server instance
+         * @param minecraftServer the server instance
          */
         void onServerStopped(MinecraftServer minecraftServer);
     }

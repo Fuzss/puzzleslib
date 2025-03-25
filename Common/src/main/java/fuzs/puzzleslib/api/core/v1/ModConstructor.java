@@ -52,27 +52,16 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
+     * @param context register attributes for entities
+     */
+    default void onRegisterEntityAttributes(EntityAttributesContext context) {
+        // NO-OP
+    }
+
+    /**
      * @param context add to entity spawn placement register
      */
     default void onRegisterSpawnPlacements(SpawnPlacementsContext context) {
-        // NO-OP
-    }
-
-    /**
-     * TODO rename onCreateEntityAttributes along with context
-     *
-     * @param context add default attributes for our own entities to entity attribute map
-     */
-    default void onEntityAttributeCreation(EntityAttributesCreateContext context) {
-        // NO-OP
-    }
-
-    /**
-     * TODO rename onModifyEntityAttributes along with context
-     *
-     * @param context replace or add attribute in entity attribute map
-     */
-    default void onEntityAttributeModification(EntityAttributesModifyContext context) {
         // NO-OP
     }
 
@@ -92,38 +81,6 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * @param context register items as furnace fuel
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterFuelValues(FuelValuesContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register blocks that {@link net.minecraft.world.level.block.FireBlock} can spread to
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterFlammableBlocks(FlammableBlocksContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register items for usage with the composter block
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterCompostableBlocks(CompostableBlocksContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register various block transformations triggered by right-clicking with certain vanilla tools
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterBlockInteractions(BlockInteractionsContext context) {
-        // NO-OP
-    }
-
-    /**
      * @param context register additional data pack sources
      */
     default void onAddDataPackFinders(PackRepositorySourcesContext context) {
@@ -131,20 +88,16 @@ public interface ModConstructor extends BaseModConstructor {
     }
 
     /**
-     * TODO rename onRegisterGameRegistriesContext
-     *
      * @param context register built-in static registries
      */
-    default void onGameRegistriesContext(GameRegistriesContext context) {
+    default void onRegisterGameRegistriesContext(GameRegistriesContext context) {
         // NO-OP
     }
 
     /**
-     * TODO rename onRegisterDataPackRegistriesContext
-     *
      * @param context register data pack-driven dynamic registries
      */
-    default void onDataPackRegistriesContext(DataPackRegistriesContext context) {
+    default void onRegisterDataPackRegistriesContext(DataPackRegistriesContext context) {
         // NO-OP
     }
 }
