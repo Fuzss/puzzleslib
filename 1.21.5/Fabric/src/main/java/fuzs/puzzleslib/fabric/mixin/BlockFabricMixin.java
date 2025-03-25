@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -41,16 +42,16 @@ abstract class BlockFabricMixin extends BlockBehaviour {
 
     @Inject(method = "playerDestroy", at = @At("TAIL"))
     public void playerDestroy$1(Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, ItemStack itemInHand, CallbackInfo callback) {
-        if (level instanceof ServerLevel serverLevel) {
-            int[] capturedExperience = this.puzzleslib$capturedExperience;
-            this.puzzleslib$capturedExperience = null;
-            Objects.requireNonNull(capturedExperience, "captured experience is null");
-            MutableInt experienceToDrop = MutableInt.fromValue(capturedExperience[0]);
-            FabricLevelEvents.DROP_BLOCK_EXPERIENCE.invoker()
-                    .onDropExperience(serverLevel, pos, state, player, itemInHand, experienceToDrop);
-            if (experienceToDrop.getAsInt() > 0) {
-                this.popExperience(serverLevel, pos, experienceToDrop.getAsInt());
-            }
+        if (!(level instanceof ServerLevel serverLevel)) return;
+        if (!(player instanceof ServerPlayer serverPlayer)) return;
+        int[] capturedExperience = this.puzzleslib$capturedExperience;
+        this.puzzleslib$capturedExperience = null;
+        Objects.requireNonNull(capturedExperience, "captured experience is null");
+        MutableInt experienceToDrop = MutableInt.fromValue(capturedExperience[0]);
+        FabricLevelEvents.DROP_BLOCK_EXPERIENCE.invoker()
+                .onDropExperience(serverLevel, pos, state, serverPlayer, itemInHand, experienceToDrop);
+        if (experienceToDrop.getAsInt() > 0) {
+            this.popExperience(serverLevel, pos, experienceToDrop.getAsInt());
         }
     }
 

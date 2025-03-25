@@ -62,8 +62,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Handles registering to game registries. Registration is performed instantly on Fabric and is deferred on Forge.
@@ -448,22 +446,6 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param <T>                block entity type parameter
      * @return the holder reference
      */
-    @Deprecated(forRemoval = true)
-    default <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Holder<Block>... validBlocks) {
-        return this.registerBlockEntityType(path,
-                blockEntityFactory,
-                () -> Stream.of(validBlocks).map(Holder::value).collect(Collectors.toSet()));
-    }
-
-    /**
-     * Register a block entity type.
-     *
-     * @param path               path for new entry
-     * @param blockEntityFactory factory for every newly created block entity instance
-     * @param validBlocks        blocks allowed to use this block entity
-     * @param <T>                block entity type parameter
-     * @return the holder reference
-     */
     <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Supplier<Set<Block>> validBlocks);
 
     /**
@@ -500,23 +482,6 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block> matchingBlock) {
         return this.registerPoiType(path, () -> Collections.singleton(matchingBlock.value()));
-    }
-
-    /**
-     * Register a poi type.
-     *
-     * @param path           path for new entry
-     * @param matchingBlocks blocks valid for this poi type
-     * @return the holder reference
-     */
-    @Deprecated(forRemoval = true)
-    default Holder.Reference<PoiType> registerPoiType(String path, Holder<Block>... matchingBlocks) {
-        return this.registerPoiType(path, 0, 1, () -> {
-            return Stream.of(matchingBlocks)
-                    .map(Holder::value)
-                    .flatMap(block -> block.getStateDefinition().getPossibleStates().stream())
-                    .collect(Collectors.toSet());
-        });
     }
 
     /**

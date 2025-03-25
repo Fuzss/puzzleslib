@@ -1,7 +1,10 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.shaders.FogShape;
-import fuzs.puzzleslib.api.client.event.v1.*;
+import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
+import fuzs.puzzleslib.api.client.event.v1.ClientSetupCallback;
+import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
+import fuzs.puzzleslib.api.client.event.v1.InputEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
@@ -26,17 +29,14 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -84,9 +84,6 @@ public final class NeoForgeClientEventInvokers {
             evt.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
                 callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
             });
-        });
-        INSTANCE.register(ClientStartedCallback.class, FMLLoadCompleteEvent.class, (ClientStartedCallback callback, FMLLoadCompleteEvent evt) -> {
-            evt.enqueueWork(() -> callback.onClientStarted(Minecraft.getInstance()));
         });
         INSTANCE.register(ClientSetupCallback.class, FMLClientSetupEvent.class, (ClientSetupCallback callback, FMLClientSetupEvent evt) -> {
             evt.enqueueWork(callback::onClientSetup);

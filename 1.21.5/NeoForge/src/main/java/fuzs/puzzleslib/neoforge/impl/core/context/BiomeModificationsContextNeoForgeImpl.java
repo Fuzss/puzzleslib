@@ -10,8 +10,8 @@ import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
 import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
-import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import fuzs.puzzleslib.neoforge.impl.biome.*;
 import net.minecraft.core.Holder;
 import net.minecraft.core.RegistryAccess;
@@ -52,7 +52,7 @@ public record BiomeModificationsContextNeoForgeImpl(String modId,
             deferredRegister.register(this.eventBus);
             Holder<MapCodec<? extends BiomeModifier>> holder = deferredRegister.register("biome_modifications",
                     biomeModifierImpl::codec);
-            DataProviderHelper.registerDataProviders(this.modId, (DataProviderContext context) -> {
+            DataProviderHelper.registerDataProviders(this.modId, (NeoForgeDataProviderContext context) -> {
                 return new JsonCodecProvider<>(context.getPackOutput(),
                         PackOutput.Target.DATA_PACK,
                         NeoForgeRegistries.Keys.BIOME_MODIFIERS.location().toString().replace(':', '/'),

@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.item;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.init.v3.registry.ContentRegistrationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -29,7 +30,7 @@ public interface CustomTransmuteRecipe {
      * <p>
      * The serializer must manually be registered via
      * {@link
-     * fuzs.puzzleslib.api.init.v3.registry.TransmuteRecipeHelper#registerTransmuteRecipeSerializers(RegistryManager)}.
+     * ContentRegistrationHelper#registerTransmuteRecipeSerializers(RegistryManager)}.
      *
      * @param modId              the mod id to find the serializer for
      * @param recipeSerializerId the serializer string id, either {@link #TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID} or

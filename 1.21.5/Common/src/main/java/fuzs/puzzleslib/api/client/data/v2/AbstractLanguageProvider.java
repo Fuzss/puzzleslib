@@ -139,20 +139,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(resourceLocation.toLanguageKey(), additionalKey, value);
         }
 
-        @Deprecated(forRemoval = true)
-        default void add(String registry, Holder<?> holder, String value) {
-            Objects.requireNonNull(registry, "registry is null");
-            Objects.requireNonNull(holder, "holder is null");
-            this.add(registry, holder.unwrapKey().orElseThrow(), value);
-        }
-
-        @Deprecated(forRemoval = true)
-        default void add(String registry, ResourceKey<?> resourceKey, String value) {
-            Objects.requireNonNull(registry, "registry is null");
-            Objects.requireNonNull(resourceKey, "resource key is null");
-            this.add(registry, resourceKey.location(), value);
-        }
-
         default void add(Holder<?> holder, String value) {
             Objects.requireNonNull(holder, "holder is null");
             this.add(holder.unwrapKey().orElseThrow(), value);
@@ -314,39 +300,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add("subtitles." + soundEvent.location().getPath(), value);
         }
 
-        default void add(KeyMapping keyMapping, String value) {
-            Objects.requireNonNull(keyMapping, "key mapping is null");
-            this.add(keyMapping.getName(), value);
-        }
-
-        default void addKeyCategory(String modId, String value) {
-            this.add("key.categories." + modId, value);
-        }
-
-        @Deprecated(forRemoval = true)
-        default void addCreativeModeTab(String modId, String value) {
-            this.addCreativeModeTab(modId, "main", value);
-        }
-
-        @Deprecated(forRemoval = true)
-        default void addCreativeModeTab(String modId, String tabId, String value) {
-            Objects.requireNonNull(modId, "mod id is null");
-            Objects.requireNonNull(tabId, "tab id is null");
-            this.addCreativeModeTab(ResourceLocationHelper.fromNamespaceAndPath(modId, tabId), value);
-        }
-
-        @Deprecated(forRemoval = true)
-        default void addCreativeModeTab(ResourceLocation resourceLocation, String value) {
-            Objects.requireNonNull(resourceLocation, "resource location is null");
-            this.addCreativeModeTab(ResourceKey.create(Registries.CREATIVE_MODE_TAB, resourceLocation), value);
-        }
-
-        @Deprecated(forRemoval = true)
-        default void addCreativeModeTab(ResourceKey<CreativeModeTab> resourceKey, String value) {
-            Objects.requireNonNull(resourceKey, "resource key is null");
-            this.add(BuiltInRegistries.CREATIVE_MODE_TAB.getValue(resourceKey), value);
-        }
-
         default void addCreativeModeTab(Holder<CreativeModeTab> creativeModeTab, String value) {
             Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
             this.add(creativeModeTab.value(), value);
@@ -355,6 +308,15 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(CreativeModeTab creativeModeTab, String value) {
             Objects.requireNonNull(creativeModeTab, "creative mode tab is null");
             this.add(creativeModeTab.getDisplayName(), value);
+        }
+
+        default void add(KeyMapping keyMapping, String value) {
+            Objects.requireNonNull(keyMapping, "key mapping is null");
+            this.add(keyMapping.getName(), value);
+        }
+
+        default void addKeyCategory(String modId, String value) {
+            this.add("key.categories." + modId, value);
         }
 
         default void add(Component component, String value) {

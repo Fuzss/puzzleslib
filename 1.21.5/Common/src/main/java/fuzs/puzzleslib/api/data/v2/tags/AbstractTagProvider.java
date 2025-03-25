@@ -54,15 +54,4 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     public AbstractTagAppender<T> tag(TagKey<T> tagKey) {
         return tagAppender(this.getOrCreateRawBuilder(tagKey), this.registryKey);
     }
-
-    @Deprecated(forRemoval = true)
-    protected Registry<T> registry() {
-        return LookupHelper.getRegistry(this.registryKey).orElseThrow();
-    }
-
-    @Deprecated(forRemoval = true)
-    protected Function<T, ResourceKey<T>> keyExtractor() {
-        Registry<T> registry = this.registry();
-        return (T t) -> registry.getResourceKey(t).orElseThrow();
-    }
 }

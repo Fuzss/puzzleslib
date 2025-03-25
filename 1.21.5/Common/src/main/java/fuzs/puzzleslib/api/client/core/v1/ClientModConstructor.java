@@ -10,7 +10,6 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -134,14 +133,6 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param context register codecs for handling custom item model types and properties
      */
     default void onRegisterItemModels(ItemModelsContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register a codec for a custom {@link SpecialModelRenderer.Unbaked} implementation
-     */
-    @Deprecated(forRemoval = true)
-    default void onRegisterSpecialBlockModelTypes(SpecialBlockModelTypesContext context) {
         // NO-OP
     }
 

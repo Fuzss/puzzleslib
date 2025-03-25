@@ -18,7 +18,6 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -149,8 +148,11 @@ public final class FabricClientEventInvokers {
             });
         });
         INSTANCE.register(ModelBakingCompleteCallback.class, FabricClientEvents.MODEL_BAKING_COMPLETE);
-        INSTANCE.register(ClientStartedCallback.class, ClientLifecycleEvents.CLIENT_STARTED, callback -> {
+        INSTANCE.register(ClientLifecycleEvents.Started.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED, (ClientLifecycleEvents.Started callback) -> {
             return callback::onClientStarted;
+        });
+        INSTANCE.register(ClientLifecycleEvents.Stopping.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STOPPING, (ClientLifecycleEvents.Stopping callback) -> {
+            return callback::onClientStopping;
         });
         INSTANCE.register(ClientSetupCallback.class, (ClientSetupCallback callback, @Nullable Object context) -> {
             callback.onClientSetup();

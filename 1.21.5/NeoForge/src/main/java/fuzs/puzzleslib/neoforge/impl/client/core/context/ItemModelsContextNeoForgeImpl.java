@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.mojang.serialization.MapCodec;
-import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.core.v1.context.ItemModelsContext;
+import fuzs.puzzleslib.neoforge.impl.core.context.AbstractNeoForgeContext;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperty;
@@ -10,24 +10,11 @@ import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemMode
 import net.minecraft.client.renderer.item.properties.select.SelectItemModelProperty;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.client.event.*;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 
-public final class ItemModelsContextNeoForgeImpl implements ItemModelsContext {
-    private final List<Consumer<Event>> listeners = new ArrayList<>();
-
-    public static ItemModelsContextNeoForgeImpl computeIfAbsent(ItemModelsContextNeoForgeImpl[] itemModelsContext, ClientModConstructor modConstructor) {
-        if (itemModelsContext[0] == null) {
-            itemModelsContext[0] = new ItemModelsContextNeoForgeImpl();
-            modConstructor.onRegisterItemModels(itemModelsContext[0]);
-        }
-        return itemModelsContext[0];
-    }
+public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext implements ItemModelsContext {
 
     @Override
     public void registerItemModel(ResourceLocation resourceLocation, MapCodec<? extends ItemModel.Unbaked> codec) {
@@ -85,17 +72,5 @@ public final class ItemModelsContextNeoForgeImpl implements ItemModelsContext {
                 (RegisterRangeSelectItemModelPropertyEvent evt) -> {
                     evt.register(resourceLocation, codec);
                 });
-    }
-
-    private <T extends Event> void registerForEvent(Class<T> eventClazz, Consumer<T> consumer) {
-        this.listeners.add((Event event) -> {
-            if (eventClazz.isInstance(event)) {
-                consumer.accept((T) event);
-            }
-        });
-    }
-
-    public void registerForEvent(Event event) {
-        this.listeners.forEach((Consumer<Event> consumer) -> consumer.accept(event));
     }
 }

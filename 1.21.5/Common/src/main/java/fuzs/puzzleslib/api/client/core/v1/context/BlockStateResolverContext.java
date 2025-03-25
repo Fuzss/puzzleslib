@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
-import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -26,19 +25,6 @@ public interface BlockStateResolverContext {
      * @param blockStateConsumer the consumer resolving block states to individual unbaked block state models
      */
     void registerBlockStateResolver(Block block, Consumer<BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer);
-
-    /**
-     * @param block              the block to resolve block states for
-     * @param resourceLoader     the resource provider for asynchronously loaded data
-     * @param blockStateConsumer the consumer resolving block states to individual unbaked block state models
-     * @param <T>                the loaded data type
-     */
-    @Deprecated
-    default <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, UnbakedBlockStateModel>> blockStateConsumer) {
-        this.registerBlockStateResolver(block, (ResourceLoaderContext context) -> {
-            return resourceLoader.apply(context.resourceManager(), context.executor());
-        }, blockStateConsumer);
-    }
 
     /**
      * @param block              the block to resolve block states for

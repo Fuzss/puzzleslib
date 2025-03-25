@@ -19,41 +19,40 @@ public final class NeoForgeModConstructor {
         // NO-OP
     }
 
-    public static void construct(ModConstructor constructor, String modId) {
+    public static void construct(ModConstructor modConstructor, String modId) {
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
-            constructor.onConstructMod();
+            EntityAttributesContextNeoForgeImpl[] entityAttributesContext = new EntityAttributesContextNeoForgeImpl[1];
+            modConstructor.onConstructMod();
             // these need to run immediately, as they register content for data generation,
             // which cannot be added during common setup, as it does not run during data generation
-            constructor.onRegisterGameplayContent(new GameplayContentContextNeoForgeImpl(modId));
-            constructor.onRegisterCompostableBlocks(new CompostableBlocksContextNeoForgeImpl(modId));
-            constructor.onRegisterFuelValues(new FuelValuesContextNeoForgeImpl(modId));
-            constructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(modId, eventBus));
+            modConstructor.onRegisterGameplayContent(new GameplayContentContextNeoForgeImpl(modId, eventBus));
+            modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(modId, eventBus));
             eventBus.addListener((final FMLCommonSetupEvent evt) -> {
-                evt.enqueueWork(() -> {
-                    constructor.onCommonSetup();
-                    constructor.onRegisterFlammableBlocks(new FlammableBlocksContextNeoForgeImpl());
-                    constructor.onRegisterBlockInteractions(new BlockInteractionsContextNeoForgeImpl());
-                });
+                evt.enqueueWork(modConstructor::onCommonSetup);
             });
             eventBus.addListener((final RegisterSpawnPlacementsEvent evt) -> {
-                constructor.onRegisterSpawnPlacements(new SpawnPlacementsContextNeoForgeImpl(evt));
+                modConstructor.onRegisterSpawnPlacements(new SpawnPlacementsContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final EntityAttributeCreationEvent evt) -> {
-                constructor.onEntityAttributeCreation(new EntityAttributesCreateContextNeoForgeImpl(evt::put));
+                AbstractNeoForgeContext.computeIfAbsent(entityAttributesContext,
+                        EntityAttributesContextNeoForgeImpl::new,
+                        modConstructor::onRegisterEntityAttributes);
             });
             eventBus.addListener((final EntityAttributeModificationEvent evt) -> {
-                constructor.onEntityAttributeModification(new EntityAttributesModifyContextNeoForgeImpl(evt::add));
+                AbstractNeoForgeContext.computeIfAbsent(entityAttributesContext,
+                        EntityAttributesContextNeoForgeImpl::new,
+                        modConstructor::onRegisterEntityAttributes);
             });
             eventBus.addListener((final AddPackFindersEvent evt) -> {
                 if (evt.getPackType() == PackType.SERVER_DATA) {
-                    constructor.onAddDataPackFinders(new DataPackSourcesContextNeoForgeImpl(evt::addRepositorySource));
+                    modConstructor.onAddDataPackFinders(new DataPackSourcesContextNeoForgeImpl(evt));
                 }
             });
             eventBus.addListener((final NewRegistryEvent evt) -> {
-                constructor.onGameRegistriesContext(new GameRegistriesContextNeoForgeImpl(evt));
+                modConstructor.onRegisterGameRegistriesContext(new GameRegistriesContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final DataPackRegistryEvent.NewRegistry evt) -> {
-                constructor.onDataPackRegistriesContext(new DataPackRegistriesContextNeoForgeImpl(evt));
+                modConstructor.onRegisterDataPackRegistriesContext(new DataPackRegistriesContextNeoForgeImpl(evt));
             });
         });
     }
