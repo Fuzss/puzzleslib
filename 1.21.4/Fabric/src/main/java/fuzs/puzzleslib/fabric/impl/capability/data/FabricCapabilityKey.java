@@ -34,22 +34,39 @@ public abstract class FabricCapabilityKey<T, C extends CapabilityComponent<T>> i
         GlobalCapabilityRegister.register(this);
     }
 
+    public AttachmentType<C> getAttachmentType() {
+        return this.attachmentType;
+    }
+
     @Override
     public ResourceLocation identifier() {
-        return this.attachmentType.identifier();
+        return this.getAttachmentType().identifier();
     }
 
     @Override
     public C get(@NotNull T holder) {
         Objects.requireNonNull(holder, "holder is null");
-        if (holder instanceof AttachmentTarget attachmentTarget && this.isProvidedBy(holder)) {
-            C capabilityComponent = attachmentTarget.getAttachedOrCreate(this.attachmentType, this.factory.apply(holder));
+        if (this.isProvidedBy(holder)) {
+            C capabilityComponent = ((AttachmentTarget) holder).getAttachedOrCreate(this.getAttachmentType(),
+                    this.factory.apply(holder));
             Objects.requireNonNull(capabilityComponent, "data is null");
             // if the attachment is created from deserialization this has not been called yet
             capabilityComponent.initialize((CapabilityKey<T, CapabilityComponent<T>>) this, holder);
             return capabilityComponent;
         } else {
-            throw new IllegalArgumentException("Invalid capability holder: %s".formatted(holder));
+            throw new IllegalArgumentException(
+                    "Holder " + holder + " does not provide capability " + this.identifier());
+        }
+    }
+
+    @Override
+    public void clear(@NotNull T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        if (this.isProvidedBy(holder)) {
+            ((AttachmentTarget) holder).removeAttached(this.getAttachmentType());
+        } else {
+            throw new IllegalArgumentException(
+                    "Holder " + holder + " does not provide capability " + this.identifier());
         }
     }
 
