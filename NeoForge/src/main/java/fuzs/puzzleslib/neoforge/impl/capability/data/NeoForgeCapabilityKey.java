@@ -24,6 +24,10 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
         GlobalCapabilityRegister.register(this);
     }
 
+    public AttachmentType<C> getAttachmentType() {
+        return this.holder.value();
+    }
+
     @Override
     public ResourceLocation identifier() {
         return this.holder.getId();
@@ -32,12 +36,24 @@ public abstract class NeoForgeCapabilityKey<T, C extends CapabilityComponent<T>>
     @Override
     public C get(@NotNull T holder) {
         Objects.requireNonNull(holder, "holder is null");
-        if (holder instanceof IAttachmentHolder attachmentHolder && this.isProvidedBy(holder)) {
-            C capabilityComponent = attachmentHolder.getData(this.holder.value());
+        if (this.isProvidedBy(holder)) {
+            C capabilityComponent = ((IAttachmentHolder) holder).getData(this.getAttachmentType());
             Objects.requireNonNull(capabilityComponent, "data is null");
             return capabilityComponent;
         } else {
-            throw new IllegalArgumentException("Invalid capability holder: %s".formatted(holder));
+            throw new IllegalArgumentException(
+                    "Holder " + holder + " does not provide capability " + this.identifier());
+        }
+    }
+
+    @Override
+    public void clear(@NotNull T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        if (this.isProvidedBy(holder)) {
+            ((IAttachmentHolder) holder).removeData(this.getAttachmentType());
+        } else {
+            throw new IllegalArgumentException(
+                    "Holder " + holder + " does not provide capability " + this.identifier());
         }
     }
 

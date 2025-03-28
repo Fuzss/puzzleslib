@@ -32,6 +32,13 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
     C get(@NotNull T holder);
 
     /**
+     * Clear capability data for a holder.
+     *
+     * @param holder provider to clear capability for
+     */
+    void clear(@NotNull T holder);
+
+    /**
      * Checks if a capability is compatible with a holder.
      *
      * @param holder provider to test
