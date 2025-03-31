@@ -40,10 +40,10 @@ public abstract class PayloadTypesContextImpl implements PayloadTypesContext {
         return type;
     }
 
-    protected final BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally(Class<?> clazz) {
+    protected final BiConsumer<Throwable, Consumer<Component>> disconnectExceptionally(String payloadContext) {
         return (Throwable throwable, Consumer<Component> consumer) -> {
             String modName = ModContainer.getDisplayName(this.channelName.getNamespace());
-            consumer.accept(Component.literal("Receiving %s from %s failed: %s".formatted(clazz.getSimpleName(),
+            consumer.accept(Component.literal("Receiving %s from %s failed: %s".formatted(payloadContext,
                     modName,
                     throwable.getMessage())));
         };

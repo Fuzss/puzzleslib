@@ -7,6 +7,8 @@ import net.minecraft.network.codec.StreamDecoder;
 /**
  * A simplified message that allows for manually writing to and reading from a provided
  * {@link io.netty.buffer.ByteBuf}.
+ * <p>
+ * This should be implemented together with any of the clientbound or serverbound message templates.
  *
  * @param <B> the {@link io.netty.buffer.ByteBuf} type
  */

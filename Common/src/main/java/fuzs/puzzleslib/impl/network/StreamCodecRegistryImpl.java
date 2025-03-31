@@ -244,7 +244,7 @@ public final class StreamCodecRegistryImpl implements StreamCodecRegistry<Stream
         INSTANCE.registerSerializer(ParticleOptions.class, ParticleTypes.STREAM_CODEC);
         INSTANCE.registerSerializer(VillagerData.class, VillagerData.STREAM_CODEC);
         INSTANCE.registerSerializer(Pose.class, Pose.STREAM_CODEC);
-        INSTANCE.registerSerializer(ChunkPos.class, ExtraStreamCodecs.CHUNK_POS);
+        INSTANCE.registerSerializer(ChunkPos.class, ChunkPos.STREAM_CODEC);
         INSTANCE.registerSerializer(ResourceLocation.class, ResourceLocation.STREAM_CODEC);
         INSTANCE.registerSerializer((Class<ResourceKey<?>>) (Class<?>) ResourceKey.class,
                 ExtraStreamCodecs.DIRECT_RESOURCE_KEY);
@@ -253,8 +253,8 @@ public final class StreamCodecRegistryImpl implements StreamCodecRegistry<Stream
         INSTANCE.registerSerializer(BlockHitResult.class, ExtraStreamCodecs.BLOCK_HIT_RESULT);
         INSTANCE.registerSerializer(BitSet.class, ExtraStreamCodecs.BIT_SET);
         INSTANCE.registerSerializer(GameProfile.class, ByteBufCodecs.GAME_PROFILE);
-        INSTANCE.registerSerializer(Vec3.class, ExtraStreamCodecs.VEC3);
-        INSTANCE.registerSerializer(Vector3f.class, ExtraStreamCodecs.VECTOR3F);
+        INSTANCE.registerSerializer(Vec3.class, Vec3.STREAM_CODEC);
+        INSTANCE.registerSerializer(Vector3f.class, ByteBufCodecs.VECTOR3F);
         INSTANCE.registerSerializer(FriendlyByteBuf.class, ExtraStreamCodecs.FRIENDLY_BYTE_BUF);
         INSTANCE.registerSerializer(RegistryFriendlyByteBuf.class, ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF);
 

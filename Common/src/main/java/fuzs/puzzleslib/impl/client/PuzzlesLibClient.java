@@ -138,6 +138,7 @@ public class PuzzlesLibClient implements ClientModConstructor {
     }
 
     private static void setupGameOptions() {
+        // TODO look into this for 1.21.5, since the singleton is not available this early anymore
         Minecraft minecraft = Minecraft.getInstance();
         // necessary to disable to prevent some options from accessing fields that have not yet been initialized
         boolean running = minecraft.running;
