@@ -1,17 +1,18 @@
 package fuzs.puzzleslib.impl;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
+import fuzs.puzzleslib.api.event.v1.server.RegisterConfigurationTasksCallback;
 import fuzs.puzzleslib.api.init.v3.override.CommandOverrides;
 import fuzs.puzzleslib.api.init.v3.override.GameRuleValueOverrides;
-import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
@@ -22,10 +23,6 @@ import net.minecraft.world.level.GameRules;
  * in {@link PuzzlesLib} early.
  */
 public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
-    public static final NetworkHandler NETWORK = NetworkHandler.builder(MOD_ID)
-            .optional()
-            .registerClientbound(ClientboundEntityCapabilityMessage.class)
-            .registerClientbound(ClientboundModListMessage.class);
 
     @Override
     public void onConstructMod() {
@@ -33,10 +30,18 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
         setupDevelopmentEnvironment();
     }
 
+    @Override
+    public void onRegisterPayloadTypes(PayloadTypesContext context) {
+        context.optional();
+        context.configurationToClient(ClientboundModListMessage.class, ClientboundModListMessage.STREAM_CODEC);
+        context.playToClient(ClientboundEntityCapabilityMessage.class, ClientboundEntityCapabilityMessage.STREAM_CODEC);
+    }
+
     private static void registerEventHandlers() {
-        ModContext.registerEventHandlers();
-        EventHandlerProvider.tryRegister(CommonAbstractions.INSTANCE);
+        RegisterConfigurationTasksCallback.EVENT.register(ModContext::onRegisterConfigurationTasks);
+        LoadCompleteCallback.EVENT.register(ModContext::onLoadComplete);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
+        EventHandlerProvider.tryRegister(ProxyImpl.get());
     }
 
     private static void setupDevelopmentEnvironment() {

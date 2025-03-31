@@ -4,8 +4,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -17,9 +15,9 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.api.network.v4.MessageSender;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
-import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.fabric.impl.init.FabricPotionBrewingBuilder;
 import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
@@ -41,6 +39,7 @@ import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.core.BlockPos;
@@ -62,6 +61,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -131,9 +131,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(CommonSetupCallback.class, (CommonSetupCallback callback, @Nullable Object context) -> {
             callback.onCommonSetup();
         });
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            FabricClientEventInvokers.registerLoadingHandlers();
-        }
+        INSTANCE.register(RegisterConfigurationTasksCallback.class, ServerConfigurationConnectionEvents.CONFIGURE, (RegisterConfigurationTasksCallback callback) -> {
+            return (ServerConfigurationPacketListenerImpl handler, MinecraftServer server) -> {
+                callback.onRegisterConfigurationTasks(server, handler, handler::addTask);
+            };
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -178,7 +180,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
                     if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
                         // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                        ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level, (int id) -> new ServerboundUseItemOnPacket(hand, hitResult, id));
+                        FabricProxy.get().startClientPrediction(level, (int id) -> new ServerboundUseItemOnPacket(hand, hitResult, id));
                     }
 
                     return interactionResult;
@@ -187,7 +189,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, (PlayerInteractEvents.AttackBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
-                if (!level.isClientSide || player.isCreative() || ((FabricProxy) Proxy.INSTANCE).shouldStartDestroyBlock(pos)) {
+                if (!level.isClientSide || player.isCreative() || FabricProxy.get().shouldStartDestroyBlock(pos)) {
                     EventResult result = callback.onAttackBlock(player, level, hand, pos, direction);
                     // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
                     // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
@@ -218,8 +220,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
                     if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
                         // send the move packet like vanilla to ensure the position+view vectors are accurate
-                        Proxy.INSTANCE.getClientPacketListener()
-                                .send(new ServerboundMovePlayerPacket.PosRot(player.getX(),
+                        MessageSender.broadcast(new ServerboundMovePlayerPacket.PosRot(player.getX(),
                                         player.getY(),
                                         player.getZ(),
                                         player.getYRot(),
@@ -227,7 +228,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                                         player.onGround(), player.horizontalCollision
                                 ));
                         // send interaction packet to the server with a new sequentially assigned id
-                        ((FabricProxy) Proxy.INSTANCE).startClientPrediction(level,
+                        FabricProxy.get().startClientPrediction(level,
                                 (int id) -> new ServerboundUseItemPacket(hand, id, player.getYRot(), player.getXRot())
                         );
                     }
@@ -250,7 +251,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
                     if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
                         // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                        Proxy.INSTANCE.getClientPacketListener().send(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand));
+                        MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand));
                     }
 
                     return interactionResult;
@@ -276,7 +277,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
 
                     if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
                         // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                        Proxy.INSTANCE.getClientPacketListener().send(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand, hitResult.getLocation()));
+                        MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand, hitResult.getLocation()));
                     }
 
                     return interactionResult;
@@ -461,9 +462,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
         }, UnaryOperator.identity(), false);
         INSTANCE.register(SetupMobGoalsCallback.class, FabricLivingEvents.SETUP_MOB_GOALS);
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            FabricClientEventInvokers.registerEventHandlers();
-        }
     }
 
     @Override

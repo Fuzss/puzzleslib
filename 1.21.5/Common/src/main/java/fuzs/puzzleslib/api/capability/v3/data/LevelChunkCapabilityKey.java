@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
-import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
 import net.minecraft.world.level.chunk.LevelChunk;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +20,7 @@ public interface LevelChunkCapabilityKey<C extends CapabilityComponent<LevelChun
     }
 
     @Override
-    default ClientboundMessage<?> toPacket(C capabilityComponent) {
+    default ClientboundPlayMessage toMessage(C capabilityComponent) {
         throw new UnsupportedOperationException();
     }
 }

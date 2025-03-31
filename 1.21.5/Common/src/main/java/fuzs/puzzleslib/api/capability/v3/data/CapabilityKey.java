@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
-import fuzs.puzzleslib.api.network.v3.ClientboundMessage;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +21,7 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      *
      * @return capability id
      */
-    ResourceLocation identifier();
+    ResourceLocation id();
 
     /**
      * Get capability implementation from a holder.
@@ -30,6 +30,13 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      * @return capability implementation for given holder
      */
     C get(@NotNull T holder);
+
+    /**
+     * Clear capability data for a holder.
+     *
+     * @param holder provider to clear capability for
+     */
+    void clear(@Nullable Object holder);
 
     /**
      * Checks if a capability is compatible with a holder.
@@ -70,5 +77,5 @@ public interface CapabilityKey<T, C extends CapabilityComponent<T>> {
      * @param capabilityComponent the component for serialization
      * @return the packet
      */
-    ClientboundMessage<?> toPacket(C capabilityComponent);
+    ClientboundPlayMessage toMessage(C capabilityComponent);
 }

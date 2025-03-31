@@ -17,12 +17,11 @@ import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.*;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
@@ -60,6 +59,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -166,10 +166,19 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ClientTickEvents.End.class, net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK, (ClientTickEvents.End callback) -> {
             return callback::onEndClientTick;
         });
-        INSTANCE.register(RenderGuiEvents.Before.class, FabricGuiEvents.BEFORE_RENDER_GUI);
-        INSTANCE.register(RenderGuiEvents.After.class, HudRenderCallback.EVENT, (RenderGuiEvents.After callback) -> {
-            return (GuiGraphics drawContext, DeltaTracker tickCounter) -> {
-                callback.onAfterRenderGui(Minecraft.getInstance().gui, drawContext, tickCounter);
+        AtomicInteger atomicInteger = new AtomicInteger();
+        INSTANCE.register(RenderGuiEvents.Before.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.Before callback) -> {
+            return (LayeredDrawerWrapper layeredDrawer) -> {
+                layeredDrawer.attachLayerBefore(IdentifiedLayer.MISC_OVERLAYS, IdentifiedLayer.of(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    callback.onBeforeRenderGui(Minecraft.getInstance().gui, guiGraphics, deltaTracker);
+                }));
+            };
+        });
+        INSTANCE.register(RenderGuiEvents.After.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.After callback) -> {
+            return (LayeredDrawerWrapper layeredDrawer) -> {
+                layeredDrawer.addLayer(IdentifiedLayer.of(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    callback.onAfterRenderGui(Minecraft.getInstance().gui, guiGraphics, deltaTracker);
+                }));
             };
         });
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, (ItemTooltipCallback callback) -> {

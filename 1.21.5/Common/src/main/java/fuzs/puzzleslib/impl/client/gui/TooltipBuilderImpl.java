@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
-import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.ClientComponentSplitter;
-import fuzs.puzzleslib.api.client.gui.v2.components.tooltip.TooltipBuilder;
+import fuzs.puzzleslib.api.client.gui.v2.tooltip.ClientComponentSplitter;
+import fuzs.puzzleslib.api.client.gui.v2.tooltip.TooltipBuilder;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;

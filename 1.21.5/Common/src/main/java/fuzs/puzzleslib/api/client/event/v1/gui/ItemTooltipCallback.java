@@ -24,7 +24,7 @@ public interface ItemTooltipCallback {
      * @param tooltipLines   the tooltip lines
      * @param tooltipContext the tooltip item context
      * @param player         the player looking at the tooltip, null when search trees are created
-     * @param tooltipType    the tooltip flag context
+     * @param tooltipFlag    the tooltip flag context
      */
-    void onItemTooltip(ItemStack itemStack, List<Component> tooltipLines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipType);
+    void onItemTooltip(ItemStack itemStack, List<Component> tooltipLines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipFlag);
 }

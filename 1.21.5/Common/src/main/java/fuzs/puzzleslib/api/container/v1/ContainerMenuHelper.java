@@ -1,8 +1,12 @@
 package fuzs.puzzleslib.api.container.v1;
 
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -11,6 +15,9 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+import java.util.function.BiConsumer;
+
 /**
  * Small helper class related to working with implementations of {@link AbstractContainerMenu}.
  */
@@ -18,6 +25,20 @@ public final class ContainerMenuHelper {
 
     private ContainerMenuHelper() {
         // NO-OP
+    }
+
+    /**
+     * Opens a menu on both client and server while also providing additional data.
+     *
+     * @param serverPlayer the player opening the menu
+     * @param menuProvider the menu factory
+     * @param dataWriter   the additional data to be sent to the client
+     */
+    public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
+        Objects.requireNonNull(serverPlayer, "server player is null");
+        Objects.requireNonNull(menuProvider, "menu provider is null");
+        Objects.requireNonNull(dataWriter, "data writer is null");
+        ProxyImpl.get().openMenu(serverPlayer, menuProvider, dataWriter);
     }
 
     /**
@@ -31,9 +52,10 @@ public final class ContainerMenuHelper {
         for (int i = 0; i < containerMenu.slots.size(); i++) {
             Slot slot = containerMenu.slots.get(i);
             if (slot.container instanceof Inventory inventory && inventory.selected == slot.getContainerSlot()) {
-                NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container, slot.getContainerSlot(),
-                        slot.x, slot.y
-                ) {
+                NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container,
+                        slot.getContainerSlot(),
+                        slot.x,
+                        slot.y) {
                     @Override
                     public boolean isFake() {
                         return false;

@@ -2,10 +2,9 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
+import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,8 +31,6 @@ import java.util.Set;
  * The implementation is meant to be similar to NeoForge's {@code Gui#leftHeight} &amp; {@code Gui#rightHeight}.
  */
 public final class FabricGuiEventHelper {
-    private static final String KEY_GUI_LEFT_HEIGHT = PuzzlesLibMod.id("left_height").toString();
-    private static final String KEY_GUI_RIGHT_HEIGHT = PuzzlesLibMod.id("right_height").toString();
     private static final Set<ResourceLocation> CANCELLED_GUI_LAYERS = new HashSet<>();
 
     private FabricGuiEventHelper() {
@@ -45,6 +42,7 @@ public final class FabricGuiEventHelper {
         guiGraphics.pose().pushPose();
         guiGraphics.pose().translate(0.0F, 0.0F, 50.0F);
         for (ResourceLocation resourceLocation : RenderGuiLayerEvents.VANILLA_GUI_LAYERS_VIEW) {
+            resourceLocation = RenderGuiLayerEvents.getModLoaderGuiLayer(resourceLocation);
             if (FabricGuiEvents.beforeRenderGuiElement(resourceLocation)
                     .invoker()
                     .onBeforeRenderGuiLayer(gui, guiGraphics, deltaTracker)
@@ -66,28 +64,13 @@ public final class FabricGuiEventHelper {
         }
     }
 
-    public static int getGuiLeftHeight() {
-        return FabricLoader.getInstance().getObjectShare().get(KEY_GUI_LEFT_HEIGHT) instanceof Integer i ? i : 0;
-    }
-
-    public static int getGuiRightHeight() {
-        return FabricLoader.getInstance().getObjectShare().get(KEY_GUI_RIGHT_HEIGHT) instanceof Integer i ? i : 0;
-    }
-
-    public static void setGuiLeftHeight(int leftHeight) {
-        FabricLoader.getInstance().getObjectShare().put(KEY_GUI_LEFT_HEIGHT, leftHeight);
-    }
-
-    public static void setGuiRightHeight(int rightHeight) {
-        FabricLoader.getInstance().getObjectShare().put(KEY_GUI_RIGHT_HEIGHT, rightHeight);
-    }
-
     public static void registerEventHandlers() {
-        RenderGuiEvents.BEFORE.register(EventPhase.FIRST, (minecraft, guiGraphics, deltaTracker) -> {
-            CANCELLED_GUI_LAYERS.clear();
-            setGuiLeftHeight(39);
-            setGuiRightHeight(39);
-        });
+        RenderGuiEvents.BEFORE.register(EventPhase.FIRST,
+                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    CANCELLED_GUI_LAYERS.clear();
+                    GuiHeightHelper.setLeftHeight(gui, 39);
+                    GuiHeightHelper.setRightHeight(gui, 39);
+                });
         RenderGuiEvents.BEFORE.register(EventPhase.AFTER, FabricGuiEventHelper::invokeGuiLayerEvents);
         RenderGuiLayerEvents.after(RenderGuiLayerEvents.PLAYER_HEALTH)
                 .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
@@ -99,14 +82,14 @@ public final class FabricGuiEventHelper {
                         int absorptionAmount = Mth.ceil(player.getAbsorptionAmount());
                         int healthRows = Mth.ceil((maxHealth + (float) absorptionAmount) / 2.0F / 10.0F);
                         int healthRowShift = Math.max(10 - (healthRows - 2), 3);
-                        setGuiLeftHeight(getGuiLeftHeight() + 10 + (healthRows - 1) * healthRowShift);
+                        GuiHeightHelper.addLeftHeight(gui, 10 + (healthRows - 1) * healthRowShift);
                     }
                 });
         RenderGuiLayerEvents.after(RenderGuiLayerEvents.ARMOR_LEVEL)
                 .register(EventPhase.FIRST, (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     if (gui.minecraft.gameMode.canHurtPlayer() &&
                             gui.minecraft.getCameraEntity() instanceof Player player && player.getArmorValue() > 0) {
-                        setGuiLeftHeight(getGuiLeftHeight() + 10);
+                        GuiHeightHelper.addLeftHeight(gui, 10);
                     }
                 });
         RenderGuiLayerEvents.after(RenderGuiLayerEvents.FOOD_LEVEL)
@@ -114,7 +97,7 @@ public final class FabricGuiEventHelper {
                     if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player) {
                         LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
                         if (gui.getVehicleMaxHearts(livingEntity) == 0) {
-                            setGuiRightHeight(getGuiRightHeight() + 10);
+                            GuiHeightHelper.addRightHeight(gui, 10);
                         }
                     }
                 });
@@ -125,7 +108,7 @@ public final class FabricGuiEventHelper {
                         int maxAirSupply = player.getMaxAirSupply();
                         int airSupply = Math.min(player.getAirSupply(), maxAirSupply);
                         if (player.isEyeInFluid(FluidTags.WATER) || airSupply < maxAirSupply) {
-                            setGuiRightHeight(getGuiRightHeight() + 10);
+                            GuiHeightHelper.addRightHeight(gui, 10);
                         }
                     }
                 });
@@ -134,7 +117,7 @@ public final class FabricGuiEventHelper {
                     if (gui.minecraft.getCameraEntity() instanceof Player) {
                         LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
                         int maxHearts = gui.getVehicleMaxHearts(livingEntity);
-                        setGuiRightHeight(getGuiRightHeight() + 10 * Mth.ceil(maxHearts / 10.0F));
+                        GuiHeightHelper.addRightHeight(gui, 10 * Mth.ceil(maxHearts / 10.0F));
                     }
                 });
     }

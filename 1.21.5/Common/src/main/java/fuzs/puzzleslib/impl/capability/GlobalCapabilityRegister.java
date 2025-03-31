@@ -22,8 +22,8 @@ public final class GlobalCapabilityRegister {
     }
 
     public static <T, C extends CapabilityComponent<T>> void register(CapabilityKey<T, C> capabilityKey) {
-        if (REGISTER.put(capabilityKey.identifier(), capabilityKey) != null) {
-            throw new IllegalStateException("Duplicate capability " + capabilityKey.identifier());
+        if (REGISTER.put(capabilityKey.id(), capabilityKey) != null) {
+            throw new IllegalStateException("Duplicate capability " + capabilityKey.id());
         }
     }
 

@@ -1,11 +1,5 @@
 accessWidener	v2	named
 transitive-accessible   method  net/minecraft/core/particles/SimpleParticleType     <init>  (Z)V
-transitive-accessible   field   net/minecraft/world/entity/Mob  goalSelector    Lnet/minecraft/world/entity/ai/goal/GoalSelector;
-transitive-accessible   field   net/minecraft/world/entity/Mob  targetSelector  Lnet/minecraft/world/entity/ai/goal/GoalSelector;
-transitive-extendable   method  net/minecraft/world/entity/monster/AbstractSkeleton getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
-transitive-extendable   method  net/minecraft/world/entity/monster/Skeleton getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
-transitive-extendable   method  net/minecraft/world/entity/monster/Stray    getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
-transitive-extendable   method  net/minecraft/world/entity/monster/WitherSkeleton   getStepSound    ()Lnet/minecraft/sounds/SoundEvent;
 transitive-accessible   field   net/minecraft/client/gui/screens/Screen     renderables     Ljava/util/List;
 transitive-accessible   field   net/minecraft/client/renderer/blockentity/SkullBlockRenderer    SKIN_BY_TYPE    Ljava/util/Map;
 transitive-accessible	field	net/minecraft/client/model/geom/LayerDefinitions    OUTER_ARMOR_DEFORMATION     Lnet/minecraft/client/model/geom/builders/CubeDeformation;

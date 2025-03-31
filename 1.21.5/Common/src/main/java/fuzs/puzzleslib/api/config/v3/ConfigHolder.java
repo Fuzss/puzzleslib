@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.config.v3;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.impl.config.ConfigHolderRegistry;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 
 import java.nio.file.Paths;
 import java.util.function.UnaryOperator;
@@ -10,8 +11,8 @@ import java.util.function.UnaryOperator;
 /**
  * a config holder for holding mod configs there are three different kinds depending on where the data shall be used:
  * CLIENT, COMMON, SERVER this implementation is not limited to three held configs though, as many configs as desired
- * may be added (file names must be different!) instead of retrieving configs via mod config type they are stored by
- * class type
+ * may be added (only the file names must be different) instead of retrieving configs via mod config type they are
+ * stored by class type
  */
 public interface ConfigHolder {
 
@@ -65,8 +66,18 @@ public interface ConfigHolder {
         return (String modId) -> Paths.get(directory, getDefaultNameFactory(configType).apply(modId)).toString();
     }
 
-    static void registerForwardingConfigScreenFactory(String modId, String forwardedModId) {
-
+    /**
+     * Registers a config screen factory. Will create an empty screen for mods without any config, so registering for
+     * those mods is fine and will not throw an exception.
+     * <p>
+     * Allows for registering a config screen that collects and merges configs from multiple mods. Useful for mods that
+     * have some of their relevant configuration as part of an underlying library.
+     *
+     * @param modId       the mod id to register the config screen for
+     * @param otherModIds optional mod ids to include configs from
+     */
+    static void registerConfigurationScreen(String modId, String... otherModIds) {
+        ProxyImpl.get().registerConfigurationScreen(modId, otherModIds);
     }
 
     /**

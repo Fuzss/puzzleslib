@@ -4,7 +4,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
-import fuzs.puzzleslib.api.network.v3.codec.ExtraStreamCodecs;
+import fuzs.puzzleslib.api.network.v4.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;

@@ -1,18 +1,21 @@
 package fuzs.puzzleslib.api.util.v1;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.*;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.IntStream;
@@ -25,8 +28,17 @@ public final class CodecExtras {
      * A codec version of the serialization methods in {@link net.minecraft.world.ContainerHelper}.
      */
     public static final Codec<NonNullList<ItemStack>> NON_NULL_ITEM_STACK_LIST_CODEC = nonNullList(ItemStack.CODEC,
-            Predicate.not(ItemStack::isEmpty), ItemStack.EMPTY
-    );
+            Predicate.not(ItemStack::isEmpty),
+            ItemStack.EMPTY);
+    /**
+     * Adapted from {@link net.minecraft.nbt.CompoundTag#CODEC}.
+     */
+    public static final Codec<ListTag> LIST_TAG_CODEC = Codec.PASSTHROUGH.comapFlatMap((Dynamic<?> dynamic) -> {
+        Tag tag = dynamic.convert(NbtOps.INSTANCE).getValue();
+        return tag instanceof ListTag listTag ?
+                DataResult.success(listTag == dynamic.getValue() ? listTag.copy() : listTag) :
+                DataResult.error(() -> "Not a list tag: " + tag);
+    }, (ListTag listTag) -> new Dynamic<>(NbtOps.INSTANCE, listTag.copy()));
 
     private CodecExtras() {
         // NO-OP
@@ -49,11 +61,11 @@ public final class CodecExtras {
                             .listOf()
                             .fieldOf("items")
                             .forGetter((NonNullList<T> items) -> {
-                                return IntStream.range(0, items.size()).mapToObj(
-                                        index -> new Pair<>(index, items.get(index))).filter(
-                                        pair -> filter.test(pair.getSecond())).toList();
-                            })
-            ).apply(instance, (Integer size, List<Pair<Integer, T>> items) -> {
+                                return IntStream.range(0, items.size())
+                                        .mapToObj(index -> new Pair<>(index, items.get(index)))
+                                        .filter(pair -> filter.test(pair.getSecond()))
+                                        .toList();
+                            })).apply(instance, (Integer size, List<Pair<Integer, T>> items) -> {
                 NonNullList<T> nonNullList = defaultValue != null ? NonNullList.withSize(size, defaultValue) :
                         NonNullList.createWithCapacity(size);
                 for (Pair<Integer, T> pair : items) {
@@ -75,8 +87,36 @@ public final class CodecExtras {
      */
     public static Function<Tag, DataResult<CompoundTag>> mapCompoundTag() {
         return (Tag tag) -> {
-            return tag instanceof CompoundTag compoundTag ? DataResult.success(compoundTag) : DataResult.error(
-                    () -> "Not a compound tag: " + tag);
+            return tag instanceof CompoundTag compoundTag ? DataResult.success(compoundTag) :
+                    DataResult.error(() -> "Not a compound tag: " + tag);
         };
+    }
+
+    /**
+     * Creates a codec for a set of elements. Similar to {@link Codec#list(Codec)}.
+     * <p>
+     * Copied from {@code net.neoforged.neoforge.common.util.NeoForgeExtraCodecs#setOf}.
+     *
+     * @param codec the single element codec
+     * @param <T>   the list element type
+     * @return the list codec
+     */
+    public static <T> Codec<Set<T>> setOf(Codec<T> codec) {
+        return Codec.list(codec).xmap(ImmutableSet::copyOf, ImmutableList::copyOf);
+    }
+
+    /**
+     * Creates a codec from a decoder. The returned codec can only decode, and will throw on any attempt to encode.
+     * <p>
+     * Copied from {@code net.neoforged.neoforge.common.util.NeoForgeExtraCodecs#decodeOnly}.
+     *
+     * @param decoder the decoder
+     * @param <A>     the element type
+     * @return the codec
+     */
+    public static <A> Codec<A> decodeOnly(Decoder<A> decoder) {
+        return Codec.of(Codec.unit(() -> {
+            throw new UnsupportedOperationException("Cannot encode with decode-only codec! Decoder:" + decoder);
+        }), decoder, "DecodeOnly[" + decoder + "]");
     }
 }

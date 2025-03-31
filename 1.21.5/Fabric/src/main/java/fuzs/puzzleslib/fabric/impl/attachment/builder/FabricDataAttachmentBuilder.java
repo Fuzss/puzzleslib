@@ -32,9 +32,7 @@ public class FabricDataAttachmentBuilder<T, V> extends DataAttachmentBuilder<T, 
 
     @Override
     public DataAttachmentType<T, V> build(ResourceLocation resourceLocation) {
-        AttachmentRegistry.Builder<V> builder = AttachmentRegistry.builder();
-        this.configureBuilder(builder);
-        AttachmentType<V> attachmentType = builder.buildAndRegister(resourceLocation);
+        AttachmentType<V> attachmentType = AttachmentRegistry.create(resourceLocation, this::configureBuilder);
         AttachmentTypeAdapter<T, V> adapter = new FabricAttachmentTypeAdapter<>(attachmentType);
         BiConsumer<T, V> synchronizer = this.getSynchronizer(resourceLocation, adapter);
         return new DataAttachmentTypeImpl<>(adapter, this.registryAccessExtractor, this.defaultValues, synchronizer);

@@ -1,12 +1,11 @@
 package fuzs.puzzleslib.impl.config;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import org.jetbrains.annotations.MustBeInvokedByOverriders;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
@@ -91,15 +90,9 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
             if (holder.config != null) this.bake(holder, this.modId);
         }
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            this.registerConfigurationScreen(this.modId);
-        }
+        ConfigHolder.registerConfigurationScreen(this.modId);
+        ProxyImpl.get().registerConfigTranslations(this.modId);
     }
 
     protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
-
-    @MustBeInvokedByOverriders
-    protected void registerConfigurationScreen(String modId) {
-        ClientAbstractions.INSTANCE.registerConfigScreenFactory(modId);
-    }
 }

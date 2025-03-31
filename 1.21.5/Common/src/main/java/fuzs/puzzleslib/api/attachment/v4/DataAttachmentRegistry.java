@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.attachment.v4;
 
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;

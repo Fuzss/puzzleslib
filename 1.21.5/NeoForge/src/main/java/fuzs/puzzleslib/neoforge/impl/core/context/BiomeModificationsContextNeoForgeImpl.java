@@ -8,7 +8,6 @@ import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingPhase;
 import fuzs.puzzleslib.api.biome.v1.BiomeModificationContext;
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.context.BiomeModificationsContext;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
@@ -24,6 +23,7 @@ import net.neoforged.neoforge.common.world.BiomeModifier;
 import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 
 import java.util.Collection;
 import java.util.Map;
@@ -97,7 +97,7 @@ public record BiomeModificationsContextNeoForgeImpl(String modId,
                 Collection<Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>>> biomeModification = BiomeModificationsContextNeoForgeImpl.this.biomeModifications.get(
                         biomeLoadingPhase);
                 if (!biomeModification.isEmpty()) {
-                    MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
+                    MinecraftServer minecraftServer = ServerLifecycleHooks.getCurrentServer();
                     Objects.requireNonNull(minecraftServer, "minecraft server is null");
                     RegistryAccess registryAccess = minecraftServer.registryAccess();
                     BiomeLoadingContext biomeLoadingContext = new BiomeLoadingContextNeoForge(registryAccess, holder);

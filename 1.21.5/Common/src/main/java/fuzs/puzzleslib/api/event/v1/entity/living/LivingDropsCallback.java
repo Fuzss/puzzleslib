@@ -18,7 +18,7 @@ public interface LivingDropsCallback {
      * This allows to change the loot that is dropped.
      * <p>
      * The looting level can be obtained via
-     * {@link fuzs.puzzleslib.api.core.v1.CommonAbstractions#getMobLootingLevel(Entity, Entity, DamageSource)}.
+     * {@link fuzs.puzzleslib.api.item.v2.EnchantingHelper#getMobLootingLevel(Entity, Entity, DamageSource)}.
      *
      * @param livingEntity the entity that has been killed
      * @param damageSource damage source that killed the entity

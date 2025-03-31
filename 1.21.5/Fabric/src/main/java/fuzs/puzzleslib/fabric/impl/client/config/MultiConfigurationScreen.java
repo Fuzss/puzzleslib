@@ -34,12 +34,12 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
     protected final ConfigurationScreen configurationScreen;
 
     public static BiFunction<String, Screen, Screen> getFactory(String[] mergedModIds) {
-        return (String modId, Screen lastScreen) -> {
+        return mergedModIds.length != 0 ? (String modId, Screen lastScreen) -> {
             ConfigurationScreen configurationScreen = new ConfigurationScreen(modId, lastScreen);
             return new MultiConfigurationScreen(ImmutableSet.<String>builder().add(modId).add(mergedModIds).build(),
                     lastScreen,
                     configurationScreen);
-        };
+        } : ConfigurationScreen::new;
     }
 
     protected MultiConfigurationScreen(Collection<String> modIds, Screen lastScreen, ConfigurationScreen configurationScreen) {

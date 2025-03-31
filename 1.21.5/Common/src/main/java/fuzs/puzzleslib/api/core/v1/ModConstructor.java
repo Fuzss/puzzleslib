@@ -2,10 +2,9 @@ package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.core.CommonFactories;
 import fuzs.puzzleslib.impl.core.ModContext;
-import net.minecraft.resources.ResourceLocation;
-import org.apache.logging.log4j.util.Strings;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 
 import java.util.function.Supplier;
 
@@ -13,7 +12,7 @@ import java.util.function.Supplier;
  * A base class for a mods main common class, contains a bunch of methods for registering various common content and
  * components.
  */
-public interface ModConstructor extends BaseModConstructor {
+public interface ModConstructor {
 
     /**
      * Construct the main {@link ModConstructor} instance to begin initialization of a mod.
@@ -22,15 +21,11 @@ public interface ModConstructor extends BaseModConstructor {
      * @param modConstructorSupplier the main mod instance for mod setup
      */
     static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
-        // build first to force class being loaded for executing buildables
-        ModConstructor modConstructor = modConstructorSupplier.get();
-        ResourceLocation resourceLocation = ModContext.getPairingIdentifier(modId, modConstructor);
-        PuzzlesLib.LOGGER.info("Constructing common components for {}", resourceLocation);
-        ModContext modContext = ModContext.get(modId);
-        modContext.beforeModConstruction();
-        CommonFactories.INSTANCE.constructMod(modId, modConstructor);
-        modContext.afterModConstruction(resourceLocation);
+        PuzzlesLib.LOGGER.info("Constructing common components for {}", modId);
+        ModConstructorImpl.construct(modId,
+                modConstructorSupplier,
+                ProxyImpl.get()::getModConstructorImpl,
+                ModContext::buildAll);
     }
 
     /**
@@ -48,6 +43,14 @@ public interface ModConstructor extends BaseModConstructor {
      * Used to set various values and settings for already registered content.
      */
     default void onCommonSetup() {
+        // NO-OP
+    }
+
+    /**
+     * @param context register custom messages that are compatible with vanilla
+     *                {@link net.minecraft.network.protocol.Packet Packets}
+     */
+    default void onRegisterPayloadTypes(PayloadTypesContext context) {
         // NO-OP
     }
 

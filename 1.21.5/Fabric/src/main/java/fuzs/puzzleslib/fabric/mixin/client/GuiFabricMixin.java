@@ -4,6 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
+import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
@@ -26,16 +27,6 @@ abstract class GuiFabricMixin {
     @Shadow
     @Final
     private Minecraft minecraft;
-
-    @Inject(
-            method = "render", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/LayeredDraw;render(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"
-    )
-    )
-    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEvents.BEFORE_RENDER_GUI.invoker().onBeforeRenderGui(Gui.class.cast(this), guiGraphics, deltaTracker);
-    }
 
     @WrapOperation(
             method = "renderChat", at = @At(
@@ -122,12 +113,13 @@ abstract class GuiFabricMixin {
     public int renderSelectedItemName(int guiHeight) {
         // offset selected item name depending on gui height values, NeoForge also does this
         return guiHeight + 59 - Math.max(59,
-                Math.max(FabricGuiEventHelper.getGuiLeftHeight(), FabricGuiEventHelper.getGuiRightHeight()));
+                Math.max(GuiHeightHelper.getLeftHeight(Gui.class.cast(this)),
+                        GuiHeightHelper.getRightHeight(Gui.class.cast(this))));
     }
 
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
     protected void renderEffects(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EFFECTS, callback);
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.STATUS_EFFECTS, callback);
     }
 
     @Inject(method = "renderSavingIndicator", at = @At("HEAD"), cancellable = true)

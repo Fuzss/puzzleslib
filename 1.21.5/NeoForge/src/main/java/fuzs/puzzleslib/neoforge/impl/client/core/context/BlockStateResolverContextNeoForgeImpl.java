@@ -4,7 +4,7 @@ import com.google.common.base.Suppliers;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import fuzs.puzzleslib.api.client.core.v1.context.BlockStateResolverContext;
-import fuzs.puzzleslib.api.client.util.v1.ModelLoadingHelper;
+import fuzs.puzzleslib.api.client.renderer.v1.model.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.core.context.ResourceLoaderContextImpl;

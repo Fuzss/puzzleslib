@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.biome;
 
 import fuzs.puzzleslib.api.biome.v1.BiomeLoadingContext;
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
@@ -22,10 +21,6 @@ public record BiomeLoadingContextNeoForge(RegistryAccess registryAccess,
     public BiomeLoadingContextNeoForge(RegistryAccess registryAccess, Holder<Biome> holder) {
         this.registryAccess = registryAccess;
         this.holder = holder;
-    }
-
-    public BiomeLoadingContextNeoForge(Holder<Biome> holder) {
-        this(CommonAbstractions.INSTANCE.getMinecraftServer().registryAccess(), holder);
     }
 
     @Override
@@ -65,8 +60,11 @@ public record BiomeLoadingContextNeoForge(RegistryAccess registryAccess,
     @Override
     public boolean canGenerateIn(ResourceKey<LevelStem> dimensionKey) {
         LevelStem levelStem = this.registryAccess.lookupOrThrow(Registries.LEVEL_STEM).getValue(dimensionKey);
-        return levelStem != null && levelStem.generator().getBiomeSource().possibleBiomes().stream().anyMatch(
-                entry -> entry.value() == this.getBiome());
+        return levelStem != null && levelStem.generator()
+                .getBiomeSource()
+                .possibleBiomes()
+                .stream()
+                .anyMatch(entry -> entry.value() == this.getBiome());
     }
 
     @Override

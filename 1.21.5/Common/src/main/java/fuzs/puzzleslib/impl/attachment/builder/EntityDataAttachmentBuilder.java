@@ -5,12 +5,12 @@ import fuzs.puzzleslib.api.event.v1.entity.player.AfterChangeDimensionCallback;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerNetworkEvents;
 import fuzs.puzzleslib.api.event.v1.entity.player.PlayerTrackingEvents;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.MessageSender;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -82,6 +82,6 @@ public interface EntityDataAttachmentBuilder<V> extends DataAttachmentRegistry.E
         ClientboundEntityDataAttachmentMessage<V> message = new ClientboundEntityDataAttachmentMessage<>(type,
                 entity.getId(),
                 Optional.ofNullable(value));
-        playerSet.broadcast(type, new ClientboundCustomPayloadPacket(message));
+        MessageSender.broadcast(playerSet, message);
     }
 }

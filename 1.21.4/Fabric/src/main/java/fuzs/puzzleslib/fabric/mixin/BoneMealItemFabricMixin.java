@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.BoneMealItem;
 import net.minecraft.world.item.Item;
@@ -21,16 +21,10 @@ abstract class BoneMealItemFabricMixin extends Item {
 
     @Inject(method = "growCrop", at = @At("HEAD"), cancellable = true)
     private static void growCrop(ItemStack itemStack, Level level, BlockPos blockPos, CallbackInfoReturnable<Boolean> callbackInfo) {
-        EventResult result = FabricPlayerEvents.USE_BONEMEAL.invoker().onUseBoneMeal(level, blockPos, level.getBlockState(blockPos), itemStack);
+        EventResult result = FabricPlayerEvents.USE_BONEMEAL.invoker()
+                .onUseBoneMeal(level, blockPos, level.getBlockState(blockPos), itemStack);
         if (result.isInterrupt()) {
-            if (result.getAsBoolean()) {
-                if (!level.isClientSide) {
-                    itemStack.shrink(1);
-                }
-                callbackInfo.setReturnValue(true);
-            } else {
-                callbackInfo.setReturnValue(false);
-            }
+            callbackInfo.setReturnValue(result.getAsBoolean());
         }
     }
 }

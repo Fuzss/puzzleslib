@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.impl.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import fuzs.puzzleslib.api.client.core.v1.ClientAbstractions;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
+import fuzs.puzzleslib.api.client.event.v1.entity.player.ClientPlayerNetworkEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
@@ -13,8 +13,8 @@ import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
-import fuzs.puzzleslib.impl.core.EventHandlerProvider;
+import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
+import fuzs.puzzleslib.impl.core.ModContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -29,8 +29,11 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.multiplayer.MultiPlayerGameMode;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.item.CreativeModeTabs;
 import org.jetbrains.annotations.Nullable;
@@ -47,6 +50,9 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     private static void registerEventHandlers() {
         AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
+        ClientPlayerNetworkEvents.LOGGED_OUT.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
+            ModContext.clearPresentServerside();
+        });
     }
 
     private static void setupDevelopmentEnvironment() {
@@ -161,7 +167,6 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     @Override
     public void onClientSetup() {
-        EventHandlerProvider.tryRegister(ClientAbstractions.INSTANCE);
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
             CreativeModeInventoryScreen.selectedTab = BuiltInRegistries.CREATIVE_MODE_TAB.getValueOrThrow(
                     CreativeModeTabs.SEARCH);

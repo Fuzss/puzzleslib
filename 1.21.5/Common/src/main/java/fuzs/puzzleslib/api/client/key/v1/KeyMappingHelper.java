@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.client.key.v1;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.resources.ResourceLocation;
 
@@ -9,7 +9,7 @@ import net.minecraft.resources.ResourceLocation;
  * A small helper class for retrieving the registered {@link KeyActivationContext} for a {@link KeyMapping}.
  */
 public interface KeyMappingHelper {
-    KeyMappingHelper INSTANCE = ClientFactories.INSTANCE.getKeyMappingActivationHelper();
+    KeyMappingHelper INSTANCE = ClientProxyImpl.get().getKeyMappingActivationHelper();
 
     /**
      * Retrieve the registered {@link KeyActivationContext} for a {@link KeyMapping}, will default to
@@ -28,7 +28,8 @@ public interface KeyMappingHelper {
      * @return can both key mappings coexist without interfering with each other
      */
     default boolean isConflictingWith(KeyMapping keyMapping, KeyMapping otherKeyMapping) {
-        return this.getKeyActivationContext(keyMapping).isConflictingWith(this.getKeyActivationContext(otherKeyMapping));
+        return this.getKeyActivationContext(keyMapping)
+                .isConflictingWith(this.getKeyActivationContext(otherKeyMapping));
     }
 
     /**
@@ -51,7 +52,21 @@ public interface KeyMappingHelper {
     static KeyMapping registerKeyMapping(ResourceLocation resourceLocation, int keyCode) {
         return new KeyMapping("key." + resourceLocation.getPath(),
                 keyCode,
-                "key.categories." + resourceLocation.getNamespace()
-        );
+                "key.categories." + resourceLocation.getNamespace());
+    }
+
+    /**
+     * Checks if a key mapping is pressed.
+     * <p>
+     * NeoForge replaces the vanilla call to {@link KeyMapping#matches(int, int)} in a few places to account for key
+     * activation contexts (game &amp; screen environments).
+     *
+     * @param keyMapping the key mapping to check if pressed
+     * @param keyCode    the current key code
+     * @param scanCode   the key scan code
+     * @return is the key mapping pressed
+     */
+    static boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode) {
+        return ClientProxyImpl.get().isKeyActiveAndMatches(keyMapping, keyCode, scanCode);
     }
 }

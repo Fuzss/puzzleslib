@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import fuzs.puzzleslib.impl.attachment.builder.EntityDataAttachmentBuilder;
@@ -49,10 +49,11 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
                 StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
                         type,
                         this.streamCodec);
-                evt.registrar(resourceLocation.withPath("attachments").toLanguageKey())
+                evt.registrar(resourceLocation.toString())
                         .playToClient(type,
                                 messageStreamCodec,
                                 (ClientboundEntityDataAttachmentMessage<V> message, IPayloadContext context) -> {
+                                    // TODO use proxy, not some cheap check to avoid issues with synthetic method parameters from lambdas
                                     if (ModLoaderEnvironment.INSTANCE.isClient()) {
                                         context.enqueueWork(() -> {
                                             LocalPlayer player = (LocalPlayer) context.player();
