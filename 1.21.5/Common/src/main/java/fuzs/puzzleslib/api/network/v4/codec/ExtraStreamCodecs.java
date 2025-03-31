@@ -12,10 +12,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ByIdMap;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.time.Instant;
 import java.util.BitSet;
@@ -44,10 +41,6 @@ public final class ExtraStreamCodecs {
     public static final StreamCodec<FriendlyByteBuf, Instant> INSTANT = StreamCodec.of(FriendlyByteBuf::writeInstant,
             FriendlyByteBuf::readInstant);
     /**
-     * {@link ChunkPos} stream codec
-     */
-    public static final StreamCodec<ByteBuf, ChunkPos> CHUNK_POS = ChunkPos.STREAM_CODEC;
-    /**
      * {@link BlockHitResult} stream codec
      */
     public static final StreamCodec<FriendlyByteBuf, BlockHitResult> BLOCK_HIT_RESULT = StreamCodec.of(FriendlyByteBuf::writeBlockHitResult,
@@ -68,14 +61,6 @@ public final class ExtraStreamCodecs {
             (ResourceLocation registry, ResourceLocation location) -> {
                 return ResourceKey.create(ResourceKey.createRegistryKey(registry), location);
             });
-    /**
-     * {@link Vec3} stream codec
-     */
-    public static final StreamCodec<ByteBuf, Vec3> VEC3 = Vec3.STREAM_CODEC;
-    /**
-     * {@link Vector3f} stream codec
-     */
-    public static final StreamCodec<ByteBuf, Vector3f> VECTOR3F = ByteBufCodecs.VECTOR3F;
     /**
      * {@link FriendlyByteBuf} stream codec
      */

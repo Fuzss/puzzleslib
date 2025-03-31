@@ -2,22 +2,21 @@ package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import fuzs.puzzleslib.impl.attachment.builder.EntityDataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
-import net.minecraft.client.player.LocalPlayer;
+import fuzs.puzzleslib.neoforge.impl.core.NeoForgeProxy;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -39,37 +38,23 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
     @Override
     @Nullable
     public BiConsumer<Entity, V> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType) {
-        return this.getSynchronizer(resourceLocation, attachmentType, this.streamCodec, this.synchronizationTargets);
+        return this.getSynchronizer(attachmentType, this.streamCodec, this.synchronizationTargets);
     }
 
     @Override
-    public void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
-        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(eventBus -> {
-            eventBus.addListener((final RegisterPayloadHandlersEvent evt) -> {
-                StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
-                        type,
-                        this.streamCodec);
-                evt.registrar(resourceLocation.toString())
-                        .playToClient(type,
-                                messageStreamCodec,
-                                (ClientboundEntityDataAttachmentMessage<V> message, IPayloadContext context) -> {
-                                    // TODO use proxy, not some cheap check to avoid issues with synthetic method parameters from lambdas
-                                    if (ModLoaderEnvironment.INSTANCE.isClient()) {
-                                        context.enqueueWork(() -> {
-                                            LocalPlayer player = (LocalPlayer) context.player();
-                                            Entity entity = player.clientLevel.getEntity(message.entityId());
-                                            if (entity != null) {
-                                                if (message.value().isPresent()) {
-                                                    attachmentType.setData(entity, message.value().get());
-                                                } else {
-                                                    attachmentType.removeData(entity);
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-            });
-        });
+    public void registerPayloadHandlers(AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> payloadType, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
+        NeoForgeModContainerHelper.getOptionalModEventBus(attachmentType.resourceLocation().getNamespace())
+                .ifPresent((IEventBus eventBus) -> {
+                    eventBus.addListener((final RegisterPayloadHandlersEvent evt) -> {
+                        StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
+                                attachmentType,
+                                payloadType,
+                                this.streamCodec);
+                        NeoForgeProxy.get()
+                                .createPayloadTypesContext(attachmentType.resourceLocation().getNamespace(), evt)
+                                .playToClient(payloadType, messageStreamCodec);
+                    });
+                });
     }
 
     @Override

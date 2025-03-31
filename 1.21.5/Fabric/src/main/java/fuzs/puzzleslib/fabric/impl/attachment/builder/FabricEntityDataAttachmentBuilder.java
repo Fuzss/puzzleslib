@@ -2,15 +2,12 @@ package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
+import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import fuzs.puzzleslib.impl.attachment.builder.EntityDataAttachmentBuilder;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -38,30 +35,18 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
     @Override
     @Nullable
     public BiConsumer<Entity, V> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType) {
-        return this.getSynchronizer(resourceLocation, attachmentType, this.streamCodec, this.synchronizationTargets);
+        return this.getSynchronizer(attachmentType, this.streamCodec, this.synchronizationTargets);
     }
 
     @Override
-    public void registerPayloadHandlers(ResourceLocation resourceLocation, AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> type, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
+    public void registerPayloadHandlers(AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> payloadType, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
         StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
-                type,
+                attachmentType,
+                payloadType,
                 this.streamCodec);
-        PayloadTypeRegistry.playS2C().register(type, messageStreamCodec);
-        // TODO use proxy, not some cheap check to avoid issues with synthetic method parameters from lambdas
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            ClientPlayNetworking.registerGlobalReceiver(type,
-                    (ClientboundEntityDataAttachmentMessage<V> message, ClientPlayNetworking.Context context) -> {
-                        LocalPlayer player = context.player();
-                        Entity entity = player.clientLevel.getEntity(message.entityId());
-                        if (entity != null) {
-                            if (message.value().isPresent()) {
-                                attachmentType.setData(entity, message.value().get());
-                            } else {
-                                attachmentType.removeData(entity);
-                            }
-                        }
-                    });
-        }
+        FabricProxy.get()
+                .createPayloadTypesContext(attachmentType.resourceLocation().getNamespace())
+                .playToClient(payloadType, messageStreamCodec);
     }
 
     @Override
