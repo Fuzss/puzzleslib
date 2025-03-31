@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.init.v3;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.level.GameRules;
 
@@ -15,7 +15,7 @@ public interface GameRulesFactory {
     /**
      * the instance
      */
-    GameRulesFactory INSTANCE = CommonFactories.INSTANCE.getGameRulesFactory();
+    GameRulesFactory INSTANCE = ProxyImpl.get().getGameRulesFactory();
 
     /**
      * Register a new boolean game rule.
@@ -107,11 +107,12 @@ public interface GameRulesFactory {
      * @return the game rule
      */
     default GameRules.Type<GameRules.IntegerValue> createIntRule(int defaultValue, int minimumValue, int maximumValue) {
-        return this.createIntRule(defaultValue, minimumValue, maximumValue,
+        return this.createIntRule(defaultValue,
+                minimumValue,
+                maximumValue,
                 (MinecraftServer server, GameRules.IntegerValue integerValue) -> {
                     // NO-OP
-                }
-        );
+                });
     }
 
     /**

@@ -4,11 +4,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.5.0-1.21.5] - 2025-03-25
+## [v21.5.0-1.21.5] - 2025-03-31
 - Port to Minecraft 1.21.5
 ### Added
+- Add `RegisterConfigurationTasksCallback`
 - Add `ContentRegistrationHelper`for registering new skull block types
+- Add `QuadUtils`
+- Add `CodecExtras::LIST_TAG_CODEC`, `CodecExtras::setOf`, and `CodecExtras::decodeOnly`
 ### Changed
+- Complete networking refactor, replacing `NetworkHandler` with `ModConstructor::onRegisterPayloadTypes`, and adding support for configuration phase messages
+- Untie `PlayerSet` from only being able to handle sending packets
+- Split `CommonAbstractions` into multiple classes such as `EntityHelper`, `EnchantingHelper`, and `ExplosionEventHelper`
+- Split `ClientAbstractions` into multiple classes such as `GuiHeightHelper`, `ClientWoodTypeRegistry`, and `RenderTypeHelper`
 - Merge `EntityAttributesCreateContext` & `EntityAttributesModifyContext` into `EntityAttributesContext`
 - Refactor `ClientStartedCallback` into `ClientLifecycleEvents`
 - Support directly registering a texture location in `SkullRenderersContext`
@@ -19,3 +26,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `ReflectionHelper`
 - Remove `RegisterFuelValuesCallback`
 - Remove `RegistryHelper`
+- Remove `MessageV2`

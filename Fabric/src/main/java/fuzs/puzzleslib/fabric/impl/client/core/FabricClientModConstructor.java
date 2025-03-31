@@ -4,17 +4,15 @@ import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.fabric.impl.client.core.context.*;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.minecraft.client.Minecraft;
 
-public final class FabricClientModConstructor {
+public final class FabricClientModConstructor implements ModConstructorImpl<ClientModConstructor> {
 
-    private FabricClientModConstructor() {
-        // NO-OP
-    }
-
-    public static void construct(ClientModConstructor modConstructor, String modId) {
+    @Override
+    public void construct(String modId, ClientModConstructor modConstructor) {
         modConstructor.onConstructMod();
         modConstructor.onClientSetup();
         modConstructor.onRegisterItemModels(new ItemModelsContextFabricImpl());

@@ -1,12 +1,16 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModContainer;
+import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.fabricmc.loader.api.metadata.Person;
 import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public final class FabricModContainer implements ModContainer {
     private final net.fabricmc.loader.api.ModContainer container;
@@ -94,5 +98,28 @@ public final class FabricModContainer implements ModContainer {
 
     public net.fabricmc.loader.api.ModContainer getFabricModContainer() {
         return this.container;
+    }
+
+    public static Stream<? extends ModContainer> getFabricModContainers() {
+        Map<net.fabricmc.loader.api.ModContainer, FabricModContainer> allMods = FabricLoader.getInstance()
+                .getAllMods()
+                .stream()
+                .map(FabricModContainer::new)
+                .collect(Collectors.toMap(FabricModContainer::getFabricModContainer,
+                        Function.identity(),
+                        (FabricModContainer o1, FabricModContainer o2) -> {
+                            o2.setParent(o1);
+                            return o1;
+                        }));
+        for (FabricModContainer modContainer : allMods.values()) {
+            modContainer.getFabricModContainer()
+                    .getContainedMods()
+                    .stream()
+                    .map(allMods::get)
+                    .forEach((FabricModContainer childModContainer) -> {
+                        childModContainer.setParent(modContainer);
+                    });
+        }
+        return allMods.values().stream();
     }
 }

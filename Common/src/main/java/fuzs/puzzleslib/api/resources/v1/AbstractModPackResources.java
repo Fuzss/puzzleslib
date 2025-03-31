@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.resources.v1;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.resources.ModPackResourcesSupplier;
@@ -138,30 +137,35 @@ public class AbstractModPackResources implements PackResources {
     /**
      * Creates a new pack for registering a repository source.
      *
-     * @param packType      type marking this pack as containing data or resource pack resources
-     * @param id            id for the pack, used for internal references and is stored in <code>options.txt</code>
-     * @param factory       {@link net.minecraft.server.packs.PackResources} implementation supplier
-     * @param title         the title of this pack shown in the pack selection screen
-     * @param description   the description for this pack shown in the pack selection screen
-     * @param required      a required pack cannot be disabled, like in the pack selection screen the pack cannot be
-     *                      moved to the left side; this is used for the vanilla resource pack
-     * @param position      insertion end in the pack list, new packs are usually inserted at the top above vanilla
-     * @param fixedPosition a fixed pack cannot be moved up or down, like a server or world resource pack
-     * @param hidden        controls whether the pack is hidden from user-facing screens like the resource pack and data
-     *                      pack selection screens, only available on Forge
-     * @param features      {@link net.minecraft.world.flag.FeatureFlags} enabled through this pack
+     * @param packType             type marking this pack as containing data or resource pack resources
+     * @param resourceLocation     id for the pack, used for internal references and is stored in
+     *                             <code>options.txt</code>
+     * @param factory              {@link net.minecraft.server.packs.PackResources} implementation supplier
+     * @param titleComponent       the title of this pack shown in the pack selection screen
+     * @param descriptionComponent the description for this pack shown in the pack selection screen
+     * @param required             a required pack cannot be disabled, like in the pack selection screen the pack cannot
+     *                             be moved to the left side; this is used for the vanilla resource pack
+     * @param position             insertion end in the pack list, new packs are usually inserted at the top above
+     *                             vanilla
+     * @param fixedPosition        a fixed pack cannot be moved up or down, like a server or world resource pack
+     * @param hidden               controls whether the pack is hidden from user-facing screens like the resource pack
+     *                             and data pack selection screens, only available on Forge
+     * @param featureFlagSet       {@link net.minecraft.world.flag.FeatureFlags} enabled through this pack
      * @return the pack to be used for creating a {@link RepositorySource}
      */
-    public static Pack buildPack(PackType packType, ResourceLocation id, Supplier<AbstractModPackResources> factory, Component title, Component description, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet features) {
-        PackLocationInfo info = new PackLocationInfo(id.toString(), title, PackSource.BUILT_IN, Optional.empty());
+    public static Pack buildPack(PackType packType, ResourceLocation resourceLocation, Supplier<AbstractModPackResources> factory, Component titleComponent, Component descriptionComponent, boolean required, Pack.Position position, boolean fixedPosition, boolean hidden, FeatureFlagSet featureFlagSet) {
+        PackLocationInfo info = new PackLocationInfo(resourceLocation.toString(),
+                titleComponent,
+                PackSource.BUILT_IN,
+                Optional.empty());
         Pack.ResourcesSupplier resourcesSupplier = ModPackResourcesSupplier.create(packType,
                 info,
                 createSupplier(factory),
-                description);
-        Pack.Metadata metadata = CommonAbstractions.INSTANCE.createPackInfo(id,
-                description,
+                descriptionComponent);
+        Pack.Metadata metadata = PackResourcesHelper.createPackInfo(resourceLocation,
+                descriptionComponent,
                 PackCompatibility.COMPATIBLE,
-                features,
+                featureFlagSet,
                 hidden);
         PackSelectionConfig config = new PackSelectionConfig(required, position, fixedPosition);
         return new Pack(info, resourcesSupplier, metadata, config);

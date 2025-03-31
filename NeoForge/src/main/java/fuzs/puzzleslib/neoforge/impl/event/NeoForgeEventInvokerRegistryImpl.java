@@ -2,7 +2,6 @@ package fuzs.puzzleslib.neoforge.impl.event;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
@@ -24,7 +23,6 @@ import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
 import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.SetupMobGoalsEvent;
-import fuzs.puzzleslib.neoforge.impl.client.event.NeoForgeClientEventInvokers;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -33,8 +31,10 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -76,6 +76,7 @@ import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.network.event.RegisterConfigurationTasksEvent;
 import net.neoforged.neoforge.registries.ModifyRegistriesEvent;
 import net.neoforged.neoforge.registries.RegisterEvent;
 import net.neoforged.neoforge.registries.callback.AddCallback;
@@ -132,9 +133,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(CommonSetupCallback.class, FMLCommonSetupEvent.class, (CommonSetupCallback callback, FMLCommonSetupEvent evt) -> {
             evt.enqueueWork(callback::onCommonSetup);
         });
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            NeoForgeClientEventInvokers.registerLoadingHandlers();
-        }
+        INSTANCE.register(RegisterConfigurationTasksCallback.class, RegisterConfigurationTasksEvent.class, (RegisterConfigurationTasksCallback callback, RegisterConfigurationTasksEvent evt) -> {
+            callback.onRegisterConfigurationTasks((MinecraftServer) evt.getListener().getMainThreadEventLoop(),
+                    (ServerConfigurationPacketListenerImpl) evt.getListener(), evt::register);
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -717,9 +719,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(SetupMobGoalsCallback.class, SetupMobGoalsEvent.class, (SetupMobGoalsCallback callback, SetupMobGoalsEvent evt) -> {
             callback.onSetupMobGoals(evt.getEntity(), evt.getGoalSelector(), evt.getTargetSelector());
         });
-        if (ModLoaderEnvironment.INSTANCE.isClient()) {
-            NeoForgeClientEventInvokers.registerEventHandlers();
-        }
     }
 
     @Override

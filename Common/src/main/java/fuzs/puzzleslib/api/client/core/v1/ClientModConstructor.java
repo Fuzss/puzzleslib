@@ -1,20 +1,18 @@
 package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.*;
-import fuzs.puzzleslib.api.core.v1.BaseModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
-import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.function.Consumers;
 
 import java.util.function.Supplier;
 
@@ -22,7 +20,7 @@ import java.util.function.Supplier;
  * A base class for a mods main client class, contains a bunch of methods for registering various client content and
  * components.
  */
-public interface ClientModConstructor extends BaseModConstructor {
+public interface ClientModConstructor {
 
     /**
      * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
@@ -31,14 +29,11 @@ public interface ClientModConstructor extends BaseModConstructor {
      * @param modConstructorSupplier the main mod instance for mod setup
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructorSupplier) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
-        ClientModConstructor modConstructor = modConstructorSupplier.get();
-        ModContext modContext = ModContext.get(modId);
-        ResourceLocation resourceLocation = ModContext.getPairingIdentifier(modId, modConstructor);
-        modContext.scheduleClientModConstruction(resourceLocation, () -> {
-            PuzzlesLib.LOGGER.info("Constructing client components for {}", resourceLocation);
-            ClientFactories.INSTANCE.constructClientMod(modId, modConstructor);
-        });
+        PuzzlesLib.LOGGER.info("Constructing client components for {}", modId);
+        ModConstructorImpl.construct(modId,
+                modConstructorSupplier,
+                ClientProxyImpl.get()::getClientModConstructorImpl,
+                Consumers.nop());
     }
 
     /**

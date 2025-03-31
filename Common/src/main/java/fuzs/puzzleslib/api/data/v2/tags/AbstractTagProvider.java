@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.data.v2.tags;
 
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
@@ -36,7 +36,7 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
                 (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
                     return new IllegalStateException("Missing value in " + registryKey + ": " + t);
                 }) : null;
-        return CommonFactories.INSTANCE.getTagAppender(tagBuilder, keyExtractor);
+        return ProxyImpl.get().getTagAppender(tagBuilder, keyExtractor);
     }
 
     @Override

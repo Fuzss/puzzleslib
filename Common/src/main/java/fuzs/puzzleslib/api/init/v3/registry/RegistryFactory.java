@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.init.v3.registry;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +13,7 @@ public interface RegistryFactory {
     /**
      * the instance
      */
-    RegistryFactory INSTANCE = CommonFactories.INSTANCE.getRegistryFactory();
+    RegistryFactory INSTANCE = ProxyImpl.get().getRegistryFactory();
 
     /**
      * Create an un-synchronized {@link net.minecraft.core.DefaultedMappedRegistry}.

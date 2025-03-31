@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.impl.attachment.builder;
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.ClientboundEntityDataAttachmentMessage;
 import fuzs.puzzleslib.impl.attachment.builder.EntityDataAttachmentBuilder;
@@ -47,6 +47,7 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
                 type,
                 this.streamCodec);
         PayloadTypeRegistry.playS2C().register(type, messageStreamCodec);
+        // TODO use proxy, not some cheap check to avoid issues with synthetic method parameters from lambdas
         if (ModLoaderEnvironment.INSTANCE.isClient()) {
             ClientPlayNetworking.registerGlobalReceiver(type,
                     (ClientboundEntityDataAttachmentMessage<V> message, ClientPlayNetworking.Context context) -> {

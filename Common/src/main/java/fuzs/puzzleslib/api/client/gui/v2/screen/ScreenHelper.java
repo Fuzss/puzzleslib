@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.api.client.gui.v2.screen;
 
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.world.effect.MobEffectInstance;
 
 /**
  * A {@link net.minecraft.client.gui.screens.Screen} related helper class.
@@ -9,6 +12,15 @@ public final class ScreenHelper {
 
     private ScreenHelper() {
         // NO-OP
+    }
+
+    /**
+     * Get the current partial tick time while taking into account whether the game is paused.
+     *
+     * @return current partial tick time
+     */
+    public static float getPartialTick() {
+        return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
     /**
@@ -42,5 +54,26 @@ public final class ScreenHelper {
      */
     public static boolean isHovering(int posX, int posY, int width, int height, double mouseX, double mouseY) {
         return mouseX >= posX && mouseX < posX + width && mouseY >= posY && mouseY < posY + height;
+    }
+
+    /**
+     * Can a mob effect render in the player inventory via
+     * {@link net.minecraft.client.gui.screens.inventory.EffectsInInventory}.
+     *
+     * @param mobEffect the mob effect instance
+     * @return is rendering permitted
+     */
+    public static boolean isEffectVisibleInInventory(MobEffectInstance mobEffect) {
+        return ClientProxyImpl.get().isEffectVisibleInInventory(mobEffect);
+    }
+
+    /**
+     * Can a mob effect render in the {@link Gui}.
+     *
+     * @param mobEffect the mob effect instance
+     * @return is rendering permitted
+     */
+    public static boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {
+        return ClientProxyImpl.get().isEffectVisibleInGui(mobEffect);
     }
 }

@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.client.packs.v1;
 
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -42,6 +42,6 @@ public final class BuiltinResourcePackHelper {
      * @param required         is this pack always enabled and cannot be turned off
      */
     public static void registerBuiltinResourcePack(ResourceLocation resourceLocation, Component displayName, boolean required) {
-        ClientFactories.INSTANCE.registerBuiltinResourcePack(resourceLocation, displayName, required);
+        ClientProxyImpl.get().registerBuiltinResourcePack(resourceLocation, displayName, required);
     }
 }

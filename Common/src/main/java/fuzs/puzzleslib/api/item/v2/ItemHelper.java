@@ -1,16 +1,20 @@
 package fuzs.puzzleslib.api.item.v2;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import net.minecraft.network.chat.Style;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Rarity;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -66,7 +70,7 @@ public final class ItemHelper {
         itemStack.hurtAndBreak(amount, serverLevel, serverPlayer, (Item item) -> {
             onBreak.accept(item);
             if (serverPlayer != null) {
-                CommonAbstractions.INSTANCE.onPlayerDestroyItem(serverPlayer, originalItemStack, null);
+                onPlayerDestroyItem(serverPlayer, originalItemStack, null);
             }
         });
     }
@@ -78,5 +82,32 @@ public final class ItemHelper {
         } else {
             return itemStack;
         }
+    }
+
+    /**
+     * A trigger for running a NeoForge event for destroying an item.
+     *
+     * @param player            the player destroying the item
+     * @param originalItemStack the item stack before being destroyed
+     * @param interactionHand   the hand holding the destroyed stack
+     */
+    public static void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand) {
+        Objects.requireNonNull(player, "player is null");
+        Objects.requireNonNull(originalItemStack, "original item stack is null");
+        ProxyImpl.get().onPlayerDestroyItem(player, originalItemStack, interactionHand);
+    }
+
+    /**
+     * Creates a style for item names for a rarity.
+     * <p>
+     * Alternatively use {@link ItemStack#getStyledHoverName()} where possible.
+     *
+     * @param rarity the rarity
+     * @return the style for this rarity, apply via {@link net.minecraft.network.chat.MutableComponent#withStyle(Style)}
+     *         or {@link Style#applyTo(Style)}
+     */
+    public static Style getRarityStyle(Rarity rarity) {
+        Objects.requireNonNull(rarity, "rarity is null");
+        return ProxyImpl.get().getRarityStyle(rarity);
     }
 }

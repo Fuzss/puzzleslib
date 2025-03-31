@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
+import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import fuzs.puzzleslib.neoforge.impl.core.context.AbstractNeoForgeContext;
@@ -12,13 +13,10 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 
-public final class NeoForgeClientModConstructor {
+public final class NeoForgeClientModConstructor implements ModConstructorImpl<ClientModConstructor> {
 
-    private NeoForgeClientModConstructor() {
-        // NO-OP
-    }
-
-    public static void construct(ClientModConstructor modConstructor, String modId) {
+    @Override
+    public void construct(String modId, ClientModConstructor modConstructor) {
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             SkullRenderersContextNeoForgeImpl[] skullRenderersContext = new SkullRenderersContextNeoForgeImpl[1];
             ItemModelsContextNeoForgeImpl[] itemModelsContext = new ItemModelsContextNeoForgeImpl[1];

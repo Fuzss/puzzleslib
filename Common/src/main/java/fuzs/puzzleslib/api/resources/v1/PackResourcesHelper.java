@@ -2,10 +2,12 @@ package fuzs.puzzleslib.api.resources.v1;
 
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.world.flag.FeatureFlagSet;
 
@@ -206,5 +208,22 @@ public final class PackResourcesHelper {
                     hidden,
                     FeatureFlagSet.of()));
         };
+    }
+
+    /**
+     * Creates a new {@link Pack.Metadata} instance with additional parameters only supported on NeoForge.
+     *
+     * @param resourceLocation     the pack identifier
+     * @param descriptionComponent the pack description component
+     * @param packCompatibility    the pack version, ideally retrieved from
+     *                             {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
+     * @param featureFlagSet       the feature flags provided by this pack
+     * @param hidden               controls whether the pack is hidden from user-facing screens like the resource pack
+     *                             and data pack selection screens
+     * @return the created pack info instance
+     */
+    public static Pack.Metadata createPackInfo(ResourceLocation resourceLocation, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
+        return ProxyImpl.get()
+                .createPackInfo(resourceLocation, descriptionComponent, packCompatibility, featureFlagSet, hidden);
     }
 }

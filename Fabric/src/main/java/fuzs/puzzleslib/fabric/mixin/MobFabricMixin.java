@@ -26,10 +26,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     @Shadow
     @Final
-    public GoalSelector goalSelector;
+    protected GoalSelector goalSelector;
     @Shadow
     @Final
-    public GoalSelector targetSelector;
+    protected GoalSelector targetSelector;
     @Shadow
     @Nullable
     private LivingEntity target;

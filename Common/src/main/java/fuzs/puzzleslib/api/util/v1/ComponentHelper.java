@@ -1,9 +1,16 @@
 package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.impl.chat.FormattedContentSink;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+
+import java.util.List;
+import java.util.Objects;
 
 /**
  * A helper class for converting various text representations.
@@ -61,5 +68,52 @@ public class ComponentHelper {
      */
     public static String toString(FormattedCharSequence formattedCharSequence) {
         return new FormattedContentSink(formattedCharSequence).getString();
+    }
+
+    /**
+     * Used to check if the control key (command on Mac) is pressed, useful for item tooltips.
+     * <p>
+     * Always returns <code>false</code> on the server.
+     */
+    public static boolean hasControlDown() {
+        return ProxyImpl.get().hasControlDown();
+    }
+
+    /**
+     * Used to check if the shift key is pressed, useful for item tooltips.
+     * <p>
+     * Always returns <code>false</code> on the server.
+     *
+     * @return is the shift key pressed
+     */
+    public static boolean hasShiftDown() {
+        return ProxyImpl.get().hasShiftDown();
+    }
+
+    /**
+     * Used to check if the alt key is pressed, useful for item tooltips.
+     * <p>
+     * Always returns <code>false</code> on the server.
+     *
+     * @return is the alt key pressed
+     */
+    public static boolean hasAltDown() {
+        return ProxyImpl.get().hasAltDown();
+    }
+
+    /**
+     * Split a text component into multiple parts depending on a predefined max width.
+     * <p>
+     * Most useful for constructing item tooltips in
+     * {@link net.minecraft.world.item.Item#appendHoverText(ItemStack, Item.TooltipContext, List, TooltipFlag)}.
+     * <p>
+     * Always returns the unmodified component on the server.
+     *
+     * @param component the component to split
+     * @return the split component
+     */
+    public static List<Component> splitTooltipLines(Component component) {
+        Objects.requireNonNull(component, "component is null");
+        return ProxyImpl.get().splitTooltipLines(component);
     }
 }

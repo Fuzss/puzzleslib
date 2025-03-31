@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.item.v2;
 
-import fuzs.puzzleslib.impl.core.CommonFactories;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.*;
@@ -16,7 +16,10 @@ import net.minecraft.world.item.equipment.Equippable;
  * href="https://github.com/Serilum/Collective">Collective</a> mod.
  */
 public interface ToolTypeHelper {
-    ToolTypeHelper INSTANCE = CommonFactories.INSTANCE.getToolTypeHelper();
+    /**
+     * the instance
+     */
+    ToolTypeHelper INSTANCE = ProxyImpl.get().getToolTypeHelper();
 
     /**
      * Tests if an item stack is a sword.
@@ -155,8 +158,8 @@ public interface ToolTypeHelper {
      * @return is this stack a melee weapon
      */
     default boolean isMeleeWeapon(ItemStack itemStack) {
-        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) || this.isMace(
-                itemStack);
+        return this.isSword(itemStack) || this.isAxe(itemStack) || this.isTridentLike(itemStack) ||
+                this.isMace(itemStack);
     }
 
     /**
@@ -196,8 +199,8 @@ public interface ToolTypeHelper {
      * @return is this stack a tool
      */
     default boolean isTool(ItemStack itemStack) {
-        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) || this.isShield(
-                itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
+        return this.isMiningTool(itemStack) || this.isWeapon(itemStack) || this.isShears(itemStack) ||
+                this.isShield(itemStack) || this.isFishingRod(itemStack) || this.isBrush(itemStack);
     }
 
     /**

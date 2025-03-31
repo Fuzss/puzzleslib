@@ -3,23 +3,15 @@ package fuzs.puzzleslib.neoforge.impl.core;
 import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
-import fuzs.puzzleslib.api.network.v3.NetworkHandler;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.neoforge.impl.capability.NeoForgeCapabilityController;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryManager;
-import fuzs.puzzleslib.neoforge.impl.network.NeoForgeNetworkHandler;
-import net.minecraft.resources.ResourceLocation;
 
 public final class NeoForgeModContext extends ModContext {
 
     public NeoForgeModContext(String modId) {
         super(modId);
-    }
-
-    @Override
-    public NetworkHandler.Builder getNetworkHandler(ResourceLocation resourceLocation) {
-        return this.addBuildable(new NeoForgeNetworkHandler(resourceLocation));
     }
 
     @Override

@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.event;
 
-import fuzs.puzzleslib.api.core.v1.CommonAbstractions;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingJumpCallback;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,7 +38,7 @@ public final class EventImplHelper {
     }
 
     public static Optional<Player> getGrindstoneUsingPlayer(ItemStack topInput, ItemStack bottomInput) {
-        MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
+        MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
         Optional<Player> optional = Optional.empty();
         for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
             if (serverPlayer.containerMenu instanceof GrindstoneMenu menu) {
@@ -57,7 +57,7 @@ public final class EventImplHelper {
                 return Optional.of(inventory.player);
             }
         }
-        MinecraftServer minecraftServer = CommonAbstractions.INSTANCE.getMinecraftServer();
+        MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
         for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
             if (serverPlayer.containerMenu == menu) {
                 return Optional.of(serverPlayer);

@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.api.client.searchtree.v1;
 
-import fuzs.puzzleslib.api.core.v1.Proxy;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.multiplayer.SessionSearchTrees;
 import net.minecraft.client.searchtree.SearchTree;
-import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -56,8 +56,11 @@ public final class SearchRegistryHelper {
      * @return all tooltip lines from the item stacks
      */
     public static Stream<String> getTooltipLines(Stream<ItemStack> stream, TooltipFlag tooltipFlag) {
-        RegistryAccess.Frozen registries = Proxy.INSTANCE.getClientPacketListener().registryAccess();
-        return SessionSearchTrees.getTooltipLines(stream, Item.TooltipContext.of(registries), tooltipFlag);
+        ClientPacketListener clientPacketListener = Minecraft.getInstance().getConnection();
+        Objects.requireNonNull(clientPacketListener, "client packet listener is null");
+        return SessionSearchTrees.getTooltipLines(stream,
+                Item.TooltipContext.of(clientPacketListener.registryAccess()),
+                tooltipFlag);
     }
 
     /**
@@ -69,7 +72,9 @@ public final class SearchRegistryHelper {
      */
     public static <T> void populateSearchTree(SearchTreeType<T> type, List<T> values) {
         Entry<T> entry = lookupEntry(type);
-        Proxy.INSTANCE.getClientPacketListener().searchTrees().register(entry.key, () -> {
+        ClientPacketListener clientPacketListener = Minecraft.getInstance().getConnection();
+        Objects.requireNonNull(clientPacketListener, "client packet listener is null");
+        clientPacketListener.searchTrees().register(entry.key, () -> {
             CompletableFuture<SearchTree<T>> searchTree = entry.searchTree;
             entry.searchTree = CompletableFuture.supplyAsync(() -> {
                 return entry.factory.apply(values);

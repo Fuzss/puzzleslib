@@ -3,7 +3,6 @@ package fuzs.puzzleslib.fabric.api.client.event.v1;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.resources.ResourceLocation;
@@ -73,12 +72,6 @@ public final class FabricGuiEvents {
      */
     public static final Event<GatherEffectScreenTooltipCallback> GATHER_EFFECT_SCREEN_TOOLTIP = FabricEventFactory.create(
             GatherEffectScreenTooltipCallback.class);
-    /**
-     * Called at the beginning of {@link net.minecraft.client.gui.Gui#render(GuiGraphics, DeltaTracker)}, before vanilla
-     * has drawn any gui elements.
-     */
-    public static final Event<RenderGuiEvents.Before> BEFORE_RENDER_GUI = FabricEventFactory.create(
-            RenderGuiEvents.Before.class);
 
     private FabricGuiEvents() {
         // NO-OP

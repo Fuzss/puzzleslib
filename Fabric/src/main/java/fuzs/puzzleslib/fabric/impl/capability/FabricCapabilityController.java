@@ -60,7 +60,7 @@ public final class FabricCapabilityController implements CapabilityController {
         GlobalCapabilityRegister.testHolderType(holderType);
         Codec<C> codec = NbtSerializable.codec(capabilityFactory);
         ResourceLocation capabilityName = ResourceLocationHelper.fromNamespaceAndPath(this.modId, identifier);
-        AttachmentType<C> attachmentType = AttachmentRegistry.<C>builder().persistent(codec).buildAndRegister(capabilityName);
+        AttachmentType<C> attachmentType = AttachmentRegistry.createPersistent(capabilityName, codec);
         return capabilityKeyFactory.apply(attachmentType, filter, capabilityFactory);
     }
 }

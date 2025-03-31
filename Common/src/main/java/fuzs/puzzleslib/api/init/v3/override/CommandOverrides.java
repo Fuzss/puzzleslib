@@ -3,10 +3,12 @@ package fuzs.puzzleslib.api.init.v3.override;
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.entity.ServerEntityLevelEvents;
+import fuzs.puzzleslib.api.event.v1.entity.player.PlayerCopyEvents;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import net.minecraft.core.Holder;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,7 +28,7 @@ import java.util.function.UnaryOperator;
  * Will not apply any changes in a production environment.
  */
 public final class CommandOverrides {
-    private static final String KEY_PLAYER_SEEN_WORLD = PuzzlesLibMod.id("has_seen_world").toLanguageKey();
+    private static final String KEY_PLAYER_JOINED_WORLD = PuzzlesLibMod.id("joined_world").toString();
     private static final Map<CommandEnvironment, Collection<String>> COMMAND_OVERRIDES = Maps.newEnumMap(
             CommandEnvironment.class);
 
@@ -74,26 +76,31 @@ public final class CommandOverrides {
 
     @ApiStatus.Internal
     public static void registerEventHandlers() {
-        ServerLifecycleEvents.STARTED.register((MinecraftServer server) -> {
-            if (server.overworld().getGameTime() == 0) {
-                executeCommandOverrides(server,
+        ServerLifecycleEvents.STARTED.register((MinecraftServer minecraftServer) -> {
+            if (minecraftServer.overworld().getGameTime() == 0) {
+                executeCommandOverrides(minecraftServer,
                         CommandEnvironment.SERVER,
                         CommandEnvironment.DEDICATED_SERVER,
                         UnaryOperator.identity());
             }
         });
-        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel level) -> {
+        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel serverLevel) -> {
             // idea from Serilum's Starter Kit mod
             if (entity instanceof ServerPlayer serverPlayer &&
-                    !serverPlayer.getTags().contains(KEY_PLAYER_SEEN_WORLD)) {
-                serverPlayer.addTag(KEY_PLAYER_SEEN_WORLD);
-                String playerName = serverPlayer.getGameProfile().getName();
-                executeCommandOverrides(serverPlayer.server,
-                        CommandEnvironment.PLAYER,
-                        CommandEnvironment.DEDICATED_PLAYER,
-                        s -> s.replaceAll("@[sp]", playerName));
+                    !serverPlayer.getTags().contains(KEY_PLAYER_JOINED_WORLD)) {
+                serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
+                serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
+                    String playerName = serverPlayer.getGameProfile().getName();
+                    executeCommandOverrides(serverPlayer.server,
+                            CommandEnvironment.PLAYER,
+                            CommandEnvironment.DEDICATED_PLAYER,
+                            (String s) -> s.replaceAll("@[sp]", playerName));
+                }));
             }
             return EventResult.PASS;
+        });
+        PlayerCopyEvents.COPY.register((ServerPlayer originalServerPlayer, ServerPlayer newServerPlayer, boolean originalStillAlive) -> {
+            if (!originalStillAlive) originalServerPlayer.removeTag(KEY_PLAYER_JOINED_WORLD);
         });
     }
 

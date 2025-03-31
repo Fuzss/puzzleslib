@@ -8,9 +8,7 @@ import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
-import fuzs.puzzleslib.impl.config.ConfigTranslationsManager;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
@@ -41,32 +39,17 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
     protected void bake(ConfigDataHolderImpl<?> holder, String modId) {
         NeoForgeModConfigEvents.loading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
-                    ConfigDataHolderImpl.ModConfigEventType.LOADING
-            );
+                    ConfigDataHolderImpl.ModConfigEventType.LOADING);
         });
         NeoForgeModConfigEvents.reloading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
-                    ConfigDataHolderImpl.ModConfigEventType.RELOADING
-            );
+                    ConfigDataHolderImpl.ModConfigEventType.RELOADING);
         });
         NeoForgeModConfigEvents.unloading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
-                    ConfigDataHolderImpl.ModConfigEventType.UNLOADING
-            );
+                    ConfigDataHolderImpl.ModConfigEventType.UNLOADING);
         });
         ((FabricConfigDataHolderImpl<?>) holder).register(modId);
-    }
-
-    @Override
-    protected void registerConfigurationScreen(String modId) {
-        super.registerConfigurationScreen(modId);
-        ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
-            if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                ConfigTranslationsManager.addModConfig(modConfig.getModId(), modConfig.getType().extension(),
-                        modConfig.getFileName(), modConfigSpec
-                );
-            }
-        });
     }
 
     private static class FabricConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {
@@ -91,9 +74,9 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
                             Path path = modConfig.getFullPath();
                             FileWatcher.defaultInstance().removeWatch(path);
                         } catch (RuntimeException exception) {
-                            PuzzlesLib.LOGGER.error("Failed to remove config {} from tracker!", modConfig.getFileName(),
-                                    exception
-                            );
+                            PuzzlesLib.LOGGER.error("Failed to remove config {} from tracker!",
+                                    modConfig.getFileName(),
+                                    exception);
                         }
                     }
                 });

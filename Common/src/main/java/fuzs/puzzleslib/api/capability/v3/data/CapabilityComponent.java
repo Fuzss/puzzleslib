@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.capability.v3.data;
 
 import fuzs.puzzleslib.api.core.v1.utility.NbtSerializable;
-import fuzs.puzzleslib.api.network.v3.PlayerSet;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import org.jetbrains.annotations.ApiStatus;

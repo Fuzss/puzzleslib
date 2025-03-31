@@ -6,10 +6,10 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.LocalPlayer;
 
 /**
- * Client-side handler for messages received by the client.
+ * Handler for messages received by the client.
  * <p>
- * This is implemented as an anonymous class, to force implementations to be a class as well, to prevent issues
- * concerning loading client-only classes on a dedicated server.
+ * This is implemented as a class, to force any implementation to be a class as well. This is to prevent issues with
+ * loading client-only classes on the server.
  *
  * @param <T> the message to handle
  */

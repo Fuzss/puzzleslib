@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.api.client.renderer.v1;
 
-import fuzs.puzzleslib.impl.client.core.ClientFactories;
+import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
@@ -18,6 +18,16 @@ import java.util.Objects;
 public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
 
     /**
+     * Get the partial tick time from a render state instance.
+     *
+     * @param renderState the render state
+     * @return the partial tick time
+     */
+    public static float getPartialTick(EntityRenderState renderState) {
+        return ClientProxyImpl.get().getPartialTick(renderState);
+    }
+
+    /**
      * Gets a nullable value for a key from the provided render state.
      *
      * @param renderState the render state
@@ -27,7 +37,7 @@ public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
      */
     @Nullable
     public static <T> T get(EntityRenderState renderState, RenderPropertyKey<T> key) {
-        return ClientFactories.INSTANCE.getRenderProperty(renderState, key);
+        return ClientProxyImpl.get().getRenderProperty(renderState, key);
     }
 
     /**
@@ -40,7 +50,7 @@ public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
      * @return the render property value associated with the key
      */
     public static <T> T getOrDefault(EntityRenderState renderState, RenderPropertyKey<T> key, T defaultProperty) {
-        T renderProperty = ClientFactories.INSTANCE.getRenderProperty(renderState, key);
+        T renderProperty = ClientProxyImpl.get().getRenderProperty(renderState, key);
         return renderProperty != null ? renderProperty : defaultProperty;
     }
 
@@ -53,7 +63,7 @@ public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
      * @return is there a render property value associated with the key
      */
     public static <T> boolean has(EntityRenderState renderState, RenderPropertyKey<T> key) {
-        return ClientFactories.INSTANCE.getRenderProperty(renderState, key) != null;
+        return ClientProxyImpl.get().getRenderProperty(renderState, key) != null;
     }
 
     /**
@@ -66,7 +76,7 @@ public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
      */
     public static <T> void set(EntityRenderState renderState, RenderPropertyKey<T> key, T renderProperty) {
         Objects.requireNonNull(renderProperty, "render property is null");
-        ClientFactories.INSTANCE.setRenderProperty(renderState, key, renderProperty);
+        ClientProxyImpl.get().setRenderProperty(renderState, key, renderProperty);
     }
 
     /**
@@ -77,6 +87,6 @@ public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
      * @param <T>         the value type
      */
     public static <T> void remove(EntityRenderState renderState, RenderPropertyKey<T> key) {
-        ClientFactories.INSTANCE.setRenderProperty(renderState, key, null);
+        ClientProxyImpl.get().setRenderProperty(renderState, key, null);
     }
 }
