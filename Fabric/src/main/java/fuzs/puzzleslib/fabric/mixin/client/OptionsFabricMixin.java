@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import fuzs.puzzleslib.impl.client.PuzzlesLibClient;
+import fuzs.puzzleslib.impl.content.client.PuzzlesLibClientDevelopment;
 import net.minecraft.client.Options;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -12,6 +12,6 @@ abstract class OptionsFabricMixin {
 
     @Inject(method = "load", at = @At("HEAD"))
     public void load(CallbackInfo callback) {
-        PuzzlesLibClient.initializeGameOptions(Options.class.cast(this));
+        PuzzlesLibClientDevelopment.initializeGameOptions(Options.class.cast(this));
     }
 }

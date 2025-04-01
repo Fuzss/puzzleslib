@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.core.proxy;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,7 +44,8 @@ public interface SidedProxy {
         // NO-OP
     }
 
-    default void registerConfigTranslations(String modId) {
-        // NO-OP
+    @MustBeInvokedByOverriders
+    default void registerConfigurationScreenForHolder(String modId) {
+        this.registerConfigurationScreen(modId);
     }
 }

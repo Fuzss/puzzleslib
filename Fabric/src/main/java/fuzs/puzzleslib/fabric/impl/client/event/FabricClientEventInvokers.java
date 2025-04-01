@@ -164,20 +164,20 @@ public final class FabricClientEventInvokers {
             return callback::onEndClientTick;
         });
         AtomicInteger atomicInteger = new AtomicInteger();
-        INSTANCE.register(RenderGuiEvents.Before.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.Before callback) -> {
+        INSTANCE.register(RenderGuiEvents.Before.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.Before callback, @Nullable Object context) -> {
             return (LayeredDrawerWrapper layeredDrawer) -> {
                 layeredDrawer.attachLayerBefore(IdentifiedLayer.MISC_OVERLAYS, IdentifiedLayer.of(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     callback.onBeforeRenderGui(Minecraft.getInstance().gui, guiGraphics, deltaTracker);
                 }));
             };
-        });
-        INSTANCE.register(RenderGuiEvents.After.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.After callback) -> {
+        }, EventPhase::early, false);
+        INSTANCE.register(RenderGuiEvents.After.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.After callback, @Nullable Object context) -> {
             return (LayeredDrawerWrapper layeredDrawer) -> {
                 layeredDrawer.addLayer(IdentifiedLayer.of(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     callback.onAfterRenderGui(Minecraft.getInstance().gui, guiGraphics, deltaTracker);
                 }));
             };
-        });
+        }, EventPhase::late, false);
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, (ItemTooltipCallback callback) -> {
             return (ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag context, List<Component> lines) -> {
                 callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);

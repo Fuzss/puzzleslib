@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.impl.command;
+package fuzs.puzzleslib.impl.content;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;

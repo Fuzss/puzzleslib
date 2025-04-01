@@ -21,21 +21,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class EditBoxMixin extends AbstractWidget {
     @Shadow
     @Final
-    public Font font;
+    private Font font;
     @Shadow
-    public String value;
+    private String value;
     @Shadow
-    public boolean bordered;
+    private boolean bordered;
     @Shadow
-    public int displayPos;
+    private int displayPos;
     @Shadow
-    public int cursorPos;
+    private int cursorPos;
     @Shadow
-    public int highlightPos;
-    protected long lastClickTime;
-    protected boolean doubleClick;
-    protected int doubleClickHighlightPos;
-    protected int doubleClickCursorPos;
+    private int highlightPos;
+    private long lastClickTime;
+    private boolean doubleClick;
+    private int doubleClickHighlightPos;
+    private int doubleClickCursorPos;
 
     public EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);

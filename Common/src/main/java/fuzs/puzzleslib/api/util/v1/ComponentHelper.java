@@ -8,9 +8,11 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 
 /**
  * A helper class for converting various text representations.
@@ -105,7 +107,8 @@ public class ComponentHelper {
      * Split a text component into multiple parts depending on a predefined max width.
      * <p>
      * Most useful for constructing item tooltips in
-     * {@link net.minecraft.world.item.Item#appendHoverText(ItemStack, Item.TooltipContext, List, TooltipFlag)}.
+     * {@link net.minecraft.world.item.Item#appendHoverText(ItemStack, Item.TooltipContext, TooltipDisplay, Consumer,
+     * TooltipFlag)}.
      * <p>
      * Always returns the unmodified component on the server.
      *

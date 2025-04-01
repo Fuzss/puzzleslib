@@ -15,7 +15,6 @@ import java.util.Set;
 public class MixinConfigPluginImpl implements IMixinConfigPlugin {
     private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("EnchantCommandMixin",
             "client.EditBoxMixin",
-            "client.ClientSuggestionProviderMixin",
             "server.DedicatedServerSettingsMixin",
             "server.EulaMixin");
 

@@ -42,6 +42,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -214,14 +215,21 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public void registerConfigTranslations(String modId) {
-        ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
-            if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                ConfigTranslationsManager.addModConfig(modConfig.getModId(),
-                        modConfig.getType().extension(),
-                        modConfig.getFileName(),
-                        modConfigSpec);
-            }
+    public void registerConfigurationScreenForHolder(String modId) {
+        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
+            eventBus.addListener((final FMLClientSetupEvent evt) -> {
+                evt.enqueueWork(() -> {
+                    super.registerConfigurationScreenForHolder(modId);
+                    ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
+                        if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
+                            ConfigTranslationsManager.addModConfig(modConfig.getModId(),
+                                    modConfig.getType().extension(),
+                                    modConfig.getFileName(),
+                                    modConfigSpec);
+                        }
+                    });
+                });
+            });
         });
     }
 

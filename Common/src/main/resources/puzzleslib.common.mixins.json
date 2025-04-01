@@ -8,8 +8,7 @@
     "EnchantCommandMixin"
   ],
   "client": [
-    "client.EditBoxMixin",
-    "client.ClientSuggestionProviderMixin"
+    "client.EditBoxMixin"
   ],
   "server": [
     "server.DedicatedServerSettingsMixin",

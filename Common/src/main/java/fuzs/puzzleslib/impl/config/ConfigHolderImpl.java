@@ -90,8 +90,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
             if (holder.config != null) this.bake(holder, this.modId);
         }
-        ConfigHolder.registerConfigurationScreen(this.modId);
-        ProxyImpl.get().registerConfigTranslations(this.modId);
+        ProxyImpl.get().registerConfigurationScreenForHolder(this.modId);
     }
 
     protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
