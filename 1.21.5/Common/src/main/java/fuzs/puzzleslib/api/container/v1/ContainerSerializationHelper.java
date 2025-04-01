@@ -4,7 +4,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.SimpleContainer;
@@ -83,8 +82,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
                 container.getContainerSize(),
                 container::getItem,
                 saveEmpty,
-                lookupProvider
-        );
+                lookupProvider);
     }
 
     /**
@@ -211,7 +209,7 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      * @param itemSetter set items to the provider
      */
     public static void loadAllItems(String tagKey, CompoundTag tag, int size, ObjIntConsumer<ItemStack> itemSetter, HolderLookup.Provider lookupProvider) {
-        ListTag listTag = tag.getList(tagKey, Tag.TAG_COMPOUND);
+        ListTag listTag = tag.getListOrEmpty(tagKey);
         fromTag(listTag, size, itemSetter, lookupProvider);
     }
 
@@ -226,8 +224,8 @@ public final class ContainerSerializationHelper extends ContainerHelper {
      */
     public static void fromTag(ListTag listTag, int size, ObjIntConsumer<ItemStack> itemSetter, HolderLookup.Provider lookupProvider) {
         for (int i = 0; i < listTag.size(); ++i) {
-            CompoundTag compoundTag = listTag.getCompound(i);
-            int slot = compoundTag.getByte(TAG_SLOT) & 255;
+            CompoundTag compoundTag = listTag.getCompoundOrEmpty(i);
+            int slot = compoundTag.getByteOr(TAG_SLOT, (byte) 0) & 255;
             if (slot < size) {
                 itemSetter.accept(ItemStack.parse(lookupProvider, compoundTag).orElse(ItemStack.EMPTY), slot);
             }

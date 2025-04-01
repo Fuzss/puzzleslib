@@ -9,11 +9,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.ai.goal.GoalSelector;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -25,12 +23,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(Mob.class)
 abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     @Shadow
-    @Final
-    protected GoalSelector goalSelector;
-    @Shadow
-    @Final
-    protected GoalSelector targetSelector;
-    @Shadow
     @Nullable
     private LivingEntity target;
     @Unique
@@ -39,14 +31,6 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
 
     protected MobFabricMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
-    }
-
-    @Inject(method = "<init>", at = @At("TAIL"))
-    protected void init(EntityType<? extends Mob> entityType, Level level, CallbackInfo callback) {
-        if (level instanceof ServerLevel) {
-            FabricLivingEvents.SETUP_MOB_GOALS.invoker()
-                    .onSetupMobGoals(Mob.class.cast(this), this.goalSelector, this.targetSelector);
-        }
     }
 
     @Inject(method = "finalizeSpawn", at = @At("TAIL"))
@@ -109,7 +93,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         String key = PuzzlesLibMod.id("spawn_type").toString();
         if (compound.contains(key)) {
             try {
-                this.puzzleslib$spawnType = EntitySpawnReason.valueOf(compound.getString(key));
+                this.puzzleslib$spawnType = EntitySpawnReason.valueOf(compound.getString(key).orElseThrow());
             } catch (Exception exception) {
                 compound.remove(key);
             }

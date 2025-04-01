@@ -3,7 +3,7 @@ package fuzs.puzzleslib.api.biome.v1;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.Music;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.random.SimpleWeightedRandomList;
+import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.level.biome.AmbientAdditionsSettings;
 import net.minecraft.world.level.biome.AmbientMoodSettings;
 import net.minecraft.world.level.biome.AmbientParticleSettings;
@@ -262,19 +262,19 @@ public interface SpecialEffectsContext {
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    void setBackgroundMusic(Optional<SimpleWeightedRandomList<Music>> backgroundMusic);
+    void setBackgroundMusic(Optional<WeightedList<Music>> backgroundMusic);
 
     /**
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    Optional<SimpleWeightedRandomList<Music>> getBackgroundMusic();
+    Optional<WeightedList<Music>> getBackgroundMusic();
 
     /**
      * @see BiomeSpecialEffects#getBackgroundMusic()
      * @see BiomeSpecialEffects.Builder#backgroundMusic(Music)
      */
-    default void setBackgroundMusic(SimpleWeightedRandomList<Music> backgroundMusic) {
+    default void setBackgroundMusic(WeightedList<Music> backgroundMusic) {
         Objects.requireNonNull(backgroundMusic, "background music is null");
         this.setBackgroundMusic(Optional.of(backgroundMusic));
     }

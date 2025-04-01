@@ -51,7 +51,8 @@ public final class ContainerMenuHelper {
     public static void setSelectedSlotLocked(AbstractContainerMenu containerMenu) {
         for (int i = 0; i < containerMenu.slots.size(); i++) {
             Slot slot = containerMenu.slots.get(i);
-            if (slot.container instanceof Inventory inventory && inventory.selected == slot.getContainerSlot()) {
+            if (slot.container instanceof Inventory inventory &&
+                    inventory.getSelectedSlot() == slot.getContainerSlot()) {
                 NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container,
                         slot.getContainerSlot(),
                         slot.x,

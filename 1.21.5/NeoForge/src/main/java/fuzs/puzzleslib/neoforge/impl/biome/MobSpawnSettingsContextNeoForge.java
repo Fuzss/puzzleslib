@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.biome;
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
 import fuzs.puzzleslib.neoforge.mixin.accessor.MobSpawnSettingsBuilderNeoForgeAccessor;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -21,16 +22,20 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
     }
 
     @Override
-    public void addSpawn(MobCategory mobCategory, MobSpawnSettings.SpawnerData spawnerData) {
-        this.context.addSpawn(mobCategory, spawnerData);
+    public void addSpawn(MobCategory mobCategory, int weight, MobSpawnSettings.SpawnerData spawnerData) {
+        this.context.addSpawn(mobCategory, weight, spawnerData);
     }
 
     @Override
-    public boolean removeSpawns(BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> predicate) {
+    public boolean removeSpawns(BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> filter) {
         boolean anyRemoved = false;
 
-        for (MobCategory group : this.context.getSpawnerTypes()) {
-            if (this.context.getSpawner(group).removeIf(entry -> predicate.test(group, entry))) {
+        for (MobCategory mobCategory : this.context.getSpawnerTypes()) {
+            if (this.context.getSpawner(mobCategory)
+                    .getList()
+                    .removeIf((Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> {
+                        return filter.test(mobCategory, spawnerData.value());
+                    })) {
                 anyRemoved = true;
             }
         }
@@ -45,19 +50,23 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
 
     @Override
     public boolean clearSpawnCost(EntityType<?> entityType) {
-        return ((MobSpawnSettingsBuilderNeoForgeAccessor) this.context).puzzleslib$getMobSpawnCosts().remove(entityType) != null;
+        return ((MobSpawnSettingsBuilderNeoForgeAccessor) this.context).puzzleslib$getMobSpawnCosts()
+                .remove(entityType) != null;
     }
 
     @Override
     public Set<MobCategory> getMobCategoriesWithSpawns() {
         // This implementation does not provide a view, which is necessary to be able to filter out empty mob categories.
         // Otherwise, the implementation would simply return MobCategory::values.
-        return this.context.getSpawnerTypes().stream().filter(mobCategory -> !this.context.getSpawner(mobCategory).isEmpty()).collect(ImmutableSet.toImmutableSet());
+        return this.context.getSpawnerTypes()
+                .stream()
+                .filter((MobCategory mobCategory) -> !this.context.getSpawner(mobCategory).getList().isEmpty())
+                .collect(ImmutableSet.toImmutableSet());
     }
 
     @Override
-    public List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory mobCategory) {
-        return this.context.getSpawner(mobCategory);
+    public List<Weighted<MobSpawnSettings.SpawnerData>> getSpawnerData(MobCategory mobCategory) {
+        return this.context.getSpawner(mobCategory).getList();
     }
 
     @Override

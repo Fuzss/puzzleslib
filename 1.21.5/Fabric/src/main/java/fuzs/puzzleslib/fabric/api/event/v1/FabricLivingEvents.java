@@ -146,10 +146,6 @@ public final class FabricLivingEvents {
      * Fired when an entity attempts to find a valid projectile via {@link LivingEntity#getProjectile(ItemStack)}.
      */
     public static final Event<PickProjectileCallback> PICK_PROJECTILE = FabricEventFactory.create(PickProjectileCallback.class);
-    /**
-     * Called after goals have been registered for a mob. Useful for adding new goals and modifying existing ones.
-     */
-    public static final Event<SetupMobGoalsCallback> SETUP_MOB_GOALS = FabricEventFactory.create(SetupMobGoalsCallback.class);
 
     private FabricLivingEvents() {
         // NO-OP

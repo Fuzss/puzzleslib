@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.LidBlockEntity;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,11 +42,11 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
     }
 
     @Override
-    public final void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public final void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPosition) {
         this.blockEntity = blockEntity;
         this.partialTick = partialTick;
         this.bufferSource = bufferSource;
-        super.render(blockEntity, partialTick, poseStack, bufferSource, packedLight, packedOverlay);
+        super.render(blockEntity, partialTick, poseStack, bufferSource, packedLight, packedOverlay, cameraPosition);
         this.blockEntity = null;
         this.partialTick = null;
         this.bufferSource = null;

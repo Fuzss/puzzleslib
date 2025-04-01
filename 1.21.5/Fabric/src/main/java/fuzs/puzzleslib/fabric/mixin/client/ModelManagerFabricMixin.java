@@ -17,7 +17,7 @@ abstract class ModelManagerFabricMixin {
     @Inject(
             method = "apply", at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/client/resources/model/ModelManager;missingItemModel:Lnet/minecraft/client/renderer/item/ItemModel;",
+            target = "Lnet/minecraft/client/resources/model/ModelManager;missingModels:Lnet/minecraft/client/resources/model/ModelBakery$MissingModels;",
             shift = At.Shift.AFTER
     )
     )

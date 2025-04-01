@@ -18,8 +18,10 @@ public interface LookingAtEndermanCallback {
      *
      * @param enderman the enderman being look at
      * @param player   the player looking at the enderman
-     * @return {@link EventResult#INTERRUPT INTERRUPT} to prevent the enderman from being angered and targeting the
-     *         player, {@link EventResult#PASS PASS} to let the enderman become angry
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the enderman from being angered and targeting the player</li>
+     *         <li>{@link EventResult#PASS PASS} to let the enderman become angry</li>
+     *         </ul>
      */
     EventResult onLookingAtEnderManCallback(EnderMan enderman, Player player);
 }

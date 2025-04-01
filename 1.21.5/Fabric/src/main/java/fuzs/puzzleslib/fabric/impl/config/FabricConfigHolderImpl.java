@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.config;
 
 import com.electronwill.nightconfig.core.file.FileWatcher;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeConfigRegistry;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.NeoForgeModConfigEvents;
+import fuzs.forgeconfigapiport.fabric.api.v5.ConfigRegistry;
+import fuzs.forgeconfigapiport.fabric.api.v5.ModConfigEvents;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -37,15 +37,15 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected void bake(ConfigDataHolderImpl<?> holder, String modId) {
-        NeoForgeModConfigEvents.loading(modId).register((ModConfig config) -> {
+        ModConfigEvents.loading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
                     ConfigDataHolderImpl.ModConfigEventType.LOADING);
         });
-        NeoForgeModConfigEvents.reloading(modId).register((ModConfig config) -> {
+        ModConfigEvents.reloading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
                     ConfigDataHolderImpl.ModConfigEventType.RELOADING);
         });
-        NeoForgeModConfigEvents.unloading(modId).register((ModConfig config) -> {
+        ModConfigEvents.unloading(modId).register((ModConfig config) -> {
             ((FabricConfigDataHolderImpl<?>) holder).onModConfig(config,
                     ConfigDataHolderImpl.ModConfigEventType.UNLOADING);
         });
@@ -86,7 +86,7 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
         @Override
         protected ModConfigSpec register(String modId) {
             ModConfigSpec modConfigSpec = super.register(modId);
-            NeoForgeConfigRegistry.INSTANCE.register(modId, this.configType, modConfigSpec, this.getFileName());
+            ConfigRegistry.INSTANCE.register(modId, this.configType, modConfigSpec, this.getFileName());
             return modConfigSpec;
         }
     }

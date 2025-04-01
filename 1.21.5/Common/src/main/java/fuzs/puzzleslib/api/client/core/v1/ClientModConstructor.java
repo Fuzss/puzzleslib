@@ -95,13 +95,6 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context add external models to be loaded
-     */
-    default void onRegisterAdditionalModels(AdditionalModelsContext context) {
-        // NO-OP
-    }
-
-    /**
      * @param context register a resolver responsible for mapping each {@link BlockState} of a block to an
      *                {@link net.minecraft.client.renderer.block.model.UnbakedBlockStateModel}
      */
@@ -186,13 +179,6 @@ public interface ClientModConstructor {
      * @param context register additional resource pack sources
      */
     default void onAddResourcePackFinders(PackRepositorySourcesContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register new resource pack provided shaders
-     */
-    default void onRegisterCoreShaders(CoreShadersContext context) {
         // NO-OP
     }
 

@@ -78,9 +78,6 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
                 modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(evt::registerLayerDefinition));
             });
-            eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
-                modConstructor.onRegisterAdditionalModels(new AdditionalModelsContextNeoForgeImpl(evt));
-            });
             eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
                 modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextNeoForgeImpl(evt));
             });
@@ -112,9 +109,6 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
                     modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextNeoForgeImpl(evt));
                 }
-            });
-            eventBus.addListener((final RegisterShadersEvent evt) -> {
-                modConstructor.onRegisterCoreShaders(new CoreShadersContextNeoForgeImpl(evt::registerShader));
             });
             eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
                 modConstructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));

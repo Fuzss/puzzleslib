@@ -115,7 +115,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                     callback.onComputeItemAttributeModifiers(item, entries);
                     if (entries.delegate() != itemAttributeModifiers.modifiers()) {
                         context.modify(item, (DataComponentMap.Builder builder) -> {
-                            builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
+                            builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries)));
                         });
                     }
                 }
@@ -170,8 +170,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, (PlayerInteractEvents.UseBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
-                EventResultHolder<InteractionResult> result = callback.onUseBlock(player, level, hand, hitResult);
-                return result.getInterrupt().map((InteractionResult interactionResult) -> {
+                EventResultHolder<InteractionResult> eventResult = callback.onUseBlock(player, level, hand, hitResult);
+                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -190,10 +190,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, (PlayerInteractEvents.AttackBlock callback) -> {
             return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
                 if (!level.isClientSide || player.isCreative() || FabricProxy.get().shouldStartDestroyBlock(pos)) {
-                    EventResult result = callback.onAttackBlock(player, level, hand, pos, direction);
+                    EventResult eventResult = callback.onAttackBlock(player, level, hand, pos, direction);
                     // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
                     // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
-                    return result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
+                    return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
                 } else {
                     return InteractionResult.PASS;
                 }
@@ -201,15 +201,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, (PlayerInteractEvents.UseItem callback) -> {
             return (Player player, Level level, InteractionHand hand) -> {
-                // parity with Forge, result item stack does not matter for Fabric implementation when result is pass
+                // parity with Forge, eventResult item stack does not matter for Fabric implementation when eventResult is pass
                 if (player.isSpectator()) {
                     return InteractionResult.PASS;
                 } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand))) {
                     return InteractionResult.PASS;
                 }
 
-                EventResultHolder<InteractionResult> result = callback.onUseItem(player, level, hand);
-                return result.getInterrupt().map((InteractionResult interactionResult) -> {
+                EventResultHolder<InteractionResult> eventResult = callback.onUseItem(player, level, hand);
+                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -241,8 +241,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult != null) return InteractionResult.PASS;
-                EventResultHolder<InteractionResult> result = callback.onUseEntity(player, level, hand, entity);
-                return result.getInterrupt().map((InteractionResult interactionResult) -> {
+                EventResultHolder<InteractionResult> eventResult = callback.onUseEntity(player, level, hand, entity);
+                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -262,13 +262,13 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                 // Fabric handles two possible cases in one event, here we separate them again
                 if (hitResult == null) return InteractionResult.PASS;
-                EventResultHolder<InteractionResult> result = callback.onUseEntityAt(player,
+                EventResultHolder<InteractionResult> eventResult = callback.onUseEntityAt(player,
                         level,
                         hand,
                         entity,
                         hitResult.getLocation()
                 );
-                return result.getInterrupt().map((InteractionResult interactionResult) -> {
+                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
                     if (interactionResult == InteractionResult.PASS) {
                         // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
                         // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
@@ -286,10 +286,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, (PlayerInteractEvents.AttackEntity callback) -> {
             return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                EventResult result = callback.onAttackEntity(player, level, hand, entity);
+                EventResult eventResult = callback.onAttackEntity(player, level, hand, entity);
                 // this isn't a proper item use callback (seen with the server-side and Forge implementations), so the return looks a little odd
                 // we return InteractionResult#SUCCESS so the packet is sent to the server either way so the server may handle this on its own as Forge does
-                return result.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
+                return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
             };
         });
         INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_XP);
@@ -299,8 +299,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
                 if (!(level instanceof ServerLevel serverLevel)) return true;
                 if (!(player instanceof ServerPlayer serverPlayer)) return true;
-                EventResult result = callback.onBreakBlock(serverLevel, pos, state, serverPlayer, player.getMainHandItem());
-                return result.isPass();
+                EventResult eventResult = callback.onBreakBlock(serverLevel, pos, state, serverPlayer, player.getMainHandItem());
+                return eventResult.isPass();
             };
         });
         INSTANCE.register(BlockEvents.DropExperience.class, FabricLevelEvents.DROP_BLOCK_EXPERIENCE);
@@ -461,7 +461,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
             applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
         }, UnaryOperator.identity(), false);
-        INSTANCE.register(SetupMobGoalsCallback.class, FabricLivingEvents.SETUP_MOB_GOALS);
     }
 
     @Override

@@ -237,9 +237,6 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Shadow
     public abstract boolean isInvulnerableTo(ServerLevel serverLevel, DamageSource damageSource);
 
-    @Shadow
-    public abstract boolean isDamageSourceBlocked(DamageSource damageSource);
-
     @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
     public void hurtServer(ServerLevel serverLevel, DamageSource damageSource, float damageAmount, CallbackInfoReturnable<Boolean> callback) {
         EventResult result = FabricLivingEvents.LIVING_ATTACK.invoker()

@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
@@ -11,9 +10,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.animal.horse.AbstractHorse;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -23,7 +20,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.Collection;
 import java.util.OptionalInt;
 
 @Mixin(ServerPlayer.class)
@@ -33,27 +29,10 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         super(level, pos, yRot, gameProfile);
     }
 
-    @WrapWithCondition(
-            method = "drop",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
-            )
-    )
-    public boolean drop(Level level, Entity entity) {
-        Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
-        if (capturedDrops != null) {
-            capturedDrops.add((ItemEntity) entity);
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
-        EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
-        if (result.isInterrupt()) callback.cancel();
+        EventResult eventResult = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
+        if (eventResult.isInterrupt()) callback.cancel();
     }
 
     @Inject(method = "openMenu", at = @At("TAIL"))
@@ -74,8 +53,7 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
     )
     )
     public void doCloseContainer(CallbackInfo callback) {
-        FabricPlayerEvents.CONTAINER_CLOSE.invoker().onContainerClose(ServerPlayer.class.cast(this),
-                this.containerMenu
-        );
+        FabricPlayerEvents.CONTAINER_CLOSE.invoker()
+                .onContainerClose(ServerPlayer.class.cast(this), this.containerMenu);
     }
 }

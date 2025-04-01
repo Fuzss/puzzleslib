@@ -59,9 +59,9 @@ public abstract class AbstractModelProvider implements DataProvider {
 
     private BlockModelGenerators setupBlockModelGenerators(BlockModelGenerators blockModelGenerators) {
         // make all these mutable, so it is possibly to add our own entries
-        blockModelGenerators.nonOrientableTrapdoor = new ArrayList<>(blockModelGenerators.nonOrientableTrapdoor);
-        blockModelGenerators.fullBlockModelCustomGenerators = new HashMap<>(blockModelGenerators.fullBlockModelCustomGenerators);
-        blockModelGenerators.texturedModels = new HashMap<>(blockModelGenerators.texturedModels);
+        BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR = new ArrayList<>(BlockModelGenerators.NON_ORIENTABLE_TRAPDOOR);
+        BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS = new HashMap<>(BlockModelGenerators.FULL_BLOCK_MODEL_CUSTOM_GENERATORS);
+        BlockModelGenerators.TEXTURED_MODELS = new HashMap<>(BlockModelGenerators.TEXTURED_MODELS);
         return blockModelGenerators;
     }
 

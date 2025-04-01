@@ -22,7 +22,6 @@ import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
-import fuzs.puzzleslib.fabric.mixin.accessor.ServerCommonPacketListenerImplFabricAccessor;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -83,7 +82,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -180,8 +178,8 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     @MustBeInvokedByOverriders
     @Override
     public Connection getConnection(PacketListener packetListener) {
-        return packetListener instanceof ServerCommonPacketListenerImpl ?
-                ((ServerCommonPacketListenerImplFabricAccessor) packetListener).puzzleslib$getConnection() : null;
+        return packetListener instanceof ServerCommonPacketListenerImpl serverPacketListener ?
+                serverPacketListener.connection : null;
     }
 
     @Override

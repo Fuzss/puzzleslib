@@ -2,9 +2,8 @@ package fuzs.puzzleslib.fabric.impl.client.event;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import com.mojang.blaze3d.systems.RenderSystem;
-import fuzs.puzzleslib.fabric.api.client.event.v1.registry.ItemDecoratorRegistry;
 import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
+import fuzs.puzzleslib.fabric.api.client.event.v1.registry.ItemDecoratorRegistry;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.Item;
@@ -25,21 +24,12 @@ public final class ItemDecoratorRegistryImpl implements ItemDecoratorRegistry {
         DECORATORS.put(item.asItem(), itemDecorator);
     }
 
-    public static void render(GuiGraphics guiGraphics, Font font, ItemStack stack, int itemPosX, int itemPosY) {
-        Collection<DynamicItemDecorator> dynamicItemDecorators = DECORATORS.get(stack.getItem());
+    public static void render(GuiGraphics guiGraphics, Font font, ItemStack itemStack, int itemPosX, int itemPosY) {
+        Collection<DynamicItemDecorator> dynamicItemDecorators = DECORATORS.get(itemStack.getItem());
         if (!dynamicItemDecorators.isEmpty()) {
-            resetRenderState();
             for (DynamicItemDecorator itemDecorator : dynamicItemDecorators) {
-                if (itemDecorator.renderItemDecorations(guiGraphics, font, stack, itemPosX, itemPosY)) {
-                    resetRenderState();
-                }
+                itemDecorator.renderItemDecorations(guiGraphics, font, itemStack, itemPosX, itemPosY);
             }
         }
-    }
-
-    private static void resetRenderState() {
-        RenderSystem.enableDepthTest();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
     }
 }

@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.event.v1.level;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.core.Holder;
 import net.minecraft.sounds.SoundEvent;
@@ -27,7 +27,7 @@ public final class PlayLevelSoundEvents {
          *
          * @param level       the current level
          * @param position    the position the sound is to be played at
-         * @param soundEvent  the sound event, can be replaced
+         * @param soundEvent  the sound event
          * @param soundSource the sound source
          * @param soundVolume the sound volume
          * @param soundPitch  the sound pitch
@@ -36,7 +36,7 @@ public final class PlayLevelSoundEvents {
          *         <li>{@link EventResult#PASS PASS} to allow the sound to play normally</li>
          *         </ul>
          */
-        EventResult onPlaySoundAtPosition(Level level, Vec3 position, MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, DefaultedFloat soundVolume, DefaultedFloat soundPitch);
+        EventResult onPlaySoundAtPosition(Level level, Vec3 position, MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch);
     }
 
     @FunctionalInterface
@@ -47,7 +47,7 @@ public final class PlayLevelSoundEvents {
          *
          * @param level       the current level
          * @param entity      the entity the sound is playing from
-         * @param soundEvent  the sound event, can be replaced
+         * @param soundEvent  the sound event
          * @param soundSource the sound source
          * @param soundVolume the sound volume
          * @param soundPitch  the sound pitch
@@ -56,6 +56,6 @@ public final class PlayLevelSoundEvents {
          *         <li>{@link EventResult#PASS PASS} to allow the sound to play normally</li>
          *         </ul>
          */
-        EventResult onPlaySoundAtEntity(Level level, Entity entity, MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, DefaultedFloat soundVolume, DefaultedFloat soundPitch);
+        EventResult onPlaySoundAtEntity(Level level, Entity entity, MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch);
     }
 }

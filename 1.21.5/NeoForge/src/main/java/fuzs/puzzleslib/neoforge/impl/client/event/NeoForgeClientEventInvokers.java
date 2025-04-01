@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.mojang.blaze3d.shaders.FogShape;
-import fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback;
-import fuzs.puzzleslib.api.client.event.v1.ClientSetupCallback;
-import fuzs.puzzleslib.api.client.event.v1.ClientTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.InputEvents;
+import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
@@ -38,6 +35,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
+import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
+import net.neoforged.neoforge.client.event.lifecycle.ClientStoppingEvent;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
@@ -65,11 +64,11 @@ public final class NeoForgeClientEventInvokers {
             });
         });
         INSTANCE.register(ScreenOpeningCallback.class, ScreenEvent.Opening.class, (ScreenOpeningCallback callback, ScreenEvent.Opening evt) -> {
-            EventResultHolder<Screen> result = callback.onScreenOpening(evt.getCurrentScreen(), evt.getNewScreen());
+            EventResultHolder<Screen> eventResult = callback.onScreenOpening(evt.getCurrentScreen(), evt.getNewScreen());
             // returning the current screen should ideally cause no change at all,
             // which is implemented fine on NeoForge via cancelling the event,
             // on Fabric though the screen will be initialized again, after Screen::remove having been called
-            result.ifInterrupt((Screen screen) -> {
+            eventResult.ifInterrupt((Screen screen) -> {
                 if (screen == evt.getCurrentScreen()) {
                     evt.setCanceled(true);
                 } else {
@@ -84,6 +83,12 @@ public final class NeoForgeClientEventInvokers {
             evt.registerEntityModifier((Class<? extends EntityRenderer<? extends Entity, ? extends EntityRenderState>>) (Class<?>) EntityRenderer.class, (Entity entity, EntityRenderState entityRenderState) -> {
                 callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
             });
+        });
+        INSTANCE.register(ClientLifecycleEvents.Started.class, ClientStartedEvent.class, (ClientLifecycleEvents.Started callback, ClientStartedEvent evt) -> {
+            callback.onClientStarted(evt.getClient());
+        });
+        INSTANCE.register(ClientLifecycleEvents.Stopping.class, ClientStoppingEvent.class, (ClientLifecycleEvents.Stopping callback, ClientStoppingEvent evt) -> {
+            callback.onClientStopping(evt.getClient());
         });
         INSTANCE.register(ClientSetupCallback.class, FMLClientSetupEvent.class, (ClientSetupCallback callback, FMLClientSetupEvent evt) -> {
             evt.enqueueWork(callback::onClientSetup);
@@ -108,8 +113,8 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(
                 RenderNameTagCallback.class, RenderNameTagEvent.DoRender.class, (RenderNameTagCallback callback, RenderNameTagEvent.DoRender evt) -> {
-                    EventResult result = callback.onRenderNameTag(evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
-                    if (result.isInterrupt()) evt.setCanceled(true);
+                    EventResult eventResult = callback.onRenderNameTag(evt.getEntityRenderState(), evt.getContent(), evt.getEntityRenderer(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+                    if (eventResult.isInterrupt()) evt.setCanceled(true);
                 });
         INSTANCE.register(ContainerScreenEvents.Background.class, ContainerScreenEvent.Render.Background.class, (ContainerScreenEvents.Background callback, ContainerScreenEvent.Render.Background evt) -> {
             callback.onDrawBackground(evt.getContainerScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY());
@@ -120,8 +125,8 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(InventoryMobEffectsCallback.class, ScreenEvent.RenderInventoryMobEffects.class, (InventoryMobEffectsCallback callback, ScreenEvent.RenderInventoryMobEffects evt) -> {
             MutableBoolean fullSizeRendering = MutableBoolean.fromEvent(evt::setCompact, evt::isCompact);
             MutableInt horizontalOffset = MutableInt.fromEvent(evt::setHorizontalOffset, evt::getHorizontalOffset);
-            EventResult result = callback.onInventoryMobEffects(evt.getScreen(), evt.getAvailableSpace(), fullSizeRendering, horizontalOffset);
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onInventoryMobEffects(evt.getScreen(), evt.getAvailableSpace(), fullSizeRendering, horizontalOffset);
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ComputeFovModifierCallback.class, ComputeFovModifierEvent.class, (ComputeFovModifierCallback callback, ComputeFovModifierEvent evt) -> {
             float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
@@ -152,43 +157,43 @@ public final class NeoForgeClientEventInvokers {
             callback.onAfterRender(evt.getScreen(), evt.getGuiGraphics(), evt.getMouseX(), evt.getMouseY(), evt.getPartialTick());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class, ScreenEvent.MouseButtonPressed.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeMouseClick(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeMouseClick(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenMouseEvents.AfterMouseClick.class, ScreenEvent.MouseButtonPressed.Post.class, (callback, evt) -> {
             callback.onAfterMouseClick(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseRelease.class, ScreenEvent.MouseButtonReleased.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeMouseRelease(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeMouseRelease(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenMouseEvents.AfterMouseRelease.class, ScreenEvent.MouseButtonReleased.Post.class, (callback, evt) -> {
             callback.onAfterMouseRelease(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getButton());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class, ScreenEvent.MouseScrolled.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDeltaX(), evt.getScrollDeltaY());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDeltaX(), evt.getScrollDeltaY());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class, ScreenEvent.MouseScrolled.Post.class, (callback, evt) -> {
             callback.onAfterMouseScroll(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getScrollDeltaX(), evt.getScrollDeltaY());
         });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class, ScreenEvent.MouseDragged.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class, ScreenEvent.MouseDragged.Post.class, (callback, evt) -> {
             callback.onAfterMouseDrag(evt.getScreen(), evt.getMouseX(), evt.getMouseY(), evt.getMouseButton(), evt.getDragX(), evt.getDragY());
         });
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class, ScreenEvent.KeyPressed.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeKeyPress(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeKeyPress(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyPress.class, ScreenEvent.KeyPressed.Post.class, (callback, evt) -> {
             callback.onAfterKeyPress(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
         });
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyRelease.class, ScreenEvent.KeyReleased.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, ScreenEvent.KeyReleased.Post.class, (callback, evt) -> {
             callback.onAfterKeyRelease(evt.getScreen(), evt.getKeyCode(), evt.getScanCode(), evt.getModifiers());
@@ -197,8 +202,8 @@ public final class NeoForgeClientEventInvokers {
             Objects.requireNonNull(context, "context is null");
             ResourceLocation resourceLocation = (ResourceLocation) context;
             if (!evt.getName().equals(resourceLocation) || Minecraft.getInstance().options.hideGui) return;
-            EventResult result = callback.onBeforeRenderGuiLayer(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeRenderGuiLayer(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderGuiLayerEvents.After.class, RenderGuiLayerEvent.Post.class, (RenderGuiLayerEvents.After callback, RenderGuiLayerEvent.Post evt, @Nullable Object context) -> {
             Objects.requireNonNull(context, "context is null");
@@ -213,8 +218,8 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ClientEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
-            EventResult result = callback.onEntityLoad(evt.getEntity(), clientLevel);
-            if (result.isInterrupt()) {
+            EventResult eventResult = callback.onEntityLoad(evt.getEntity(), clientLevel);
+            if (eventResult.isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -229,16 +234,16 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(
                 InputEvents.MouseClick.class, InputEvent.MouseButton.Pre.class, (InputEvents.MouseClick callback, InputEvent.MouseButton.Pre evt) -> {
-            EventResult result = callback.onMouseClick(evt.getButton(), evt.getAction(), evt.getModifiers());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onMouseClick(evt.getButton(), evt.getAction(), evt.getModifiers());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(
                 InputEvents.MouseScroll.class, InputEvent.MouseScrollingEvent.class, (InputEvents.MouseScroll callback, InputEvent.MouseScrollingEvent evt) -> {
-            EventResult result = callback.onMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDeltaX(), evt.getScrollDeltaY());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onMouseScroll(evt.isLeftDown(), evt.isMiddleDown(), evt.isRightDown(), evt.getScrollDeltaX(), evt.getScrollDeltaY());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(InputEvents.KeyPress.class, InputEvent.Key.class, (InputEvents.KeyPress callback, InputEvent.Key evt) -> {
-            // result is ignored, as before event doesn't exist on NeoForge, so there is nothing to cancel the input
+            // eventResult is ignored, as before event doesn't exist on NeoForge, so there is nothing to cancel the input
             callback.onKeyPress(evt.getKey(), evt.getScanCode(), evt.getAction(), evt.getModifiers());
         });
         INSTANCE.register(ComputeCameraAnglesCallback.class, ViewportEvent.ComputeCameraAngles.class, (ComputeCameraAnglesCallback callback, ViewportEvent.ComputeCameraAngles evt) -> {
@@ -248,8 +253,8 @@ public final class NeoForgeClientEventInvokers {
             callback.onComputeCameraAngles(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), pitch, yaw, roll);
         });
         INSTANCE.register(RenderLivingEvents.Before.class, RenderLivingEvent.Pre.class, (callback, evt) -> {
-            EventResult result = callback.onBeforeRenderEntity(evt.getRenderState(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onBeforeRenderEntity(evt.getRenderState(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderLivingEvents.After.class, RenderLivingEvent.Post.class, (callback, evt) -> {
             callback.onAfterRenderEntity(evt.getRenderState(), evt.getRenderer(), evt.getPartialTick(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight());
@@ -258,15 +263,15 @@ public final class NeoForgeClientEventInvokers {
             if (evt.getHand() != InteractionHand.MAIN_HAND) return;
             Minecraft minecraft = Minecraft.getInstance();
             ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
-            EventResult result = callback.onRenderMainHand(itemInHandRenderer, evt.getHand(), minecraft.player, minecraft.player.getMainArm(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onRenderMainHand(itemInHandRenderer, evt.getHand(), minecraft.player, minecraft.player.getMainArm(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderHandEvents.OffHand.class, RenderHandEvent.class, (RenderHandEvents.OffHand callback, RenderHandEvent evt) -> {
             if (evt.getHand() != InteractionHand.OFF_HAND) return;
             Minecraft minecraft = Minecraft.getInstance();
             ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
-            EventResult result = callback.onRenderOffHand(itemInHandRenderer, evt.getHand(), minecraft.player, minecraft.player.getMainArm().getOpposite(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onRenderOffHand(itemInHandRenderer, evt.getHand(), minecraft.player, minecraft.player.getMainArm().getOpposite(), evt.getItemStack(), evt.getPoseStack(), evt.getMultiBufferSource(), evt.getPackedLight(), evt.getPartialTick(), evt.getInterpolatedPitch(), evt.getSwingProgress(), evt.getEquipProgress());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(ClientLevelTickEvents.Start.class, LevelTickEvent.Pre.class, (ClientLevelTickEvents.Start callback, LevelTickEvent.Pre evt) -> {
             if (!(evt.getLevel() instanceof ClientLevel clientLevel)) return;
@@ -299,8 +304,8 @@ public final class NeoForgeClientEventInvokers {
             if (!evt.isAttack()) return;
             Minecraft minecraft = Minecraft.getInstance();
             if (minecraft.hitResult != null) {
-                EventResult result = callback.onAttackInteraction(minecraft, minecraft.player, minecraft.hitResult);
-                if (result.isInterrupt()) {
+                EventResult eventResult = callback.onAttackInteraction(minecraft, minecraft.player, minecraft.hitResult);
+                if (eventResult.isInterrupt()) {
                     // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
                     // just manually send swing hand packet if necessary
                     evt.setSwingHand(false);
@@ -314,8 +319,8 @@ public final class NeoForgeClientEventInvokers {
             // add in more checks that also run on Fabric
             if (minecraft.hitResult != null && minecraft.player.getItemInHand(evt.getHand()).isItemEnabled(minecraft.level.enabledFeatures())) {
                 if (minecraft.hitResult.getType() != HitResult.Type.ENTITY || minecraft.level.getWorldBorder().isWithinBounds(((EntityHitResult) minecraft.hitResult).getEntity().blockPosition())) {
-                    EventResult result = callback.onUseInteraction(minecraft, minecraft.player, evt.getHand(), minecraft.hitResult);
-                    if (result.isInterrupt()) {
+                    EventResult eventResult = callback.onUseInteraction(minecraft, minecraft.player, evt.getHand(), minecraft.hitResult);
+                    if (eventResult.isInterrupt()) {
                         // set this to achieve same behavior as Fabric where the methods are cancelled at head without additional processing
                         // just manually send swing hand packet if necessary
                         evt.setSwingHand(false);
@@ -327,8 +332,8 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(InteractionInputEvents.Pick.class, InputEvent.InteractionKeyMappingTriggered.class, (InteractionInputEvents.Pick callback, InputEvent.InteractionKeyMappingTriggered evt) -> {
             if (!evt.isPickBlock()) return;
             Minecraft minecraft = Minecraft.getInstance();
-            EventResult result = callback.onPickInteraction(minecraft, minecraft.player, minecraft.hitResult);
-            if (result.isInterrupt()) {
+            EventResult eventResult = callback.onPickInteraction(minecraft, minecraft.player, minecraft.hitResult);
+            if (eventResult.isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -344,9 +349,9 @@ public final class NeoForgeClientEventInvokers {
             callback.onMovementInputUpdate((LocalPlayer) evt.getEntity(), evt.getInput());
         });
         INSTANCE.register(RenderBlockOverlayCallback.class, RenderBlockScreenEffectEvent.class, (RenderBlockOverlayCallback callback, RenderBlockScreenEffectEvent evt) -> {
-            EventResult result = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), Minecraft.getInstance().renderBuffers()
+            EventResult eventResult = callback.onRenderBlockOverlay((LocalPlayer) evt.getPlayer(), evt.getPoseStack(), Minecraft.getInstance().renderBuffers()
                     .bufferSource(), evt.getBlockState());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(FogEvents.Render.class, ViewportEvent.RenderFog.class, (FogEvents.Render callback, ViewportEvent.RenderFog evt) -> {
             MutableFloat nearPlaneDistance = MutableFloat.fromEvent(nearPlaneDistanceValue -> {
@@ -370,14 +375,14 @@ public final class NeoForgeClientEventInvokers {
             callback.onComputeFogColor(evt.getRenderer(), evt.getCamera(), (float) evt.getPartialTick(), red, green, blue);
         });
         INSTANCE.register(RenderTooltipCallback.class, RenderTooltipEvent.Pre.class, (RenderTooltipCallback callback, RenderTooltipEvent.Pre evt) -> {
-            EventResult result = callback.onRenderTooltip(evt.getGraphics(), evt.getFont(), evt.getX(), evt.getY(), evt.getComponents(), evt.getTooltipPositioner());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onRenderTooltip(evt.getGraphics(), evt.getFont(), evt.getX(), evt.getY(), evt.getComponents(), evt.getTooltipPositioner());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.Block.class, (RenderHighlightCallback callback, RenderHighlightEvent.Block evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
             if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
-            EventResult result = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getDeltaTracker(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getDeltaTracker(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         }, true);
         INSTANCE.register(RenderHighlightCallback.class, RenderHighlightEvent.Entity.class, (RenderHighlightCallback callback, RenderHighlightEvent.Entity evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
@@ -416,8 +421,8 @@ public final class NeoForgeClientEventInvokers {
         });
         INSTANCE.register(AddToastCallback.class, ToastAddEvent.class, (AddToastCallback callback, ToastAddEvent evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
-            EventResult result = callback.onAddToast(minecraft.getToastManager(), evt.getToast());
-            if (result.isInterrupt()) evt.setCanceled(true);
+            EventResult eventResult = callback.onAddToast(minecraft.getToastManager(), evt.getToast());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             Minecraft minecraft = Minecraft.getInstance();
@@ -438,11 +443,11 @@ public final class NeoForgeClientEventInvokers {
                     MutableValue<Component> message = MutableValue.fromEvent(evt::setMessage, evt::getMessage);
                     PlayerChatMessage playerChatMessage = evt instanceof ClientChatReceivedEvent.Player player ? player.getPlayerChatMessage() : null;
                     boolean isOverlay = evt instanceof ClientChatReceivedEvent.System system && system.isOverlay();
-                    EventResult result = callback.onChatMessageReceived(message, evt.getBoundChatType(),
+                    EventResult eventResult = callback.onChatMessageReceived(message, evt.getBoundChatType(),
                             playerChatMessage,
                             isOverlay
                     );
-                    if (result.isInterrupt()) evt.setCanceled(true);
+                    if (eventResult.isInterrupt()) evt.setCanceled(true);
                 });
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, GatherEffectScreenTooltipsEvent.class, (GatherEffectScreenTooltipCallback callback, GatherEffectScreenTooltipsEvent evt) -> {
             callback.onGatherEffectScreenTooltip(evt.getScreen(), evt.getEffectInstance(), evt.getTooltip());

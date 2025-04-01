@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.biome.v1;
 
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
@@ -26,16 +27,16 @@ public interface MobSpawnSettingsContext {
      * Associated JSON property: <code>spawners</code>.
      *
      * @see MobSpawnSettings#getMobs(MobCategory)
-     * @see MobSpawnSettings.Builder#addSpawn(MobCategory, MobSpawnSettings.SpawnerData)
+     * @see MobSpawnSettings.Builder#addSpawn(MobCategory, int, MobSpawnSettings.SpawnerData)
      */
-    void addSpawn(MobCategory mobCategory, MobSpawnSettings.SpawnerData spawnerData);
+    void addSpawn(MobCategory mobCategory, int weight, MobSpawnSettings.SpawnerData spawnerData);
 
     /**
      * Removes any spawns matching the given predicate from this biome, and returns true if any matched.
      *
      * <p>Associated JSON property: <code>spawners</code>.
      */
-    boolean removeSpawns(BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> predicate);
+    boolean removeSpawns(BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> filter);
 
     /**
      * Removes all spawns of the given entity type.
@@ -45,7 +46,9 @@ public interface MobSpawnSettingsContext {
      * @return True if any spawns were removed.
      */
     default boolean removeSpawnsOfEntityType(EntityType<?> entityType) {
-        return this.removeSpawns((spawnGroup, spawnEntry) -> spawnEntry.type == entityType);
+        return this.removeSpawns((MobCategory mobCategory, MobSpawnSettings.SpawnerData spawnerData) -> {
+            return spawnerData.type() == entityType;
+        });
     }
 
     /**
@@ -54,7 +57,9 @@ public interface MobSpawnSettingsContext {
      * <p>Associated JSON property: <code>spawners</code>.
      */
     default void clearSpawns(MobCategory mobCategory) {
-        this.removeSpawns((spawnGroup, spawnEntry) -> spawnGroup == mobCategory);
+        this.removeSpawns((MobCategory mobCategoryX, MobSpawnSettings.SpawnerData spawnerData) -> {
+            return mobCategoryX == mobCategory;
+        });
     }
 
     /**
@@ -63,7 +68,9 @@ public interface MobSpawnSettingsContext {
      * <p>Associated JSON property: <code>spawners</code>.
      */
     default void clearSpawns() {
-        this.removeSpawns((spawnGroup, spawnEntry) -> true);
+        this.removeSpawns((MobCategory mobCategory, MobSpawnSettings.SpawnerData spawnerData) -> {
+            return true;
+        });
     }
 
     /**
@@ -72,7 +79,8 @@ public interface MobSpawnSettingsContext {
      * @param entityType   the entity type
      * @param energyBudget a tolerance level for how close other spawns can happen nearby, like an aura; the higher this
      *                     value is the closer mobs can spawn together, usually <code>0.15</code> in vanilla
-     * @param charge       the strength of a spawn aura, defines how far away other spawn attempts are affected, usually
+     * @param charge       the strength of a spawn aura, defines how far away other spawn attempts are affected,
+     *                     usually
      *                     <code>0.7</code> in vanilla
      * @see MobSpawnSettings#getMobSpawnCost(EntityType)
      * @see MobSpawnSettings.Builder#addMobCharge(EntityType, double, double)
@@ -99,7 +107,7 @@ public interface MobSpawnSettingsContext {
      * @return all {@link net.minecraft.world.level.biome.MobSpawnSettings.SpawnerData} registered for the given
      *         <code>type</code>
      */
-    List<MobSpawnSettings.SpawnerData> getSpawnerData(MobCategory mobCategory);
+    List<Weighted<MobSpawnSettings.SpawnerData>> getSpawnerData(MobCategory mobCategory);
 
     /**
      * @return all {@link EntityType}s with a registered spawn cost

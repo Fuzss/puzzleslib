@@ -22,7 +22,6 @@ import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
-import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.SetupMobGoalsEvent;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -39,6 +38,8 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
+import net.minecraft.util.TriState;
+import net.minecraft.util.random.Weighted;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityDimensions;
@@ -60,7 +61,6 @@ import net.neoforged.fml.event.IModBusEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.TriState;
 import net.neoforged.neoforge.event.*;
 import net.neoforged.neoforge.event.brewing.RegisterBrewingRecipesEvent;
 import net.neoforged.neoforge.event.entity.*;
@@ -115,7 +115,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 callback.onComputeItemAttributeModifiers(item, entries);
                 if (entries.delegate() != itemAttributeModifiers.modifiers()) {
                     evt.modify(item, (DataComponentPatch.Builder builder) -> {
-                        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries), itemAttributeModifiers.showInTooltip()));
+                        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries)));
                     });
                 }
             });
@@ -244,9 +244,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(UseBoneMealCallback.class, BonemealEvent.class, (UseBoneMealCallback callback, BonemealEvent evt) -> {
-            EventResult result = callback.onUseBoneMeal(evt.getLevel(), evt.getPos(), evt.getState(), evt.getStack());
-            if (result.isInterrupt()) {
-                evt.setSuccessful(result.getAsBoolean());
+            EventResult eventResult = callback.onUseBoneMeal(evt.getLevel(), evt.getPos(), evt.getState(), evt.getStack());
+            if (eventResult.isInterrupt()) {
+                evt.setSuccessful(eventResult.getAsBoolean());
             }
         });
         INSTANCE.register(LivingExperienceDropCallback.class, LivingExperienceDropEvent.class, (LivingExperienceDropCallback callback, LivingExperienceDropEvent evt) -> {
@@ -266,8 +266,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             if (serverPlayer.blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
                 return;
             }
-            EventResult result = callback.onBreakBlock(serverLevel, evt.getPos(), evt.getState(), serverPlayer, serverPlayer.getMainHandItem());
-            if (result.isInterrupt()) {
+            EventResult eventResult = callback.onBreakBlock(serverLevel, evt.getPos(), evt.getState(), serverPlayer, serverPlayer.getMainHandItem());
+            if (eventResult.isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -289,7 +289,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onEndPlayerTick(evt.getEntity());
         });
         INSTANCE.register(LivingFallCallback.class, LivingFallEvent.class, (LivingFallCallback callback, LivingFallEvent evt) -> {
-            MutableFloat fallDistance = MutableFloat.fromEvent(evt::setDistance, evt::getDistance);
+            MutableDouble fallDistance = MutableDouble.fromEvent(evt::setDistance, evt::getDistance);
             MutableFloat damageMultiplier = MutableFloat.fromEvent(evt::setDamageMultiplier, evt::getDamageMultiplier);
             if (callback.onLivingFall(evt.getEntity(), fallDistance, damageMultiplier).isInterrupt()) {
                 evt.setCanceled(true);
@@ -307,9 +307,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onAnvilUse(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
         });
         INSTANCE.register(ItemEntityEvents.Touch.class, ItemEntityPickupEvent.Pre.class, (ItemEntityEvents.Touch callback, ItemEntityPickupEvent.Pre evt) -> {
-            EventResult result = callback.onItemTouch(evt.getPlayer(), evt.getItemEntity());
-            if (result.isInterrupt()) {
-                evt.setCanPickup(result.getAsBoolean() ? TriState.TRUE : TriState.FALSE);
+            EventResult eventResult = callback.onItemTouch(evt.getPlayer(), evt.getItemEntity());
+            if (eventResult.isInterrupt()) {
+                evt.setCanPickup(eventResult.getAsBoolean() ? TriState.TRUE : TriState.FALSE);
             }
         });
         INSTANCE.register(ItemEntityEvents.Pickup.class, ItemEntityPickupEvent.Post.class, (ItemEntityEvents.Pickup callback, ItemEntityPickupEvent.Post evt) -> {
@@ -325,10 +325,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             DefaultedValue<ItemStack> output = DefaultedValue.fromEventWithValue(evt::setOutput, evt::getOutput, evt.getOutput());
             DefaultedInt enchantmentCost = DefaultedInt.fromEventWithValue(evt::setCost, () -> (int) evt.getCost(), (int) evt.getCost());
             DefaultedInt materialCost = DefaultedInt.fromEventWithValue(evt::setMaterialCost, evt::getMaterialCost, evt.getMaterialCost());
-            EventResult result = callback.onAnvilUpdate(evt.getLeft(), evt.getRight(), output, evt.getName(), enchantmentCost, materialCost, evt.getPlayer());
-            if (result.isInterrupt()) {
+            EventResult eventResult = callback.onAnvilUpdate(evt.getLeft(), evt.getRight(), output, evt.getName(), enchantmentCost, materialCost, evt.getPlayer());
+            if (eventResult.isInterrupt()) {
                 // interruption for allow will run properly as long as output is changed from an empty stack
-                if (!result.getAsBoolean()) {
+                if (!eventResult.getAsBoolean()) {
                     evt.setCanceled(true);
                 }
             } else {
@@ -387,8 +387,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onUseItemFinish(evt.getEntity(), itemStack, evt.getItem());
         });
         INSTANCE.register(ShieldBlockCallback.class, LivingShieldBlockEvent.class, (ShieldBlockCallback callback, LivingShieldBlockEvent evt) -> {
-            if (evt.getBlocked() && callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), evt.getBlockedDamage()).isInterrupt()) {
-                evt.setCanceled(true);
+            DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(evt::setBlockedDamage,
+                    evt::getBlockedDamage,
+                    evt::getOriginalBlockedDamage);
+            if (evt.getBlocked() && callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), blockedDamage).isInterrupt()) {
+                evt.setBlocked(true);
             }
         });
         INSTANCE.register(TagsUpdatedCallback.class, TagsUpdatedEvent.class, (TagsUpdatedCallback callback, TagsUpdatedEvent evt) -> {
@@ -422,20 +425,20 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onServerStopped(evt.getServer());
         });
         INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, PlayLevelSoundEvent.AtPosition.class, (PlayLevelSoundEvents.AtPosition callback, PlayLevelSoundEvent.AtPosition evt) -> {
-            MutableValue<Holder<SoundEvent>> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
-            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setSource, evt::getSource);
-            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setNewVolume, evt::getNewVolume, evt::getOriginalVolume);
-            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setNewPitch, evt::getNewPitch, evt::getOriginalPitch);
-            if (callback.onPlaySoundAtPosition(evt.getLevel(), evt.getPosition(), sound, source, volume, pitch).isInterrupt()) {
+            MutableValue<Holder<SoundEvent>> soundEvent = MutableValue.fromEvent(evt::setSound, evt::getSound);
+            MutableValue<SoundSource> soundSource = MutableValue.fromEvent(evt::setSource, evt::getSource);
+            MutableFloat soundVolume = MutableFloat.fromEvent(evt::setNewVolume, evt::getNewVolume);
+            MutableFloat soundPitch = MutableFloat.fromEvent(evt::setNewPitch, evt::getNewPitch);
+            if (callback.onPlaySoundAtPosition(evt.getLevel(), evt.getPosition(), soundEvent, soundSource, soundVolume, soundPitch).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
         INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, PlayLevelSoundEvent.AtEntity.class, (PlayLevelSoundEvents.AtEntity callback, PlayLevelSoundEvent.AtEntity evt) -> {
-            MutableValue<Holder<SoundEvent>> sound = MutableValue.fromEvent(evt::setSound, evt::getSound);
-            MutableValue<SoundSource> source = MutableValue.fromEvent(evt::setSource, evt::getSource);
-            DefaultedFloat volume = DefaultedFloat.fromEvent(evt::setNewVolume, evt::getNewVolume, evt::getOriginalVolume);
-            DefaultedFloat pitch = DefaultedFloat.fromEvent(evt::setNewPitch, evt::getNewPitch, evt::getOriginalPitch);
-            if (callback.onPlaySoundAtEntity(evt.getLevel(), evt.getEntity(), sound, source, volume, pitch).isInterrupt()) {
+            MutableValue<Holder<SoundEvent>> soundEvent = MutableValue.fromEvent(evt::setSound, evt::getSound);
+            MutableValue<SoundSource> soundSource = MutableValue.fromEvent(evt::setSource, evt::getSource);
+            MutableFloat soundVolume = MutableFloat.fromEvent(evt::setNewVolume, evt::getNewVolume);
+            MutableFloat soundPitch = MutableFloat.fromEvent(evt::setNewPitch, evt::getNewPitch);
+            if (callback.onPlaySoundAtEntity(evt.getLevel(), evt.getEntity(), soundEvent, soundSource, soundVolume, soundPitch).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -574,9 +577,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         });
         INSTANCE.register(MobEffectEvents.Affects.class, MobEffectEvent.Applicable.class, (MobEffectEvents.Affects callback, MobEffectEvent.Applicable evt) -> {
-            EventResult result = callback.onMobEffectAffects(evt.getEntity(), evt.getEffectInstance());
-            if (result.isInterrupt()) {
-                evt.setResult(result.getAsBoolean() ? MobEffectEvent.Applicable.Result.APPLY : MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+            EventResult eventResult = callback.onMobEffectAffects(evt.getEntity(), evt.getEffectInstance());
+            if (eventResult.isInterrupt()) {
+                evt.setResult(eventResult.getAsBoolean() ? MobEffectEvent.Applicable.Result.APPLY : MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
             }
         });
         INSTANCE.register(MobEffectEvents.Apply.class, MobEffectEvent.Added.class, (MobEffectEvents.Apply callback, MobEffectEvent.Added evt) -> {
@@ -606,17 +609,22 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(CheckMobDespawnCallback.class, MobDespawnEvent.class, (CheckMobDespawnCallback callback, MobDespawnEvent evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
-            EventResult result = callback.onCheckMobDespawn(evt.getEntity(), serverLevel);
-            if (result.isInterrupt()) {
-                evt.setResult(result.getAsBoolean() ? MobDespawnEvent.Result.ALLOW : MobDespawnEvent.Result.DENY);
+            EventResult eventResult = callback.onCheckMobDespawn(evt.getEntity(), serverLevel);
+            if (eventResult.isInterrupt()) {
+                evt.setResult(eventResult.getAsBoolean() ? MobDespawnEvent.Result.ALLOW : MobDespawnEvent.Result.DENY);
             }
         });
         INSTANCE.register(GatherPotentialSpawnsCallback.class, LevelEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, LevelEvent.PotentialSpawns evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
-            List<MobSpawnSettings.SpawnerData> mobs = new PotentialSpawnsList<>(evt::getSpawnerDataList, (MobSpawnSettings.SpawnerData spawnerData) -> {
+            List<Weighted<MobSpawnSettings.SpawnerData>> mobs = new PotentialSpawnsList<>(evt::getSpawnerDataList, (Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> {
+                int size = evt.getSpawnerDataList().size();
                 evt.addSpawnerData(spawnerData);
-                return true;
-            }, evt::removeSpawnerData);
+                return size != evt.getSpawnerDataList().size();
+            }, (Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> {
+                int size = evt.getSpawnerDataList().size();
+                evt.removeSpawnerData(spawnerData);
+                return size != evt.getSpawnerDataList().size();
+            });
             callback.onGatherPotentialSpawns(serverLevel, serverLevel.structureManager(), serverLevel.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobs);
         });
         INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
@@ -640,10 +648,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
             MutableInt experienceReward = MutableInt.fromEvent(evt::setXp, evt::getXp);
             Player player = EventImplHelper.getGrindstoneUsingPlayer(evt.getTopItem(), evt.getBottomItem()).orElseThrow(NullPointerException::new);
-            EventResult result = callback.onGrindstoneUpdate(evt.getTopItem(), evt.getBottomItem(), output, experienceReward, player);
-            if (result.isInterrupt()) {
+            EventResult eventResult = callback.onGrindstoneUpdate(evt.getTopItem(), evt.getBottomItem(), output, experienceReward, player);
+            if (eventResult.isInterrupt()) {
                 // interruption for allow will run properly as long as output is changed from an empty stack
-                if (!result.getAsBoolean()) {
+                if (!eventResult.getAsBoolean()) {
                     evt.setCanceled(true);
                 }
             } else {
@@ -699,9 +707,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(
                 ChangeEntitySizeCallback.class, EntityEvent.Size.class, (ChangeEntitySizeCallback callback, EntityEvent.Size evt) -> {
-            EventResultHolder<EntityDimensions> result = callback.onChangeEntitySize(
+            EventResultHolder<EntityDimensions> eventResult = callback.onChangeEntitySize(
                     evt.getEntity(), evt.getPose(), evt.getOldSize());
-            result.ifInterrupt(evt::setNewSize);
+            eventResult.ifInterrupt(evt::setNewSize);
         });
         INSTANCE.register(PickProjectileCallback.class, LivingGetProjectileEvent.class, (PickProjectileCallback callback, LivingGetProjectileEvent evt) -> {
             MutableValue<ItemStack> ammoItemStack = MutableValue.fromEvent(evt::setProjectileItemStack,
@@ -709,15 +717,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onPickProjectile(evt.getEntity(), evt.getProjectileWeaponItemStack(), ammoItemStack);
         });
         INSTANCE.register(EnderPearlTeleportCallback.class, EntityTeleportEvent.EnderPearl.class, (EnderPearlTeleportCallback callback, EntityTeleportEvent.EnderPearl evt) -> {
-            EventResult result = callback.onEnderPearlTeleport(evt.getPlayer(),
+            EventResult eventResult = callback.onEnderPearlTeleport(evt.getPlayer(),
                     evt.getTarget(),
                     evt.getPearlEntity(),
                     MutableFloat.fromEvent(evt::setAttackDamage, evt::getAttackDamage),
                     evt.getHitResult());
-            if (result.isInterrupt()) evt.setCanceled(true);
-        });
-        INSTANCE.register(SetupMobGoalsCallback.class, SetupMobGoalsEvent.class, (SetupMobGoalsCallback callback, SetupMobGoalsEvent evt) -> {
-            callback.onSetupMobGoals(evt.getEntity(), evt.getGoalSelector(), evt.getTargetSelector());
+            if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
     }
 
