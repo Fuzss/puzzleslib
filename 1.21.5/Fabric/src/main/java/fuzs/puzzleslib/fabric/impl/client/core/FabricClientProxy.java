@@ -250,7 +250,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public void registerConfigTranslations(String modId) {
+    public void registerConfigurationScreenForHolder(String modId) {
+        super.registerConfigurationScreenForHolder(modId);
         ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
             if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
                 ConfigTranslationsManager.addModConfig(modConfig.getModId(),

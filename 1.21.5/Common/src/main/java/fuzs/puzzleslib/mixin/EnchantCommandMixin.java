@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.mixin;
 
 import com.mojang.brigadier.CommandDispatcher;
-import fuzs.puzzleslib.impl.command.ModEnchantCommand;
+import fuzs.puzzleslib.impl.content.ModEnchantCommand;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.server.commands.EnchantCommand;

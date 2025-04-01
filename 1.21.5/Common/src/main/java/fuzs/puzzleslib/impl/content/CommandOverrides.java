@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.init.v3.override;
+package fuzs.puzzleslib.impl.content;
 
 import com.google.common.collect.Maps;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;

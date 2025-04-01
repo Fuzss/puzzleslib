@@ -79,7 +79,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
             modelDiscovery.addRoot(unbakedBlockStateModel);
             unbakedBlockStateModels.put(blockState, unbakedBlockStateModel);
         });
-        modelDiscovery.resolve().forEach(this.resolvedModels::putIfAbsent);
+        this.resolvedModels.putAll(modelDiscovery.resolve());
         this.loadModels(unbakedBlockStateModels).blockStateModels().forEach(this.blockStateModelOutput);
     }
 

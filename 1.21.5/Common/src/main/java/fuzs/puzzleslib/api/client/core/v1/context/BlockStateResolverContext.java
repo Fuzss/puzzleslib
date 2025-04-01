@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Register a resolver responsible for mapping each {@link BlockState} of a block to an {@link UnbakedBlockStateModel}.
+ * Register a resolver responsible for mapping each {@link BlockState} of a block to an
+ * {@link BlockStateModel.UnbakedRoot}.
  * <p>
  * Replaces the vanilla {@code JSON} files found in {@code assets/<namespace>/blockstates/}.
  */

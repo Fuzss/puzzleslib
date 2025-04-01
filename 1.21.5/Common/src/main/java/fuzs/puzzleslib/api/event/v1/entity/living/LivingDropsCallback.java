@@ -24,8 +24,8 @@ public interface LivingDropsCallback {
      * @param damageSource damage source that killed the entity
      * @param itemDrops    all drops, including equipment, so not just drops from the entity's loot table; this can be
      *                     modified
-     * @param recentlyHit  does this count as a player kill, meaning {@link LivingEntity#lastHurtByPlayerTime} is not
-     *                     zero
+     * @param recentlyHit  does this count as a player kill, meaning
+     *                     {@link LivingEntity#getLastHurtByPlayerMemoryTime()} is not zero
      * @return {@link EventResult#INTERRUPT} to prevent any drops from spawning, {@link EventResult#PASS} to allow drops
      *         to be spawned in the world; will have the same result as {@link EventResult#INTERRUPT} if drops are
      *         empty

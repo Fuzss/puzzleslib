@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.gui.v2.screen;
+package fuzs.puzzleslib.api.client.gui.v2;
 
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.Minecraft;

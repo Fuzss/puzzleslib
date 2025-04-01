@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.client.gui.v2.screen;
+package fuzs.puzzleslib.impl.content.client;
 
 import com.google.common.base.Preconditions;
 import com.mojang.serialization.Codec;
