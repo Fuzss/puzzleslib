@@ -420,7 +420,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(ShieldBlockCallback.class, LivingShieldBlockEvent.class, (ShieldBlockCallback callback, LivingShieldBlockEvent evt) -> {
             if (evt.getBlocked() && callback.onShieldBlock(evt.getEntity(), evt.getDamageSource(), evt.getBlockedDamage()).isInterrupt()) {
-                evt.setCanceled(true);
+                evt.setBlocked(true);
             }
         });
         INSTANCE.register(TagsUpdatedCallback.class, TagsUpdatedEvent.class, (TagsUpdatedCallback callback, TagsUpdatedEvent evt) -> {
