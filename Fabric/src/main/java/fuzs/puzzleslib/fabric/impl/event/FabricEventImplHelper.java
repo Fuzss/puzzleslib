@@ -2,10 +2,14 @@ package fuzs.puzzleslib.fabric.impl.event;
 
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -17,6 +21,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.Collection;
 
@@ -41,9 +46,9 @@ public final class FabricEventImplHelper {
     public static float onLivingHurt(LivingEntity livingEntity, ServerLevel serverLevel, DamageSource damageSource, float damageAmount, MutableBoolean cancelInjection) {
         if (!livingEntity.isInvulnerableTo(serverLevel, damageSource)) {
             DefaultedFloat damageAmountValue = DefaultedFloat.fromValue(damageAmount);
-            EventResult result = FabricLivingEvents.LIVING_HURT.invoker()
+            EventResult eventResult = FabricLivingEvents.LIVING_HURT.invoker()
                     .onLivingHurt(livingEntity, damageSource, damageAmountValue);
-            if (result.isInterrupt()) {
+            if (eventResult.isInterrupt()) {
                 cancelInjection.setTrue();
             }
             return damageAmountValue.getAsOptionalFloat().orElse(damageAmount);
@@ -66,15 +71,39 @@ public final class FabricEventImplHelper {
         return mutableInt.getAsInt();
     }
 
-    public static boolean tryOnLivingDrops(LivingEntity entity, DamageSource damageSource, int lastHurtByPlayerTime) {
+    public static boolean tryOnLivingDrops(LivingEntity entity, DamageSource damageSource, int lastHurtByPlayerMemoryTime) {
         Collection<ItemEntity> capturedDrops = ((CapturedDropsEntity) entity).puzzleslib$acceptCapturedDrops(null);
         if (capturedDrops != null) {
-            EventResult result = FabricLivingEvents.LIVING_DROPS.invoker()
-                    .onLivingDrops(entity, damageSource, capturedDrops, lastHurtByPlayerTime > 0);
-            if (result.isPass()) capturedDrops.forEach(itemEntity -> entity.level().addFreshEntity(itemEntity));
+            EventResult eventResult = FabricLivingEvents.LIVING_DROPS.invoker()
+                    .onLivingDrops(entity, damageSource, capturedDrops, lastHurtByPlayerMemoryTime > 0);
+            if (eventResult.isPass()) {
+                capturedDrops.forEach((ItemEntity itemEntity) -> {
+                    entity.level().addFreshEntity(itemEntity);
+                });
+            }
             return true;
         } else {
             return false;
         }
+    }
+
+    public static EventResult onPlaySound(LevelSoundEventInvoker eventInvoker, Args args, int soundEventOrdinal, int soundSourceOrdinal, int soundVolumeOrdinal, int soundPitchOrdinal) {
+        MutableValue<Holder<SoundEvent>> soundEvent = MutableValue.fromEvent((Holder<SoundEvent> holder) -> args.set(
+                soundEventOrdinal,
+                holder), () -> args.get(soundEventOrdinal));
+        MutableValue<SoundSource> soundSource = MutableValue.fromEvent((SoundSource soundSourceX) -> args.set(
+                soundSourceOrdinal,
+                soundSourceX), () -> args.get(soundSourceOrdinal));
+        MutableFloat soundVolume = MutableFloat.fromEvent((Float volume) -> args.set(soundVolumeOrdinal, volume),
+                () -> args.get(soundVolumeOrdinal));
+        MutableFloat soundPitch = MutableFloat.fromEvent((Float pitch) -> args.set(soundPitchOrdinal, pitch),
+                () -> args.get(soundPitchOrdinal));
+        return eventInvoker.onPlaySound(soundEvent, soundSource, soundVolume, soundPitch);
+    }
+
+    @FunctionalInterface
+    public interface LevelSoundEventInvoker {
+
+        EventResult onPlaySound(MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch);
     }
 }

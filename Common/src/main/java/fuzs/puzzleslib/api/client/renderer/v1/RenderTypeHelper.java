@@ -24,7 +24,7 @@ public final class RenderTypeHelper {
      * @return the render type
      */
     public static RenderType getRenderType(Block block) {
-        return ClientProxyImpl.get().getRenderType(block);
+        return ItemBlockRenderTypes.getChunkRenderType(block.defaultBlockState());
     }
 
     /**

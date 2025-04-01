@@ -15,9 +15,8 @@ public interface LivingVisibilityCallback {
      * entity for applying a given percentage to the looking entity's original visibility range.
      *
      * @param livingEntity         the entity trying to be targeted
-     * @param lookingEntity        the looking entity that is trying to target <code>entity</code>
-     * @param visibilityPercentage the visibility percentage multiplied with the <code>lookingEntity</code>'s targeting
-     *                             range
+     * @param lookingEntity        the looking entity that is trying to target the other entity
+     * @param visibilityPercentage the visibility percentage multiplied with the looking entity's targeting range
      */
     void onLivingVisibility(LivingEntity livingEntity, @Nullable Entity lookingEntity, MutableDouble visibilityPercentage);
 }

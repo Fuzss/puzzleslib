@@ -10,12 +10,12 @@
     "EnchantedCountIncreaseFunctionNeoForgeMixin",
     "EnchantmentHelperNeoForgeMixin",
     "LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin",
-    "MobNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
     "accessor.MobSpawnSettingsBuilderNeoForgeAccessor"
   ],
   "client": [
-    "client.accessor.BlockColorsNeoForgeAccessor"
+    "client.accessor.BlockColorsNeoForgeAccessor",
+    "client.accessor.RegisterKeyMappingsEventNeoForgeAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

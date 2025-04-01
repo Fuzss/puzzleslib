@@ -15,10 +15,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -26,13 +25,15 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
+import net.minecraft.world.level.material.Fluid;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
 
-public interface ClientProxyImpl extends ProxyImpl, RenderTypeProxy, GuiHeightProxy {
+public interface ClientProxyImpl extends ProxyImpl, GuiHeightProxy {
 
     static ClientProxyImpl get() {
         return (ClientProxyImpl) ProxyImpl.INSTANCE;
@@ -58,8 +59,6 @@ public interface ClientProxyImpl extends ProxyImpl, RenderTypeProxy, GuiHeightPr
 
     BakedQuad copyBakedQuad(BakedQuad bakedQuad);
 
-    BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation);
-
     boolean isEffectVisibleInInventory(MobEffectInstance mobEffect);
 
     boolean isEffectVisibleInGui(MobEffectInstance mobEffect);
@@ -67,6 +66,10 @@ public interface ClientProxyImpl extends ProxyImpl, RenderTypeProxy, GuiHeightPr
     void registerWoodType(WoodType woodType);
 
     ResourceLocation getModLoaderGuiLayer(ResourceLocation resourceLocation);
+
+    void registerRenderType(Block block, RenderType renderType);
+
+    void registerRenderType(Fluid fluid, RenderType renderType);
 
     @Override
     default Player getClientPlayer() {

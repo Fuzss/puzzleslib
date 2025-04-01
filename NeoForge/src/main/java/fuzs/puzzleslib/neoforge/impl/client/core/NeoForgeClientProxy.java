@@ -27,8 +27,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
@@ -44,7 +42,6 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
-import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -179,19 +176,14 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
 
     @Override
     public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
-        int[] vertices = bakedQuad.getVertices();
+        int[] vertices = bakedQuad.vertices();
         return new BakedQuad(Arrays.copyOf(vertices, vertices.length),
-                bakedQuad.getTintIndex(),
-                bakedQuad.getDirection(),
-                bakedQuad.getSprite(),
-                bakedQuad.isShade(),
-                bakedQuad.getLightEmission(),
+                bakedQuad.tintIndex(),
+                bakedQuad.direction(),
+                bakedQuad.sprite(),
+                bakedQuad.shade(),
+                bakedQuad.lightEmission(),
                 bakedQuad.hasAmbientOcclusion());
-    }
-
-    @Override
-    public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
-        return modelManager.getStandaloneModel(resourceLocation);
     }
 
     @Override
@@ -231,13 +223,6 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
                         modConfigSpec);
             }
         });
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public RenderType getRenderType(Block block) {
-        ChunkRenderTypeSet renderTypes = ItemBlockRenderTypes.getRenderLayers(block.defaultBlockState());
-        return renderTypes.isEmpty() ? RenderType.solid() : renderTypes.iterator().next();
     }
 
     @SuppressWarnings("deprecation")

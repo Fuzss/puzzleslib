@@ -74,6 +74,6 @@ public final class BlockEvents {
          *         <li>{@link EventResult#PASS PASS} to allow trampling to occur</li>
          *         </ul>
          */
-        EventResult onFarmlandTrample(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, float fallDistance, Entity entity);
+        EventResult onFarmlandTrample(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, double fallDistance, Entity entity);
     }
 }

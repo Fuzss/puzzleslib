@@ -75,7 +75,7 @@ public final class QuadUtils {
      */
     public static float getX(BakedQuad bakedQuad, int vertexIndex) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_POSITION;
-        return Float.intBitsToFloat(bakedQuad.getVertices()[offset]);
+        return Float.intBitsToFloat(bakedQuad.vertices()[offset]);
     }
 
     /**
@@ -85,7 +85,7 @@ public final class QuadUtils {
      */
     public static float getY(BakedQuad bakedQuad, int vertexIndex) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_POSITION;
-        return Float.intBitsToFloat(bakedQuad.getVertices()[offset + 1]);
+        return Float.intBitsToFloat(bakedQuad.vertices()[offset + 1]);
     }
 
     /**
@@ -95,7 +95,7 @@ public final class QuadUtils {
      */
     public static float getZ(BakedQuad bakedQuad, int vertexIndex) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_POSITION;
-        return Float.intBitsToFloat(bakedQuad.getVertices()[offset + 2]);
+        return Float.intBitsToFloat(bakedQuad.vertices()[offset + 2]);
     }
 
     /**
@@ -116,7 +116,7 @@ public final class QuadUtils {
      */
     public static float getNormalX(BakedQuad bakedQuad, int vertexIndex) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_NORMAL;
-        int normal = bakedQuad.getVertices()[offset];
+        int normal = bakedQuad.vertices()[offset];
         return ((byte) (normal & 0xFF)) / 127.0F;
     }
 
@@ -127,7 +127,7 @@ public final class QuadUtils {
      */
     public static float getNormalY(BakedQuad bakedQuad, int vertexIndex) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_NORMAL;
-        int normal = bakedQuad.getVertices()[offset];
+        int normal = bakedQuad.vertices()[offset];
         return ((byte) ((normal >> 8) & 0xFF)) / 127.0F;
     }
 
@@ -138,7 +138,7 @@ public final class QuadUtils {
      */
     public static float getNormalZ(BakedQuad bakedQuad, int vertexIndex) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_NORMAL;
-        int normal = bakedQuad.getVertices()[offset];
+        int normal = bakedQuad.vertices()[offset];
         return ((byte) ((normal >> 16) & 0xFF)) / 127.0F;
     }
 
@@ -148,7 +148,7 @@ public final class QuadUtils {
      * @return the packed color for the vertex
      */
     public static int getColor(BakedQuad bakedQuad, int vertexIndex) {
-        return bakedQuad.getVertices()[vertexIndex * VERTEX_STRIDE + VERTEX_COLOR];
+        return bakedQuad.vertices()[vertexIndex * VERTEX_STRIDE + VERTEX_COLOR];
     }
 
     /**
@@ -166,7 +166,7 @@ public final class QuadUtils {
      * @return the u-component for the vertex
      */
     public static float getU(BakedQuad bakedQuad, int vertexIndex) {
-        return Float.intBitsToFloat(bakedQuad.getVertices()[vertexIndex * VERTEX_STRIDE + VERTEX_UV]);
+        return Float.intBitsToFloat(bakedQuad.vertices()[vertexIndex * VERTEX_STRIDE + VERTEX_UV]);
     }
 
     /**
@@ -175,7 +175,7 @@ public final class QuadUtils {
      * @return the v-component for the vertex
      */
     public static float getV(BakedQuad bakedQuad, int vertexIndex) {
-        return Float.intBitsToFloat(bakedQuad.getVertices()[vertexIndex * VERTEX_STRIDE + VERTEX_UV + 1]);
+        return Float.intBitsToFloat(bakedQuad.vertices()[vertexIndex * VERTEX_STRIDE + VERTEX_UV + 1]);
     }
 
     /**
@@ -207,7 +207,7 @@ public final class QuadUtils {
      */
     public static void setX(BakedQuad bakedQuad, int vertexIndex, float x) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_POSITION;
-        bakedQuad.getVertices()[offset] = Float.floatToRawIntBits(x);
+        bakedQuad.vertices()[offset] = Float.floatToRawIntBits(x);
     }
 
     /**
@@ -217,7 +217,7 @@ public final class QuadUtils {
      */
     public static void setY(BakedQuad bakedQuad, int vertexIndex, float y) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_POSITION;
-        bakedQuad.getVertices()[offset + 1] = Float.floatToRawIntBits(y);
+        bakedQuad.vertices()[offset + 1] = Float.floatToRawIntBits(y);
     }
 
     /**
@@ -227,7 +227,7 @@ public final class QuadUtils {
      */
     public static void setZ(BakedQuad bakedQuad, int vertexIndex, float z) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_POSITION;
-        bakedQuad.getVertices()[offset + 2] = Float.floatToRawIntBits(z);
+        bakedQuad.vertices()[offset + 2] = Float.floatToRawIntBits(z);
     }
 
     /**
@@ -248,7 +248,7 @@ public final class QuadUtils {
      */
     public static void setNormal(BakedQuad bakedQuad, int vertexIndex, float x, float y, float z) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_NORMAL;
-        bakedQuad.getVertices()[offset] =
+        bakedQuad.vertices()[offset] =
                 ((int) (x * 127.0f) & 0xFF) | (((int) (y * 127.0f) & 0xFF) << 8) | (((int) (z * 127.0f) & 0xFF) << 16);
     }
 
@@ -262,7 +262,7 @@ public final class QuadUtils {
      */
     public static void setColor(BakedQuad bakedQuad, int vertexIndex, int r, int g, int b, int a) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_COLOR;
-        bakedQuad.getVertices()[offset] = ((a & 0xFF) << 24) | ((b & 0xFF) << 16) | ((g & 0xFF) << 8) | (r & 0xFF);
+        bakedQuad.vertices()[offset] = ((a & 0xFF) << 24) | ((b & 0xFF) << 16) | ((g & 0xFF) << 8) | (r & 0xFF);
     }
 
     /**
@@ -292,7 +292,7 @@ public final class QuadUtils {
      */
     public static void setU(BakedQuad bakedQuad, int vertexIndex, float u) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_UV;
-        bakedQuad.getVertices()[offset] = Float.floatToRawIntBits(u);
+        bakedQuad.vertices()[offset] = Float.floatToRawIntBits(u);
     }
 
     /**
@@ -302,7 +302,7 @@ public final class QuadUtils {
      */
     public static void setV(BakedQuad bakedQuad, int vertexIndex, float v) {
         int offset = vertexIndex * VERTEX_STRIDE + VERTEX_UV;
-        bakedQuad.getVertices()[offset + 1] = Float.floatToRawIntBits(v);
+        bakedQuad.vertices()[offset + 1] = Float.floatToRawIntBits(v);
     }
 
     /**

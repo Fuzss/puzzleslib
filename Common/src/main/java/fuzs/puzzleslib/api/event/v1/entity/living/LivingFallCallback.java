@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.event.v1.entity.living;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.data.MutableDouble;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -24,5 +25,5 @@ public interface LivingFallCallback {
      *         <li>{@link EventResult#PASS PASS} to allow vanilla behavior to continue executing with values set by the event</li>
      *         </ul>
      */
-    EventResult onLivingFall(LivingEntity livingEntity, MutableFloat fallDistance, MutableFloat damageMultiplier);
+    EventResult onLivingFall(LivingEntity livingEntity, MutableDouble fallDistance, MutableFloat damageMultiplier);
 }

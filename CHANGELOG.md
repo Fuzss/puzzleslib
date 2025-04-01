@@ -27,3 +27,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `RegisterFuelValuesCallback`
 - Remove `RegistryHelper`
 - Remove `MessageV2`
+- Remove `ClientModConstructor::onRegisterAdditionalModels`
+- Remove `ClientModConstructor::onRegisterCoreShaders`
+- Remove `SetupMobGoalsCallback`

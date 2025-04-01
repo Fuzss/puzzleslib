@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
 import com.google.common.collect.ImmutableMap;
-import fuzs.forgeconfigapiport.fabric.api.neoforge.v4.client.ConfigScreenFactoryRegistry;
+import fuzs.forgeconfigapiport.fabric.api.v5.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
@@ -15,7 +15,6 @@ import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.client.util.EntityRenderStateExtension;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
-import fuzs.puzzleslib.fabric.mixin.client.accessor.ClientCommonPacketListenerImplFabricAccessor;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
@@ -39,13 +38,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.*;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
@@ -130,9 +126,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public Connection getConnection(PacketListener packetListener) {
-        return packetListener instanceof ClientCommonPacketListenerImpl ?
-                ((ClientCommonPacketListenerImplFabricAccessor) packetListener).puzzleslib$getConnection() :
-                super.getConnection(packetListener);
+        return packetListener instanceof ClientCommonPacketListenerImpl clientPacketListener ?
+                clientPacketListener.connection : super.getConnection(packetListener);
     }
 
     @Override
@@ -213,18 +208,13 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public BakedQuad copyBakedQuad(BakedQuad bakedQuad) {
-        int[] vertices = bakedQuad.getVertices();
+        int[] vertices = bakedQuad.vertices();
         return new BakedQuad(Arrays.copyOf(vertices, vertices.length),
-                bakedQuad.getTintIndex(),
-                bakedQuad.getDirection(),
-                bakedQuad.getSprite(),
-                bakedQuad.isShade(),
-                bakedQuad.getLightEmission());
-    }
-
-    @Override
-    public BakedModel getBakedModel(ModelManager modelManager, ResourceLocation resourceLocation) {
-        return modelManager.getModel(resourceLocation);
+                bakedQuad.tintIndex(),
+                bakedQuad.direction(),
+                bakedQuad.sprite(),
+                bakedQuad.shade(),
+                bakedQuad.lightEmission());
     }
 
     @Override
@@ -269,11 +259,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
                         modConfigSpec);
             }
         });
-    }
-
-    @Override
-    public RenderType getRenderType(Block block) {
-        return ItemBlockRenderTypes.getChunkRenderType(block.defaultBlockState());
     }
 
     @Override

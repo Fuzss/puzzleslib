@@ -1,8 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
-import fuzs.puzzleslib.fabric.mixin.accessor.GrindstoneMenuFabricAccessor;
+import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.GrindstoneExperienceHolder;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -41,13 +40,22 @@ abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
 
     @Inject(method = "onTake", at = @At("HEAD"), cancellable = true)
     public void onTake$0(Player player, ItemStack stack, CallbackInfo callback) {
-        Container repairSlots = ((GrindstoneMenuFabricAccessor) this.this$0).puzzleslib$getRepairSlots();
-        DefaultedValue<ItemStack> topInput = this.puzzleslib$topInput = DefaultedValue.fromValue(repairSlots.getItem(0));
-        DefaultedValue<ItemStack> bottomInput = this.puzzleslib$bottomInput = DefaultedValue.fromValue(repairSlots.getItem(1));
+        DefaultedValue<ItemStack> topInput = this.puzzleslib$topInput = DefaultedValue.fromValue(this.this$0.repairSlots.getItem(
+                0));
+        DefaultedValue<ItemStack> bottomInput = this.puzzleslib$bottomInput = DefaultedValue.fromValue(this.this$0.repairSlots.getItem(
+                1));
         FabricPlayerEvents.GRINDSTONE_USE.invoker().onGrindstoneUse(topInput, bottomInput, player);
     }
 
-    @Inject(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/inventory/ContainerLevelAccess;execute(Ljava/util/function/BiConsumer;)V", shift = At.Shift.AFTER), cancellable = true)
+    @Inject(
+            method = "onTake",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/world/inventory/ContainerLevelAccess;execute(Ljava/util/function/BiConsumer;)V",
+                    shift = At.Shift.AFTER
+            ),
+            cancellable = true
+    )
     public void onTake$1(Player player, ItemStack stack, CallbackInfo callback) {
         Objects.requireNonNull(this.puzzleslib$topInput, "top input is null");
         Objects.requireNonNull(this.puzzleslib$bottomInput, "bottom input is null");
@@ -55,9 +63,8 @@ abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
         Optional<ItemStack> bottomInput = this.puzzleslib$bottomInput.getAsOptional();
         this.puzzleslib$topInput = this.puzzleslib$bottomInput = null;
         if (topInput.isPresent() || bottomInput.isPresent()) {
-            Container repairSlots = ((GrindstoneMenuFabricAccessor) this.this$0).puzzleslib$getRepairSlots();
-            repairSlots.setItem(0, topInput.orElse(ItemStack.EMPTY));
-            repairSlots.setItem(1, bottomInput.orElse(ItemStack.EMPTY));
+            this.this$0.repairSlots.setItem(0, topInput.orElse(ItemStack.EMPTY));
+            this.this$0.repairSlots.setItem(1, bottomInput.orElse(ItemStack.EMPTY));
             callback.cancel();
         }
     }

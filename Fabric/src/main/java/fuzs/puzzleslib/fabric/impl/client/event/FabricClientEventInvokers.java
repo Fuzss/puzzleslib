@@ -7,8 +7,8 @@ import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.model.BlockModelLoadingEvents;
 import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompleteCallback;
+import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingEvents;
 import fuzs.puzzleslib.api.client.event.v1.model.ModelLoadingEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -36,8 +36,8 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.block.model.UnbakedBlockStateModel;
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.item.ItemModel;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -81,69 +81,66 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(ModelLoadingEvents.LoadModel.class, (ModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
                 pluginContext.modifyModelOnLoad().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.OnLoad.Context context) -> {
-                    EventResultHolder<UnbakedModel> result = callback.onLoadModel(
+                    EventResultHolder<UnbakedModel> eventResult = callback.onLoadModel(
                             context.id(),
                             model);
-                    return result.getInterrupt().orElse(model);
+                    return eventResult.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(ModelLoadingEvents.ModifyUnbakedModel.class, (ModelLoadingEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelBakingEvents.BeforeItem.class, (ModelBakingEvents.BeforeItem callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedModel model, ModelModifier.BeforeBake.Context context) -> {
-                    EventResultHolder<UnbakedModel> result = callback.onModifyUnbakedModel(
-                            context.id(),
+                pluginContext.modifyItemModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (ItemModel.Unbaked model, ModelModifier.BeforeBakeItem.Context context) -> {
+                    EventResultHolder<ItemModel.Unbaked> eventResult = callback.onBeforeBakeItem(
+                            context.itemId(),
                             model,
-                            context.settings(),
-                            context.baker());
-                    return result.getInterrupt().orElse(model);
+                            context.bakeContext());
+                    return eventResult.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(ModelLoadingEvents.ModifyBakedModel.class, (ModelLoadingEvents.ModifyBakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelBakingEvents.AfterItem.class, (ModelBakingEvents.AfterItem callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (BakedModel model, ModelModifier.AfterBake.Context context) -> {
-                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(
-                            context.id(),
+                pluginContext.modifyItemModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (ItemModel model, ModelModifier.AfterBakeItem.Context context) -> {
+                    EventResultHolder<ItemModel> eventResult = callback.onAfterBakeItem(
+                            context.itemId(),
                             model,
                             context.sourceModel(),
-                            context.settings(),
-                            context.baker());
-                    return result.getInterrupt().orElse(model);
+                            context.bakeContext());
+                    return eventResult.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(BlockModelLoadingEvents.LoadModel.class, (BlockModelLoadingEvents.LoadModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelLoadingEvents.LoadBlockModel.class, (ModelLoadingEvents.LoadBlockModel callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyBlockModelOnLoad().register(ModelModifier.OVERRIDE_PHASE, (UnbakedBlockStateModel model, ModelModifier.OnLoadBlock.Context context) -> {
-                    EventResultHolder<UnbakedBlockStateModel> result = callback.onLoadModel(
-                            context.id(),
-                            model,
-                            context.state());
-                    return result.getInterrupt().orElse(model);
+                pluginContext.modifyBlockModelOnLoad().register(ModelModifier.OVERRIDE_PHASE, (BlockStateModel.UnbakedRoot model, ModelModifier.OnLoadBlock.Context context) -> {
+                    EventResultHolder<BlockStateModel.UnbakedRoot> eventResult = callback.onLoadBlockModel(
+                            context.state(),
+                            model);
+                    return eventResult.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(BlockModelLoadingEvents.ModifyUnbakedModel.class, (BlockModelLoadingEvents.ModifyUnbakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelBakingEvents.BeforeBlock.class, (ModelBakingEvents.BeforeBlock callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyBlockModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (UnbakedBlockStateModel model, ModelModifier.BeforeBakeBlock.Context context) -> {
-                    EventResultHolder<UnbakedBlockStateModel> result = callback.onModifyUnbakedModel(
-                            context.id(),
+                pluginContext.modifyBlockModelBeforeBake().register(ModelModifier.OVERRIDE_PHASE, (BlockStateModel.UnbakedRoot model, ModelModifier.BeforeBakeBlock.Context context) -> {
+                    EventResultHolder<BlockStateModel.UnbakedRoot> eventResult = callback.onBeforeBakeBlock(
+                            context.state(),
                             model,
                             context.baker());
-                    return result.getInterrupt().orElse(model);
+                    return eventResult.getInterrupt().orElse(model);
                 });
             });
         });
-        INSTANCE.register(BlockModelLoadingEvents.ModifyBakedModel.class, (BlockModelLoadingEvents.ModifyBakedModel callback, @Nullable Object o) -> {
+        INSTANCE.register(ModelBakingEvents.AfterBlock.class, (ModelBakingEvents.AfterBlock callback, @Nullable Object o) -> {
             ModelLoadingPlugin.register((ModelLoadingPlugin.Context pluginContext) -> {
-                pluginContext.modifyBlockModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (BakedModel model, ModelModifier.AfterBakeBlock.Context context) -> {
-                    EventResultHolder<BakedModel> result = callback.onModifyBakedModel(
-                            context.id(),
+                pluginContext.modifyBlockModelAfterBake().register(ModelModifier.OVERRIDE_PHASE, (BlockStateModel model, ModelModifier.AfterBakeBlock.Context context) -> {
+                    EventResultHolder<BlockStateModel> eventResult = callback.onAfterBakeBlock(
+                            context.state(),
                             model,
                             context.sourceModel(),
                             context.baker());
-                    return result.getInterrupt().orElse(model);
+                    return eventResult.getInterrupt().orElse(model);
                 });
             });
         });
@@ -336,9 +333,9 @@ public final class FabricClientEventInvokers {
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
                 if (!level.isClientSide) return InteractionResult.PASS;
                 Minecraft minecraft = Minecraft.getInstance();
-                EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
+                EventResult eventResult = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
                 // when interrupted cancel the interaction without the server being notified
-                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
+                return eventResult.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Use.class, UseEntityCallback.EVENT, (InteractionInputEvents.Use callback, @Nullable Object context) -> {
@@ -347,9 +344,9 @@ public final class FabricClientEventInvokers {
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
                 if (!level.isClientSide) return InteractionResult.PASS;
                 Minecraft minecraft = Minecraft.getInstance();
-                EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
+                EventResult eventResult = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
                 // when interrupted cancel the interaction without the server being notified
-                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
+                return eventResult.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Use.class, UseItemCallback.EVENT, (InteractionInputEvents.Use callback, @Nullable Object context) -> {
@@ -358,9 +355,9 @@ public final class FabricClientEventInvokers {
                 // proper handling of the Fabric callback with the server-side component is implemented elsewhere
                 if (!level.isClientSide) return InteractionResult.PASS;
                 Minecraft minecraft = Minecraft.getInstance();
-                EventResult result = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
+                EventResult eventResult = callback.onUseInteraction(minecraft, (LocalPlayer) player, hand, minecraft.hitResult);
                 // when interrupted cancel the interaction without the server being notified
-                return result.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
+                return eventResult.isInterrupt() ? InteractionResult.FAIL : InteractionResult.PASS;
             };
         }, EventPhase::early, true);
         INSTANCE.register(InteractionInputEvents.Pick.class, FabricClientPlayerEvents.PICK_INTERACTION_INPUT);
@@ -378,8 +375,8 @@ public final class FabricClientEventInvokers {
                 }
                 Minecraft minecraft = Minecraft.getInstance();
                 if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return true;
-                EventResult result = callback.onRenderHighlight(context.worldRenderer(), context.camera(), context.gameRenderer(), hitResult, context.tickCounter(), context.matrixStack(), context.consumers(), context.world());
-                return result.isPass();
+                EventResult eventResult = callback.onRenderHighlight(context.worldRenderer(), context.camera(), context.gameRenderer(), hitResult, context.tickCounter(), context.matrixStack(), context.consumers(), context.world());
+                return eventResult.isPass();
             };
         });
         INSTANCE.register(RenderLevelEvents.AfterTerrain.class, WorldRenderEvents.BEFORE_ENTITIES, (RenderLevelEvents.AfterTerrain callback) -> {

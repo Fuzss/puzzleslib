@@ -47,9 +47,7 @@
     "StartAttackingFabricMixin",
     "ThrownEnderpearlFabricMixin",
     "WolfFabricMixin",
-    "accessor.GrindstoneMenuFabricAccessor",
-    "accessor.PackRepositoryFabricAccessor",
-    "accessor.ServerCommonPacketListenerImplFabricAccessor"
+    "accessor.PackRepositoryFabricAccessor"
   ],
   "client": [
     "client.AbstractClientPlayerFabricMixin",
@@ -81,7 +79,6 @@
     "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.ToastComponentFabricMixin",
-    "client.accessor.ClientCommonPacketListenerImplFabricAccessor",
     "client.accessor.MultiPlayerGameModeFabricAccessor"
   ],
   "server": [

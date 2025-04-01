@@ -22,7 +22,7 @@ abstract class FarmBlockFabricMixin extends Block {
     }
 
     @Inject(method = "fallOn", at = @At("HEAD"), cancellable = true)
-    public void fallOn(Level level, BlockState blockState, BlockPos blockPos, Entity entity, float fallDistance, CallbackInfo callback) {
+    public void fallOn(Level level, BlockState blockState, BlockPos blockPos, Entity entity, double fallDistance, CallbackInfo callback) {
         if (level instanceof ServerLevel serverLevel) {
             if (FabricLevelEvents.FARMLAND_TRAMPLE.invoker()
                     .onFarmlandTrample(serverLevel, blockPos, Blocks.DIRT.defaultBlockState(), fallDistance, entity)

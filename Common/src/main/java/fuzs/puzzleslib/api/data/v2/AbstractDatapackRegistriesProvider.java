@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.JukeboxSong;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.trim.MaterialAssetGroup;
 import net.minecraft.world.item.equipment.trim.TrimMaterial;
 
 import java.util.Collections;
@@ -70,10 +71,9 @@ public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatap
     public static void registerTrimMaterial(BootstrapContext<TrimMaterial> context, ResourceKey<TrimMaterial> resourceKey, Item ingredient, int descriptionColor, Map<ResourceKey<EquipmentAsset>, String> overrideArmorAssets) {
         Component component = ResourceKeyHelper.getComponent(resourceKey)
                 .withStyle(Style.EMPTY.withColor(descriptionColor));
-        TrimMaterial trimMaterial = TrimMaterial.create(resourceKey.location().getPath(),
-                ingredient,
-                component,
+        MaterialAssetGroup materialAssetGroup = MaterialAssetGroup.create(resourceKey.location().getPath(),
                 overrideArmorAssets);
+        TrimMaterial trimMaterial = new TrimMaterial(materialAssetGroup, component);
         context.register(resourceKey, trimMaterial);
     }
 

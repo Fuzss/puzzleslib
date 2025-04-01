@@ -6,6 +6,7 @@ import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementType;
 import net.minecraft.advancements.DisplayInfo;
+import net.minecraft.core.ClientAsset;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
@@ -54,7 +55,7 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
         return new DisplayInfo(itemStack,
                 advancementToken.title(),
                 advancementToken.description(),
-                Optional.ofNullable(background),
+                Optional.ofNullable(background).map(ClientAsset::new),
                 advancementType,
                 true,
                 true,

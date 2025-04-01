@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.data.v2.models;
 
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -90,9 +91,21 @@ public final class ItemModelGenerationHelper {
     }
 
     public static void generateSpawnEgg(Item item, ItemModelGenerators itemModelGenerators) {
-        itemModelGenerators.generateSpawnEgg(item,
+        generateSpawnEgg(item,
                 ((DyedSpawnEggItem) item).backgroundColor(),
-                ((DyedSpawnEggItem) item).highlightColor());
+                ((DyedSpawnEggItem) item).highlightColor(),
+                itemModelGenerators);
+    }
+
+    public static void generateSpawnEgg(Item item, int primaryColor, int secondaryColor, ItemModelGenerators itemModelGenerators) {
+        ResourceLocation textureLocation = PuzzlesLibMod.id("spawn_egg");
+        ResourceLocation resourceLocation = itemModelGenerators.generateLayeredItem(item,
+                ModelLocationHelper.getItemTexture(textureLocation),
+                ModelLocationHelper.getItemTexture(textureLocation, "_overlay"));
+        itemModelGenerators.itemModelOutput.accept(item,
+                ItemModelUtils.tintedModel(resourceLocation,
+                        ItemModelUtils.constantTint(primaryColor),
+                        ItemModelUtils.constantTint(secondaryColor)));
     }
 
     public static void generateHorn(Item item, ItemModelGenerators itemModelGenerators) {
