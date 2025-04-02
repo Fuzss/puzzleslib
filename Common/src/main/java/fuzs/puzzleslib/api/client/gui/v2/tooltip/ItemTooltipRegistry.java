@@ -39,7 +39,7 @@ public final class ItemTooltipRegistry {
     /**
      * Registers an item tooltip provider built from a component.
      *
-     * @param clazz     the item / block
+     * @param itemLike  the item / block
      * @param component the component
      * @param <T>       the item / block type
      */
@@ -64,7 +64,7 @@ public final class ItemTooltipRegistry {
     /**
      * Registers an item tooltip provider built from extracting a component.
      *
-     * @param clazz              the item / block
+     * @param itemLike           the item / block
      * @param componentExtractor the component getter from the item / block
      * @param <T>                the item / block type
      */
