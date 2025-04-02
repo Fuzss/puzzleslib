@@ -1,8 +1,14 @@
 package fuzs.puzzleslib.impl.content;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
+import org.objectweb.asm.Type;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class PuzzlesLibDevelopment implements ModConstructor {
 
@@ -36,5 +42,24 @@ public class PuzzlesLibDevelopment implements ModConstructor {
         GameRuleValueOverrides.setValue(GameRules.RULE_MAX_ENTITY_CRAMMING, 0);
         GameRuleValueOverrides.setValue(GameRules.RULE_PLAYERS_NETHER_PORTAL_DEFAULT_DELAY, 1);
         GameRuleValueOverrides.setValue(GameRules.RULE_COMMANDBLOCKOUTPUT, false);
+    }
+
+    public static void printComponentsWithoutAccess(Class<?> clazz) {
+        for (Field field : clazz.getDeclaredFields()) {
+            if (!Modifier.isPublic(field.getModifiers()) && !field.isSynthetic()) {
+                PuzzlesLib.LOGGER.info("transitive-accessible\tfield\t{}\t{}\t{}",
+                        Type.getInternalName(field.getDeclaringClass()),
+                        field.getName(),
+                        Type.getDescriptor(field.getType()));
+            }
+        }
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (!Modifier.isPublic(method.getModifiers()) && !method.isSynthetic()) {
+                PuzzlesLib.LOGGER.info("transitive-accessible\tmethod\t{}\t{}\t{}",
+                        Type.getInternalName(method.getDeclaringClass()),
+                        method.getName(),
+                        Type.getMethodDescriptor(method));
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.event.v1.entity.player;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -22,11 +23,12 @@ public final class ItemEntityEvents {
          * Called when a player touches an {@link ItemEntity} laying on the ground.
          *
          * @param player     the player touching the item entity on the ground
-         * @param itemEntity the {@link ItemEntity} that is being touched
-         * @return {@link EventResult#ALLOW} to force the item to be removed without there being any attempt at adding
-         *         to the player inventory, {@link EventResult#DENY} to prevent the item from being picked up,
-         *         {@link EventResult#PASS} to allow vanilla behavior to proceed where the item will be added to the
-         *         player inventory, staying on the ground if that fails
+         * @param itemEntity the item entity being touched
+         * @return <ul>
+         *         <li>{@link EventResult#ALLOW ALLOW} to force the item to be removed without there being any attempt at adding to the player inventory</li>
+         *         <li>{@link EventResult#DENY DENY} to prevent the item from being picked up</li>
+         *         <li>{@link EventResult#PASS PASS} to allow vanilla behavior to proceed where the item will be added to the player inventory, staying on the ground if that fails</li>
+         *         </ul>
          */
         EventResult onItemTouch(Player player, ItemEntity itemEntity);
     }
@@ -38,14 +40,13 @@ public final class ItemEntityEvents {
          * Called when the player picks up an {@link ItemEntity} from the ground after the {@link ItemStack} has been
          * added to the player inventory.
          * <p>
-         * The event's main purpose is to notify that the item pickup has happened.
+         * The event's purpose is to notify that the item pickup has happened.
          *
-         * @param player     the player that touched <code>itemEntity</code>, picking up <code>stack</code> in the
-         *                   process
-         * @param itemEntity the {@link ItemEntity} that was touched
-         * @param itemStack  a stack copy containing the amount that was added to the player inventory, usually the full
-         *                   stack from <code>itemEntity</code>, but can also be an empty stack in case the item pick-up
-         *                   was forced without considering the player inventory via {@link Touch}
+         * @param player     the player that touched the item entity, picking up the held item stack in the process
+         * @param itemEntity the item entity that was touched
+         * @param itemStack  an item stack copy containing the amount that was added to the player inventory, usually
+         *                   the full item stack, but can also be an empty stack in case the item pick-up was forced
+         *                   without considering the player inventory via {@link Touch}
          */
         void onItemPickup(Player player, ItemEntity itemEntity, ItemStack itemStack);
     }
@@ -59,13 +60,18 @@ public final class ItemEntityEvents {
          * <p>
          * This callback can be cancelled so no item entity is added to the level, the item will be lost in that case as
          * it has already been removed from the player inventory.
+         * <p>
+         * Use in combination with
+         * {@link net.minecraft.world.entity.LivingEntity#createItemStackToDrop(ItemStack, boolean, boolean)} to create
+         * a custom item entity.
          *
-         * @param player     the player tossing the item stack
-         * @param itemEntity item entity containing the item stack being tossed, not added to the level yet
-         * @return {@link EventResult#INTERRUPT} to prevent the item from being tossed, nothing will be added to the
-         *         world and the stack will be lost, {@link EventResult#PASS} to allow the stack to be tossed from the
-         *         player inventory as usual
+         * @param serverPlayer the player tossing the item stack
+         * @param itemStack    the item stack being tossed
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the item from being tossed, nothing will be added to the level and the stack will be lost</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the item stack to be tossed from the player inventory</li>
+         *         </ul>
          */
-        EventResult onItemToss(Player player, ItemEntity itemEntity);
+        EventResult onItemToss(ServerPlayer serverPlayer, ItemStack itemStack);
     }
 }

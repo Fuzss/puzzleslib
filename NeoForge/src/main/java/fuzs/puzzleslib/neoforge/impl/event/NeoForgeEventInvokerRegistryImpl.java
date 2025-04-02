@@ -553,7 +553,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             callback.onChunkUnload(serverLevel, evt.getChunk());
         });
         INSTANCE.register(ItemEntityEvents.Toss.class, ItemTossEvent.class, (ItemEntityEvents.Toss callback, ItemTossEvent evt) -> {
-            if (callback.onItemToss(evt.getPlayer(), evt.getEntity()).isInterrupt()) {
+            if (!(evt.getPlayer() instanceof ServerPlayer serverPlayer)) return;
+            if (callback.onItemToss(serverPlayer, evt.getEntity().getItem()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });

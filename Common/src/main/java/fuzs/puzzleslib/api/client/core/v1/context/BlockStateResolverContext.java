@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import net.minecraft.client.renderer.block.model.BlockStateModel;
-import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -10,8 +8,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Register a resolver responsible for mapping each {@link BlockState} of a block to an
@@ -33,29 +31,5 @@ public interface BlockStateResolverContext {
      * @param blockStateConsumer the consumer resolving block states to individual unbaked block state models
      * @param <T>                the loaded data type
      */
-    <T> void registerBlockStateResolver(Block block, Function<ResourceLoaderContext, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer);
-
-    /**
-     * A context for preparing loadable resources.
-     */
-    interface ResourceLoaderContext {
-
-        /**
-         * @return the resource manager
-         */
-        ResourceManager resourceManager();
-
-        /**
-         * @return the executor
-         */
-        Executor executor();
-
-        /**
-         * Allows for adding additional unbaked models. The models are automatically resolved and baked.
-         *
-         * @param resourceLocation the model resource location
-         * @param resolvedModel    the unbaked model instance
-         */
-        void addModel(ResourceLocation resourceLocation, ResolvedModel resolvedModel);
-    }
+    <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer);
 }

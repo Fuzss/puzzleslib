@@ -93,7 +93,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
         String key = PuzzlesLibMod.id("spawn_type").toString();
         if (compound.contains(key)) {
             try {
-                this.puzzleslib$spawnType = EntitySpawnReason.valueOf(compound.getString(key).orElseThrow());
+                this.puzzleslib$spawnType = EntitySpawnReason.valueOf(compound.getStringOr(key, ""));
             } catch (Exception exception) {
                 compound.remove(key);
             }
