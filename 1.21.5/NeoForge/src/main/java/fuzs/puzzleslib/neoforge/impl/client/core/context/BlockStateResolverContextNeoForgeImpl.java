@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.client.core.v1.context.BlockStateResolverContext;
 import fuzs.puzzleslib.api.client.renderer.v1.model.ModelLoadingHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.client.core.context.ResourceLoaderContextImpl;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -29,10 +28,8 @@ import net.neoforged.neoforge.client.model.standalone.StandaloneModelLoader;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.util.concurrent.Executor;
+import java.util.function.*;
 import java.util.stream.Collectors;
 
 public final class BlockStateResolverContextNeoForgeImpl implements BlockStateResolverContext {
@@ -62,8 +59,8 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
         modelDiscovery.uncachedResolver = (Object object) -> {
             ResourceLocation resourcelocation = (ResourceLocation) object;
             ResolvedModel resolvedModel = this.resolvedModels.get(resourcelocation);
-            if (resolvedModel != null) {
-                return (ModelDiscovery.ModelWrapper) resolvedModel;
+            if (resolvedModel instanceof ModelDiscovery.ModelWrapper modelWrapper) {
+                return modelWrapper;
             } else {
                 UnbakedModel unbakedmodel = ModelLoadingHelper.loadBlockModel(this.resourceManager, resourcelocation);
                 if (unbakedmodel == null) {
@@ -79,7 +76,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
             modelDiscovery.addRoot(unbakedBlockStateModel);
             unbakedBlockStateModels.put(blockState, unbakedBlockStateModel);
         });
-        this.resolvedModels.putAll(modelDiscovery.resolve());
+        modelDiscovery.resolve().forEach(this.resolvedModels::putIfAbsent);
         this.loadModels(unbakedBlockStateModels).blockStateModels().forEach(this.blockStateModelOutput);
     }
 
@@ -94,11 +91,10 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
     }
 
     @Override
-    public <T> void registerBlockStateResolver(Block block, Function<BlockStateResolverContext.ResourceLoaderContext, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer) {
+    public <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer) {
         this.registerBlockStateResolver(block, (BiConsumer<BlockState, BlockStateModel.UnbakedRoot> consumer) -> {
-            blockStateConsumer.accept(resourceLoader.apply(new ResourceLoaderContextImpl(this.resourceManager,
-                    Util.backgroundExecutor(),
-                    this.resolvedModels)).join(), consumer);
+            blockStateConsumer.accept(resourceLoader.apply(this.resourceManager, Util.backgroundExecutor()).join(),
+                    consumer);
         });
     }
 

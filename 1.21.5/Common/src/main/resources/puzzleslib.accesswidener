@@ -255,6 +255,23 @@ transitive-accessible   method  net/minecraft/client/data/AtlasProvider storeAtl
 transitive-accessible   field   net/minecraft/server/network/ServerCommonPacketListenerImpl connection  Lnet/minecraft/network/Connection;
 transitive-accessible   field   net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl connection  Lnet/minecraft/network/Connection;
 accessible  field   net/minecraft/world/inventory/GrindstoneMenu    repairSlots Lnet/minecraft/world/Container;
+transitive-accessible   method  net/minecraft/client/renderer/entity/ItemEntityRenderer calculateModelBoundingBox   (Lnet/minecraft/client/renderer/item/ItemStackRenderState;)Lnet/minecraft/world/phys/AABB;
+transitive-accessible   method  net/minecraft/world/entity/LivingEntity createItemStackToDrop   (Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;
+transitive-accessible   field   net/minecraft/world/entity/LivingEntity lastHurtByPlayer    Lnet/minecraft/world/entity/EntityReference;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	FLOWER_BED_MODEL_1_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	FLOWER_BED_MODEL_2_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	FLOWER_BED_MODEL_3_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	FLOWER_BED_MODEL_4_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	LEAF_LITTER_MODEL_1_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	LEAF_LITTER_MODEL_2_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	LEAF_LITTER_MODEL_3_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	LEAF_LITTER_MODEL_4_SEGMENT_CONDITION	Ljava/util/function/Function;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_FACING	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATIONS_COLUMN_WITH_FACING	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_TORCH	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_HORIZONTAL_FACING_ALT	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_HORIZONTAL_FACING	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
+transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	MULTIFACE_GENERATOR	Ljava/util/Map;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

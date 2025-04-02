@@ -13,7 +13,7 @@ public interface BreakSpeedCallback {
     /**
      * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
      *
-     * @param player     the player breaking <code>state</code>
+     * @param player     the player breaking the block
      * @param blockState the block state being broken
      * @param breakSpeed the speed at which the block is broken, usually a value around 1.0
      * @return <ul>

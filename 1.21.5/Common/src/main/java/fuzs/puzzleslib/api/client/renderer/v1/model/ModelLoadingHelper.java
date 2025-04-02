@@ -8,9 +8,8 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.BlockModelDefinition;
-import net.minecraft.client.resources.model.BlockStateModelLoader;
-import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.resources.model.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -22,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -125,5 +125,27 @@ public final class ModelLoadingHelper {
                 }
             }).orElse(null);
         });
+    }
+
+    public static BlockStateModel.UnbakedRoot missingModel() {
+        return new BlockStateModel.UnbakedRoot() {
+            @Override
+            public BlockStateModel bake(BlockState blockState, ModelBaker modelBaker) {
+                UnbakedModel unbakedModel = MissingBlockModel.missingModel();
+                // just use this, so we do not have to deal with the internal resolved model implementation
+                ResolvedModel resolvedModel = new ModelDiscovery(Collections.emptyMap(), unbakedModel).missingModel();
+                return ModelBakery.MissingModels.bake(resolvedModel, modelBaker.sprites()).block();
+            }
+
+            @Override
+            public Object visualEqualityGroup(BlockState state) {
+                return this;
+            }
+
+            @Override
+            public void resolveDependencies(ResolvableModel.Resolver resolver) {
+                // NO-OP
+            }
+        };
     }
 }

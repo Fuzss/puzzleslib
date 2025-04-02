@@ -34,8 +34,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.neoforged.neoforge.client.event.*;
-import net.neoforged.neoforge.client.event.lifecycle.ClientStartedEvent;
 import net.neoforged.neoforge.client.event.lifecycle.ClientStoppingEvent;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
@@ -84,8 +84,9 @@ public final class NeoForgeClientEventInvokers {
                 callback.onExtractRenderState(entity, entityRenderState, entityRenderState.partialTick);
             });
         });
-        INSTANCE.register(ClientLifecycleEvents.Started.class, ClientStartedEvent.class, (ClientLifecycleEvents.Started callback, ClientStartedEvent evt) -> {
-            callback.onClientStarted(evt.getClient());
+        // TODO switch back to ClientStartedEvent when fixed in NeoForge
+        INSTANCE.register(ClientLifecycleEvents.Started.class, FMLLoadCompleteEvent.class, (ClientLifecycleEvents.Started callback, FMLLoadCompleteEvent evt) -> {
+            evt.enqueueWork(() -> callback.onClientStarted(Minecraft.getInstance()));
         });
         INSTANCE.register(ClientLifecycleEvents.Stopping.class, ClientStoppingEvent.class, (ClientLifecycleEvents.Stopping callback, ClientStoppingEvent evt) -> {
             callback.onClientStopping(evt.getClient());
