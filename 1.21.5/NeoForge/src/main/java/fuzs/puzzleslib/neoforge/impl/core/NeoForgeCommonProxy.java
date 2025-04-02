@@ -255,4 +255,9 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     public boolean isFakePlayer(ServerPlayer serverPlayer) {
         return serverPlayer.isFakePlayer();
     }
+
+    @Override
+    public boolean isPiglinCurrency(ItemStack itemStack) {
+        return itemStack.isPiglinCurrency();
+    }
 }

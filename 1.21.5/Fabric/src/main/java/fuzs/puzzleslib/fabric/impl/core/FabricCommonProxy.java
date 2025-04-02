@@ -63,6 +63,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -291,6 +292,11 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     @Override
     public boolean isFakePlayer(ServerPlayer serverPlayer) {
         return serverPlayer instanceof FakePlayer;
+    }
+
+    @Override
+    public boolean isPiglinCurrency(ItemStack itemStack) {
+        return itemStack.is(PiglinAi.BARTERING_ITEM);
     }
 
     @Override

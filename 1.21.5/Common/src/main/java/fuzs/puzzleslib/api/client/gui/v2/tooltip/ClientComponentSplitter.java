@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.api.client.gui.v2.tooltip;
 
+import fuzs.puzzleslib.api.util.v1.ComponentHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -19,31 +21,40 @@ public final class ClientComponentSplitter {
     }
 
     /**
-     * Split formatted text instances according to a max width.
+     * Split formatted text instances.
      *
-     * @param tooltipLines components for building the tooltip
-     * @return stream of split char sequences
+     * @param tooltipLines the lines for building the tooltip
+     * @return the split components
+     */
+    public static List<Component> splitTooltipComponents(FormattedText... tooltipLines) {
+        return splitTooltipLines(tooltipLines).map(ComponentHelper::toComponent).toList();
+    }
+
+    /**
+     * Split formatted text instances.
+     *
+     * @param tooltipLines the lines for building the tooltip
+     * @return the split components
+     */
+    public static List<Component> splitTooltipComponents(List<? extends FormattedText> tooltipLines) {
+        return splitTooltipLines(tooltipLines).map(ComponentHelper::toComponent).toList();
+    }
+
+    /**
+     * Split formatted text instances.
+     *
+     * @param tooltipLines the lines for building the tooltip
+     * @return the stream of split char sequences
      */
     public static Stream<FormattedCharSequence> splitTooltipLines(FormattedText... tooltipLines) {
-        return splitTooltipLines(170, Arrays.asList(tooltipLines));
+        return splitTooltipLines(Arrays.asList(tooltipLines));
     }
 
     /**
-     * Split formatted text instances according to a max width.
+     * Split formatted text instances.
      *
-     * @param maxWidth     the maximum text width for the line splitter
-     * @param tooltipLines components for building the tooltip
-     * @return stream of split char sequences
-     */
-    public static Stream<FormattedCharSequence> splitTooltipLines(int maxWidth, FormattedText... tooltipLines) {
-        return splitTooltipLines(maxWidth, Arrays.asList(tooltipLines));
-    }
-
-    /**
-     * Split formatted text instances according to a max width.
-     *
-     * @param tooltipLines components for building the tooltip
-     * @return stream of split char sequences
+     * @param tooltipLines the lines for building the tooltip
+     * @return the stream of split char sequences
      */
     public static Stream<FormattedCharSequence> splitTooltipLines(List<? extends FormattedText> tooltipLines) {
         return splitTooltipLines(170, tooltipLines);
@@ -53,8 +64,19 @@ public final class ClientComponentSplitter {
      * Split formatted text instances according to a max width.
      *
      * @param maxWidth     the maximum text width for the line splitter
-     * @param tooltipLines components for building the tooltip
-     * @return stream of split char sequences
+     * @param tooltipLines the lines for building the tooltip
+     * @return the stream of split char sequences
+     */
+    public static Stream<FormattedCharSequence> splitTooltipLines(int maxWidth, FormattedText... tooltipLines) {
+        return splitTooltipLines(maxWidth, Arrays.asList(tooltipLines));
+    }
+
+    /**
+     * Split formatted text instances according to a max width.
+     *
+     * @param maxWidth     the maximum text width for the line splitter
+     * @param tooltipLines the lines for building the tooltip
+     * @return the stream of split char sequences
      */
     public static Stream<FormattedCharSequence> splitTooltipLines(int maxWidth, List<? extends FormattedText> tooltipLines) {
         return tooltipLines.stream().flatMap((FormattedText formattedText) -> {
@@ -72,8 +94,8 @@ public final class ClientComponentSplitter {
     /**
      * Process formatted text instances into char sequences.
      *
-     * @param tooltipLines components for building the tooltip
-     * @return stream of char sequences
+     * @param tooltipLines the lines for building the tooltip
+     * @return the stream of char sequences
      */
     public static Stream<FormattedCharSequence> processTooltipLines(FormattedText... tooltipLines) {
         return processTooltipLines(Arrays.asList(tooltipLines));
@@ -82,8 +104,8 @@ public final class ClientComponentSplitter {
     /**
      * Process formatted text instances into char sequences.
      *
-     * @param tooltipLines components for building the tooltip
-     * @return stream of char sequences
+     * @param tooltipLines the lines for building the tooltip
+     * @return the stream of char sequences
      */
     public static Stream<FormattedCharSequence> processTooltipLines(List<? extends FormattedText> tooltipLines) {
         return tooltipLines.stream().map((FormattedText formattedText) -> {

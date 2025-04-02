@@ -85,4 +85,15 @@ public final class EntityHelper {
         Objects.requireNonNull(serverPlayer, "server player is null");
         return ProxyImpl.get().isFakePlayer(serverPlayer);
     }
+
+    /**
+     * Will {@link net.minecraft.world.entity.monster.piglin.Piglin Piglins} give something back in exchange when given
+     * this item.
+     *
+     * @param itemStack the item stack
+     * @return is the item valid for bartering
+     */
+    public static boolean isPiglinCurrency(ItemStack itemStack) {
+        return ProxyImpl.get().isPiglinCurrency(itemStack);
+    }
 }

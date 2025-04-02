@@ -100,18 +100,22 @@ public abstract class AbstractLanguageProvider implements DataProvider {
                 this.pathProvider.json(ResourceLocationHelper.fromNamespaceAndPath(this.modId, this.languageCode)));
     }
 
-    protected <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
+    private <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
         registry.listElements()
                 .filter((Holder.Reference<T> holder) -> holder.key().location().getNamespace().equals(this.modId))
                 .forEach((Holder.Reference<T> holder) -> {
                     holderTranslationCollector.accept((String translationKey, String value) -> {
-                        if (!predicate.test(translationKey)) {
+                        if (this.mustHaveTranslationKey(holder, translationKey) && !predicate.test(translationKey)) {
                             throw new IllegalStateException("Missing translation key '%s' for '%s'".formatted(
                                     translationKey,
                                     holder));
                         }
                     }, holder, "");
                 });
+    }
+
+    protected boolean mustHaveTranslationKey(Holder.Reference<?> holder, String translationKey) {
+        return true;
     }
 
     @Override
