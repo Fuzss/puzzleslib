@@ -17,4 +17,6 @@ public interface EntityProxy {
     Entity getPartEntityParent(Entity entity);
 
     boolean isFakePlayer(ServerPlayer serverPlayer);
+
+    boolean isPiglinCurrency(ItemStack itemStack);
 }

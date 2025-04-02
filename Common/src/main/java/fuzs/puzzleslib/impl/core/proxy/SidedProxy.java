@@ -14,12 +14,12 @@ public interface SidedProxy {
 
     void registerEventHandlers();
 
-    @Deprecated
+    @Deprecated(forRemoval = true)
     default Player getClientPlayer() {
         throw new RuntimeException("Client player accessed for wrong side!");
     }
 
-    @Deprecated
+    @Deprecated(forRemoval = true)
     default Level getClientLevel() {
         throw new RuntimeException("Client level accessed for wrong side!");
     }

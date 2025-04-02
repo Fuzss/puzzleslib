@@ -77,6 +77,7 @@ public class ComponentHelper {
      * <p>
      * Always returns <code>false</code> on the server.
      */
+    @Deprecated(forRemoval = true)
     public static boolean hasControlDown() {
         return ProxyImpl.get().hasControlDown();
     }
@@ -88,6 +89,7 @@ public class ComponentHelper {
      *
      * @return is the shift key pressed
      */
+    @Deprecated(forRemoval = true)
     public static boolean hasShiftDown() {
         return ProxyImpl.get().hasShiftDown();
     }
@@ -99,6 +101,7 @@ public class ComponentHelper {
      *
      * @return is the alt key pressed
      */
+    @Deprecated(forRemoval = true)
     public static boolean hasAltDown() {
         return ProxyImpl.get().hasAltDown();
     }
@@ -115,6 +118,7 @@ public class ComponentHelper {
      * @param component the component to split
      * @return the split component
      */
+    @Deprecated(forRemoval = true)
     public static List<Component> splitTooltipLines(Component component) {
         Objects.requireNonNull(component, "component is null");
         return ProxyImpl.get().splitTooltipLines(component);

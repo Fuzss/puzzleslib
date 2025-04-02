@@ -133,7 +133,7 @@ public final class ExtraStreamCodecs {
     /**
      * read {@link Component}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static Component readComponent(RegistryFriendlyByteBuf buf) {
         return ComponentSerialization.TRUSTED_STREAM_CODEC.decode(buf);
     }
@@ -141,7 +141,7 @@ public final class ExtraStreamCodecs {
     /**
      * write {@link Component}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static void writeComponent(RegistryFriendlyByteBuf buf, Component component) {
         ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buf, component);
     }
@@ -149,7 +149,7 @@ public final class ExtraStreamCodecs {
     /**
      * read {@link ItemStack}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static ItemStack readItem(RegistryFriendlyByteBuf buf) {
         return ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
     }
@@ -157,7 +157,7 @@ public final class ExtraStreamCodecs {
     /**
      * write {@link ItemStack}
      */
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public static void writeItem(RegistryFriendlyByteBuf buf, ItemStack itemStack) {
         ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, itemStack);
     }
