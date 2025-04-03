@@ -105,14 +105,20 @@ public final class ItemTooltipRegistry {
      */
     public static <T extends ItemLike> void registerItemTooltip(T itemLike, Provider<T> provider) {
         ItemTooltipCallback.EVENT.register((ItemStack itemStack, List<Component> tooltipLines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipFlag) -> {
-            if (itemStack.getItem() == itemLike ||
-                    itemStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == itemLike) {
-                int originalSize = tooltipLines.size();
-                provider.appendHoverText(itemLike, itemStack, tooltipContext, tooltipFlag, (Component component) -> {
-                    // add lines directly below the item name
-                    tooltipLines.addAll(tooltipLines.isEmpty() ? 0 : 1 + tooltipLines.size() - originalSize,
-                            ClientComponentSplitter.splitTooltipComponents(component));
-                });
+            if (tooltipContext != Item.TooltipContext.EMPTY) {
+                if (itemStack.getItem() == itemLike ||
+                        itemStack.getItem() instanceof BlockItem blockItem && blockItem.getBlock() == itemLike) {
+                    int originalSize = tooltipLines.size();
+                    provider.appendHoverText(itemLike,
+                            itemStack,
+                            tooltipContext,
+                            tooltipFlag,
+                            (Component component) -> {
+                                // add lines directly below the item name
+                                tooltipLines.addAll(tooltipLines.isEmpty() ? 0 : 1 + tooltipLines.size() - originalSize,
+                                        ClientComponentSplitter.splitTooltipComponents(component));
+                            });
+                }
             }
         });
     }

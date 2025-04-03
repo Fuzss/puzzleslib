@@ -12,7 +12,6 @@ import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
-import fuzs.puzzleslib.fabric.impl.core.context.FabricModConstructor;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;

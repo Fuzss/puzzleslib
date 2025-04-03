@@ -1,9 +1,9 @@
-package fuzs.puzzleslib.neoforge.impl.core.context;
+package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
-import fuzs.puzzleslib.neoforge.impl.core.NeoForgeProxy;
+import fuzs.puzzleslib.neoforge.impl.core.context.*;
 import net.minecraft.server.packs.PackType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -38,12 +38,12 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
             eventBus.addListener((final EntityAttributeCreationEvent evt) -> {
                 AbstractNeoForgeContext.computeIfAbsent(entityAttributesContext,
                         EntityAttributesContextNeoForgeImpl::new,
-                        modConstructor::onRegisterEntityAttributes);
+                        modConstructor::onRegisterEntityAttributes).registerForEvent(evt);
             });
             eventBus.addListener((final EntityAttributeModificationEvent evt) -> {
                 AbstractNeoForgeContext.computeIfAbsent(entityAttributesContext,
                         EntityAttributesContextNeoForgeImpl::new,
-                        modConstructor::onRegisterEntityAttributes);
+                        modConstructor::onRegisterEntityAttributes).registerForEvent(evt);
             });
             eventBus.addListener((final AddPackFindersEvent evt) -> {
                 if (evt.getPackType() == PackType.SERVER_DATA) {

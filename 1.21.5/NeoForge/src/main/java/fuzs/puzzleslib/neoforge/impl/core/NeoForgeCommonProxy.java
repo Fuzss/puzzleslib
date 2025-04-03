@@ -13,7 +13,6 @@ import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
-import fuzs.puzzleslib.neoforge.impl.core.context.NeoForgeModConstructor;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;

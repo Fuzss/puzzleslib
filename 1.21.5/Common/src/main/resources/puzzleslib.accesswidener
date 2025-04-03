@@ -272,6 +272,7 @@ transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerator
 transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_HORIZONTAL_FACING_ALT	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
 transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_HORIZONTAL_FACING	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
 transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	MULTIFACE_GENERATOR	Ljava/util/Map;
+transitive-accessible	method  net/minecraft/util/ARGB from8BitChannel (I)F
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
