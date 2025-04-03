@@ -257,6 +257,19 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      *
      * @param entityTypeHolder entity type holder to register a spawn egg for
      * @param backgroundColor  background color of the spawn egg item
+     * @return the holder reference
+     */
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor) {
+        return this.registerSpawnEggItem(entityTypeHolder,
+                backgroundColor,
+                DyedSpawnEggItem.generateHighlightColor(backgroundColor));
+    }
+
+    /**
+     * Registers a spawn egg item for an entity type.
+     *
+     * @param entityTypeHolder entity type holder to register a spawn egg for
+     * @param backgroundColor  background color of the spawn egg item
      * @param highlightColor   spots color pf the spawn egg item
      * @return the holder reference
      */
