@@ -245,16 +245,18 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(BlockEvents.Break.class, BlockEvent.BreakEvent.class, (BlockEvents.Break callback, BlockEvent.BreakEvent evt) -> {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (!(evt.getPlayer() instanceof ServerPlayer serverPlayer)) return;
             // match Fabric implementation
             if (evt.getState().getBlock() instanceof GameMasterBlock && !evt.getPlayer().canUseGameMasterBlocks()) {
                 return;
             }
-            GameType gameType = ((ServerPlayer) evt.getPlayer()).gameMode.getGameModeForPlayer();
+            GameType gameType = serverPlayer.gameMode.getGameModeForPlayer();
             if (evt.getPlayer().blockActionRestricted((Level) evt.getLevel(), evt.getPos(), gameType)) {
                 return;
             }
             // no call to IForgeItemStack::onBlockStartBreak, as it may also invoke this event, leading to an infinite recursion
-            EventResult result = callback.onBreakBlock((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
+            EventResult result = callback.onBreakBlock(serverLevel, evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(BlockEvents.DropExperience.class, BlockEvent.BreakEvent.class, (BlockEvents.DropExperience callback, BlockEvent.BreakEvent evt) -> {
@@ -262,7 +264,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             callback.onDropExperience((ServerLevel) evt.getLevel(), evt.getPos(), evt.getState(), evt.getPlayer(), evt.getPlayer().getMainHandItem(), experienceToDrop);
         });
         INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
-            if (callback.onFarmlandTrample((Level) evt.getLevel(), evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (callback.onFarmlandTrample(serverLevel, evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });
@@ -434,8 +437,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel(), !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (callback.onEntityLoad(evt.getEntity(),
+                    serverLevel, !evt.loadedFromDisk() && evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server event on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -445,8 +449,8 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.LoadV2.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.LoadV2 callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            if (callback.onEntityLoad(evt.getEntity(), (ServerLevel) evt.getLevel()).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            if (callback.onEntityLoad(evt.getEntity(), serverLevel).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from loading in!");
@@ -456,8 +460,9 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Spawn.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Spawn callback, EntityJoinLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide || evt.loadedFromDisk()) return;
-            if (callback.onEntitySpawn(evt.getEntity(), (ServerLevel) evt.getLevel(), evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel) || evt.loadedFromDisk()) return;
+            if (callback.onEntitySpawn(evt.getEntity(),
+                    serverLevel, evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
@@ -467,32 +472,36 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(ServerEntityLevelEvents.Remove.class, EntityLeaveLevelEvent.class, (ServerEntityLevelEvents.Remove callback, EntityLeaveLevelEvent evt) -> {
-            if (evt.getLevel().isClientSide) return;
-            callback.onEntityRemove(evt.getEntity(), (ServerLevel) evt.getLevel());
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            callback.onEntityRemove(evt.getEntity(), serverLevel);
         });
         INSTANCE.register(LivingDeathCallback.class, LivingDeathEvent.class, (LivingDeathCallback callback, LivingDeathEvent evt) -> {
             EventResult result = callback.onLivingDeath(evt.getEntity(), evt.getSource());
             if (result.isInterrupt()) evt.setCanceled(true);
         });
         INSTANCE.register(PlayerEvents.StartTracking.class, PlayerEvent.StartTracking.class, (PlayerEvents.StartTracking callback, PlayerEvent.StartTracking evt) -> {
-            callback.onStartTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onStartTracking(evt.getTarget(), serverPlayer);
         });
         INSTANCE.register(PlayerEvents.StopTracking.class, PlayerEvent.StopTracking.class, (PlayerEvents.StopTracking callback, PlayerEvent.StopTracking evt) -> {
-            callback.onStopTracking(evt.getTarget(), (ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onStopTracking(evt.getTarget(), serverPlayer);
         });
         INSTANCE.register(PlayerEvents.LoggedIn.class, PlayerEvent.PlayerLoggedInEvent.class, (PlayerEvents.LoggedIn callback, PlayerEvent.PlayerLoggedInEvent evt) -> {
-            callback.onLoggedIn((ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onLoggedIn(serverPlayer);
         });
         INSTANCE.register(PlayerEvents.LoggedOut.class, PlayerEvent.PlayerLoggedOutEvent.class, (PlayerEvents.LoggedOut callback, PlayerEvent.PlayerLoggedOutEvent evt) -> {
-            callback.onLoggedOut((ServerPlayer) evt.getEntity());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onLoggedOut(serverPlayer);
         });
         INSTANCE.register(PlayerEvents.AfterChangeDimension.class, PlayerEvent.PlayerChangedDimensionEvent.class, (PlayerEvents.AfterChangeDimension callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
-            MinecraftServer server = CommonAbstractions.INSTANCE.getMinecraftServer();
-            ServerLevel from = server.getLevel(evt.getFrom());
-            ServerLevel to = server.getLevel(evt.getTo());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            ServerLevel from = serverPlayer.getServer().getLevel(evt.getFrom());
+            ServerLevel to = serverPlayer.getServer().getLevel(evt.getTo());
             Objects.requireNonNull(from, "level origin is null");
             Objects.requireNonNull(to, "level destination is null");
-            callback.onAfterChangeDimension((ServerPlayer) evt.getEntity(), from, to);
+            callback.onAfterChangeDimension(serverPlayer, from, to);
         });
         INSTANCE.register(BabyEntitySpawnCallback.class, BabyEntitySpawnEvent.class, (BabyEntitySpawnCallback callback, BabyEntitySpawnEvent evt) -> {
             MutableValue<AgeableMob> child = MutableValue.fromEvent(evt::setChild, evt::getChild);
@@ -511,12 +520,15 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(PlayerEvents.Copy.class, PlayerEvent.Clone.class, (PlayerEvents.Copy callback, PlayerEvent.Clone evt) -> {
+            if (!(evt.getOriginal() instanceof ServerPlayer originalServerPlayer)) return;
+            if (!(evt.getEntity() instanceof ServerPlayer newServerPlayer)) return;
             evt.getOriginal().reviveCaps();
-            callback.onCopy((ServerPlayer) evt.getOriginal(), (ServerPlayer) evt.getEntity(), !evt.isWasDeath());
+            callback.onCopy(originalServerPlayer, newServerPlayer, !evt.isWasDeath());
             evt.getOriginal().invalidateCaps();
         });
         INSTANCE.register(PlayerEvents.Respawn.class, PlayerEvent.PlayerRespawnEvent.class, (PlayerEvents.Respawn callback, PlayerEvent.PlayerRespawnEvent evt) -> {
-            callback.onRespawn((ServerPlayer) evt.getEntity(), evt.isEndConquered());
+            if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
+            callback.onRespawn(serverPlayer, evt.isEndConquered());
         });
         INSTANCE.register(ServerTickEvents.Start.class, TickEvent.ServerTickEvent.class, (ServerTickEvents.Start callback, TickEvent.ServerTickEvent evt) -> {
             if (evt.phase != TickEvent.Phase.START) return;
@@ -610,18 +622,19 @@ public final class ForgeEventInvokerRegistryImpl implements ForgeEventInvokerReg
             }
         });
         INSTANCE.register(CheckMobDespawnCallback.class, MobSpawnEvent.AllowDespawn.class, (CheckMobDespawnCallback callback, MobSpawnEvent.AllowDespawn evt) -> {
-            EventResult result = callback.onCheckMobDespawn(evt.getEntity(), (ServerLevel) evt.getLevel());
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
+            EventResult result = callback.onCheckMobDespawn(evt.getEntity(), serverLevel);
             if (result.isInterrupt()) {
                 evt.setResult(result.getAsBoolean() ? Event.Result.ALLOW : Event.Result.DENY);
             }
         });
         INSTANCE.register(GatherPotentialSpawnsCallback.class, LevelEvent.PotentialSpawns.class, (GatherPotentialSpawnsCallback callback, LevelEvent.PotentialSpawns evt) -> {
-            ServerLevel level = (ServerLevel) evt.getLevel();
+            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
             List<MobSpawnSettings.SpawnerData> mobsAt = new PotentialSpawnsList<>(evt::getSpawnerDataList, spawnerData -> {
                 evt.addSpawnerData(spawnerData);
                 return true;
             }, evt::removeSpawnerData);
-            callback.onGatherPotentialSpawns(level, level.structureManager(), level.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
+            callback.onGatherPotentialSpawns(serverLevel, serverLevel.structureManager(), serverLevel.getChunkSource().getGenerator(), evt.getMobCategory(), evt.getPos(), mobsAt);
         });
         INSTANCE.register(EntityRidingEvents.Start.class, EntityMountEvent.class, (EntityRidingEvents.Start callback, EntityMountEvent evt) -> {
             if (evt.isDismounting()) return;

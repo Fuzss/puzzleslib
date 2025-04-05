@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.32-1.20.1] - 2025-04-05
+### Changed
+- Add a bunch of safety checks for casting in event invokers
+
 ## [v8.1.31-1.20.1] - 2025-03-09
 ### Fixed
 - Fix crash from invoking `ContainerMenuHelper::createListBackedContainer`
