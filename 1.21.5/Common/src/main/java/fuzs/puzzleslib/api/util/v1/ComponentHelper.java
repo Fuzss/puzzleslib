@@ -20,7 +20,11 @@ import java.util.function.Consumer;
  * Useful for text instances returned from {@link net.minecraft.client.StringSplitter} and
  * {@link Component#getVisualOrderText()}.
  */
-public class ComponentHelper {
+public final class ComponentHelper {
+
+    private ComponentHelper() {
+        // NO-OP
+    }
 
     /**
      * Converts an instance of {@link FormattedText} to a {@link Component}.
