@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.impl.content;
 
+import com.google.common.collect.Sets;
 import com.mojang.brigadier.builder.ArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -11,6 +12,8 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.NbtPathArgument;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.component.DataComponentMap;
+import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.NbtUtils;
@@ -24,6 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Locale;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -69,7 +73,23 @@ public class ItemDataAccessor implements DataAccessor {
         RegistryOps<Tag> registryOps = this.registryAccess.createSerializationContext(NbtOps.INSTANCE);
         DataComponentMap.CODEC.parse(registryOps, compoundTag)
                 .resultOrPartial()
-                .ifPresent(this.itemStack::applyComponents);
+                .ifPresent((DataComponentMap newComponents) -> {
+                    DataComponentMap oldComponents = this.itemStack.getComponents();
+                    this.itemStack.applyComponents(this.constructDataComponentPatch(oldComponents, newComponents));
+                });
+    }
+
+    <T> DataComponentPatch constructDataComponentPatch(DataComponentMap oldComponents, DataComponentMap newComponents) {
+        DataComponentPatch.Builder builder = DataComponentPatch.builder();
+        for (DataComponentType<?> dataComponentType : Sets.union(oldComponents.keySet(), newComponents.keySet())) {
+            T t = (T) newComponents.get(dataComponentType);
+            if (!newComponents.has(dataComponentType)) {
+                builder.remove(dataComponentType);
+            } else if (!Objects.equals(oldComponents.get(dataComponentType), t)) {
+                builder.set((DataComponentType<T>) dataComponentType, t);
+            }
+        }
+        return builder.build();
     }
 
     @Override
