@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.mixin;
 
-import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.objectweb.asm.tree.ClassNode;
@@ -8,12 +7,13 @@ import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
 import org.spongepowered.asm.mixin.extensibility.IMixinInfo;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("EnchantCommandMixin",
+    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("DataCommandsMixin",
+            "EnchantCommandMixin",
+            "client.ClientSuggestionProviderMixin",
             "client.EditBoxMixin",
             "server.DedicatedServerSettingsMixin",
             "server.EulaMixin");
@@ -26,44 +26,6 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
             Class.forName("fuzs.puzzleslib.api.core.v1.ServiceProviderHelper");
         } catch (ClassNotFoundException exception) {
             throw new RuntimeException(exception);
-        }
-        // we print the mod list to the log as early as possible
-        // this greatly helps with diagnosing issues where only a log has been provided and should otherwise be unobtrusive
-//        printModList();
-    }
-
-    private static void printModList() {
-        Collection<ModContainer> mods = ModLoaderEnvironment.INSTANCE.getModList().values();
-        PuzzlesLib.LOGGER.info(dumpModList(mods));
-    }
-
-    private static String dumpModList(Collection<ModContainer> mods) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Loading ");
-        builder.append(mods.size());
-        builder.append(" mod");
-        if (mods.size() != 1) builder.append("s");
-        builder.append(":");
-        for (ModContainer mod : mods) {
-            if (mod.getParent() == null) {
-                printMod(builder, mod, 0, false);
-            }
-        }
-        return builder.toString();
-    }
-
-    private static void printMod(StringBuilder builder, ModContainer mod, int depth, boolean lastChild) {
-        builder.append('\n');
-        builder.append("\t".repeat(depth + 1));
-        builder.append(depth == 0 ? "-" : (lastChild ? "\\" : "|") + "--");
-        builder.append(' ');
-        builder.append(mod.getModId());
-        builder.append(' ');
-        builder.append(mod.getVersion());
-        Iterator<ModContainer> iterator = mod.getChildren().iterator();
-        while (iterator.hasNext()) {
-            ModContainer childMod = iterator.next();
-            printMod(builder, childMod, depth + 1, !iterator.hasNext());
         }
     }
 

@@ -5,9 +5,11 @@
   "package": "${modGroup}.mixin",
   "plugin": "${modGroup}.mixin.MixinConfigPluginImpl",
   "mixins": [
+    "DataCommandsMixin",
     "EnchantCommandMixin"
   ],
   "client": [
+    "client.ClientSuggestionProviderMixin",
     "client.EditBoxMixin"
   ],
   "server": [

@@ -10,7 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-public class PuzzlesLibDevelopment implements ModConstructor {
+public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor {
 
     @Override
     public void onCommonSetup() {
@@ -47,7 +47,7 @@ public class PuzzlesLibDevelopment implements ModConstructor {
     public static void printComponentsWithoutAccess(Class<?> clazz) {
         for (Field field : clazz.getDeclaredFields()) {
             if (!Modifier.isPublic(field.getModifiers()) && !field.isSynthetic()) {
-                PuzzlesLib.LOGGER.info("transitive-accessible\tfield\t{}\t{}\t{}",
+                LOGGER.info("transitive-accessible\tfield\t{}\t{}\t{}",
                         Type.getInternalName(field.getDeclaringClass()),
                         field.getName(),
                         Type.getDescriptor(field.getType()));
@@ -55,7 +55,7 @@ public class PuzzlesLibDevelopment implements ModConstructor {
         }
         for (Method method : clazz.getDeclaredMethods()) {
             if (!Modifier.isPublic(method.getModifiers()) && !method.isSynthetic()) {
-                PuzzlesLib.LOGGER.info("transitive-accessible\tmethod\t{}\t{}\t{}",
+                LOGGER.info("transitive-accessible\tmethod\t{}\t{}\t{}",
                         Type.getInternalName(method.getDeclaringClass()),
                         method.getName(),
                         Type.getMethodDescriptor(method));
