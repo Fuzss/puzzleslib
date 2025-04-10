@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
+import com.google.common.base.Preconditions;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.llamalad7.mixinextras.sugar.Local;
@@ -81,15 +82,21 @@ abstract class ServerLevelFabricMixin extends Level {
             )
     )
     public void playSeededSound$0(Args args, @Cancellable CallbackInfo callback) {
+        Preconditions.checkArgument(args.get(0) instanceof Holder<?>, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((soundEvent, soundSource, soundVolume, soundPitch) -> {
-            return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker()
-                    .onPlaySoundAtPosition(this,
-                            new Vec3(args.get(2), args.get(3), args.get(4)),
-                            soundEvent,
-                            soundSource,
-                            soundVolume,
-                            soundPitch);
-        }, args, 0, 1, 5, 6);
+                    return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker()
+                            .onPlaySoundAtPosition(this,
+                                    new Vec3(args.get(2), args.get(3), args.get(4)),
+                                    soundEvent,
+                                    soundSource,
+                                    soundVolume,
+                                    soundPitch);
+                },
+                args,
+                MutableValue.fromEvent((Holder<SoundEvent> holder) -> args.set(0, holder), () -> args.get(0)),
+                1,
+                5,
+                6);
         if (eventResult.isInterrupt()) callback.cancel();
     }
 
@@ -101,10 +108,16 @@ abstract class ServerLevelFabricMixin extends Level {
             )
     )
     public void playSeededSound$1(Args args, @Cancellable CallbackInfo callback) {
+        Preconditions.checkArgument(args.get(0) instanceof Holder<?>, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch) -> {
-            return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
-                    .onPlaySoundAtEntity(this, args.get(2), soundEvent, soundSource, soundVolume, soundPitch);
-        }, args, 0, 1, 3, 4);
+                    return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
+                            .onPlaySoundAtEntity(this, args.get(2), soundEvent, soundSource, soundVolume, soundPitch);
+                },
+                args,
+                MutableValue.fromEvent((Holder<SoundEvent> holder) -> args.set(0, holder), () -> args.get(0)),
+                1,
+                3,
+                4);
         if (eventResult.isInterrupt()) callback.cancel();
     }
 }

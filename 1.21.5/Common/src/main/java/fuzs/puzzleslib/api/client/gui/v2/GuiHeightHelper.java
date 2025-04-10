@@ -38,6 +38,26 @@ public final class GuiHeightHelper {
     }
 
     /**
+     * Returns the highest current render height for hotbar decorations on either side.
+     *
+     * @param gui the gui instance
+     * @return the hotbar decorations render height
+     */
+    public static int getMaxHeight(Gui gui) {
+        return Math.max(getLeftHeight(gui), getRightHeight(gui));
+    }
+
+    /**
+     * Returns the lowest current render height for hotbar decorations on either side.
+     *
+     * @param gui the gui instance
+     * @return the hotbar decorations render height
+     */
+    public static int getMinHeight(Gui gui) {
+        return Math.min(getLeftHeight(gui), getRightHeight(gui));
+    }
+
+    /**
      * Set the render height for hotbar decorations on the left side.
      *
      * @param gui        the gui instance

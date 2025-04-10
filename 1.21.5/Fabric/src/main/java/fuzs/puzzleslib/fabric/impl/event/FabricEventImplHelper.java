@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.event;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
@@ -87,10 +88,10 @@ public final class FabricEventImplHelper {
         }
     }
 
-    public static EventResult onPlaySound(LevelSoundEventInvoker eventInvoker, Args args, int soundEventOrdinal, int soundSourceOrdinal, int soundVolumeOrdinal, int soundPitchOrdinal) {
-        MutableValue<Holder<SoundEvent>> soundEvent = MutableValue.fromEvent((Holder<SoundEvent> holder) -> args.set(
-                soundEventOrdinal,
-                holder), () -> args.get(soundEventOrdinal));
+    public static EventResult onPlaySound(LevelSoundEventInvoker eventInvoker, Args args, MutableValue<Holder<SoundEvent>> soundEvent, int soundSourceOrdinal, int soundVolumeOrdinal, int soundPitchOrdinal) {
+        Preconditions.checkArgument(args.get(soundSourceOrdinal) instanceof SoundSource, "sound source is wrong type");
+        Preconditions.checkArgument(args.get(soundVolumeOrdinal) instanceof Float, "sound volume is wrong type");
+        Preconditions.checkArgument(args.get(soundPitchOrdinal) instanceof Float, "sound pitch is wrong type");
         MutableValue<SoundSource> soundSource = MutableValue.fromEvent((SoundSource soundSourceX) -> args.set(
                 soundSourceOrdinal,
                 soundSourceX), () -> args.get(soundSourceOrdinal));
