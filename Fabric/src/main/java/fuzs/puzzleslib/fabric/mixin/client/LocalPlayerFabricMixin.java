@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
+import com.google.common.base.Preconditions;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.mojang.authlib.GameProfile;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -13,6 +14,7 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,10 +51,14 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
     )
     )
     public void playSound(Args args, @Cancellable CallbackInfo callback) {
+        Preconditions.checkArgument(args.get(3) instanceof SoundEvent, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch) -> {
-            return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
-                    .onPlaySoundAtEntity(this.level(), this, soundEvent, soundSource, soundVolume, soundPitch);
-        }, args, 3, 4, 5, 6);
+                    return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
+                            .onPlaySoundAtEntity(this.level(), this, soundEvent, soundSource, soundVolume, soundPitch);
+                }, args, MutableValue.fromEvent((Holder<SoundEvent> holder) -> args.set(3, holder.value()),
+                        () -> BuiltInRegistries.SOUND_EVENT.wrapAsHolder(args.get(3))), 4,
+                5,
+                6);
         if (eventResult.isInterrupt()) callback.cancel();
     }
 }
