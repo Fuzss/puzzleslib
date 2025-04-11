@@ -286,24 +286,6 @@ public final class QuickMoveRuleSet {
         boolean moveItemStackTo(ItemStack itemStack, int startIndex, int endIndex, boolean reverseDirection);
     }
 
-    private record Rule(Type type, int startIndex, int endIndex, boolean reverseDirection, Predicate<Slot> filter) {
-
-        public boolean isValid() {
-            return this.startIndex != -1 && this.endIndex != -1;
-        }
-
-        enum Type {
-            CONTAINER_SLOT,
-            CONTAINER,
-            INVENTORY_ITEMS,
-            INVENTORY_ARMOR,
-            TO_HOTBAR,
-            FROM_HOTBAR,
-            TO_ARMOR,
-            FROM_ARMOR
-        }
-    }
-
     /**
      * Controls how further attempts at moving remaining items in an item stack are made after a rule has already been
      * applied.
@@ -329,5 +311,23 @@ public final class QuickMoveRuleSet {
          * Items can be split across slots handled by multiple rules.
          */
         LENIENT
+    }
+
+    private record Rule(Type type, int startIndex, int endIndex, boolean reverseDirection, Predicate<Slot> filter) {
+
+        public boolean isValid() {
+            return this.startIndex != -1 && this.endIndex != -1;
+        }
+
+        enum Type {
+            CONTAINER_SLOT,
+            CONTAINER,
+            INVENTORY_ITEMS,
+            INVENTORY_ARMOR,
+            TO_HOTBAR,
+            FROM_HOTBAR,
+            TO_ARMOR,
+            FROM_ARMOR
+        }
     }
 }
