@@ -2,9 +2,8 @@ package fuzs.puzzleslib.fabric.impl.init;
 
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
-import fuzs.puzzleslib.api.network.v4.codec.ExtraStreamCodecs;
+import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
@@ -17,6 +16,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
@@ -67,18 +68,16 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
                 path,
                 () -> {
-                    return FabricBlockEntityTypeBuilder.create(blockEntityFactory::apply, validBlocks.get().toArray(Block[]::new))
-                            .build();
+                    return FabricBlockEntityTypeBuilder.create(blockEntityFactory::apply,
+                            validBlocks.get().toArray(Block[]::new)).build();
                 });
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
+    public <T extends AbstractContainerMenu, S> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuSupplierWithData<T, S> menuSupplier, StreamCodec<? super RegistryFriendlyByteBuf, S> streamCodec) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU,
                 path,
-                () -> new ExtendedScreenHandlerType<>(entry.get()::create,
-                        ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF));
+                () -> new ExtendedScreenHandlerType<>(menuSupplier::create, streamCodec));
     }
 
     @Override
@@ -101,10 +100,10 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
+    public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entityDataSerializerSupplier) {
         ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(
                 ResourceLocationHelper.withDefaultNamespace("entity_data_serializers"));
-        EntityDataSerializer<T> serializer = entry.get();
+        EntityDataSerializer<T> serializer = entityDataSerializerSupplier.get();
         EntityDataSerializers.registerSerializer(serializer);
         return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), serializer);
     }

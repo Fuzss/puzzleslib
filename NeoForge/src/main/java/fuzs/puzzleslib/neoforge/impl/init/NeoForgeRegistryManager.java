@@ -3,7 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.init;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
-import fuzs.puzzleslib.api.init.v3.registry.ExtendedMenuSupplier;
+import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
 import fuzs.puzzleslib.impl.init.LazyHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
@@ -13,6 +13,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
@@ -24,7 +26,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -84,12 +85,11 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
                 });
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry) {
+    public <T extends AbstractContainerMenu, S> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuSupplierWithData<T, S> menuSupplier, StreamCodec<? super RegistryFriendlyByteBuf, S> streamCodec) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU,
                 path,
-                () -> IMenuTypeExtension.create(entry.get()::create));
+                () -> new MenuTypeWithData<>(menuSupplier, streamCodec));
     }
 
     @Override
@@ -108,7 +108,7 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     }
 
     @Override
-    public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry) {
-        return this.register(NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, path, entry);
+    public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entityDataSerializerSupplier) {
+        return this.register(NeoForgeRegistries.Keys.ENTITY_DATA_SERIALIZERS, path, entityDataSerializerSupplier);
     }
 }
