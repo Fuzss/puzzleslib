@@ -66,26 +66,26 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 modConstructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
-                modConstructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(evt::registerEntityRenderer));
-                modConstructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextNeoForgeImpl(evt::registerBlockEntityRenderer));
+                modConstructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(evt));
+                modConstructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent evt) -> {
-                modConstructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(evt::register));
+                modConstructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterParticleProvidersEvent evt) -> {
                 modConstructor.onRegisterParticleProviders(new ParticleProvidersContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
-                modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(evt::registerLayerDefinition));
+                modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
                 modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterItemDecorationsEvent evt) -> {
-                modConstructor.onRegisterItemDecorations(new ItemDecorationsContextNeoForgeImpl(evt::register));
+                modConstructor.onRegisterItemDecorations(new ItemDecorationsContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterEntitySpectatorShadersEvent evt) -> {
-                modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(evt::register));
+                modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterSpecialBlockModelRendererEvent evt) -> {
                 modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextNeoForgeImpl(
@@ -100,7 +100,7 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterKeyMappingsEvent evt) -> {
-                modConstructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(evt::register));
+                modConstructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(evt));
             });
             eventBus.addListener((final RegisterColorHandlersEvent.Block evt) -> {
                 modConstructor.onRegisterBlockColorProviders(new BlockBlockColorsContextNeoForgeImpl(evt));
@@ -111,7 +111,10 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 }
             });
             eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
-                modConstructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));
+                modConstructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt));
+            });
+            eventBus.addListener((final RegisterRenderPipelinesEvent evt) -> {
+                modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextNeoForgeImpl(evt));
             });
         });
     }

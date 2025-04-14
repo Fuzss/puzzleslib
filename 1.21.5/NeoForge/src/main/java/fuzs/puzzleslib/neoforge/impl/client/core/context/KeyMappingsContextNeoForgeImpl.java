@@ -7,19 +7,20 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public record KeyMappingsContextNeoForgeImpl(Consumer<KeyMapping> consumer) implements KeyMappingsContext {
+public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent evt) implements KeyMappingsContext {
 
     @Override
     public void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         Objects.requireNonNull(keyMapping, "key mapping is null");
         Objects.requireNonNull(activationHandler, "activation handler is null");
-        this.consumer.accept(keyMapping);
+        this.evt.register(keyMapping);
         keyMapping.setKeyConflictContext(NeoForgeKeyMappingHelper.KEY_CONTEXTS.get(activationHandler.getActivationContext()));
         registerKeyActivationHandles(keyMapping, activationHandler);
     }

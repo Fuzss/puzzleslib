@@ -30,6 +30,7 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterKeyMappings(new KeyMappingsContextFabricImpl());
         modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextFabricImpl());
         modConstructor.onRegisterRenderBuffers(new RenderBuffersContextFabricImpl());
+        modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextFabricImpl());
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft client) -> {
             // run this as late as possible and not during client init so that maps are already fully populated with vanilla content
             modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
