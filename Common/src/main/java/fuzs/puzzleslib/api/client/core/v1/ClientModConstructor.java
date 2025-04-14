@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1;
 
+import com.mojang.blaze3d.pipeline.RenderPipeline;
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.impl.PuzzlesLib;
@@ -186,6 +187,13 @@ public interface ClientModConstructor {
      * @param context register new render buffers to {@link net.minecraft.client.renderer.RenderBuffers}
      */
     default void onRegisterRenderBuffers(RenderBuffersContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register new render pipelines to {@link net.minecraft.client.renderer.RenderPipelines}
+     */
+    default void onRegisterRenderPipelines(RenderPipelinesContext context) {
         // NO-OP
     }
 }

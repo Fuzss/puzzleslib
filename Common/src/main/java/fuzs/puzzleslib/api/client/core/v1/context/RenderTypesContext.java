@@ -7,24 +7,25 @@ import net.minecraft.world.level.material.Fluid;
 /**
  * Register custom {@link RenderType RenderTypes} for blocks and fluids.
  *
- * @param <T> object type supported by provider, either {@link Block} or {@link Fluid}
+ * @param <T> type supported by provider, either {@link Block} or {@link Fluid}
  */
 public interface RenderTypesContext<T> {
 
     /**
-     * Register a <code>renderType</code> for an <code>object</code>
+     * Register a {@link RenderType}.
      *
-     * @param renderType the {@link RenderType} for <code>object</code>
-     * @param objects    object types supporting render type, either {@link Block} or {@link Fluid}
+     * @param renderType the render type
+     * @param objects    objects supporting render type
      */
     @SuppressWarnings("unchecked")
     void registerRenderType(RenderType renderType, T... objects);
 
     /**
-     * Allows for retrieving the {@link RenderType} that has been registered for an object type.
-     * <p>When not render type is registered {@link RenderType#solid()} is returned.
+     * Allows for retrieving the {@link RenderType} that has been registered for an object.
+     * <p>
+     * When no render type is registered, {@link RenderType#solid()} is returned.
      *
-     * @param object the object type to get the render type for
+     * @param object the object to get the render type for
      * @return the render type
      */
     RenderType getRenderType(T object);

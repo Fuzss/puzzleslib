@@ -4,9 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.5.6-1.21.5] - 2025-04-11
+## [v21.5.6-1.21.5] - 2025-04-14
 ### Added
 - Add `SimpleContainerImpl`
+- Add `RenderPipelinesContext`
+- Add some overloads to `HSV`
+### Fixed
+- Fix `RenderPipelines` failing to register on NeoForge
 
 ## [v21.5.5-1.21.5] - 2025-04-10
 ### Added

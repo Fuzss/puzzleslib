@@ -79,10 +79,19 @@ public class HSV {
     }
 
     /**
+     * @param color the packed rgb color
+     * @return the packed hsv color
+     */
+    public static int rgbToHsv(int color) {
+        return rgbToHsv(ARGB.redFloat(color), ARGB.greenFloat(color), ARGB.blueFloat(color));
+    }
+
+    /**
      * @param red   the unpacked red component
      * @param green the unpacked green component
      * @param blue  the unpacked blue component
      * @return the packed hsv color
+     *
      * @author ChatGPT
      */
     public static int rgbToHsv(float red, float green, float blue) {
@@ -109,6 +118,14 @@ public class HSV {
         float value = max;
         // Return the HSV values as an array
         return colorFromFloat(hue, saturation, value);
+    }
+
+    /**
+     * @param color the packed hsv color
+     * @return the packed rgb color
+     */
+    public static int hsvToRgb(int color) {
+        return hsvToRgb(hueFloat(color), saturationFloat(color), valueFloat(color));
     }
 
     /**
