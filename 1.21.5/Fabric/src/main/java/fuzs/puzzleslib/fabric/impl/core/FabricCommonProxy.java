@@ -25,7 +25,6 @@ import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
-import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
@@ -36,7 +35,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.Packet;
@@ -83,9 +81,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     private final Set<String> hiddenPacks = new HashSet<>();
@@ -97,14 +95,11 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     }
 
     @Override
-    public void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
-        serverPlayer.openMenu(new ExtendedScreenHandlerFactory<RegistryFriendlyByteBuf>() {
-
+    public <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
+        player.openMenu(new ExtendedScreenHandlerFactory<>() {
             @Override
-            public RegistryFriendlyByteBuf getScreenOpeningData(ServerPlayer player) {
-                RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), player.registryAccess());
-                dataWriter.accept(player, buf);
-                return buf;
+            public T getScreenOpeningData(ServerPlayer player) {
+                return dataSupplier.get();
             }
 
             @Override
@@ -114,8 +109,8 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
 
             @Nullable
             @Override
-            public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-                return menuProvider.createMenu(i, inventory, player);
+            public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+                return menuProvider.createMenu(containerId, inventory, player);
             }
         });
     }

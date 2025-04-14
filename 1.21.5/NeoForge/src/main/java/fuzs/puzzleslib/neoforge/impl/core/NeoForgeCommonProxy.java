@@ -18,6 +18,7 @@ import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootPoolBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.ForwardingLootTableBuilder;
 import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
+import fuzs.puzzleslib.neoforge.impl.init.MenuTypeWithData;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeGameRulesFactory;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryFactory;
 import fuzs.puzzleslib.neoforge.impl.item.NeoForgeToolTypeHelper;
@@ -47,8 +48,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
@@ -67,9 +70,9 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class NeoForgeCommonProxy implements NeoForgeProxy {
 
@@ -79,9 +82,23 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
-        serverPlayer.openMenu(menuProvider, (RegistryFriendlyByteBuf buf) -> {
-            dataWriter.accept(serverPlayer, buf);
+    public <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
+        player.openMenu(new MenuProvider() {
+            @Override
+            public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buf) {
+                ((MenuTypeWithData<?, T>) menu.getType()).getStreamCodec().encode(buf, dataSupplier.get());
+            }
+
+            @Override
+            public Component getDisplayName() {
+                return menuProvider.getDisplayName();
+            }
+
+            @Nullable
+            @Override
+            public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
+                return menuProvider.createMenu(containerId, inventory, player);
+            }
         });
     }
 

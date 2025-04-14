@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
+import fuzs.puzzleslib.api.network.v4.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
@@ -82,7 +83,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Creates a new {@link ResourceKey} for a provided registry from the given path.
      *
      * @param registryKey key for registry to create {@link ResourceKey} for
-     * @param path        path for new entry
+     * @param path        the registered name
      * @param <T>         registry type
      * @return {@link ResourceKey} for path
      */
@@ -103,7 +104,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Creates a new description id used in translations for a provided registry from the given path.
      *
      * @param registryKey key for registry to create description id for
-     * @param path        path for new entry
+     * @param path        the registered name
      * @return the description id
      */
     default String makeDescriptionId(ResourceKey<? extends Registry<?>> registryKey, String path) {
@@ -114,7 +115,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Creates a lazy holder reference that will update when used.
      *
      * @param registryKey key for registry to register to
-     * @param path        path for new entry
+     * @param path        the registered name
      * @param <T>         registry type
      * @return new placeholder registry object
      */
@@ -124,7 +125,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Register a supplied value to a given registry of that type returning a holder reference.
      *
      * @param registryKey key for registry to register to
-     * @param path        path for new entry
+     * @param path        the registered name
      * @param supplier    supplier for entry to register
      * @param <T>         registry type
      * @return the holder reference
@@ -134,7 +135,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block.
      *
-     * @param path                    path for new entry
+     * @param path                    the registered name
      * @param blockPropertiesSupplier supplier for block properties
      * @return the holder reference
      */
@@ -145,7 +146,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block.
      *
-     * @param path                    path for new entry
+     * @param path                    the registered name
      * @param blockFactory            factory for new block
      * @param blockPropertiesSupplier supplier for block properties
      * @return the holder reference
@@ -160,7 +161,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an item.
      *
-     * @param path path for new entry
+     * @param path the registered name
      * @return the holder reference
      */
     default Holder.Reference<Item> registerItem(String path) {
@@ -170,7 +171,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an item.
      *
-     * @param path                   path for new entry
+     * @param path                   the registered name
      * @param itemPropertiesSupplier supplier for new item properties
      * @return the holder reference
      */
@@ -181,7 +182,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an item.
      *
-     * @param path        path for new entry
+     * @param path        the registered name
      * @param itemFactory factory for new item
      * @return the holder reference
      */
@@ -192,7 +193,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an item.
      *
-     * @param path                   path for new entry
+     * @param path                   the registered name
      * @param itemFactory            factory for new item
      * @param itemPropertiesSupplier supplier for new item properties
      * @return the holder reference
@@ -333,7 +334,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a creative mode tab.
      *
-     * @param path          path for new entry
+     * @param path          the registered name
      * @param iconSupplier  the tab icon item stack
      * @param displayItems  the display items generator
      * @param withSearchBar should the tab include a search bar (only supported for NeoForge)
@@ -344,42 +345,42 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a data component type.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path                          the registered name
+     * @param dataComponentTypeConfigurator supplier for entry to register
      * @return the holder reference
      */
-    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> entry) {
+    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> dataComponentTypeConfigurator) {
         return this.register(Registries.DATA_COMPONENT_TYPE,
                 path,
-                () -> entry.apply(DataComponentType.builder()).build());
+                () -> dataComponentTypeConfigurator.apply(DataComponentType.builder()).build());
     }
 
     /**
      * Register a fluid.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path          the registered name
+     * @param fluidSupplier supplier for entry to register
      * @return the holder reference
      */
-    default Holder.Reference<Fluid> registerFluid(String path, Supplier<Fluid> entry) {
-        return this.register(Registries.FLUID, path, entry);
+    default Holder.Reference<Fluid> registerFluid(String path, Supplier<Fluid> fluidSupplier) {
+        return this.register(Registries.FLUID, path, fluidSupplier);
     }
 
     /**
      * Register a mob effect.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path              the registered name
+     * @param mobEffectSupplier supplier for entry to register
      * @return the holder reference
      */
-    default Holder.Reference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> entry) {
-        return this.register(Registries.MOB_EFFECT, path, entry);
+    default Holder.Reference<MobEffect> registerMobEffect(String path, Supplier<MobEffect> mobEffectSupplier) {
+        return this.register(Registries.MOB_EFFECT, path, mobEffectSupplier);
     }
 
     /**
      * Register a sound event.
      *
-     * @param path path for new entry
+     * @param path the registered name
      * @return the holder reference
      */
     default Holder.Reference<SoundEvent> registerSoundEvent(String path) {
@@ -391,29 +392,29 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a potion.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path           the registered name
+     * @param potionSupplier supplier for entry to register
      * @return the holder reference
      */
-    default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> entry) {
-        return this.registerPotion(path, (String s) -> entry.get());
+    default Holder.Reference<Potion> registerPotion(String path, Supplier<Potion> potionSupplier) {
+        return this.registerPotion(path, (String name) -> potionSupplier.get());
     }
 
     /**
      * Register a potion.
      *
-     * @param path  path for new entry
-     * @param entry function for entry to register, receiving the passed path parameter
+     * @param path          the registered name
+     * @param potionFactory function for entry to register, receiving the passed path parameter
      * @return the holder reference
      */
-    default Holder.Reference<Potion> registerPotion(String path, Function<String, Potion> entry) {
-        return this.register(Registries.POTION, path, () -> entry.apply(path));
+    default Holder.Reference<Potion> registerPotion(String path, Function<String, Potion> potionFactory) {
+        return this.register(Registries.POTION, path, () -> potionFactory.apply(path));
     }
 
     /**
      * Register an enchantment.
      *
-     * @param path path for new entry
+     * @param path the registered name
      * @return the holder reference
      */
     default ResourceKey<Enchantment> registerEnchantment(String path) {
@@ -423,24 +424,24 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an entity type.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @param <T>   entity type parameter
+     * @param path               the registered name
+     * @param entityTypeSupplier supplier for entry to register
+     * @param <T>                entity type parameter
      * @return the holder reference
      */
     @SuppressWarnings("unchecked")
-    default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entry) {
+    default <T extends Entity> Holder.Reference<EntityType<T>> registerEntityType(String path, Supplier<EntityType.Builder<T>> entityTypeSupplier) {
         return this.register((ResourceKey<Registry<EntityType<T>>>) (ResourceKey<?>) Registries.ENTITY_TYPE,
                 path,
                 () -> {
-                    return entry.get().build(this.makeResourceKey(Registries.ENTITY_TYPE, path));
+                    return entityTypeSupplier.get().build(this.makeResourceKey(Registries.ENTITY_TYPE, path));
                 });
     }
 
     /**
      * Register a block entity type.
      *
-     * @param path               path for new entry
+     * @param path               the registered name
      * @param blockEntityFactory factory for every newly created block entity instance
      * @param validBlock         block allowed to use this block entity
      * @param <T>                block entity type parameter
@@ -453,7 +454,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a block entity type.
      *
-     * @param path               path for new entry
+     * @param path               the registered name
      * @param blockEntityFactory factory for every newly created block entity instance
      * @param validBlocks        blocks allowed to use this block entity
      * @param <T>                block entity type parameter
@@ -464,32 +465,60 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a menu type.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @param <T>   container menu type parameter
+     * @param path         the registered name
+     * @param menuSupplier the menu supplier
+     * @param <T>          the menu type
      * @return the holder reference
      */
-    @SuppressWarnings("unchecked")
-    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> entry) {
-        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> {
-            return new MenuType<>(entry.get(), FeatureFlags.DEFAULT_FLAGS);
-        });
+    @Deprecated(forRemoval = true)
+    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> menuSupplier) {
+        return this.registerMenuType(path, menuSupplier.get());
     }
 
     /**
      * Register a menu type.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
-     * @param <T>   container menu type
+     * @param path         the registered name
+     * @param menuSupplier the menu supplier
+     * @param <T>          the menu type
      * @return the holder reference
      */
-    <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> entry);
+    @SuppressWarnings("unchecked")
+    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuType.MenuSupplier<T> menuSupplier) {
+        return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> {
+            return new MenuType<>(menuSupplier, FeatureFlags.DEFAULT_FLAGS);
+        });
+    }
+
+    /**
+     * Register a menu type with additional data for constructing the menu on the client.
+     *
+     * @param path         the registered name
+     * @param menuSupplier the menu supplier
+     * @param <T>          the menu type
+     * @return the holder reference
+     */
+    @Deprecated(forRemoval = true)
+    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> menuSupplier) {
+        return this.registerMenuType(path, menuSupplier.get()::create, ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF);
+    }
+
+    /**
+     * Register a menu type with additional data for constructing the menu on the client.
+     *
+     * @param path         the registered name
+     * @param menuSupplier the menu supplier
+     * @param streamCodec  the stream codec for additional data
+     * @param <T>          the menu type
+     * @param <S>          the data type
+     * @return the holder reference
+     */
+    <T extends AbstractContainerMenu, S> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuSupplierWithData<T, S> menuSupplier, StreamCodec<? super RegistryFriendlyByteBuf, S> streamCodec);
 
     /**
      * Register a poi type.
      *
-     * @param path          path for new entry
+     * @param path          the registered name
      * @param matchingBlock block valid for this poi type
      * @return the holder reference
      */
@@ -500,7 +529,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a poi type.
      *
-     * @param path           path for new entry
+     * @param path           the registered name
      * @param matchingBlocks blocks valid for this poi type
      * @return the holder reference
      */
@@ -516,7 +545,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a poi type.
      *
-     * @param path                path for new entry
+     * @param path                the registered name
      * @param maxTickets          max amount of accessor tickets
      * @param validRange          distance to search for this poi type
      * @param matchingBlockStates blocks states valid for this poi type
@@ -527,7 +556,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an argument type.
      *
-     * @param path          path for new entry
+     * @param path          the registered name
      * @param argumentClass argument type class
      * @param argumentType  argument type factory
      * @param <A>           argument type
@@ -540,7 +569,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an argument type.
      *
-     * @param path             path for new entry
+     * @param path             the registered name
      * @param argumentClass    argument type class
      * @param argumentTypeInfo argument type info
      * @param <A>              argument type
@@ -552,7 +581,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a type of recipe.
      *
-     * @param path path for new entry
+     * @param path the registered name
      * @param <T>  recipe type
      * @return the holder reference
      */
@@ -571,7 +600,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a recipe book category.
      *
-     * @param path path for new entry
+     * @param path the registered name
      * @return the holder reference
      */
     default Holder.Reference<RecipeBookCategory> registerRecipeBookCategory(String path) {
@@ -589,7 +618,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a game event.
      *
-     * @param path               path for new entry
+     * @param path               the registered name
      * @param notificationRadius range in blocks in which this event will be listened to
      * @return the holder reference
      */
@@ -602,7 +631,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a simple particle type.
      *
-     * @param path path for new entry
+     * @param path the registered name
      * @return the holder reference
      */
     default Holder.Reference<SimpleParticleType> registerParticleType(String path) {
@@ -614,7 +643,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a particle type.
      *
-     * @param path              path for new entry
+     * @param path              the registered name
      * @param overrideLimiter   allow this particle to spawn regardless of the global particle limit
      * @param codecGetter       the codec for serialization
      * @param streamCodecGetter the stream codec for network synchronization
@@ -638,7 +667,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an attribute.
      *
-     * @param path         path for new entry
+     * @param path         the registered name
      * @param defaultValue the default value when no base value is otherwise specified
      * @param minValue     the min value
      * @param maxValue     the max value
@@ -651,7 +680,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register an attribute.
      *
-     * @param path         path for new entry
+     * @param path         the registered name
      * @param defaultValue the default value when no base value is otherwise specified
      * @param minValue     the min value
      * @param maxValue     the max value
@@ -675,11 +704,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * Registration to a game registry is only required on NeoForge, therefore a direct holder is returned on other mod
      * loaders.
      *
-     * @param path  path for new entry
-     * @param entry supplier for entry to register
+     * @param path                         the registered name
+     * @param entityDataSerializerSupplier supplier for entry to register
      * @return the holder reference
      */
-    <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entry);
+    <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entityDataSerializerSupplier);
 
     /**
      * Creates a new {@link ResourceKey} for a {@link DamageType}.

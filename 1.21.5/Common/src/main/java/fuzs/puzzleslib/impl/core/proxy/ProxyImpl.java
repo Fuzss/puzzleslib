@@ -3,6 +3,7 @@ package fuzs.puzzleslib.impl.core.proxy;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import io.netty.buffer.Unpooled;
 import net.minecraft.Util;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, EnchantingProxy, EntityProxy {
     ProxyImpl INSTANCE = Util.make(() -> {
@@ -42,7 +44,16 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
 
     MinecraftServer getMinecraftServer();
 
-    void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter);
+    @Deprecated(forRemoval = true)
+    default void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
+        this.openMenu(serverPlayer, menuProvider, () -> {
+            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), serverPlayer.registryAccess());
+            dataWriter.accept(serverPlayer, buf);
+            return buf;
+        });
+    }
+
+    <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier);
 
     Pack.Metadata createPackInfo(ResourceLocation resourceLocation, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden);
 
