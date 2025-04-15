@@ -40,7 +40,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @return current value
      */
-    protected double getAbsoluteValue() {
+    public double getAbsoluteValue() {
         return this.getRelativeValue() * (this.maxValue - this.minValue) + this.minValue;
     }
 
@@ -49,7 +49,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @param value new value to set
      */
-    protected void setAbsoluteValue(double value) {
+    public void setAbsoluteValue(double value) {
         this.setRelativeValue((value - this.minValue) / (this.maxValue - this.minValue));
     }
 
@@ -58,7 +58,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @return current value
      */
-    protected double getRelativeValue() {
+    public double getRelativeValue() {
         return this.value;
     }
 
@@ -69,7 +69,7 @@ public abstract class RangedSliderButton extends AbstractSliderButton {
      *
      * @param value new value to set
      */
-    protected void setRelativeValue(double value) {
+    public void setRelativeValue(double value) {
         double oldValue = this.value;
         this.value = Mth.clamp(value, 0.0F, 1.0F);
         if (oldValue != this.value) {

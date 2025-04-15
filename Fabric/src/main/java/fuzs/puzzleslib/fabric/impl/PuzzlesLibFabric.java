@@ -13,7 +13,7 @@ public class PuzzlesLibFabric implements ModInitializer {
     public void onInitialize() {
         ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibMod::new);
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
-            ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibDevelopment::new);
+            ModConstructor.construct(PuzzlesLibMod.id("development"), PuzzlesLibDevelopment::new);
         }
     }
 }

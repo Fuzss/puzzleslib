@@ -2,20 +2,19 @@ package fuzs.puzzleslib.impl.event.core;
 
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
 
 public record EventPhaseImpl(ResourceLocation resourceLocation,
-                             @Nullable EventPhase parent,
-                             @Nullable EventPhaseImpl.Ordering ordering) implements EventPhase {
+                             EventPhase parent,
+                             EventPhaseImpl.Ordering ordering) implements EventPhase {
 
     @Override
-    public void applyOrdering(BiConsumer<ResourceLocation, ResourceLocation> consumer) {
+    public void applyOrdering(ResourceLocation resourceLocation, BiConsumer<ResourceLocation, ResourceLocation> phaseOrderingConsumer) {
         Objects.requireNonNull(this.parent, "parent is null");
         Objects.requireNonNull(this.ordering, "ordering is null");
-        this.ordering.apply(consumer, this.resourceLocation, this.parent.resourceLocation());
+        this.ordering.apply(phaseOrderingConsumer, resourceLocation, this.parent.resourceLocation());
     }
 
     @Override

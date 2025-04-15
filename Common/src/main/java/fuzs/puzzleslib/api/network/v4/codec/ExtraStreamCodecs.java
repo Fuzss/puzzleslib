@@ -60,6 +60,7 @@ public final class ExtraStreamCodecs {
     /**
      * {@link ResourceKey} stream codec
      */
+    @Deprecated(forRemoval = true)
     public static final StreamCodec<ByteBuf, ResourceKey<?>> DIRECT_RESOURCE_KEY = StreamCodec.composite(
             ResourceLocation.STREAM_CODEC,
             ResourceKey::registry,
@@ -71,6 +72,7 @@ public final class ExtraStreamCodecs {
     /**
      * {@link FriendlyByteBuf} stream codec
      */
+    @Deprecated(forRemoval = true)
     public static final StreamCodec<FriendlyByteBuf, FriendlyByteBuf> FRIENDLY_BYTE_BUF = new StreamCodec<>() {
 
         @Override
@@ -90,6 +92,7 @@ public final class ExtraStreamCodecs {
     /**
      * {@link RegistryFriendlyByteBuf} stream codec
      */
+    @Deprecated(forRemoval = true)
     public static final StreamCodec<RegistryFriendlyByteBuf, RegistryFriendlyByteBuf> REGISTRY_FRIENDLY_BYTE_BUF = new StreamCodec<>() {
 
         @Override

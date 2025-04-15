@@ -1,10 +1,12 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.core.v1.context.*;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Supplier;
 
@@ -15,14 +17,24 @@ import java.util.function.Supplier;
 public interface ModConstructor {
 
     /**
-     * Construct the main {@link ModConstructor} instance to begin initialization of a mod.
+     * Construct the {@link ModConstructor} instance to begin initialization of a mod.
      *
-     * @param modId                  the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructorSupplier the main mod instance for mod setup
+     * @param modId                  the mod id
+     * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
-        PuzzlesLib.LOGGER.info("Constructing common components for {}", modId);
-        ModConstructorImpl.construct(modId,
+        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"), modConstructorSupplier);
+    }
+
+    /**
+     * Construct the {@link ModConstructor} instance to begin initialization of a mod.
+     *
+     * @param resourceLocation       the identifier for the provided mod instance
+     * @param modConstructorSupplier the mod instance for the setup
+     */
+    static void construct(ResourceLocation resourceLocation, Supplier<ModConstructor> modConstructorSupplier) {
+        PuzzlesLib.LOGGER.info("Constructing common components for {}", resourceLocation);
+        ModConstructorImpl.construct(resourceLocation.getNamespace(),
                 modConstructorSupplier,
                 ProxyImpl.get()::getModConstructorImpl,
                 ModContext::buildAll);
