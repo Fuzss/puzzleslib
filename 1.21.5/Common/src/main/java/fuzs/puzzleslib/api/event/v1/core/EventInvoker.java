@@ -9,8 +9,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>Instances are usually created by performing a {@link #lookup(Class)} which will retrieve the actually implemented
  * event from the mod loader-specific subproject.
  * <p>An invoker can also be implemented as a functional interface for the rare case of using a different invoker to
- * run
- * the event, not requiring a mod loader-specific implementation.
+ * run the event, not requiring a mod loader-specific implementation.
  *
  * @param <T> event type
  */
@@ -61,8 +60,8 @@ public interface EventInvoker<T> {
      * <code>FMLJavaModLoadingContext</code>.
      * <p>If events of type <code>IModbusEvent</code> are registered too late an exception is thrown.
      *
-     * @param phase    the order in relation to other events
-     * @param callback the event callback
+     * @param eventPhase the order in relation to other events
+     * @param callback   the event callback
      */
-    void register(EventPhase phase, T callback);
+    void register(EventPhase eventPhase, T callback);
 }

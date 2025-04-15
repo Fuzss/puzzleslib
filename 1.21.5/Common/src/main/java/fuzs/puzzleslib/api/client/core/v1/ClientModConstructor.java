@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.api.client.core.v1;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
@@ -10,6 +10,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -26,12 +27,22 @@ public interface ClientModConstructor {
     /**
      * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
      *
-     * @param modId                  the mod id for registering events on Forge to the correct mod event bus
-     * @param modConstructorSupplier the main mod instance for mod setup
+     * @param modId                  the mod id
+     * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructorSupplier) {
-        PuzzlesLib.LOGGER.info("Constructing client components for {}", modId);
-        ModConstructorImpl.construct(modId,
+        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"), modConstructorSupplier);
+    }
+
+    /**
+     * Construct the {@link ClientModConstructor} instance to begin client-side initialization of a mod.
+     *
+     * @param resourceLocation       the identifier for the provided mod instance
+     * @param modConstructorSupplier the mod instance for the setup
+     */
+    static void construct(ResourceLocation resourceLocation, Supplier<ClientModConstructor> modConstructorSupplier) {
+        PuzzlesLib.LOGGER.info("Constructing client components for {}", resourceLocation);
+        ModConstructorImpl.construct(resourceLocation.getNamespace(),
                 modConstructorSupplier,
                 ClientProxyImpl.get()::getClientModConstructorImpl,
                 Consumers.nop());

@@ -9,6 +9,7 @@ import net.minecraft.world.ContainerListener;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.NonInteractiveResultSlot;
 import net.minecraft.world.inventory.Slot;
@@ -17,6 +18,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 /**
  * Small helper class related to working with implementations of {@link AbstractContainerMenu}.
@@ -34,11 +36,26 @@ public final class ContainerMenuHelper {
      * @param menuProvider the menu factory
      * @param dataWriter   the additional data to be sent to the client
      */
+    @Deprecated(forRemoval = true)
     public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
         Objects.requireNonNull(serverPlayer, "server player is null");
         Objects.requireNonNull(menuProvider, "menu provider is null");
         Objects.requireNonNull(dataWriter, "data writer is null");
         ProxyImpl.get().openMenu(serverPlayer, menuProvider, dataWriter);
+    }
+
+    /**
+     * Opens a menu on both client and server while also providing additional data.
+     *
+     * @param player       the player opening the menu
+     * @param menuProvider the menu factory
+     * @param dataSupplier the additional data to be sent to the client
+     */
+    public static <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
+        Objects.requireNonNull(player, "player is null");
+        Objects.requireNonNull(menuProvider, "menu provider is null");
+        Objects.requireNonNull(dataSupplier, "data supplier is null");
+        ProxyImpl.get().openMenu(player, menuProvider, dataSupplier);
     }
 
     /**

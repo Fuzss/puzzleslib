@@ -494,36 +494,43 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
 
         @Override
-        public void register(EventPhase phase, T callback) {
-            this.register(phase, callback, null);
+        public void register(EventPhase eventPhase, T callback) {
+            this.register(eventPhase, callback, null);
         }
 
-        private void register(EventPhase phase, T callback, @Nullable Object context) {
-            Objects.requireNonNull(phase, "phase is null");
+        private void register(EventPhase eventPhase, T callback, @Nullable Object context) {
+            Objects.requireNonNull(eventPhase, "phase is null");
             Objects.requireNonNull(callback, "callback is null");
-            phase = this.eventPhaseConverter.apply(phase);
+            eventPhase = this.eventPhaseConverter.apply(eventPhase);
             // this is the default phase
-            if (phase.parent() == null) {
+            if (eventPhase.parent() == null) {
                 this.event.register(this.converter.apply(callback, context));
             } else {
                 // make sure phase has consumer phase ordering, we keep track of phases we have already added an ordering for in this event in #knownEventPhases
-                this.testEventPhase(phase);
-                this.event.register(phase.resourceLocation(), this.converter.apply(callback, context));
+                this.testEventPhase(eventPhase);
+                this.event.register(eventPhase.resourceLocation(), this.converter.apply(callback, context));
             }
         }
 
-        private void testEventPhase(EventPhase phase) {
+        private void testEventPhase(EventPhase eventPhase) {
             Stack<EventPhase> stack = new Stack<>();
             // find the first parent we already know (probably default)
-            while (phase.parent() != null && !this.knownEventPhases.contains(phase)) {
-                stack.push(phase);
-                phase = phase.parent();
+            while (eventPhase.parent() != null && !this.knownEventPhases.contains(eventPhase)) {
+                stack.push(eventPhase);
+                eventPhase = eventPhase.parent();
             }
             // add consumer phase ordering for all parents in reverse order until we reach the phase we want to add
             while (!stack.isEmpty()) {
-                phase = stack.pop();
-                phase.applyOrdering(this.event::addPhaseOrdering);
-                this.knownEventPhases.add(phase);
+                eventPhase = stack.pop();
+                eventPhase.applyOrdering(this.event::addPhaseOrdering);
+                this.knownEventPhases.add(eventPhase);
+                EventPhase parentEventPhase = eventPhase;
+                while ((parentEventPhase = parentEventPhase.parent()) != null && parentEventPhase.parent() != null) {
+                    if (eventPhase.getOrderingValue() != parentEventPhase.getOrderingValue()) {
+                        parentEventPhase.applyOrdering(eventPhase.resourceLocation(), this.event::addPhaseOrdering);
+                        break;
+                    }
+                }
             }
         }
     }

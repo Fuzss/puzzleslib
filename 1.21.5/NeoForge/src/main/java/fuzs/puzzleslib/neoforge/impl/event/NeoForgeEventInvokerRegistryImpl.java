@@ -758,8 +758,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         }
 
         @Override
-        public void register(EventPhase phase, T callback) {
-            this.register(phase, callback, null);
+        public void register(EventPhase eventPhase, T callback) {
+            this.register(eventPhase, callback, null);
         }
 
         private void register(EventPhase phase, T callback, @Nullable Object context) {

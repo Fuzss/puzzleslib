@@ -77,7 +77,8 @@ public final class CommandOverrides {
     @ApiStatus.Internal
     public static void registerEventHandlers() {
         ServerLifecycleEvents.STARTED.register((MinecraftServer minecraftServer) -> {
-            if (minecraftServer.overworld().getGameTime() == 0) {
+            if (minecraftServer.getWorldData().overworldData().getGameTime() == 0 &&
+                    minecraftServer.getWorldData().isAllowCommands()) {
                 executeCommandOverrides(minecraftServer,
                         CommandEnvironment.SERVER,
                         CommandEnvironment.DEDICATED_SERVER,
@@ -89,13 +90,15 @@ public final class CommandOverrides {
             if (entity instanceof ServerPlayer serverPlayer &&
                     !serverPlayer.getTags().contains(KEY_PLAYER_JOINED_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
-                serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
-                    String playerName = serverPlayer.getGameProfile().getName();
-                    executeCommandOverrides(serverPlayer.server,
-                            CommandEnvironment.PLAYER,
-                            CommandEnvironment.DEDICATED_PLAYER,
-                            (String s) -> s.replaceAll("@[sp]", playerName));
-                }));
+                if (serverLevel.getServer().getWorldData().isAllowCommands()) {
+                    serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
+                        String playerName = serverPlayer.getGameProfile().getName();
+                        executeCommandOverrides(serverPlayer.server,
+                                CommandEnvironment.PLAYER,
+                                CommandEnvironment.DEDICATED_PLAYER,
+                                (String s) -> s.replaceAll("@[sp]", playerName));
+                    }));
+                }
             }
             return EventResult.PASS;
         });
