@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v21.5.8-1.21.5] - 2025-04-15
 ### Added
+- Add `SpawnerDataBuilder`
 - Add `ContainerMenuHelper::openMenu`
 ### Fixed
 - Only trigger `CommandOverrides` when commands are allowed
