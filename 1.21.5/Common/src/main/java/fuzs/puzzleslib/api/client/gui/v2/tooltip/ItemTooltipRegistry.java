@@ -19,6 +19,7 @@ import java.util.function.Function;
 /**
  * A helper class for registering item tooltips for items and blocks.
  */
+@Deprecated(forRemoval = true)
 public final class ItemTooltipRegistry {
 
     private ItemTooltipRegistry() {
