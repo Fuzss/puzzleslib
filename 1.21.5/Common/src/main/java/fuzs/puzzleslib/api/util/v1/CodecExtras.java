@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.util.v1;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.*;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -103,6 +105,41 @@ public final class CodecExtras {
      */
     public static <T> Codec<Set<T>> setOf(Codec<T> codec) {
         return Codec.list(codec).xmap(ImmutableSet::copyOf, ImmutableList::copyOf);
+    }
+
+    /**
+     * A map codec that allows for key values that are not encoded as {@link net.minecraft.nbt.StringTag}, unlike
+     * {@link Codec#unboundedMap(Codec, Codec)}.
+     *
+     * @param keyCodec   the map key codec
+     * @param valueCodec the map value codec
+     * @param <K>        the map key type
+     * @param <V>        the map value type
+     * @return the codec
+     */
+    public static <K, V> Codec<Map<K, V>> mapOf(Codec<K> keyCodec, Codec<V> valueCodec) {
+        return mapOf(keyCodec.fieldOf("key"), valueCodec.fieldOf("value"));
+    }
+
+    /**
+     * A map codec that allows for key values that are not encoded as {@link net.minecraft.nbt.StringTag}, unlike
+     * {@link Codec#unboundedMap(Codec, Codec)}
+     *
+     * @param keyCodec   the map key codec
+     * @param valueCodec the map value codec
+     * @param <K>        the map key type
+     * @param <V>        the map value type
+     * @return the codec
+     */
+    public static <K, V> Codec<Map<K, V>> mapOf(MapCodec<K> keyCodec, MapCodec<V> valueCodec) {
+        return Codec.mapPair(keyCodec, valueCodec).codec().listOf().xmap((List<Pair<K, V>> list) -> {
+                    return list.stream()
+                            .collect(ImmutableMap.<Pair<K, V>, K, V>toImmutableMap(Pair::getFirst, Pair::getSecond));
+                },
+                (Map<K, V> map) -> map.entrySet()
+                        .stream()
+                        .map((Map.Entry<K, V> entry) -> new Pair<>(entry.getKey(), entry.getValue()))
+                        .toList());
     }
 
     /**

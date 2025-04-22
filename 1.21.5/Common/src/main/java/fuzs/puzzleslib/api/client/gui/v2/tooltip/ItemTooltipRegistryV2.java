@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -62,13 +63,43 @@ public abstract class ItemTooltipRegistryV2<T> {
     abstract Registry<T> getRegistry();
 
     /**
+     * Register an item tooltip provider built from a component.
+     *
+     * @param value      the item / block
+     * @param components the component
+     */
+    public void registerItemTooltip(T value, Component component) {
+        this.registerItemTooltip(value, new Component[]{component});
+    }
+
+    /**
+     * Register an item tooltip provider built from a component.
+     *
+     * @param clazz      the item / block class
+     * @param components the component
+     */
+    public void registerItemTooltip(Class<T> clazz, Component component) {
+        this.registerItemTooltip(clazz, new Component[]{component});
+    }
+
+    /**
+     * Register an item tooltip provider built from a component.
+     *
+     * @param tagKey     the item / block tag key
+     * @param components the components
+     */
+    public void registerItemTooltip(TagKey<T> tagKey, Component component) {
+        this.registerItemTooltip(tagKey, new Component[]{component});
+    }
+
+    /**
      * Register an item tooltip provider built from components.
      *
      * @param value      the item / block
      * @param components the component
      */
     public void registerItemTooltip(T value, Component... components) {
-        this.registerItemTooltip(value, (T valueX) -> Arrays.asList(components));
+        this.registerItemTooltipLines(value, (T valueX) -> Arrays.asList(components));
     }
 
     /**
@@ -78,7 +109,7 @@ public abstract class ItemTooltipRegistryV2<T> {
      * @param components the component
      */
     public void registerItemTooltip(Class<T> clazz, Component... components) {
-        this.registerItemTooltip(clazz, (T valueX) -> Arrays.asList(components));
+        this.registerItemTooltipLines(clazz, (T valueX) -> Arrays.asList(components));
     }
 
     /**
@@ -88,7 +119,56 @@ public abstract class ItemTooltipRegistryV2<T> {
      * @param components the components
      */
     public void registerItemTooltip(TagKey<T> tagKey, Component... components) {
-        this.registerItemTooltip(tagKey, (T valueX) -> Arrays.asList(components));
+        this.registerItemTooltipLines(tagKey, (T valueX) -> Arrays.asList(components));
+    }
+
+    /**
+     * Register an item tooltip provider built from extracting a component.
+     *
+     * @param value              the item / block
+     * @param componentExtractor the component getter from the item / block
+     */
+    public void registerItemTooltip(T value, Function<T, Component> componentExtractor) {
+        this.registerItemTooltipLines(value, (T valueX) -> {
+            return Collections.singletonList(componentExtractor.apply(valueX));
+        });
+    }
+
+    /**
+     * Register an item tooltip provider built from extracting a component.
+     *
+     * @param clazz              the item / block class
+     * @param componentExtractor the component getter from the item / block
+     */
+    public void registerItemTooltip(Class<T> clazz, Function<T, Component> componentExtractor) {
+        this.registerItemTooltipLines(clazz, (T valueX) -> {
+            return Collections.singletonList(componentExtractor.apply(valueX));
+        });
+    }
+
+    /**
+     * Register an item tooltip provider built from extracting a component.
+     *
+     * @param tagKey             the item / block tag key
+     * @param componentExtractor the component getter from the item / block
+     */
+    public void registerItemTooltip(TagKey<T> tagKey, Function<T, Component> componentExtractor) {
+        this.registerItemTooltipLines(tagKey, (T valueX) -> {
+            return Collections.singletonList(componentExtractor.apply(valueX));
+        });
+    }
+
+    /**
+     * Register an item tooltip provider built from extracting components.
+     *
+     * @param value              the item / block
+     * @param componentExtractor the component getter from the item / block
+     */
+    public void registerItemTooltipLines(T value, Function<T, List<Component>> componentExtractor) {
+        registerItemTooltip((ItemStack itemStack) -> this.getFromItemStack(itemStack) == value,
+                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
+                    componentExtractor.apply(value).forEach(tooltipLineConsumer);
+                });
     }
 
     /**
@@ -97,7 +177,7 @@ public abstract class ItemTooltipRegistryV2<T> {
      * @param clazz              the item / block class
      * @param componentExtractor the component getter from the item / block
      */
-    public void registerItemTooltip(Class<T> clazz, Function<T, List<Component>> componentExtractor) {
+    public void registerItemTooltipLines(Class<T> clazz, Function<T, List<Component>> componentExtractor) {
         this.registerItemTooltip(clazz,
                 (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
                     T value = this.getFromItemStack(itemStack);
@@ -112,24 +192,11 @@ public abstract class ItemTooltipRegistryV2<T> {
      * @param tagKey             the item / block tag key
      * @param componentExtractor the component getter from the item / block
      */
-    public void registerItemTooltip(TagKey<T> tagKey, Function<T, List<Component>> componentExtractor) {
+    public void registerItemTooltipLines(TagKey<T> tagKey, Function<T, List<Component>> componentExtractor) {
         this.registerItemTooltip(tagKey,
                 (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
                     T value = this.getFromItemStack(itemStack);
                     Objects.requireNonNull(value, "value from item stack " + itemStack + " is null");
-                    componentExtractor.apply(value).forEach(tooltipLineConsumer);
-                });
-    }
-
-    /**
-     * Register an item tooltip provider built from extracting components.
-     *
-     * @param value              the item / block
-     * @param componentExtractor the component getter from the item / block
-     */
-    public void registerItemTooltip(T value, Function<T, List<Component>> componentExtractor) {
-        registerItemTooltip((ItemStack itemStack) -> this.getFromItemStack(itemStack) == value,
-                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
                     componentExtractor.apply(value).forEach(tooltipLineConsumer);
                 });
     }
