@@ -25,12 +25,12 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> client(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.CLIENT, ModConfig.Type.CLIENT, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.CLIENT, supplier);
     }
 
     @Override
     protected <T extends ConfigCore> ConfigDataHolderImpl<T> common(Supplier<T> supplier) {
-        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.COMMON, ModConfig.Type.COMMON, supplier);
+        return new NeoForgeConfigDataHolderImpl<>(ModConfig.Type.STARTUP, ModConfig.Type.COMMON, supplier);
     }
 
     @Override

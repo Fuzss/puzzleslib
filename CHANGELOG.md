@@ -4,11 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.5.8-1.21.5] - 2025-04-15
+## [v21.5.8-1.21.5] - 2025-04-22
 ### Added
 - Add `SpawnerDataBuilder`
 - Add `ItemTooltipRegistryV2`
 - Add `ContainerMenuHelper::openMenu`
+### Changed
+ - Allow configs to be available during start-up
+ - Make custom registries optional to handle mod presence mismatches between clients and servers more leniently on Fabric
+ - Switch `CLIENT` & `COMMON` configs to startup configs
 ### Fixed
 - Only trigger `CommandOverrides` when commands are allowed
 - Fix event phase converters not respecting the ordering of all parent event phases
