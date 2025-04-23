@@ -92,7 +92,13 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
                     });
                 });
             } else {
-                REPLACED_GUI_LAYERS.put(resourceLocation, guiLayerFactory);
+                REPLACED_GUI_LAYERS.merge(resourceLocation,
+                        guiLayerFactory,
+                        (UnaryOperator<LayeredDraw.Layer> originalGuiLayerFactory, UnaryOperator<LayeredDraw.Layer> newGuiLayerFactory) -> {
+                            return (LayeredDraw.Layer layer) -> {
+                                return newGuiLayerFactory.apply(originalGuiLayerFactory.apply(layer));
+                            };
+                        });
             }
         } else {
             throw new RuntimeException("Unregistered gui layer: " + resourceLocation);
@@ -111,8 +117,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     public static void applyPlayerHealthGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() &&
-                gui.minecraft.getCameraEntity() instanceof Player player) {
+        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player) {
             int playerHealth = Mth.ceil(player.getHealth());
             float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH),
                     (float) Math.max(gui.displayHealth, playerHealth));
@@ -124,8 +129,8 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     public static void applyArmorLevelGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() &&
-                gui.minecraft.getCameraEntity() instanceof Player player && player.getArmorValue() > 0) {
+        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player &&
+                player.getArmorValue() > 0) {
             GuiHeightHelper.addLeftHeight(gui, 10);
         }
     }
@@ -140,8 +145,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     public static void applyAirLevelGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() &&
-                gui.minecraft.getCameraEntity() instanceof Player player) {
+        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player) {
             int maxAirSupply = player.getMaxAirSupply();
             int airSupply = Math.min(player.getAirSupply(), maxAirSupply);
             if (player.isEyeInFluid(FluidTags.WATER) || airSupply < maxAirSupply) {

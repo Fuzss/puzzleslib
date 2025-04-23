@@ -1,24 +1,18 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
-import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
 import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
-import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
-import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.PlayerRideableJumping;
@@ -44,75 +38,97 @@ abstract class GuiFabricMixin {
     private long healthBlinkTime;
 
     @WrapOperation(
-            method = "renderChat", at = @At(
+            method = "renderHotbarAndDecorations", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/gui/components/ChatComponent;render(Lnet/minecraft/client/gui/GuiGraphics;IIIZ)V"
+            target = "Lnet/minecraft/client/gui/Gui;renderItemHotbar(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/client/DeltaTracker;)V"
     )
     )
-    private void renderChat(ChatComponent chatComponent, GuiGraphics guiGraphics, int tickCount, int mouseX, int mouseY, boolean focused, Operation<Void> operation, GuiGraphics $, DeltaTracker deltaTracker) {
-        guiGraphics.pose().pushPose();
-        DefaultedInt posX = DefaultedInt.fromValue(0);
-        DefaultedInt posY = DefaultedInt.fromValue(guiGraphics.guiHeight() - 48);
-        FabricGuiEvents.CUSTOMIZE_CHAT_PANEL.invoker().onRenderChatPanel(guiGraphics, deltaTracker, posX, posY);
-        if (posX.getAsOptionalInt().isPresent() || posY.getAsOptionalInt().isPresent()) {
-            guiGraphics.pose().translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48), 0.0);
-        }
-        operation.call(chatComponent, guiGraphics, tickCount, mouseX, mouseY, focused);
-        guiGraphics.pose().popPose();
-    }
-
-    @Inject(method = "renderCameraOverlays", at = @At("HEAD"), cancellable = true)
-    private void renderCameraOverlays$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CAMERA_OVERLAYS, callback);
-    }
-
-    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    private void renderCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CROSSHAIR, callback);
-    }
-
-    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
-    private void renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.HOTBAR, callback);
-    }
-
-    @WrapMethod(method = "renderItemHotbar")
-    private void renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, Operation<Void> operation) {
+    private void renderHotbarAndDecorations(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker, Operation<Void> operation) {
         GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.HOTBAR,
                 guiGraphics,
                 deltaTracker,
-                () -> operation.call(guiGraphics, deltaTracker));
+                () -> operation.call(gui, guiGraphics, deltaTracker));
     }
 
-    @Inject(method = "renderJumpMeter", at = @At(value = "HEAD"))
-    private void renderJumpMeter(PlayerRideableJumping rideable, GuiGraphics guiGraphics, int x, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.JUMP_METER, callback);
-    }
-
-    @WrapMethod(method = "renderJumpMeter")
-    private void renderJumpMeter(PlayerRideableJumping rideable, GuiGraphics guiGraphics, int x, Operation<Void> operation) {
+    @WrapOperation(
+            method = "renderHotbarAndDecorations", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderJumpMeter(Lnet/minecraft/world/entity/PlayerRideableJumping;Lnet/minecraft/client/gui/GuiGraphics;I)V"
+    )
+    )
+    private void renderHotbarAndDecorations(Gui gui, PlayerRideableJumping rideable, GuiGraphics guiGraphics, int x, Operation<Void> operation) {
         GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.JUMP_METER,
                 guiGraphics,
-                this.minecraft.getDeltaTracker(),
-                () -> operation.call(rideable, guiGraphics, x));
+                gui.minecraft.getDeltaTracker(),
+                () -> operation.call(gui, rideable, guiGraphics, x));
     }
 
-    @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"))
-    public void renderExperienceBar(GuiGraphics guiGraphics, int xPos, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_BAR, callback);
-    }
-
-    @WrapMethod(method = "renderExperienceBar")
-    public void renderExperienceBar(GuiGraphics guiGraphics, int xPos, Operation<Void> operation) {
+    @WrapOperation(
+            method = "renderHotbarAndDecorations", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderExperienceBar(Lnet/minecraft/client/gui/GuiGraphics;I)V"
+    )
+    )
+    private void renderHotbarAndDecorations(Gui gui, GuiGraphics guiGraphics, int xPos, Operation<Void> operation) {
         GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.EXPERIENCE_BAR,
                 guiGraphics,
-                this.minecraft.getDeltaTracker(),
-                () -> operation.call(guiGraphics, xPos));
+                gui.minecraft.getDeltaTracker(),
+                () -> operation.call(gui, guiGraphics, xPos));
     }
 
-    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
-    private void renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_LEVEL, callback);
+    @Inject(
+            method = "renderHotbarAndDecorations", at = @At(
+            value = "INVOKE", target = "Lnet/minecraft/client/multiplayer/MultiPlayerGameMode;canHurtPlayer()Z"
+    )
+    )
+    private void renderHotbarAndDecorations(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback, @Share(
+            "heartsAlreadyRendered"
+    ) LocalBooleanRef heartsAlreadyRendered) {
+        if (GuiLayersContextFabricImpl.REPLACED_GUI_LAYERS.containsKey(GuiLayersContext.VEHICLE_HEALTH)) {
+            heartsAlreadyRendered.set(true);
+            GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.VEHICLE_HEALTH,
+                    guiGraphics,
+                    deltaTracker,
+                    () -> {
+                        this.renderVehicleHealth(guiGraphics);
+                        GuiLayersContextFabricImpl.applyVehicleHealthGuiHeight(Gui.class.cast(this));
+                    });
+        }
+    }
+
+    @Shadow
+    private void renderVehicleHealth(GuiGraphics guiGraphics) {
+        throw new RuntimeException();
+    }
+
+    @WrapWithCondition(
+            method = "renderHotbarAndDecorations", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderVehicleHealth(Lnet/minecraft/client/gui/GuiGraphics;)V"
+    )
+    )
+    private boolean renderHotbarAndDecorations(Gui gui, GuiGraphics guiGraphics, @Share(
+            "heartsAlreadyRendered"
+    ) LocalBooleanRef heartsAlreadyRendered) {
+        if (!heartsAlreadyRendered.get()) {
+            GuiLayersContextFabricImpl.applyVehicleHealthGuiHeight(gui);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @WrapOperation(
+            method = "renderHotbarAndDecorations", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderSelectedItemName(Lnet/minecraft/client/gui/GuiGraphics;)V"
+    )
+    )
+    private void renderHotbarAndDecorations(Gui gui, GuiGraphics guiGraphics, Operation<Void> operation) {
+        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.SELECTED_ITEM_NAME,
+                guiGraphics,
+                gui.minecraft.getDeltaTracker(),
+                () -> operation.call(gui, guiGraphics));
     }
 
     @Inject(
@@ -187,20 +203,88 @@ abstract class GuiFabricMixin {
         }
     }
 
+    @WrapOperation(
+            method = "renderPlayerHealth", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderArmor(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;IIII)V"
+    )
+    )
+    private void renderPlayerHealth(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, Operation<Void> operation) {
+        Gui gui = Gui.class.cast(this);
+        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.ARMOR_LEVEL,
+                guiGraphics,
+                gui.minecraft.getDeltaTracker(),
+                () -> {
+                    operation.call(guiGraphics, player, y, heartRows, height, x);
+                    GuiLayersContextFabricImpl.applyArmorLevelGuiHeight(gui);
+                });
+    }
+
+    @WrapOperation(
+            method = "renderPlayerHealth", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderFood(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;II)V"
+    )
+    )
+    private void renderPlayerHealth(Gui gui, GuiGraphics guiGraphics, Player player, int y, int x, Operation<Void> operation) {
+        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.FOOD_LEVEL,
+                guiGraphics,
+                gui.minecraft.getDeltaTracker(),
+                () -> {
+                    operation.call(gui, guiGraphics, player, y, x);
+                    GuiLayersContextFabricImpl.applyFoodLevelGuiHeight(gui);
+                });
+    }
+
+    @WrapOperation(
+            method = "renderPlayerHealth", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/Gui;renderAirBubbles(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;III)V"
+    )
+    )
+    private void renderPlayerHealth(Gui gui, GuiGraphics guiGraphics, Player player, int vehicleMaxHealth, int y, int x, Operation<Void> operation) {
+        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.AIR_LEVEL,
+                guiGraphics,
+                gui.minecraft.getDeltaTracker(),
+                () -> {
+                    operation.call(gui, guiGraphics, player, vehicleMaxHealth, y, x);
+                    GuiLayersContextFabricImpl.applyAirLevelGuiHeight(gui);
+                });
+    }
+
+    @Inject(method = "renderCameraOverlays", at = @At("HEAD"), cancellable = true)
+    private void renderCameraOverlays$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CAMERA_OVERLAYS, callback);
+    }
+
+    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
+    private void renderCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CROSSHAIR, callback);
+    }
+
+    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
+    private void renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.HOTBAR, callback);
+    }
+
+    @Inject(method = "renderJumpMeter", at = @At(value = "HEAD"))
+    private void renderJumpMeter(PlayerRideableJumping rideable, GuiGraphics guiGraphics, int x, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.JUMP_METER, callback);
+    }
+
+    @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"))
+    public void renderExperienceBar(GuiGraphics guiGraphics, int xPos, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_BAR, callback);
+    }
+
+    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
+    private void renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
+        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_LEVEL, callback);
+    }
+
     @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
     private static void renderArmor(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, CallbackInfo callback) {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.ARMOR_LEVEL, callback);
-    }
-
-    @WrapMethod(method = "renderArmor")
-    private static void renderArmor(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, Operation<Void> operation) {
-        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.ARMOR_LEVEL,
-                guiGraphics,
-                Minecraft.getInstance().getDeltaTracker(),
-                () -> {
-                    operation.call(guiGraphics, player, y, heartRows, height, x);
-                    GuiLayersContextFabricImpl.applyArmorLevelGuiHeight(Minecraft.getInstance().gui);
-                });
     }
 
     @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
@@ -213,31 +297,9 @@ abstract class GuiFabricMixin {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.FOOD_LEVEL, callback);
     }
 
-    @WrapMethod(method = "renderFood")
-    public void renderFood(GuiGraphics guiGraphics, Player player, int y, int x, Operation<Void> operation) {
-        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.FOOD_LEVEL,
-                guiGraphics,
-                this.minecraft.getDeltaTracker(),
-                () -> {
-                    operation.call(guiGraphics, player, y, x);
-                    GuiLayersContextFabricImpl.applyFoodLevelGuiHeight(Gui.class.cast(this));
-                });
-    }
-
     @Inject(method = "renderAirBubbles", at = @At("HEAD"), cancellable = true)
     private void renderAirBubbles(GuiGraphics guiGraphics, Player player, int vehicleMaxHealth, int y, int x, CallbackInfo callback) {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, callback);
-    }
-
-    @WrapMethod(method = "renderAirBubbles")
-    private void renderAirBubbles(GuiGraphics guiGraphics, Player player, int vehicleMaxHealth, int y, int x, Operation<Void> operation) {
-        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.AIR_LEVEL,
-                guiGraphics,
-                this.minecraft.getDeltaTracker(),
-                () -> {
-                    operation.call(guiGraphics, player, vehicleMaxHealth, y, x);
-                    GuiLayersContextFabricImpl.applyAirLevelGuiHeight(Gui.class.cast(this));
-                });
     }
 
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
@@ -245,39 +307,9 @@ abstract class GuiFabricMixin {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.VEHICLE_HEALTH, callback);
     }
 
-    @WrapMethod(method = "renderVehicleHealth")
-    public void renderVehicleHealth(GuiGraphics guiGraphics, Operation<Void> operation) {
-        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.VEHICLE_HEALTH,
-                guiGraphics,
-                this.minecraft.getDeltaTracker(),
-                () -> {
-                    operation.call(guiGraphics);
-                    GuiLayersContextFabricImpl.applyVehicleHealthGuiHeight(Gui.class.cast(this));
-                });
-    }
-
     @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
     public void renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo callback) {
         FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.SELECTED_ITEM_NAME, callback);
-    }
-
-    @WrapMethod(method = "renderSelectedItemName")
-    public void renderSelectedItemName(GuiGraphics guiGraphics, Operation<Void> operation) {
-        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.SELECTED_ITEM_NAME,
-                guiGraphics,
-                this.minecraft.getDeltaTracker(),
-                () -> operation.call(guiGraphics));
-    }
-
-    @ModifyExpressionValue(
-            method = "renderSelectedItemName",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;guiHeight()I")
-    )
-    public int renderSelectedItemName(int guiHeight) {
-        // offset selected item name depending on gui height values, NeoForge also does this
-        return guiHeight + 59 - Math.max(59,
-                Math.max(GuiHeightHelper.getLeftHeight(Gui.class.cast(this)),
-                        GuiHeightHelper.getRightHeight(Gui.class.cast(this))));
     }
 
     @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)

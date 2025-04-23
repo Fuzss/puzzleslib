@@ -14,6 +14,7 @@ import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
+import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
@@ -274,7 +275,23 @@ public final class FabricClientEventInvokers {
             Objects.requireNonNull(context, "context is null");
             applyToInvoker.accept(FabricGuiEvents.afterRenderGuiElement(((ResourceLocation) context)));
         });
-        INSTANCE.register(CustomizeChatPanelCallback.class, FabricGuiEvents.CUSTOMIZE_CHAT_PANEL);
+        INSTANCE.register(CustomizeChatPanelCallback.class, HudLayerRegistrationCallback.EVENT, (CustomizeChatPanelCallback callback) -> {
+            return (LayeredDrawerWrapper layeredDrawer) -> {
+                layeredDrawer.replaceLayer(IdentifiedLayer.CHAT, (IdentifiedLayer identifiedLayer) -> {
+                    return IdentifiedLayer.of(identifiedLayer.id(), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                        guiGraphics.pose().pushPose();
+                        DefaultedInt posX = DefaultedInt.fromValue(0);
+                        DefaultedInt posY = DefaultedInt.fromValue(guiGraphics.guiHeight() - 48);
+                        callback.onRenderChatPanel(guiGraphics, deltaTracker, posX, posY);
+                        if (posX.getAsOptionalInt().isPresent() || posY.getAsOptionalInt().isPresent()) {
+                            guiGraphics.pose().translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48), 0.0);
+                        }
+                        identifiedLayer.render(guiGraphics, deltaTracker);
+                        guiGraphics.pose().popPose();
+                    });
+                });
+            };
+        });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, (ClientEntityLevelEvents.Unload callback) -> {
             return callback::onEntityUnload;

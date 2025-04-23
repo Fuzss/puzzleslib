@@ -13,9 +13,9 @@ public interface CustomizeChatPanelCallback {
      * Called before the chat panel is drawn, allows for changing x- and y-position.
      *
      * @param guiGraphics  the gui graphics component
-     * @param deltaTracker tick delta time
-     * @param posX         x-position of the chat panel overlay from screen left
-     * @param posY         y-position of the chat panel overlay from screen top
+     * @param deltaTracker the delta tracker
+     * @param posX         the x-position of the chat panel overlay from the screen left
+     * @param posY         the y-position of the chat panel overlay from the screen top
      */
     void onRenderChatPanel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, MutableInt posX, MutableInt posY);
 }

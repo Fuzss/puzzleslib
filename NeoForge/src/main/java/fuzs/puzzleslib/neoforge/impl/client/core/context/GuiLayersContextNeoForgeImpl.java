@@ -2,12 +2,15 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
+import fuzs.puzzleslib.neoforge.mixin.client.accessor.RegisterGuiLayersEventAccessor;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
-import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.Map;
 import java.util.Objects;
@@ -67,12 +70,22 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent evt) implement
         Objects.requireNonNull(guiLayerFactory, "gui layer factory is null");
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
             ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
-            NeoForge.EVENT_BUS.addListener((final RenderGuiLayerEvent.Pre evt) -> {
-                if (evt.getName().equals(vanillaResourceLocation)) {
-                    guiLayerFactory.apply(evt.getLayer()).render(evt.getGuiGraphics(), evt.getPartialTick());
-                    evt.setCanceled(true);
-                }
-            });
+            ((RegisterGuiLayersEventAccessor) this.evt).puzzleslib$getLayers()
+                    .replaceAll((GuiLayerManager.NamedLayer namedLayer) -> {
+                        if (namedLayer.name().equals(vanillaResourceLocation)) {
+                            return new GuiLayerManager.NamedLayer(namedLayer.name(),
+                                    (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                                        // render condition is not inherited from the parent, add it back manually,
+                                        // since all are known for vanilla layers
+                                        if (namedLayer.name().equals(VanillaGuiLayers.SLEEP_OVERLAY) ||
+                                                !Minecraft.getInstance().options.hideGui) {
+                                            guiLayerFactory.apply(namedLayer.layer()).render(guiGraphics, deltaTracker);
+                                        }
+                                    });
+                        } else {
+                            return namedLayer;
+                        }
+                    });
         } else {
             throw new RuntimeException("Unregistered gui layer: " + resourceLocation);
         }
