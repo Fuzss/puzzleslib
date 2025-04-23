@@ -13,19 +13,11 @@ public class PuzzlesLibClient implements ClientModConstructor {
 
     @Override
     public void onConstructMod() {
-        registerLoadingHandlers();
-    }
-
-    private static void registerLoadingHandlers() {
-        AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
-    }
-
-    @Override
-    public void onClientSetup() {
         registerEventHandlers();
     }
 
     private static void registerEventHandlers() {
+        AddResourcePackReloadListenersCallback.EVENT.register(ConfigTranslationsManager::onAddResourcePackReloadListeners);
         ClientPlayerNetworkEvents.LOGGED_OUT.register((LocalPlayer player, MultiPlayerGameMode multiPlayerGameMode, Connection connection) -> {
             ModContext.clearPresentServerside();
         });

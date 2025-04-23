@@ -116,6 +116,9 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             eventBus.addListener((final RegisterRenderPipelinesEvent evt) -> {
                 modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextNeoForgeImpl(evt));
             });
+            eventBus.addListener((final RegisterGuiLayersEvent evt) -> {
+                modConstructor.onRegisterGuiLayers(new GuiLayersContextNeoForgeImpl(evt));
+            });
         });
     }
 }

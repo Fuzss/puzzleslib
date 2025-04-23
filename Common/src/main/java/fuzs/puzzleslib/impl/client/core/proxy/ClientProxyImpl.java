@@ -65,8 +65,6 @@ public interface ClientProxyImpl extends ProxyImpl, GuiHeightProxy {
 
     void registerWoodType(WoodType woodType);
 
-    ResourceLocation getModLoaderGuiLayer(ResourceLocation resourceLocation);
-
     void registerRenderType(Block block, RenderType renderType);
 
     void registerRenderType(Fluid fluid, RenderType renderType);

@@ -13,8 +13,12 @@ import java.lang.reflect.Modifier;
 public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor {
 
     @Override
-    public void onCommonSetup() {
+    public void onConstructMod() {
         CommandOverrides.registerEventHandlers();
+    }
+
+    @Override
+    public void onCommonSetup() {
         initializeGameRules();
         initializeCommands();
     }
@@ -44,7 +48,7 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
         GameRuleValueOverrides.setValue(GameRules.RULE_COMMANDBLOCKOUTPUT, false);
     }
 
-    public static void printComponentsWithoutAccess(Class<?> clazz) {
+    public static void printClazzComponentsWithoutAccess(Class<?> clazz) {
         for (Field field : clazz.getDeclaredFields()) {
             if (!Modifier.isPublic(field.getModifiers()) && !field.isSynthetic()) {
                 LOGGER.info("transitive-accessible\tfield\t{}\t{}\t{}",

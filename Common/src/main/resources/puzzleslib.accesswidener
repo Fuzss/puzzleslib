@@ -279,6 +279,10 @@ transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerator
 transitive-accessible	method  net/minecraft/util/ARGB from8BitChannel (I)F
 transitive-accessible   method  net/minecraft/client/renderer/RenderPipelines   register    (Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 accessible  field   net/minecraft/client/gui/Gui    tabList Lnet/minecraft/client/gui/components/PlayerTabOverlay;
+accessible	method	net/minecraft/client/gui/Gui	renderExperienceBar	(Lnet/minecraft/client/gui/GuiGraphics;I)V
+accessible	method	net/minecraft/client/gui/Gui	getCameraPlayer	()Lnet/minecraft/world/entity/player/Player;
+accessible	method	net/minecraft/client/gui/Gui	renderFood	(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;II)V
+accessible	method	net/minecraft/client/gui/Gui	renderAirBubbles	(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;III)V
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
