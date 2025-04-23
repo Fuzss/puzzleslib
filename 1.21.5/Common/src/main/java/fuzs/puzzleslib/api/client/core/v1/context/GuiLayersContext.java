@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.resources.ResourceLocation;
 
@@ -107,6 +108,13 @@ public interface GuiLayersContext {
      */
     ResourceLocation SUBTITLES = ResourceLocationHelper.withDefaultNamespace("subtitles");
 
+    /**
+     * Set a custom event phase other than {@link EventPhase#DEFAULT} for ordering purposes during gui layer
+     * registration.
+     *
+     * @param eventPhase the event phase
+     */
+    void setEventPhase(EventPhase eventPhase);
 
     /**
      * Register a new gui layer rendered after all existing layers.

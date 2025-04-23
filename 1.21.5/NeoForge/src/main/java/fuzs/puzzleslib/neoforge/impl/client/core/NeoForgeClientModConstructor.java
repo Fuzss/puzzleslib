@@ -21,6 +21,7 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             SkullRenderersContextNeoForgeImpl[] skullRenderersContext = new SkullRenderersContextNeoForgeImpl[1];
             ItemModelsContextNeoForgeImpl[] itemModelsContext = new ItemModelsContextNeoForgeImpl[1];
             modConstructor.onConstructMod();
+            modConstructor.onRegisterGuiLayers(new GuiLayersContextNeoForgeImpl(eventBus));
             eventBus.addListener((final FMLClientSetupEvent evt) -> {
                 evt.enqueueWork(() -> {
                     modConstructor.onClientSetup();
@@ -115,9 +116,6 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             });
             eventBus.addListener((final RegisterRenderPipelinesEvent evt) -> {
                 modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextNeoForgeImpl(evt));
-            });
-            eventBus.addListener((final RegisterGuiLayersEvent evt) -> {
-                modConstructor.onRegisterGuiLayers(new GuiLayersContextNeoForgeImpl(evt));
             });
         });
     }
