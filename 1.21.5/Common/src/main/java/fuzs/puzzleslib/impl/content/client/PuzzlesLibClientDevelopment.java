@@ -8,6 +8,7 @@ import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
 import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
+import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import net.minecraft.client.DeltaTracker;
@@ -28,17 +29,16 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.profiling.Profiler;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PlayerRideableJumping;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
-import org.apache.commons.lang3.mutable.MutableBoolean;
+import net.minecraft.world.scores.DisplaySlot;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -72,9 +72,6 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
             if (toast instanceof SystemToast systemToast &&
                     systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
                 // block the annoying unsecure server warning when joining a multiplayer server in offline mode
-                return EventResult.INTERRUPT;
-            } else if (toastManager.freeSlotCount() == 0) {
-                // prevent toast spam when unlocking all advancements at once
                 return EventResult.INTERRUPT;
             } else {
                 return EventResult.PASS;
@@ -130,7 +127,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 .setTitleComponent("selectWorld.warning.experimental.title")
                 .setButtonComponent(CommonComponents.GUI_YES)
                 .build();
-        // launch directly into the key binds screen from the controls button
+        // launch directly into the key binds screen from the control button
         ScreenSkipper.create()
                 .setTitleComponent("controls.title")
                 .setButtonComponent("controls.keybinds")
@@ -141,7 +138,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
     public static void setupGameOptions(Options options) {
         Minecraft minecraft = Minecraft.getInstance();
         Objects.requireNonNull(minecraft, "minecraft is null");
-        // disable to prevent some options from accessing fields that have not yet been initialized
+        // disable to prevent some options from accessing fields that have not yet been initialised
         boolean running = minecraft.running;
         minecraft.running = false;
         initializeGameOptions(options);
@@ -169,14 +166,29 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
 
     @Override
     public void onRegisterGuiLayers(GuiLayersContext context) {
+        context.replaceGuiLayer(GuiLayersContext.PLAYER_LIST, (LayeredDraw.Layer layer) -> {
+            return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                Minecraft minecraft = Minecraft.getInstance();
+                Scoreboard scoreboard = minecraft.level.getScoreboard();
+                Objective objective = scoreboard.getDisplayObjective(DisplaySlot.LIST);
+                if (minecraft.options.keyPlayerList.isDown() && minecraft.isLocalServer() &&
+                        minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective == null) {
+                    minecraft.gui.tabList.setVisible(true);
+                    minecraft.gui.tabList.render(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
+                } else {
+                    layer.render(guiGraphics, deltaTracker);
+                }
+            };
+        });
         context.replaceGuiLayer(GuiLayersContext.JUMP_METER, (LayeredDraw.Layer layer) -> {
             return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                 Gui gui = Minecraft.getInstance().gui;
                 PlayerRideableJumping playerRideableJumping = gui.minecraft.player.jumpableVehicle();
                 if (playerRideableJumping != null) {
                     if (this.isExperienceBarVisible(gui)) {
-                        int i = guiGraphics.guiWidth() / 2 - 91;
-                        gui.renderExperienceBar(guiGraphics, i);
+                        int posX = guiGraphics.guiWidth() / 2 - 91;
+                        gui.renderExperienceBar(guiGraphics, posX);
+                        // the vanilla method already includes the experience visibility check
                         this.renderExperienceLevel(gui, guiGraphics, deltaTracker);
                     } else {
                         layer.render(guiGraphics, deltaTracker);
@@ -184,83 +196,60 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 }
             };
         });
-        MutableBoolean mutableBoolean = new MutableBoolean();
-        context.replaceGuiLayer(GuiLayersContext.AIR_LEVEL, (LayeredDraw.Layer layer) -> {
+        // Fabric requires special handling, as gui layers do not respect the actual gui height, it is only updated afterward
+        context.replaceGuiLayer(GuiLayersContext.VEHICLE_HEALTH, (LayeredDraw.Layer layer) -> {
             return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                 Gui gui = Minecraft.getInstance().gui;
-                Player player = gui.getCameraPlayer();
-                LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
-                int vehicleMaxHealth = gui.getVehicleMaxHearts(livingEntity);
-                int m = guiGraphics.guiWidth() / 2 + 91;
-                if (mutableBoolean.isFalse() && vehicleMaxHealth > 0) {
-                    mutableBoolean.setTrue();
+                int vehicleMaxHearts = gui.getVehicleMaxHearts(gui.getPlayerVehicleWithHealth());
+                if (gui.minecraft.gameMode.canHurtPlayer() && vehicleMaxHearts > 0) {
+                    Player player = gui.getCameraPlayer();
+                    int posX = guiGraphics.guiWidth() / 2 + 91;
                     gui.renderFood(guiGraphics,
                             player,
                             guiGraphics.guiHeight() - GuiHeightHelper.getRightHeight(gui),
-                            m);
+                            posX);
                     GuiHeightHelper.addRightHeight(gui, 10);
-                    this.renderVehicleHealth(gui, guiGraphics);
-                    gui.renderAirBubbles(guiGraphics,
-                            player,
-                            10,
-                            guiGraphics.guiHeight() - GuiHeightHelper.getRightHeight(gui),
-                            m);
-                    GuiHeightHelper.addRightHeight(gui, 10);
-                    mutableBoolean.setFalse();
-                } else {
-                    layer.render(guiGraphics, deltaTracker);
+                    if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
+                        this.renderLayerWithTranslation(layer, guiGraphics, deltaTracker);
+                        return;
+                    }
                 }
+                layer.render(guiGraphics, deltaTracker);
             };
         });
-        context.replaceGuiLayer(GuiLayersContext.VEHICLE_HEALTH, GuiLayersContext.EMPTY);
-    }
-
-    private static final ResourceLocation HEART_VEHICLE_CONTAINER_SPRITE = ResourceLocation.withDefaultNamespace(
-            "hud/heart/vehicle_container");
-    private static final ResourceLocation HEART_VEHICLE_FULL_SPRITE = ResourceLocation.withDefaultNamespace(
-            "hud/heart/vehicle_full");
-    private static final ResourceLocation HEART_VEHICLE_HALF_SPRITE = ResourceLocation.withDefaultNamespace(
-            "hud/heart/vehicle_half");
-
-    private void renderVehicleHealth(Gui gui, GuiGraphics guiGraphics) {
-        LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
-        if (livingEntity != null) {
-            int i = gui.getVehicleMaxHearts(livingEntity);
-            if (i != 0) {
-                int j = (int) Math.ceil(livingEntity.getHealth());
-                Profiler.get().popPush("mountHealth");
-                int k = guiGraphics.guiHeight() - GuiHeightHelper.getRightHeight(gui);
-                int l = guiGraphics.guiWidth() / 2 + 91;
-                int m = k;
-
-                for (int n = 0; i > 0; n += 20) {
-                    int o = Math.min(i, 10);
-                    i -= o;
-
-                    for (int p = 0; p < o; p++) {
-                        int q = l - p * 8 - 9;
-                        guiGraphics.blitSprite(RenderType::guiTextured, HEART_VEHICLE_CONTAINER_SPRITE, q, m, 9, 9);
-                        if (p * 2 + 1 + n < j) {
-                            guiGraphics.blitSprite(RenderType::guiTextured, HEART_VEHICLE_FULL_SPRITE, q, m, 9, 9);
-                        }
-
-                        if (p * 2 + 1 + n == j) {
-                            guiGraphics.blitSprite(RenderType::guiTextured, HEART_VEHICLE_HALF_SPRITE, q, m, 9, 9);
-                        }
+        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
+            context.replaceGuiLayer(GuiLayersContext.AIR_LEVEL, (LayeredDraw.Layer layer) -> {
+                return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    Gui gui = Minecraft.getInstance().gui;
+                    int vehicleMaxHearts = gui.getVehicleMaxHearts(gui.getPlayerVehicleWithHealth());
+                    if (gui.minecraft.gameMode.canHurtPlayer() && vehicleMaxHearts > 0) {
+                        this.renderLayerWithTranslation(layer, guiGraphics, deltaTracker);
+                    } else {
+                        layer.render(guiGraphics, deltaTracker);
                     }
-
-                    m -= 10;
-                    GuiHeightHelper.addRightHeight(gui, 10);
-                }
-            }
+                };
+            });
         }
     }
 
+    private void renderLayerWithTranslation(LayeredDraw.Layer layer, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
+        guiGraphics.pose().pushPose();
+        guiGraphics.pose().translate(0.0F, -10.0F, 0.0F);
+        layer.render(guiGraphics, deltaTracker);
+        guiGraphics.pose().popPose();
+    }
+
+    /**
+     * @see Gui#isExperienceBarVisible()
+     */
     private boolean isExperienceBarVisible(Gui gui) {
         return gui.minecraft.gameMode.hasExperience() &&
                 (gui.minecraft.player.jumpableVehicle() == null || gui.minecraft.player.getJumpRidingScale() == 0.0F);
     }
 
+    /**
+     * @see Gui#renderExperienceLevel(GuiGraphics, DeltaTracker)
+     */
     private void renderExperienceLevel(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
         int i = gui.minecraft.player.experienceLevel;
         if (i > 0) {
@@ -272,7 +261,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
             guiGraphics.drawString(gui.getFont(), string, j - 1, k, 0, false);
             guiGraphics.drawString(gui.getFont(), string, j, k + 1, 0, false);
             guiGraphics.drawString(gui.getFont(), string, j, k - 1, 0, false);
-            guiGraphics.drawString(gui.getFont(), string, j, k, 8453920, false);
+            guiGraphics.drawString(gui.getFont(), string, j, k, 0X80FF20, false);
             Profiler.get().pop();
         }
     }

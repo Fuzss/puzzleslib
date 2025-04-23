@@ -15,6 +15,7 @@
   ],
   "client": [
     "client.accessor.BlockColorsNeoForgeAccessor",
+    "client.accessor.RegisterGuiLayersEventAccessor",
     "client.accessor.RegisterKeyMappingsEventNeoForgeAccessor"
   ],
   "injectors": {

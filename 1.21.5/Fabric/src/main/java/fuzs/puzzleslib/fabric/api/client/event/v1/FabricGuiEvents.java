@@ -47,11 +47,6 @@ public final class FabricGuiEvents {
     public static final Event<RenderTooltipCallback> RENDER_TOOLTIP = FabricEventFactory.createResult(
             RenderTooltipCallback.class);
     /**
-     * Called before the chat panel is drawn, allows for changing x- and y-position.
-     */
-    public static final Event<CustomizeChatPanelCallback> CUSTOMIZE_CHAT_PANEL = FabricEventFactory.create(
-            CustomizeChatPanelCallback.class);
-    /**
      * Fires when a {@link Toast} is about to be queued in
      * {@link net.minecraft.client.gui.components.toasts.ToastManager#addToast(Toast)}.
      */
