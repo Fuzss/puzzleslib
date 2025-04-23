@@ -65,8 +65,8 @@ public abstract class ItemTooltipRegistryV2<T> {
     /**
      * Register an item tooltip provider built from a component.
      *
-     * @param value      the item / block
-     * @param components the component
+     * @param value     the item / block
+     * @param component the component
      */
     public void registerItemTooltip(T value, Component component) {
         this.registerItemTooltip(value, new Component[]{component});
@@ -75,8 +75,8 @@ public abstract class ItemTooltipRegistryV2<T> {
     /**
      * Register an item tooltip provider built from a component.
      *
-     * @param clazz      the item / block class
-     * @param components the component
+     * @param clazz     the item / block class
+     * @param component the component
      */
     public void registerItemTooltip(Class<T> clazz, Component component) {
         this.registerItemTooltip(clazz, new Component[]{component});
@@ -85,8 +85,8 @@ public abstract class ItemTooltipRegistryV2<T> {
     /**
      * Register an item tooltip provider built from a component.
      *
-     * @param tagKey     the item / block tag key
-     * @param components the components
+     * @param tagKey    the item / block tag key
+     * @param component the components
      */
     public void registerItemTooltip(TagKey<T> tagKey, Component component) {
         this.registerItemTooltip(tagKey, new Component[]{component});
