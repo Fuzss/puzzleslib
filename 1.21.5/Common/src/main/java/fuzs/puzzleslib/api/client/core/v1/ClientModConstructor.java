@@ -7,6 +7,7 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
@@ -205,6 +206,14 @@ public interface ClientModConstructor {
      * @param context register new render pipelines to {@link net.minecraft.client.renderer.RenderPipelines}
      */
     default void onRegisterRenderPipelines(RenderPipelinesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register new {@link LayeredDraw.Layer Layers} to be drawn as part of the
+     *                {@link net.minecraft.client.gui.Gui}
+     */
+    default void onRegisterGuiLayers(GuiLayersContext context) {
         // NO-OP
     }
 }

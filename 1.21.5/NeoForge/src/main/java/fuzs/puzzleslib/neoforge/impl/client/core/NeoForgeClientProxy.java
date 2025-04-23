@@ -1,9 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
-import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
@@ -46,7 +44,6 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.ClientHooks;
 import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtensions;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
-import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
@@ -58,33 +55,6 @@ import java.util.List;
 import java.util.Map;
 
 public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientProxyImpl {
-    private static final Map<ResourceLocation, ResourceLocation> VANILLA_GUI_LAYERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
-            .put(RenderGuiLayerEvents.CAMERA_OVERLAYS, VanillaGuiLayers.CAMERA_OVERLAYS)
-            .put(RenderGuiLayerEvents.CROSSHAIR, VanillaGuiLayers.CROSSHAIR)
-            .put(RenderGuiLayerEvents.HOTBAR, VanillaGuiLayers.HOTBAR)
-            .put(RenderGuiLayerEvents.JUMP_METER, VanillaGuiLayers.JUMP_METER)
-            .put(RenderGuiLayerEvents.EXPERIENCE_BAR, VanillaGuiLayers.EXPERIENCE_BAR)
-            .put(RenderGuiLayerEvents.PLAYER_HEALTH, VanillaGuiLayers.PLAYER_HEALTH)
-            .put(RenderGuiLayerEvents.ARMOR_LEVEL, VanillaGuiLayers.ARMOR_LEVEL)
-            .put(RenderGuiLayerEvents.FOOD_LEVEL, VanillaGuiLayers.FOOD_LEVEL)
-            .put(RenderGuiLayerEvents.VEHICLE_HEALTH, VanillaGuiLayers.VEHICLE_HEALTH)
-            .put(RenderGuiLayerEvents.AIR_LEVEL, VanillaGuiLayers.AIR_LEVEL)
-            .put(RenderGuiLayerEvents.SELECTED_ITEM_NAME, VanillaGuiLayers.SELECTED_ITEM_NAME)
-            .put(RenderGuiLayerEvents.SPECTATOR_TOOLTIP, VanillaGuiLayers.SPECTATOR_TOOLTIP)
-            .put(RenderGuiLayerEvents.EXPERIENCE_LEVEL, VanillaGuiLayers.EXPERIENCE_LEVEL)
-            .put(RenderGuiLayerEvents.STATUS_EFFECTS, VanillaGuiLayers.EFFECTS)
-            .put(RenderGuiLayerEvents.BOSS_BAR, VanillaGuiLayers.BOSS_OVERLAY)
-            .put(RenderGuiLayerEvents.SLEEP_OVERLAY, VanillaGuiLayers.SLEEP_OVERLAY)
-            .put(RenderGuiLayerEvents.DEMO_TIMER, VanillaGuiLayers.DEMO_OVERLAY)
-            .put(RenderGuiLayerEvents.DEBUG_OVERLAY, VanillaGuiLayers.DEBUG_OVERLAY)
-            .put(RenderGuiLayerEvents.SCOREBOARD, VanillaGuiLayers.SCOREBOARD_SIDEBAR)
-            .put(RenderGuiLayerEvents.OVERLAY_MESSAGE, VanillaGuiLayers.OVERLAY_MESSAGE)
-            .put(RenderGuiLayerEvents.TITLE, VanillaGuiLayers.TITLE)
-            .put(RenderGuiLayerEvents.CHAT, VanillaGuiLayers.CHAT)
-            .put(RenderGuiLayerEvents.PLAYER_LIST, VanillaGuiLayers.TAB_LIST)
-            .put(RenderGuiLayerEvents.SUBTITLES, VanillaGuiLayers.SUBTITLE_OVERLAY)
-            .put(RenderGuiLayerEvents.SAVING_INDICATOR, VanillaGuiLayers.SAVING_INDICATOR)
-            .build();
     private final Map<RenderPropertyKey<?>, ContextKey<?>> entityRenderStateKeys = new IdentityHashMap<>();
 
     @Override
@@ -200,11 +170,6 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     @Override
     public void registerWoodType(WoodType woodType) {
         Sheets.addWoodType(woodType);
-    }
-
-    @Override
-    public ResourceLocation getModLoaderGuiLayer(ResourceLocation resourceLocation) {
-        return VANILLA_GUI_LAYERS.get(resourceLocation);
     }
 
     @Override

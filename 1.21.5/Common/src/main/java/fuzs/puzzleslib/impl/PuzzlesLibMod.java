@@ -21,13 +21,14 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
 
     @Override
     public void onConstructMod() {
-        registerLoadingHandlers();
+        registerEventHandlers();
     }
 
-    private static void registerLoadingHandlers() {
+    private static void registerEventHandlers() {
         RegisterConfigurationTasksCallback.EVENT.register(ModContext::onRegisterConfigurationTasks);
         LoadCompleteCallback.EVENT.register(ModContext::onLoadComplete);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
+        EventHandlerProvider.tryRegister(ProxyImpl.get());
     }
 
     @Override
@@ -35,15 +36,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
         context.optional();
         context.configurationToClient(ClientboundModListMessage.class, ClientboundModListMessage.STREAM_CODEC);
         context.playToClient(ClientboundEntityCapabilityMessage.class, ClientboundEntityCapabilityMessage.STREAM_CODEC);
-    }
-
-    @Override
-    public void onCommonSetup() {
-        registerEventHandlers();
-    }
-
-    private static void registerEventHandlers() {
-        EventHandlerProvider.tryRegister(ProxyImpl.get());
     }
 
     public static ResourceLocation id(String path) {

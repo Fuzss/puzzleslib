@@ -1,12 +1,13 @@
 package fuzs.puzzleslib.fabric.impl.client.core;
 
-import com.google.common.collect.ImmutableMap;
 import fuzs.forgeconfigapiport.fabric.api.v5.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
+import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiEvents;
+import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -24,12 +25,12 @@ import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -64,40 +65,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntFunction;
 
 public class FabricClientProxy extends FabricCommonProxy implements ClientProxyImpl {
     private static final String KEY_GUI_LEFT_HEIGHT = PuzzlesLibMod.id("gui_left_height").toString();
     private static final String KEY_GUI_RIGHT_HEIGHT = PuzzlesLibMod.id("gui_right_height").toString();
-    private static final Map<ResourceLocation, ResourceLocation> VANILLA_GUI_LAYERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
-            .put(RenderGuiLayerEvents.CAMERA_OVERLAYS, IdentifiedLayer.MISC_OVERLAYS)
-            .put(RenderGuiLayerEvents.CROSSHAIR, IdentifiedLayer.CROSSHAIR)
-//            .put(RenderGuiLayerEvents.HOTBAR, VanillaGuiLayers.HOTBAR)
-//            .put(RenderGuiLayerEvents.JUMP_METER, VanillaGuiLayers.JUMP_METER)
-//            .put(RenderGuiLayerEvents.EXPERIENCE_BAR, VanillaGuiLayers.EXPERIENCE_BAR)
-//            .put(RenderGuiLayerEvents.PLAYER_HEALTH, VanillaGuiLayers.PLAYER_HEALTH)
-//            .put(RenderGuiLayerEvents.ARMOR_LEVEL, VanillaGuiLayers.ARMOR_LEVEL)
-//            .put(RenderGuiLayerEvents.FOOD_LEVEL, VanillaGuiLayers.FOOD_LEVEL)
-//            .put(RenderGuiLayerEvents.VEHICLE_HEALTH, VanillaGuiLayers.VEHICLE_HEALTH)
-//            .put(RenderGuiLayerEvents.AIR_LEVEL, VanillaGuiLayers.AIR_LEVEL)
-//            .put(RenderGuiLayerEvents.SELECTED_ITEM_NAME, VanillaGuiLayers.SELECTED_ITEM_NAME)
-//            .put(RenderGuiLayerEvents.SPECTATOR_TOOLTIP, VanillaGuiLayers.SPECTATOR_TOOLTIP)
-            .put(RenderGuiLayerEvents.EXPERIENCE_LEVEL, IdentifiedLayer.EXPERIENCE_LEVEL)
-            .put(RenderGuiLayerEvents.STATUS_EFFECTS, IdentifiedLayer.STATUS_EFFECTS)
-            .put(RenderGuiLayerEvents.BOSS_BAR, IdentifiedLayer.BOSS_BAR)
-            .put(RenderGuiLayerEvents.SLEEP_OVERLAY, IdentifiedLayer.SLEEP)
-            .put(RenderGuiLayerEvents.DEMO_TIMER, IdentifiedLayer.DEMO_TIMER)
-            .put(RenderGuiLayerEvents.DEBUG_OVERLAY, IdentifiedLayer.DEBUG)
-            .put(RenderGuiLayerEvents.SCOREBOARD, IdentifiedLayer.SCOREBOARD)
-            .put(RenderGuiLayerEvents.OVERLAY_MESSAGE, IdentifiedLayer.OVERLAY_MESSAGE)
-            .put(RenderGuiLayerEvents.TITLE, IdentifiedLayer.TITLE_AND_SUBTITLE)
-            .put(RenderGuiLayerEvents.CHAT, IdentifiedLayer.CHAT)
-            .put(RenderGuiLayerEvents.PLAYER_LIST, IdentifiedLayer.PLAYER_LIST)
-            .put(RenderGuiLayerEvents.SUBTITLES, IdentifiedLayer.SUBTITLES)
-//            .put(RenderGuiLayerEvents.SAVING_INDICATOR, VanillaGuiLayers.SAVING_INDICATOR)
-            .build();
 
     @Override
     public void registerLoadingHandlers() {
@@ -238,13 +211,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public ResourceLocation getModLoaderGuiLayer(ResourceLocation resourceLocation) {
-        // TODO implement this properly
-//        return VANILLA_GUI_LAYERS.get(resourceLocation);
-        return resourceLocation;
-    }
-
-    @Override
     public void registerConfigurationScreen(String modId, String... otherModIds) {
         ConfigScreenFactoryRegistry.INSTANCE.register(modId, MultiConfigurationScreen.getFactory(otherModIds));
     }
@@ -296,5 +262,10 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     public void registerProvidedEventHandlers() {
         super.registerProvidedEventHandlers();
         FabricGuiEventHelper.registerEventHandlers();
+        RenderGuiEvents.BEFORE.register(EventPhase.FIRST,
+                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    GuiHeightHelper.setLeftHeight(gui, 39);
+                    GuiHeightHelper.setRightHeight(gui, 39);
+                });
     }
 }

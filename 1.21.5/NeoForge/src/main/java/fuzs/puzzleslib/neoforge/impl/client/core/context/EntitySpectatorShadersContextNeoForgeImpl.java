@@ -11,13 +11,13 @@ import java.util.Objects;
 public record EntitySpectatorShadersContextNeoForgeImpl(RegisterEntitySpectatorShadersEvent evt) implements EntitySpectatorShadersContext {
 
     @Override
-    public void registerSpectatorShader(ResourceLocation shaderLocation, EntityType<?>... entityTypes) {
-        Objects.requireNonNull(shaderLocation, "shader location is null");
+    public void registerSpectatorShader(ResourceLocation resourceLocation, EntityType<?>... entityTypes) {
+        Objects.requireNonNull(resourceLocation, "shader location is null");
         Objects.requireNonNull(entityTypes, "entity types is null");
         Preconditions.checkState(entityTypes.length > 0, "entity types is empty");
         for (EntityType<?> entityType : entityTypes) {
             Objects.requireNonNull(entityType, "entity type is null");
-            this.evt.register(entityType, shaderLocation);
+            this.evt.register(entityType, resourceLocation);
         }
     }
 }
