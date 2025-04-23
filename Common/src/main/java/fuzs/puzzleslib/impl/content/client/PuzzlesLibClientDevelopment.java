@@ -7,14 +7,11 @@ import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
-import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
-import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -32,9 +29,6 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
-import net.minecraft.util.profiling.Profiler;
-import net.minecraft.world.entity.PlayerRideableJumping;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.scores.DisplaySlot;
 import net.minecraft.world.scores.Objective;
@@ -180,89 +174,5 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 }
             };
         });
-        context.replaceGuiLayer(GuiLayersContext.JUMP_METER, (LayeredDraw.Layer layer) -> {
-            return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                Gui gui = Minecraft.getInstance().gui;
-                PlayerRideableJumping playerRideableJumping = gui.minecraft.player.jumpableVehicle();
-                if (playerRideableJumping != null) {
-                    if (this.isExperienceBarVisible(gui)) {
-                        int posX = guiGraphics.guiWidth() / 2 - 91;
-                        gui.renderExperienceBar(guiGraphics, posX);
-                        // the vanilla method already includes the experience visibility check
-                        this.renderExperienceLevel(gui, guiGraphics, deltaTracker);
-                    } else {
-                        layer.render(guiGraphics, deltaTracker);
-                    }
-                }
-            };
-        });
-        // Fabric requires special handling, as gui layers do not respect the actual gui height, it is only updated afterward
-        context.replaceGuiLayer(GuiLayersContext.VEHICLE_HEALTH, (LayeredDraw.Layer layer) -> {
-            return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                Gui gui = Minecraft.getInstance().gui;
-                int vehicleMaxHearts = gui.getVehicleMaxHearts(gui.getPlayerVehicleWithHealth());
-                if (gui.minecraft.gameMode.canHurtPlayer() && vehicleMaxHearts > 0) {
-                    Player player = gui.getCameraPlayer();
-                    int posX = guiGraphics.guiWidth() / 2 + 91;
-                    gui.renderFood(guiGraphics,
-                            player,
-                            guiGraphics.guiHeight() - GuiHeightHelper.getRightHeight(gui),
-                            posX);
-                    GuiHeightHelper.addRightHeight(gui, 10);
-                    if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
-                        this.renderLayerWithTranslation(layer, guiGraphics, deltaTracker);
-                        return;
-                    }
-                }
-                layer.render(guiGraphics, deltaTracker);
-            };
-        });
-        if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
-            context.replaceGuiLayer(GuiLayersContext.AIR_LEVEL, (LayeredDraw.Layer layer) -> {
-                return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    Gui gui = Minecraft.getInstance().gui;
-                    int vehicleMaxHearts = gui.getVehicleMaxHearts(gui.getPlayerVehicleWithHealth());
-                    if (gui.minecraft.gameMode.canHurtPlayer() && vehicleMaxHearts > 0) {
-                        this.renderLayerWithTranslation(layer, guiGraphics, deltaTracker);
-                    } else {
-                        layer.render(guiGraphics, deltaTracker);
-                    }
-                };
-            });
-        }
-    }
-
-    private void renderLayerWithTranslation(LayeredDraw.Layer layer, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        guiGraphics.pose().pushPose();
-        guiGraphics.pose().translate(0.0F, -10.0F, 0.0F);
-        layer.render(guiGraphics, deltaTracker);
-        guiGraphics.pose().popPose();
-    }
-
-    /**
-     * @see Gui#isExperienceBarVisible()
-     */
-    private boolean isExperienceBarVisible(Gui gui) {
-        return gui.minecraft.gameMode.hasExperience() &&
-                (gui.minecraft.player.jumpableVehicle() == null || gui.minecraft.player.getJumpRidingScale() == 0.0F);
-    }
-
-    /**
-     * @see Gui#renderExperienceLevel(GuiGraphics, DeltaTracker)
-     */
-    private void renderExperienceLevel(Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) {
-        int i = gui.minecraft.player.experienceLevel;
-        if (i > 0) {
-            Profiler.get().push("expLevel");
-            String string = i + "";
-            int j = (guiGraphics.guiWidth() - gui.getFont().width(string)) / 2;
-            int k = guiGraphics.guiHeight() - 31 - 4;
-            guiGraphics.drawString(gui.getFont(), string, j + 1, k, 0, false);
-            guiGraphics.drawString(gui.getFont(), string, j - 1, k, 0, false);
-            guiGraphics.drawString(gui.getFont(), string, j, k + 1, 0, false);
-            guiGraphics.drawString(gui.getFont(), string, j, k - 1, 0, false);
-            guiGraphics.drawString(gui.getFont(), string, j, k, 0X80FF20, false);
-            Profiler.get().pop();
-        }
     }
 }
