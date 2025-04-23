@@ -129,8 +129,6 @@ public final class ItemTooltipRegistry {
 
         /**
          * A tooltip provider for adding individual tooltip lines.
-         * <p>
-         * TODO add player
          *
          * @param itemLike            the item / block
          * @param itemStack           the item stack

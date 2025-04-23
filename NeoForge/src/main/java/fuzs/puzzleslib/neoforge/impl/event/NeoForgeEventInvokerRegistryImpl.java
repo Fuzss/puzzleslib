@@ -746,6 +746,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         EventInvokerImpl.register(clazz, new NeoForgeEventInvoker<>(eventBus, event, converter, eventPhaseConverter), joinInvokers);
     }
 
+    public static EventPriority getEventPriorityFromPhase(EventPhase eventPhase) {
+        return NeoForgeEventInvoker.getEventPriority(eventPhase);
+    }
+
     private record NeoForgeEventInvoker<T, E extends Event>(@Nullable IEventBus eventBus, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
         private static final Map<EventPhase, EventPriority> PHASE_TO_PRIORITY = Map.of(EventPhase.FIRST, EventPriority.HIGHEST, EventPhase.BEFORE, EventPriority.HIGH, EventPhase.DEFAULT, EventPriority.NORMAL, EventPhase.AFTER, EventPriority.LOW, EventPhase.LAST, EventPriority.LOWEST);
         private static final IntFunction<EventPriority> PRIORITY_IDS = ByIdMap.continuous(Enum::ordinal, EventPriority.values(), ByIdMap.OutOfBoundsStrategy.CLAMP);
@@ -762,12 +766,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             this.register(eventPhase, callback, null);
         }
 
-        private void register(EventPhase phase, T callback, @Nullable Object context) {
-            Objects.requireNonNull(phase, "phase is null");
+        private void register(EventPhase eventPhase, T callback, @Nullable Object context) {
+            Objects.requireNonNull(eventPhase, "phase is null");
             Objects.requireNonNull(callback, "callback is null");
-            phase = this.eventPhaseConverter.apply(phase);
+            eventPhase = this.eventPhaseConverter.apply(eventPhase);
             IEventBus eventBus = this.getEventBus(context);
-            EventPriority eventPriority = this.getEventPriority(phase);
+            EventPriority eventPriority = getEventPriority(eventPhase);
             // filter out mod id which has been used to retrieve a missing mod event bus
             Object eventContext = this.eventBus != eventBus ? null : context;
             // we don't support receiving cancelled events since the event api on Fabric is not designed for it
@@ -783,7 +787,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             }
         }
 
-        private EventPriority getEventPriority(EventPhase eventPhase) {
+        private static EventPriority getEventPriority(EventPhase eventPhase) {
             if (PHASE_TO_PRIORITY.containsKey(eventPhase)) {
                 return PHASE_TO_PRIORITY.get(eventPhase);
             } else {

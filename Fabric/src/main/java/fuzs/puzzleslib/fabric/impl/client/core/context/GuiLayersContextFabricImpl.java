@@ -3,6 +3,8 @@ package fuzs.puzzleslib.fabric.impl.client.core.context;
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
 import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
+import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.fabricmc.fabric.api.client.rendering.v1.LayeredDrawerWrapper;
@@ -50,11 +52,20 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
             .build();
     public static final Map<ResourceLocation, UnaryOperator<LayeredDraw.Layer>> REPLACED_GUI_LAYERS = new IdentityHashMap<>();
 
+    private ResourceLocation eventPhase = EventPhase.DEFAULT.resourceLocation();
+
+    @Override
+    public void setEventPhase(EventPhase eventPhase) {
+        Objects.requireNonNull(eventPhase, "event phase is null");
+        FabricEventInvokerRegistryImpl.registerEventPhaseIfNecessary(HudLayerRegistrationCallback.EVENT, eventPhase);
+        this.eventPhase = eventPhase.resourceLocation();
+    }
+
     @Override
     public void registerGuiLayer(ResourceLocation resourceLocation, LayeredDraw.Layer guiLayer) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
-        HudLayerRegistrationCallback.EVENT.register((LayeredDrawerWrapper layeredDrawerWrapper) -> {
+        HudLayerRegistrationCallback.EVENT.register(this.eventPhase, (LayeredDrawerWrapper layeredDrawerWrapper) -> {
             layeredDrawerWrapper.addLayer(IdentifiedLayer.of(resourceLocation, guiLayer));
         });
     }
@@ -66,14 +77,16 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         Objects.requireNonNull(guiLayer, "gui layer is null");
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
             ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
-            HudLayerRegistrationCallback.EVENT.register((LayeredDrawerWrapper layeredDrawerWrapper) -> {
-                layeredDrawerWrapper.attachLayerAfter(vanillaResourceLocation, otherResourceLocation, guiLayer);
-            });
+            HudLayerRegistrationCallback.EVENT.register(this.eventPhase,
+                    (LayeredDrawerWrapper layeredDrawerWrapper) -> {
+                        layeredDrawerWrapper.attachLayerAfter(vanillaResourceLocation, otherResourceLocation, guiLayer);
+                    });
         } else if (VANILLA_GUI_LAYERS.containsKey(otherResourceLocation)) {
             ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(otherResourceLocation);
-            HudLayerRegistrationCallback.EVENT.register((LayeredDrawerWrapper layeredDrawerWrapper) -> {
-                layeredDrawerWrapper.attachLayerBefore(vanillaResourceLocation, resourceLocation, guiLayer);
-            });
+            HudLayerRegistrationCallback.EVENT.register(this.eventPhase,
+                    (LayeredDrawerWrapper layeredDrawerWrapper) -> {
+                        layeredDrawerWrapper.attachLayerBefore(vanillaResourceLocation, resourceLocation, guiLayer);
+                    });
         } else {
             throw new RuntimeException("Unregistered gui layers: " + resourceLocation + ", " + otherResourceLocation);
         }
@@ -86,11 +99,14 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
             ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
             if (vanillaResourceLocation != IdentifiedLayer.HOTBAR_AND_BARS) {
-                HudLayerRegistrationCallback.EVENT.register((LayeredDrawerWrapper layeredDrawerWrapper) -> {
-                    layeredDrawerWrapper.replaceLayer(vanillaResourceLocation, (IdentifiedLayer identifiedLayer) -> {
-                        return IdentifiedLayer.of(identifiedLayer.id(), guiLayerFactory.apply(identifiedLayer));
-                    });
-                });
+                HudLayerRegistrationCallback.EVENT.register(this.eventPhase,
+                        (LayeredDrawerWrapper layeredDrawerWrapper) -> {
+                            layeredDrawerWrapper.replaceLayer(vanillaResourceLocation,
+                                    (IdentifiedLayer identifiedLayer) -> {
+                                        return IdentifiedLayer.of(identifiedLayer.id(),
+                                                guiLayerFactory.apply(identifiedLayer));
+                                    });
+                        });
             } else {
                 REPLACED_GUI_LAYERS.merge(resourceLocation,
                         guiLayerFactory,
@@ -129,9 +145,10 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     public static void applyArmorLevelGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player &&
-                player.getArmorValue() > 0) {
-            GuiHeightHelper.addLeftHeight(gui, 10);
+        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player) {
+            if (player.getArmorValue() > 0) {
+                GuiHeightHelper.addLeftHeight(gui, 10);
+            }
         }
     }
 

@@ -20,6 +20,7 @@ transitive-accessible   method  net/minecraft/client/data/models/model/ModelTemp
 transitive-accessible   method  net/minecraft/client/data/models/model/ModelTemplates  create  (Ljava/lang/String;Ljava/lang/String;[Lnet/minecraft/client/data/models/model/TextureSlot;)Lnet/minecraft/client/data/models/model/ModelTemplate;
 transitive-accessible   field   net/minecraft/data/loot/EntityLootSubProvider   map Ljava/util/Map;
 transitive-accessible   method  net/minecraft/client/gui/GuiGraphics    blitNineSlicedSprite    (Ljava/util/function/Function;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lnet/minecraft/client/resources/metadata/gui/GuiSpriteScaling$NineSlice;IIIII)V
+transitive-accessible   method  net/minecraft/client/gui/GuiGraphics    blitTiledSprite (Ljava/util/function/Function;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;IIIIIIIIIII)V
 accessible  field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
 mutable field   net/minecraft/world/SimpleContainer items   Lnet/minecraft/core/NonNullList;
 accessible  field   net/minecraft/world/SimpleContainer size    I
@@ -154,10 +155,11 @@ accessible  field   net/minecraft/data/registries/RegistriesDatapackGenerator   
 mutable field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
 accessible  method  net/minecraft/client/gui/components/toasts/ToastManager freeSlotCount   ()I
 accessible  field   net/minecraft/client/gui/screens/TitleScreen    fading  Z
-accessible  method  net/minecraft/client/gui/GuiGraphics    blitTiledSprite (Ljava/util/function/Function;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;IIIIIIIIIII)V
-accessible  method  net/minecraft/client/gui/Gui    getVehicleMaxHearts (Lnet/minecraft/world/entity/LivingEntity;)I
-accessible  method  net/minecraft/client/gui/Gui    getPlayerVehicleWithHealth  ()Lnet/minecraft/world/entity/LivingEntity;
+transitive-accessible   method	net/minecraft/client/gui/Gui	getCameraPlayer	()Lnet/minecraft/world/entity/player/Player;
+transitive-accessible   method  net/minecraft/client/gui/Gui    getVehicleMaxHearts (Lnet/minecraft/world/entity/LivingEntity;)I
+transitive-accessible   method  net/minecraft/client/gui/Gui    getPlayerVehicleWithHealth  ()Lnet/minecraft/world/entity/LivingEntity;
 accessible  field   net/minecraft/client/gui/Gui    displayHealth   I
+accessible  field   net/minecraft/client/gui/Gui    tabList Lnet/minecraft/client/gui/components/PlayerTabOverlay;
 accessible  field   net/minecraft/server/level/ChunkMap entityMap   Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;
 accessible  class   net/minecraft/server/level/ChunkMap$TrackedEntity
 accessible  field   net/minecraft/server/level/ChunkMap$TrackedEntity   seenBy  Ljava/util/Set;
@@ -277,12 +279,6 @@ transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerator
 transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	ROTATION_HORIZONTAL_FACING	Lnet/minecraft/client/data/models/blockstates/PropertyDispatch;
 transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerators	MULTIFACE_GENERATOR	Ljava/util/Map;
 transitive-accessible	method  net/minecraft/util/ARGB from8BitChannel (I)F
-transitive-accessible   method  net/minecraft/client/renderer/RenderPipelines   register    (Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
-accessible  field   net/minecraft/client/gui/Gui    tabList Lnet/minecraft/client/gui/components/PlayerTabOverlay;
-accessible	method	net/minecraft/client/gui/Gui	renderExperienceBar	(Lnet/minecraft/client/gui/GuiGraphics;I)V
-accessible	method	net/minecraft/client/gui/Gui	getCameraPlayer	()Lnet/minecraft/world/entity/player/Player;
-accessible	method	net/minecraft/client/gui/Gui	renderFood	(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;II)V
-accessible	method	net/minecraft/client/gui/Gui	renderAirBubbles	(Lnet/minecraft/client/gui/GuiGraphics;Lnet/minecraft/world/entity/player/Player;III)V
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
