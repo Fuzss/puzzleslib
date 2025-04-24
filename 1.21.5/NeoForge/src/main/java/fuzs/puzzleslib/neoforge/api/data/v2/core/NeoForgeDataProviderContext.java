@@ -41,13 +41,14 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     /**
      * Creates a proper context from the corresponding Forge event usable in actual data-generation.
      *
-     * @param evt the event
+     * @param evt        the event
+     * @param registries the registry lookup provider
      * @return new context instance
      */
-    public static NeoForgeDataProviderContext fromEvent(GatherDataEvent evt) {
+    public static NeoForgeDataProviderContext fromEvent(GatherDataEvent evt, CompletableFuture<HolderLookup.Provider> registries) {
         return new NeoForgeDataProviderContext(evt.getModContainer().getModId(),
                 evt.getGenerator().getPackOutput(),
-                evt.getLookupProvider(),
+                registries,
                 evt.getResourceManager(PackType.CLIENT_RESOURCES),
                 evt.getResourceManager(PackType.SERVER_DATA));
     }
@@ -76,8 +77,8 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     }
 
     /**
-     * A simple shortcut for a data provider factory requiring an instance of this context, it helps with complaints
-     * about parametrized varargs.
+     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about
+     * parametrized varargs.
      */
     @FunctionalInterface
     public interface Factory extends Function<NeoForgeDataProviderContext, DataProvider> {
