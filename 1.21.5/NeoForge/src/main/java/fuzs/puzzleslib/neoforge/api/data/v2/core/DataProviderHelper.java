@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.neoforge.api.data.v2.core;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.data.v2.core.RegistriesDataProvider;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
@@ -54,7 +53,6 @@ public final class DataProviderHelper {
 
     static <T> void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, T[] factories, Function<T, Factory> factoryConverter) {
         if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
-        Preconditions.checkState(factories.length > 0, "data provider factories is empty");
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final GatherDataEvent.Client evt) -> {
                 if (!registrySetBuilder.getEntryKeys().isEmpty()) {
