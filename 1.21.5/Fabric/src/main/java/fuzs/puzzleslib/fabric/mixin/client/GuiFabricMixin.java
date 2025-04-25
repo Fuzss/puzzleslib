@@ -25,7 +25,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(value = Gui.class, priority = 900)
+@Mixin(Gui.class)
 abstract class GuiFabricMixin {
     @Shadow
     @Final

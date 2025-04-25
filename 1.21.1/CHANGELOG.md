@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.34-1.21.1] - 2025-04-25
+### Changed
+- Improve compatibility with other mods injecting into the `Gui` class on Fabric
+
 ## [v21.1.33-1.21.1] - 2025-03-16
 ### Fixed
 - Fix `ModelPart$Vertex` & `ModelPart$Polygon` being inaccessible on NeoForge
@@ -21,7 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v21.1.30-1.21.1] - 2025-03-11
 ### Fixed
-- Fix rare start-up crash when registering generated config translations on NeoForge
+- Fix a rare start-up crash when registering generated config translations on NeoForge
 
 ## [v21.1.29-1.21.1] - 2025-03-09
 ### Fixed

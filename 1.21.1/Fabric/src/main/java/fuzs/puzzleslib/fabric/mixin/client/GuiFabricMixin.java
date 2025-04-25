@@ -23,7 +23,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
-@Mixin(value = Gui.class, priority = 500)
+@Mixin(Gui.class)
 abstract class GuiFabricMixin {
     @Shadow
     @Final
@@ -107,8 +107,8 @@ abstract class GuiFabricMixin {
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;getAirSupply()I")
     )
     private int renderPlayerHealth(int airSupply, GuiGraphics guiGraphics) {
-        return FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, () -> Optional.of(0)).orElse(
-                airSupply);
+        return FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, () -> Optional.of(0))
+                .orElse(airSupply);
     }
 
     @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
