@@ -20,7 +20,7 @@ import java.util.Objects;
 
 // increase priority to apply before Fabric Api, as we want this to be available in Fabric Api's before-init callback,
 // which also fires at the head of vanilla's Screen::init method
-@Mixin(value = Screen.class, priority = 500)
+@Mixin(value = Screen.class, priority = 900)
 abstract class ScreenFabricMixin extends AbstractContainerEventHandler implements ExtraScreenExtensions {
     @Unique
     private Event<ExtraScreenMouseEvents.AllowMouseDrag> puzzleslib$allowMouseDragEvent;

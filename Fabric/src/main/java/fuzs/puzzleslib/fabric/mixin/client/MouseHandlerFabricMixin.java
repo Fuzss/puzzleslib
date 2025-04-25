@@ -17,7 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 // run before Mouse Tweaks mod
-@Mixin(value = MouseHandler.class, priority = 500)
+@Mixin(value = MouseHandler.class, priority = 900)
 abstract class MouseHandlerFabricMixin {
     @Shadow
     @Final
