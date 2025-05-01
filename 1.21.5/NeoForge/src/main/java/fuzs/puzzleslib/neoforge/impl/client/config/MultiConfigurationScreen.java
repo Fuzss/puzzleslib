@@ -32,35 +32,33 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
     private static final String FILENAME_TOOLTIP = LANG_PREFIX + "filenametooltip";
 
     protected final Collection<String> modIds;
-    protected final ConfigurationScreen configurationScreen;
+    protected final ConfigurationScreen parentScreen;
 
-    public static BiFunction<ModContainer, Screen, Screen> getFactory(String[] mergedModIds) {
-        return mergedModIds.length != 0 ? (ModContainer modContainer, Screen lastScreen) -> {
+    public static BiFunction<ModContainer, Screen, Screen> getScreenFactory(String[] mergedModIds) {
+        return (ModContainer modContainer, Screen lastScreen) -> {
             ConfigurationScreen configurationScreen = new ConfigurationScreen(modContainer, lastScreen);
-            return new MultiConfigurationScreen(ImmutableSet.<String>builder()
+            // this is set to GAME for startup configs, which is wrong, as they reload just fine
+            configurationScreen.needsRestart = ModConfigSpec.RestartType.NONE;
+            return mergedModIds.length != 0 ? new MultiConfigurationScreen(ImmutableSet.<String>builder()
                     .add(modContainer.getModId())
                     .add(mergedModIds)
-                    .build(), lastScreen, configurationScreen);
-        } : ConfigurationScreen::new;
+                    .build(), lastScreen, configurationScreen) : configurationScreen;
+        };
     }
 
-    protected MultiConfigurationScreen(Collection<String> modIds, Screen lastScreen, ConfigurationScreen configurationScreen) {
-        super(lastScreen, Minecraft.getInstance().options, configurationScreen.getTitle());
+    protected MultiConfigurationScreen(Collection<String> modIds, Screen lastScreen, ConfigurationScreen parentScreen) {
+        super(lastScreen, Minecraft.getInstance().options, parentScreen.getTitle());
         this.modIds = modIds;
-        this.configurationScreen = configurationScreen;
+        this.parentScreen = parentScreen;
     }
 
     @Override
     protected void init() {
         super.init();
-        this.copyScreenProperties();
-    }
-
-    private void copyScreenProperties() {
-        this.configurationScreen.minecraft = this.minecraft;
-        this.configurationScreen.font = this.font;
-        this.configurationScreen.width = this.width;
-        this.configurationScreen.height = this.height;
+        this.parentScreen.minecraft = this.minecraft;
+        this.parentScreen.font = this.font;
+        this.parentScreen.width = this.width;
+        this.parentScreen.height = this.height;
     }
 
     @Override
@@ -91,7 +89,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
                                         modConfig,
                                         component,
                                         restartType -> {
-                                            this.configurationScreen.needsRestart = this.configurationScreen.needsRestart.with(
+                                            this.parentScreen.needsRestart = this.parentScreen.needsRestart.with(
                                                     restartType);
                                         }));
                             }).width(ConfigurationScreen.BIG_BUTTON_WIDTH).build();
@@ -135,7 +133,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
 
     @Override
     public void onClose() {
-        this.configurationScreen.onClose();
+        this.parentScreen.onClose();
     }
 
     public static class MultiConfigurationSectionScreen extends ConfigurationScreen.ConfigurationSectionScreen {

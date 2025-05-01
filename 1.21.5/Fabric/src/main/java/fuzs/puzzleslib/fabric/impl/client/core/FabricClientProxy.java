@@ -212,7 +212,7 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public void registerConfigurationScreen(String modId, String... otherModIds) {
-        ConfigScreenFactoryRegistry.INSTANCE.register(modId, MultiConfigurationScreen.getFactory(otherModIds));
+        ConfigScreenFactoryRegistry.INSTANCE.register(modId, MultiConfigurationScreen.getScreenFactory(otherModIds));
     }
 
     @Override
