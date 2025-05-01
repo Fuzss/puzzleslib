@@ -8,7 +8,7 @@ import net.minecraft.world.level.ServerExplosion;
 import java.util.Objects;
 
 /**
- * A helper class containing explosion related methods.
+ * A helper class containing explosion-related methods.
  */
 public final class ExplosionEventHelper {
 
