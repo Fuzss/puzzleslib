@@ -73,7 +73,7 @@ public final class ConfigTranslationsManager {
                 .replaceFirst("^\\.", "")
                 .replaceFirst("\\.$", "")
                 .toLowerCase();
-        TRANSLATIONS.put(modId + ".configuration.section." + fileName, configType + " Settings");
+        TRANSLATIONS.put(modId + ".configuration.section." + fileName, "%s " + configType + " Settings");
         TRANSLATIONS.put(modId + ".configuration.section." + fileName + ".title",
                 "%s " + configType + " Configuration");
     }

@@ -31,33 +31,40 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
     private static final String FILENAME_TOOLTIP = LANG_PREFIX + "filenametooltip";
 
     protected final Collection<String> modIds;
-    protected final ConfigurationScreen parentScreen;
+    protected final ConfigurationScreen configurationScreen;
 
     public static BiFunction<String, Screen, Screen> getScreenFactory(String[] mergedModIds) {
         return (String modId, Screen lastScreen) -> {
-            ConfigurationScreen configurationScreen = new ConfigurationScreen(modId, lastScreen);
-            // this is set to GAME for startup configs, which is wrong, as they reload just fine
-            configurationScreen.needsRestart = ModConfigSpec.RestartType.NONE;
-            return mergedModIds.length != 0 ?
-                    new MultiConfigurationScreen(ImmutableSet.<String>builder().add(modId).add(mergedModIds).build(),
-                            lastScreen,
-                            configurationScreen) : configurationScreen;
+            ConfigurationScreen configurationScreen = new ConfigurationScreen(modId,
+                    lastScreen,
+                    (ConfigurationScreen configurationScreenX, ModConfig.Type type, ModConfig modConfig, Component component) -> {
+                        // this is only used for determining the restart type, which is always set to GAME for startup configs
+                        // this is wrong, as they reload just fine, so we pass any other type
+                        return new ConfigurationScreen.ConfigurationSectionScreen(configurationScreenX,
+                                ModConfig.Type.COMMON,
+                                modConfig,
+                                component);
+                    });
+            // always use our screen to have the rest of our custom implementation apply always
+            return new MultiConfigurationScreen(ImmutableSet.<String>builder().add(modId).add(mergedModIds).build(),
+                    lastScreen,
+                    configurationScreen);
         };
     }
 
-    protected MultiConfigurationScreen(Collection<String> modIds, Screen lastScreen, ConfigurationScreen parentScreen) {
-        super(lastScreen, Minecraft.getInstance().options, parentScreen.getTitle());
+    MultiConfigurationScreen(Collection<String> modIds, Screen lastScreen, ConfigurationScreen configurationScreen) {
+        super(lastScreen, Minecraft.getInstance().options, configurationScreen.getTitle());
         this.modIds = modIds;
-        this.parentScreen = parentScreen;
+        this.configurationScreen = configurationScreen;
     }
 
     @Override
     protected void init() {
         super.init();
-        this.parentScreen.minecraft = this.minecraft;
-        this.parentScreen.font = this.font;
-        this.parentScreen.width = this.width;
-        this.parentScreen.height = this.height;
+        this.configurationScreen.minecraft = this.minecraft;
+        this.configurationScreen.font = this.font;
+        this.configurationScreen.width = this.width;
+        this.configurationScreen.height = this.height;
     }
 
     @Override
@@ -88,7 +95,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
                                         modConfig,
                                         component,
                                         restartType -> {
-                                            this.parentScreen.needsRestart = this.parentScreen.needsRestart.with(
+                                            this.configurationScreen.needsRestart = this.configurationScreen.needsRestart.with(
                                                     restartType);
                                         }));
                             }).width(ConfigurationScreen.BIG_BUTTON_WIDTH).build();
@@ -132,7 +139,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
 
     @Override
     public void onClose() {
-        this.parentScreen.onClose();
+        this.configurationScreen.onClose();
     }
 
     public static class MultiConfigurationSectionScreen extends ConfigurationScreen.ConfigurationSectionScreen {
@@ -141,6 +148,8 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
         public MultiConfigurationSectionScreen(Screen parent, ModConfig.Type type, ModConfig modConfig, Component title, Consumer<ModConfigSpec.RestartType> needsRestartCallback) {
             super(parent, type, modConfig, title);
             this.needsRestartCallback = needsRestartCallback;
+            // this is set to GAME for startup configs, which is wrong, as they reload just fine
+            this.needsRestart = ModConfigSpec.RestartType.NONE;
         }
 
         @Override
