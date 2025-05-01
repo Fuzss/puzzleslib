@@ -34,4 +34,14 @@ public final class MenuTypeWithData<T extends AbstractContainerMenu, S> extends 
     public StreamCodec<? super RegistryFriendlyByteBuf, S> getStreamCodec() {
         return this.streamCodec;
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T> void encodeMenuData(AbstractContainerMenu containerMenu, RegistryFriendlyByteBuf buf, T data) {
+        Objects.requireNonNull(containerMenu, "container menu is null");
+        if (containerMenu.getType() instanceof MenuTypeWithData<?, ?> menuType) {
+            ((MenuTypeWithData<?, T>) menuType).getStreamCodec().encode(buf, data);
+        } else {
+            throw new IllegalArgumentException("Menu type " + containerMenu.getType() + " does not support data");
+        }
+    }
 }

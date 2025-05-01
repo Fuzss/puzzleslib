@@ -51,15 +51,15 @@ public final class EventImplHelper {
         return optional;
     }
 
-    public static Optional<Player> getPlayerFromContainerMenu(AbstractContainerMenu menu) {
-        for (Slot slot : menu.slots) {
+    public static Optional<Player> getPlayerFromContainerMenu(AbstractContainerMenu containerMenu) {
+        for (Slot slot : containerMenu.slots) {
             if (slot.container instanceof Inventory inventory) {
                 return Optional.of(inventory.player);
             }
         }
         MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
         for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
-            if (serverPlayer.containerMenu == menu) {
+            if (serverPlayer.containerMenu == containerMenu) {
                 return Optional.of(serverPlayer);
             }
         }

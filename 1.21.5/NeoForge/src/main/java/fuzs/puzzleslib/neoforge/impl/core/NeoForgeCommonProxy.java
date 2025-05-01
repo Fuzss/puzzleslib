@@ -72,7 +72,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class NeoForgeCommonProxy implements NeoForgeProxy {
 
@@ -82,11 +81,11 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
+    public <T> void openMenu(Player player, MenuProvider menuProvider, T data) {
         player.openMenu(new MenuProvider() {
             @Override
-            public void writeClientSideData(AbstractContainerMenu menu, RegistryFriendlyByteBuf buf) {
-                ((MenuTypeWithData<?, T>) menu.getType()).getStreamCodec().encode(buf, dataSupplier.get());
+            public void writeClientSideData(AbstractContainerMenu containerMenu, RegistryFriendlyByteBuf buf) {
+                MenuTypeWithData.encodeMenuData(containerMenu, buf, data);
             }
 
             @Override

@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.container.v1;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,7 +42,11 @@ public final class ContainerMenuHelper {
         Objects.requireNonNull(serverPlayer, "server player is null");
         Objects.requireNonNull(menuProvider, "menu provider is null");
         Objects.requireNonNull(dataWriter, "data writer is null");
-        ProxyImpl.get().openMenu(serverPlayer, menuProvider, dataWriter);
+        openMenu(serverPlayer, menuProvider, () -> {
+            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), serverPlayer.registryAccess());
+            dataWriter.accept(serverPlayer, buf);
+            return buf;
+        });
     }
 
     /**
@@ -51,11 +56,26 @@ public final class ContainerMenuHelper {
      * @param menuProvider the menu factory
      * @param dataSupplier the additional data to be sent to the client
      */
+    @Deprecated(forRemoval = true)
     public static <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
         Objects.requireNonNull(player, "player is null");
         Objects.requireNonNull(menuProvider, "menu provider is null");
         Objects.requireNonNull(dataSupplier, "data supplier is null");
-        ProxyImpl.get().openMenu(player, menuProvider, dataSupplier);
+        openMenu(player, menuProvider, dataSupplier.get());
+    }
+
+    /**
+     * Opens a menu on both client and server while also providing additional data.
+     *
+     * @param player       the player opening the menu
+     * @param menuProvider the menu factory
+     * @param data         the additional data to be sent to the client
+     */
+    public static <T> void openMenu(Player player, MenuProvider menuProvider, T data) {
+        Objects.requireNonNull(player, "player is null");
+        Objects.requireNonNull(menuProvider, "menu provider is null");
+        Objects.requireNonNull(data, "data is null");
+        ProxyImpl.get().openMenu(player, menuProvider, data);
     }
 
     /**

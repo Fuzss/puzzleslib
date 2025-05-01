@@ -83,7 +83,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     private final Set<String> hiddenPacks = new HashSet<>();
@@ -95,11 +94,11 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     }
 
     @Override
-    public <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
+    public <T> void openMenu(Player player, MenuProvider menuProvider, T data) {
         player.openMenu(new ExtendedScreenHandlerFactory<>() {
             @Override
             public T getScreenOpeningData(ServerPlayer player) {
-                return dataSupplier.get();
+                return data;
             }
 
             @Override

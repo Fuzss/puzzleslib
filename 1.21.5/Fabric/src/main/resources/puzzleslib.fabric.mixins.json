@@ -28,6 +28,7 @@
     "LivingEntityFabricMixin",
     "LootItemRandomChanceWithEnchantedBonusConditionFabricMixin",
     "MagmaCubeFabricMixin",
+    "MenuProviderWithDataFabricMixin",
     "MobFabricMixin",
     "MonsterFabricMixin",
     "NaturalSpawnerFabricMixin",
