@@ -67,6 +67,7 @@ public final class ConfigTranslationsManager {
     }
 
     public static void addConfigFile(String modId, String fileName, String configType) {
+        configType = getConfigTypeFromFileName(fileName).orElse(configType);
         configType = getCapitalizedString(configType);
         fileName = fileName.replaceAll("[^a-zA-Z0-9]+", ".")
                 .replaceFirst("^\\.", "")
@@ -75,6 +76,16 @@ public final class ConfigTranslationsManager {
         TRANSLATIONS.put(modId + ".configuration.section." + fileName, configType + " Settings");
         TRANSLATIONS.put(modId + ".configuration.section." + fileName + ".title",
                 "%s " + configType + " Configuration");
+    }
+
+    static Optional<String> getConfigTypeFromFileName(String fileName) {
+        int startIndex = fileName.lastIndexOf('-');
+        int endIndex = fileName.lastIndexOf('.');
+        if (startIndex != -1 && endIndex != -1 && startIndex < endIndex) {
+            return Optional.of(fileName.substring(startIndex + 1, endIndex));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public static void addConfigValue(String modId, String valueName) {
