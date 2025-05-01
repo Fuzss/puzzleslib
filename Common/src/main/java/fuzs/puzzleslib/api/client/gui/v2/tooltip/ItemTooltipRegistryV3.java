@@ -23,13 +23,14 @@ import java.util.function.Predicate;
 
 /**
  * A helper class for registering item tooltips for items and blocks.
+ *
+ * @param <T> the value type
  */
-@Deprecated(forRemoval = true)
-public abstract class ItemTooltipRegistryV2<T> {
+public abstract class ItemTooltipRegistryV3<T> {
     /**
      * The block registry.
      */
-    public static final ItemTooltipRegistryV2<Block> BLOCK = new ItemTooltipRegistryV2<>() {
+    public static final ItemTooltipRegistryV3<Block> BLOCK = new ItemTooltipRegistryV3<>() {
         @Override
         @Nullable Block getFromItemStack(ItemStack itemStack) {
             return itemStack.getItem() instanceof BlockItem blockItem ? blockItem.getBlock() : null;
@@ -43,7 +44,7 @@ public abstract class ItemTooltipRegistryV2<T> {
     /**
      * The item registry.
      */
-    public static final ItemTooltipRegistryV2<Item> ITEM = new ItemTooltipRegistryV2<>() {
+    public static final ItemTooltipRegistryV3<Item> ITEM = new ItemTooltipRegistryV3<>() {
         @Override
         Item getFromItemStack(ItemStack itemStack) {
             return itemStack.getItem();
@@ -55,7 +56,7 @@ public abstract class ItemTooltipRegistryV2<T> {
         }
     };
 
-    ItemTooltipRegistryV2() {
+    ItemTooltipRegistryV3() {
         // NO-OP
     }
 
@@ -68,8 +69,9 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param value     the item / block
      * @param component the component
+     * @param <V>       the value type
      */
-    public void registerItemTooltip(T value, Component component) {
+    public <V extends T> void registerItemTooltip(V value, Component component) {
         this.registerItemTooltip(value, new Component[]{component});
     }
 
@@ -78,8 +80,9 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param clazz     the item / block class
      * @param component the component
+     * @param <V>       the value type
      */
-    public void registerItemTooltip(Class<T> clazz, Component component) {
+    public <V extends T> void registerItemTooltip(Class<V> clazz, Component component) {
         this.registerItemTooltip(clazz, new Component[]{component});
     }
 
@@ -98,9 +101,10 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param value      the item / block
      * @param components the component
+     * @param <V>        the value type
      */
-    public void registerItemTooltip(T value, Component... components) {
-        this.registerItemTooltipLines(value, (T valueX) -> Arrays.asList(components));
+    public <V extends T> void registerItemTooltip(V value, Component... components) {
+        this.registerItemTooltipLines(value, (V valueX) -> Arrays.asList(components));
     }
 
     /**
@@ -108,9 +112,10 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param clazz      the item / block class
      * @param components the component
+     * @param <V>        the value type
      */
-    public void registerItemTooltip(Class<T> clazz, Component... components) {
-        this.registerItemTooltipLines(clazz, (T valueX) -> Arrays.asList(components));
+    public <V extends T> void registerItemTooltip(Class<V> clazz, Component... components) {
+        this.registerItemTooltipLines(clazz, (V valueX) -> Arrays.asList(components));
     }
 
     /**
@@ -128,9 +133,10 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param value              the item / block
      * @param componentExtractor the component getter from the item / block
+     * @param <V>                the value type
      */
-    public void registerItemTooltip(T value, Function<T, Component> componentExtractor) {
-        this.registerItemTooltipLines(value, (T valueX) -> {
+    public <V extends T> void registerItemTooltip(V value, Function<V, Component> componentExtractor) {
+        this.registerItemTooltipLines(value, (V valueX) -> {
             return Collections.singletonList(componentExtractor.apply(valueX));
         });
     }
@@ -140,9 +146,10 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param clazz              the item / block class
      * @param componentExtractor the component getter from the item / block
+     * @param <V>                the value type
      */
-    public void registerItemTooltip(Class<T> clazz, Function<T, Component> componentExtractor) {
-        this.registerItemTooltipLines(clazz, (T valueX) -> {
+    public <V extends T> void registerItemTooltip(Class<V> clazz, Function<V, Component> componentExtractor) {
+        this.registerItemTooltipLines(clazz, (V valueX) -> {
             return Collections.singletonList(componentExtractor.apply(valueX));
         });
     }
@@ -164,8 +171,9 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param value              the item / block
      * @param componentExtractor the component getter from the item / block
+     * @param <V>                the value type
      */
-    public void registerItemTooltipLines(T value, Function<T, List<Component>> componentExtractor) {
+    public <V extends T> void registerItemTooltipLines(V value, Function<V, List<Component>> componentExtractor) {
         registerItemTooltip((ItemStack itemStack) -> this.getFromItemStack(itemStack) == value,
                 (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
                     componentExtractor.apply(value).forEach(tooltipLineConsumer);
@@ -177,13 +185,14 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param clazz              the item / block class
      * @param componentExtractor the component getter from the item / block
+     * @param <V>                the value type
      */
-    public void registerItemTooltipLines(Class<T> clazz, Function<T, List<Component>> componentExtractor) {
+    public <V extends T> void registerItemTooltipLines(Class<V> clazz, Function<V, List<Component>> componentExtractor) {
         this.registerItemTooltip(clazz,
                 (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
                     T value = this.getFromItemStack(itemStack);
                     Objects.requireNonNull(value, "value from item stack " + itemStack + " is null");
-                    componentExtractor.apply(value).forEach(tooltipLineConsumer);
+                    componentExtractor.apply((V) value).forEach(tooltipLineConsumer);
                 });
     }
 
@@ -207,8 +216,9 @@ public abstract class ItemTooltipRegistryV2<T> {
      *
      * @param clazz    the item / block class
      * @param provider the tooltip provider
+     * @param <V>      the value type
      */
-    public void registerItemTooltip(Class<T> clazz, Provider provider) {
+    public <V extends T> void registerItemTooltip(Class<V> clazz, Provider provider) {
         for (T value : this.getRegistry()) {
             if (clazz.isInstance(value)) {
                 registerItemTooltip((ItemStack itemStack) -> {
