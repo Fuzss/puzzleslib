@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.1.36-1.21.1] - 2025-05-04
+### Changed
+- Allow `DataProviderHelper` to support `RegistrySetBuilder`
+
 ## [v21.1.35-1.21.1] - 2025-05-04
 ### Removed
 - Remove unused breathing and drowning event implementations on Fabric to improve compatibility with Lunar Client
