@@ -10,8 +10,6 @@ import net.minecraft.data.DataProvider;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
@@ -40,8 +38,9 @@ public final class DataProviderHelper {
      * Registers factories for multiple {@link DataProvider} instances to be run during data-gen, which is when
      * {@link GatherDataEvent} fires.
      *
-     * @param modId     the current mod id
-     * @param factories the data provider factories to run
+     * @param modId              the current mod id
+     * @param registrySetBuilder the optional registry set builder
+     * @param factories          the data provider factories to run
      */
     public static void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, NeoForgeDataProviderContext.Factory... factories) {
         registerDataProviders(modId, registrySetBuilder, factories, (NeoForgeDataProviderContext.Factory factory) -> {
@@ -58,20 +57,16 @@ public final class DataProviderHelper {
                 if (!registrySetBuilder.getEntryKeys().isEmpty()) {
                     evt.createDatapackRegistryObjects(registrySetBuilder);
                 }
-                onGatherData(evt, Arrays.stream(factories).map(factoryConverter).toList());
+                CompletableFuture<HolderLookup.Provider> registries = evt.getLookupProvider();
+                for (T factory : factories) {
+                    DataProvider dataProvider = factoryConverter.apply(factory).apply(evt, registries);
+                    if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
+                        registries = registriesDataProvider.getRegistries();
+                    }
+                    evt.addProvider(dataProvider);
+                }
             });
         });
-    }
-
-    static void onGatherData(GatherDataEvent evt, Collection<Factory> factories) {
-        CompletableFuture<HolderLookup.Provider> registries = evt.getLookupProvider();
-        for (Factory factory : factories) {
-            DataProvider dataProvider = factory.apply(evt, registries);
-            if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
-                registries = registriesDataProvider.getRegistries();
-            }
-            evt.addProvider(dataProvider);
-        }
     }
 
     @FunctionalInterface
