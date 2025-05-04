@@ -4,8 +4,10 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
@@ -32,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -52,8 +53,6 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Shadow
     @Final
     private Map<Holder<MobEffect>, MobEffectInstance> activeEffects;
-    @Unique
-    private final ThreadLocal<ItemStack> puzzleslib$originalUseItem = new ThreadLocal<>();
 
     public LivingEntityFabricMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -122,23 +121,20 @@ abstract class LivingEntityFabricMixin extends Entity {
     @Inject(
             method = "completeUsingItem", at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;",
-            shift = At.Shift.BEFORE
+            target = "Lnet/minecraft/world/item/ItemStack;finishUsingItem(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/entity/LivingEntity;)Lnet/minecraft/world/item/ItemStack;"
     )
     )
-    protected void completeUsingItem(CallbackInfo callback) {
-        this.puzzleslib$originalUseItem.set(this.useItem.copy());
+    protected void completeUsingItem(CallbackInfo callback, @Share("originalUseItem") LocalRef<ItemStack> originalUseItem) {
+        originalUseItem.set(this.useItem.copy());
     }
 
     @ModifyVariable(method = "completeUsingItem", at = @At("STORE"), ordinal = 0)
-    protected ItemStack completeUsingItem(ItemStack useItem) {
-        Objects.requireNonNull(this.puzzleslib$originalUseItem.get(), "use item copy is null");
+    protected ItemStack completeUsingItem(ItemStack useItem, @Share("originalUseItem") LocalRef<ItemStack> originalUseItem) {
+        Objects.requireNonNull(originalUseItem.get(), "original use item is null");
         DefaultedValue<ItemStack> itemStack = DefaultedValue.fromValue(useItem);
         FabricLivingEvents.USE_ITEM_FINISH.invoker()
-                .onUseItemFinish(LivingEntity.class.cast(this), itemStack, this.puzzleslib$originalUseItem.get());
-        useItem = itemStack.getAsOptional().orElse(useItem);
-        this.puzzleslib$originalUseItem.remove();
-        return useItem;
+                .onUseItemFinish(LivingEntity.class.cast(this), itemStack, originalUseItem.get());
+        return itemStack.getAsOptional().orElse(useItem);
     }
 
     @Shadow
