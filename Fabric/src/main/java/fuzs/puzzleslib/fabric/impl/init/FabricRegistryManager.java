@@ -9,6 +9,7 @@ import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.fabricmc.fabric.api.object.builder.v1.entity.FabricTrackedDataRegistry;
 import net.fabricmc.fabric.api.object.builder.v1.world.poi.PointOfInterestHelper;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -19,7 +20,6 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -36,6 +36,8 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public final class FabricRegistryManager extends RegistryManagerImpl {
+    static final ResourceKey<Registry<EntityDataSerializer<?>>> ENTITY_DATA_SERIALIZERS_REGISTRY_KEY = ResourceKey.createRegistryKey(
+            ResourceLocationHelper.withDefaultNamespace("entity_data_serializers"));
 
     public FabricRegistryManager(String modId) {
         super(modId);
@@ -101,10 +103,11 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
 
     @Override
     public <T> Holder.Reference<EntityDataSerializer<T>> registerEntityDataSerializer(String path, Supplier<EntityDataSerializer<T>> entityDataSerializerSupplier) {
-        ResourceKey<Registry<EntityDataSerializer<?>>> registryKey = ResourceKey.createRegistryKey(
-                ResourceLocationHelper.withDefaultNamespace("entity_data_serializers"));
-        EntityDataSerializer<T> serializer = entityDataSerializerSupplier.get();
-        EntityDataSerializers.registerSerializer(serializer);
-        return new DirectReferenceHolder<>(this.makeResourceKey(registryKey, path), serializer);
+        ResourceKey<EntityDataSerializer<T>> resourceKey = this.makeResourceKey(ENTITY_DATA_SERIALIZERS_REGISTRY_KEY,
+                path);
+        Holder.Reference<EntityDataSerializer<T>> holder = new DirectReferenceHolder<>(resourceKey,
+                entityDataSerializerSupplier.get());
+        FabricTrackedDataRegistry.register(holder.key().location(), holder.value());
+        return holder;
     }
 }
