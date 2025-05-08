@@ -283,6 +283,8 @@ transitive-accessible	field	net/minecraft/client/data/models/BlockModelGenerator
 transitive-accessible	method  net/minecraft/util/ARGB from8BitChannel (I)F
 # TODO remove this entry
 transitive-accessible   method  net/minecraft/client/renderer/RenderPipelines   register    (Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
+transitive-accessible   field	net/minecraft/world/level/block/entity/BlockEntity	type	Lnet/minecraft/world/level/block/entity/BlockEntityType;
+transitive-mutable  field	net/minecraft/world/level/block/entity/BlockEntity	type	Lnet/minecraft/world/level/block/entity/BlockEntityType;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
