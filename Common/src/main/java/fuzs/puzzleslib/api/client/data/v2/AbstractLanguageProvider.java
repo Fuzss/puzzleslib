@@ -231,7 +231,12 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(mobEffect.getDescriptionId(), additionalKey, value);
         }
 
+        @Deprecated(forRemoval = true)
         default void addEntityType(Holder<EntityType<?>> entityType, String value) {
+            this.add(entityType.value(), value);
+        }
+
+        default void addEntityTypeV2(Holder<? extends EntityType<?>> entityType, String value) {
             this.add(entityType.value(), value);
         }
 
