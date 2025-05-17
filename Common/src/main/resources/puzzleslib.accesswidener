@@ -285,6 +285,14 @@ transitive-accessible	method  net/minecraft/util/ARGB from8BitChannel (I)F
 transitive-accessible   method  net/minecraft/client/renderer/RenderPipelines   register    (Lcom/mojang/blaze3d/pipeline/RenderPipeline;)Lcom/mojang/blaze3d/pipeline/RenderPipeline;
 transitive-accessible   field	net/minecraft/world/level/block/entity/BlockEntity	type	Lnet/minecraft/world/level/block/entity/BlockEntityType;
 transitive-mutable  field	net/minecraft/world/level/block/entity/BlockEntity	type	Lnet/minecraft/world/level/block/entity/BlockEntityType;
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generatePotionEffectTypes	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup;Lnet/minecraft/world/item/Item;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;Lnet/minecraft/world/flag/FeatureFlagSet;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateEnchantmentBookTypesOnlyMaxLevel	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateEnchantmentBookTypesAllLevels	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateInstrumentTypes	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup;Lnet/minecraft/world/item/Item;Lnet/minecraft/tags/TagKey;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateSuspiciousStews	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateOminousBottles	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateFireworksAllDurations	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generatePresetPaintings (Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup$Provider;Lnet/minecraft/core/HolderLookup$RegistryLookup;Ljava/util/function/Predicate;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
