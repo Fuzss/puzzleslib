@@ -25,6 +25,7 @@ import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.decoration.PaintingVariant;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -73,13 +74,13 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     public CompletableFuture<?> run(CachedOutput writer) {
 
         JsonObject jsonObject = new JsonObject();
-        this.addTranslations((String key, String value) -> {
-            Objects.requireNonNull(key, "key is null");
+        this.addTranslations((String translationKey, String value) -> {
+            Objects.requireNonNull(translationKey, "translation key is null");
             Objects.requireNonNull(value, "value is null");
-            if (jsonObject.has(key)) {
-                throw new IllegalStateException("Created duplicate translation key: " + key);
+            if (jsonObject.has(translationKey)) {
+                throw new IllegalStateException("Created duplicate translation key: " + translationKey);
             } else {
-                jsonObject.addProperty(key, value);
+                jsonObject.addProperty(translationKey, value);
             }
         });
 
@@ -105,6 +106,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
                 .filter((Holder.Reference<T> holder) -> holder.key().location().getNamespace().equals(this.modId))
                 .forEach((Holder.Reference<T> holder) -> {
                     holderTranslationCollector.accept((String translationKey, String value) -> {
+                        Objects.requireNonNull(translationKey, "translation key is null");
                         if (this.mustHaveTranslationKey(holder, translationKey) && !predicate.test(translationKey)) {
                             throw new IllegalStateException("Missing translation key '%s' for '%s'".formatted(
                                     translationKey,
@@ -350,6 +352,13 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void addItemDamageType(ResourceKey<DamageType> damageType, String value) {
             Objects.requireNonNull(damageType, "damage type is null");
             this.add("death.attack." + damageType.location().getPath() + ".item", value);
+        }
+
+        default void addPaintingVariant(ResourceKey<PaintingVariant> paintingVariant, String title, String author) {
+            Objects.requireNonNull(paintingVariant, "painting variant is null");
+            // do not use the registry name, it is "painting_variant", not "painting"
+            this.add(paintingVariant.location().toLanguageKey("painting", "title"), title);
+            this.add(paintingVariant.location().toLanguageKey("painting", "author"), author);
         }
     }
 
