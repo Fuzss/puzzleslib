@@ -253,6 +253,7 @@ transitive-accessible   field   net/minecraft/client/particle/Particle  roll    
 transitive-accessible   field   net/minecraft/client/particle/Particle  oRoll   F
 transitive-accessible   field   net/minecraft/client/particle/Particle  friction    F
 transitive-accessible   field   net/minecraft/client/particle/Particle  speedUpWhenYMotionIsBlocked Z
+transitive-accessible   field	net/minecraft/client/particle/SingleQuadParticle	quadSize	F
 transitive-accessible   method  net/minecraft/client/data/AtlasProvider forMaterial (Lnet/minecraft/client/resources/model/Material;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSource;
 transitive-accessible   method  net/minecraft/client/data/AtlasProvider forMapper   (Lnet/minecraft/client/renderer/MaterialMapper;)Lnet/minecraft/client/renderer/texture/atlas/SpriteSource;
 transitive-accessible   method  net/minecraft/client/data/AtlasProvider simpleMapper    (Lnet/minecraft/client/renderer/MaterialMapper;)Ljava/util/List;
@@ -293,6 +294,8 @@ transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateS
 transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateOminousBottles	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
 transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generateFireworksAllDurations	(Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
 transitive-accessible	method	net/minecraft/world/item/CreativeModeTabs	generatePresetPaintings (Lnet/minecraft/world/item/CreativeModeTab$Output;Lnet/minecraft/core/HolderLookup$Provider;Lnet/minecraft/core/HolderLookup$RegistryLookup;Ljava/util/function/Predicate;Lnet/minecraft/world/item/CreativeModeTab$TabVisibility;)V
+transitive-accessible	method	net/minecraft/world/entity/decoration/PaintingVariants	register	(Lnet/minecraft/data/worldgen/BootstrapContext;Lnet/minecraft/resources/ResourceKey;II)V
+transitive-accessible   method	net/minecraft/world/entity/decoration/PaintingVariants	register	(Lnet/minecraft/data/worldgen/BootstrapContext;Lnet/minecraft/resources/ResourceKey;IIZ)V
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;
