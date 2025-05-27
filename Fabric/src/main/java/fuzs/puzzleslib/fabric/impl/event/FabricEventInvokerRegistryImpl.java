@@ -38,9 +38,7 @@ import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.fabricmc.fabric.api.networking.v1.ServerConfigurationConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.registry.FabricBrewingRecipeRegistryBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -62,7 +60,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.ConversionParams;
@@ -354,15 +351,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, (PlayerTrackingEvents.Stop callback) -> {
             return callback::onStopTracking;
         });
-        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, ServerPlayConnectionEvents.JOIN, (PlayerNetworkEvents.LoggedIn callback) -> {
-            return (ServerGamePacketListenerImpl handler, PacketSender sender, MinecraftServer server) -> {
-                callback.onLoggedIn(handler.getPlayer());
-            };
+        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, ServerPlayerEvents.JOIN, (PlayerNetworkEvents.LoggedIn callback) -> {
+            return callback::onLoggedIn;
         });
-        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, ServerPlayConnectionEvents.DISCONNECT, (PlayerNetworkEvents.LoggedOut callback) -> {
-            return (ServerGamePacketListenerImpl handler, MinecraftServer server) -> {
-                callback.onLoggedOut(handler.getPlayer());
-            };
+        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, ServerPlayerEvents.LEAVE, (PlayerNetworkEvents.LoggedOut callback) -> {
+            return callback::onLoggedOut;
         });
         INSTANCE.register(AfterChangeDimensionCallback.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, (AfterChangeDimensionCallback callback) -> {
             return callback::onAfterChangeDimension;
@@ -552,8 +545,9 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         @Override
         public EventInvoker<T> asEventInvoker(Object context) {
             Objects.requireNonNull(context, "context is null");
-            // keeping track of events and corresponding invoker is not so important since there is only ever one event per context anyway which is guaranteed by the underlying implementation
-            // but for managing event phases it becomes necessary to use our FabricEventInvoker to keep track
+            // keeping track of events and corresponding invoker is not so important,
+            // since there is only ever one event per context anyway which is guaranteed by the underlying implementation,
+            // but for managing event phases, it becomes necessary to use our FabricEventInvoker to keep track
             return (EventPhase phase, T callback) -> {
                 this.consumer.accept(context, (Event<E> event) -> {
                     this.events.computeIfAbsent(event, this.factory).asEventInvoker(context).register(phase, callback);
