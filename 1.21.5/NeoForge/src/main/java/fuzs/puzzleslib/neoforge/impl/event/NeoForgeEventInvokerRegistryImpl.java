@@ -301,9 +301,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(LootTableLoadCallback.class, LootTableLoadEvent.class, (LootTableLoadCallback callback, LootTableLoadEvent evt) -> {
             callback.onLootTableLoad(evt.getName(), new ForwardingLootTableBuilder(evt.getTable()), evt.getRegistries());
         });
-        INSTANCE.register(AnvilEvents.Use.class, AnvilRepairEvent.class, (AnvilEvents.Use callback, AnvilRepairEvent evt) -> {
+        INSTANCE.register(AnvilEvents.Use.class, AnvilCraftEvent.Post.class, (AnvilEvents.Use callback, AnvilCraftEvent.Post evt) -> {
             if (evt.getEntity().level().isClientSide) return;
-            MutableFloat breakChance = MutableFloat.fromEvent(evt::setBreakChance, evt::getBreakChance);
+            // TODO unused for now, remove break chance for 1.21.6
+            MutableFloat breakChance = MutableFloat.fromValue(0.12F);
             callback.onAnvilUse(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
         });
         INSTANCE.register(ItemEntityEvents.Touch.class, ItemEntityPickupEvent.Pre.class, (ItemEntityEvents.Touch callback, ItemEntityPickupEvent.Pre evt) -> {
@@ -322,9 +323,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             );
         });
         INSTANCE.register(AnvilEvents.Update.class, AnvilUpdateEvent.class, (AnvilEvents.Update callback, AnvilUpdateEvent evt) -> {
-            DefaultedValue<ItemStack> output = DefaultedValue.fromEventWithValue(evt::setOutput, evt::getOutput, evt.getOutput());
-            DefaultedInt enchantmentCost = DefaultedInt.fromEventWithValue(evt::setCost, () -> (int) evt.getCost(), (int) evt.getCost());
-            DefaultedInt materialCost = DefaultedInt.fromEventWithValue(evt::setMaterialCost, evt::getMaterialCost, evt.getMaterialCost());
+            DefaultedValue<ItemStack> output = DefaultedValue.fromEvent(evt::setOutput, evt::getOutput, evt.getVanillaResult()::output);
+            DefaultedInt enchantmentCost = DefaultedInt.fromEvent(evt::setXpCost, evt::getXpCost, evt.getVanillaResult()::xpCost);
+            DefaultedInt materialCost = DefaultedInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost, evt.getVanillaResult()::materialCost);
             EventResult eventResult = callback.onAnvilUpdate(evt.getLeft(), evt.getRight(), output, evt.getName(), enchantmentCost, materialCost, evt.getPlayer());
             if (eventResult.isInterrupt()) {
                 // interruption for allow will run properly as long as output is changed from an empty stack
@@ -334,7 +335,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             } else {
                 // revert any changes made by us if the callback has not been cancelled
                 evt.setOutput(output.getAsDefault());
-                evt.setCost(enchantmentCost.getAsDefaultInt());
+                evt.setXpCost(enchantmentCost.getAsDefaultInt());
                 evt.setMaterialCost(materialCost.getAsDefaultInt());
             }
         });

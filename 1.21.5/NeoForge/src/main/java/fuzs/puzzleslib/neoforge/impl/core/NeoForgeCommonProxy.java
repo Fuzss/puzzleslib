@@ -191,11 +191,6 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public boolean isBookEnchantable(ItemStack inputItemStack, ItemStack bookItemStack) {
-        return inputItemStack.isBookEnchantable(bookItemStack);
-    }
-
-    @Override
     public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         int enchantmentLevel = NeoForgeProxy.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;

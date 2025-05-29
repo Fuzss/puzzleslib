@@ -20,7 +20,10 @@ public interface EnchantingProxy {
 
     boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack);
 
-    boolean isBookEnchantable(ItemStack inputItemStack, ItemStack bookItemStack);
+    @Deprecated(forRemoval = true)
+    default boolean isBookEnchantable(ItemStack inputItemStack, ItemStack bookItemStack) {
+        return true;
+    }
 
     default int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         if (attacker instanceof LivingEntity livingEntity) {

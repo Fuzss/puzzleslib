@@ -207,11 +207,6 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     }
 
     @Override
-    public boolean isBookEnchantable(ItemStack inputItemStack, ItemStack bookItemStack) {
-        return true;
-    }
-
-    @Override
     public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         int enchantmentLevel = FabricProxy.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;

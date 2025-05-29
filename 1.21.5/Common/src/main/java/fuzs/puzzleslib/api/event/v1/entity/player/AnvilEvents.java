@@ -10,6 +10,9 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * TODO rework this for 1.21.6 to account for changes in NeoForge's anvil events
+ */
 public final class AnvilEvents {
     public static final EventInvoker<Update> UPDATE = EventInvoker.lookup(Update.class);
     public static final EventInvoker<Use> USE = EventInvoker.lookup(Use.class);
