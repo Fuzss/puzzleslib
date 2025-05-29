@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.5.11-1.21.5] - 2025-05-29
+### Added
+- Add `ItemTooltipRegistryV3`
+### Changed
+- Update custom configuration screens to better handle startup configs
+- Update `RegistryManager::registerEntityDataSerializer` to use new Fabric Api hook
+- Rework `CreativeModeTabHelper`, including support for painting variants
+- Update `PlayerNetworkEvents` to use Fabric Api's new events in `ServerPlayerEvents`
+- Update `AnvilEvents` for NeoForge 21.5.73+
+
 ## [v21.5.10-1.21.5] - 2025-05-01
 ### Added
 - Add `MenuProviderWithData`
