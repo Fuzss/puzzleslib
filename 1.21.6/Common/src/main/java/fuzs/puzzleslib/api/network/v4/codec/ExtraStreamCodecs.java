@@ -1,17 +1,10 @@
 package fuzs.puzzleslib.api.network.v4.codec;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ByIdMap;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
@@ -57,58 +50,6 @@ public final class ExtraStreamCodecs {
      */
     public static final StreamCodec<ByteBuf, BlockState> BLOCK_STATE = ByteBufCodecs.VAR_INT.map(Block::stateById,
             Block::getId);
-    /**
-     * {@link ResourceKey} stream codec
-     */
-    @Deprecated(forRemoval = true)
-    public static final StreamCodec<ByteBuf, ResourceKey<?>> DIRECT_RESOURCE_KEY = StreamCodec.composite(
-            ResourceLocation.STREAM_CODEC,
-            ResourceKey::registry,
-            ResourceLocation.STREAM_CODEC,
-            ResourceKey::location,
-            (ResourceLocation registry, ResourceLocation location) -> {
-                return ResourceKey.create(ResourceKey.createRegistryKey(registry), location);
-            });
-    /**
-     * {@link FriendlyByteBuf} stream codec
-     */
-    @Deprecated(forRemoval = true)
-    public static final StreamCodec<FriendlyByteBuf, FriendlyByteBuf> FRIENDLY_BYTE_BUF = new StreamCodec<>() {
-
-        @Override
-        public FriendlyByteBuf decode(FriendlyByteBuf buf) {
-            FriendlyByteBuf newBuf = new FriendlyByteBuf(Unpooled.buffer());
-            newBuf.writeBytes(buf.copy());
-            buf.skipBytes(buf.readableBytes());
-            return newBuf;
-        }
-
-        @Override
-        public void encode(FriendlyByteBuf buf, FriendlyByteBuf toEncode) {
-            buf.writeBytes(toEncode.copy());
-            toEncode.release();
-        }
-    };
-    /**
-     * {@link RegistryFriendlyByteBuf} stream codec
-     */
-    @Deprecated(forRemoval = true)
-    public static final StreamCodec<RegistryFriendlyByteBuf, RegistryFriendlyByteBuf> REGISTRY_FRIENDLY_BYTE_BUF = new StreamCodec<>() {
-
-        @Override
-        public RegistryFriendlyByteBuf decode(RegistryFriendlyByteBuf buf) {
-            RegistryFriendlyByteBuf newBuf = new RegistryFriendlyByteBuf(Unpooled.buffer(), buf.registryAccess());
-            newBuf.writeBytes(buf.copy());
-            buf.skipBytes(buf.readableBytes());
-            return newBuf;
-        }
-
-        @Override
-        public void encode(RegistryFriendlyByteBuf buf, RegistryFriendlyByteBuf toEncode) {
-            buf.writeBytes(toEncode.copy());
-            toEncode.release();
-        }
-    };
 
     private ExtraStreamCodecs() {
         // NO-OP
@@ -138,37 +79,5 @@ public final class ExtraStreamCodecs {
                 clazz.getEnumConstants(),
                 ByIdMap.OutOfBoundsStrategy.ZERO);
         return ByteBufCodecs.idMapper(idMapper, keyExtractor);
-    }
-
-    /**
-     * read {@link Component}
-     */
-    @Deprecated(forRemoval = true)
-    public static Component readComponent(RegistryFriendlyByteBuf buf) {
-        return ComponentSerialization.TRUSTED_STREAM_CODEC.decode(buf);
-    }
-
-    /**
-     * write {@link Component}
-     */
-    @Deprecated(forRemoval = true)
-    public static void writeComponent(RegistryFriendlyByteBuf buf, Component component) {
-        ComponentSerialization.TRUSTED_STREAM_CODEC.encode(buf, component);
-    }
-
-    /**
-     * read {@link ItemStack}
-     */
-    @Deprecated(forRemoval = true)
-    public static ItemStack readItem(RegistryFriendlyByteBuf buf) {
-        return ItemStack.OPTIONAL_STREAM_CODEC.decode(buf);
-    }
-
-    /**
-     * write {@link ItemStack}
-     */
-    @Deprecated(forRemoval = true)
-    public static void writeItem(RegistryFriendlyByteBuf buf, ItemStack itemStack) {
-        ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, itemStack);
     }
 }

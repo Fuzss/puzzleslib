@@ -1,19 +1,19 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
+import fuzs.puzzleslib.api.client.init.v1.ItemStackDecorator;
 import net.minecraft.world.level.ItemLike;
 
 /**
- * register additional renders to run after stack count and durability have been drawn for an item stack
+ * Register additional renderers to run after stack count and durability have been drawn for an item stack.
  */
 @FunctionalInterface
 public interface ItemDecorationsContext {
 
     /**
-     * register a {@link DynamicItemDecorator} for an <code>item</code>
+     * Register a {@link ItemStackDecorator} for an item.
      *
-     * @param decorator renderer implementation
-     * @param items   items to draw for
+     * @param itemLike           the item to draw for
+     * @param itemStackDecorator the renderer implementation
      */
-    void registerItemDecorator(DynamicItemDecorator decorator, ItemLike... items);
+    void registerItemStackDecorator(ItemLike itemLike, ItemStackDecorator itemStackDecorator);
 }

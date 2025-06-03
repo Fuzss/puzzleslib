@@ -1,32 +1,31 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
 
 /**
- * Register custom {@link RenderType RenderTypes} for blocks and fluids.
+ * Register custom {@link ChunkSectionLayer ChunkSectionLayers} for blocks and fluids.
  *
  * @param <T> type supported by provider, either {@link Block} or {@link Fluid}
  */
 public interface RenderTypesContext<T> {
 
     /**
-     * Register a {@link RenderType}.
+     * Register a {@link ChunkSectionLayer}.
      *
-     * @param renderType the render type
-     * @param objects    objects supporting render type
+     * @param object            the object
+     * @param chunkSectionLayer the chunk section layer
      */
-    @SuppressWarnings("unchecked")
-    void registerRenderType(RenderType renderType, T... objects);
+    void registerChunkRenderType(T object, ChunkSectionLayer chunkSectionLayer);
 
     /**
-     * Allows for retrieving the {@link RenderType} that has been registered for an object.
+     * Allows for retrieving the {@link ChunkSectionLayer} that has been registered for an object.
      * <p>
-     * When no render type is registered, {@link RenderType#solid()} is returned.
+     * When no render type is registered, {@link ChunkSectionLayer#SOLID} is returned.
      *
-     * @param object the object to get the render type for
-     * @return the render type
+     * @param object the object
+     * @return the chunk section layer
      */
-    RenderType getRenderType(T object);
+    ChunkSectionLayer getChunkRenderType(T object);
 }

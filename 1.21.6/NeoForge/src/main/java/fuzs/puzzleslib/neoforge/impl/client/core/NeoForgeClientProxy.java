@@ -20,8 +20,6 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -34,9 +32,7 @@ import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
@@ -196,17 +192,6 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
                 });
             });
         });
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void registerRenderType(Block block, RenderType renderType) {
-        ItemBlockRenderTypes.setRenderLayer(block, renderType);
-    }
-
-    @Override
-    public void registerRenderType(Fluid fluid, RenderType renderType) {
-        ItemBlockRenderTypes.setRenderLayer(fluid, renderType);
     }
 
     @Override

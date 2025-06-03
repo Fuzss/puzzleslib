@@ -301,12 +301,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(LootTableLoadCallback.class, LootTableLoadEvent.class, (LootTableLoadCallback callback, LootTableLoadEvent evt) -> {
             callback.onLootTableLoad(evt.getName(), new ForwardingLootTableBuilder(evt.getTable()), evt.getRegistries());
         });
-        INSTANCE.register(AnvilEvents.Use.class, AnvilCraftEvent.Post.class, (AnvilEvents.Use callback, AnvilCraftEvent.Post evt) -> {
-            if (evt.getEntity().level().isClientSide) return;
-            // TODO unused for now, remove break chance for 1.21.6
-            MutableFloat breakChance = MutableFloat.fromValue(0.12F);
-            callback.onAnvilUse(evt.getEntity(), evt.getLeft(), evt.getRight(), evt.getOutput(), breakChance);
-        });
         INSTANCE.register(ItemEntityEvents.Touch.class, ItemEntityPickupEvent.Pre.class, (ItemEntityEvents.Touch callback, ItemEntityPickupEvent.Pre evt) -> {
             EventResult eventResult = callback.onItemTouch(evt.getPlayer(), evt.getItemEntity());
             if (eventResult.isInterrupt()) {
@@ -322,21 +316,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     enchantmentLevel
             );
         });
-        INSTANCE.register(AnvilEvents.Update.class, AnvilUpdateEvent.class, (AnvilEvents.Update callback, AnvilUpdateEvent evt) -> {
-            DefaultedValue<ItemStack> output = DefaultedValue.fromEvent(evt::setOutput, evt::getOutput, evt.getVanillaResult()::output);
-            DefaultedInt enchantmentCost = DefaultedInt.fromEvent(evt::setXpCost, evt::getXpCost, evt.getVanillaResult()::xpCost);
-            DefaultedInt materialCost = DefaultedInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost, evt.getVanillaResult()::materialCost);
-            EventResult eventResult = callback.onAnvilUpdate(evt.getLeft(), evt.getRight(), output, evt.getName(), enchantmentCost, materialCost, evt.getPlayer());
-            if (eventResult.isInterrupt()) {
-                // interruption for allow will run properly as long as output is changed from an empty stack
-                if (!eventResult.getAsBoolean()) {
-                    evt.setCanceled(true);
-                }
-            } else {
-                // revert any changes made by us if the callback has not been cancelled
-                evt.setOutput(output.getAsDefault());
-                evt.setXpCost(enchantmentCost.getAsDefaultInt());
-                evt.setMaterialCost(materialCost.getAsDefaultInt());
+        INSTANCE.register(CreateAnvilResultCallback.class, AnvilUpdateEvent.class, (CreateAnvilResultCallback callback, AnvilUpdateEvent evt) -> {
+            DefaultedValue<ItemStack> outputItemStack = DefaultedValue.fromEvent(evt::setOutput, evt::getOutput, evt.getVanillaResult()::output);
+            DefaultedInt enchantmentLevelCost = DefaultedInt.fromEvent(evt::setXpCost, evt::getXpCost, evt.getVanillaResult()::xpCost);
+            DefaultedInt repairMaterialCost = DefaultedInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost, evt.getVanillaResult()::materialCost);
+            if (callback.onCreateAnvilResult(evt.getLeft(), evt.getRight(), outputItemStack, evt.getName(), enchantmentLevelCost, repairMaterialCost, evt.getPlayer())
+                    .isInterrupt()) {
+                evt.setCanceled(true);
             }
         });
         INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (LivingDropsCallback callback, LivingDropsEvent evt) -> {
@@ -492,8 +478,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(AfterChangeDimensionCallback.class, PlayerEvent.PlayerChangedDimensionEvent.class, (AfterChangeDimensionCallback callback, PlayerEvent.PlayerChangedDimensionEvent evt) -> {
             if (!(evt.getEntity() instanceof ServerPlayer serverPlayer)) return;
-            ServerLevel originalLevel = serverPlayer.server.getLevel(evt.getFrom());
-            ServerLevel newLevel = serverPlayer.server.getLevel(evt.getTo());
+            ServerLevel originalLevel = serverPlayer.getServer().getLevel(evt.getFrom());
+            ServerLevel newLevel = serverPlayer.getServer().getLevel(evt.getTo());
             Objects.requireNonNull(originalLevel, "original level is null");
             Objects.requireNonNull(newLevel, "new level is null");
             callback.onAfterChangeDimension(serverPlayer, originalLevel, newLevel);

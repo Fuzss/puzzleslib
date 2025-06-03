@@ -4,7 +4,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -18,8 +18,8 @@ import java.util.function.ToIntFunction;
  * <ul>
  * <li>No need for using {@link WidgetSprites}.</li>
  * <li>Completely mutable to allow for manipulating texture coordinates, size and position after the button has been
- * initialized.</li>
- * <li>Control over texture layout, meaning how inactive, active and hovered sprites are arranged in the texture source
+ * initialised.</li>
+ * <li>Control over texture layout, meaning how inactive, active, and hovered sprites are arranged in the texture source
  * file.</li>
  * <li>Optionally draws the vanilla background texture behind the rendered sprite.</li>
  * </ul>
@@ -123,7 +123,7 @@ public class SpritelessImageButton extends Button {
     }
 
     /**
-     * Controls how inactive, active and hovered sprites are arranged in the texture source file.
+     * Controls how inactive, active, and hovered sprites are arranged in the texture source file.
      *
      * @param textureLayout layout property
      * @return builder instance
@@ -134,9 +134,9 @@ public class SpritelessImageButton extends Button {
     }
 
     /**
-     * Draws the vanilla button texture when rendering, so that sprites provided by this implementation can be drawn on
+     * Draws the vanilla button texture when rendering so that sprites provided by this implementation can be drawn on
      * top.
-     * <p>This does however not include drawing the button message.
+     * <p>This does, however, not include drawing the button message.
      *
      * @return builder instance
      */
@@ -150,7 +150,7 @@ public class SpritelessImageButton extends Button {
         if (this.drawBackground) {
             super.renderWidget(guiGraphics, mouseX, mouseY, partialTick);
         }
-        guiGraphics.blit(RenderType::guiTextured,
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED,
                 this.resourceLocation,
                 this.getX(),
                 this.getY(),
@@ -169,7 +169,7 @@ public class SpritelessImageButton extends Button {
     }
 
     /**
-     * Controls how inactive, active and hovered sprites are arranged in the texture source file.
+     * Controls how inactive, active, and hovered sprites are arranged in the texture source file.
      *
      * @return the texture y index (0, 1, or 2)
      */

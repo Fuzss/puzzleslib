@@ -11,7 +11,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.DefaultTooltipPositioner;
 import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -211,7 +210,7 @@ public final class TooltipRenderHelper {
      * {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)}, otherwise
      * {@link IllegalArgumentException} will be thrown.
      * <p>
-     * For simple text based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)}
+     * For simple text-based components directly use {@link ClientTooltipComponent#create(FormattedCharSequence)}
      * instead.
      *
      * @param imageComponent the un-sided {@link TooltipComponent} to convert
@@ -222,109 +221,93 @@ public final class TooltipRenderHelper {
     }
 
     /**
-     * Finally renders the tooltip, simply copied from the vanilla implementation.
+     * Finally, renders the tooltip, simply copied from the vanilla implementation.
      * <p>
      * Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
      * <p>
      * Also, the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning
      * to avoid running offscreen are made.
      * <p>
-     * The behavior is like using {@link DefaultTooltipPositioner#INSTANCE}.
+     * The behaviour is like using {@link DefaultTooltipPositioner#INSTANCE}.
      *
      * @param guiGraphics       the gui graphics component
-     * @param posX              position on x-axis, would be mouse cursor x for vanilla
-     * @param posY              position on y-axis, would be mouse cursor y for vanilla
+     * @param posX              the position on x-axis; would be mouse cursor x for vanilla
+     * @param posY              the position on y-axis; would be mouse cursor y for vanilla
      * @param tooltipComponents components to render in the tooltip
+     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, ResourceLocation)
      */
     public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents) {
         renderTooltipComponents(guiGraphics, posX, posY, tooltipComponents, null);
     }
 
     /**
-     * Finally renders the tooltip, simply copied from the vanilla implementation.
+     * Finally, renders the tooltip, simply copied from the vanilla implementation.
      * <p>
      * Note that this method also offsets the position by +12 / -12 (x / y), just like vanilla.
      * <p>
      * Also, the tooltip is guaranteed to be placed at the specified position, no attempts at wrapping / repositioning
      * to avoid running offscreen are made.
      * <p>
-     * The behavior is like using {@link DefaultTooltipPositioner#INSTANCE}.
+     * The behaviour is like using {@link DefaultTooltipPositioner#INSTANCE}.
      *
      * @param guiGraphics       the gui graphics component
-     * @param posX              position on x-axis, would be mouse cursor x for vanilla
-     * @param posY              position on y-axis, would be mouse cursor y for vanilla
-     * @param tooltipComponents components to render in the tooltip
-     * @param tooltipStyle      an optional resource location for overriding the background and frame sprites of the
+     * @param posX              the position on x-axis; would be mouse cursor x for vanilla
+     * @param posY              the position on y-axis; would be mouse cursor y for vanilla
+     * @param tooltipComponents the components to render in the tooltip
+     * @param tooltipStyle      the optional resource location for overriding the background and frame sprites of the
      *                          tooltip
+     * @see GuiGraphics#renderTooltip(Font, List, int, int, ClientTooltipPositioner, ResourceLocation)
      */
     public static void renderTooltipComponents(GuiGraphics guiGraphics, int posX, int posY, List<? extends ClientTooltipComponent> tooltipComponents, @Nullable ResourceLocation tooltipStyle) {
 
-        if (tooltipComponents.isEmpty()) return;
+        Font font = Minecraft.getInstance().font;
 
-        Minecraft minecraft = Minecraft.getInstance();
-        boolean isCancelled = onRenderTooltip(guiGraphics,
-                minecraft.font,
+        if (tooltipComponents.isEmpty() || onRenderTooltip(guiGraphics,
+                font,
                 posX,
                 posY,
                 (List<ClientTooltipComponent>) tooltipComponents,
-                DefaultTooltipPositioner.INSTANCE);
-
-        if (isCancelled) return;
+                DefaultTooltipPositioner.INSTANCE)) {
+            return;
+        }
 
         int lineWidth = 0;
         int lineHeight = tooltipComponents.size() == 1 ? -2 : 0;
 
         for (ClientTooltipComponent component : tooltipComponents) {
-            int width = component.getWidth(minecraft.font);
+            int width = component.getWidth(font);
             if (width > lineWidth) {
                 lineWidth = width;
             }
-            lineHeight += component.getHeight(minecraft.font);
+            lineHeight += component.getHeight(font);
         }
 
         int originPosX = posX + 12;
         int originPosY = posY - 12;
 
-        guiGraphics.pose().pushPose();
-        guiGraphics.flush();
+        guiGraphics.pose().pushMatrix();
         TooltipRenderUtil.renderTooltipBackground(guiGraphics,
                 originPosX,
                 originPosY,
                 lineWidth,
                 lineHeight,
-                400,
                 tooltipStyle);
-        guiGraphics.flush();
-        guiGraphics.pose().translate(0.0F, 0.0F, 400.0F);
 
         MutableInt currentPosY = new MutableInt(originPosY);
         for (int i = 0; i < tooltipComponents.size(); ++i) {
             ClientTooltipComponent component = tooltipComponents.get(i);
-            guiGraphics.drawSpecial((MultiBufferSource bufferSource) -> {
-                component.renderText(minecraft.font,
-                        originPosX,
-                        currentPosY.intValue(),
-                        guiGraphics.pose().last().pose(),
-                        (MultiBufferSource.BufferSource) bufferSource);
-            });
-            currentPosY.add(component.getHeight(minecraft.font) + (i == 0 ? 2 : 0));
+            component.renderText(guiGraphics, font, originPosX, currentPosY.intValue());
+            currentPosY.add(component.getHeight(font) + (i == 0 ? 2 : 0));
         }
 
         currentPosY.setValue(originPosY);
         for (int i = 0; i < tooltipComponents.size(); ++i) {
             ClientTooltipComponent component = tooltipComponents.get(i);
-            component.renderImage(minecraft.font,
-                    originPosX,
-                    currentPosY.intValue(),
-                    lineWidth,
-                    lineHeight,
-                    guiGraphics);
-            currentPosY.add(component.getHeight(minecraft.font) + (i == 0 ? 2 : 0));
+            component.renderImage(font, originPosX, currentPosY.intValue(), lineWidth, lineHeight, guiGraphics);
+            currentPosY.add(component.getHeight(font) + (i == 0 ? 2 : 0));
         }
 
-        // we need this as opposed to the renderer in GuiGraphics, otherwise tooltip text leaks through screens
-        guiGraphics.flush();
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     /**

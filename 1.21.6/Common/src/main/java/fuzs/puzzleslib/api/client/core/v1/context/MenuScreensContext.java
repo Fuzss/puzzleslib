@@ -16,10 +16,10 @@ public interface MenuScreensContext {
      * Register a factory for creating a {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen} for
      * a corresponding {@link MenuType}.
      *
-     * @param menuType the menu type
-     * @param factory  the screen factory
-     * @param <M>      the type of menu
-     * @param <S>      the type of screen
+     * @param menuType              the menu type
+     * @param menuScreenConstructor the screen factory
+     * @param <M>                   the type of menu
+     * @param <S>                   the type of screen
      */
-    <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, S> factory);
+    <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, S> menuScreenConstructor);
 }

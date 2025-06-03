@@ -35,7 +35,7 @@ public final class GiveItemHelper {
      * @param serverPlayer the player to give the item stack to
      */
     public static void giveItem(ItemStack itemStack, ServerPlayer serverPlayer) {
-        giveItem(createEmptyCommandSource(serverPlayer.serverLevel()), itemStack, Collections.singleton(serverPlayer));
+        giveItem(createEmptyCommandSource(serverPlayer.level()), itemStack, Collections.singleton(serverPlayer));
     }
 
     /**
@@ -47,7 +47,7 @@ public final class GiveItemHelper {
      */
     public static void giveItem(ItemStack itemStack, Collection<ServerPlayer> serverPlayers) {
         ServerPlayer serverPlayer = serverPlayers.iterator().next();
-        giveItem(createEmptyCommandSource(serverPlayer.serverLevel()), itemStack, serverPlayers);
+        giveItem(createEmptyCommandSource(serverPlayer.level()), itemStack, serverPlayers);
     }
 
     static void giveItem(CommandSourceStack commandSourceStack, ItemStack itemStack, Collection<ServerPlayer> serverPlayers) {

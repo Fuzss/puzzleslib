@@ -13,7 +13,7 @@ public class PuzzlesLibNeoForge {
     public PuzzlesLibNeoForge() {
         ModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibMod::new);
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
-            ModConstructor.construct(PuzzlesLibMod.id("development"), PuzzlesLibDevelopment::new);
+            ModConstructor.construct(PuzzlesLibMod.id("common/development"), PuzzlesLibDevelopment::new);
         }
     }
 }

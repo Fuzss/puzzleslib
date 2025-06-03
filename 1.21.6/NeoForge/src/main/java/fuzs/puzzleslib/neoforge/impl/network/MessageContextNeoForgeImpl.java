@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.network;
 
-import fuzs.puzzleslib.api.network.v4.message.*;
+import fuzs.puzzleslib.api.network.v4.message.Message;
 import fuzs.puzzleslib.api.network.v4.message.configuration.ClientboundConfigurationMessage;
 import fuzs.puzzleslib.api.network.v4.message.configuration.ServerboundConfigurationMessage;
 import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
@@ -122,7 +122,7 @@ public abstract class MessageContextNeoForgeImpl<T extends PacketListener> imple
 
         @Override
         public ServerLevel level() {
-            return this.player().serverLevel();
+            return this.player().level();
         }
     }
 }

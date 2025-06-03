@@ -1,13 +1,12 @@
 package fuzs.puzzleslib.neoforge.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
-import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.client.core.context.*;
 import fuzs.puzzleslib.neoforge.impl.core.context.AbstractNeoForgeContext;
 import net.minecraft.server.packs.PackType;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
@@ -28,9 +27,14 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                     AbstractNeoForgeContext.computeIfAbsent(skullRenderersContext,
                             SkullRenderersContextNeoForgeImpl::new,
                             modConstructor::onRegisterSkullRenderers).registerForEvent(evt);
-                    // need to run this deferred as the underlying registries do not use concurrent maps
-                    modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
-                    modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
+                });
+            });
+            // let this run after other mods, some of our mods are likely going to reference what other mods have registered
+            eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent evt) -> {
+                // need to run this deferred as the underlying registries do not use concurrent maps
+                evt.enqueueWork(() -> {
+                    modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextNeoForgeImpl());
+                    modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextNeoForgeImpl());
                 });
             });
             eventBus.addListener((final RegisterItemModelsEvent evt) -> {

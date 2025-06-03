@@ -2,13 +2,14 @@ package fuzs.puzzleslib.api.client.core.v1.context;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import net.minecraft.client.gui.LayeredDraw;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.UnaryOperator;
 
 /**
- * Register new {@link LayeredDraw.Layer Layers} to be drawn as part of the {@link net.minecraft.client.gui.Gui}.
+ * Register new {@link Layer Layers} to be drawn as part of the {@link net.minecraft.client.gui.Gui}.
  * <p>
  * The implementation works together with {@link fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper} for providing
  * accurate height values for hotbar decorations. Note that on Fabric height values are only updated but not respected
@@ -28,13 +29,10 @@ public interface GuiLayersContext {
      */
     ResourceLocation HOTBAR = ResourceLocationHelper.withDefaultNamespace("hotbar");
     /**
-     * The layer for rendering the jump meter (e.g., for horses).
+     * The layer for rendering the info bars, like the experience bar, the locator bar, or the jump meter (e.g. for
+     * horses).
      */
-    ResourceLocation JUMP_METER = ResourceLocationHelper.withDefaultNamespace("jump_meter");
-    /**
-     * The layer for rendering the experience bar.
-     */
-    ResourceLocation EXPERIENCE_BAR = ResourceLocationHelper.withDefaultNamespace("experience_bar");
+    ResourceLocation INFO_BAR = ResourceLocationHelper.withDefaultNamespace("info_bar");
     /**
      * The layer for rendering the player's health hearts.
      */
@@ -122,7 +120,7 @@ public interface GuiLayersContext {
      * @param resourceLocation the gui layer resource location
      * @param guiLayer         the gui layer
      */
-    void registerGuiLayer(ResourceLocation resourceLocation, LayeredDraw.Layer guiLayer);
+    void registerGuiLayer(ResourceLocation resourceLocation, Layer guiLayer);
 
     /**
      * Register a new gui layer rendered before or after an existing vanilla gui layer.
@@ -135,7 +133,7 @@ public interface GuiLayersContext {
      *                              vanilla layer
      * @param guiLayer              the gui layer
      */
-    void registerGuiLayer(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, LayeredDraw.Layer guiLayer);
+    void registerGuiLayer(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, Layer guiLayer);
 
     /**
      * Replace an existing vanilla gui layer. Replacing custom layers is not supported.
@@ -143,5 +141,17 @@ public interface GuiLayersContext {
      * @param resourceLocation the vanilla gui layer resource location
      * @param guiLayerFactory  the gui layer factory, receiving the existing layer
      */
-    void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<LayeredDraw.Layer> guiLayerFactory);
+    void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<Layer> guiLayerFactory);
+
+    @FunctionalInterface
+    interface Layer {
+
+        /**
+         * Renders the gui layer.
+         *
+         * @param guiGraphics  the gui graphics
+         * @param deltaTracker the delta tracker
+         */
+        void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker);
+    }
 }

@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.ExtraCodecs;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,5 +47,25 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
             list.add("!" + new ExtraCodecs.TagOrElementLocation(tagEntry.getId(), tagEntry.isTag()));
         }
         return list;
+    }
+
+    @Override
+    public AbstractTagAppender<T> add(TagEntry tagEntry) {
+        ResourceLocation resourceLocation = tagEntry.getId();
+        if (tagEntry.isTag()) {
+            return tagEntry.isRequired() ? this.addTag(resourceLocation) : this.addOptionalTag(resourceLocation);
+        } else {
+            return tagEntry.isRequired() ? this.add(resourceLocation) : this.addOptional(resourceLocation);
+        }
+    }
+
+    @Override
+    public AbstractTagAppender<T> replace(boolean replace) {
+        return this.setReplace(replace);
+    }
+
+    @Override
+    public AbstractTagAppender<T> remove(TagKey<T> tagKey) {
+        return this.removeTag(tagKey);
     }
 }

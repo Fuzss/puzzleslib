@@ -6,9 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
-import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiLayerEvents;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
-import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
@@ -70,7 +68,7 @@ abstract class GuiFabricMixin {
     )
     )
     private void renderHotbarAndDecorations(Gui gui, GuiGraphics guiGraphics, int xPos, Operation<Void> operation) {
-        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.EXPERIENCE_BAR,
+        GuiLayersContextFabricImpl.renderGuiLayer(GuiLayersContext.INFO_BAR,
                 guiGraphics,
                 gui.minecraft.getDeltaTracker(),
                 () -> operation.call(gui, guiGraphics, xPos));
@@ -250,75 +248,5 @@ abstract class GuiFabricMixin {
                     operation.call(gui, guiGraphics, player, vehicleMaxHealth, y, x);
                     GuiLayersContextFabricImpl.applyAirLevelGuiHeight(gui);
                 });
-    }
-
-    @Inject(method = "renderCameraOverlays", at = @At("HEAD"), cancellable = true)
-    private void renderCameraOverlays$0(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CAMERA_OVERLAYS, callback);
-    }
-
-    @Inject(method = "renderCrosshair", at = @At("HEAD"), cancellable = true)
-    private void renderCrosshair(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.CROSSHAIR, callback);
-    }
-
-    @Inject(method = "renderItemHotbar", at = @At("HEAD"), cancellable = true)
-    private void renderItemHotbar(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.HOTBAR, callback);
-    }
-
-    @Inject(method = "renderJumpMeter", at = @At(value = "HEAD"))
-    private void renderJumpMeter(PlayerRideableJumping rideable, GuiGraphics guiGraphics, int x, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.JUMP_METER, callback);
-    }
-
-    @Inject(method = "renderExperienceBar", at = @At(value = "HEAD"))
-    public void renderExperienceBar(GuiGraphics guiGraphics, int xPos, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_BAR, callback);
-    }
-
-    @Inject(method = "renderExperienceLevel", at = @At(value = "HEAD"))
-    private void renderExperienceLevel(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.EXPERIENCE_LEVEL, callback);
-    }
-
-    @Inject(method = "renderArmor", at = @At("HEAD"), cancellable = true)
-    private static void renderArmor(GuiGraphics guiGraphics, Player player, int y, int heartRows, int height, int x, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.ARMOR_LEVEL, callback);
-    }
-
-    @Inject(method = "renderHearts", at = @At("HEAD"), cancellable = true)
-    private void renderHearts(GuiGraphics guiGraphics, Player player, int x, int y, int height, int offsetHeartIndex, float maxHealth, int currentHealth, int displayHealth, int absorptionAmount, boolean renderHighlight, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.PLAYER_HEALTH, callback);
-    }
-
-    @Inject(method = "renderFood", at = @At("HEAD"), cancellable = true)
-    public void renderFood(GuiGraphics guiGraphics, Player player, int y, int x, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.FOOD_LEVEL, callback);
-    }
-
-    @Inject(method = "renderAirBubbles", at = @At("HEAD"), cancellable = true)
-    private void renderAirBubbles(GuiGraphics guiGraphics, Player player, int vehicleMaxHealth, int y, int x, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.AIR_LEVEL, callback);
-    }
-
-    @Inject(method = "renderVehicleHealth", at = @At("HEAD"), cancellable = true)
-    public void renderVehicleHealth(GuiGraphics guiGraphics, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.VEHICLE_HEALTH, callback);
-    }
-
-    @Inject(method = "renderSelectedItemName", at = @At("HEAD"), cancellable = true)
-    public void renderSelectedItemName(GuiGraphics guiGraphics, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.SELECTED_ITEM_NAME, callback);
-    }
-
-    @Inject(method = "renderEffects", at = @At("HEAD"), cancellable = true)
-    protected void renderEffects(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.STATUS_EFFECTS, callback);
-    }
-
-    @Inject(method = "renderSavingIndicator", at = @At("HEAD"), cancellable = true)
-    public void renderSavingIndicator(GuiGraphics guiGraphics, DeltaTracker deltaTracker, CallbackInfo callback) {
-        FabricGuiEventHelper.cancelIfNecessary(RenderGuiLayerEvents.SAVING_INDICATOR, callback);
     }
 }

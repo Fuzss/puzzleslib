@@ -14,12 +14,12 @@ public interface UseBoneMealCallback {
     /**
      * Called when a bone meal is used on a block by the player, a dispenser, or a farmer villager.
      * <p>
-     * Useful for adding custom bone meal behavior to blocks, or for cancelling vanilla interactions.
+     * Useful for adding custom bone meal behaviour to blocks or for cancelling vanilla interactions.
      *
-     * @param level      level bone meal event occurs in
-     * @param blockPos   position bone meal is applied to
-     * @param blockState block state bone meal is applied to
-     * @param itemStack  the bone meal stack
+     * @param level      the level the bone meal event occurs in
+     * @param blockPos   the position the bone meal is applied to
+     * @param blockState the block state the bone meal is applied to
+     * @param itemStack  the bone meal item stack
      * @return <ul>
      *         <li>{@link EventResult#PASS PASS} to continue with vanilla</li>
      *         <li>{@link EventResult#ALLOW ALLOW} to set as handled and let vanilla show particles + arm swing animation</li>

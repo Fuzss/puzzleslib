@@ -13,7 +13,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -160,7 +159,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
 
     @Override
     public void onRegisterGuiLayers(GuiLayersContext context) {
-        context.replaceGuiLayer(GuiLayersContext.PLAYER_LIST, (LayeredDraw.Layer layer) -> {
+        context.replaceGuiLayer(GuiLayersContext.PLAYER_LIST, (GuiLayersContext.Layer layer) -> {
             return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 Scoreboard scoreboard = minecraft.level.getScoreboard();

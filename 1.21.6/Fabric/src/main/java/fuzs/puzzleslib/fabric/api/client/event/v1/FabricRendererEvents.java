@@ -59,11 +59,11 @@ public final class FabricRendererEvents {
      * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the
      * color.
      */
-    public static final Event<FogEvents.ComputeColor> COMPUTE_FOG_COLOR = FabricEventFactory.create(FogEvents.ComputeColor.class);
+    public static final Event<FogEvents.Color> FOG_COLOR = FabricEventFactory.create(FogEvents.Color.class);
     /**
      * Called before fog is rendered, allows for controlling fog start and end distance.
      */
-    public static final Event<FogEvents.Render> RENDER_FOG = FabricEventFactory.create(FogEvents.Render.class);
+    public static final Event<FogEvents.Setup> SETUP_FOG = FabricEventFactory.create(FogEvents.Setup.class);
     /**
      * Fires before the game and level are rendered in {@link GameRenderer#render(DeltaTracker, boolean)}.
      */

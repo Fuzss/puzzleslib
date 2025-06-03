@@ -1,7 +1,8 @@
 package fuzs.puzzleslib.impl.core.context;
 
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.ModContext;
-import org.apache.logging.log4j.util.Strings;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -10,11 +11,11 @@ public interface ModConstructorImpl<T> {
 
     void construct(String modId, T modConstructor);
 
-    static <T> void construct(String modId, Supplier<T> modConstructorSupplier, Supplier<ModConstructorImpl<T>> modConstructorImplSupplier, Consumer<ModContext> modContextConsumer) {
-        if (Strings.isBlank(modId)) throw new IllegalArgumentException("mod id is empty");
-        // build first to force class being loaded for executing buildables
+    static <T> void construct(ResourceLocation resourceLocation, Supplier<T> modConstructorSupplier, Supplier<ModConstructorImpl<T>> modConstructorImplSupplier, Consumer<ModContext> modContextConsumer) {
+        PuzzlesLib.LOGGER.info("Constructing components for {}", resourceLocation);
+        // build first to force the class being loaded for executing buildable elements
         T modConstructor = modConstructorSupplier.get();
-        modContextConsumer.accept(ModContext.get(modId));
-        modConstructorImplSupplier.get().construct(modId, modConstructor);
+        modContextConsumer.accept(ModContext.get(resourceLocation.getNamespace()));
+        modConstructorImplSupplier.get().construct(resourceLocation.getNamespace(), modConstructor);
     }
 }

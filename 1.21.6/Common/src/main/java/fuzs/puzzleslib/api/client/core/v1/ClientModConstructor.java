@@ -3,13 +3,11 @@ package fuzs.puzzleslib.api.client.core.v1;
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -32,7 +30,7 @@ public interface ClientModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructorSupplier) {
-        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"), modConstructorSupplier);
+        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "client"), modConstructorSupplier);
     }
 
     /**
@@ -42,8 +40,7 @@ public interface ClientModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(ResourceLocation resourceLocation, Supplier<ClientModConstructor> modConstructorSupplier) {
-        PuzzlesLib.LOGGER.info("Constructing client components for {}", resourceLocation);
-        ModConstructorImpl.construct(resourceLocation.getNamespace(),
+        ModConstructorImpl.construct(resourceLocation,
                 modConstructorSupplier,
                 ClientProxyImpl.get()::getClientModConstructorImpl,
                 Consumers.nop());
@@ -168,14 +165,14 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context register custom {@link RenderType}s for blocks
+     * @param context register custom {@link ChunkSectionLayer ChunkSectionLayers} for blocks
      */
     default void onRegisterBlockRenderTypes(RenderTypesContext<Block> context) {
         // NO-OP
     }
 
     /**
-     * @param context register custom {@link RenderType}s for fluids
+     * @param context register custom {@link ChunkSectionLayer ChunkSectionLayers} for fluids
      */
     default void onRegisterFluidRenderTypes(RenderTypesContext<Fluid> context) {
         // NO-OP
@@ -210,7 +207,7 @@ public interface ClientModConstructor {
     }
 
     /**
-     * @param context register new {@link LayeredDraw.Layer Layers} to be drawn as part of the
+     * @param context register new {@link GuiLayersContext.Layer Layers} to be drawn as part of the
      *                {@link net.minecraft.client.gui.Gui}
      */
     default void onRegisterGuiLayers(GuiLayersContext context) {

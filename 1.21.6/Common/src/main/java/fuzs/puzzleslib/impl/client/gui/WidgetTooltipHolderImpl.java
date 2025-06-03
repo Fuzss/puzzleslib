@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.client.gui;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
@@ -84,10 +85,10 @@ public final class WidgetTooltipHolderImpl extends WidgetTooltipHolder {
     }
 
     @Override
-    public void refreshTooltipForNextRenderPass(boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
+    public void refreshTooltipForNextRenderPass(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean hovering, boolean focused, ScreenRectangle screenRectangle) {
         this.refreshLines(this.getLinesForNextRenderPass());
         if (!this.tooltipLines.isEmpty()) {
-            super.refreshTooltipForNextRenderPass(hovering, focused, screenRectangle);
+            super.refreshTooltipForNextRenderPass(guiGraphics, mouseX, mouseY, hovering, focused, screenRectangle);
         }
     }
 

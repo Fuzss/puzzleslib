@@ -11,7 +11,7 @@ import java.util.Objects;
 public final class BlockBlockColorsContextFabricImpl implements BlockColorsContext {
 
     @Override
-    public void registerBlockColor(BlockColor blockColor, Block block) {
+    public void registerBlockColor(Block block, BlockColor blockColor) {
         Objects.requireNonNull(blockColor, "block color is null");
         Objects.requireNonNull(block, "block is null");
         ColorProviderRegistry.BLOCK.register(blockColor, block);

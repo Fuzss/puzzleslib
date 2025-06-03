@@ -290,7 +290,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             };
         });
         INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_XP);
-        INSTANCE.register(UseBoneMealCallback.class, FabricPlayerEvents.USE_BONEMEAL);
+        INSTANCE.register(UseBoneMealCallback.class, FabricPlayerEvents.USE_BONE_MEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
@@ -310,11 +310,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 callback.onLootTableLoad(key.location(), tableBuilder, registries);
             };
         });
-        INSTANCE.register(AnvilEvents.Use.class, FabricPlayerEvents.ANVIL_USE);
         INSTANCE.register(ItemEntityEvents.Touch.class, FabricPlayerEvents.ITEM_TOUCH);
         INSTANCE.register(ItemEntityEvents.Pickup.class, FabricPlayerEvents.ITEM_PICKUP);
         INSTANCE.register(ComputeEnchantedLootBonusCallback.class, FabricLivingEvents.COMPUTE_ENCHANTED_LOOT_BONUS);
-        INSTANCE.register(AnvilEvents.Update.class, FabricPlayerEvents.ANVIL_UPDATE);
+        INSTANCE.register(CreateAnvilResultCallback.class, FabricPlayerEvents.CREATE_ANVIL_RESULT);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
         INSTANCE.register(EntityTickEvents.Start.class, FabricEntityEvents.ENTITY_TICK_START);
         INSTANCE.register(EntityTickEvents.End.class, FabricEntityEvents.ENTITY_TICK_END);

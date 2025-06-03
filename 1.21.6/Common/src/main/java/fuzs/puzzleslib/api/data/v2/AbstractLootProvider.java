@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.data.v2;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Multimap;
 import com.mojang.serialization.Lifecycle;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -429,11 +428,10 @@ public final class AbstractLootProvider {
                 this.validate(holder, validationContext);
             });
 
-            Multimap<String, String> multimap = collector.get();
-            if (!multimap.isEmpty()) {
-                multimap.forEach((string, string2) -> {
-                    LOGGER.warn("Found validation problem in {}: {}", string, string2);
-                });
+            if (!collector.isEmpty()) {
+                collector.forEach((string, problem) -> LOGGER.warn("Found validation problem in {}: {}",
+                        string,
+                        problem.description()));
                 throw new IllegalStateException("Failed to validate loot tables, see logs");
             }
         }
@@ -442,7 +440,7 @@ public final class AbstractLootProvider {
             if (!this.skipValidationFor(holder.key())) {
                 holder.value()
                         .validate(validationContext.setContextKeySet(holder.value().getParamSet())
-                                .enterElement("{" + holder.key().location() + "}", holder.key()));
+                                .enterElement(new ProblemReporter.RootElementPathElement(holder.key()), holder.key()));
             }
         }
     }
