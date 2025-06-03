@@ -30,7 +30,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
             .put(CROSSHAIR, IdentifiedLayer.CROSSHAIR)
             .put(HOTBAR, IdentifiedLayer.HOTBAR_AND_BARS)
             .put(JUMP_METER, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(EXPERIENCE_BAR, IdentifiedLayer.HOTBAR_AND_BARS)
+            .put(INFO_BAR, IdentifiedLayer.HOTBAR_AND_BARS)
             .put(PLAYER_HEALTH, IdentifiedLayer.HOTBAR_AND_BARS)
             .put(ARMOR_LEVEL, IdentifiedLayer.HOTBAR_AND_BARS)
             .put(FOOD_LEVEL, IdentifiedLayer.HOTBAR_AND_BARS)
@@ -62,7 +62,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     @Override
-    public void registerGuiLayer(ResourceLocation resourceLocation, LayeredDraw.Layer guiLayer) {
+    public void registerGuiLayer(ResourceLocation resourceLocation, GuiLayersContext.Layer guiLayer) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
         HudLayerRegistrationCallback.EVENT.register(this.eventPhase, (LayeredDrawerWrapper layeredDrawerWrapper) -> {
@@ -71,7 +71,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     @Override
-    public void registerGuiLayer(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, LayeredDraw.Layer guiLayer) {
+    public void registerGuiLayer(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, GuiLayersContext.Layer guiLayer) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(otherResourceLocation, "other resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
@@ -93,7 +93,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     }
 
     @Override
-    public void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<LayeredDraw.Layer> guiLayerFactory) {
+    public void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<GuiLayersContext.Layer> guiLayerFactory) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayerFactory, "gui layer factory is null");
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {

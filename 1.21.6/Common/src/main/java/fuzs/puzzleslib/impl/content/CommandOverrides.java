@@ -93,7 +93,7 @@ public final class CommandOverrides {
                 if (serverLevel.getServer().getWorldData().isAllowCommands()) {
                     serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
                         String playerName = serverPlayer.getGameProfile().getName();
-                        executeCommandOverrides(serverPlayer.server,
+                        executeCommandOverrides(serverPlayer.getServer(),
                                 CommandEnvironment.PLAYER,
                                 CommandEnvironment.DEDICATED_PLAYER,
                                 (String s) -> s.replaceAll("@[sp]", playerName));
@@ -107,14 +107,15 @@ public final class CommandOverrides {
         });
     }
 
-    private static void executeCommandOverrides(MinecraftServer server, CommandEnvironment commandEnvironment, CommandEnvironment dedicatedCommandEnvironment, UnaryOperator<String> formatter) {
+    private static void executeCommandOverrides(MinecraftServer minecraftServer, CommandEnvironment commandEnvironment, CommandEnvironment dedicatedCommandEnvironment, UnaryOperator<String> formatter) {
         for (String command : COMMAND_OVERRIDES.getOrDefault(commandEnvironment, Collections.emptySet())) {
-            server.getCommands().performPrefixedCommand(server.createCommandSourceStack(), formatter.apply(command));
+            minecraftServer.getCommands()
+                    .performPrefixedCommand(minecraftServer.createCommandSourceStack(), formatter.apply(command));
         }
-        if (server instanceof DedicatedServer) {
+        if (minecraftServer instanceof DedicatedServer) {
             for (String command : COMMAND_OVERRIDES.getOrDefault(dedicatedCommandEnvironment, Collections.emptySet())) {
-                server.getCommands()
-                        .performPrefixedCommand(server.createCommandSourceStack(), formatter.apply(command));
+                minecraftServer.getCommands()
+                        .performPrefixedCommand(minecraftServer.createCommandSourceStack(), formatter.apply(command));
             }
         }
     }

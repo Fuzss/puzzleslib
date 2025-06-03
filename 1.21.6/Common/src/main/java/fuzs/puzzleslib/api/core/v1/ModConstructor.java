@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
@@ -23,7 +22,7 @@ public interface ModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
-        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "main"), modConstructorSupplier);
+        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "common"), modConstructorSupplier);
     }
 
     /**
@@ -33,8 +32,7 @@ public interface ModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(ResourceLocation resourceLocation, Supplier<ModConstructor> modConstructorSupplier) {
-        PuzzlesLib.LOGGER.info("Constructing common components for {}", resourceLocation);
-        ModConstructorImpl.construct(resourceLocation.getNamespace(),
+        ModConstructorImpl.construct(resourceLocation,
                 modConstructorSupplier,
                 ProxyImpl.get()::getModConstructorImpl,
                 ModContext::buildAll);

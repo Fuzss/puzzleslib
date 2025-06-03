@@ -12,7 +12,7 @@ import java.util.Objects;
 public record BlockBlockColorsContextNeoForgeImpl(RegisterColorHandlersEvent.Block evt) implements BlockColorsContext {
 
     @Override
-    public void registerBlockColor(BlockColor blockColor, Block block) {
+    public void registerBlockColor(Block block, BlockColor blockColor) {
         Objects.requireNonNull(blockColor, "block color is null");
         Objects.requireNonNull(block, "block is null");
         this.evt.register(blockColor, block);

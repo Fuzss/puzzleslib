@@ -12,7 +12,6 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
@@ -35,26 +34,25 @@ public class PuzzlesLibClient implements ClientModConstructor {
     public void onRegisterGuiLayers(GuiLayersContext context) {
         if (ModLoaderEnvironment.INSTANCE.getModLoader().isFabricLike()) {
             // offset text above hotbar depending on gui height values, NeoForge also does this
-            context.replaceGuiLayer(GuiLayersContext.SELECTED_ITEM_NAME, (LayeredDraw.Layer layer) -> {
+            context.replaceGuiLayer(GuiLayersContext.SELECTED_ITEM_NAME, (GuiLayersContext.Layer layer) -> {
                 return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     Gui gui = Minecraft.getInstance().gui;
-                    guiGraphics.pose().pushPose();
-                    guiGraphics.pose().translate(0.0F, 59.0F - Math.max(59.0F, GuiHeightHelper.getMaxHeight(gui)), 0.0F);
+                    guiGraphics.pose().pushMatrix();
+                    guiGraphics.pose().translate(0.0F, 59.0F - Math.max(59.0F, GuiHeightHelper.getMaxHeight(gui)));
                     layer.render(guiGraphics, deltaTracker);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                 };
             });
-            context.replaceGuiLayer(GuiLayersContext.OVERLAY_MESSAGE, (LayeredDraw.Layer layer) -> {
+            context.replaceGuiLayer(GuiLayersContext.OVERLAY_MESSAGE, (GuiLayersContext.Layer layer) -> {
                 return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     Gui gui = Minecraft.getInstance().gui;
-                    guiGraphics.pose().pushPose();
+                    guiGraphics.pose().pushMatrix();
                     guiGraphics.pose()
                             .translate(0.0F,
                                     68.0F - Math.max(68.0F,
-                                            GuiHeightHelper.getMaxHeight(gui) + gui.minecraft.font.lineHeight),
-                                    0.0F);
+                                            GuiHeightHelper.getMaxHeight(gui) + gui.minecraft.font.lineHeight));
                     layer.render(guiGraphics, deltaTracker);
-                    guiGraphics.pose().popPose();
+                    guiGraphics.pose().popMatrix();
                 };
             });
         }

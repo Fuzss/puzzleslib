@@ -45,17 +45,6 @@ public final class EnchantingHelper {
     }
 
     /**
-     * Tests if an enchanted book can be put onto an item stack.
-     *
-     * @param inputItemStack the item stack to enchant
-     * @param bookItemStack  the book stack to enchant the item with
-     * @return is combining both stacks allowed
-     */
-    public static boolean isBookEnchantable(ItemStack inputItemStack, ItemStack bookItemStack) {
-        return ProxyImpl.get().isBookEnchantable(inputItemStack, bookItemStack);
-    }
-
-    /**
      * Called before an entity drops loot for determining the level of
      * {@link net.minecraft.world.item.enchantment.Enchantments#LOOTING} to apply when generating drops.
      *

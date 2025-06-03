@@ -19,14 +19,12 @@ public record ModPackResourcesSupplier(PackType packType,
 
     public static ModPackResourcesSupplier create(PackType packType, PackLocationInfo info, PackResourcesSupplier<AbstractModPackResources> supplier, Component description) {
         PackMetadataSection metadataSection = new PackMetadataSection(description,
-                SharedConstants.getCurrentVersion().getPackVersion(packType),
-                Optional.empty()
-        );
+                SharedConstants.getCurrentVersion().packVersion(packType),
+                Optional.empty());
         return new ModPackResourcesSupplier(packType,
                 info,
                 supplier,
-                BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection)
-        );
+                BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection));
     }
 
     @Override

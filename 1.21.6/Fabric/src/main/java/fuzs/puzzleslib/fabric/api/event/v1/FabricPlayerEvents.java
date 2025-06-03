@@ -23,19 +23,13 @@ public final class FabricPlayerEvents {
             PickupExperienceCallback.class);
     /**
      * Called when a bone meal is used on a block by the player, a dispenser, or a farmer villager.
-     * <p>Useful for adding custom bone meal behavior to blocks, or for cancelling vanilla interactions.
      */
-    public static final Event<UseBoneMealCallback> USE_BONEMEAL = FabricEventFactory.createResult(UseBoneMealCallback.class);
+    public static final Event<UseBoneMealCallback> USE_BONE_MEAL = FabricEventFactory.createResult(UseBoneMealCallback.class);
     /**
-     * Called before a result item is generated from the two input slots in an anvil in
-     * {@link AnvilMenu#createResult()}.
+     * Called after a result item is created from the two input slots in an anvil via {@link AnvilMenu#createResult()}.
      */
-    public static final Event<AnvilEvents.Update> ANVIL_UPDATE = FabricEventFactory.createResult(AnvilEvents.Update.class);
-    /**
-     * Called when the player takes the output item from an anvil, used to determine the chance by which the anvil will
-     * break down one stage.
-     */
-    public static final Event<AnvilEvents.Use> ANVIL_USE = FabricEventFactory.create(AnvilEvents.Use.class);
+    public static final Event<CreateAnvilResultCallback> CREATE_ANVIL_RESULT = FabricEventFactory.createResult(
+            CreateAnvilResultCallback.class);
     /**
      * Called when a player touches an {@link ItemEntity} laying on the ground.
      */

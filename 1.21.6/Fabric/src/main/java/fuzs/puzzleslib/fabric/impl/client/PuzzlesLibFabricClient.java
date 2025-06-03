@@ -14,7 +14,7 @@ public class PuzzlesLibFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         ClientModConstructor.construct(PuzzlesLib.MOD_ID, PuzzlesLibClient::new);
         if (ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) {
-            ClientModConstructor.construct(PuzzlesLibMod.id("development"), PuzzlesLibClientDevelopment::new);
+            ClientModConstructor.construct(PuzzlesLibMod.id("client/development"), PuzzlesLibClientDevelopment::new);
         }
     }
 }

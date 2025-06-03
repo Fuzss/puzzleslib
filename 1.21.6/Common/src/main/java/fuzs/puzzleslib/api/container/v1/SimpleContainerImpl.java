@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.container.v1;
 
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A simple {@link Container} implementation taking care of slot range checks and container updates.
@@ -29,6 +30,7 @@ public interface SimpleContainerImpl extends Container {
      * @param slot the slot index
      * @return the item stack
      */
+    @ApiStatus.OverrideOnly
     ItemStack getContainerItem(int slot);
 
     @Override
@@ -49,6 +51,7 @@ public interface SimpleContainerImpl extends Container {
      * @param amount the item amount to remove
      * @return the removed item stack
      */
+    @ApiStatus.OverrideOnly
     ItemStack removeContainerItem(int slot, int amount);
 
     @Override
@@ -62,6 +65,7 @@ public interface SimpleContainerImpl extends Container {
      * @param slot the slot index
      * @return the removed item stack
      */
+    @ApiStatus.OverrideOnly
     ItemStack removeContainerItemNoUpdate(int slot);
 
     @Override
@@ -81,6 +85,7 @@ public interface SimpleContainerImpl extends Container {
      * @param slot      the slot index
      * @param itemStack the item stack
      */
+    @ApiStatus.OverrideOnly
     void setContainerItem(int slot, ItemStack itemStack);
 
     @Override

@@ -50,7 +50,6 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         return this.tag(TagKey.create(this.registryKey, resourceLocation));
     }
 
-    @Override
     public AbstractTagAppender<T> tag(TagKey<T> tagKey) {
         return tagAppender(this.getOrCreateRawBuilder(tagKey), this.registryKey);
     }

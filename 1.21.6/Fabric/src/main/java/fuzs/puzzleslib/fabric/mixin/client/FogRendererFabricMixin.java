@@ -2,19 +2,21 @@ package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
-import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.FogParameters;
-import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.fog.FogRenderer;
+import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.world.level.material.FogType;
 import org.joml.Vector4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(FogRenderer.class)
 abstract class FogRendererFabricMixin {
@@ -26,40 +28,20 @@ abstract class FogRendererFabricMixin {
         MutableFloat red = MutableFloat.fromEvent(x -> vector4f.x = x, vector4f::x);
         MutableFloat green = MutableFloat.fromEvent(y -> vector4f.y = y, vector4f::y);
         MutableFloat blue = MutableFloat.fromEvent(z -> vector4f.z = z, vector4f::z);
-        FabricRendererEvents.COMPUTE_FOG_COLOR.invoker().onComputeFogColor(minecraft.gameRenderer, camera, partialTick,
-                red, green, blue
-        );
+        FabricRendererEvents.FOG_COLOR.invoker()
+                .onComputeFogColor(camera, partialTick, red, green, blue);
         return vector4f;
     }
 
-    @ModifyReturnValue(method = "setupFog", at = @At("TAIL"))
-    private static FogParameters setupFog(FogParameters fogParameters, Camera camera, FogRenderer.FogMode fogMode, Vector4f vector4f, float farPlaneDistance, boolean isFoggy, float partialTick, @Local FogType fogType) {
-        Minecraft minecraft = Minecraft.getInstance();
-        FogParameters[] fogParametersObj = new FogParameters[]{fogParameters};
-        MutableFloat fogStart = MutableFloat.fromEvent(startValue -> {
-            FogParameters fogParametersInst = fogParametersObj[0];
-            fogParametersObj[0] = new FogParameters(startValue, fogParametersInst.end(), fogParametersInst.shape(),
-                    fogParametersInst.red(), fogParametersInst.green(), fogParametersInst.blue(),
-                    fogParametersInst.alpha()
-            );
-        }, () -> fogParametersObj[0].start());
-        MutableFloat fogEnd = MutableFloat.fromEvent(endValue -> {
-            FogParameters fogParametersInst = fogParametersObj[0];
-            fogParametersObj[0] = new FogParameters(fogParametersInst.start(), endValue, fogParametersInst.shape(),
-                    fogParametersInst.red(), fogParametersInst.green(), fogParametersInst.blue(),
-                    fogParametersInst.alpha()
-            );
-        }, () -> fogParametersObj[0].end());
-        MutableValue<FogShape> fogShape = MutableValue.fromEvent(fogShapeValue -> {
-            FogParameters fogParametersInst = fogParametersObj[0];
-            fogParametersObj[0] = new FogParameters(fogParametersInst.start(), fogParametersInst.end(), fogShapeValue,
-                    fogParametersInst.red(), fogParametersInst.green(), fogParametersInst.blue(),
-                    fogParametersInst.alpha()
-            );
-        }, () -> fogParametersObj[0].shape());
-        FabricRendererEvents.RENDER_FOG.invoker().onRenderFog(minecraft.gameRenderer, camera, partialTick, fogMode,
-                fogType, fogStart, fogEnd, fogShape
-        );
-        return fogParametersObj[0];
+    @Inject(
+            method = "setupFog", at = @At(
+            value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;renderDistanceEnd:F", ordinal = 0
+    )
+    )
+    public void setupFog(Camera camera, int renderDistance, boolean isFoggy, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel clientLevel, CallbackInfoReturnable<Vector4f> callback, @Local(
+            ordinal = 1
+    ) float partialTick, @Local FogType fogType, @Local FogData fogData, @Local FogEnvironment fogEnvironment) {
+        FabricRendererEvents.SETUP_FOG.invoker()
+                .onSetupFog(camera, partialTick, fogEnvironment, fogType, fogData);
     }
 }

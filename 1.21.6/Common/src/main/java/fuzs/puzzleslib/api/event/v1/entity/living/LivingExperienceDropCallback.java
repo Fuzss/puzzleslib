@@ -16,7 +16,7 @@ public interface LivingExperienceDropCallback {
      *
      * @param livingEntity      the entity that died
      * @param attackingPlayer   the player that killed the entity
-     * @param droppedExperience amount of xp dropped by vanilla, allows for setting a custom amount
+     * @param droppedExperience the amount of xp dropped
      * @return <ul>
      *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent any xp from dropping</li>
      *         <li>{@link EventResult#PASS PASS} to drop the experience amount set via the event</li>

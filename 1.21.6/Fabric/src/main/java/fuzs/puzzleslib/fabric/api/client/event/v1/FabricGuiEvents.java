@@ -5,17 +5,8 @@ import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
-import net.minecraft.resources.ResourceLocation;
-
-import java.util.IdentityHashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public final class FabricGuiEvents {
-    @Deprecated
-    private static final Map<String, Event<RenderGuiLayerEvents.Before>> BEFORE_RENDER_GUI_ELEMENT_EVENTS = new IdentityHashMap<>();
-    @Deprecated
-    private static final Map<String, Event<RenderGuiLayerEvents.After>> AFTER_RENDER_GUI_ELEMENT_EVENTS = new IdentityHashMap<>();
     /**
      * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the
      * screen background is drawn (like menu texture).
@@ -72,33 +63,5 @@ public final class FabricGuiEvents {
 
     private FabricGuiEvents() {
         // NO-OP
-    }
-
-    /**
-     * Called before a gui element is rendered, allows for cancelling rendering.
-     *
-     * @param resourceLocation id of the gui element, all vanilla ids can be found in {@link RenderGuiLayerEvents}
-     * @return the event instance
-     */
-    @Deprecated
-    public static Event<RenderGuiLayerEvents.Before> beforeRenderGuiElement(ResourceLocation resourceLocation) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
-        return BEFORE_RENDER_GUI_ELEMENT_EVENTS.computeIfAbsent(resourceLocation.toString().intern(), (String s) -> {
-            return FabricEventFactory.createResult(RenderGuiLayerEvents.Before.class);
-        });
-    }
-
-    /**
-     * Called after a gui element is rendered.
-     *
-     * @param resourceLocation id of the gui element, all vanilla ids can be found in {@link RenderGuiLayerEvents}
-     * @return the event instance
-     */
-    @Deprecated
-    public static Event<RenderGuiLayerEvents.After> afterRenderGuiElement(ResourceLocation resourceLocation) {
-        Objects.requireNonNull(resourceLocation, "resource location is null");
-        return AFTER_RENDER_GUI_ELEMENT_EVENTS.computeIfAbsent(resourceLocation.toString().intern(), (String s) -> {
-            return FabricEventFactory.create(RenderGuiLayerEvents.After.class);
-        });
     }
 }

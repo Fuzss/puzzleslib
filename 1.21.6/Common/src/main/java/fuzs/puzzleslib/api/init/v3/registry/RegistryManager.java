@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
-import fuzs.puzzleslib.api.network.v4.codec.ExtraStreamCodecs;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
@@ -72,8 +71,8 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Creates a new registry manager for <code>modId</code> or returns an existing one.
      *
-     * @param modId namespace used for registration
-     * @return mod specific registry manager
+     * @param modId the namespace used for registration
+     * @return the mod-specific registry manager
      */
     static RegistryManager from(String modId) {
         return ModContext.get(modId).getRegistryManager();
@@ -470,37 +469,11 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param <T>          the menu type
      * @return the holder reference
      */
-    @Deprecated(forRemoval = true)
-    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, Supplier<MenuType.MenuSupplier<T>> menuSupplier) {
-        return this.registerMenuType(path, menuSupplier.get());
-    }
-
-    /**
-     * Register a menu type.
-     *
-     * @param path         the registered name
-     * @param menuSupplier the menu supplier
-     * @param <T>          the menu type
-     * @return the holder reference
-     */
     @SuppressWarnings("unchecked")
     default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerMenuType(String path, MenuType.MenuSupplier<T> menuSupplier) {
         return this.register((ResourceKey<Registry<MenuType<T>>>) (ResourceKey<?>) Registries.MENU, path, () -> {
             return new MenuType<>(menuSupplier, FeatureFlags.DEFAULT_FLAGS);
         });
-    }
-
-    /**
-     * Register a menu type with additional data for constructing the menu on the client.
-     *
-     * @param path         the registered name
-     * @param menuSupplier the menu supplier
-     * @param <T>          the menu type
-     * @return the holder reference
-     */
-    @Deprecated(forRemoval = true)
-    default <T extends AbstractContainerMenu> Holder.Reference<MenuType<T>> registerExtendedMenuType(String path, Supplier<ExtendedMenuSupplier<T>> menuSupplier) {
-        return this.registerMenuType(path, menuSupplier.get()::create, ExtraStreamCodecs.REGISTRY_FRIENDLY_BYTE_BUF);
     }
 
     /**

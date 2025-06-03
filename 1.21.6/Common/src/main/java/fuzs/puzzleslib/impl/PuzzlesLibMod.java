@@ -5,7 +5,6 @@ import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.api.event.v1.server.RegisterConfigurationTasksCallback;
-import fuzs.puzzleslib.impl.capability.ClientboundEntityCapabilityMessage;
 import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
@@ -35,7 +34,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     public void onRegisterPayloadTypes(PayloadTypesContext context) {
         context.optional();
         context.configurationToClient(ClientboundModListMessage.class, ClientboundModListMessage.STREAM_CODEC);
-        context.playToClient(ClientboundEntityCapabilityMessage.class, ClientboundEntityCapabilityMessage.STREAM_CODEC);
     }
 
     public static ResourceLocation id(String path) {

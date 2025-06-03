@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.core;
 
 import com.google.common.collect.Queues;
-import fuzs.puzzleslib.api.capability.v3.CapabilityController;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.Buildable;
@@ -23,8 +22,6 @@ public abstract class ModContext {
     private final Queue<Buildable> buildables = Queues.newConcurrentLinkedQueue();
     @Nullable
     protected RegistryManager registryManager;
-    @Nullable
-    protected CapabilityController capabilityController;
     /**
      * {@code true} by default for dedicated servers, is handled properly on clients.
      */
@@ -75,8 +72,6 @@ public abstract class ModContext {
     public abstract ConfigHolder.Builder getConfigHolder();
 
     public abstract RegistryManager getRegistryManager();
-
-    public abstract CapabilityController getCapabilityController();
 
     protected <T extends Buildable> T addBuildable(T buildable) {
         Objects.requireNonNull(buildable, "buildable is null");

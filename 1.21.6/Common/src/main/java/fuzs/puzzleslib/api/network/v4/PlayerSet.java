@@ -213,19 +213,18 @@ public interface PlayerSet {
      */
     static PlayerSet nearEntity(Entity entity) {
         Objects.requireNonNull(entity, "entity is null");
-        return entity.getCommandSenderWorld().isClientSide ? PlayerSet.ofNone() :
-                (Consumer<ServerPlayer> serverPlayerConsumer) -> {
-                    ChunkMap chunkMap = ((ServerLevel) entity.getCommandSenderWorld()).getChunkSource().chunkMap;
-                    ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
-                    if (trackedEntity != null) {
-                        for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
-                            ofPlayer(serverPlayerConnection.getPlayer()).apply(serverPlayerConsumer);
-                        }
-                        if (entity instanceof ServerPlayer serverPlayer) {
-                            ofPlayer(serverPlayer).apply(serverPlayerConsumer);
-                        }
-                    }
-                };
+        return entity.level().isClientSide ? PlayerSet.ofNone() : (Consumer<ServerPlayer> serverPlayerConsumer) -> {
+            ChunkMap chunkMap = ((ServerLevel) entity.level()).getChunkSource().chunkMap;
+            ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
+            if (trackedEntity != null) {
+                for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {
+                    ofPlayer(serverPlayerConnection.getPlayer()).apply(serverPlayerConsumer);
+                }
+                if (entity instanceof ServerPlayer serverPlayer) {
+                    ofPlayer(serverPlayer).apply(serverPlayerConsumer);
+                }
+            }
+        };
     }
 
     /**
@@ -240,7 +239,7 @@ public interface PlayerSet {
     static PlayerSet nearPlayer(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
         return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
-            ChunkMap chunkMap = serverPlayer.serverLevel().getChunkSource().chunkMap;
+            ChunkMap chunkMap = serverPlayer.level().getChunkSource().chunkMap;
             ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(serverPlayer.getId());
             if (trackedEntity != null) {
                 for (ServerPlayerConnection serverPlayerConnection : trackedEntity.seenBy) {

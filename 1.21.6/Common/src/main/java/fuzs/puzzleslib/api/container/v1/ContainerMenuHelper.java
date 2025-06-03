@@ -1,10 +1,7 @@
 package fuzs.puzzleslib.api.container.v1;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
-import io.netty.buffer.Unpooled;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerListener;
 import net.minecraft.world.MenuProvider;
@@ -18,8 +15,6 @@ import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 /**
  * Small helper class related to working with implementations of {@link AbstractContainerMenu}.
@@ -28,40 +23,6 @@ public final class ContainerMenuHelper {
 
     private ContainerMenuHelper() {
         // NO-OP
-    }
-
-    /**
-     * Opens a menu on both client and server while also providing additional data.
-     *
-     * @param serverPlayer the player opening the menu
-     * @param menuProvider the menu factory
-     * @param dataWriter   the additional data to be sent to the client
-     */
-    @Deprecated(forRemoval = true)
-    public static void openMenu(ServerPlayer serverPlayer, MenuProvider menuProvider, BiConsumer<ServerPlayer, RegistryFriendlyByteBuf> dataWriter) {
-        Objects.requireNonNull(serverPlayer, "server player is null");
-        Objects.requireNonNull(menuProvider, "menu provider is null");
-        Objects.requireNonNull(dataWriter, "data writer is null");
-        openMenu(serverPlayer, menuProvider, () -> {
-            RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), serverPlayer.registryAccess());
-            dataWriter.accept(serverPlayer, buf);
-            return buf;
-        });
-    }
-
-    /**
-     * Opens a menu on both client and server while also providing additional data.
-     *
-     * @param player       the player opening the menu
-     * @param menuProvider the menu factory
-     * @param dataSupplier the additional data to be sent to the client
-     */
-    @Deprecated(forRemoval = true)
-    public static <T> void openMenu(Player player, MenuProvider menuProvider, Supplier<T> dataSupplier) {
-        Objects.requireNonNull(player, "player is null");
-        Objects.requireNonNull(menuProvider, "menu provider is null");
-        Objects.requireNonNull(dataSupplier, "data supplier is null");
-        openMenu(player, menuProvider, dataSupplier.get());
     }
 
     /**

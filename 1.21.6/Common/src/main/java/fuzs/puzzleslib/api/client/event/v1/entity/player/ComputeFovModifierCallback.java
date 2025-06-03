@@ -12,11 +12,11 @@ public interface ComputeFovModifierCallback {
      * Called when computing the field of view modifier on the client, mostly depending on
      * {@link Attributes#MOVEMENT_SPEED}, but also changes for certain actions such as when drawing a bow.
      * <p>
-     * The modifier value is the actual raw value, effects from the <code>fovEffectScale</code> option are applied
-     * afterward by the callback implementation.
+     * The modifier value is the actual raw value, effects from the {@code fovEffectScale} option are applied afterward
+     * by the callback implementation.
      *
      * @param player              the client player this is calculated for
-     * @param fieldOfViewModifier modifier as calculated by vanilla, can be modified
+     * @param fieldOfViewModifier the modifier, as calculated by vanilla, can be modified
      */
     void onComputeFovModifier(Player player, DefaultedFloat fieldOfViewModifier);
 }

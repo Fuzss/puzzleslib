@@ -11,7 +11,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
-import fuzs.puzzleslib.fabric.impl.client.event.FabricGuiEventHelper;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.client.util.EntityRenderStateExtension;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
@@ -21,7 +20,6 @@ import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
-import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -39,7 +37,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.multiplayer.*;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -55,9 +52,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.minecraft.world.level.material.Fluid;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -229,16 +224,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public void registerRenderType(Block block, RenderType renderType) {
-        BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
-    }
-
-    @Override
-    public void registerRenderType(Fluid fluid, RenderType renderType) {
-        BlockRenderLayerMap.INSTANCE.putFluid(fluid, renderType);
-    }
-
-    @Override
     public int getGuiLeftHeight(Gui gui) {
         return FabricLoader.getInstance().getObjectShare().get(KEY_GUI_LEFT_HEIGHT) instanceof Integer i ? i : 0;
     }
@@ -261,7 +246,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public void registerProvidedEventHandlers() {
         super.registerProvidedEventHandlers();
-        FabricGuiEventHelper.registerEventHandlers();
         RenderGuiEvents.BEFORE.register(EventPhase.FIRST,
                 (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
                     GuiHeightHelper.setLeftHeight(gui, 39);

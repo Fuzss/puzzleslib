@@ -12,9 +12,9 @@ import java.util.Objects;
 public final class MenuScreensContextFabricImpl implements MenuScreensContext {
 
     @Override
-    public <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, S> factory) {
+    public <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, S> menuScreenConstructor) {
         Objects.requireNonNull(menuType, "menu type is null");
-        Objects.requireNonNull(factory, "factory is null");
-        MenuScreens.register(menuType, factory);
+        Objects.requireNonNull(menuScreenConstructor, "factory is null");
+        MenuScreens.register(menuType, menuScreenConstructor);
     }
 }

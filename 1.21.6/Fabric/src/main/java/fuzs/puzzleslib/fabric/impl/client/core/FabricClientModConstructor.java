@@ -2,8 +2,6 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.fabric.impl.client.core.context.*;
-import fuzs.puzzleslib.impl.client.core.context.BlockRenderTypesContextImpl;
-import fuzs.puzzleslib.impl.client.core.context.FluidRenderTypesContextImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.minecraft.client.Minecraft;
@@ -33,9 +31,9 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextFabricImpl());
         modConstructor.onRegisterGuiLayers(new GuiLayersContextFabricImpl());
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
-            // run this as late as possible and not during client init so that maps are already fully populated with vanilla content
-            modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextImpl());
-            modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextImpl());
+            // run this as late as possible and not during client init, so that maps are already fully populated with vanilla and modded content
+            modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextFabricImpl());
+            modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextFabricImpl());
             modConstructor.onRegisterBlockColorProviders(new BlockBlockColorsContextFabricImpl());
         });
     }

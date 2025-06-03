@@ -1,11 +1,11 @@
 package fuzs.puzzleslib.fabric.api.client.event.v1.registry;
 
-import fuzs.puzzleslib.api.client.init.v1.DynamicItemDecorator;
+import fuzs.puzzleslib.api.client.init.v1.ItemStackDecorator;
 import fuzs.puzzleslib.fabric.impl.client.event.ItemDecoratorRegistryImpl;
 import net.minecraft.world.level.ItemLike;
 
 /**
- * This registry holds {@linkplain DynamicItemDecorator item decorators}.
+ * This registry holds {@linkplain ItemStackDecorator item decorators}.
  */
 public interface ItemDecoratorRegistry {
     /**
@@ -15,10 +15,10 @@ public interface ItemDecoratorRegistry {
     ItemDecoratorRegistry INSTANCE = new ItemDecoratorRegistryImpl();
 
     /**
-     * register a {@link DynamicItemDecorator} for an <code>item</code>
+     * register a {@link ItemStackDecorator} for an <code>item</code>
      *
      * @param item              the item to draw for
      * @param itemDecorator     renderer implementation
      */
-    void register(ItemLike item, DynamicItemDecorator itemDecorator);
+    void register(ItemLike item, ItemStackDecorator itemDecorator);
 }

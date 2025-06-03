@@ -1,54 +1,49 @@
 package fuzs.puzzleslib.api.client.event.v1.renderer;
 
-import com.mojang.blaze3d.shaders.FogShape;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
-import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.client.Camera;
-import net.minecraft.client.renderer.FogRenderer;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.world.level.material.FogType;
+import org.jetbrains.annotations.Nullable;
 
 public final class FogEvents {
-    public static final EventInvoker<ComputeColor> COMPUTE_COLOR = EventInvoker.lookup(ComputeColor.class);
-    public static final EventInvoker<Render> RENDER = EventInvoker.lookup(Render.class);
+    public static final EventInvoker<Color> COLOR = EventInvoker.lookup(Color.class);
+    public static final EventInvoker<Setup> SETUP = EventInvoker.lookup(Setup.class);
 
     private FogEvents() {
         // NO-OP
     }
 
     @FunctionalInterface
-    public interface ComputeColor {
+    public interface Color {
 
         /**
          * Called after the fog color is calculated from the current block overlay or biome. Allows for modifying the
          * fog color.
          *
-         * @param gameRenderer the game renderer instance
-         * @param camera       the camera instance
-         * @param partialTick  the partial tick
-         * @param fogRed       the red color component
-         * @param fogGreen     the green color component
-         * @param fogBlue      the blue color component
+         * @param camera      the camera instance
+         * @param partialTick the partial tick
+         * @param fogRed      the red color component
+         * @param fogGreen    the green color component
+         * @param fogBlue     the blue color component
          */
-        void onComputeFogColor(GameRenderer gameRenderer, Camera camera, float partialTick, MutableFloat fogRed, MutableFloat fogGreen, MutableFloat fogBlue);
+        void onComputeFogColor(Camera camera, float partialTick, MutableFloat fogRed, MutableFloat fogGreen, MutableFloat fogBlue);
     }
 
     @FunctionalInterface
-    public interface Render {
+    public interface Setup {
 
         /**
          * Called before fog is rendered, allows for controlling fog start and end distance.
          *
-         * @param gameRenderer the game renderer instance
-         * @param camera       the camera instance
-         * @param partialTick  the partial tick
-         * @param fogMode      the fog mode
-         * @param fogType      the fog type
-         * @param fogStart     the distance from the camera for the fog to start
-         * @param fogEnd       the distance from the camera for the fog to end
-         * @param fogShape     the spherical or cylindrical fog shape
+         * @param camera         the camera instance
+         * @param partialTick    the partial tick
+         * @param fogEnvironment the fog environment implementation
+         * @param fogType        the fog type
+         * @param fogData        the fog data container
          */
-        void onRenderFog(GameRenderer gameRenderer, Camera camera, float partialTick, FogRenderer.FogMode fogMode, FogType fogType, MutableFloat fogStart, MutableFloat fogEnd, MutableValue<FogShape> fogShape);
+        void onSetupFog(Camera camera, float partialTick, @Nullable FogEnvironment fogEnvironment, FogType fogType, FogData fogData);
     }
 }
