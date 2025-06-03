@@ -51,21 +51,16 @@ public final class NeoForgeTagAppender<T> extends AbstractTagAppender<T> {
 
     @Override
     public AbstractTagAppender<T> add(TagEntry tagEntry) {
-        ResourceLocation resourceLocation = tagEntry.getId();
-        if (tagEntry.isTag()) {
-            return tagEntry.isRequired() ? this.addTag(resourceLocation) : this.addOptionalTag(resourceLocation);
-        } else {
-            return tagEntry.isRequired() ? this.add(resourceLocation) : this.addOptional(resourceLocation);
-        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public AbstractTagAppender<T> replace(boolean replace) {
-        return this.setReplace(replace);
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public AbstractTagAppender<T> remove(TagKey<T> tagKey) {
-        return this.removeTag(tagKey);
+        throw new UnsupportedOperationException();
     }
 }
