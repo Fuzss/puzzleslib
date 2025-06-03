@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "compatibilityLevel": "JAVA_17",
+  "package": "${modGroup}.neoforge.mixin",
+  "plugin": "${modGroup}.neoforge.mixin.MixinConfigPluginNeoForgeImpl",
+  "mixins": [
+    "AbstractPackResourcesNeoForgeMixin",
+    "DatagenModLoaderNeoForgeMixin",
+    "EnchantedCountIncreaseFunctionNeoForgeMixin",
+    "EnchantmentHelperNeoForgeMixin",
+    "LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin",
+    "MenuProviderWithDataNeoForgeMixin",
+    "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
+    "accessor.MobSpawnSettingsBuilderNeoForgeAccessor"
+  ],
+  "client": [
+    "client.accessor.BlockColorsNeoForgeAccessor",
+    "client.accessor.RegisterGuiLayersEventAccessor",
+    "client.accessor.RegisterKeyMappingsEventNeoForgeAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
