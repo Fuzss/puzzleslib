@@ -2,7 +2,7 @@ package fuzs.puzzleslib.fabric.impl.event;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;

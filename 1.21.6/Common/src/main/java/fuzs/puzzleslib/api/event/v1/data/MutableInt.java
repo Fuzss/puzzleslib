@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.data;
 
-import fuzs.puzzleslib.impl.event.data.EventMutableInt;
-import fuzs.puzzleslib.impl.event.data.ValueMutableInt;
+import fuzs.puzzleslib.impl.event.data.event.EventMutableInt;
+import fuzs.puzzleslib.impl.event.data.value.ValueMutableInt;
 
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
@@ -34,7 +34,7 @@ public interface MutableInt extends IntConsumer, IntSupplier {
     }
 
     /**
-     * Maps the contained value to something new.
+     * Maps contained value to something new.
      *
      * @param operator operator to apply to contained value
      */

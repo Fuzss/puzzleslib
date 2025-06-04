@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.data;
 
-import fuzs.puzzleslib.impl.event.data.EventMutableFloat;
-import fuzs.puzzleslib.impl.event.data.ValueMutableFloat;
+import fuzs.puzzleslib.impl.event.data.event.EventMutableFloat;
+import fuzs.puzzleslib.impl.event.data.value.ValueMutableFloat;
 
 import java.util.function.*;
 
@@ -46,7 +46,7 @@ public interface MutableFloat {
     float getAsFloat();
 
     /**
-     * Maps the contained value to something new.
+     * Maps contained value to something new.
      *
      * @param operator operator to apply to contained value
      */

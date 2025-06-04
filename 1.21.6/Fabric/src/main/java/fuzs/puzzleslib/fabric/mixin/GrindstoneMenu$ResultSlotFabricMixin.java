@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.GrindstoneExperienceHolder;
 import net.minecraft.world.Container;

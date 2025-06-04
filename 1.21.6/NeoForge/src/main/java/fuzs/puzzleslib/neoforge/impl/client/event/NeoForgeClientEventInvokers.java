@@ -14,6 +14,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.*;
 import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;

@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.event.v1.entity.living;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
@@ -22,5 +22,5 @@ public interface LivingExperienceDropCallback {
      *         <li>{@link EventResult#PASS PASS} to drop the experience amount set via the event</li>
      *         </ul>
      */
-    EventResult onLivingExperienceDrop(LivingEntity livingEntity, @Nullable Player attackingPlayer, DefaultedInt droppedExperience);
+    EventResult onLivingExperienceDrop(LivingEntity livingEntity, @Nullable Player attackingPlayer, MutableInt droppedExperience);
 }

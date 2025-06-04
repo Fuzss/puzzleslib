@@ -19,12 +19,8 @@ public final class FabricPlayerEvents {
      * Called when a {@link Player} collides with an {@link ExperienceOrb} entity, just before it is added to the
      * player.
      */
-    public static final Event<PickupExperienceCallback> PICKUP_XP = FabricEventFactory.createResult(
+    public static final Event<PickupExperienceCallback> PICKUP_EXPERIENCE = FabricEventFactory.createResult(
             PickupExperienceCallback.class);
-    /**
-     * Called when a bone meal is used on a block by the player, a dispenser, or a farmer villager.
-     */
-    public static final Event<UseBoneMealCallback> USE_BONE_MEAL = FabricEventFactory.createResult(UseBoneMealCallback.class);
     /**
      * Called after a result item is created from the two input slots in an anvil via {@link AnvilMenu#createResult()}.
      */
@@ -41,6 +37,11 @@ public final class FabricPlayerEvents {
      */
     public static final Event<ItemEntityEvents.Pickup> ITEM_PICKUP = FabricEventFactory.create(ItemEntityEvents.Pickup.class);
     /**
+     * Called when an item is tossed from the player inventory, either by pressing 'Q' or by clicking an item stack
+     * outside a container screen.
+     */
+    public static final Event<ItemEntityEvents.Toss> ITEM_TOSS = FabricEventFactory.createResult(ItemEntityEvents.Toss.class);
+    /**
      * Called when the player stops using a bow, just before the arrow is fired.
      */
     public static final Event<ArrowLooseCallback> ARROW_LOOSE = FabricEventFactory.createResult(ArrowLooseCallback.class);
@@ -53,14 +54,10 @@ public final class FabricPlayerEvents {
      */
     public static final Event<PlayerTickEvents.End> PLAYER_TICK_END = FabricEventFactory.create(PlayerTickEvents.End.class);
     /**
-     * Called when an item is tossed from the player inventory, either by pressing 'Q' or by clicking an item stack
-     * outside a container screen.
-     */
-    public static final Event<ItemEntityEvents.Toss> ITEM_TOSS = FabricEventFactory.createResult(ItemEntityEvents.Toss.class);
-    /**
      * Called when the player attempts to harvest a block in {@link Player#getDestroySpeed(BlockState)}.
      */
-    public static final Event<BreakSpeedCallback> BREAK_SPEED = FabricEventFactory.createResult(BreakSpeedCallback.class);
+    public static final Event<CalculateBlockBreakSpeedCallback> CALCULATE_BLOCK_BREAK_SPEED = FabricEventFactory.createResult(
+            CalculateBlockBreakSpeedCallback.class);
     /**
      * Called when the grindstone output slot is populated in {@link GrindstoneMenu#createResult()}.
      */
@@ -79,15 +76,6 @@ public final class FabricPlayerEvents {
      * Called when the player is closing an open container.
      */
     public static final Event<ContainerEvents.Close> CONTAINER_CLOSE = FabricEventFactory.create(ContainerEvents.Close.class);
-    /**
-     * Called before an entity starts being tracked by a player.
-     * <p>
-     * Fabric Api has this event as well via
-     * {@link net.fabricmc.fabric.api.networking.v1.EntityTrackingEvents#START_TRACKING}, but it fires too early before
-     * the client is notified about the entity.
-     */
-    public static final Event<PlayerTrackingEvents.Start> START_TRACKING = FabricEventFactory.create(
-            PlayerTrackingEvents.Start.class);
 
     private FabricPlayerEvents() {
         // NO-OP

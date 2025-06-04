@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.api.event.v1;
 
-import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import fuzs.puzzleslib.api.event.v1.level.*;
+import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
 import net.minecraft.world.level.Explosion;
 
@@ -13,12 +13,6 @@ public final class FabricLevelEvents {
      * Fires when a block is about to drop experience after being broken.
      */
     public static final Event<BlockEvents.DropExperience> DROP_BLOCK_EXPERIENCE = FabricEventFactory.create(BlockEvents.DropExperience.class);
-    /**
-     * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block
-     * into dirt and destroying potential crops.
-     */
-    public static final Event<BlockEvents.FarmlandTrample> FARMLAND_TRAMPLE = FabricEventFactory.createResult(
-            BlockEvents.FarmlandTrample.class);
     /**
      * Called just before an {@link Explosion} is about to be executed for a level, allows for preventing that
      * explosion.
@@ -32,13 +26,13 @@ public final class FabricLevelEvents {
     /**
      * Called when a sound event is played at a specific position in the world, allows for cancelling the sound.
      */
-    public static final Event<PlayLevelSoundEvents.AtPosition> PLAY_LEVEL_SOUND_AT_POSITION = FabricEventFactory.createResult(
-            PlayLevelSoundEvents.AtPosition.class);
+    public static final Event<PlaySoundEvents.AtPosition> PLAY_SOUND_AT_POSITION = FabricEventFactory.createResult(
+            PlaySoundEvents.AtPosition.class);
     /**
      * Called when a sound event is played at a specific entity, allows for cancelling the sound.
      */
-    public static final Event<PlayLevelSoundEvents.AtEntity> PLAY_LEVEL_SOUND_AT_ENTITY = FabricEventFactory.createResult(
-            PlayLevelSoundEvents.AtEntity.class);
+    public static final Event<PlaySoundEvents.AtEntity> PLAY_SOUND_AT_ENTITY = FabricEventFactory.createResult(
+            PlaySoundEvents.AtEntity.class);
     /**
      * Fires when building a list of all possible entities that can spawn at the specified location.
      */
@@ -52,6 +46,10 @@ public final class FabricLevelEvents {
      * Fires when a server player stops watching a chunk.
      */
     public static final Event<ServerChunkEvents.Unwatch> UNWATCH_CHUNK = FabricEventFactory.create(ServerChunkEvents.Unwatch.class);
+    /**
+     * Called when a bone meal is used on a block by the player, a dispenser, or a farmer villager.
+     */
+    public static final Event<UseBoneMealCallback> USE_BONE_MEAL = FabricEventFactory.createResult(UseBoneMealCallback.class);
 
     private FabricLevelEvents() {
         // NO-OP

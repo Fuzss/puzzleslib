@@ -3,8 +3,8 @@ package fuzs.puzzleslib.fabric.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
@@ -59,8 +59,8 @@ abstract class PlayerFabricMixin extends LivingEntity {
     @ModifyReturnValue(method = "getDestroySpeed", at = @At("TAIL"))
     public float getDestroySpeed(float destroySpeed, BlockState blockState) {
         DefaultedFloat defaultedFloat = DefaultedFloat.fromValue(destroySpeed);
-        if (FabricPlayerEvents.BREAK_SPEED.invoker()
-                .onBreakSpeed(Player.class.cast(this), blockState, defaultedFloat)
+        if (FabricPlayerEvents.CALCULATE_BLOCK_BREAK_SPEED.invoker()
+                .onCalculateBlockBreakSpeed(Player.class.cast(this), blockState, defaultedFloat)
                 .isInterrupt()) {
             defaultedFloat.accept(-1.0F);
         }

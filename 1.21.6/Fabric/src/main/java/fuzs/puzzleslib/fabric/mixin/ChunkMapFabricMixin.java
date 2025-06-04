@@ -29,6 +29,6 @@ abstract class ChunkMapFabricMixin extends ChunkStorage {
 
     @Inject(method = "dropChunk", at = @At("HEAD"))
     private static void dropChunk(ServerPlayer player, ChunkPos chunkPos, CallbackInfo callback) {
-        FabricLevelEvents.UNWATCH_CHUNK.invoker().onChunkUnwatch(player, chunkPos, player.serverLevel());
+        FabricLevelEvents.UNWATCH_CHUNK.invoker().onChunkUnwatch(player, chunkPos, player.level());
     }
 }

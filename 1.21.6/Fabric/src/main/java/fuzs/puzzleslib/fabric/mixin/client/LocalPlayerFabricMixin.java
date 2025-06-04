@@ -53,7 +53,7 @@ abstract class LocalPlayerFabricMixin extends AbstractClientPlayer {
     public void playSound(Args args, @Cancellable CallbackInfo callback) {
         Preconditions.checkArgument(args.get(3) instanceof SoundEvent, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch) -> {
-                    return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
+                    return FabricLevelEvents.PLAY_SOUND_AT_ENTITY.invoker()
                             .onPlaySoundAtEntity(this.level(), this, soundEvent, soundSource, soundVolume, soundPitch);
                 }, args, MutableValue.fromEvent((Holder<SoundEvent> holder) -> args.set(3, holder.value()),
                         () -> BuiltInRegistries.SOUND_EVENT.wrapAsHolder(args.get(3))), 4,

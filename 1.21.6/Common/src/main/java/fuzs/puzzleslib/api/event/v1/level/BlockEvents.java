@@ -6,14 +6,12 @@ import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 
 public final class BlockEvents {
     public static final EventInvoker<Break> BREAK = EventInvoker.lookup(Break.class);
     public static final EventInvoker<DropExperience> DROP_EXPERIENCE = EventInvoker.lookup(DropExperience.class);
-    public static final EventInvoker<FarmlandTrample> FARMLAND_TRAMPLE = EventInvoker.lookup(FarmlandTrample.class);
 
     private BlockEvents() {
         // NO-OP
@@ -55,25 +53,5 @@ public final class BlockEvents {
          * @param experienceAmount the amount of experience to drop for this block
          */
         void onDropExperience(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, ServerPlayer serverPlayer, ItemStack itemInHand, MutableInt experienceAmount);
-    }
-
-    @FunctionalInterface
-    public interface FarmlandTrample {
-
-        /**
-         * Fired when an entity falls onto a block of farmland and in the process would trample on it, turning the block
-         * into dirt and destroying potential crops.
-         *
-         * @param serverLevel  level farmland block is trampled in
-         * @param blockPos     farmland block position
-         * @param blockState   block state farmland will be converted to after trampling
-         * @param fallDistance fall distance of the entity
-         * @param entity       the entity falling on the farmland block
-         * @return <ul>
-         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent trampling</li>
-         *         <li>{@link EventResult#PASS PASS} to allow trampling to occur</li>
-         *         </ul>
-         */
-        EventResult onFarmlandTrample(ServerLevel serverLevel, BlockPos blockPos, BlockState blockState, double fallDistance, Entity entity);
     }
 }

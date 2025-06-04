@@ -19,6 +19,10 @@ import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
 import fuzs.puzzleslib.impl.event.EventImplHelper;
 import fuzs.puzzleslib.impl.event.PotentialSpawnsList;
 import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
+import fuzs.puzzleslib.impl.event.data.DefaultedDouble;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.impl.event.data.DefaultedInt;
+import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
 import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
@@ -276,12 +280,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             MutableInt experienceAmount = MutableInt.fromEvent(evt::setDroppedExperience, evt::getDroppedExperience);
             callback.onDropExperience(evt.getLevel(), evt.getPos(), evt.getState(), serverPlayer, evt.getTool(), experienceAmount);
         });
-        INSTANCE.register(BlockEvents.FarmlandTrample.class, BlockEvent.FarmlandTrampleEvent.class, (BlockEvents.FarmlandTrample callback, BlockEvent.FarmlandTrampleEvent evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
-            if (callback.onFarmlandTrample(serverLevel, evt.getPos(), evt.getState(), evt.getFallDistance(), evt.getEntity()).isInterrupt()) {
-                evt.setCanceled(true);
-            }
-        });
         INSTANCE.register(PlayerTickEvents.Start.class, PlayerTickEvent.Pre.class, (PlayerTickEvents.Start callback, PlayerTickEvent.Pre evt) -> {
             callback.onStartPlayerTick(evt.getEntity());
         });
@@ -411,7 +409,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(ServerLifecycleEvents.Stopped.class, ServerStoppedEvent.class, (ServerLifecycleEvents.Stopped callback, ServerStoppedEvent evt) -> {
             callback.onServerStopped(evt.getServer());
         });
-        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, PlayLevelSoundEvent.AtPosition.class, (PlayLevelSoundEvents.AtPosition callback, PlayLevelSoundEvent.AtPosition evt) -> {
+        INSTANCE.register(PlaySoundEvents.AtPosition.class, PlayLevelSoundEvent.AtPosition.class, (PlaySoundEvents.AtPosition callback, PlayLevelSoundEvent.AtPosition evt) -> {
             MutableValue<Holder<SoundEvent>> soundEvent = MutableValue.fromEvent(evt::setSound, evt::getSound);
             MutableValue<SoundSource> soundSource = MutableValue.fromEvent(evt::setSource, evt::getSource);
             MutableFloat soundVolume = MutableFloat.fromEvent(evt::setNewVolume, evt::getNewVolume);
@@ -420,7 +418,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, PlayLevelSoundEvent.AtEntity.class, (PlayLevelSoundEvents.AtEntity callback, PlayLevelSoundEvent.AtEntity evt) -> {
+        INSTANCE.register(PlaySoundEvents.AtEntity.class, PlayLevelSoundEvent.AtEntity.class, (PlaySoundEvents.AtEntity callback, PlayLevelSoundEvent.AtEntity evt) -> {
             MutableValue<Holder<SoundEvent>> soundEvent = MutableValue.fromEvent(evt::setSound, evt::getSound);
             MutableValue<SoundSource> soundSource = MutableValue.fromEvent(evt::setSource, evt::getSource);
             MutableFloat soundVolume = MutableFloat.fromEvent(evt::setNewVolume, evt::getNewVolume);
@@ -558,9 +556,9 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 evt.setCanceled(true);
             }
         });
-        INSTANCE.register(BreakSpeedCallback.class, PlayerEvent.BreakSpeed.class, (BreakSpeedCallback callback, PlayerEvent.BreakSpeed evt) -> {
+        INSTANCE.register(CalculateBlockBreakSpeedCallback.class, PlayerEvent.BreakSpeed.class, (CalculateBlockBreakSpeedCallback callback, PlayerEvent.BreakSpeed evt) -> {
             DefaultedFloat breakSpeed = DefaultedFloat.fromEvent(evt::setNewSpeed, evt::getNewSpeed, evt::getOriginalSpeed);
-            if (callback.onBreakSpeed(evt.getEntity(), evt.getState(), breakSpeed).isInterrupt()) {
+            if (callback.onCalculateBlockBreakSpeed(evt.getEntity(), evt.getState(), breakSpeed).isInterrupt()) {
                 evt.setCanceled(true);
             }
         });

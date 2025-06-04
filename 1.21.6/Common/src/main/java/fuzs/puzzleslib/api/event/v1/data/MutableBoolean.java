@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.data;
 
-import fuzs.puzzleslib.impl.event.data.EventMutableBoolean;
-import fuzs.puzzleslib.impl.event.data.ValueMutableBoolean;
+import fuzs.puzzleslib.impl.event.data.event.EventMutableBoolean;
+import fuzs.puzzleslib.impl.event.data.value.ValueMutableBoolean;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
@@ -42,7 +42,7 @@ public interface MutableBoolean extends BooleanSupplier {
     void accept(boolean value);
 
     /**
-     * Maps the contained value to something new.
+     * Maps contained value to something new.
      *
      * @param operator operator to apply to contained value
      */

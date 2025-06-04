@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
+import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
