@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.client.event.v1.entity.player;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 
@@ -18,5 +18,5 @@ public interface ComputeFovModifierCallback {
      * @param player              the client player this is calculated for
      * @param fieldOfViewModifier the modifier, as calculated by vanilla, can be modified
      */
-    void onComputeFovModifier(Player player, DefaultedFloat fieldOfViewModifier);
+    void onComputeFovModifier(Player player, MutableFloat fieldOfViewModifier);
 }

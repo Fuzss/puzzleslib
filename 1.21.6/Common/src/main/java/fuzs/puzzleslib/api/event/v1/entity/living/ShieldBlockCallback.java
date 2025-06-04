@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.event.v1.entity.living;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -23,5 +23,5 @@ public interface ShieldBlockCallback {
      *         <li>{@link EventResult#PASS PASS} to allow the block to happen with the entity taking no damage</li>
      *         </ul>
      */
-    EventResult onShieldBlock(LivingEntity blockingEntity, DamageSource damageSource, DefaultedFloat blockedDamage);
+    EventResult onShieldBlock(LivingEntity blockingEntity, DamageSource damageSource, MutableFloat blockedDamage);
 }

@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.mixin.client;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.authlib.GameProfile;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientPlayerEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.AbstractClientPlayer;
@@ -13,7 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(AbstractClientPlayer.class)
 abstract class AbstractClientPlayerFabricMixin extends Player {

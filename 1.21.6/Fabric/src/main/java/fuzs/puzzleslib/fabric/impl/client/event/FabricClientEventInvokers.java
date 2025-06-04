@@ -14,7 +14,7 @@ import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
@@ -277,7 +277,7 @@ public final class FabricClientEventInvokers {
                         DefaultedInt posY = DefaultedInt.fromValue(guiGraphics.guiHeight() - 48);
                         callback.onRenderChatPanel(guiGraphics, deltaTracker, posX, posY);
                         if (posX.getAsOptionalInt().isPresent() || posY.getAsOptionalInt().isPresent()) {
-                            guiGraphics.pose().translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48), 0.0);
+                            guiGraphics.pose().translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48));
                         }
                         identifiedLayer.render(guiGraphics, deltaTracker);
                         guiGraphics.pose().popPose();

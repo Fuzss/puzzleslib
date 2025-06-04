@@ -84,7 +84,7 @@ abstract class ServerLevelFabricMixin extends Level {
     public void playSeededSound$0(Args args, @Cancellable CallbackInfo callback) {
         Preconditions.checkArgument(args.get(0) instanceof Holder<?>, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((soundEvent, soundSource, soundVolume, soundPitch) -> {
-                    return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION.invoker()
+                    return FabricLevelEvents.PLAY_SOUND_AT_POSITION.invoker()
                             .onPlaySoundAtPosition(this,
                                     new Vec3(args.get(2), args.get(3), args.get(4)),
                                     soundEvent,
@@ -110,7 +110,7 @@ abstract class ServerLevelFabricMixin extends Level {
     public void playSeededSound$1(Args args, @Cancellable CallbackInfo callback) {
         Preconditions.checkArgument(args.get(0) instanceof Holder<?>, "sound event is wrong type");
         EventResult eventResult = FabricEventImplHelper.onPlaySound((MutableValue<Holder<SoundEvent>> soundEvent, MutableValue<SoundSource> soundSource, MutableFloat soundVolume, MutableFloat soundPitch) -> {
-                    return FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY.invoker()
+                    return FabricLevelEvents.PLAY_SOUND_AT_ENTITY.invoker()
                             .onPlaySoundAtEntity(this, args.get(2), soundEvent, soundSource, soundVolume, soundPitch);
                 },
                 args,

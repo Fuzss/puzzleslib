@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.data;
 
-import fuzs.puzzleslib.impl.event.data.EventMutableDouble;
-import fuzs.puzzleslib.impl.event.data.ValueMutableDouble;
+import fuzs.puzzleslib.impl.event.data.event.EventMutableDouble;
+import fuzs.puzzleslib.impl.event.data.value.ValueMutableDouble;
 
 import java.util.function.DoubleConsumer;
 import java.util.function.DoubleSupplier;
@@ -34,7 +34,7 @@ public interface MutableDouble extends DoubleConsumer, DoubleSupplier {
     }
 
     /**
-     * Maps the contained value to something new.
+     * Maps contained value to something new.
      *
      * @param operator operator to apply to contained value
      */

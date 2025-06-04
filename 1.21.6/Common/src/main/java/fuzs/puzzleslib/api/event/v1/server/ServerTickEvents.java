@@ -10,7 +10,7 @@ public final class ServerTickEvents {
     public static final EventInvoker<End> END = EventInvoker.lookup(End.class);
 
     private ServerTickEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface

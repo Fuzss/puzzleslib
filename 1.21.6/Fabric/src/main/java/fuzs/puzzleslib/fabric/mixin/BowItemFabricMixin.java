@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedInt;
+import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;

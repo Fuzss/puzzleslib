@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 import java.util.function.ToIntFunction;
 
 /**
@@ -63,21 +64,31 @@ public final class ExtraStreamCodecs {
      * @return the stream codec
      */
     public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Class<E> clazz) {
-        return fromEnum(clazz, E::ordinal);
+        return fromEnum(clazz::getEnumConstants);
     }
 
     /**
      * Create an {@link Enum} stream codec.
      *
-     * @param clazz        the enum class
+     * @param enumValues the enum values
+     * @param <E>        the enum type
+     * @return the stream codec
+     */
+    public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Supplier<E[]> enumValues) {
+        return fromEnum(enumValues, E::ordinal);
+    }
+
+    /**
+     * Create an {@link Enum} stream codec.
+     *
+     * @param enumValues   the enum values
      * @param keyExtractor the numeric key extractor
      * @param <E>          the enum type
      * @return the stream codec
      */
-    public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Class<E> clazz, ToIntFunction<E> keyExtractor) {
-        IntFunction<E> idMapper = ByIdMap.continuous(keyExtractor,
-                clazz.getEnumConstants(),
-                ByIdMap.OutOfBoundsStrategy.ZERO);
+    public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Supplier<E[]> enumValues, ToIntFunction<E> keyExtractor) {
+        E[] enums = enumValues.get();
+        IntFunction<E> idMapper = ByIdMap.continuous(keyExtractor, enums, ByIdMap.OutOfBoundsStrategy.ZERO);
         return ByteBufCodecs.idMapper(idMapper, keyExtractor);
     }
 }

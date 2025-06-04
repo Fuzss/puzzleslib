@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.event;
 
-import fuzs.puzzleslib.api.event.v1.data.DefaultedDouble;
+import fuzs.puzzleslib.impl.event.data.DefaultedDouble;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingJumpCallback;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.MinecraftServer;

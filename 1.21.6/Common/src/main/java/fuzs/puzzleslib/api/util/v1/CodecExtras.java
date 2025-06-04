@@ -15,11 +15,10 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
 /**
@@ -155,5 +154,42 @@ public final class CodecExtras {
         return Codec.of(Codec.unit(() -> {
             throw new UnsupportedOperationException("Cannot encode with decode-only codec! Decoder:" + decoder);
         }), decoder, "DecodeOnly[" + decoder + "]");
+    }
+
+    /**
+     * Create an {@link Enum} codec.
+     *
+     * @param enumClazz the enum class
+     * @param <E>       the enum type
+     * @return the codec
+     */
+    public static <E extends Enum<E>> Codec<E> fromEnum(Class<E> enumClazz) {
+        return fromEnum(enumClazz::getEnumConstants);
+    }
+
+    /**
+     * Create an {@link Enum} codec.
+     *
+     * @param enumValues the enum values
+     * @param <E>        the enum type
+     * @return the codec
+     */
+    public static <E extends Enum<E>> Codec<E> fromEnum(Supplier<E[]> enumValues) {
+        return fromEnumWithMapping(enumValues, (E enumConstant) -> enumConstant.name().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Create an {@link Enum} codec.
+     *
+     * @param enumValues  the enum values
+     * @param keyFunction the string key extractor
+     * @param <E>         the enum type
+     * @return the codec
+     */
+    public static <E extends Enum<E>> Codec<E> fromEnumWithMapping(Supplier<E[]> enumValues, Function<E, String> keyFunction) {
+        E[] enums = enumValues.get();
+        Function<String, E> function = Arrays.stream(enums)
+                .collect(ImmutableMap.toImmutableMap(keyFunction, Function.identity()))::get;
+        return Codec.stringResolver(keyFunction, function);
     }
 }

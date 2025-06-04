@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.event.v1.data;
 
-import fuzs.puzzleslib.impl.event.data.EventMutableValue;
-import fuzs.puzzleslib.impl.event.data.ValueMutableValue;
+import fuzs.puzzleslib.impl.event.data.event.EventMutableValue;
+import fuzs.puzzleslib.impl.event.data.value.ValueMutableValue;
 
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -34,7 +34,7 @@ public interface MutableValue<T> extends Consumer<T>, Supplier<T> {
     }
 
     /**
-     * Maps the contained value to something new.
+     * Maps contained value to something new.
      *
      * @param operator operator to apply to contained value
      */

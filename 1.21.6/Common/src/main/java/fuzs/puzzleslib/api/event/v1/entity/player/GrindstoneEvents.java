@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.event.v1.entity.player;
 
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedValue;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import net.minecraft.world.entity.player.Player;
@@ -47,13 +46,13 @@ public final class GrindstoneEvents {
          * input items present in the corresponding slots.
          *
          * @param primaryItemStack   the top input item stack with the default value being the current item stack before
-         *                           it is cleared during the operation, when a new value is set it will be set to the
+         *                           it is cleared during the operation; when a new value is set, it will be set to the
          *                           top slot instead of the slot being cleared
          * @param secondaryItemStack the bottom input item stack with the default value being the current item stack
-         *                           before it is cleared during the operation, when a new value is set it will be set
+         *                           before it is cleared during the operation; when a new value is set, it will be set
          *                           to the bottom slot instead of the slot being cleared
          * @param player             the player using the grindstone
          */
-        void onGrindstoneUse(DefaultedValue<ItemStack> primaryItemStack, DefaultedValue<ItemStack> secondaryItemStack, Player player);
+        void onGrindstoneUse(MutableValue<ItemStack> primaryItemStack, MutableValue<ItemStack> secondaryItemStack, Player player);
     }
 }

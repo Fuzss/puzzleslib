@@ -20,3 +20,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `RenderTypeHelper`, all functionality is now covered by `RenderTypesContext`
 - Remove `ExtendedMenuSupplier`
 - Remove `EnchantingHelper::isBookEnchantable`
+- Remove `BlockEvents$FarmlandTrample`

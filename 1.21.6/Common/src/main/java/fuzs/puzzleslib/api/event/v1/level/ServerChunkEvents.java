@@ -45,7 +45,8 @@ public final class ServerChunkEvents {
 
         /**
          * Fires when a server player begins watching a chunk, and it has just been sent to a client.
-         * <p>Useful for syncing additional chunk data.
+         * <p>
+         * Useful for syncing additional chunk data.
          *
          * @param serverPlayer the player watching the chunk
          * @param levelChunk   the chunk

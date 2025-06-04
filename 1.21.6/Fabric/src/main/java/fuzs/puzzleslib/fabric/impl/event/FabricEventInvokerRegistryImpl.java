@@ -289,8 +289,8 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
             };
         });
-        INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_XP);
-        INSTANCE.register(UseBoneMealCallback.class, FabricPlayerEvents.USE_BONE_MEAL);
+        INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_EXPERIENCE);
+        INSTANCE.register(UseBoneMealCallback.class, FabricLevelEvents.USE_BONE_MEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
         INSTANCE.register(BlockEvents.Break.class, PlayerBlockBreakEvents.BEFORE, (BlockEvents.Break callback) -> {
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
@@ -301,7 +301,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             };
         });
         INSTANCE.register(BlockEvents.DropExperience.class, FabricLevelEvents.DROP_BLOCK_EXPERIENCE);
-        INSTANCE.register(BlockEvents.FarmlandTrample.class, FabricLevelEvents.FARMLAND_TRAMPLE);
         INSTANCE.register(PlayerTickEvents.Start.class, FabricPlayerEvents.PLAYER_TICK_START);
         INSTANCE.register(PlayerTickEvents.End.class, FabricPlayerEvents.PLAYER_TICK_END);
         INSTANCE.register(LivingFallCallback.class, FabricLivingEvents.LIVING_FALL);
@@ -338,15 +337,17 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped.class, ServerLifecycleEvents.SERVER_STOPPED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped callback) -> {
             return callback::onServerStopped;
         });
-        INSTANCE.register(PlayLevelSoundEvents.AtPosition.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_POSITION);
-        INSTANCE.register(PlayLevelSoundEvents.AtEntity.class, FabricLevelEvents.PLAY_LEVEL_SOUND_AT_ENTITY);
+        INSTANCE.register(PlaySoundEvents.AtPosition.class, FabricLevelEvents.PLAY_SOUND_AT_POSITION);
+        INSTANCE.register(PlaySoundEvents.AtEntity.class, FabricLevelEvents.PLAY_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ServerEntityLevelEvents.Spawn.class, FabricEntityEvents.ENTITY_SPAWN);
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, (ServerEntityLevelEvents.Unload callback) -> {
             return callback::onEntityUnload;
         });
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
-        INSTANCE.register(PlayerTrackingEvents.Start.class, FabricPlayerEvents.START_TRACKING);
+        INSTANCE.register(PlayerTrackingEvents.Start.class, EntityTrackingEvents.START_TRACKING, (PlayerTrackingEvents.Start callback) -> {
+            return callback::onStartTracking;
+        });
         INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, (PlayerTrackingEvents.Stop callback) -> {
             return callback::onStopTracking;
         });
@@ -401,7 +402,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ItemEntityEvents.Toss.class, FabricPlayerEvents.ITEM_TOSS);
         INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
         INSTANCE.register(ProjectileImpactCallback.class, FabricEntityEvents.PROJECTILE_IMPACT);
-        INSTANCE.register(BreakSpeedCallback.class, FabricPlayerEvents.BREAK_SPEED);
+        INSTANCE.register(CalculateBlockBreakSpeedCallback.class, FabricPlayerEvents.CALCULATE_BLOCK_BREAK_SPEED);
         INSTANCE.register(MobEffectEvents.Affects.class, FabricLivingEvents.MOB_EFFECT_AFFECTS);
         INSTANCE.register(MobEffectEvents.Apply.class, FabricLivingEvents.MOB_EFFECT_APPLY);
         INSTANCE.register(MobEffectEvents.Remove.class, FabricLivingEvents.MOB_EFFECT_REMOVE);

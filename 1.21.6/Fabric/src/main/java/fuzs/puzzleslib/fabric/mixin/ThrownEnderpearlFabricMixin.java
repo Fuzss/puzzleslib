@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.DefaultedFloat;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
