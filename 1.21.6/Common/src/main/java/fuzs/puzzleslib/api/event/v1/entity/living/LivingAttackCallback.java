@@ -17,7 +17,7 @@ public interface LivingAttackCallback {
      * @param damageAmount the amount of damage the entity is attacked with
      * @return <ul>
      *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the attack from happening, dealing no damage</li>
-     *         <li>{@link EventResult#PASS} to allow the entity to be attacked and to take damage</li>
+     *         <li>{@link EventResult#PASS PASS} to allow the entity to be attacked and to take damage</li>
      *         </ul>
      */
     EventResult onLivingAttack(LivingEntity livingEntity, DamageSource damageSource, float damageAmount);

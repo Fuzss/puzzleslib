@@ -4,8 +4,8 @@ import fuzs.puzzleslib.api.core.v1.ModConstructor;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
+import fuzs.puzzleslib.api.item.v2.EnchantingHelper;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
@@ -194,7 +194,7 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         int enchantmentLevel = NeoForgeProxy.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
-        Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
+        Holder<Enchantment> enchantment = EnchantingHelper.lookup(target, Enchantments.LOOTING);
         return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment,
                 enchantmentLevel,
                 livingEntity,

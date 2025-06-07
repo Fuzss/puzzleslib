@@ -1,4 +1,4 @@
-package fuzs.puzzleslib.api.entity.v1;
+package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.level.ServerLevel;

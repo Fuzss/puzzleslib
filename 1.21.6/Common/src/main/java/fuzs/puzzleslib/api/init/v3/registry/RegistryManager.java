@@ -344,14 +344,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Register a data component type.
      *
-     * @param path                          the registered name
-     * @param dataComponentTypeConfigurator supplier for entry to register
+     * @param path     the registered name
+     * @param operator the supplier for entry to register
+     * @param <T>      the component type
      * @return the holder reference
      */
-    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> dataComponentTypeConfigurator) {
+    default <T> Holder.Reference<DataComponentType<T>> registerDataComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> operator) {
         return this.register(Registries.DATA_COMPONENT_TYPE,
                 path,
-                () -> dataComponentTypeConfigurator.apply(DataComponentType.builder()).build());
+                () -> operator.apply(DataComponentType.builder()).build());
     }
 
     /**
@@ -418,6 +419,20 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      */
     default ResourceKey<Enchantment> registerEnchantment(String path) {
         return this.makeResourceKey(Registries.ENCHANTMENT, path);
+    }
+
+    /**
+     * Register an enchantment effect component type.
+     *
+     * @param path     the registered name
+     * @param operator the supplier for entry to register
+     * @param <T>      the component type
+     * @return the holder reference
+     */
+    default <T> Holder.Reference<DataComponentType<T>> registerEnchantmentEffectComponentType(String path, UnaryOperator<DataComponentType.Builder<T>> operator) {
+        return this.register(Registries.ENCHANTMENT_EFFECT_COMPONENT_TYPE,
+                path,
+                () -> operator.apply(DataComponentType.builder()).build());
     }
 
     /**
