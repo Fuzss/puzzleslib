@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.impl.core.proxy;
 
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
+import fuzs.puzzleslib.api.item.v2.EnchantingHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,7 +22,7 @@ public interface EnchantingProxy {
 
     default int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         if (attacker instanceof LivingEntity livingEntity) {
-            Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
+            Holder<Enchantment> enchantment = EnchantingHelper.lookup(target, Enchantments.LOOTING);
             return EnchantmentHelper.getEnchantmentLevel(enchantment, livingEntity);
         } else {
             return 0;

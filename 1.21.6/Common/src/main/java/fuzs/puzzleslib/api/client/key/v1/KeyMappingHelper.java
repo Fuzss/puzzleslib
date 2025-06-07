@@ -50,7 +50,7 @@ public interface KeyMappingHelper {
      * @return key mapping instance
      */
     static KeyMapping registerKeyMapping(ResourceLocation resourceLocation, int keyCode) {
-        return new KeyMapping("key." + resourceLocation.getPath(),
+        return new KeyMapping("key." + resourceLocation.toLanguageKey(),
                 keyCode,
                 "key.categories." + resourceLocation.getNamespace());
     }

@@ -6,8 +6,8 @@ import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
+import fuzs.puzzleslib.api.item.v2.EnchantingHelper;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
@@ -210,7 +210,7 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
         int enchantmentLevel = FabricProxy.super.getMobLootingLevel(target, attacker, damageSource);
         if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
-        Holder<Enchantment> enchantment = LookupHelper.lookupEnchantment(target, Enchantments.LOOTING);
+        Holder<Enchantment> enchantment = EnchantingHelper.lookup(target, Enchantments.LOOTING);
         return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment,
                 enchantmentLevel,
                 livingEntity,

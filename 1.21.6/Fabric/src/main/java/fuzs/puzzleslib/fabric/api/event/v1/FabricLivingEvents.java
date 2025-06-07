@@ -86,10 +86,6 @@ public final class FabricLivingEvents {
      */
     public static final Event<AnimalTameCallback> ANIMAL_TAME = FabricEventFactory.createResult(AnimalTameCallback.class);
     /**
-     * Fires when a {@link LivingEntity} is attacked, allows for cancelling that attack.
-     */
-    public static final Event<LivingAttackCallback> LIVING_ATTACK = FabricEventFactory.createResult(LivingAttackCallback.class);
-    /**
      * Called before an entity is knocked-back in {@link LivingEntity#knockback(double, double, double)}, allows for
      * preventing the knock-back.
      */

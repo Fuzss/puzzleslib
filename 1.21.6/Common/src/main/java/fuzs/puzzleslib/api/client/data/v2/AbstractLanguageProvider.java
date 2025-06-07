@@ -32,7 +32,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
@@ -146,19 +145,35 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void add(Holder<?> holder, String value) {
+            this.add(holder, "", value);
+        }
+
+        default void add(Holder<?> holder, String additionalKey, String value) {
             Objects.requireNonNull(holder, "holder is null");
-            this.add(holder.unwrapKey().orElseThrow(), value);
+            this.add(holder.unwrapKey().orElseThrow(), additionalKey, value);
         }
 
         default void add(ResourceKey<?> resourceKey, String value) {
+            this.add(resourceKey, "", value);
+        }
+
+        default void add(ResourceKey<?> resourceKey, String additionalKey, String value) {
             Objects.requireNonNull(resourceKey, "resource key is null");
-            this.add(Registries.elementsDirPath(resourceKey.registryKey()), resourceKey.location(), value);
+            this.add(Registries.elementsDirPath(resourceKey.registryKey()),
+                    resourceKey.location(),
+                    additionalKey,
+                    value);
         }
 
         default void add(String registry, ResourceLocation resourceLocation, String value) {
+            this.add(registry, resourceLocation, "", value);
+        }
+
+        default void add(String registry, ResourceLocation resourceLocation, String additionalKey, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(resourceLocation, "resource location is null");
-            this.add(Util.makeDescriptionId(registry, resourceLocation), value);
+            String translationKey = Util.makeDescriptionId(registry, resourceLocation);
+            this.add(translationKey, additionalKey, value);
         }
 
         default void add(TagKey<?> tagKey, String value) {
@@ -207,16 +222,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             } else {
                 throw new IllegalArgumentException("Unsupported item: " + item);
             }
-        }
-
-        default void addEnchantment(ResourceKey<Enchantment> enchantment, String value) {
-            this.addEnchantment(enchantment, "", value);
-        }
-
-        default void addEnchantment(ResourceKey<Enchantment> enchantment, String additionalKey, String value) {
-            Objects.requireNonNull(enchantment, "enchantment is null");
-            String translationKey = Util.makeDescriptionId(enchantment.registry().getPath(), enchantment.location());
-            this.add(translationKey, additionalKey, value);
         }
 
         default void addMobEffect(Holder<MobEffect> mobEffect, String value) {

@@ -9,7 +9,8 @@ import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalFloatRef;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.api.event.v1.data.MutableDouble;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
@@ -228,13 +229,6 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Shadow
     public abstract boolean isInvulnerableTo(ServerLevel serverLevel, DamageSource damageSource);
-
-    @Inject(method = "hurtServer", at = @At("HEAD"), cancellable = true)
-    public void hurtServer(ServerLevel serverLevel, DamageSource damageSource, float damageAmount, CallbackInfoReturnable<Boolean> callback) {
-        EventResult eventResult = FabricLivingEvents.LIVING_ATTACK.invoker()
-                .onLivingAttack(LivingEntity.class.cast(this), damageSource, damageAmount);
-        if (eventResult.isInterrupt()) callback.setReturnValue(false);
-    }
 
     @ModifyExpressionValue(
             method = "applyItemBlocking", at = @At(

@@ -62,8 +62,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.ConversionParams;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CreativeModeTab;
@@ -362,7 +364,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(BabyEntitySpawnCallback.class, FabricLivingEvents.BABY_ENTITY_SPAWN);
         INSTANCE.register(AnimalTameCallback.class, FabricLivingEvents.ANIMAL_TAME);
-        INSTANCE.register(LivingAttackCallback.class, FabricLivingEvents.LIVING_ATTACK);
+        INSTANCE.register(LivingAttackCallback.class, ServerLivingEntityEvents.ALLOW_DAMAGE, (LivingAttackCallback callback) -> {
+            return (LivingEntity entity, DamageSource source, float amount) -> {
+                return callback.onLivingAttack(entity, source, amount).isPass();
+            };
+        });
         INSTANCE.register(PlayerCopyEvents.Copy.class, ServerPlayerEvents.COPY_FROM, (PlayerCopyEvents.Copy callback) -> {
             return callback::onCopy;
         });
