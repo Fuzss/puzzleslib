@@ -11,6 +11,6 @@ import java.util.Map;
 @Mixin(BlockColors.class)
 public interface BlockColorsNeoForgeAccessor {
 
-    @Accessor("blockColors")
+    @Accessor(value = "blockColors", remap = false)
     Map<Block, BlockColor> puzzleslib$getBlockColors();
 }

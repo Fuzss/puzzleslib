@@ -5,13 +5,11 @@ import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
-import fuzs.puzzleslib.api.item.v2.EnchantingHelper;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
-import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import fuzs.puzzleslib.neoforge.impl.data.NeoForgeTagAppender;
@@ -46,7 +44,6 @@ import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -55,7 +52,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.state.BlockState;
@@ -111,13 +107,13 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
-        return EventHooks.onExplosionStart(serverLevel, explosion);
+    public Style getRarityStyle(Rarity rarity) {
+        return rarity.getStyleModifier().apply(Style.EMPTY);
     }
 
     @Override
-    public Style getRarityStyle(Rarity rarity) {
-        return rarity.getStyleModifier().apply(Style.EMPTY);
+    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
+        return EventHooks.onExplosionStart(serverLevel, explosion);
     }
 
     @Override
@@ -134,6 +130,16 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
         } else {
             throw new UnsupportedOperationException("Must be ForwardingLootTableBuilder");
         }
+    }
+
+    @Override
+    public float getEnchantPowerBonus(BlockState blockState, Level level, BlockPos blockPos) {
+        return blockState.getEnchantPowerBonus(level, blockPos);
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
+        return itemStack.isPrimaryItemFor(enchantment);
     }
 
     @MustBeInvokedByOverriders
@@ -178,27 +184,6 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     @Override
     public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent evt) {
         return new PayloadTypesContextNeoForgeImpl.ServerImpl(modId, evt);
-    }
-
-    @Override
-    public float getEnchantPowerBonus(BlockState blockState, Level level, BlockPos blockPos) {
-        return blockState.getEnchantPowerBonus(level, blockPos);
-    }
-
-    @Override
-    public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
-        return itemStack.isPrimaryItemFor(enchantment);
-    }
-
-    @Override
-    public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
-        int enchantmentLevel = NeoForgeProxy.super.getMobLootingLevel(target, attacker, damageSource);
-        if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
-        Holder<Enchantment> enchantment = EnchantingHelper.lookup(target, Enchantments.LOOTING);
-        return ComputeEnchantedLootBonusEvent.onComputeEnchantedLootBonus(enchantment,
-                enchantmentLevel,
-                livingEntity,
-                damageSource);
     }
 
     @Override

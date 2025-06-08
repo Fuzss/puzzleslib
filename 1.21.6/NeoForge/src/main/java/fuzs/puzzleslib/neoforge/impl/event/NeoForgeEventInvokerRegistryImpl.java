@@ -8,7 +8,10 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.api.event.v1.data.MutableDouble;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.api.event.v1.entity.*;
 import fuzs.puzzleslib.api.event.v1.entity.living.*;
 import fuzs.puzzleslib.api.event.v1.entity.player.*;
@@ -25,7 +28,6 @@ import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerRegistry;
-import fuzs.puzzleslib.neoforge.api.event.v1.entity.living.ComputeEnchantedLootBonusEvent;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgePotionBrewingBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -307,12 +309,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(ItemEntityEvents.Pickup.class, ItemEntityPickupEvent.Post.class, (ItemEntityEvents.Pickup callback, ItemEntityPickupEvent.Post evt) -> {
             callback.onItemPickup(evt.getPlayer(), evt.getItemEntity(), evt.getOriginalStack());
-        });
-        INSTANCE.register(ComputeEnchantedLootBonusCallback.class, ComputeEnchantedLootBonusEvent.class, (ComputeEnchantedLootBonusCallback callback, ComputeEnchantedLootBonusEvent evt) -> {
-            MutableInt enchantmentLevel = MutableInt.fromEvent(evt::setEnchantmentLevel, evt::getEnchantmentLevel);
-            callback.onComputeEnchantedLootBonus(evt.getEntity(), evt.getDamageSource(), evt.getEnchantment(),
-                    enchantmentLevel
-            );
         });
         INSTANCE.register(CreateAnvilResultCallback.class, AnvilUpdateEvent.class, (CreateAnvilResultCallback callback, AnvilUpdateEvent evt) -> {
             DefaultedValue<ItemStack> outputItemStack = DefaultedValue.fromEvent(evt::setOutput, evt::getOutput, evt.getVanillaResult()::output);

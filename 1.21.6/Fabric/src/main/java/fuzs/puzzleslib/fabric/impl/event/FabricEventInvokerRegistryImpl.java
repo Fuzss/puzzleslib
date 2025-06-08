@@ -313,7 +313,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         });
         INSTANCE.register(ItemEntityEvents.Touch.class, FabricPlayerEvents.ITEM_TOUCH);
         INSTANCE.register(ItemEntityEvents.Pickup.class, FabricPlayerEvents.ITEM_PICKUP);
-        INSTANCE.register(ComputeEnchantedLootBonusCallback.class, FabricLivingEvents.COMPUTE_ENCHANTED_LOOT_BONUS);
         INSTANCE.register(CreateAnvilResultCallback.class, FabricPlayerEvents.CREATE_ANVIL_RESULT);
         INSTANCE.register(LivingDropsCallback.class, FabricLivingEvents.LIVING_DROPS);
         INSTANCE.register(EntityTickEvents.Start.class, FabricEntityEvents.ENTITY_TICK_START);

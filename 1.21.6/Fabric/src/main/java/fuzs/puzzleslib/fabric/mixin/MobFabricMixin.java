@@ -1,16 +1,18 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.impl.event.data.DefaultedValue;
+import fuzs.puzzleslib.api.util.v1.CodecExtras;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import net.minecraft.nbt.CompoundTag;
+import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -81,22 +83,15 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     }
 
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
-    public void addAdditionalSaveData(CompoundTag compound, CallbackInfo callback) {
-        if (this.puzzleslib$spawnType != null) {
-            String key = PuzzlesLibMod.id("spawn_type").toString();
-            compound.putString(key, this.puzzleslib$spawnType.name());
-        }
+    public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo callback) {
+        valueOutput.storeNullable(PuzzlesLibMod.id("spawn_type").toString(),
+                CodecExtras.ENTITY_SPAWN_REASON_CODEC,
+                this.puzzleslib$spawnType);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
-    public void readAdditionalSaveData(CompoundTag compound, CallbackInfo callback) {
-        String key = PuzzlesLibMod.id("spawn_type").toString();
-        if (compound.contains(key)) {
-            try {
-                this.puzzleslib$spawnType = EntitySpawnReason.valueOf(compound.getStringOr(key, ""));
-            } catch (Exception exception) {
-                compound.remove(key);
-            }
-        }
+    public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo callback) {
+        this.puzzleslib$spawnType = valueInput.read(PuzzlesLibMod.id("spawn_type").toString(),
+                CodecExtras.ENTITY_SPAWN_REASON_CODEC).orElse(null);
     }
 }
