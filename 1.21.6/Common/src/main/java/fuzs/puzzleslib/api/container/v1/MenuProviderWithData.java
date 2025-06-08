@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.container.v1;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * A custom {@link MenuProvider} for menu types registered via
@@ -17,5 +16,5 @@ public interface MenuProviderWithData<T> extends MenuProvider {
      *                     slots
      * @return the menu data
      */
-    T getMenuData(@Nullable ServerPlayer serverPlayer);
+    T getMenuData(ServerPlayer serverPlayer);
 }
