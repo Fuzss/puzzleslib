@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.api.client.data.v2;
 
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
@@ -70,14 +69,6 @@ public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
     @Override
     protected void add(ResourceLocation soundEvent, SoundDefinition definition) {
         super.add(soundEvent, definition.subtitle("subtitles." + soundEvent.getPath()));
-    }
-
-    protected ResourceLocation id(String path) {
-        return ResourceLocationHelper.fromNamespaceAndPath(this.modId, path);
-    }
-
-    protected ResourceLocation vanilla(String path) {
-        return ResourceLocationHelper.withDefaultNamespace(path);
     }
 
     @Override

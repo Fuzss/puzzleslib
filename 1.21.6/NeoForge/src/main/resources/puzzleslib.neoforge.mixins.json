@@ -7,9 +7,6 @@
   "mixins": [
     "AbstractPackResourcesNeoForgeMixin",
     "DatagenModLoaderNeoForgeMixin",
-    "EnchantedCountIncreaseFunctionNeoForgeMixin",
-    "EnchantmentHelperNeoForgeMixin",
-    "LootItemRandomChanceWithEnchantedBonusConditionNeoForgeMixin",
     "MenuProviderWithDataNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",
     "accessor.MobSpawnSettingsBuilderNeoForgeAccessor"

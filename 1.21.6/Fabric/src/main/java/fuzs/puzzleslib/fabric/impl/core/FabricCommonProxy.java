@@ -7,14 +7,12 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents;
 import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
-import fuzs.puzzleslib.api.item.v2.EnchantingHelper;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
-import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
 import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
@@ -57,7 +55,6 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.boss.EnderDragonPart;
 import net.minecraft.world.entity.monster.piglin.PiglinAi;
@@ -68,7 +65,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerExplosion;
@@ -126,13 +122,13 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     }
 
     @Override
-    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
-        return FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(serverLevel, explosion).isInterrupt();
+    public Style getRarityStyle(Rarity rarity) {
+        return Style.EMPTY.applyFormat(rarity.color());
     }
 
     @Override
-    public Style getRarityStyle(Rarity rarity) {
-        return Style.EMPTY.applyFormat(rarity.color());
+    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
+        return FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(serverLevel, explosion).isInterrupt();
     }
 
     @Override
@@ -143,6 +139,16 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     @Override
     public void forEachPool(LootTable.Builder lootTable, Consumer<? super LootPool.Builder> lootPoolConsumer) {
         lootTable.modifyPools(lootPoolConsumer);
+    }
+
+    @Override
+    public float getEnchantPowerBonus(BlockState blockState, Level level, BlockPos blockPos) {
+        return blockState.is(BlockTags.ENCHANTMENT_POWER_PROVIDER) ? 1.0F : 0.0F;
+    }
+
+    @Override
+    public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
+        return itemStack.canBeEnchantedWith(enchantment, EnchantingContext.PRIMARY);
     }
 
     @MustBeInvokedByOverriders
@@ -194,27 +200,6 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     @Override
     public PayloadTypesContext createPayloadTypesContext(String modId) {
         return new PayloadTypesContextFabricImpl.ServerImpl(modId);
-    }
-
-    @Override
-    public float getEnchantPowerBonus(BlockState blockState, Level level, BlockPos blockPos) {
-        return blockState.is(BlockTags.ENCHANTMENT_POWER_PROVIDER) ? 1.0F : 0.0F;
-    }
-
-    @Override
-    public boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment, ItemStack itemStack) {
-        return itemStack.canBeEnchantedWith(enchantment, EnchantingContext.PRIMARY);
-    }
-
-    @Override
-    public int getMobLootingLevel(Entity target, @Nullable Entity attacker, @Nullable DamageSource damageSource) {
-        int enchantmentLevel = FabricProxy.super.getMobLootingLevel(target, attacker, damageSource);
-        if (!(target instanceof LivingEntity livingEntity)) return enchantmentLevel;
-        Holder<Enchantment> enchantment = EnchantingHelper.lookup(target, Enchantments.LOOTING);
-        return FabricEventImplHelper.onComputeEnchantedLootBonus(enchantment,
-                enchantmentLevel,
-                livingEntity,
-                damageSource);
     }
 
     @Override

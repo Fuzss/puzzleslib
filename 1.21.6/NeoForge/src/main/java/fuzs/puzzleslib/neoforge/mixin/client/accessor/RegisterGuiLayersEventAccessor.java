@@ -10,6 +10,6 @@ import java.util.List;
 @Mixin(RegisterGuiLayersEvent.class)
 public interface RegisterGuiLayersEventAccessor {
 
-    @Accessor("layers")
+    @Accessor(value = "layers", remap = false)
     List<GuiLayerManager.NamedLayer> puzzleslib$getLayers();
 }

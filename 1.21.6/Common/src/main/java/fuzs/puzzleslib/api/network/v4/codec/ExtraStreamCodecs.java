@@ -75,20 +75,20 @@ public final class ExtraStreamCodecs {
      * @return the stream codec
      */
     public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Supplier<E[]> enumValues) {
-        return fromEnum(enumValues, E::ordinal);
+        return fromEnumWithMapping(enumValues, E::ordinal);
     }
 
     /**
      * Create an {@link Enum} stream codec.
      *
-     * @param enumValues   the enum values
-     * @param keyExtractor the numeric key extractor
-     * @param <E>          the enum type
+     * @param enumValues  the enum values
+     * @param keyFunction the numeric key extractor
+     * @param <E>         the enum type
      * @return the stream codec
      */
-    public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnum(Supplier<E[]> enumValues, ToIntFunction<E> keyExtractor) {
+    public static <E extends Enum<E>> StreamCodec<ByteBuf, E> fromEnumWithMapping(Supplier<E[]> enumValues, ToIntFunction<E> keyFunction) {
         E[] enums = enumValues.get();
-        IntFunction<E> idMapper = ByIdMap.continuous(keyExtractor, enums, ByIdMap.OutOfBoundsStrategy.ZERO);
-        return ByteBufCodecs.idMapper(idMapper, keyExtractor);
+        IntFunction<E> idMapper = ByIdMap.continuous(keyFunction, enums, ByIdMap.OutOfBoundsStrategy.ZERO);
+        return ByteBufCodecs.idMapper(idMapper, keyFunction);
     }
 }

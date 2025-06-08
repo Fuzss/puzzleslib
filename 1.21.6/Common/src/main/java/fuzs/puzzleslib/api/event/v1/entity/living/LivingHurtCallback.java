@@ -11,7 +11,7 @@ public interface LivingHurtCallback {
     EventInvoker<LivingHurtCallback> EVENT = EventInvoker.lookup(LivingHurtCallback.class);
 
     /**
-     * Called right before any reduction on damage due to e.g. armor are done, cancelling prevents any damage / armor
+     * Called right before any reduction in damage due to e.g. armour is done, cancelling prevents any damage / armour
      * durability being taken.
      *
      * @param livingEntity the entity being hurt

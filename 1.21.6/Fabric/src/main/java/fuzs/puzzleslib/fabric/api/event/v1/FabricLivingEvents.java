@@ -31,18 +31,12 @@ public final class FabricLivingEvents {
      */
     public static final Event<LivingFallCallback> LIVING_FALL = FabricEventFactory.createResult(LivingFallCallback.class);
     /**
-     * Called just before a {@link LivingEntity} drops all its loot for determining the level of a bonus enchantment
-     * such as {@link net.minecraft.world.item.enchantment.Enchantments#LOOTING} that should be applied to the drops.
-     */
-    public static final Event<ComputeEnchantedLootBonusCallback> COMPUTE_ENCHANTED_LOOT_BONUS = FabricEventFactory.create(
-            ComputeEnchantedLootBonusCallback.class);
-    /**
      * Called right before drops from a killed entity are spawned in the world.
      * <p>This event is fired whenever an Entity dies and drops items in {@link LivingEntity#die(DamageSource)}.
      */
     public static final Event<LivingDropsCallback> LIVING_DROPS = FabricEventFactory.createResult(LivingDropsCallback.class);
     /**
-     * Called right before any reduction on damage due to e.g. armor are done, cancelling prevents any damage / armor
+     * Called right before any reduction in damage due to e.g. armour is done, cancelling prevents any damage / armour
      * durability being taken.
      */
     public static final Event<LivingHurtCallback> LIVING_HURT = FabricEventFactory.createResult(LivingHurtCallback.class);
