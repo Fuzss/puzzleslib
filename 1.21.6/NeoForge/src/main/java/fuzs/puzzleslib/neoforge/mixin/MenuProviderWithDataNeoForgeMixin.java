@@ -6,6 +6,7 @@ import fuzs.puzzleslib.neoforge.impl.init.MenuTypeWithData;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,9 +20,7 @@ public interface MenuProviderWithDataNeoForgeMixin<T> extends MenuProvider {
 
     @Override
     default void writeClientSideData(AbstractContainerMenu containerMenu, RegistryFriendlyByteBuf buf) {
-        ServerPlayer serverPlayer = EventImplHelper.getPlayerFromContainerMenu(containerMenu)
-                .map(player -> player instanceof ServerPlayer serverPlayerX ? serverPlayerX : null)
-                .orElse(null);
-        MenuTypeWithData.encodeMenuData(containerMenu, buf, this.getMenuData(serverPlayer));
+        Player player = EventImplHelper.getPlayerFromContainerMenu(containerMenu);
+        MenuTypeWithData.encodeMenuData(containerMenu, buf, this.getMenuData((ServerPlayer) player));
     }
 }

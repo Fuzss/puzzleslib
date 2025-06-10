@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -10,10 +9,6 @@ import java.util.function.UnaryOperator;
 
 /**
  * Register new {@link Layer Layers} to be drawn as part of the {@link net.minecraft.client.gui.Gui}.
- * <p>
- * The implementation works together with {@link fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper} for providing
- * accurate height values for hotbar decorations. Note that on Fabric height values are only updated but not respected
- * by the vanilla implementation to reduce the patch surface.
  */
 public interface GuiLayersContext {
     /**
@@ -56,11 +51,15 @@ public interface GuiLayersContext {
     /**
      * The layer for rendering the name of the selected item.
      */
-    ResourceLocation SELECTED_ITEM_NAME = ResourceLocationHelper.withDefaultNamespace("selected_item_name");
+    ResourceLocation HELD_ITEM_TOOLTIP = ResourceLocationHelper.withDefaultNamespace("held_item_tooltip");
     /**
      * The layer for rendering the player's experience level number.
      */
     ResourceLocation EXPERIENCE_LEVEL = ResourceLocationHelper.withDefaultNamespace("experience_level");
+    /**
+     * The layer for rendering the selected spectator menu action.
+     */
+    ResourceLocation SPECTATOR_TOOLTIP = ResourceLocationHelper.withDefaultNamespace("spectator_tooltip");
     /**
      * The layer for rendering status effect icons.
      */
@@ -105,14 +104,6 @@ public interface GuiLayersContext {
      * The layer for rendering subtitles.
      */
     ResourceLocation SUBTITLES = ResourceLocationHelper.withDefaultNamespace("subtitles");
-
-    /**
-     * Set a custom event phase other than {@link EventPhase#DEFAULT} for ordering purposes during gui layer
-     * registration.
-     *
-     * @param eventPhase the event phase
-     */
-    void setEventPhase(EventPhase eventPhase);
 
     /**
      * Register a new gui layer rendered after all existing layers.

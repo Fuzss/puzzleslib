@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.event;
 
 import com.google.common.base.Preconditions;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.*;
@@ -52,6 +53,7 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -314,9 +316,25 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             DefaultedValue<ItemStack> outputItemStack = DefaultedValue.fromEvent(evt::setOutput, evt::getOutput, evt.getVanillaResult()::output);
             DefaultedInt enchantmentLevelCost = DefaultedInt.fromEvent(evt::setXpCost, evt::getXpCost, evt.getVanillaResult()::xpCost);
             DefaultedInt repairMaterialCost = DefaultedInt.fromEvent(evt::setMaterialCost, evt::getMaterialCost, evt.getVanillaResult()::materialCost);
-            if (callback.onCreateAnvilResult(evt.getLeft(), evt.getRight(), outputItemStack, evt.getName(), enchantmentLevelCost, repairMaterialCost, evt.getPlayer())
+            if (callback.onCreateAnvilResult(evt.getPlayer(),
+                            evt.getLeft(), evt.getRight(), outputItemStack, evt.getName(), enchantmentLevelCost, repairMaterialCost)
                     .isInterrupt()) {
                 evt.setCanceled(true);
+            }
+        });
+        INSTANCE.register(CreateGrindstoneResultCallback.class, GrindstoneEvent.OnPlaceItem.class, (CreateGrindstoneResultCallback callback, GrindstoneEvent.OnPlaceItem evt) -> {
+            Map.Entry<GrindstoneMenu, Player> entry = EventImplHelper.getGrindstoneMenuFromInputs(evt.getTopItem(), evt.getBottomItem());
+            if (entry != null) {
+                Supplier<ItemStack> outputItemStackSupplier = Suppliers.memoize(() -> entry.getKey().computeResult(evt.getTopItem(), evt.getBottomItem()));
+                MutableValue<ItemStack> outputItemStack = MutableValue.fromEvent(evt::setOutput, () -> {
+                    return !evt.getOutput().isEmpty() ? evt.getOutput() : outputItemStackSupplier.get();
+                });
+                MutableInt experiencePointReward = MutableInt.fromEvent(evt::setXp, evt::getXp);
+                EventResult eventResult = callback.onCreateGrindstoneResult(entry.getValue(),
+                        evt.getTopItem(), evt.getBottomItem(), outputItemStack, experiencePointReward);
+                if (eventResult.isInterrupt()) {
+                    evt.setCanceled(true);
+                }
             }
         });
         INSTANCE.register(LivingDropsCallback.class, LivingDropsEvent.class, (LivingDropsCallback callback, LivingDropsEvent evt) -> {
@@ -623,36 +641,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             if (callback.onStopRiding(evt.getLevel(), evt.getEntity(), evt.getEntityBeingMounted()).isInterrupt()) {
                 evt.setCanceled(true);
             }
-        });
-        INSTANCE.register(GrindstoneEvents.Update.class, GrindstoneEvent.OnPlaceItem.class, (GrindstoneEvents.Update callback, GrindstoneEvent.OnPlaceItem evt) -> {
-            ItemStack originalOutput = evt.getOutput();
-            int originalExperienceReward = evt.getXp();
-            MutableValue<ItemStack> output = MutableValue.fromEvent(evt::setOutput, evt::getOutput);
-            MutableInt experienceReward = MutableInt.fromEvent(evt::setXp, evt::getXp);
-            Player player = EventImplHelper.getGrindstoneUsingPlayer(evt.getTopItem(), evt.getBottomItem()).orElseThrow(NullPointerException::new);
-            EventResult eventResult = callback.onGrindstoneUpdate(evt.getTopItem(), evt.getBottomItem(), output, experienceReward, player);
-            if (eventResult.isInterrupt()) {
-                // interruption for allow will run properly as long as output is changed from an empty stack
-                if (!eventResult.getAsBoolean()) {
-                    evt.setCanceled(true);
-                }
-            } else {
-                // revert any changes made by us if the callback has not been cancelled
-                evt.setOutput(originalOutput);
-                evt.setXp(originalExperienceReward);
-            }
-        });
-        INSTANCE.register(GrindstoneEvents.Use.class, GrindstoneEvent.OnTakeItem.class, (GrindstoneEvents.Use callback, GrindstoneEvent.OnTakeItem evt) -> {
-            DefaultedValue<ItemStack> topInput = DefaultedValue.fromValue(evt.getTopItem());
-            // set new item set by other event listeners
-            if (!evt.getNewTopItem().isEmpty()) topInput.accept(evt.getNewTopItem());
-            DefaultedValue<ItemStack> bottomInput = DefaultedValue.fromValue(evt.getBottomItem());
-            // set new item set by other event listeners
-            if (!evt.getNewBottomItem().isEmpty()) bottomInput.accept(evt.getNewBottomItem());
-            Player player = EventImplHelper.getGrindstoneUsingPlayer(evt.getTopItem(), evt.getBottomItem()).orElseThrow(NullPointerException::new);
-            callback.onGrindstoneUse(topInput, bottomInput, player);
-            topInput.getAsOptional().ifPresent(evt::setNewTopItem);
-            bottomInput.getAsOptional().ifPresent(evt::setNewBottomItem);
         });
         INSTANCE.register(ServerChunkEvents.Watch.class, ChunkWatchEvent.Watch.class, (ServerChunkEvents.Watch callback, ChunkWatchEvent.Watch evt) -> {
             callback.onChunkWatch(evt.getPlayer(), evt.getChunk(), evt.getLevel());

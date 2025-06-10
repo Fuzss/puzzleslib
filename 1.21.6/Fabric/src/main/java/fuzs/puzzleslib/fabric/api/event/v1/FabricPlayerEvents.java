@@ -27,6 +27,12 @@ public final class FabricPlayerEvents {
     public static final Event<CreateAnvilResultCallback> CREATE_ANVIL_RESULT = FabricEventFactory.createResult(
             CreateAnvilResultCallback.class);
     /**
+     * Called after a result item is created from the two input slots in a grindstone via
+     * {@link GrindstoneMenu#createResult()}.
+     */
+    public static final Event<CreateGrindstoneResultCallback> CREATE_GRINDSTONE_RESULT = FabricEventFactory.createResult(
+            CreateGrindstoneResultCallback.class);
+    /**
      * Called when a player touches an {@link ItemEntity} laying on the ground.
      */
     public static final Event<ItemEntityEvents.Touch> ITEM_TOUCH = FabricEventFactory.createResult(ItemEntityEvents.Touch.class);
@@ -58,16 +64,6 @@ public final class FabricPlayerEvents {
      */
     public static final Event<CalculateBlockBreakSpeedCallback> CALCULATE_BLOCK_BREAK_SPEED = FabricEventFactory.createResult(
             CalculateBlockBreakSpeedCallback.class);
-    /**
-     * Called when the grindstone output slot is populated in {@link GrindstoneMenu#createResult()}.
-     */
-    public static final Event<GrindstoneEvents.Update> GRINDSTONE_UPDATE = FabricEventFactory.createResult(
-            GrindstoneEvents.Update.class);
-    /**
-     * Called when the result item is taken from the output slot of a grindstone. This callback allows for handling
-     * input items present in the corresponding slots.
-     */
-    public static final Event<GrindstoneEvents.Use> GRINDSTONE_USE = FabricEventFactory.create(GrindstoneEvents.Use.class);
     /**
      * Called after the player has opened a container.
      */

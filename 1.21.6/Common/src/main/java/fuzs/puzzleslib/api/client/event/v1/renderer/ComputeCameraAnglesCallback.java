@@ -13,12 +13,12 @@ public interface ComputeCameraAnglesCallback {
      * Runs before camera angle setup is done, allows for additional control over roll (which vanilla itself does not
      * support) in addition to pitch and yaw.
      *
-     * @param renderer    the game renderer
-     * @param camera      the client camera
-     * @param partialTick the partial tick
-     * @param yaw         the x-axis angle; transformation is applied second
-     * @param pitch       the y-axis angle; transformation is applied last
-     * @param roll        the z-axis angle; transformation is applied first
+     * @param gameRenderer the game renderer
+     * @param camera       the client camera
+     * @param partialTick  the partial tick
+     * @param yaw          the x-axis angle; transformation is applied second
+     * @param pitch        the y-axis angle; transformation is applied last
+     * @param roll         the z-axis angle; transformation is applied first
      */
-    void onComputeCameraAngles(GameRenderer renderer, Camera camera, float partialTick, MutableFloat pitch, MutableFloat yaw, MutableFloat roll);
+    void onComputeCameraAngles(GameRenderer gameRenderer, Camera camera, float partialTick, MutableFloat pitch, MutableFloat yaw, MutableFloat roll);
 }

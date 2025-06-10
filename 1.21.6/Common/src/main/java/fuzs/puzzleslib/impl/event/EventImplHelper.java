@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.impl.event;
 
-import fuzs.puzzleslib.impl.event.data.DefaultedDouble;
 import fuzs.puzzleslib.api.event.v1.entity.living.LivingJumpCallback;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import fuzs.puzzleslib.impl.event.data.DefaultedDouble;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -13,8 +13,9 @@ import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.Map;
 import java.util.OptionalDouble;
 
 public final class EventImplHelper {
@@ -37,32 +38,37 @@ public final class EventImplHelper {
         }
     }
 
-    public static Optional<Player> getGrindstoneUsingPlayer(ItemStack topInput, ItemStack bottomInput) {
+    @Nullable
+    public static Player getPlayerFromContainerMenu(AbstractContainerMenu abstractContainerMenu) {
+        for (Slot slot : abstractContainerMenu.slots) {
+            if (slot.container instanceof Inventory inventory) {
+                return inventory.player;
+            }
+        }
         MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
-        Optional<Player> optional = Optional.empty();
-        for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
-            if (serverPlayer.containerMenu instanceof GrindstoneMenu menu) {
-                optional = Optional.of(serverPlayer);
-                if (menu.getSlot(0).getItem() == topInput && menu.getSlot(1).getItem() == bottomInput) {
-                    break;
+        if (minecraftServer != null) {
+            for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
+                if (serverPlayer.containerMenu == abstractContainerMenu) {
+                    return serverPlayer;
                 }
             }
         }
-        return optional;
+        return null;
     }
 
-    public static Optional<Player> getPlayerFromContainerMenu(AbstractContainerMenu containerMenu) {
-        for (Slot slot : containerMenu.slots) {
-            if (slot.container instanceof Inventory inventory) {
-                return Optional.of(inventory.player);
-            }
-        }
+    @Nullable
+    public static Map.Entry<GrindstoneMenu, Player> getGrindstoneMenuFromInputs(ItemStack primaryItemStack, ItemStack secondaryItemStack) {
         MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
-        for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
-            if (serverPlayer.containerMenu == containerMenu) {
-                return Optional.of(serverPlayer);
+        if (minecraftServer != null) {
+            for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
+                if (serverPlayer.containerMenu instanceof GrindstoneMenu grindstoneMenu) {
+                    if (grindstoneMenu.getSlot(0).getItem() == primaryItemStack &&
+                            grindstoneMenu.getSlot(1).getItem() == secondaryItemStack) {
+                        return Map.entry(grindstoneMenu, serverPlayer);
+                    }
+                }
             }
         }
-        return Optional.empty();
+        return null;
     }
 }

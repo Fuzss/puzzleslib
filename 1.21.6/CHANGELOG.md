@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simplify `RenderLevelEvents` implementation as `RenderLevelCallback`
 - Greatly simplify `ContainerSerializationHelper`
 - Replace `AnvilEvents` with a single `CreateAnvilResultCallback`
+- Replace `GrindstoneEvents` with a single `CreateGrindstoneResultCallback`
 - Move some methods from `LookupHelper` to dedicated classes
 ### Removed
 - Remove `fuzs.puzzleslib.api.capability.v3`

@@ -1,8 +1,8 @@
 package fuzs.puzzleslib.fabric.impl.network;
 
 import fuzs.puzzleslib.api.network.v4.message.configuration.ClientboundConfigurationMessage;
-import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
 import fuzs.puzzleslib.api.network.v4.message.configuration.ServerboundConfigurationMessage;
+import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
 import fuzs.puzzleslib.api.network.v4.message.play.ServerboundPlayMessage;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -157,7 +157,7 @@ public final class MessageContextFabricImpl {
 
         @Override
         public ServerLevel level() {
-            return this.player().serverLevel();
+            return this.player().level();
         }
     }
 }

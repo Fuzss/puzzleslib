@@ -2,14 +2,11 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import fuzs.puzzleslib.neoforge.impl.event.NeoForgeEventInvokerRegistryImpl;
 import fuzs.puzzleslib.neoforge.mixin.client.accessor.RegisterGuiLayersEventAccessor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.gui.GuiLayerManager;
@@ -33,8 +30,9 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
             .put(FOOD_LEVEL, VanillaGuiLayers.FOOD_LEVEL)
             .put(VEHICLE_HEALTH, VanillaGuiLayers.VEHICLE_HEALTH)
             .put(AIR_LEVEL, VanillaGuiLayers.AIR_LEVEL)
-            .put(SELECTED_ITEM_NAME, VanillaGuiLayers.SELECTED_ITEM_NAME)
+            .put(HELD_ITEM_TOOLTIP, VanillaGuiLayers.SELECTED_ITEM_NAME)
             .put(EXPERIENCE_LEVEL, VanillaGuiLayers.EXPERIENCE_LEVEL)
+            .put(SPECTATOR_TOOLTIP, VanillaGuiLayers.SPECTATOR_TOOLTIP)
             .put(STATUS_EFFECTS, VanillaGuiLayers.EFFECTS)
             .put(BOSS_BAR, VanillaGuiLayers.BOSS_OVERLAY)
             .put(SLEEP_OVERLAY, VanillaGuiLayers.SLEEP_OVERLAY)
@@ -50,20 +48,9 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
 
     private final IEventBus eventBus;
     private final Collection<Consumer<RegisterGuiLayersEvent>> eventConsumers = new ArrayList<>();
-    private EventPriority eventPriority = EventPriority.NORMAL;
 
     public GuiLayersContextNeoForgeImpl(IEventBus eventBus) {
         this.eventBus = eventBus;
-    }
-
-    @Override
-    public void setEventPhase(EventPhase eventPhase) {
-        Objects.requireNonNull(eventPhase, "event phase is null");
-        if (this.eventConsumers.isEmpty()) {
-            this.eventPriority = NeoForgeEventInvokerRegistryImpl.getEventPriorityFromPhase(eventPhase);
-        } else {
-            throw new IllegalStateException("RegisterGuiLayersEvent already registered");
-        }
     }
 
     @Override
@@ -121,7 +108,7 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
 
     private void registerGuiLayer(Consumer<RegisterGuiLayersEvent> eventConsumer) {
         if (this.eventConsumers.isEmpty()) {
-            this.eventBus.addListener(this.eventPriority, (final RegisterGuiLayersEvent evt) -> {
+            this.eventBus.addListener((final RegisterGuiLayersEvent evt) -> {
                 for (Consumer<RegisterGuiLayersEvent> consumer : this.eventConsumers) {
                     consumer.accept(evt);
                 }

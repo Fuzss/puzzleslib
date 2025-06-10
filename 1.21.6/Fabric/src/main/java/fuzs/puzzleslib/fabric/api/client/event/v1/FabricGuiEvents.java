@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.api.client.event.v1;
 import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventFactory;
 import net.fabricmc.fabric.api.event.Event;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
 import net.minecraft.client.gui.components.toasts.Toast;
 
 public final class FabricGuiEvents {
@@ -43,17 +43,19 @@ public final class FabricGuiEvents {
      */
     public static final Event<AddToastCallback> ADD_TOAST = FabricEventFactory.createResult(AddToastCallback.class);
     /**
-     * An event that runs just before rendering all game information text lines on the left side of the debug screen
-     * overlay in {@link net.minecraft.client.gui.components.DebugScreenOverlay#drawGameInformation(GuiGraphics)}.
+     * An event that runs when gathering all game information text lines via
+     * {@link DebugScreenOverlay#getGameInformation()}. These are to be rendered on the left side of the debug screen
+     * overlay.
      */
-    public static final Event<GatherDebugTextEvents.Left> GATHER_LEFT_DEBUG_TEXT = FabricEventFactory.create(
-            GatherDebugTextEvents.Left.class);
+    public static final Event<GatherDebugTextEvents.GameInformation> GATHER_GAME_INFORMATION_DEBUG_TEXT = FabricEventFactory.create(
+            GatherDebugTextEvents.GameInformation.class);
     /**
-     * An event that runs just before rendering all system information text lines on the right side of the debug screen
-     * overlay in {@link net.minecraft.client.gui.components.DebugScreenOverlay#drawSystemInformation(GuiGraphics)}.
+     * An event that runs when gathering all system information text lines via
+     * {@link DebugScreenOverlay#getSystemInformation()}. These are to be rendered on the right side of the debug screen
+     * overlay.
      */
-    public static final Event<GatherDebugTextEvents.Right> GATHER_RIGHT_DEBUG_TEXT = FabricEventFactory.create(
-            GatherDebugTextEvents.Right.class);
+    public static final Event<GatherDebugTextEvents.SystemInformation> GATHER_SYSTEM_INFORMATION_DEBUG_TEXT = FabricEventFactory.create(
+            GatherDebugTextEvents.SystemInformation.class);
     /**
      * Called when tooltip lines are gathered for an effect widget in the player inventory when it is hovered by the
      * cursor.

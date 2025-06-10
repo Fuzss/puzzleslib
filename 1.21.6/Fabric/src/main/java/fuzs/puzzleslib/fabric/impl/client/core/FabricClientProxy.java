@@ -2,12 +2,9 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 
 import fuzs.forgeconfigapiport.fabric.api.v5.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
-import fuzs.puzzleslib.api.client.event.v1.gui.RenderGuiEvents;
-import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -28,7 +25,6 @@ import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -241,15 +237,5 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public void setGuiRightHeight(Gui gui, int rightHeight) {
         FabricLoader.getInstance().getObjectShare().put(KEY_GUI_RIGHT_HEIGHT, rightHeight);
-    }
-
-    @Override
-    public void registerProvidedEventHandlers() {
-        super.registerProvidedEventHandlers();
-        RenderGuiEvents.BEFORE.register(EventPhase.FIRST,
-                (Gui gui, GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    GuiHeightHelper.setLeftHeight(gui, 39);
-                    GuiHeightHelper.setRightHeight(gui, 39);
-                });
     }
 }
