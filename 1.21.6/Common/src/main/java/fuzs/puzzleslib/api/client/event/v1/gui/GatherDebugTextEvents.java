@@ -1,48 +1,41 @@
 package fuzs.puzzleslib.api.client.event.v1.gui;
 
-import com.mojang.blaze3d.platform.Window;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.DebugScreenOverlay;
 
 import java.util.List;
 
 public final class GatherDebugTextEvents {
-    public static final EventInvoker<Left> LEFT = EventInvoker.lookup(Left.class);
-    public static final EventInvoker<Right> RIGHT = EventInvoker.lookup(Right.class);
+    public static final EventInvoker<GameInformation> GAME_INFORMATION = EventInvoker.lookup(GameInformation.class);
+    public static final EventInvoker<SystemInformation> SYSTEM_INFORMATION = EventInvoker.lookup(SystemInformation.class);
 
     private GatherDebugTextEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
-    public interface Left {
+    public interface GameInformation {
 
         /**
-         * An event that runs just before rendering all game information text lines on the left side of the debug screen
-         * overlay in {@link net.minecraft.client.gui.components.DebugScreenOverlay#drawGameInformation(GuiGraphics)}.
+         * An event that runs when gathering all game information text lines via
+         * {@link DebugScreenOverlay#getGameInformation()}. These are to be rendered on the left side of the debug
+         * screen overlay.
          *
-         * @param window       game window instance
-         * @param guiGraphics  gui graphics instance
-         * @param deltaTracker current partial tick time
-         * @param lines        game information text lines about to be rendered
+         * @param lines the game information text lines
          */
-        void onGatherLeftDebugText(Window window, GuiGraphics guiGraphics, DeltaTracker deltaTracker, List<String> lines);
+        void onGatherGameInformation(List<String> lines);
     }
 
     @FunctionalInterface
-    public interface Right {
+    public interface SystemInformation {
 
         /**
-         * An event that runs just before rendering all system information text lines on the right side of the debug
-         * screen overlay in
-         * {@link net.minecraft.client.gui.components.DebugScreenOverlay#drawSystemInformation(GuiGraphics)}.
+         * An event that runs when gathering all system information text lines via
+         * {@link DebugScreenOverlay#getSystemInformation()}. These are to be rendered on the right side of the debug
+         * screen overlay.
          *
-         * @param window       game window instance
-         * @param guiGraphics  gui graphics instance
-         * @param deltaTracker current partial tick time
-         * @param lines        system information text lines about to be rendered
+         * @param lines the system information text lines
          */
-        void onGatherRightDebugText(Window window, GuiGraphics guiGraphics, DeltaTracker deltaTracker, List<String> lines);
+        void onGatherSystemInformation(List<String> lines);
     }
 }

@@ -58,7 +58,6 @@
     "client.EntityRenderStateFabricMixin",
     "client.FogRendererFabricMixin",
     "client.GameRendererFabricMixin",
-    "client.GuiFabricMixin",
     "client.GuiGraphicsFabricMixin",
     "client.ItemInHandRendererFabricMixin",
     "client.KeyboardHandlerFabricMixin",

@@ -14,16 +14,19 @@ import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
+import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
@@ -166,20 +169,22 @@ public final class FabricClientEventInvokers {
             return callback::onEndClientTick;
         });
         AtomicInteger atomicInteger = new AtomicInteger();
-        INSTANCE.register(RenderGuiEvents.Before.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.Before callback, @Nullable Object context) -> {
-            return (LayeredDrawerWrapper layeredDrawer) -> {
-                layeredDrawer.attachLayerBefore(IdentifiedLayer.MISC_OVERLAYS, IdentifiedLayer.of(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    callback.onBeforeRenderGui(Minecraft.getInstance().gui, guiGraphics, deltaTracker);
-                }));
-            };
-        }, EventPhase::early, false);
-        INSTANCE.register(RenderGuiEvents.After.class, HudLayerRegistrationCallback.EVENT, (RenderGuiEvents.After callback, @Nullable Object context) -> {
-            return (LayeredDrawerWrapper layeredDrawer) -> {
-                layeredDrawer.addLayer(IdentifiedLayer.of(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                    callback.onAfterRenderGui(Minecraft.getInstance().gui, guiGraphics, deltaTracker);
-                }));
-            };
-        }, EventPhase::late, false);
+        INSTANCE.register(RenderGuiEvents.Before.class, (RenderGuiEvents.Before callback, @Nullable Object context) -> {
+            // register as late as possible, so we capture as many hud layers as possible
+            net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
+                HudElementRegistry.addFirst(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    callback.onBeforeRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                });
+            });
+        });
+        INSTANCE.register(RenderGuiEvents.After.class, (RenderGuiEvents.After callback, @Nullable Object context) -> {
+            // register as late as possible, so we capture as many hud layers as possible
+            net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
+                HudElementRegistry.addLast(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    callback.onAfterRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                });
+            });
+        });
         INSTANCE.register(ItemTooltipCallback.class, net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT, (ItemTooltipCallback callback) -> {
             return (ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag context, List<Component> lines) -> {
                 callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
@@ -268,22 +273,20 @@ public final class FabricClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AfterKeyRelease.class, callback -> {
             return callback::onAfterKeyRelease;
         }, net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
-        INSTANCE.register(CustomizeChatPanelCallback.class, HudLayerRegistrationCallback.EVENT, (CustomizeChatPanelCallback callback) -> {
-            return (LayeredDrawerWrapper layeredDrawer) -> {
-                layeredDrawer.replaceLayer(IdentifiedLayer.CHAT, (IdentifiedLayer identifiedLayer) -> {
-                    return IdentifiedLayer.of(identifiedLayer.id(), (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                        guiGraphics.pose().pushPose();
-                        DefaultedInt posX = DefaultedInt.fromValue(0);
-                        DefaultedInt posY = DefaultedInt.fromValue(guiGraphics.guiHeight() - 48);
-                        callback.onRenderChatPanel(guiGraphics, deltaTracker, posX, posY);
-                        if (posX.getAsOptionalInt().isPresent() || posY.getAsOptionalInt().isPresent()) {
-                            guiGraphics.pose().translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48));
-                        }
-                        identifiedLayer.render(guiGraphics, deltaTracker);
-                        guiGraphics.pose().popPose();
-                    });
-                });
-            };
+        INSTANCE.register(CustomizeChatPanelCallback.class, (CustomizeChatPanelCallback callback, @Nullable Object context) -> {
+            HudElementRegistry.replaceElement(VanillaHudElements.CHAT, (HudElement hudElement) -> {
+                return (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                    guiGraphics.pose().pushMatrix();
+                    DefaultedInt posX = DefaultedInt.fromValue(0);
+                    DefaultedInt posY = DefaultedInt.fromValue(guiGraphics.guiHeight() - 48);
+                    callback.onRenderChatPanel(guiGraphics, deltaTracker, posX, posY);
+                    if (posX.getAsOptionalInt().isPresent() || posY.getAsOptionalInt().isPresent()) {
+                        guiGraphics.pose().translate(posX.getAsInt(), posY.getAsInt() - (guiGraphics.guiHeight() - 48));
+                    }
+                    hudElement.render(guiGraphics, deltaTracker);
+                    guiGraphics.pose().popMatrix();
+                };
+            });
         });
         INSTANCE.register(ClientEntityLevelEvents.Load.class, FabricClientEntityEvents.ENTITY_LOAD);
         INSTANCE.register(ClientEntityLevelEvents.Unload.class, ClientEntityEvents.ENTITY_UNLOAD, (ClientEntityLevelEvents.Unload callback) -> {
@@ -416,8 +419,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
-        INSTANCE.register(GatherDebugTextEvents.Left.class, FabricGuiEvents.GATHER_LEFT_DEBUG_TEXT);
-        INSTANCE.register(GatherDebugTextEvents.Right.class, FabricGuiEvents.GATHER_RIGHT_DEBUG_TEXT);
+        INSTANCE.register(GatherDebugTextEvents.GameInformation.class, FabricGuiEvents.GATHER_GAME_INFORMATION_DEBUG_TEXT);
+        INSTANCE.register(GatherDebugTextEvents.SystemInformation.class, FabricGuiEvents.GATHER_SYSTEM_INFORMATION_DEBUG_TEXT);
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);

@@ -12,7 +12,10 @@ import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
-import fuzs.puzzleslib.api.event.v1.data.*;
+import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
+import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
+import fuzs.puzzleslib.api.event.v1.data.MutableInt;
+import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.impl.client.event.ScreenButtonList;
 import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Minecraft;
@@ -403,15 +406,14 @@ public final class NeoForgeClientEventInvokers {
             EventResult eventResult = callback.onAddToast(minecraft.getToastManager(), evt.getToast());
             if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(GatherDebugTextEvents.Left.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Left callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
-            Minecraft minecraft = Minecraft.getInstance();
-            if (!minecraft.getDebugOverlay().showDebugScreen()) return;
-            callback.onGatherLeftDebugText(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getLeft());
+        INSTANCE.register(GatherDebugTextEvents.GameInformation.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.GameInformation callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+            // to exclude non-game information lines, we insert before that
+            int index = evt.getLeft().lastIndexOf("For help: press F3 + Q");
+            index = Math.max(0, index - 2);
+            callback.onGatherGameInformation(evt.getLeft().subList(0, index));
         });
-        INSTANCE.register(GatherDebugTextEvents.Right.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.Right callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
-            Minecraft minecraft = Minecraft.getInstance();
-            if (!minecraft.getDebugOverlay().showDebugScreen()) return;
-            callback.onGatherRightDebugText(evt.getWindow(), evt.getGuiGraphics(), evt.getPartialTick(), evt.getRight());
+        INSTANCE.register(GatherDebugTextEvents.SystemInformation.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.SystemInformation callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+            callback.onGatherSystemInformation(evt.getRight());
         });
         INSTANCE.register(ComputeFieldOfViewCallback.class, ViewportEvent.ComputeFov.class, (ComputeFieldOfViewCallback callback, ViewportEvent.ComputeFov evt) -> {
             MutableFloat fieldOfView = MutableFloat.fromEvent(evt::setFOV, evt::getFOV);

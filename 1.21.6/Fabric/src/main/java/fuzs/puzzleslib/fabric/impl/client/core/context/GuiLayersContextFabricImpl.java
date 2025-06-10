@@ -2,72 +2,47 @@ package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
-import fuzs.puzzleslib.api.client.gui.v2.GuiHeightHelper;
-import fuzs.puzzleslib.api.event.v1.core.EventPhase;
-import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
-import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
-import net.fabricmc.fabric.api.client.rendering.v1.LayeredDrawerWrapper;
-import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 
-import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.UnaryOperator;
 
 public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     private static final Map<ResourceLocation, ResourceLocation> VANILLA_GUI_LAYERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
-            .put(CAMERA_OVERLAYS, IdentifiedLayer.MISC_OVERLAYS)
-            .put(CROSSHAIR, IdentifiedLayer.CROSSHAIR)
-            .put(HOTBAR, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(JUMP_METER, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(INFO_BAR, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(PLAYER_HEALTH, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(ARMOR_LEVEL, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(FOOD_LEVEL, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(VEHICLE_HEALTH, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(AIR_LEVEL, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(SELECTED_ITEM_NAME, IdentifiedLayer.HOTBAR_AND_BARS)
-            .put(EXPERIENCE_LEVEL, IdentifiedLayer.EXPERIENCE_LEVEL)
-            .put(STATUS_EFFECTS, IdentifiedLayer.STATUS_EFFECTS)
-            .put(BOSS_BAR, IdentifiedLayer.BOSS_BAR)
-            .put(SLEEP_OVERLAY, IdentifiedLayer.SLEEP)
-            .put(DEMO_TIMER, IdentifiedLayer.DEMO_TIMER)
-            .put(DEBUG_OVERLAY, IdentifiedLayer.DEBUG)
-            .put(SCOREBOARD, IdentifiedLayer.SCOREBOARD)
-            .put(OVERLAY_MESSAGE, IdentifiedLayer.OVERLAY_MESSAGE)
-            .put(TITLE, IdentifiedLayer.TITLE_AND_SUBTITLE)
-            .put(CHAT, IdentifiedLayer.CHAT)
-            .put(PLAYER_LIST, IdentifiedLayer.PLAYER_LIST)
-            .put(SUBTITLES, IdentifiedLayer.SUBTITLES)
+            .put(CAMERA_OVERLAYS, VanillaHudElements.MISC_OVERLAYS)
+            .put(CROSSHAIR, VanillaHudElements.CROSSHAIR)
+            .put(HOTBAR, VanillaHudElements.HOTBAR)
+            .put(INFO_BAR, VanillaHudElements.INFO_BAR)
+            .put(PLAYER_HEALTH, VanillaHudElements.HEALTH_BAR)
+            .put(ARMOR_LEVEL, VanillaHudElements.ARMOR_BAR)
+            .put(FOOD_LEVEL, VanillaHudElements.FOOD_BAR)
+            .put(VEHICLE_HEALTH, VanillaHudElements.MOUNT_HEALTH)
+            .put(AIR_LEVEL, VanillaHudElements.AIR_BAR)
+            .put(HELD_ITEM_TOOLTIP, VanillaHudElements.HELD_ITEM_TOOLTIP)
+            .put(EXPERIENCE_LEVEL, VanillaHudElements.EXPERIENCE_LEVEL)
+            .put(SPECTATOR_TOOLTIP, VanillaHudElements.SPECTATOR_TOOLTIP)
+            .put(STATUS_EFFECTS, VanillaHudElements.STATUS_EFFECTS)
+            .put(BOSS_BAR, VanillaHudElements.BOSS_BAR)
+            .put(SLEEP_OVERLAY, VanillaHudElements.SLEEP)
+            .put(DEMO_TIMER, VanillaHudElements.DEMO_TIMER)
+            .put(DEBUG_OVERLAY, VanillaHudElements.DEBUG)
+            .put(SCOREBOARD, VanillaHudElements.SCOREBOARD)
+            .put(OVERLAY_MESSAGE, VanillaHudElements.OVERLAY_MESSAGE)
+            .put(TITLE, VanillaHudElements.TITLE_AND_SUBTITLE)
+            .put(CHAT, VanillaHudElements.CHAT)
+            .put(PLAYER_LIST, VanillaHudElements.PLAYER_LIST)
+            .put(SUBTITLES, VanillaHudElements.SUBTITLES)
             .build();
-    public static final Map<ResourceLocation, UnaryOperator<LayeredDraw.Layer>> REPLACED_GUI_LAYERS = new IdentityHashMap<>();
-
-    private ResourceLocation eventPhase = EventPhase.DEFAULT.resourceLocation();
-
-    @Override
-    public void setEventPhase(EventPhase eventPhase) {
-        Objects.requireNonNull(eventPhase, "event phase is null");
-        FabricEventInvokerRegistryImpl.registerEventPhaseIfNecessary(HudLayerRegistrationCallback.EVENT, eventPhase);
-        this.eventPhase = eventPhase.resourceLocation();
-    }
 
     @Override
     public void registerGuiLayer(ResourceLocation resourceLocation, GuiLayersContext.Layer guiLayer) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
-        HudLayerRegistrationCallback.EVENT.register(this.eventPhase, (LayeredDrawerWrapper layeredDrawerWrapper) -> {
-            layeredDrawerWrapper.addLayer(IdentifiedLayer.of(resourceLocation, guiLayer));
-        });
+        HudElementRegistry.addLast(resourceLocation, guiLayer::render);
     }
 
     @Override
@@ -76,17 +51,13 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         Objects.requireNonNull(otherResourceLocation, "other resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
-            ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
-            HudLayerRegistrationCallback.EVENT.register(this.eventPhase,
-                    (LayeredDrawerWrapper layeredDrawerWrapper) -> {
-                        layeredDrawerWrapper.attachLayerAfter(vanillaResourceLocation, otherResourceLocation, guiLayer);
-                    });
+            HudElementRegistry.attachElementAfter(VANILLA_GUI_LAYERS.get(resourceLocation),
+                    otherResourceLocation,
+                    guiLayer::render);
         } else if (VANILLA_GUI_LAYERS.containsKey(otherResourceLocation)) {
-            ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(otherResourceLocation);
-            HudLayerRegistrationCallback.EVENT.register(this.eventPhase,
-                    (LayeredDrawerWrapper layeredDrawerWrapper) -> {
-                        layeredDrawerWrapper.attachLayerBefore(vanillaResourceLocation, resourceLocation, guiLayer);
-                    });
+            HudElementRegistry.attachElementBefore(VANILLA_GUI_LAYERS.get(otherResourceLocation),
+                    resourceLocation,
+                    guiLayer::render);
         } else {
             throw new RuntimeException("Unregistered gui layers: " + resourceLocation + ", " + otherResourceLocation);
         }
@@ -97,85 +68,11 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayerFactory, "gui layer factory is null");
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
-            ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
-            if (vanillaResourceLocation != IdentifiedLayer.HOTBAR_AND_BARS) {
-                HudLayerRegistrationCallback.EVENT.register(this.eventPhase,
-                        (LayeredDrawerWrapper layeredDrawerWrapper) -> {
-                            layeredDrawerWrapper.replaceLayer(vanillaResourceLocation,
-                                    (IdentifiedLayer identifiedLayer) -> {
-                                        return IdentifiedLayer.of(identifiedLayer.id(),
-                                                guiLayerFactory.apply(identifiedLayer));
-                                    });
-                        });
-            } else {
-                REPLACED_GUI_LAYERS.merge(resourceLocation,
-                        guiLayerFactory,
-                        (UnaryOperator<LayeredDraw.Layer> originalGuiLayerFactory, UnaryOperator<LayeredDraw.Layer> newGuiLayerFactory) -> {
-                            return (LayeredDraw.Layer layer) -> {
-                                return newGuiLayerFactory.apply(originalGuiLayerFactory.apply(layer));
-                            };
-                        });
-            }
+            HudElementRegistry.replaceElement(VANILLA_GUI_LAYERS.get(resourceLocation), (HudElement hudElement) -> {
+                return guiLayerFactory.apply(hudElement::render)::render;
+            });
         } else {
             throw new RuntimeException("Unregistered gui layer: " + resourceLocation);
-        }
-    }
-
-    public static void renderGuiLayer(ResourceLocation resourceLocation, GuiGraphics guiGraphics, DeltaTracker deltaTracker, Runnable runnable) {
-        UnaryOperator<LayeredDraw.Layer> unaryOperator = REPLACED_GUI_LAYERS.get(resourceLocation);
-        if (unaryOperator != null) {
-            unaryOperator.apply((GuiGraphics guiGraphicsX, DeltaTracker deltaTrackerX) -> {
-                runnable.run();
-            }).render(guiGraphics, deltaTracker);
-        } else {
-            runnable.run();
-        }
-    }
-
-    public static void applyPlayerHealthGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player) {
-            int playerHealth = Mth.ceil(player.getHealth());
-            float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH),
-                    (float) Math.max(gui.displayHealth, playerHealth));
-            int absorptionAmount = Mth.ceil(player.getAbsorptionAmount());
-            int healthRows = Mth.ceil((maxHealth + (float) absorptionAmount) / 2.0F / 10.0F);
-            int healthRowShift = Math.max(10 - (healthRows - 2), 3);
-            GuiHeightHelper.addLeftHeight(gui, 10 + (healthRows - 1) * healthRowShift);
-        }
-    }
-
-    public static void applyArmorLevelGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player) {
-            if (player.getArmorValue() > 0) {
-                GuiHeightHelper.addLeftHeight(gui, 10);
-            }
-        }
-    }
-
-    public static void applyFoodLevelGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player) {
-            LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
-            if (gui.getVehicleMaxHearts(livingEntity) == 0) {
-                GuiHeightHelper.addRightHeight(gui, 10);
-            }
-        }
-    }
-
-    public static void applyAirLevelGuiHeight(Gui gui) {
-        if (gui.minecraft.gameMode.canHurtPlayer() && gui.minecraft.getCameraEntity() instanceof Player player) {
-            int maxAirSupply = player.getMaxAirSupply();
-            int airSupply = Math.min(player.getAirSupply(), maxAirSupply);
-            if (player.isEyeInFluid(FluidTags.WATER) || airSupply < maxAirSupply) {
-                GuiHeightHelper.addRightHeight(gui, 10);
-            }
-        }
-    }
-
-    public static void applyVehicleHealthGuiHeight(Gui gui) {
-        if (gui.minecraft.getCameraEntity() instanceof Player) {
-            LivingEntity livingEntity = gui.getPlayerVehicleWithHealth();
-            int maxHearts = gui.getVehicleMaxHearts(livingEntity);
-            GuiHeightHelper.addRightHeight(gui, 10 * Mth.ceil(maxHearts / 10.0F));
         }
     }
 }

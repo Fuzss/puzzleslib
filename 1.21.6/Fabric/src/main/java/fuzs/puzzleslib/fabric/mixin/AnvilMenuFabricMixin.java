@@ -40,13 +40,13 @@ abstract class AnvilMenuFabricMixin extends ItemCombinerMenu {
         MutableInt repairMaterialCost = MutableInt.fromEvent((int i) -> this.repairItemCountCost = i,
                 () -> this.repairItemCountCost);
         EventResult eventResult = FabricPlayerEvents.CREATE_ANVIL_RESULT.invoker()
-                .onCreateAnvilResult(primaryItemStack,
+                .onCreateAnvilResult(this.player,
+                        primaryItemStack,
                         secondaryItemStack,
                         outputItemStack,
                         this.itemName,
                         enchantmentLevelCost,
-                        repairMaterialCost,
-                        this.player);
+                        repairMaterialCost);
         if (eventResult.isInterrupt()) {
             outputItemStack.accept(ItemStack.EMPTY);
             enchantmentLevelCost.accept(0);
