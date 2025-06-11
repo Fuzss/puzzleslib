@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.gui.v2;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 
 /**
@@ -15,16 +16,16 @@ public final class ScreenHelper {
     }
 
     /**
-     * Get the current partial tick time while taking into account whether the game is paused.
+     * Get the current partial tick time; respecting whether the game is paused.
      *
-     * @return current partial tick time
+     * @return the current partial tick time
      */
     public static float getPartialTick() {
         return Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
     }
 
     /**
-     * @return current mouse x position
+     * @return the current mouse x-position
      */
     public static int getMouseX() {
         Minecraft minecraft = Minecraft.getInstance();
@@ -33,7 +34,7 @@ public final class ScreenHelper {
     }
 
     /**
-     * @return current mouse y position
+     * @return the current mouse y-position
      */
     public static int getMouseY() {
         Minecraft minecraft = Minecraft.getInstance();
@@ -42,14 +43,14 @@ public final class ScreenHelper {
     }
 
     /**
-     * Checks if the mouse cursor is hovering a defined region.
+     * Checks if the mouse cursor is hovering in a defined region.
      *
      * @param posX   the x-start of the hover area
      * @param posY   the y-start of the hover area
      * @param width  the width from x-start of the hover area
      * @param height the height from y-start of the hover area
-     * @param mouseX mouse x position
-     * @param mouseY mouse y position
+     * @param mouseX the mouse x-position
+     * @param mouseY the mouse y-position
      * @return is the mouse cursor hovering the defined region
      */
     public static boolean isHovering(int posX, int posY, int width, int height, double mouseX, double mouseY) {
@@ -57,10 +58,34 @@ public final class ScreenHelper {
     }
 
     /**
+     * Returns the current render height for status bars on the left side drawn as part of the gui.
+     * <p>
+     * In vanilla this includes player health and armor level.
+     *
+     * @param resourceLocation the height provider location
+     * @return the status bar render height
+     */
+    public static int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
+        return ClientProxyImpl.get().getLeftStatusBarHeight(resourceLocation);
+    }
+
+    /**
+     * Returns the current render height for status bars on the right side drawn as part of the gui.
+     * <p>
+     * In vanilla this includes player food level, vehicle health and air bubbles.
+     *
+     * @param resourceLocation the height provider location
+     * @return the status bar render height
+     */
+    public static int getRightStatusBarHeight(ResourceLocation resourceLocation) {
+        return ClientProxyImpl.get().getRightStatusBarHeight(resourceLocation);
+    }
+
+    /**
      * Can a mob effect render in the player inventory via
      * {@link net.minecraft.client.gui.screens.inventory.EffectsInInventory}.
      *
-     * @param mobEffect the mob effect instance
+     * @param mobEffect the mob effect
      * @return is rendering permitted
      */
     public static boolean isEffectVisibleInInventory(MobEffectInstance mobEffect) {
@@ -70,7 +95,7 @@ public final class ScreenHelper {
     /**
      * Can a mob effect render in the {@link Gui}.
      *
-     * @param mobEffect the mob effect instance
+     * @param mobEffect the mob effect
      * @return is rendering permitted
      */
     public static boolean isEffectVisibleInGui(MobEffectInstance mobEffect) {

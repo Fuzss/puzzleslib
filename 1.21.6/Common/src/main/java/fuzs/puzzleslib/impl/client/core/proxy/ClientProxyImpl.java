@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 
-public interface ClientProxyImpl extends ProxyImpl, GuiHeightProxy {
+public interface ClientProxyImpl extends ProxyImpl {
 
     static ClientProxyImpl get() {
         return (ClientProxyImpl) ProxyImpl.INSTANCE;
@@ -61,6 +61,10 @@ public interface ClientProxyImpl extends ProxyImpl, GuiHeightProxy {
     boolean isEffectVisibleInGui(MobEffectInstance mobEffect);
 
     void registerWoodType(WoodType woodType);
+
+    int getLeftStatusBarHeight(ResourceLocation resourceLocation);
+
+    int getRightStatusBarHeight(ResourceLocation resourceLocation);
 
     @Override
     default Player getClientPlayer() {

@@ -31,33 +31,45 @@ abstract class ScreenFabricMixin extends AbstractContainerEventHandler implement
 
     @Inject(method = "init(Lnet/minecraft/client/Minecraft;II)V", at = @At("HEAD"))
     public void init(Minecraft client, int width, int height, CallbackInfo callback) {
-        this.puzzleslib$allowMouseDragEvent = FabricEventFactory.createBooleanResult(ExtraScreenMouseEvents.AllowMouseDrag.class, false);
+        this.puzzleslib$allowMouseDragEvent = FabricEventFactory.createBooleanResult(ExtraScreenMouseEvents.AllowMouseDrag.class,
+                false);
         this.puzzleslib$beforeMouseDragEvent = FabricEventFactory.create(ExtraScreenMouseEvents.BeforeMouseDrag.class);
         this.puzzleslib$afterMouseDragEvent = FabricEventFactory.create(ExtraScreenMouseEvents.AfterMouseDrag.class);
     }
 
     @Override
     public Event<ExtraScreenMouseEvents.AllowMouseDrag> puzzleslib$getAllowMouseDragEvent() {
-        Objects.requireNonNull(this.puzzleslib$allowMouseDragEvent, "allow mouse drag event is null for screen " + this.getClass().getName());
+        Objects.requireNonNull(this.puzzleslib$allowMouseDragEvent,
+                "allow mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$allowMouseDragEvent;
     }
 
     @Override
     public Event<ExtraScreenMouseEvents.BeforeMouseDrag> puzzleslib$getBeforeMouseDragEvent() {
-        Objects.requireNonNull(this.puzzleslib$beforeMouseDragEvent, "before mouse drag event is null for screen " + this.getClass().getName());
+        Objects.requireNonNull(this.puzzleslib$beforeMouseDragEvent,
+                "before mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$beforeMouseDragEvent;
     }
 
     @Override
     public Event<ExtraScreenMouseEvents.AfterMouseDrag> puzzleslib$getAfterMouseDragEvent() {
-        Objects.requireNonNull(this.puzzleslib$afterMouseDragEvent, "after mouse drag event is null for screen " + this.getClass().getName());
+        Objects.requireNonNull(this.puzzleslib$afterMouseDragEvent,
+                "after mouse drag event is null for screen " + this.getClass().getName());
         return this.puzzleslib$afterMouseDragEvent;
     }
 
-    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/screens/Screen;renderBackground(Lnet/minecraft/client/gui/GuiGraphics;IIF)V", shift = At.Shift.AFTER))
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo callback) {
+    @Inject(
+            method = "renderWithTooltip",
+            at = @At(
+                    value = "INVOKE",
+                    target = "Lnet/minecraft/client/gui/screens/Screen;renderBackground(Lnet/minecraft/client/gui/GuiGraphics;IIF)V",
+                    shift = At.Shift.AFTER
+            )
+    )
+    public void renderWithTooltip(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick, CallbackInfo callback) {
         if (AbstractContainerScreen.class.isInstance(this)) {
-            FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND.invoker().onDrawBackground(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
+            FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND.invoker()
+                    .onDrawBackground(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
         }
     }
 }

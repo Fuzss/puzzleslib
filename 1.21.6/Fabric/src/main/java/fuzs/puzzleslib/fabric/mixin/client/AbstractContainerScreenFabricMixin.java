@@ -17,13 +17,14 @@ abstract class AbstractContainerScreenFabricMixin extends Screen {
         super(component);
     }
 
-    @Inject(method = "render",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderLabels(Lnet/minecraft/client/gui/GuiGraphics;II)V",
-                    shift = At.Shift.AFTER
-            )
+    @Inject(
+            method = "renderContents", at = @At(
+            value = "INVOKE",
+            target = "Lnet/minecraft/client/gui/screens/inventory/AbstractContainerScreen;renderLabels(Lnet/minecraft/client/gui/GuiGraphics;II)V",
+            shift = At.Shift.AFTER
     )
-    public void render$1(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo callback) {
+    )
+    public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo callback) {
         FabricGuiEvents.CONTAINER_SCREEN_FOREGROUND.invoker()
                 .onDrawForeground(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
     }

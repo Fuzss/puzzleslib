@@ -57,7 +57,6 @@ transitive-accessible   method  net/minecraft/world/item/enchantment/Enchantment
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentInSlotVisitor
 transitive-accessible   class   net/minecraft/world/item/enchantment/EnchantmentHelper$EnchantmentVisitor
 transitive-accessible   method  net/minecraft/client/renderer/LevelRenderer renderHitOutline    (Lcom/mojang/blaze3d/vertex/PoseStack;Lcom/mojang/blaze3d/vertex/VertexConsumer;Lnet/minecraft/world/entity/Entity;DDDLnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;I)V
-transitive-accessible   field   net/minecraft/client/gui/Gui    minecraft   Lnet/minecraft/client/Minecraft;
 transitive-accessible   method  net/minecraft/data/recipes/ShapedRecipeBuilder  <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/level/ItemLike;I)V
 transitive-accessible   method  net/minecraft/data/recipes/ShapelessRecipeBuilder   <init>  (Lnet/minecraft/core/HolderGetter;Lnet/minecraft/data/recipes/RecipeCategory;Lnet/minecraft/world/item/ItemStack;)V
 transitive-accessible   field   net/minecraft/client/renderer/entity/AgeableMobRenderer adultModel  Lnet/minecraft/client/model/EntityModel;
@@ -153,9 +152,11 @@ accessible  field   net/minecraft/data/registries/RegistriesDatapackGenerator   
 mutable field   net/minecraft/data/registries/RegistriesDatapackGenerator   registries  Ljava/util/concurrent/CompletableFuture;
 accessible  method  net/minecraft/client/gui/components/toasts/ToastManager freeSlotCount   ()I
 accessible  field   net/minecraft/client/gui/screens/TitleScreen    fading  Z
+transitive-accessible   field   net/minecraft/client/gui/Gui    minecraft   Lnet/minecraft/client/Minecraft;
 transitive-accessible   method	net/minecraft/client/gui/Gui	getCameraPlayer	()Lnet/minecraft/world/entity/player/Player;
 transitive-accessible   method  net/minecraft/client/gui/Gui    getVehicleMaxHearts (Lnet/minecraft/world/entity/LivingEntity;)I
 transitive-accessible   method  net/minecraft/client/gui/Gui    getPlayerVehicleWithHealth  ()Lnet/minecraft/world/entity/LivingEntity;
+transitive-accessible   method  net/minecraft/client/gui/Gui    getVisibleVehicleHeartRows  (I)I
 accessible  field   net/minecraft/client/gui/Gui    displayHealth   I
 accessible  field   net/minecraft/client/gui/Gui    tabList Lnet/minecraft/client/gui/components/PlayerTabOverlay;
 accessible  field   net/minecraft/server/level/ChunkMap entityMap   Lit/unimi/dsi/fastutil/ints/Int2ObjectMap;

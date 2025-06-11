@@ -6,6 +6,8 @@ import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
+import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistry;
+import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
@@ -13,7 +15,6 @@ import fuzs.puzzleslib.fabric.impl.client.util.EntityRenderStateExtension;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
-import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
@@ -28,7 +29,6 @@ import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -60,8 +60,6 @@ import java.util.Objects;
 import java.util.function.IntFunction;
 
 public class FabricClientProxy extends FabricCommonProxy implements ClientProxyImpl {
-    private static final String KEY_GUI_LEFT_HEIGHT = PuzzlesLibMod.id("gui_left_height").toString();
-    private static final String KEY_GUI_RIGHT_HEIGHT = PuzzlesLibMod.id("gui_right_height").toString();
 
     @Override
     public void registerLoadingHandlers() {
@@ -220,22 +218,18 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public int getGuiLeftHeight(Gui gui) {
-        return FabricLoader.getInstance().getObjectShare().get(KEY_GUI_LEFT_HEIGHT) instanceof Integer i ? i : 0;
+    public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
+        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
     }
 
     @Override
-    public int getGuiRightHeight(Gui gui) {
-        return FabricLoader.getInstance().getObjectShare().get(KEY_GUI_RIGHT_HEIGHT) instanceof Integer i ? i : 0;
+    public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
+        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
     }
 
     @Override
-    public void setGuiLeftHeight(Gui gui, int leftHeight) {
-        FabricLoader.getInstance().getObjectShare().put(KEY_GUI_LEFT_HEIGHT, leftHeight);
-    }
-
-    @Override
-    public void setGuiRightHeight(Gui gui, int rightHeight) {
-        FabricLoader.getInstance().getObjectShare().put(KEY_GUI_RIGHT_HEIGHT, rightHeight);
+    public void registerProvidedEventHandlers() {
+        super.registerProvidedEventHandlers();
+        HudStatusBarHeightRegistryImpl.init();
     }
 }

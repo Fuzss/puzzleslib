@@ -5,18 +5,24 @@ import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
 import fuzs.puzzleslib.neoforge.mixin.client.accessor.RegisterGuiLayersEventAccessor;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 
 public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
@@ -65,6 +71,7 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(otherResourceLocation, "other resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
+        // only check for vanilla layers, it simplifies the implementation and is all we need
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
             this.registerGuiLayer((RegisterGuiLayersEvent evt) -> evt.registerAbove(VANILLA_GUI_LAYERS.get(
                     resourceLocation), otherResourceLocation, guiLayer::render));
@@ -72,7 +79,7 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
             this.registerGuiLayer((RegisterGuiLayersEvent evt) -> evt.registerBelow(VANILLA_GUI_LAYERS.get(
                     otherResourceLocation), resourceLocation, guiLayer::render));
         } else {
-            throw new RuntimeException("Unregistered gui layers: " + resourceLocation + ", " + otherResourceLocation);
+            throw new RuntimeException("Unknown gui layers: " + resourceLocation + ", " + otherResourceLocation);
         }
     }
 
@@ -80,6 +87,7 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
     public void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<GuiLayersContext.Layer> guiLayerFactory) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayerFactory, "gui layer factory is null");
+        // only check for vanilla layers, it simplifies the implementation and is all we need
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
             ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
             this.registerGuiLayer((RegisterGuiLayersEvent evt) -> {
@@ -102,7 +110,7 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
                         });
             });
         } else {
-            throw new RuntimeException("Unregistered gui layer: " + resourceLocation);
+            throw new RuntimeException("Unknown gui layer: " + resourceLocation);
         }
     }
 
@@ -115,5 +123,32 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
             });
         }
         this.eventConsumers.add(eventConsumer);
+    }
+
+    @Override
+    public void addLeftStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider) {
+        this.addStatusBarHeight(resourceLocation, heightProvider, (Gui gui, Integer height) -> {
+            gui.leftHeight += height;
+        });
+    }
+
+    @Override
+    public void addRightStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider) {
+        this.addStatusBarHeight(resourceLocation, heightProvider, (Gui gui, Integer height) -> {
+            gui.rightHeight += height;
+        });
+    }
+
+    private void addStatusBarHeight(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider, BiConsumer<Gui, Integer> heightConsumer) {
+        Objects.requireNonNull(resourceLocation, "resource location is null");
+        Objects.requireNonNull(heightProvider, "height provider is null");
+        NeoForge.EVENT_BUS.addListener((final RenderGuiLayerEvent.Post evt) -> {
+            if (evt.getName().equals(resourceLocation)) {
+                Gui gui = Minecraft.getInstance().gui;
+                if (gui.getCameraPlayer() != null) {
+                    heightConsumer.accept(gui, heightProvider.applyAsInt(gui.getCameraPlayer()));
+                }
+            }
+        });
     }
 }
