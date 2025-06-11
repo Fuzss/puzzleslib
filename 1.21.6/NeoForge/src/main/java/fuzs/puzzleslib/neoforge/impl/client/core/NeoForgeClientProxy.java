@@ -15,8 +15,8 @@ import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import fuzs.puzzleslib.neoforge.impl.core.NeoForgeCommonProxy;
 import fuzs.puzzleslib.neoforge.impl.core.context.PayloadTypesContextNeoForgeImpl;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
@@ -195,22 +195,12 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public int getGuiLeftHeight(Gui gui) {
-        return gui.leftHeight;
+    public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
+        return Minecraft.getInstance().gui.leftHeight;
     }
 
     @Override
-    public int getGuiRightHeight(Gui gui) {
-        return gui.rightHeight;
-    }
-
-    @Override
-    public void setGuiLeftHeight(Gui gui, int leftHeight) {
-        gui.leftHeight = leftHeight;
-    }
-
-    @Override
-    public void setGuiRightHeight(Gui gui, int rightHeight) {
-        gui.rightHeight = rightHeight;
+    public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
+        return Minecraft.getInstance().gui.leftHeight;
     }
 }

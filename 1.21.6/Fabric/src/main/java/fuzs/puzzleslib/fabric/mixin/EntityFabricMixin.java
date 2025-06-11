@@ -74,7 +74,7 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     }
 
     @WrapWithCondition(
-            method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;F)Lnet/minecraft/world/entity/item/ItemEntity;",
+            method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
@@ -97,26 +97,24 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     )
     public void startRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> callback) {
         // runs a little later than Forge when it is actually guaranteed for the rider to start riding
-        EventResult result = FabricEntityEvents.ENTITY_START_RIDING.invoker().onStartRiding(this.level,
-                Entity.class.cast(this), vehicle
-        );
+        EventResult result = FabricEntityEvents.ENTITY_START_RIDING.invoker()
+                .onStartRiding(this.level, Entity.class.cast(this), vehicle);
         if (result.isInterrupt()) callback.setReturnValue(false);
     }
 
     @Inject(method = "removeVehicle", at = @At("HEAD"), cancellable = true)
     public void removeVehicle(CallbackInfo callback) {
         if (this.vehicle != null) {
-            EventResult result = FabricEntityEvents.ENTITY_STOP_RIDING.invoker().onStopRiding(this.level,
-                    Entity.class.cast(this), this.vehicle
-            );
+            EventResult result = FabricEntityEvents.ENTITY_STOP_RIDING.invoker()
+                    .onStopRiding(this.level, Entity.class.cast(this), this.vehicle);
             if (result.isInterrupt()) callback.cancel();
         }
     }
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(EntityType<?> entityType, Level level, CallbackInfo callback) {
-        EventResultHolder<EntityDimensions> result = FabricEntityEvents.CHANGE_ENTITY_SIZE.invoker().onChangeEntitySize(
-                Entity.class.cast(this), Pose.STANDING, entityType.getDimensions());
+        EventResultHolder<EntityDimensions> result = FabricEntityEvents.CHANGE_ENTITY_SIZE.invoker()
+                .onChangeEntitySize(Entity.class.cast(this), Pose.STANDING, entityType.getDimensions());
         result.ifInterrupt((EntityDimensions entityDimensions) -> {
             this.dimensions = entityDimensions;
             this.eyeHeight = entityDimensions.eyeHeight();
@@ -125,8 +123,8 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
 
     @ModifyVariable(method = "refreshDimensions", at = @At("STORE"), ordinal = 1)
     public EntityDimensions refreshDimensions(EntityDimensions entityDimensions) {
-        EventResultHolder<EntityDimensions> result = FabricEntityEvents.CHANGE_ENTITY_SIZE.invoker().onChangeEntitySize(
-                Entity.class.cast(this), this.getPose(), entityDimensions);
+        EventResultHolder<EntityDimensions> result = FabricEntityEvents.CHANGE_ENTITY_SIZE.invoker()
+                .onChangeEntitySize(Entity.class.cast(this), this.getPose(), entityDimensions);
         return result.getInterrupt().orElse(entityDimensions);
     }
 

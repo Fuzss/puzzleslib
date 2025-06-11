@@ -4,7 +4,9 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 
+import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 
 /**
@@ -133,6 +135,32 @@ public interface GuiLayersContext {
      * @param guiLayerFactory  the gui layer factory, receiving the existing layer
      */
     void replaceGuiLayer(ResourceLocation resourceLocation, UnaryOperator<Layer> guiLayerFactory);
+
+    /**
+     * Register an additional height provider for a status bar layer rendered on the left side above the hotbar.
+     * <p>
+     * This is required for proper vertical positioning of the layer together with all other registered status bars.
+     * <p>
+     * To retrieve the render height for a status bar during rendering of the layer use
+     * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getLeftStatusBarHeight(ResourceLocation)}.
+     *
+     * @param resourceLocation the gui layer resource location
+     * @param heightProvider   the status bar height provider
+     */
+    void addLeftStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider);
+
+    /**
+     * Register an additional height provider for a status bar layer rendered on the right side above the hotbar.
+     * <p>
+     * This is required for proper vertical positioning of the layer together with all other registered status bars.
+     * <p>
+     * To retrieve the render height for a status bar during rendering of the layer use
+     * {@link fuzs.puzzleslib.api.client.gui.v2.ScreenHelper#getRightStatusBarHeight(ResourceLocation)}.
+     *
+     * @param resourceLocation the gui layer resource location
+     * @param heightProvider   the status bar height provider
+     */
+    void addRightStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider);
 
     @FunctionalInterface
     interface Layer {
