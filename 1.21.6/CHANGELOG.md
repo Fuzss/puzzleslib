@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.6.0-1.21.6] - 2025-06-08
+## [v21.6.0-1.21.6] - 2025-06-12
 - Update to Minecraft 1.21.6
 ### Added
 - Add `CommonHelper::getMinecraftServer`
@@ -28,7 +28,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove `RenderTypeHelper`, all functionality is now covered by `RenderTypesContext`
 - Remove `ExtendedMenuSupplier`
 - Remove `EnchantingHelper::isBookEnchantable`
-- Remove `BlockEvents$FarmlandTrample`
+- Remove `BlockEvents.FarmlandTrample`
 - Remove defaulted mutable value classes from public api
 - Remove `ComputeEnchantedLootBonusCallback`
 - Remove `EnchantingHelper::getMobLootingLevel`
+- Remove `ServerEntityLevelEvents.Spawn`

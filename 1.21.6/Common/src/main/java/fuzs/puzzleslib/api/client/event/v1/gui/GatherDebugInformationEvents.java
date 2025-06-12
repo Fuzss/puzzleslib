@@ -5,21 +5,22 @@ import net.minecraft.client.gui.components.DebugScreenOverlay;
 
 import java.util.List;
 
-public final class GatherDebugTextEvents {
-    public static final EventInvoker<GameInformation> GAME_INFORMATION = EventInvoker.lookup(GameInformation.class);
-    public static final EventInvoker<SystemInformation> SYSTEM_INFORMATION = EventInvoker.lookup(SystemInformation.class);
+public final class GatherDebugInformationEvents {
+    public static final EventInvoker<Game> GAME = EventInvoker.lookup(Game.class);
+    public static final EventInvoker<System> SYSTEM = EventInvoker.lookup(System.class);
 
-    private GatherDebugTextEvents() {
+    private GatherDebugInformationEvents() {
         // NO-OP
     }
 
     @FunctionalInterface
-    public interface GameInformation {
+    public interface Game {
 
         /**
          * An event that runs when gathering all game information text lines via
-         * {@link DebugScreenOverlay#getGameInformation()}. These are to be rendered on the left side of the debug
-         * screen overlay.
+         * {@link DebugScreenOverlay#getGameInformation()}.
+         * <p>
+         * These are to be rendered on the left side of the debug screen overlay.
          *
          * @param lines the game information text lines
          */
@@ -27,12 +28,13 @@ public final class GatherDebugTextEvents {
     }
 
     @FunctionalInterface
-    public interface SystemInformation {
+    public interface System {
 
         /**
          * An event that runs when gathering all system information text lines via
-         * {@link DebugScreenOverlay#getSystemInformation()}. These are to be rendered on the right side of the debug
-         * screen overlay.
+         * {@link DebugScreenOverlay#getSystemInformation()}.
+         * <p>
+         * These are to be rendered on the right side of the debug screen overlay.
          *
          * @param lines the system information text lines
          */

@@ -38,14 +38,15 @@ public final class EntityHelper {
     /**
      * Retrieves a {@link EntitySpawnReason} from a {@link Mob} if it has been set during
      * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
-     * <p>Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
+     * <p>
+     * Note that the spawn type is saved with the mob, so it persists across chunk and level reloads.
      *
      * @param mob the mob
      * @return the spawn type or null if none has been set
      */
-    public static @Nullable EntitySpawnReason getMobSpawnType(Mob mob) {
+    public static @Nullable EntitySpawnReason getMobSpawnReason(Mob mob) {
         Objects.requireNonNull(mob, "mob is null");
-        return ProxyImpl.get().getMobSpawnType(mob);
+        return ProxyImpl.get().getMobSpawnReason(mob);
     }
 
     /**

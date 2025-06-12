@@ -3,7 +3,7 @@ package fuzs.puzzleslib.fabric.mixin;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.util.v1.CodecExtras;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
-import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
+import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import net.minecraft.server.level.ServerLevel;
@@ -23,13 +23,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Mob.class)
-abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
+abstract class MobFabricMixin extends LivingEntity implements SpawnReasonMob {
     @Shadow
     @Nullable
     private LivingEntity target;
     @Unique
     @Nullable
-    private EntitySpawnReason puzzleslib$spawnType;
+    private EntitySpawnReason puzzleslib$spawnReason;
 
     protected MobFabricMixin(EntityType<? extends LivingEntity> entityType, Level level) {
         super(entityType, level);
@@ -37,18 +37,18 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
 
     @Inject(method = "finalizeSpawn", at = @At("TAIL"))
     public void finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason reason, @Nullable SpawnGroupData spawnData, CallbackInfoReturnable<SpawnGroupData> callback) {
-        this.puzzleslib$spawnType = reason;
+        this.puzzleslib$spawnReason = reason;
     }
 
     @Override
     @Nullable
-    public final EntitySpawnReason puzzleslib$getSpawnType() {
-        return this.puzzleslib$spawnType;
+    public final EntitySpawnReason puzzleslib$getSpawnReason() {
+        return this.puzzleslib$spawnReason;
     }
 
     @Override
-    public void puzzleslib$setSpawnType(@Nullable EntitySpawnReason mobSpawnType) {
-        this.puzzleslib$spawnType = mobSpawnType;
+    public void puzzleslib$setSpawnReason(@Nullable EntitySpawnReason entitySpawnReason) {
+        this.puzzleslib$spawnReason = entitySpawnReason;
     }
 
     @Inject(method = "setTarget", at = @At("HEAD"))
@@ -86,12 +86,12 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnTypeMob {
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo callback) {
         valueOutput.storeNullable(PuzzlesLibMod.id("spawn_type").toString(),
                 CodecExtras.ENTITY_SPAWN_REASON_CODEC,
-                this.puzzleslib$spawnType);
+                this.puzzleslib$spawnReason);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo callback) {
-        this.puzzleslib$spawnType = valueInput.read(PuzzlesLibMod.id("spawn_type").toString(),
+        this.puzzleslib$spawnReason = valueInput.read(PuzzlesLibMod.id("spawn_type").toString(),
                 CodecExtras.ENTITY_SPAWN_REASON_CODEC).orElse(null);
     }
 }

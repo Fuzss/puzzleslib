@@ -14,12 +14,12 @@ abstract class DebugScreenOverlayMixin {
 
     @Inject(method = "getGameInformation", at = @At("RETURN"))
     protected void getGameInformation(CallbackInfoReturnable<List<String>> callback) {
-        FabricGuiEvents.GATHER_GAME_INFORMATION_DEBUG_TEXT.invoker().onGatherGameInformation(callback.getReturnValue());
+        FabricGuiEvents.GATHER_GAME_INFORMATION.invoker().onGatherGameInformation(callback.getReturnValue());
     }
 
     @Inject(method = "getSystemInformation", at = @At("RETURN"))
     protected void getSystemInformation(CallbackInfoReturnable<List<String>> callback) {
-        FabricGuiEvents.GATHER_SYSTEM_INFORMATION_DEBUG_TEXT.invoker()
+        FabricGuiEvents.GATHER_SYSTEM_INFORMATION.invoker()
                 .onGatherSystemInformation(callback.getReturnValue());
     }
 }

@@ -47,15 +47,15 @@ public final class FabricGuiEvents {
      * {@link DebugScreenOverlay#getGameInformation()}. These are to be rendered on the left side of the debug screen
      * overlay.
      */
-    public static final Event<GatherDebugTextEvents.GameInformation> GATHER_GAME_INFORMATION_DEBUG_TEXT = FabricEventFactory.create(
-            GatherDebugTextEvents.GameInformation.class);
+    public static final Event<GatherDebugInformationEvents.Game> GATHER_GAME_INFORMATION = FabricEventFactory.create(
+            GatherDebugInformationEvents.Game.class);
     /**
      * An event that runs when gathering all system information text lines via
      * {@link DebugScreenOverlay#getSystemInformation()}. These are to be rendered on the right side of the debug screen
      * overlay.
      */
-    public static final Event<GatherDebugTextEvents.SystemInformation> GATHER_SYSTEM_INFORMATION_DEBUG_TEXT = FabricEventFactory.create(
-            GatherDebugTextEvents.SystemInformation.class);
+    public static final Event<GatherDebugInformationEvents.System> GATHER_SYSTEM_INFORMATION = FabricEventFactory.create(
+            GatherDebugInformationEvents.System.class);
     /**
      * Called when tooltip lines are gathered for an effect widget in the player inventory when it is hovered by the
      * cursor.

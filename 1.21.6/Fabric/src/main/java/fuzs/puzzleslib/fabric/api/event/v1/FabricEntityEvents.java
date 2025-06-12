@@ -19,11 +19,6 @@ public final class FabricEntityEvents {
     public static final Event<ServerEntityLevelEvents.Load> ENTITY_LOAD = FabricEventFactory.createResult(
             ServerEntityLevelEvents.Load.class);
     /**
-     * Fired when an entity is added to the level on the server after it has just been spawned in.
-     */
-    public static final Event<ServerEntityLevelEvents.Spawn> ENTITY_SPAWN = FabricEventFactory.createResult(
-            ServerEntityLevelEvents.Spawn.class);
-    /**
      * Fires when a projectile entity impacts on something, either a block or another entity.
      */
     public static final Event<ProjectileImpactCallback> PROJECTILE_IMPACT = FabricEventFactory.createResult(

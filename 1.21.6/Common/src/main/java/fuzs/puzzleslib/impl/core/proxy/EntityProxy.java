@@ -10,7 +10,7 @@ public interface EntityProxy {
 
     boolean canEquip(ItemStack itemStack, EquipmentSlot equipmentSlot, LivingEntity livingEntity);
 
-    @Nullable EntitySpawnReason getMobSpawnType(Mob mob);
+    @Nullable EntitySpawnReason getMobSpawnReason(Mob mob);
 
     boolean isMobGriefingAllowed(ServerLevel serverLevel, @Nullable Entity entity);
 

@@ -51,7 +51,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.GrindstoneMenu;
 import net.minecraft.world.item.CreativeModeTab;
@@ -443,21 +442,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         });
         INSTANCE.register(ServerEntityLevelEvents.Load.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Load callback, EntityJoinLevelEvent evt) -> {
             if (!(evt.getLevel() instanceof ServerLevel serverLevel)) return;
-            if (callback.onEntityLoad(evt.getEntity(), serverLevel).isInterrupt()) {
+            if (callback.onEntityLoad(evt.getEntity(), serverLevel, !evt.loadedFromDisk()).isInterrupt()) {
                 if (evt.getEntity() instanceof Player) {
                     // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
                     throw new UnsupportedOperationException("Cannot prevent player from loading in!");
-                } else {
-                    evt.setCanceled(true);
-                }
-            }
-        });
-        INSTANCE.register(ServerEntityLevelEvents.Spawn.class, EntityJoinLevelEvent.class, (ServerEntityLevelEvents.Spawn callback, EntityJoinLevelEvent evt) -> {
-            if (!(evt.getLevel() instanceof ServerLevel serverLevel) || evt.loadedFromDisk()) return;
-            if (callback.onEntitySpawn(evt.getEntity(), serverLevel, evt.getEntity() instanceof Mob mob ? mob.getSpawnType() : null).isInterrupt()) {
-                if (evt.getEntity() instanceof Player) {
-                    // we do not support players as it isn't as straight-forward to implement for the server player on Fabric
-                    throw new UnsupportedOperationException("Cannot prevent player from spawning in!");
                 } else {
                     evt.setCanceled(true);
                 }

@@ -406,13 +406,13 @@ public final class NeoForgeClientEventInvokers {
             EventResult eventResult = callback.onAddToast(minecraft.getToastManager(), evt.getToast());
             if (eventResult.isInterrupt()) evt.setCanceled(true);
         });
-        INSTANCE.register(GatherDebugTextEvents.GameInformation.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.GameInformation callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+        INSTANCE.register(GatherDebugInformationEvents.Game.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugInformationEvents.Game callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             // to exclude non-game information lines, we insert before that
             int index = evt.getLeft().lastIndexOf("For help: press F3 + Q");
             index = Math.max(0, index - 2);
             callback.onGatherGameInformation(evt.getLeft().subList(0, index));
         });
-        INSTANCE.register(GatherDebugTextEvents.SystemInformation.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugTextEvents.SystemInformation callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
+        INSTANCE.register(GatherDebugInformationEvents.System.class, CustomizeGuiOverlayEvent.DebugText.class, (GatherDebugInformationEvents.System callback, CustomizeGuiOverlayEvent.DebugText evt) -> {
             callback.onGatherSystemInformation(evt.getRight());
         });
         INSTANCE.register(ComputeFieldOfViewCallback.class, ViewportEvent.ComputeFov.class, (ComputeFieldOfViewCallback callback, ViewportEvent.ComputeFov evt) -> {

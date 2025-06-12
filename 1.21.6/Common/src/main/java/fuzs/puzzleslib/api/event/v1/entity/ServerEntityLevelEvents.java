@@ -6,13 +6,12 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.level.ServerLevelAccessor;
-import org.jetbrains.annotations.Nullable;
 
 public final class ServerEntityLevelEvents {
     public static final EventInvoker<Load> LOAD = EventInvoker.lookup(Load.class);
-    public static final EventInvoker<Spawn> SPAWN = EventInvoker.lookup(Spawn.class);
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
     private ServerEntityLevelEvents() {
@@ -25,32 +24,20 @@ public final class ServerEntityLevelEvents {
         /**
          * Fired when an entity is added to the level on the server, either when being loaded from chunk storage or when
          * just having been spawned in.
+         * <p>
+         * For newly spawned entities the {@link net.minecraft.world.entity.EntitySpawnReason} can be obtained via
+         * {@link fuzs.puzzleslib.api.util.v1.EntityHelper#getMobSpawnReason(Mob)} if captured in
+         * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
          *
-         * @param entity      the entity that is being loaded
-         * @param serverLevel the level the entity is loaded in
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
-         *         discarding it, {@link EventResult#PASS} for the entity to be added normally
+         * @param entity        the entity that is being loaded
+         * @param serverLevel   the level the entity is loaded in
+         * @param isFreshEntity the entity has just been spawned in instead of being loaded from storage
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the entity from being added to the level, effectively discarding it</li>
+         *         <li>{@link EventResult#PASS PASS} for the entity to be added normally</li>
+         *         </ul>
          */
-        EventResult onEntityLoad(Entity entity, ServerLevel serverLevel);
-    }
-
-    @FunctionalInterface
-    public interface Spawn {
-
-        /**
-         * Fired when an entity is added to the level on the server when it has just been spawned in.
-         *
-         * @param entity            the entity that is being spawned
-         * @param serverLevel       the level the entity is spawned in
-         * @param entitySpawnReason this provides the spawn type which has been captured in
-         *                          {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor,
-         *                          DifficultyInstance, EntitySpawnReason, SpawnGroupData)} if it has been called,
-         *                          otherwise
-         *                          <code>null</code>
-         * @return {@link EventResult#INTERRUPT} to prevent the entity from being added to the level, effectively
-         *         discarding it, {@link EventResult#PASS} for the entity to be added normally
-         */
-        EventResult onEntitySpawn(Entity entity, ServerLevel serverLevel, @Nullable EntitySpawnReason entitySpawnReason);
+        EventResult onEntityLoad(Entity entity, ServerLevel serverLevel, boolean isFreshEntity);
     }
 
     @FunctionalInterface
