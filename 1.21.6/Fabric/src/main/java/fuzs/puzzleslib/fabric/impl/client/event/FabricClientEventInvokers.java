@@ -419,8 +419,8 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
-        INSTANCE.register(GatherDebugTextEvents.GameInformation.class, FabricGuiEvents.GATHER_GAME_INFORMATION_DEBUG_TEXT);
-        INSTANCE.register(GatherDebugTextEvents.SystemInformation.class, FabricGuiEvents.GATHER_SYSTEM_INFORMATION_DEBUG_TEXT);
+        INSTANCE.register(GatherDebugInformationEvents.Game.class, FabricGuiEvents.GATHER_GAME_INFORMATION);
+        INSTANCE.register(GatherDebugInformationEvents.System.class, FabricGuiEvents.GATHER_SYSTEM_INFORMATION);
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);

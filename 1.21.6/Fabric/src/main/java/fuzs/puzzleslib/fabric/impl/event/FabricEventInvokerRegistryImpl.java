@@ -342,7 +342,6 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlaySoundEvents.AtPosition.class, FabricLevelEvents.PLAY_SOUND_AT_POSITION);
         INSTANCE.register(PlaySoundEvents.AtEntity.class, FabricLevelEvents.PLAY_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
-        INSTANCE.register(ServerEntityLevelEvents.Spawn.class, FabricEntityEvents.ENTITY_SPAWN);
         INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, (ServerEntityLevelEvents.Unload callback) -> {
             return callback::onEntityUnload;
         });

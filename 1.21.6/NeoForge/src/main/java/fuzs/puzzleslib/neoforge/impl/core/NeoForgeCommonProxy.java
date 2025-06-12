@@ -232,7 +232,7 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public @Nullable EntitySpawnReason getMobSpawnType(Mob mob) {
+    public @Nullable EntitySpawnReason getMobSpawnReason(Mob mob) {
         return mob.getSpawnType();
     }
 

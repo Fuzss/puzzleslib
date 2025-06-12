@@ -14,7 +14,7 @@ import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventInvokerRegistryImpl;
-import fuzs.puzzleslib.fabric.impl.event.SpawnTypeMob;
+import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
 import fuzs.puzzleslib.fabric.impl.init.FabricGameRulesFactory;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
@@ -248,8 +248,8 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     }
 
     @Override
-    public @Nullable EntitySpawnReason getMobSpawnType(Mob mob) {
-        return ((SpawnTypeMob) mob).puzzleslib$getSpawnType();
+    public @Nullable EntitySpawnReason getMobSpawnReason(Mob mob) {
+        return ((SpawnReasonMob) mob).puzzleslib$getSpawnReason();
     }
 
     @Override

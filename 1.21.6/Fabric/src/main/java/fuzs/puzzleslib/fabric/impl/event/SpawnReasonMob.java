@@ -14,12 +14,11 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The implementation is just like Forge, but also allows for setting the spawn type in case e.g.
  * {@link net.minecraft.world.entity.Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason,
- * SpawnGroupData)} was overridden without calling super.
+ * SpawnGroupData)} was overridden without calling {@code super}.
  */
-public interface SpawnTypeMob {
+public interface SpawnReasonMob {
 
-    @Nullable
-    EntitySpawnReason puzzleslib$getSpawnType();
+    @Nullable EntitySpawnReason puzzleslib$getSpawnReason();
 
-    void puzzleslib$setSpawnType(@Nullable EntitySpawnReason mobSpawnType);
+    void puzzleslib$setSpawnReason(@Nullable EntitySpawnReason entitySpawnReason);
 }
