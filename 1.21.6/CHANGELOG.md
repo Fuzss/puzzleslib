@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `GuiGraphicsHelper::drawInBatch8xOutline`
 ### Fixed
 - Fix reading field `puzzleslib:spawn_type` on mobs in worlds created before Minecraft 1.21.6 on Fabric
+- Fix `GatherEffectScreenTooltipCallback` injection point on Fabric
 
 ## [v21.6.0-1.21.6] - 2025-06-18
 - Update to Minecraft 1.21.6
