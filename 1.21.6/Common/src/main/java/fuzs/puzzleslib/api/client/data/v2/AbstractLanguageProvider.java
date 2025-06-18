@@ -45,9 +45,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 public abstract class AbstractLanguageProvider implements DataProvider {
-    protected final String languageCode;
-    protected final String modId;
-    protected final PackOutput.PathProvider pathProvider;
+    private final ResourceLocation filePath;
+    private final PackOutput.PathProvider pathProvider;
 
     public AbstractLanguageProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput());
@@ -62,15 +61,14 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     }
 
     public AbstractLanguageProvider(String languageCode, String modId, PackOutput packOutput) {
-        this.languageCode = languageCode;
-        this.modId = modId;
+        this.filePath = ResourceLocationHelper.fromNamespaceAndPath(modId, languageCode);
         this.pathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang");
     }
 
     public abstract void addTranslations(TranslationBuilder translationBuilder);
 
     @Override
-    public CompletableFuture<?> run(CachedOutput writer) {
+    public CompletableFuture<?> run(CachedOutput cachedOutput) {
 
         JsonObject jsonObject = new JsonObject();
         this.addTranslations((String translationKey, String value) -> {
@@ -95,14 +93,15 @@ public abstract class AbstractLanguageProvider implements DataProvider {
                 BuiltInRegistries.MOB_EFFECT,
                 TranslationBuilder::addMobEffect);
 
-        return DataProvider.saveStable(writer,
-                jsonObject,
-                this.pathProvider.json(ResourceLocationHelper.fromNamespaceAndPath(this.modId, this.languageCode)));
+        return DataProvider.saveStable(cachedOutput, jsonObject, this.pathProvider.json(this.filePath));
     }
 
     private <T> void verifyRequiredTranslationKeys(Predicate<String> predicate, Registry<T> registry, HolderTranslationCollector<T> holderTranslationCollector) {
         registry.listElements()
-                .filter((Holder.Reference<T> holder) -> holder.key().location().getNamespace().equals(this.modId))
+                .filter((Holder.Reference<T> holder) -> holder.key()
+                        .location()
+                        .getNamespace()
+                        .equals(this.filePath.getNamespace()))
                 .forEach((Holder.Reference<T> holder) -> {
                     holderTranslationCollector.accept((String translationKey, String value) -> {
                         Objects.requireNonNull(translationKey, "translation key is null");
@@ -121,7 +120,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return "Language (" + this.languageCode + ")";
+        return "Language (" + this.filePath.getPath() + ")";
     }
 
     @ApiStatus.NonExtendable

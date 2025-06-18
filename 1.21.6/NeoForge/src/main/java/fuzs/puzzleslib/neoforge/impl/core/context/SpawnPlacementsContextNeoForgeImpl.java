@@ -10,19 +10,16 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 
 import java.util.Objects;
 
-public record SpawnPlacementsContextNeoForgeImpl(RegisterSpawnPlacementsEvent evt) implements SpawnPlacementsContext {
+public record SpawnPlacementsContextNeoForgeImpl(RegisterSpawnPlacementsEvent event) implements SpawnPlacementsContext {
 
     @Override
-    public <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacementType location, Heightmap.Types heightmap, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
+    public <T extends Mob> void registerSpawnPlacement(EntityType<T> entityType, SpawnPlacementType spawnPlacementType, Heightmap.Types heightmapType, SpawnPlacements.SpawnPredicate<T> spawnPredicate) {
         Objects.requireNonNull(entityType, "entity type is null");
-        Objects.requireNonNull(location, "location is null");
-        Objects.requireNonNull(heightmap, "heightmap is null");
+        Objects.requireNonNull(spawnPlacementType, "location is null");
+        Objects.requireNonNull(heightmapType, "heightmap is null");
         Objects.requireNonNull(spawnPredicate, "spawnPredicate is null");
-        this.evt.register(entityType,
-                location,
-                heightmap,
+        this.event.register(entityType, spawnPlacementType, heightmapType,
                 spawnPredicate,
-                RegisterSpawnPlacementsEvent.Operation.REPLACE
-        );
+                RegisterSpawnPlacementsEvent.Operation.REPLACE);
     }
 }

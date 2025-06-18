@@ -8,12 +8,12 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 
 import java.util.Objects;
 
-public record BlockEntityRenderersContextNeoForgeImpl(EntityRenderersEvent.RegisterRenderers evt) implements BlockEntityRenderersContext {
+public record BlockEntityRenderersContextNeoForgeImpl(EntityRenderersEvent.RegisterRenderers event) implements BlockEntityRenderersContext {
 
     @Override
     public <T extends BlockEntity> void registerBlockEntityRenderer(BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T> blockEntityRendererProvider) {
         Objects.requireNonNull(blockEntityType, "block entity type is null");
         Objects.requireNonNull(blockEntityRendererProvider, "block entity renderer provider is null");
-        this.evt.registerBlockEntityRenderer(blockEntityType, blockEntityRendererProvider);
+        this.event.registerBlockEntityRenderer(blockEntityType, blockEntityRendererProvider);
     }
 }

@@ -10,12 +10,12 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 
 import java.util.Objects;
 
-public record MenuScreensContextNeoForgeImpl(RegisterMenuScreensEvent evt) implements MenuScreensContext {
+public record MenuScreensContextNeoForgeImpl(RegisterMenuScreensEvent event) implements MenuScreensContext {
 
     @Override
     public <M extends AbstractContainerMenu, S extends Screen & MenuAccess<M>> void registerMenuScreen(MenuType<? extends M> menuType, MenuScreens.ScreenConstructor<M, S> menuScreenConstructor) {
         Objects.requireNonNull(menuType, "menu type is null");
         Objects.requireNonNull(menuScreenConstructor, "factory is null");
-        this.evt.register(menuType, menuScreenConstructor);
+        this.event.register(menuType, menuScreenConstructor);
     }
 }

@@ -54,6 +54,16 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     }
 
     @Override
+    public ResourceManager getClientResourceManager() {
+        return this.clientResourceManager;
+    }
+
+    @Override
+    public ResourceManager getServerResourceManager() {
+        return this.serverResourceManager;
+    }
+
+    @Override
     public NeoForgeDataProviderContext withRegistries(CompletableFuture<HolderLookup.Provider> registries) {
         return new NeoForgeDataProviderContext(this.getModId(),
                 this.getPackOutput(),
@@ -63,21 +73,7 @@ public class NeoForgeDataProviderContext extends DataProviderContext {
     }
 
     /**
-     * @return the client resource manager
-     */
-    public ResourceManager getClientResourceManager() {
-        return this.clientResourceManager;
-    }
-
-    /**
-     * @return the server resource manager
-     */
-    public ResourceManager getServerResourceManager() {
-        return this.serverResourceManager;
-    }
-
-    /**
-     * A simple shortcut for a data provider factory requiring an instance of this context, helps with complaints about
+     * A simple shortcut for a data provider factory requiring an instance of this context; helps with complaints about
      * parametrized varargs.
      */
     @FunctionalInterface

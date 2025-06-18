@@ -17,8 +17,8 @@ public final class EntityAttributesContextNeoForgeImpl extends AbstractNeoForgeC
     public void registerAttributes(EntityType<? extends LivingEntity> entityType, AttributeSupplier.Builder attributesBuilder) {
         Objects.requireNonNull(entityType, "entity type is null");
         Objects.requireNonNull(attributesBuilder, "attributes builder is null");
-        this.registerForEvent(EntityAttributeCreationEvent.class, (EntityAttributeCreationEvent evt) -> {
-            evt.put(entityType, attributesBuilder.build());
+        this.registerForEvent(EntityAttributeCreationEvent.class, (EntityAttributeCreationEvent event) -> {
+            event.put(entityType, attributesBuilder.build());
         });
     }
 
@@ -26,8 +26,8 @@ public final class EntityAttributesContextNeoForgeImpl extends AbstractNeoForgeC
     public void registerAttribute(EntityType<? extends LivingEntity> entityType, Holder<Attribute> attribute, double attributeValue) {
         Objects.requireNonNull(entityType, "entity type is null");
         Objects.requireNonNull(attribute, "attribute is null");
-        this.registerForEvent(EntityAttributeModificationEvent.class, (EntityAttributeModificationEvent evt) -> {
-            evt.add(entityType, attribute, attributeValue);
+        this.registerForEvent(EntityAttributeModificationEvent.class, (EntityAttributeModificationEvent event) -> {
+            event.add(entityType, attribute, attributeValue);
         });
     }
 }

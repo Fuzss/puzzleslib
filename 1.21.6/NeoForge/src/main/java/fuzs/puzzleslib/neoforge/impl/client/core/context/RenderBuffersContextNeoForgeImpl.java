@@ -7,12 +7,12 @@ import net.neoforged.neoforge.client.event.RegisterRenderBuffersEvent;
 
 import java.util.Objects;
 
-public record RenderBuffersContextNeoForgeImpl(RegisterRenderBuffersEvent evt) implements RenderBuffersContext {
+public record RenderBuffersContextNeoForgeImpl(RegisterRenderBuffersEvent event) implements RenderBuffersContext {
 
     @Override
     public void registerRenderBuffer(RenderType renderType, ByteBufferBuilder renderBuffer) {
         Objects.requireNonNull(renderType, "render type is null");
         Objects.requireNonNull(renderBuffer, "render buffer is null");
-        this.evt.registerRenderBuffer(renderType, renderBuffer);
+        this.event.registerRenderBuffer(renderType, renderBuffer);
     }
 }

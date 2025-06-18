@@ -82,8 +82,8 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
         Preconditions.checkArgument(flammability > 0, "flammability is non-positive");
         Objects.requireNonNull(flammableBlock, "flammable block is null");
         if (this.flammables.isEmpty()) {
-            this.eventBus.addListener((final FMLCommonSetupEvent evt) -> {
-                evt.enqueueWork(() -> {
+            this.eventBus.addListener((final FMLCommonSetupEvent event) -> {
+                event.enqueueWork(() -> {
                     this.flammables.forEach((Holder<Block> holder, Flammable flammable) -> {
                         ((FireBlock) Blocks.FIRE).setFlammable(holder.value(),
                                 flammable.encouragement(),
@@ -199,11 +199,11 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
 
         public void register(Holder<Block> key, Holder<Block> value) {
             if (this.values.isEmpty()) {
-                NeoForge.EVENT_BUS.addListener((final BlockEvent.BlockToolModificationEvent evt) -> {
-                    if (evt.getItemAbility() == this.itemAbility && this.predicate.test(evt.getContext())) {
-                        Block block = this.supplier.get().get(evt.getState().getBlock());
+                NeoForge.EVENT_BUS.addListener((final BlockEvent.BlockToolModificationEvent event) -> {
+                    if (event.getItemAbility() == this.itemAbility && this.predicate.test(event.getContext())) {
+                        Block block = this.supplier.get().get(event.getState().getBlock());
                         if (block != null) {
-                            evt.setFinalState(block.defaultBlockState());
+                            event.setFinalState(block.defaultBlockState());
                         }
                     }
                 });

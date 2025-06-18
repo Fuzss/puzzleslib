@@ -20,106 +20,111 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             SkullRenderersContextNeoForgeImpl[] skullRenderersContext = new SkullRenderersContextNeoForgeImpl[1];
             ItemModelsContextNeoForgeImpl[] itemModelsContext = new ItemModelsContextNeoForgeImpl[1];
             modConstructor.onConstructMod();
-            modConstructor.onRegisterGuiLayers(new GuiLayersContextNeoForgeImpl(eventBus));
-            eventBus.addListener((final FMLClientSetupEvent evt) -> {
-                evt.enqueueWork(() -> {
+            eventBus.addListener((final FMLClientSetupEvent event) -> {
+                event.enqueueWork(() -> {
                     modConstructor.onClientSetup();
                     AbstractNeoForgeContext.computeIfAbsent(skullRenderersContext,
                             SkullRenderersContextNeoForgeImpl::new,
-                            modConstructor::onRegisterSkullRenderers).registerForEvent(evt);
+                            modConstructor::onRegisterSkullRenderers).registerForEvent(event);
                 });
             });
             // let this run after other mods, some of our mods are likely going to reference what other mods have registered
-            eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent evt) -> {
+            eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent event) -> {
                 // need to run this deferred as the underlying registries do not use concurrent maps
-                evt.enqueueWork(() -> {
+                event.enqueueWork(() -> {
                     modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextNeoForgeImpl());
                     modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextNeoForgeImpl());
                 });
             });
-            eventBus.addListener((final RegisterItemModelsEvent evt) -> {
+            eventBus.addListener((final RegisterItemModelsEvent event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
                         ItemModelsContextNeoForgeImpl::new,
-                        modConstructor::onRegisterItemModels).registerForEvent(evt);
+                        modConstructor::onRegisterItemModels).registerForEvent(event);
             });
-            eventBus.addListener((final RegisterSpecialModelRendererEvent evt) -> {
+            eventBus.addListener((final RegisterSpecialModelRendererEvent event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
                         ItemModelsContextNeoForgeImpl::new,
-                        modConstructor::onRegisterItemModels).registerForEvent(evt);
+                        modConstructor::onRegisterItemModels).registerForEvent(event);
             });
-            eventBus.addListener((final RegisterColorHandlersEvent.ItemTintSources evt) -> {
+            eventBus.addListener((final RegisterColorHandlersEvent.ItemTintSources event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
                         ItemModelsContextNeoForgeImpl::new,
-                        modConstructor::onRegisterItemModels).registerForEvent(evt);
+                        modConstructor::onRegisterItemModels).registerForEvent(event);
             });
-            eventBus.addListener((final RegisterSelectItemModelPropertyEvent evt) -> {
+            eventBus.addListener((final RegisterSelectItemModelPropertyEvent event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
                         ItemModelsContextNeoForgeImpl::new,
-                        modConstructor::onRegisterItemModels).registerForEvent(evt);
+                        modConstructor::onRegisterItemModels).registerForEvent(event);
             });
-            eventBus.addListener((final RegisterConditionalItemModelPropertyEvent evt) -> {
+            eventBus.addListener((final RegisterConditionalItemModelPropertyEvent event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
                         ItemModelsContextNeoForgeImpl::new,
-                        modConstructor::onRegisterItemModels).registerForEvent(evt);
+                        modConstructor::onRegisterItemModels).registerForEvent(event);
             });
-            eventBus.addListener((final RegisterRangeSelectItemModelPropertyEvent evt) -> {
+            eventBus.addListener((final RegisterRangeSelectItemModelPropertyEvent event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(itemModelsContext,
                         ItemModelsContextNeoForgeImpl::new,
-                        modConstructor::onRegisterItemModels).registerForEvent(evt);
+                        modConstructor::onRegisterItemModels).registerForEvent(event);
             });
-            eventBus.addListener((final RegisterMenuScreensEvent evt) -> {
-                modConstructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterMenuScreensEvent event) -> {
+                modConstructor.onRegisterMenuScreens(new MenuScreensContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
-                modConstructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(evt));
-                modConstructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextNeoForgeImpl(evt));
+            eventBus.addListener((final EntityRenderersEvent.RegisterRenderers event) -> {
+                modConstructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(event));
+                modConstructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent evt) -> {
-                modConstructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent event) -> {
+                modConstructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterParticleProvidersEvent evt) -> {
-                modConstructor.onRegisterParticleProviders(new ParticleProvidersContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterParticleProvidersEvent event) -> {
+                modConstructor.onRegisterParticleProviders(new ParticleProvidersContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
-                modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(evt));
+            eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions event) -> {
+                modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final ModelEvent.ModifyBakingResult evt) -> {
-                modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextNeoForgeImpl(evt));
+            eventBus.addListener((final ModelEvent.ModifyBakingResult event) -> {
+                modConstructor.onRegisterBlockStateResolver(new BlockStateResolverContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterItemDecorationsEvent evt) -> {
-                modConstructor.onRegisterItemDecorations(new ItemDecorationsContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterItemDecorationsEvent event) -> {
+                modConstructor.onRegisterItemDecorations(new ItemDecorationsContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterEntitySpectatorShadersEvent evt) -> {
-                modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterEntitySpectatorShadersEvent event) -> {
+                modConstructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShadersContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterSpecialBlockModelRendererEvent evt) -> {
+            eventBus.addListener((final RegisterSpecialBlockModelRendererEvent event) -> {
                 modConstructor.onRegisterSpecialBlockModelRenderers(new SpecialBlockModelRenderersContextNeoForgeImpl(
-                        evt));
+                        event));
             });
-            eventBus.addListener((final EntityRenderersEvent.CreateSkullModels evt) -> {
+            eventBus.addListener((final EntityRenderersEvent.CreateSkullModels event) -> {
                 AbstractNeoForgeContext.computeIfAbsent(skullRenderersContext,
                         SkullRenderersContextNeoForgeImpl::new,
-                        modConstructor::onRegisterSkullRenderers).registerForEvent(evt);
+                        modConstructor::onRegisterSkullRenderers).registerForEvent(event);
             });
-            eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
-                modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextNeoForgeImpl(evt));
+            eventBus.addListener((final EntityRenderersEvent.AddLayers event) -> {
+                modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterKeyMappingsEvent evt) -> {
-                modConstructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterKeyMappingsEvent event) -> {
+                modConstructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterColorHandlersEvent.Block evt) -> {
-                modConstructor.onRegisterBlockColorProviders(new BlockBlockColorsContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterColorHandlersEvent.Block event) -> {
+                modConstructor.onRegisterBlockColorProviders(new BlockBlockColorsContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final AddPackFindersEvent evt) -> {
-                if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
-                    modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextNeoForgeImpl(evt));
+            eventBus.addListener((final AddPackFindersEvent event) -> {
+                if (event.getPackType() == PackType.CLIENT_RESOURCES) {
+                    modConstructor.onAddResourcePackFinders(new ResourcePackSourcesContextNeoForgeImpl(event));
                 }
             });
-            eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
-                modConstructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterRenderBuffersEvent event) -> {
+                modConstructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(event));
             });
-            eventBus.addListener((final RegisterRenderPipelinesEvent evt) -> {
-                modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextNeoForgeImpl(evt));
+            eventBus.addListener((final RegisterRenderPipelinesEvent event) -> {
+                modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextNeoForgeImpl(event));
+            });
+            eventBus.addListener((final RegisterGuiLayersEvent event) -> {
+                modConstructor.onRegisterGuiLayers(new GuiLayersContextNeoForgeImpl(event));
+            });
+            eventBus.addListener((final RegisterPictureInPictureRenderersEvent event) -> {
+                modConstructor.onRegisterPictureInPictureRenderers(new PictureInPictureRendererContextNeoForgeImpl(event));
             });
         });
     }

@@ -40,17 +40,17 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
     private final Map<ResourceLocation, ResolvedModel> resolvedModels;
     private final BiConsumer<BlockState, BlockStateModel> blockStateModelOutput;
 
-    public BlockStateResolverContextNeoForgeImpl(ModelEvent.ModifyBakingResult evt) {
-        this.textureGetter = evt.getTextureGetter();
-        this.missingModel = evt.getModelBakery().missingModel;
+    public BlockStateResolverContextNeoForgeImpl(ModelEvent.ModifyBakingResult event) {
+        this.textureGetter = event.getTextureGetter();
+        this.missingModel = event.getModelBakery().missingModel;
         this.missingSprite = Suppliers.memoize(() -> {
             Material material = new Material(TextureAtlas.LOCATION_BLOCKS, MissingTextureAtlasSprite.getLocation());
-            TextureAtlasSprite textureAtlasSprite = evt.getTextureGetter().apply(material);
+            TextureAtlasSprite textureAtlasSprite = event.getTextureGetter().apply(material);
             Objects.requireNonNull(textureAtlasSprite, "missing sprite is null");
             return textureAtlasSprite;
         });
-        this.resolvedModels = new HashMap<>(evt.getModelBakery().resolvedModels);
-        this.blockStateModelOutput = evt.getBakingResult().blockStateModels()::put;
+        this.resolvedModels = new HashMap<>(event.getModelBakery().resolvedModels);
+        this.blockStateModelOutput = event.getBakingResult().blockStateModels()::put;
     }
 
     @Override
@@ -131,8 +131,8 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
                         string,
                         collection.stream()
                                 .sorted(Material.COMPARATOR)
-                                .map((Material material) -> "    " + material.atlasLocation() + ":" +
-                                        material.texture())
+                                .map((Material material) -> "    " + material.atlasLocation() + ":"
+                                        + material.texture())
                                 .collect(Collectors.joining("\n"))));
         multimap1.asMap()
                 .forEach((String string, Collection<String> collection) -> PuzzlesLib.LOGGER.warn(

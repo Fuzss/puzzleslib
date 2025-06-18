@@ -92,9 +92,9 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                             itemLike))
             .build();
 
+    private final String modId;
     private final PackOutput packOutput;
     private final CompletableFuture<HolderLookup.Provider> registries;
-    protected final String modId;
 
     public AbstractRecipeProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput(), context.getRegistries());
@@ -102,9 +102,9 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
 
     public AbstractRecipeProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         super(EMPTY_REGISTRY_ACCESS, EMPTY_RECIPE_OUTPUT);
+        this.modId = modId;
         this.packOutput = packOutput;
         this.registries = registries;
-        this.modId = modId;
     }
 
     @Nullable

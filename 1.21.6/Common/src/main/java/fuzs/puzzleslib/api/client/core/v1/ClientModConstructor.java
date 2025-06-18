@@ -213,4 +213,11 @@ public interface ClientModConstructor {
     default void onRegisterGuiLayers(GuiLayersContext context) {
         // NO-OP
     }
+
+    /**
+     * @param context register renderers for custom gui elements, like an entity or the enchanting table book
+     */
+    default void onRegisterPictureInPictureRenderers(PictureInPictureRendererContext context) {
+        // NO-OP
+    }
 }

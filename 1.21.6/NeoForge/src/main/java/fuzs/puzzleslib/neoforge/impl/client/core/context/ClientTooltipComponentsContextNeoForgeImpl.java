@@ -8,12 +8,12 @@ import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactori
 import java.util.Objects;
 import java.util.function.Function;
 
-public record ClientTooltipComponentsContextNeoForgeImpl(RegisterClientTooltipComponentFactoriesEvent evt) implements ClientTooltipComponentsContext {
+public record ClientTooltipComponentsContextNeoForgeImpl(RegisterClientTooltipComponentFactoriesEvent event) implements ClientTooltipComponentsContext {
 
     @Override
-    public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
-        Objects.requireNonNull(type, "tooltip component type is null");
-        Objects.requireNonNull(factory, "tooltip component factory is null");
-        this.evt.register(type, factory);
+    public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> tooltipComponentClazz, Function<? super T, ? extends ClientTooltipComponent> clientTooltipComponentFactory) {
+        Objects.requireNonNull(tooltipComponentClazz, "tooltip component type is null");
+        Objects.requireNonNull(clientTooltipComponentFactory, "tooltip component factory is null");
+        this.event.register(tooltipComponentClazz, clientTooltipComponentFactory);
     }
 }

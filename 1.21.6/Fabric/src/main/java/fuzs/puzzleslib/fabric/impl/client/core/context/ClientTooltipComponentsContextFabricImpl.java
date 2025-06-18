@@ -12,11 +12,11 @@ public final class ClientTooltipComponentsContextFabricImpl implements ClientToo
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory) {
-        Objects.requireNonNull(type, "tooltip component type is null");
-        Objects.requireNonNull(factory, "tooltip component factory is null");
+    public <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> tooltipComponentClazz, Function<? super T, ? extends ClientTooltipComponent> clientTooltipComponentFactory) {
+        Objects.requireNonNull(tooltipComponentClazz, "tooltip component type is null");
+        Objects.requireNonNull(clientTooltipComponentFactory, "tooltip component factory is null");
         TooltipComponentCallback.EVENT.register((TooltipComponent data) -> {
-            if (data.getClass() == type) return factory.apply((T) data);
+            if (data.getClass() == tooltipComponentClazz) return clientTooltipComponentFactory.apply((T) data);
             return null;
         });
     }

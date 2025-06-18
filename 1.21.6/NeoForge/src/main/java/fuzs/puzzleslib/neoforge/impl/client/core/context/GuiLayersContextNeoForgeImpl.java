@@ -9,23 +9,19 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.GuiLayerManager;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
 import java.util.function.UnaryOperator;
 
-public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
+public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) implements GuiLayersContext {
     private static final Map<ResourceLocation, ResourceLocation> VANILLA_GUI_LAYERS = ImmutableMap.<ResourceLocation, ResourceLocation>builder()
             .put(CAMERA_OVERLAYS, VanillaGuiLayers.CAMERA_OVERLAYS)
             .put(CROSSHAIR, VanillaGuiLayers.CROSSHAIR)
@@ -52,18 +48,11 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
             .put(SUBTITLES, VanillaGuiLayers.SUBTITLE_OVERLAY)
             .build();
 
-    private final IEventBus eventBus;
-    private final Collection<Consumer<RegisterGuiLayersEvent>> eventConsumers = new ArrayList<>();
-
-    public GuiLayersContextNeoForgeImpl(IEventBus eventBus) {
-        this.eventBus = eventBus;
-    }
-
     @Override
     public void registerGuiLayer(ResourceLocation resourceLocation, GuiLayersContext.Layer guiLayer) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(guiLayer, "gui layer is null");
-        this.registerGuiLayer((RegisterGuiLayersEvent evt) -> evt.registerAboveAll(resourceLocation, guiLayer::render));
+        this.event.registerAboveAll(resourceLocation, guiLayer::render);
     }
 
     @Override
@@ -73,11 +62,9 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
         Objects.requireNonNull(guiLayer, "gui layer is null");
         // only check for vanilla layers, it simplifies the implementation and is all we need
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
-            this.registerGuiLayer((RegisterGuiLayersEvent evt) -> evt.registerAbove(VANILLA_GUI_LAYERS.get(
-                    resourceLocation), otherResourceLocation, guiLayer::render));
+            this.event.registerAbove(VANILLA_GUI_LAYERS.get(resourceLocation), otherResourceLocation, guiLayer::render);
         } else if (VANILLA_GUI_LAYERS.containsKey(otherResourceLocation)) {
-            this.registerGuiLayer((RegisterGuiLayersEvent evt) -> evt.registerBelow(VANILLA_GUI_LAYERS.get(
-                    otherResourceLocation), resourceLocation, guiLayer::render));
+            this.event.registerBelow(VANILLA_GUI_LAYERS.get(otherResourceLocation), resourceLocation, guiLayer::render);
         } else {
             throw new RuntimeException("Unknown gui layers: " + resourceLocation + ", " + otherResourceLocation);
         }
@@ -90,39 +77,26 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
         // only check for vanilla layers, it simplifies the implementation and is all we need
         if (VANILLA_GUI_LAYERS.containsKey(resourceLocation)) {
             ResourceLocation vanillaResourceLocation = VANILLA_GUI_LAYERS.get(resourceLocation);
-            this.registerGuiLayer((RegisterGuiLayersEvent evt) -> {
-                ((RegisterGuiLayersEventAccessor) evt).puzzleslib$getLayers()
-                        .replaceAll((GuiLayerManager.NamedLayer namedLayer) -> {
-                            if (namedLayer.name().equals(vanillaResourceLocation)) {
-                                return new GuiLayerManager.NamedLayer(namedLayer.name(),
-                                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                                            // render condition is not inherited from the parent, add it back manually,
-                                            // since all are known for vanilla layers
-                                            if (namedLayer.name().equals(VanillaGuiLayers.SLEEP_OVERLAY) ||
-                                                    !Minecraft.getInstance().options.hideGui) {
-                                                guiLayerFactory.apply(namedLayer.layer()::render)
-                                                        .render(guiGraphics, deltaTracker);
-                                            }
-                                        });
-                            } else {
-                                return namedLayer;
-                            }
-                        });
-            });
+            ((RegisterGuiLayersEventAccessor) this.event).puzzleslib$getLayers()
+                    .replaceAll((GuiLayerManager.NamedLayer namedLayer) -> {
+                        if (namedLayer.name().equals(vanillaResourceLocation)) {
+                            return new GuiLayerManager.NamedLayer(namedLayer.name(),
+                                    (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                                        // render condition is not inherited from the parent, add it back manually,
+                                        // since all are known for vanilla layers
+                                        if (namedLayer.name().equals(VanillaGuiLayers.SLEEP_OVERLAY)
+                                                || !Minecraft.getInstance().options.hideGui) {
+                                            guiLayerFactory.apply(namedLayer.layer()::render)
+                                                    .render(guiGraphics, deltaTracker);
+                                        }
+                                    });
+                        } else {
+                            return namedLayer;
+                        }
+                    });
         } else {
             throw new RuntimeException("Unknown gui layer: " + resourceLocation);
         }
-    }
-
-    private void registerGuiLayer(Consumer<RegisterGuiLayersEvent> eventConsumer) {
-        if (this.eventConsumers.isEmpty()) {
-            this.eventBus.addListener((final RegisterGuiLayersEvent evt) -> {
-                for (Consumer<RegisterGuiLayersEvent> consumer : this.eventConsumers) {
-                    consumer.accept(evt);
-                }
-            });
-        }
-        this.eventConsumers.add(eventConsumer);
     }
 
     @Override
@@ -142,8 +116,8 @@ public final class GuiLayersContextNeoForgeImpl implements GuiLayersContext {
     private void addStatusBarHeight(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider, BiConsumer<Gui, Integer> heightConsumer) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(heightProvider, "height provider is null");
-        NeoForge.EVENT_BUS.addListener((final RenderGuiLayerEvent.Post evt) -> {
-            if (evt.getName().equals(resourceLocation)) {
+        NeoForge.EVENT_BUS.addListener((final RenderGuiLayerEvent.Post event) -> {
+            if (event.getName().equals(resourceLocation)) {
                 Gui gui = Minecraft.getInstance().gui;
                 if (gui.getCameraPlayer() != null) {
                     heightConsumer.accept(gui, heightProvider.applyAsInt(gui.getCameraPlayer()));

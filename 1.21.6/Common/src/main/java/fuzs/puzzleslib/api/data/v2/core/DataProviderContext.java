@@ -6,6 +6,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.server.packs.resources.ResourceManager;
+import org.jetbrains.annotations.Nullable;
 
 import java.nio.file.Path;
 import java.util.concurrent.CompletableFuture;
@@ -96,6 +98,22 @@ public class DataProviderContext {
      */
     public CompletableFuture<HolderLookup.Provider> getRegistries() {
         return this.registries.get();
+    }
+
+    /**
+     * @return the client resource manager
+     */
+    @Nullable
+    public ResourceManager getClientResourceManager() {
+        return null;
+    }
+
+    /**
+     * @return the server resource manager
+     */
+    @Nullable
+    public ResourceManager getServerResourceManager() {
+        return null;
     }
 
     /**

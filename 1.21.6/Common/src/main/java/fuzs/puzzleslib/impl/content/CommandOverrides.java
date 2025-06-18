@@ -77,18 +77,18 @@ public final class CommandOverrides {
     @ApiStatus.Internal
     public static void registerEventHandlers() {
         ServerLifecycleEvents.STARTED.register((MinecraftServer minecraftServer) -> {
-            if (minecraftServer.getWorldData().overworldData().getGameTime() == 0 &&
-                    minecraftServer.getWorldData().isAllowCommands()) {
+            if (minecraftServer.getWorldData().overworldData().getGameTime() == 0 && minecraftServer.getWorldData()
+                    .isAllowCommands()) {
                 executeCommandOverrides(minecraftServer,
                         CommandEnvironment.SERVER,
                         CommandEnvironment.DEDICATED_SERVER,
                         UnaryOperator.identity());
             }
         });
-        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel serverLevel) -> {
+        ServerEntityLevelEvents.LOAD.register((Entity entity, ServerLevel serverLevel, boolean isFreshEntity) -> {
             // idea from Serilum's Starter Kit mod
-            if (entity instanceof ServerPlayer serverPlayer &&
-                    !serverPlayer.getTags().contains(KEY_PLAYER_JOINED_WORLD)) {
+            if (isFreshEntity && entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags()
+                    .contains(KEY_PLAYER_JOINED_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
                 if (serverLevel.getServer().getWorldData().isAllowCommands()) {
                     serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {

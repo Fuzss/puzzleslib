@@ -22,9 +22,9 @@ import java.util.function.Supplier;
 public abstract class PayloadTypesContextNeoForgeImpl extends PayloadTypesContextImpl {
     net.neoforged.neoforge.network.registration.PayloadRegistrar registrar;
 
-    PayloadTypesContextNeoForgeImpl(String modId, RegisterPayloadHandlersEvent evt) {
+    PayloadTypesContextNeoForgeImpl(String modId, RegisterPayloadHandlersEvent event) {
         super(modId);
-        this.registrar = evt.registrar(this.channelName.toString());
+        this.registrar = event.registrar(this.channelName.toString());
     }
 
     @Override
@@ -87,8 +87,8 @@ public abstract class PayloadTypesContextNeoForgeImpl extends PayloadTypesContex
 
     public static class ServerImpl extends PayloadTypesContextNeoForgeImpl {
 
-        public ServerImpl(String modId, RegisterPayloadHandlersEvent evt) {
-            super(modId, evt);
+        public ServerImpl(String modId, RegisterPayloadHandlersEvent event) {
+            super(modId, event);
         }
 
         @Override
@@ -120,8 +120,8 @@ public abstract class PayloadTypesContextNeoForgeImpl extends PayloadTypesContex
 
     public static class ClientImpl extends PayloadTypesContextNeoForgeImpl {
 
-        public ClientImpl(String modId, RegisterPayloadHandlersEvent evt) {
-            super(modId, evt);
+        public ClientImpl(String modId, RegisterPayloadHandlersEvent event) {
+            super(modId, event);
         }
 
         @Override

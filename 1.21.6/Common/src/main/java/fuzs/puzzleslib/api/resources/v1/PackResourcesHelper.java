@@ -45,9 +45,9 @@ public final class PackResourcesHelper {
         return ModLoaderEnvironment.INSTANCE.getModContainer(modId)
                 .map(ModContainer::getDisplayName)
                 .map((String name) -> {
-                    return Component.literal(name + " Dynamic Resources");
+                    return Component.literal("Resources for " + name);
                 })
-                .orElseGet(() -> Component.literal("Dynamic Resources (" + modId + ")"));
+                .orElseGet(() -> Component.literal("Resources (" + modId + ")"));
     }
 
     /**

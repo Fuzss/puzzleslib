@@ -7,12 +7,12 @@ import net.neoforged.neoforge.client.event.RegisterSpecialBlockModelRendererEven
 
 import java.util.Objects;
 
-public record SpecialBlockModelRenderersContextNeoForgeImpl(RegisterSpecialBlockModelRendererEvent evt) implements SpecialBlockModelRenderersContext {
+public record SpecialBlockModelRenderersContextNeoForgeImpl(RegisterSpecialBlockModelRendererEvent event) implements SpecialBlockModelRenderersContext {
 
     @Override
     public void registerSpecialBlockModelRenderer(Block block, SpecialModelRenderer.Unbaked specialModelRenderer) {
         Objects.requireNonNull(block, "block is null");
         Objects.requireNonNull(specialModelRenderer, "special model renderer is null");
-        this.evt.register(block, specialModelRenderer);
+        this.event.register(block, specialModelRenderer);
     }
 }

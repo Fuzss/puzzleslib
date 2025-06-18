@@ -9,26 +9,26 @@ import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 import java.util.Objects;
 
-public record ParticleProvidersContextNeoForgeImpl(RegisterParticleProvidersEvent evt) implements ParticleProvidersContext {
+public record ParticleProvidersContextNeoForgeImpl(RegisterParticleProvidersEvent event) implements ParticleProvidersContext {
 
     @Override
     public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> particleType, ParticleProvider<T> particleProvider) {
         Objects.requireNonNull(particleType, "particle type is null");
         Objects.requireNonNull(particleProvider, "particle provider is null");
-        this.evt.registerSpecial(particleType, particleProvider);
+        this.event.registerSpecial(particleType, particleProvider);
     }
 
     @Override
     public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> particleType, ParticleProvider.Sprite<T> particleProvider) {
         Objects.requireNonNull(particleType, "particle type is null");
         Objects.requireNonNull(particleProvider, "particle provider is null");
-        this.evt.registerSprite(particleType, particleProvider);
+        this.event.registerSprite(particleType, particleProvider);
     }
 
     @Override
     public <T extends ParticleOptions> void registerParticleProvider(ParticleType<T> particleType, ParticleEngine.SpriteParticleRegistration<T> particleFactory) {
         Objects.requireNonNull(particleType, "particle type is null");
         Objects.requireNonNull(particleFactory, "particle provider factory is null");
-        this.evt.registerSpriteSet(particleType, particleFactory);
+        this.event.registerSpriteSet(particleType, particleFactory);
     }
 }

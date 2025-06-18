@@ -31,12 +31,14 @@ import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public record BiomeModificationsContextNeoForgeImpl(String modId,
-                                                    IEventBus eventBus,
-                                                    Multimap<BiomeLoadingPhase, Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>>> biomeModifications) implements BiomeModificationsContext {
+public final class BiomeModificationsContextNeoForgeImpl implements BiomeModificationsContext {
+    private final Multimap<BiomeLoadingPhase, Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>>> biomeModifications = HashMultimap.create();
+    private final String modId;
+    private final IEventBus eventBus;
 
     public BiomeModificationsContextNeoForgeImpl(String modId, IEventBus eventBus) {
-        this(modId, eventBus, HashMultimap.create());
+        this.modId = modId;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -90,8 +92,8 @@ public record BiomeModificationsContextNeoForgeImpl(String modId,
 
         @Override
         public void modify(Holder<Biome> holder, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
-            // no equivalent for BEFORE_EVERYTHING exists on Fabric, so we don't use it
-            // therefore result from map can be null
+            // no equivalent for BEFORE_EVERYTHING exists on Fabric, so we don't use it;
+            // therefore, it is possible for no mapping to be found
             BiomeLoadingPhase biomeLoadingPhase = BIOME_PHASE_CONVERSIONS.get(phase);
             if (biomeLoadingPhase != null) {
                 Collection<Map.Entry<Predicate<BiomeLoadingContext>, Consumer<BiomeModificationContext>>> biomeModification = BiomeModificationsContextNeoForgeImpl.this.biomeModifications.get(

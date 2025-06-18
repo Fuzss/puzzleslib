@@ -6,17 +6,18 @@ import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import java.util.function.Function;
 
 /**
- * register a client-side tooltip component factory
+ * Register a client-side tooltip component factory for creating a renderer from a {@link TooltipComponent}.
  */
 @FunctionalInterface
 public interface ClientTooltipComponentsContext {
 
     /**
-     * register custom tooltip components
+     * Register a {@link ClientTooltipComponent}.
      *
-     * @param type    common {@link TooltipComponent} class
-     * @param factory factory for creating {@link ClientTooltipComponent} from <code>type</code>
-     * @param <T>     type of common component
+     * @param tooltipComponentClazz         the common {@link TooltipComponent} class
+     * @param clientTooltipComponentFactory the factory for creating {@link ClientTooltipComponent} from the common
+     *                                      component
+     * @param <T>                           the type of common component
      */
-    <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> type, Function<? super T, ? extends ClientTooltipComponent> factory);
+    <T extends TooltipComponent> void registerClientTooltipComponent(Class<T> tooltipComponentClazz, Function<? super T, ? extends ClientTooltipComponent> clientTooltipComponentFactory);
 }

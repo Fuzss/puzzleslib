@@ -6,11 +6,11 @@ import net.neoforged.neoforge.event.AddPackFindersEvent;
 
 import java.util.Objects;
 
-public record DataPackSourcesContextNeoForgeImpl(AddPackFindersEvent evt) implements PackRepositorySourcesContext {
+public record DataPackSourcesContextNeoForgeImpl(AddPackFindersEvent event) implements PackRepositorySourcesContext {
 
     @Override
     public void addRepositorySource(RepositorySource repositorySource) {
         Objects.requireNonNull(repositorySource, "repository source is null");
-        this.evt.addRepositorySource(repositorySource);
+        this.event.addRepositorySource(repositorySource);
     }
 }
