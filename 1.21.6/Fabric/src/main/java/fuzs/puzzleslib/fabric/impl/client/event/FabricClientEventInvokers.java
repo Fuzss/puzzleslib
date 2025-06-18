@@ -393,25 +393,25 @@ public final class FabricClientEventInvokers {
                 return eventResult.isPass();
             };
         });
-        INSTANCE.register(RenderLevelCallback.AfterTerrain.class, WorldRenderEvents.BEFORE_ENTITIES, (RenderLevelCallback.AfterTerrain callback) -> {
+        INSTANCE.register(RenderLevelCallback.Terrain.class, WorldRenderEvents.BEFORE_ENTITIES, (RenderLevelCallback.Terrain callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(),
                         context.frustum(), context.world());
             };
         });
-        INSTANCE.register(RenderLevelCallback.AfterEntities.class, WorldRenderEvents.AFTER_ENTITIES, (RenderLevelCallback.AfterEntities callback) -> {
+        INSTANCE.register(RenderLevelCallback.Entities.class, WorldRenderEvents.AFTER_ENTITIES, (RenderLevelCallback.Entities callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(),
                         context.frustum(), context.world());
             };
         });
-        INSTANCE.register(RenderLevelCallback.AfterTranslucent.class, WorldRenderEvents.AFTER_TRANSLUCENT, (RenderLevelCallback.AfterTranslucent callback) -> {
+        INSTANCE.register(RenderLevelCallback.Translucent.class, WorldRenderEvents.AFTER_TRANSLUCENT, (RenderLevelCallback.Translucent callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(),
                         context.frustum(), context.world());
             };
         });
-        INSTANCE.register(RenderLevelCallback.AfterAll.class, WorldRenderEvents.END, (RenderLevelCallback.AfterAll callback) -> {
+        INSTANCE.register(RenderLevelCallback.All.class, WorldRenderEvents.END, (RenderLevelCallback.All callback) -> {
             return (WorldRenderContext context) -> {
                 callback.onRenderLevel(context.worldRenderer(), context.camera(), context.gameRenderer(), context.tickCounter(), context.matrixStack(),
                         context.frustum(), context.world());

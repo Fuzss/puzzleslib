@@ -43,7 +43,6 @@ public final class GuiGraphicsHelper {
      * @param maxX        the end x-position
      * @param maxY        the end y-position
      * @param borderSize  the width of the border on all sides, goes inwards
-     * @param blitOffset  the z-level offset
      * @param color       the color to fill with
      */
     public static void fillFrameArea(GuiGraphics guiGraphics, int minX, int minY, int maxX, int maxY, int borderSize, int color) {
