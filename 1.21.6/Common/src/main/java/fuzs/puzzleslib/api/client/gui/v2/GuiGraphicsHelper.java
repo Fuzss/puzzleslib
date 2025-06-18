@@ -3,10 +3,15 @@ package fuzs.puzzleslib.api.client.gui.v2;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import fuzs.puzzleslib.impl.client.gui.SingleTextureAtlasSprite;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import org.joml.Matrix4f;
 
 /**
  * A helper class for extending the functionality of {@link GuiGraphics}. Especially useful for drawing
@@ -17,6 +22,31 @@ public final class GuiGraphicsHelper {
 
     private GuiGraphicsHelper() {
         // NO-OP
+    }
+
+    /**
+     * Draws a string with a background, similar to the experience level on the gui.
+     *
+     * @param guiGraphics     the gui graphics instance
+     * @param font            the font instance
+     * @param component       the component to draw
+     * @param posX            the x-position
+     * @param posY            the y-position
+     * @param color           the text color
+     * @param backgroundColor the background text color
+     * @see GuiGraphics#drawString(Font, Component, int, int, int)
+     * @see Font#drawInBatch8xOutline(FormattedCharSequence, float, float, int, int, Matrix4f, MultiBufferSource,
+     *         int)
+     */
+    public static void drawInBatch8xOutline(GuiGraphics guiGraphics, Font font, Component component, int posX, int posY, int color, int backgroundColor) {
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (i != 0 || j != 0) {
+                    guiGraphics.drawString(font, component, posX + i, posY + j, backgroundColor, false);
+                }
+            }
+        }
+        guiGraphics.drawString(font, component, posX, posY, color, false);
     }
 
     /**
