@@ -4,15 +4,16 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.impl.event.data.DefaultedBoolean;
-import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.impl.event.CopyOnWriteForwardingList;
+import fuzs.puzzleslib.impl.event.data.DefaultedBoolean;
+import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -28,6 +29,9 @@ abstract class EffectsInInventoryFabricMixin {
     @Shadow
     @Final
     private AbstractContainerScreen<?> screen;
+    @Shadow
+    @Nullable
+    private MobEffectInstance hoveredEffect;
 
     @Inject(
             method = "renderEffects", at = @At(
@@ -71,11 +75,11 @@ abstract class EffectsInInventoryFabricMixin {
         return horizontalOffsetRef.get().getAsOptionalInt().orElse(horizontalOffset);
     }
 
-    @ModifyVariable(method = "renderEffects", at = @At("STORE"))
-    private List<Component> renderEffects(List<Component> tooltipLines, @Local(ordinal = 0) MobEffectInstance mobEffectInstance) {
+    @ModifyVariable(method = "renderTooltip", at = @At("STORE"))
+    public List<Component> renderTooltip(List<Component> tooltipLines) {
         CopyOnWriteForwardingList<Component> list = new CopyOnWriteForwardingList<>(tooltipLines);
         FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP.invoker()
-                .onGatherEffectScreenTooltip(this.screen, mobEffectInstance, list);
+                .onGatherEffectScreenTooltip(this.screen, this.hoveredEffect, list);
         return list.delegate();
     }
 }
