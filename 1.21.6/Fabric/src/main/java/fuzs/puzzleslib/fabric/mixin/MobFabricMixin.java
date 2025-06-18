@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.api.util.v1.CodecExtras;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.impl.event.SpawnReasonMob;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
@@ -85,13 +84,13 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnReasonMob {
     @Inject(method = "addAdditionalSaveData", at = @At("TAIL"))
     public void addAdditionalSaveData(ValueOutput valueOutput, CallbackInfo callback) {
         valueOutput.storeNullable(PuzzlesLibMod.id("spawn_type").toString(),
-                CodecExtras.ENTITY_SPAWN_REASON_CODEC,
+                SpawnReasonMob.CODEC,
                 this.puzzleslib$spawnReason);
     }
 
     @Inject(method = "readAdditionalSaveData", at = @At("TAIL"))
     public void readAdditionalSaveData(ValueInput valueInput, CallbackInfo callback) {
-        this.puzzleslib$spawnReason = valueInput.read(PuzzlesLibMod.id("spawn_type").toString(),
-                CodecExtras.ENTITY_SPAWN_REASON_CODEC).orElse(null);
+        this.puzzleslib$spawnReason = valueInput.read(PuzzlesLibMod.id("spawn_type").toString(), SpawnReasonMob.CODEC)
+                .orElse(null);
     }
 }

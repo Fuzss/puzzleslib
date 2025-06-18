@@ -12,7 +12,6 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.util.ExtraCodecs;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,10 +40,6 @@ public final class CodecExtras {
                 DataResult.success(listTag == dynamic.getValue() ? listTag.copy() : listTag) :
                 DataResult.error(() -> "Not a list tag: " + tag);
     }, (ListTag listTag) -> new Dynamic<>(NbtOps.INSTANCE, listTag.copy()));
-    /**
-     * @see EntitySpawnReason
-     */
-    public static final Codec<EntitySpawnReason> ENTITY_SPAWN_REASON_CODEC = fromEnum(EntitySpawnReason.class);
 
     private CodecExtras() {
         // NO-OP
