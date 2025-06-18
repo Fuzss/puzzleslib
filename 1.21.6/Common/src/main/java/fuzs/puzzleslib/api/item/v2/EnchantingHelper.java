@@ -164,7 +164,6 @@ public final class EnchantingHelper {
     /**
      * @param serverLevel   the server level for creating the loot context
      * @param itemStack     the item stack used as the enchantment holder
-     * @param entity        the entity used as the enchantment holder
      * @param componentType the enchantment effect component type
      * @return the enchantment value effect bonus
      *

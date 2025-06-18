@@ -367,27 +367,27 @@ public final class NeoForgeClientEventInvokers {
             if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
             callback.onRenderHighlight(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getTarget(), evt.getDeltaTracker(), evt.getPoseStack(), evt.getMultiBufferSource(), minecraft.level);
         }, true);
-        INSTANCE.register(RenderLevelCallback.AfterTerrain.class, RenderLevelStageEvent.class, (RenderLevelCallback.AfterTerrain callback, RenderLevelStageEvent evt) -> {
+        INSTANCE.register(RenderLevelCallback.Terrain.class, RenderLevelStageEvent.class, (RenderLevelCallback.Terrain callback, RenderLevelStageEvent evt) -> {
             // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
             if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_OPAQUE_BLOCKS) return;
             Minecraft minecraft = Minecraft.getInstance();
             callback.onRenderLevel(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(),
                     evt.getFrustum(), minecraft.level);
         });
-        INSTANCE.register(RenderLevelCallback.AfterEntities.class, RenderLevelStageEvent.class, (RenderLevelCallback.AfterEntities callback, RenderLevelStageEvent evt) -> {
+        INSTANCE.register(RenderLevelCallback.Entities.class, RenderLevelStageEvent.class, (RenderLevelCallback.Entities callback, RenderLevelStageEvent evt) -> {
             if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_ENTITIES) return;
             Minecraft minecraft = Minecraft.getInstance();
             callback.onRenderLevel(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(),
                     evt.getFrustum(), minecraft.level);
         });
-        INSTANCE.register(RenderLevelCallback.AfterTranslucent.class, RenderLevelStageEvent.class, (RenderLevelCallback.AfterTranslucent callback, RenderLevelStageEvent evt) -> {
+        INSTANCE.register(RenderLevelCallback.Translucent.class, RenderLevelStageEvent.class, (RenderLevelCallback.Translucent callback, RenderLevelStageEvent evt) -> {
             // Forge has multiple stages here, but this is the last one which mirrors Fabric the best
             if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
             Minecraft minecraft = Minecraft.getInstance();
             callback.onRenderLevel(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(),
                     evt.getFrustum(), minecraft.level);
         });
-        INSTANCE.register(RenderLevelCallback.AfterAll.class, RenderLevelStageEvent.class, (RenderLevelCallback.AfterAll callback, RenderLevelStageEvent evt) -> {
+        INSTANCE.register(RenderLevelCallback.All.class, RenderLevelStageEvent.class, (RenderLevelCallback.All callback, RenderLevelStageEvent evt) -> {
             if (evt.getStage() != RenderLevelStageEvent.Stage.AFTER_LEVEL) return;
             Minecraft minecraft = Minecraft.getInstance();
             callback.onRenderLevel(evt.getLevelRenderer(), evt.getCamera(), minecraft.gameRenderer, evt.getPartialTick(), evt.getPoseStack(),

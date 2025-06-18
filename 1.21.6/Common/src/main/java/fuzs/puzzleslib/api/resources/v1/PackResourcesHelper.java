@@ -216,7 +216,7 @@ public final class PackResourcesHelper {
      * @param resourceLocation     the pack identifier
      * @param descriptionComponent the pack description component
      * @param packCompatibility    the pack version, ideally retrieved from
-     *                             {@link net.minecraft.WorldVersion#getPackVersion(PackType)}
+     *                             {@link net.minecraft.WorldVersion#packVersion(PackType)}
      * @param featureFlagSet       the feature flags provided by this pack
      * @param hidden               controls whether the pack is hidden from user-facing screens like the resource pack
      *                             and data pack selection screens

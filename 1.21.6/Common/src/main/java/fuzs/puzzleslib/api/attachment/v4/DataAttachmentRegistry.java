@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.attachment.v4;
 
 import com.google.common.base.Predicates;
-import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
@@ -221,7 +220,7 @@ public final class DataAttachmentRegistry {
         /**
          * Copy the attachment value when the entity dies.
          * <p>
-         * Requires a persistent attachment type via {@link #persistent(Codec)}.
+         * Requires a persistent attachment type via {@link #persistent(MapCodec)}.
          *
          * @return the builder instance
          */
