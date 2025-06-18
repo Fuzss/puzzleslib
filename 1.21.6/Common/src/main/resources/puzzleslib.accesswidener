@@ -298,6 +298,7 @@ transitive-accessible	method	net/minecraft/world/item/enchantment/Enchantment	lo
 transitive-accessible	method	net/minecraft/world/item/enchantment/Enchantment	entityContext	(Lnet/minecraft/server/level/ServerLevel;ILnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/level/storage/loot/LootContext;
 transitive-accessible	method	net/minecraft/world/item/enchantment/Enchantment	blockHitContext	(Lnet/minecraft/server/level/ServerLevel;ILnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/storage/loot/LootContext;
 transitive-accessible	method	net/minecraft/world/item/enchantment/Enchantment	applyEffects	(Ljava/util/List;Lnet/minecraft/world/level/storage/loot/LootContext;Ljava/util/function/Consumer;)V
+accessible  field   net/minecraft/client/data/models/EquipmentAssetProvider pathProvider    Lnet/minecraft/data/PackOutput$PathProvider;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

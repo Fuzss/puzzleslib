@@ -52,7 +52,6 @@
     "client.ChatListenerFabricMixin",
     "client.ClientLevelFabricMixin",
     "client.ClientPacketListenerFabricMixin",
-    "client.DebugScreenOverlayMixin",
     "client.EffectsInInventoryFabricMixin",
     "client.EntityRendererFabricMixin",
     "client.EntityRenderStateFabricMixin",

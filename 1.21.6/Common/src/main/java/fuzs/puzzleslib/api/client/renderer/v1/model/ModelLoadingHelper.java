@@ -17,6 +17,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.Reader;
@@ -33,7 +34,7 @@ public final class ModelLoadingHelper {
         // NO-OP
     }
 
-    @Deprecated
+    @ApiStatus.Experimental
     public static BlockStateModelLoader.LoadedModels loadBlockState(ResourceManager resourceManager, Block block) {
         return loadBlockState(resourceManager, block, Util.backgroundExecutor()).join();
     }
@@ -45,7 +46,7 @@ public final class ModelLoadingHelper {
                 executor);
     }
 
-    @Deprecated
+    @ApiStatus.Experimental
     public static BlockStateModelLoader.LoadedModels loadBlockState(ResourceManager resourceManager, ResourceLocation resourceLocation, StateDefinition<Block, BlockState> stateDefinition) {
         return loadBlockState(resourceManager, resourceLocation, stateDefinition, Util.backgroundExecutor()).join();
     }
@@ -105,7 +106,7 @@ public final class ModelLoadingHelper {
         }, executor);
     }
 
-    @Deprecated
+    @ApiStatus.Experimental
     public static @Nullable UnbakedModel loadBlockModel(ResourceManager resourceManager, ResourceLocation resourceLocation) {
         return loadBlockModel(resourceManager, resourceLocation, Util.backgroundExecutor()).join();
     }

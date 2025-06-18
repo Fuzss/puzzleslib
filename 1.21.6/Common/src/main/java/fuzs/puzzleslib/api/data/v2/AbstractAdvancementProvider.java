@@ -24,18 +24,18 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public abstract class AbstractAdvancementProvider implements DataProvider, AdvancementSubProvider {
+    private final String modId;
     private final PackOutput.PathProvider pathProvider;
     private final CompletableFuture<HolderLookup.Provider> registries;
-    protected final String modId;
 
     public AbstractAdvancementProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput(), context.getRegistries());
     }
 
-    public AbstractAdvancementProvider(String modId, PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        this.pathProvider = output.createRegistryElementsPathProvider(Registries.ADVANCEMENT);
-        this.registries = registries;
+    public AbstractAdvancementProvider(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         this.modId = modId;
+        this.pathProvider = packOutput.createRegistryElementsPathProvider(Registries.ADVANCEMENT);
+        this.registries = registries;
     }
 
     protected static DisplayInfo display(ItemStack itemStack, ResourceLocation resourceLocation) {

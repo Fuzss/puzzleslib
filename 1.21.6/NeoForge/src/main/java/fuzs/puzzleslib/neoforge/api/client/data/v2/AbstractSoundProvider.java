@@ -9,7 +9,6 @@ import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
 public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
-    protected final String modId;
 
     public AbstractSoundProvider(DataProviderContext context) {
         this(context.getModId(), context.getPackOutput());
@@ -17,7 +16,6 @@ public abstract class AbstractSoundProvider extends SoundDefinitionsProvider {
 
     public AbstractSoundProvider(String modId, PackOutput packOutput) {
         super(packOutput, modId);
-        this.modId = modId;
     }
 
     protected static SoundDefinition.Sound sound(SoundEvent soundEvent) {

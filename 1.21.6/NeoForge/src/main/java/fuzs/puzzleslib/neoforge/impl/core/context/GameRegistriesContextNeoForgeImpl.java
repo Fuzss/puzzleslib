@@ -6,11 +6,11 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 
 import java.util.Objects;
 
-public record GameRegistriesContextNeoForgeImpl(NewRegistryEvent evt) implements GameRegistriesContext {
+public record GameRegistriesContextNeoForgeImpl(NewRegistryEvent event) implements GameRegistriesContext {
 
     @Override
     public <T> void registerRegistry(Registry<T> registry) {
         Objects.requireNonNull(registry, "registry is null");
-        this.evt.register(registry);
+        this.event.register(registry);
     }
 }

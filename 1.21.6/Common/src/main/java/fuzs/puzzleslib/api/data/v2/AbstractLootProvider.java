@@ -291,7 +291,7 @@ public final class AbstractLootProvider {
     }
 
     public static abstract class Simple implements LootTableDataProvider {
-        private final Map<ResourceKey<LootTable>, LootTable.Builder> tables = new HashMap<>();
+        private final Map<ResourceKey<LootTable>, LootTable.Builder> values = new LinkedHashMap<>();
         private final Set<ResourceKey<LootTable>> skipValidation = new HashSet<>();
         private final ContextKeySet paramSet;
         private final PackOutput.PathProvider pathProvider;
@@ -328,7 +328,7 @@ public final class AbstractLootProvider {
         @Override
         public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> exporter) {
             this.addLootTables();
-            this.tables.forEach(exporter);
+            this.values.forEach(exporter);
         }
 
         @Override
@@ -361,7 +361,7 @@ public final class AbstractLootProvider {
         }
 
         protected void add(ResourceKey<LootTable> table, LootTable.Builder builder) {
-            this.tables.put(table, builder);
+            this.values.put(table, builder);
         }
 
         public abstract void addLootTables();
@@ -391,8 +391,8 @@ public final class AbstractLootProvider {
                         resourceLocation);
                 if (oldResourceLocation != null) {
                     Util.logAndPauseIfInIde(
-                            "Loot table random sequence seed collision on " + oldResourceLocation + " and " +
-                                    resourceKey);
+                            "Loot table random sequence seed collision on " + oldResourceLocation + " and "
+                                    + resourceKey);
                 }
 
                 builder.setRandomSequence(resourceLocation);

@@ -13,22 +13,20 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public abstract class AbstractAtlasProvider extends AtlasProvider {
-    private final Map<ResourceLocation, List<SpriteSource>> atlases = new HashMap<>();
-    protected final String modId;
+    private final Map<ResourceLocation, List<SpriteSource>> values = new LinkedHashMap<>();
 
     public AbstractAtlasProvider(DataProviderContext context) {
-        this(context.getModId(), context.getPackOutput());
+        this(context.getPackOutput());
     }
 
-    public AbstractAtlasProvider(String modId, PackOutput packOutput) {
+    public AbstractAtlasProvider(PackOutput packOutput) {
         super(packOutput);
-        this.modId = modId;
     }
 
     @Override
     public final CompletableFuture<?> run(CachedOutput output) {
         this.addAtlases();
-        return CompletableFuture.allOf(this.atlases.entrySet()
+        return CompletableFuture.allOf(this.values.entrySet()
                 .stream()
                 .map((Map.Entry<ResourceLocation, List<SpriteSource>> entry) -> {
                     return this.storeAtlas(output, entry.getKey(), entry.getValue());
@@ -47,7 +45,7 @@ public abstract class AbstractAtlasProvider extends AtlasProvider {
     }
 
     protected void add(ResourceLocation resourceLocation, List<SpriteSource> spriteSources) {
-        this.atlases.computeIfAbsent(resourceLocation, (ResourceLocation resourceLocationX) -> new ArrayList<>())
+        this.values.computeIfAbsent(resourceLocation, (ResourceLocation resourceLocationX) -> new ArrayList<>())
                 .addAll(spriteSources);
     }
 }

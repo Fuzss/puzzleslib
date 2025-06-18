@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.attachment.v4;
 
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import net.minecraft.core.RegistryAccess;
@@ -93,7 +94,7 @@ public final class DataAttachmentRegistry {
          * @param codec the attachment value codec
          * @return the builder instance
          */
-        Builder<T, V> persistent(Codec<V> codec);
+        Builder<T, V> persistent(MapCodec<V> codec);
 
         /**
          * Build the attachment type.
@@ -159,7 +160,7 @@ public final class DataAttachmentRegistry {
     public interface EntityBuilder<V> extends RegistryBuilder<Entity, V> {
 
         @Override
-        EntityBuilder<V> persistent(Codec<V> codec);
+        EntityBuilder<V> persistent(MapCodec<V> codec);
 
         @Override
         default EntityBuilder<V> defaultValue(V defaultValue) {
@@ -270,6 +271,6 @@ public final class DataAttachmentRegistry {
         BlockEntityBuilder<V> defaultValue(Predicate<BlockEntity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
 
         @Override
-        BlockEntityBuilder<V> persistent(Codec<V> codec);
+        BlockEntityBuilder<V> persistent(MapCodec<V> codec);
     }
 }

@@ -34,8 +34,8 @@ public abstract class AbstractDatapackRegistriesProvider extends RegistriesDatap
         this(context.getPackOutput(), context.getRegistries());
     }
 
-    public AbstractDatapackRegistriesProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> registries) {
-        super(output, CompletableFuture.completedFuture(RegistryAccess.EMPTY));
+    public AbstractDatapackRegistriesProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        super(packOutput, CompletableFuture.completedFuture(RegistryAccess.EMPTY));
         CompletableFuture<RegistrySetBuilder.PatchedRegistries> patchedRegistries = RegistryPatchGenerator.createLookup(
                 registries,
                 Util.make(new RegistrySetBuilder(), (RegistrySetBuilder registrySetBuilder) -> {

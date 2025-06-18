@@ -6,11 +6,11 @@ import net.neoforged.neoforge.client.event.RegisterRenderPipelinesEvent;
 
 import java.util.Objects;
 
-public record RenderPipelinesContextNeoForgeImpl(RegisterRenderPipelinesEvent evt) implements RenderPipelinesContext {
+public record RenderPipelinesContextNeoForgeImpl(RegisterRenderPipelinesEvent event) implements RenderPipelinesContext {
 
     @Override
     public void registerRenderPipeline(RenderPipeline renderPipeline) {
         Objects.requireNonNull(renderPipeline, "render pipeline is null");
-        this.evt.registerPipeline(renderPipeline);
+        this.event.registerPipeline(renderPipeline);
     }
 }

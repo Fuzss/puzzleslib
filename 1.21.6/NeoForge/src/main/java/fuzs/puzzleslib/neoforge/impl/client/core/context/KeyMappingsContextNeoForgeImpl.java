@@ -14,20 +14,20 @@ import net.neoforged.neoforge.common.NeoForge;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent evt) implements KeyMappingsContext {
+public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) implements KeyMappingsContext {
 
     @Override
     public void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         Objects.requireNonNull(keyMapping, "key mapping is null");
         Objects.requireNonNull(activationHandler, "activation handler is null");
-        this.evt.register(keyMapping);
+        this.event.register(keyMapping);
         keyMapping.setKeyConflictContext(NeoForgeKeyMappingHelper.KEY_CONTEXTS.get(activationHandler.getActivationContext()));
         registerKeyActivationHandles(keyMapping, activationHandler);
     }
 
     private static void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         if (activationHandler.gameHandler() != null) {
-            NeoForge.EVENT_BUS.addListener((final ClientTickEvent.Pre evt) -> {
+            NeoForge.EVENT_BUS.addListener((final ClientTickEvent.Pre event) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 if (minecraft.player != null) {
                     while (keyMapping.consumeClick()) {
@@ -37,11 +37,11 @@ public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent evt) imple
             });
         }
         if (activationHandler.screenHandler() != null) {
-            NeoForge.EVENT_BUS.addListener((final ScreenEvent.KeyPressed.Pre evt) -> {
-                if (activationHandler.screenType().isInstance(evt.getScreen())) {
-                    if (keyMapping.matches(evt.getKeyCode(), evt.getScanCode())) {
-                        ((Consumer<Screen>) activationHandler.screenHandler()).accept(evt.getScreen());
-                        evt.setCanceled(true);
+            NeoForge.EVENT_BUS.addListener((final ScreenEvent.KeyPressed.Pre event) -> {
+                if (activationHandler.screenType().isInstance(event.getScreen())) {
+                    if (keyMapping.matches(event.getKeyCode(), event.getScanCode())) {
+                        ((Consumer<Screen>) activationHandler.screenHandler()).accept(event.getScreen());
+                        event.setCanceled(true);
                     }
                 }
             });

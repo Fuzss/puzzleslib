@@ -9,17 +9,17 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-public record BlockBlockColorsContextNeoForgeImpl(RegisterColorHandlersEvent.Block evt) implements BlockColorsContext {
+public record BlockBlockColorsContextNeoForgeImpl(RegisterColorHandlersEvent.Block event) implements BlockColorsContext {
 
     @Override
     public void registerBlockColor(Block block, BlockColor blockColor) {
         Objects.requireNonNull(blockColor, "block color is null");
         Objects.requireNonNull(block, "block is null");
-        this.evt.register(blockColor, block);
+        this.event.register(blockColor, block);
     }
 
     @Override
     public @Nullable BlockColor getBlockColor(Block block) {
-        return ((BlockColorsNeoForgeAccessor) this.evt.getBlockColors()).puzzleslib$getBlockColors().get(block);
+        return ((BlockColorsNeoForgeAccessor) this.event.getBlockColors()).puzzleslib$getBlockColors().get(block);
     }
 }

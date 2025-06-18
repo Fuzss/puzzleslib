@@ -8,13 +8,13 @@ import net.neoforged.neoforge.registries.DataPackRegistryEvent;
 
 import java.util.Objects;
 
-public record DataPackRegistriesContextNeoForgeImpl(DataPackRegistryEvent.NewRegistry evt) implements DataPackRegistriesContext {
+public record DataPackRegistriesContextNeoForgeImpl(DataPackRegistryEvent.NewRegistry event) implements DataPackRegistriesContext {
 
     @Override
     public <T> void registerRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> codec) {
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(codec, "codec is null");
-        this.evt.dataPackRegistry(registryKey, codec);
+        this.event.dataPackRegistry(registryKey, codec);
     }
 
     @Override
@@ -22,6 +22,6 @@ public record DataPackRegistriesContextNeoForgeImpl(DataPackRegistryEvent.NewReg
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(codec, "codec is null");
         Objects.requireNonNull(networkCodec, "network codec is null");
-        this.evt.dataPackRegistry(registryKey, codec, networkCodec);
+        this.event.dataPackRegistry(registryKey, codec, networkCodec);
     }
 }

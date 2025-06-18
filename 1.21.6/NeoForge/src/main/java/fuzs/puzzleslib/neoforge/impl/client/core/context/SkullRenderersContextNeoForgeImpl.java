@@ -20,14 +20,14 @@ public final class SkullRenderersContextNeoForgeImpl extends AbstractNeoForgeCon
         Objects.requireNonNull(skullBlockType, "skull block type is null");
         Objects.requireNonNull(textureLocation, "texture location is null");
         Objects.requireNonNull(skullModelFactory, "skull model factory is null");
-        this.registerForEvent(FMLClientSetupEvent.class, (FMLClientSetupEvent evt) -> {
-            evt.enqueueWork(() -> {
+        this.registerForEvent(FMLClientSetupEvent.class, (FMLClientSetupEvent event) -> {
+            event.enqueueWork(() -> {
                 SkullBlockRenderer.SKIN_BY_TYPE.put(skullBlockType, textureLocation);
             });
         });
         this.registerForEvent(EntityRenderersEvent.CreateSkullModels.class,
-                (EntityRenderersEvent.CreateSkullModels evt) -> {
-                    evt.registerSkullModel(skullBlockType, skullModelFactory);
+                (EntityRenderersEvent.CreateSkullModels event) -> {
+                    event.registerSkullModel(skullBlockType, skullModelFactory);
                 });
     }
 }

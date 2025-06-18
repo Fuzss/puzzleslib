@@ -8,12 +8,12 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-public record LayerDefinitionsContextNeoForgeImpl(EntityRenderersEvent.RegisterLayerDefinitions evt) implements LayerDefinitionsContext {
+public record LayerDefinitionsContextNeoForgeImpl(EntityRenderersEvent.RegisterLayerDefinitions event) implements LayerDefinitionsContext {
 
     @Override
     public void registerLayerDefinition(ModelLayerLocation modelLayerLocation, Supplier<LayerDefinition> layerDefinitionSupplier) {
         Objects.requireNonNull(modelLayerLocation, "layer location is null");
         Objects.requireNonNull(layerDefinitionSupplier, "layer supplier is null");
-        this.evt.registerLayerDefinition(modelLayerLocation, layerDefinitionSupplier);
+        this.event.registerLayerDefinition(modelLayerLocation, layerDefinitionSupplier);
     }
 }

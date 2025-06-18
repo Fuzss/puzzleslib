@@ -2,8 +2,8 @@ package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
-import fuzs.puzzleslib.impl.attachment.builder.DataAttachmentBuilder;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentTypeImpl;
+import fuzs.puzzleslib.impl.attachment.builder.DataAttachmentBuilder;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeAttachmentTypeAdapter;
 import net.minecraft.core.HolderLookup;
@@ -28,12 +28,12 @@ public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V> exten
 
     @Override
     public DataAttachmentType<T, V> build(ResourceLocation resourceLocation) {
-        DeferredRegister<AttachmentType<?>> registrar = DeferredRegister.create(
-                NeoForgeRegistries.Keys.ATTACHMENT_TYPES, resourceLocation.getNamespace());
-        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(
-                registrar::register);
-        DeferredHolder<AttachmentType<?>, AttachmentType<V>> attachmentType = registrar.register(
-                resourceLocation.getPath(), () -> {
+        DeferredRegister<AttachmentType<?>> registrar = DeferredRegister.create(NeoForgeRegistries.Keys.ATTACHMENT_TYPES,
+                resourceLocation.getNamespace());
+        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace())
+                .ifPresent(registrar::register);
+        DeferredHolder<AttachmentType<?>, AttachmentType<V>> attachmentType = registrar.register(resourceLocation.getPath(),
+                () -> {
                     AttachmentType.Builder<V> builder = AttachmentType.builder(() -> {
                         throw new UnsupportedOperationException(
                                 "Attachment type " + resourceLocation + " does not support a default value!");
@@ -49,8 +49,8 @@ public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V> exten
     @MustBeInvokedByOverriders
     void configureBuilder(AttachmentType.Builder<V> builder) {
         if (this.codec != null) {
-            builder.serialize(this.codec).copyHandler(
-                    (V value, IAttachmentHolder holder, HolderLookup.Provider registries) -> {
+            builder.serialize(this.codec)
+                    .copyHandler((V value, IAttachmentHolder holder, HolderLookup.Provider registries) -> {
                         return value;
                     });
         }

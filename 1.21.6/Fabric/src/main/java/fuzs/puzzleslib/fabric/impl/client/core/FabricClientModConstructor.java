@@ -30,6 +30,7 @@ public final class FabricClientModConstructor implements ModConstructorImpl<Clie
         modConstructor.onRegisterRenderBuffers(new RenderBuffersContextFabricImpl());
         modConstructor.onRegisterRenderPipelines(new RenderPipelinesContextFabricImpl());
         modConstructor.onRegisterGuiLayers(new GuiLayersContextFabricImpl());
+        modConstructor.onRegisterPictureInPictureRenderers(new PictureInPictureRendererContextFabricImpl());
         ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
             // run this as late as possible and not during client init, so that maps are already fully populated with vanilla and modded content
             modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextFabricImpl());

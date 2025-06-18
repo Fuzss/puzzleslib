@@ -10,13 +10,13 @@ import net.neoforged.neoforge.client.event.RegisterItemDecorationsEvent;
 
 import java.util.Objects;
 
-public record ItemDecorationsContextNeoForgeImpl(RegisterItemDecorationsEvent evt) implements ItemDecorationsContext {
+public record ItemDecorationsContextNeoForgeImpl(RegisterItemDecorationsEvent event) implements ItemDecorationsContext {
 
     @Override
     public void registerItemStackDecorator(ItemLike itemLike, ItemStackDecorator itemStackDecorator) {
         Objects.requireNonNull(itemStackDecorator, "item stack decorator is null");
         Objects.requireNonNull(itemLike, "item is null");
-        this.evt.register(itemLike, (GuiGraphics guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
+        this.event.register(itemLike, (GuiGraphics guiGraphics, Font font, ItemStack itemStack, int posX, int posY) -> {
             itemStackDecorator.renderItemDecorations(guiGraphics, font, itemStack, posX, posY);
             return false;
         });

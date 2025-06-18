@@ -22,6 +22,7 @@ import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
+import net.fabricmc.fabric.api.client.rendering.v1.GatherDebugTextEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
@@ -419,8 +420,12 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
-        INSTANCE.register(GatherDebugInformationEvents.Game.class, FabricGuiEvents.GATHER_GAME_INFORMATION);
-        INSTANCE.register(GatherDebugInformationEvents.System.class, FabricGuiEvents.GATHER_SYSTEM_INFORMATION);
+        INSTANCE.register(GatherDebugInformationEvents.Game.class, GatherDebugTextEvents.LEFT, (GatherDebugInformationEvents.Game callback) -> {
+            return callback::onGatherGameInformation;
+        });
+        INSTANCE.register(GatherDebugInformationEvents.System.class, GatherDebugTextEvents.RIGHT, (GatherDebugInformationEvents.System callback) -> {
+            return callback::onGatherSystemInformation;
+        });
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);

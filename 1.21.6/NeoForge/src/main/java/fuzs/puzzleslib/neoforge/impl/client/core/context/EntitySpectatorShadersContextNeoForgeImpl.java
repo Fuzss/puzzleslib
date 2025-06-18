@@ -7,12 +7,12 @@ import net.neoforged.neoforge.client.event.RegisterEntitySpectatorShadersEvent;
 
 import java.util.Objects;
 
-public record EntitySpectatorShadersContextNeoForgeImpl(RegisterEntitySpectatorShadersEvent evt) implements EntitySpectatorShadersContext {
+public record EntitySpectatorShadersContextNeoForgeImpl(RegisterEntitySpectatorShadersEvent event) implements EntitySpectatorShadersContext {
 
     @Override
     public void registerSpectatorShader(EntityType<?> entityType, ResourceLocation resourceLocation) {
         Objects.requireNonNull(entityType, "entity type is null");
         Objects.requireNonNull(resourceLocation, "resource location is null");
-        this.evt.register(entityType, resourceLocation);
+        this.event.register(entityType, resourceLocation);
     }
 }
