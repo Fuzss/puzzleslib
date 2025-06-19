@@ -38,7 +38,7 @@ public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V> exten
                         throw new UnsupportedOperationException(
                                 "Attachment type " + resourceLocation + " does not support a default value!");
                     });
-                    this.configureBuilder(builder);
+                    this.configureBuilder(resourceLocation, builder);
                     return builder.build();
                 });
         AttachmentTypeAdapter<T, V> adapter = new NeoForgeAttachmentTypeAdapter<>(attachmentType);
@@ -47,9 +47,9 @@ public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V> exten
     }
 
     @MustBeInvokedByOverriders
-    void configureBuilder(AttachmentType.Builder<V> builder) {
+    void configureBuilder(ResourceLocation resourceLocation, AttachmentType.Builder<V> builder) {
         if (this.codec != null) {
-            builder.serialize(this.codec)
+            builder.serialize(this.codec.fieldOf(resourceLocation.toString()))
                     .copyHandler((V value, IAttachmentHolder holder, HolderLookup.Provider registries) -> {
                         return value;
                     });

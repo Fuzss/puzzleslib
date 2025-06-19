@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
@@ -90,13 +90,13 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<V> persistent(MapCodec<V> codec) {
+    public DataAttachmentRegistry.EntityBuilder<V> persistent(Codec<V> codec) {
         return (DataAttachmentRegistry.EntityBuilder<V>) super.persistent(codec);
     }
 
     @Override
-    void configureBuilder(AttachmentType.Builder<V> builder) {
-        super.configureBuilder(builder);
+    void configureBuilder(ResourceLocation resourceLocation, AttachmentType.Builder<V> builder) {
+        super.configureBuilder(resourceLocation, builder);
         if (this.copyOnDeath) {
             Objects.requireNonNull(this.codec, "codec is null");
             builder.copyOnDeath();
