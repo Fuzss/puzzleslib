@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.api.attachment.v4;
 
 import com.google.common.base.Predicates;
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import net.minecraft.core.RegistryAccess;
@@ -93,7 +93,7 @@ public final class DataAttachmentRegistry {
          * @param codec the attachment value codec
          * @return the builder instance
          */
-        Builder<T, V> persistent(MapCodec<V> codec);
+        Builder<T, V> persistent(Codec<V> codec);
 
         /**
          * Build the attachment type.
@@ -159,7 +159,7 @@ public final class DataAttachmentRegistry {
     public interface EntityBuilder<V> extends RegistryBuilder<Entity, V> {
 
         @Override
-        EntityBuilder<V> persistent(MapCodec<V> codec);
+        EntityBuilder<V> persistent(Codec<V> codec);
 
         @Override
         default EntityBuilder<V> defaultValue(V defaultValue) {
@@ -220,7 +220,7 @@ public final class DataAttachmentRegistry {
         /**
          * Copy the attachment value when the entity dies.
          * <p>
-         * Requires a persistent attachment type via {@link #persistent(MapCodec)}.
+         * Requires a persistent attachment type via {@link Builder#persistent(Codec)}.
          *
          * @return the builder instance
          */
@@ -270,6 +270,6 @@ public final class DataAttachmentRegistry {
         BlockEntityBuilder<V> defaultValue(Predicate<BlockEntity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
 
         @Override
-        BlockEntityBuilder<V> persistent(MapCodec<V> codec);
+        BlockEntityBuilder<V> persistent(Codec<V> codec);
     }
 }

@@ -41,7 +41,7 @@ public class FabricDataAttachmentBuilder<T, V> extends DataAttachmentBuilder<T, 
     @MustBeInvokedByOverriders
     void configureBuilder(AttachmentRegistry.Builder<V> builder) {
         if (this.codec != null) {
-            builder.persistent(this.codec.codec());
+            builder.persistent(this.codec);
         }
     }
 }

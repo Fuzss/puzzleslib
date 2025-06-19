@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.impl.attachment.builder;
 
 import com.google.common.base.Predicates;
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import net.minecraft.core.RegistryAccess;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 public abstract class DataAttachmentBuilder<T, V> implements DataAttachmentRegistry.Builder<T, V> {
     protected final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues = new LinkedHashMap<>();
     @Nullable
-    protected MapCodec<V> codec;
+    protected Codec<V> codec;
 
     @Override
     public DataAttachmentRegistry.Builder<T, V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
@@ -28,7 +28,7 @@ public abstract class DataAttachmentBuilder<T, V> implements DataAttachmentRegis
     }
 
     @Override
-    public DataAttachmentRegistry.Builder<T, V> persistent(MapCodec<V> codec) {
+    public DataAttachmentRegistry.Builder<T, V> persistent(Codec<V> codec) {
         Objects.requireNonNull(codec, "codec is null");
         this.codec = codec;
         return this;

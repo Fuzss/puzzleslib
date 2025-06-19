@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
@@ -82,7 +82,7 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
     }
 
     @Override
-    public DataAttachmentRegistry.EntityBuilder<V> persistent(MapCodec<V> codec) {
+    public DataAttachmentRegistry.EntityBuilder<V> persistent(Codec<V> codec) {
         return (DataAttachmentRegistry.EntityBuilder<V>) super.persistent(codec);
     }
 

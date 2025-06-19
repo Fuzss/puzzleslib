@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
-import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -34,7 +34,7 @@ public final class FabricBlockEntityDataAttachmentBuilder<V> extends FabricDataA
     }
 
     @Override
-    public DataAttachmentRegistry.BlockEntityBuilder<V> persistent(MapCodec<V> codec) {
+    public DataAttachmentRegistry.BlockEntityBuilder<V> persistent(Codec<V> codec) {
         return (DataAttachmentRegistry.BlockEntityBuilder<V>) super.persistent(codec);
     }
 }
