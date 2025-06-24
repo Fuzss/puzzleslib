@@ -41,6 +41,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -93,6 +94,15 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
+    public void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType) {
+        super.setupHandshakePayload(payloadType);
+        ClientPlayNetworking.registerGlobalReceiver(payloadType,
+                (BrandPayload payload, ClientPlayNetworking.Context context) -> {
+                    // NO-OP
+                });
+    }
+
+    @Override
     public PayloadTypesContext createPayloadTypesContext(String modId) {
         return new PayloadTypesContextFabricImpl.ClientImpl(modId);
     }
@@ -101,8 +111,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     public boolean shouldStartDestroyBlock(BlockPos blockPos) {
         MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
         Objects.requireNonNull(gameMode, "game mode is null");
-        return !gameMode.isDestroying() ||
-                !((MultiPlayerGameModeFabricAccessor) gameMode).puzzleslib$callSameDestroyTarget(blockPos);
+        return !gameMode.isDestroying()
+                || !((MultiPlayerGameModeFabricAccessor) gameMode).puzzleslib$callSameDestroyTarget(blockPos);
     }
 
     @Override

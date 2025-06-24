@@ -4,6 +4,8 @@ import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.world.level.Level;
 
@@ -18,6 +20,8 @@ public interface FabricProxy extends ProxyImpl {
     boolean notHidden(String id);
 
     PayloadTypesContext createPayloadTypesContext(String modId);
+
+    void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType);
 
     default boolean shouldStartDestroyBlock(BlockPos blockPos) {
         throw new RuntimeException("Should start destroy block accessed for wrong side!");

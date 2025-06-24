@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.impl.core.ModContext;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -112,9 +113,8 @@ public interface ModLoaderEnvironment {
     }
 
     /**
-     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server.
-     * <p>
-     * Useful for altering client behavior depending on the server mod state.
+     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server; useful
+     * for altering behavior depending on the mod state.
      * <p>
      * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
      * supported.
@@ -123,6 +123,25 @@ public interface ModLoaderEnvironment {
      * @return is the mod installed on the server
      */
     default boolean isModPresentServerside(String modId) {
-        return ModContext.isPresentServerside(modId);
+        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
+                .get(modId)
+                .isPresentServerside();
+    }
+
+    /**
+     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on a client; useful for
+     * altering behavior depending on the mod state.
+     * <p>
+     * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
+     * supported.
+     *
+     * @param serverPlayer the client to check
+     * @param modId        the mod to check
+     * @return is the mod installed on a client
+     */
+    default boolean isModPresentClientside(ServerPlayer serverPlayer, String modId) {
+        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
+                .get(modId)
+                .isPresentClientside(serverPlayer);
     }
 }

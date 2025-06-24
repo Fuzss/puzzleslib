@@ -89,7 +89,7 @@ public interface PayloadTypesContext {
     /**
      * Are clients &amp; servers without this mod or vanilla clients &amp; servers compatible.
      * <p>
-     * Not supported on Fabric-like environments.
+     * Not supported in Fabric-like environments.
      */
     void optional();
 }
