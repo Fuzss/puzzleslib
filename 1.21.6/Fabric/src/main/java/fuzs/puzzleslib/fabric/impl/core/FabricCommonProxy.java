@@ -38,6 +38,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.ClientCommonPacketListener;
 import net.minecraft.network.protocol.common.ServerCommonPacketListener;
+import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
 import net.minecraft.resources.ResourceKey;
@@ -200,6 +201,15 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     @Override
     public PayloadTypesContext createPayloadTypesContext(String modId) {
         return new PayloadTypesContextFabricImpl.ServerImpl(modId);
+    }
+
+    @MustBeInvokedByOverriders
+    @Override
+    public void setupHandshakePayload(CustomPacketPayload.Type<BrandPayload> payloadType) {
+        ServerPlayNetworking.registerGlobalReceiver(payloadType,
+                (BrandPayload payload, ServerPlayNetworking.Context context) -> {
+                    // NO-OP
+                });
     }
 
     @Override

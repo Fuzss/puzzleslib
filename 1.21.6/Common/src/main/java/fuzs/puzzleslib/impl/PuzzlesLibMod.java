@@ -1,11 +1,8 @@
 package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
-import fuzs.puzzleslib.api.event.v1.server.RegisterConfigurationTasksCallback;
-import fuzs.puzzleslib.impl.core.ClientboundModListMessage;
 import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
@@ -24,16 +21,9 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void registerEventHandlers() {
-        RegisterConfigurationTasksCallback.EVENT.register(ModContext::onRegisterConfigurationTasks);
         LoadCompleteCallback.EVENT.register(ModContext::onLoadComplete);
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
         EventHandlerProvider.tryRegister(ProxyImpl.get());
-    }
-
-    @Override
-    public void onRegisterPayloadTypes(PayloadTypesContext context) {
-        context.optional();
-        context.configurationToClient(ClientboundModListMessage.class, ClientboundModListMessage.STREAM_CODEC);
     }
 
     public static ResourceLocation id(String path) {

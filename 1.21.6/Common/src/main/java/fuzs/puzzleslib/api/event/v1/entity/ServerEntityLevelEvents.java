@@ -29,15 +29,15 @@ public final class ServerEntityLevelEvents {
          * {@link fuzs.puzzleslib.api.util.v1.EntityHelper#getMobSpawnReason(Mob)} if captured in
          * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
          *
-         * @param entity        the entity that is being loaded
-         * @param serverLevel   the level the entity is loaded in
-         * @param isFreshEntity the entity has just been spawned in instead of being loaded from storage
+         * @param entity         the entity that is being loaded
+         * @param serverLevel    the level the entity is loaded in
+         * @param isNewlySpawned the entity has just been spawned in instead of being loaded from storage
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the entity from being added to the level, effectively discarding it</li>
          *         <li>{@link EventResult#PASS PASS} for the entity to be added normally</li>
          *         </ul>
          */
-        EventResult onEntityLoad(Entity entity, ServerLevel serverLevel, boolean isFreshEntity);
+        EventResult onEntityLoad(Entity entity, ServerLevel serverLevel, boolean isNewlySpawned);
     }
 
     @FunctionalInterface
