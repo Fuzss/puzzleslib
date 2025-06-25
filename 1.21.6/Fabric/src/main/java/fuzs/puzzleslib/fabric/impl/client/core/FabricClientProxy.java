@@ -9,6 +9,7 @@ import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistry;
 import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
+import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.client.util.EntityRenderStateExtension;
@@ -229,12 +230,12 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
-        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
+        return HudStatusBarHeightRegistry.getHeight(GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation));
     }
 
     @Override
     public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
-        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
+        return HudStatusBarHeightRegistry.getHeight(GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation));
     }
 
     @Override
