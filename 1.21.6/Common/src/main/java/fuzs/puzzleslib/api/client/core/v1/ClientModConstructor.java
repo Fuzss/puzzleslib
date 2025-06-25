@@ -116,6 +116,7 @@ public interface ClientModConstructor {
      * @param context register additional renders to run after stack count and durability have been drawn for an item
      *                stack
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterItemDecorations(ItemDecorationsContext context) {
         // NO-OP
     }

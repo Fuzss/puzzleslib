@@ -28,25 +28,6 @@ import java.util.function.ToIntFunction;
 
 public final class HudStatusBarHeightRegistryImpl {
     /**
-     * This serves two purposes: it provides a fixed order for some vanilla status bars; and it provides reduced vanilla
-     * height providers, to compare with the actual height providers during rendering for potential translations for
-     * vanilla status bars. Translations are achieved via pose stack transformations; alternatively can also be
-     * implemented via mixins.
-     */
-    static final Map<ResourceLocation, ToIntFunction<Player>> VANILLA_HEIGHT_PROVIDERS;
-    /**
-     * Height providers registered for the left side above the hotbar, like health and armor.
-     *
-     * <p>The height providers registered here simply return the height of the corresponding status bar.
-     */
-    static final Map<ResourceLocation, ToIntFunction<Player>> LEFT_HEIGHT_PROVIDERS = new HashMap<>();
-    /**
-     * Height providers registered for the right side above the hotbar, like food and air bubbles.
-     *
-     * <p>The height providers registered here simply return the height of the corresponding status bar.
-     */
-    static final Map<ResourceLocation, ToIntFunction<Player>> RIGHT_HEIGHT_PROVIDERS = new HashMap<>();
-    /**
      * The height at which vanilla begins rendering status bars; this is used for health and food / mount health.
      */
     static final int DEFAULT_HEIGHT = 39;
@@ -123,6 +104,61 @@ public final class HudStatusBarHeightRegistryImpl {
         boolean isInWater = player.isEyeInFluid(FluidTags.WATER);
         return isInWater || airSupply < maxAirSupply ? 10 : 0;
     };
+    /**
+     * This serves two purposes: it provides a fixed order for some vanilla status bars; and it provides reduced vanilla
+     * height providers, to compare with the actual height providers during rendering for potential translations for
+     * vanilla status bars. Translations are achieved via matrix stack transformations; alternatively can also be
+     * implemented via mixins.
+     *
+     * <p>Do not use {@link Map#of()}; it does not preserve insertion order.
+     */
+    static final Map<ResourceLocation, ToIntFunction<Player>> VANILLA_HEIGHT_PROVIDERS = ImmutableMap.of(
+            VanillaHudElements.HEALTH_BAR,
+            ZERO,
+            VanillaHudElements.ARMOR_BAR,
+            HEALTH_BAR,
+            VanillaHudElements.MOUNT_HEALTH,
+            ZERO,
+            VanillaHudElements.FOOD_BAR,
+            ZERO,
+            VanillaHudElements.AIR_BAR,
+            reduceToIntFunctions(MOUNT_HEALTH, FOOD_BAR, Integer::sum));
+    /**
+     * Height providers registered for the left side above the hotbar.
+     *
+     * <p>Used for checking if any custom height providers have been registered to potentially skip resolving later on.
+     */
+    static final Map<ResourceLocation, ToIntFunction<Player>> VANILLA_LEFT_HEIGHT_PROVIDERS = ImmutableMap.of(
+            VanillaHudElements.HEALTH_BAR,
+            HEALTH_BAR,
+            VanillaHudElements.ARMOR_BAR,
+            ARMOR_BAR);
+    /**
+     * Height providers registered for the right side above the hotbar.
+     *
+     * <p>Used for checking if any custom height providers have been registered to potentially skip resolving later on.
+     */
+    static final Map<ResourceLocation, ToIntFunction<Player>> VANILLA_RIGHT_HEIGHT_PROVIDERS = ImmutableMap.of(
+            VanillaHudElements.MOUNT_HEALTH,
+            MOUNT_HEALTH,
+            VanillaHudElements.FOOD_BAR,
+            FOOD_BAR,
+            VanillaHudElements.AIR_BAR,
+            AIR_BAR);
+    /**
+     * Height providers registered for the left side above the hotbar, like health and armor.
+     *
+     * <p>The height providers registered here simply return the height of the corresponding status bar.
+     */
+    static final Map<ResourceLocation, ToIntFunction<Player>> LEFT_HEIGHT_PROVIDERS = new HashMap<>(
+            VANILLA_LEFT_HEIGHT_PROVIDERS);
+    /**
+     * Height providers registered for the right side above the hotbar, like food and air bubbles.
+     *
+     * <p>The height providers registered here simply return the height of the corresponding status bar.
+     */
+    static final Map<ResourceLocation, ToIntFunction<Player>> RIGHT_HEIGHT_PROVIDERS = new HashMap<>(
+            VANILLA_RIGHT_HEIGHT_PROVIDERS);
 
     /**
      * Height providers used during rendering computed from everything that was registered.
@@ -133,21 +169,6 @@ public final class HudStatusBarHeightRegistryImpl {
      */
     @Nullable
     static Map<ResourceLocation, ToIntFunction<Player>> resolvedHeightProviders;
-
-    static {
-        ImmutableMap.Builder<ResourceLocation, ToIntFunction<Player>> builder = ImmutableMap.builder();
-        builder.put(VanillaHudElements.HEALTH_BAR, ZERO);
-        builder.put(VanillaHudElements.ARMOR_BAR, HEALTH_BAR);
-        builder.put(VanillaHudElements.MOUNT_HEALTH, ZERO);
-        builder.put(VanillaHudElements.FOOD_BAR, ZERO);
-        builder.put(VanillaHudElements.AIR_BAR, reduceToIntFunctions(MOUNT_HEALTH, FOOD_BAR, Integer::sum));
-        VANILLA_HEIGHT_PROVIDERS = builder.build();
-        LEFT_HEIGHT_PROVIDERS.put(VanillaHudElements.HEALTH_BAR, HEALTH_BAR);
-        LEFT_HEIGHT_PROVIDERS.put(VanillaHudElements.ARMOR_BAR, ARMOR_BAR);
-        RIGHT_HEIGHT_PROVIDERS.put(VanillaHudElements.MOUNT_HEALTH, MOUNT_HEALTH);
-        RIGHT_HEIGHT_PROVIDERS.put(VanillaHudElements.FOOD_BAR, FOOD_BAR);
-        RIGHT_HEIGHT_PROVIDERS.put(VanillaHudElements.AIR_BAR, AIR_BAR);
-    }
 
     private HudStatusBarHeightRegistryImpl() {
         // NO-OP
@@ -170,19 +191,21 @@ public final class HudStatusBarHeightRegistryImpl {
     }
 
     public static int getHeight(ResourceLocation id) {
-        // returns zero for invalid calls, can adjust this to throw instead
-        Player player = Minecraft.getInstance().gui.getCameraPlayer();
-        if (player != null) {
-            ToIntFunction<Player> heightProvider;
-            if (resolvedHeightProviders != null) {
-                heightProvider = resolvedHeightProviders.getOrDefault(id, ZERO);
-            } else {
-                heightProvider = ZERO;
-            }
-            return DEFAULT_HEIGHT + heightProvider.applyAsInt(player);
-        } else {
-            return 0;
+        if (resolvedHeightProviders == null) {
+            throw new IllegalStateException("Trying to get status bar height for " + id + " too early");
         }
+
+        if (!resolvedHeightProviders.containsKey(id)) {
+            throw new IllegalArgumentException("Unknown status bar: " + id);
+        }
+
+        Player player = Minecraft.getInstance().gui.getCameraPlayer();
+
+        if (player == null) {
+            throw new IllegalStateException("Trying to get status bar height for " + id + " without a camera player");
+        }
+
+        return DEFAULT_HEIGHT + resolvedHeightProviders.get(id).applyAsInt(player);
     }
 
     public static void init() {
@@ -202,7 +225,7 @@ public final class HudStatusBarHeightRegistryImpl {
         List<ResourceLocation> orderedHeightProviders = new ArrayList<>();
         for (ResourceLocation resourceLocation : VANILLA_HEIGHT_PROVIDERS.keySet()) {
             for (HudLayer hudLayer : HudElementRegistryImpl.ROOT_ELEMENTS.get(resourceLocation).layers()) {
-                if (heightProviderLookup.containsKey(hudLayer.id())) {
+                if (!hudLayer.isRemoved() && heightProviderLookup.containsKey(hudLayer.id())) {
                     orderedHeightProviders.add(hudLayer.id());
                 }
             }
@@ -210,7 +233,7 @@ public final class HudStatusBarHeightRegistryImpl {
         for (Map.Entry<ResourceLocation, HudElementRegistryImpl.RootLayer> entry : HudElementRegistryImpl.ROOT_ELEMENTS.entrySet()) {
             if (!VANILLA_HEIGHT_PROVIDERS.containsKey(entry.getKey())) {
                 for (HudLayer hudLayer : entry.getValue().layers()) {
-                    if (heightProviderLookup.containsKey(hudLayer.id())) {
+                    if (!hudLayer.isRemoved() && heightProviderLookup.containsKey(hudLayer.id())) {
                         orderedHeightProviders.add(hudLayer.id());
                     }
                 }
@@ -262,20 +285,38 @@ public final class HudStatusBarHeightRegistryImpl {
     }
 
     private static void applyVanillaHeightProviders(Map<ResourceLocation, ToIntFunction<Player>> resolvedHeightProviders, ToIntFunction<Player> maxHeightProvider) {
-        // wrap vanilla status bars with pose stack transformations to implement potentially altered height values
+        // wrap vanilla status bars with matrix stack transformations to implement potentially altered height values
         for (Map.Entry<ResourceLocation, ToIntFunction<Player>> entry : VANILLA_HEIGHT_PROVIDERS.entrySet()) {
-            ToIntFunction<Player> actualHeightProvider = resolvedHeightProviders.get(entry.getKey());
-            ToIntFunction<Player> expectedHeightProvider = entry.getValue();
-            replaceVanillaElement(entry.getKey(),
-                    reduceToIntFunctions(expectedHeightProvider, actualHeightProvider, (int i1, int i2) -> i1 - i2));
+            if (isVanillaHeightProvider(entry.getKey())) {
+                ToIntFunction<Player> actualHeightProvider = resolvedHeightProviders.get(entry.getKey());
+                ToIntFunction<Player> expectedHeightProvider = entry.getValue();
+                replaceVanillaElement(entry.getKey(),
+                        reduceToIntFunctions(expectedHeightProvider,
+                                actualHeightProvider,
+                                (int i1, int i2) -> i1 - i2));
+            }
         }
         // offset text above hotbar depending on height values
         replaceVanillaElement(VanillaHudElements.HELD_ITEM_TOOLTIP,
-                (Player player) -> HELD_ITEM_TOOLTIP_HEIGHT -
-                        Math.max(HELD_ITEM_TOOLTIP_HEIGHT, maxHeightProvider.applyAsInt(player)));
+                (Player player) -> HELD_ITEM_TOOLTIP_HEIGHT - Math.max(HELD_ITEM_TOOLTIP_HEIGHT,
+                        maxHeightProvider.applyAsInt(player)));
         replaceVanillaElement(VanillaHudElements.OVERLAY_MESSAGE,
-                (Player player) -> OVERLAY_MESSAGE_HEIGHT -
-                        Math.max(OVERLAY_MESSAGE_HEIGHT, maxHeightProvider.applyAsInt(player) + TEXT_HEIGHT_DELTA));
+                (Player player) -> OVERLAY_MESSAGE_HEIGHT - Math.max(OVERLAY_MESSAGE_HEIGHT,
+                        maxHeightProvider.applyAsInt(player) + TEXT_HEIGHT_DELTA));
+    }
+
+    private static boolean isVanillaHeightProvider(ResourceLocation resourceLocation) {
+        if (LEFT_HEIGHT_PROVIDERS.containsKey(resourceLocation)
+                && LEFT_HEIGHT_PROVIDERS.get(resourceLocation) == VANILLA_LEFT_HEIGHT_PROVIDERS.get(resourceLocation)) {
+            return true;
+        }
+
+        if (RIGHT_HEIGHT_PROVIDERS.containsKey(resourceLocation) && RIGHT_HEIGHT_PROVIDERS.get(resourceLocation)
+                == VANILLA_RIGHT_HEIGHT_PROVIDERS.get(resourceLocation)) {
+            return true;
+        }
+
+        return false;
     }
 
     private static void replaceVanillaElement(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider) {

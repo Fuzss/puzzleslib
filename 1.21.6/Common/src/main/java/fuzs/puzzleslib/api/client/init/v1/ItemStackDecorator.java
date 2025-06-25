@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
  * {@link net.minecraft.client.gui.GuiGraphics#renderItemDecorations(Font, ItemStack, int, int, String)} with basically
  * the same arguments.
  */
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface ItemStackDecorator {
 
