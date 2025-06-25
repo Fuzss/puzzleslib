@@ -6,6 +6,7 @@ import net.minecraft.world.level.ItemLike;
 /**
  * Register additional renderers to run after stack count and durability have been drawn for an item stack.
  */
+@Deprecated(forRemoval = true)
 @FunctionalInterface
 public interface ItemDecorationsContext {
 

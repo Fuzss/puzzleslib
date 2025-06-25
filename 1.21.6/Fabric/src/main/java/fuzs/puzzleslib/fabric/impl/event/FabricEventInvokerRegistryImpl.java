@@ -91,50 +91,63 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     public static void registerLoadingHandlers() {
         INSTANCE.register(LoadCompleteCallback.class, FabricLifecycleEvents.LOAD_COMPLETE);
         INSTANCE.register(RegistryEntryAddedCallback.class, FabricEventInvokerRegistryImpl::onRegistryEntryAdded);
-        INSTANCE.register(FinalizeItemComponentsCallback.class, DefaultItemComponentEvents.MODIFY, (FinalizeItemComponentsCallback callback) -> {
-            return (DefaultItemComponentEvents.ModifyContext context) -> {
-                for (Item item : BuiltInRegistries.ITEM) {
-                    callback.onFinalizeItemComponents(item, (Function<DataComponentMap, DataComponentPatch> function) -> {
-                        context.modify(item, (DataComponentMap.Builder builder) -> {
-                            function.apply(builder.build()).entrySet().forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
-                                builder.set((DataComponentType<Object>) entry.getKey(), entry.getValue().orElse(null));
-                            });
-                        });
-                    });
-                }
-            };
-        });
-        INSTANCE.register(ComputeItemAttributeModifiersCallback.class, DefaultItemComponentEvents.MODIFY, (ComputeItemAttributeModifiersCallback callback) -> {
-            return (DefaultItemComponentEvents.ModifyContext context) -> {
-                for (Item item : BuiltInRegistries.ITEM) {
-                    ItemAttributeModifiers itemAttributeModifiers = item.components()
-                            .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
-                    CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
-                            itemAttributeModifiers.modifiers());
-                    callback.onComputeItemAttributeModifiers(item, entries);
-                    if (entries.delegate() != itemAttributeModifiers.modifiers()) {
-                        context.modify(item, (DataComponentMap.Builder builder) -> {
-                            builder.set(DataComponents.ATTRIBUTE_MODIFIERS, new ItemAttributeModifiers(ImmutableList.copyOf(entries)));
-                        });
-                    }
-                }
-            };
-        });
-        INSTANCE.register(AddBlockEntityTypeBlocksCallback.class, FabricLifecycleEvents.LOAD_COMPLETE, (AddBlockEntityTypeBlocksCallback callback) -> {
-            return () -> {
-                callback.onAddBlockEntityTypeBlocks((BlockEntityType<?> blockEntityType, Block block) -> {
-                    blockEntityType.addSupportedBlock(block);
+        INSTANCE.register(FinalizeItemComponentsCallback.class,
+                DefaultItemComponentEvents.MODIFY,
+                (FinalizeItemComponentsCallback callback) -> {
+                    return (DefaultItemComponentEvents.ModifyContext context) -> {
+                        for (Item item : BuiltInRegistries.ITEM) {
+                            callback.onFinalizeItemComponents(item,
+                                    (Function<DataComponentMap, DataComponentPatch> function) -> {
+                                        context.modify(item, (DataComponentMap.Builder builder) -> {
+                                            function.apply(builder.build())
+                                                    .entrySet()
+                                                    .forEach((Map.Entry<DataComponentType<?>, Optional<?>> entry) -> {
+                                                        builder.set((DataComponentType<Object>) entry.getKey(),
+                                                                entry.getValue().orElse(null));
+                                                    });
+                                        });
+                                    });
+                        }
+                    };
                 });
-            };
-        });
+        INSTANCE.register(ComputeItemAttributeModifiersCallback.class,
+                DefaultItemComponentEvents.MODIFY,
+                (ComputeItemAttributeModifiersCallback callback) -> {
+                    return (DefaultItemComponentEvents.ModifyContext context) -> {
+                        for (Item item : BuiltInRegistries.ITEM) {
+                            ItemAttributeModifiers itemAttributeModifiers = item.components()
+                                    .getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
+                            CopyOnWriteForwardingList<ItemAttributeModifiers.Entry> entries = new CopyOnWriteForwardingList<>(
+                                    itemAttributeModifiers.modifiers());
+                            callback.onComputeItemAttributeModifiers(item, entries);
+                            if (entries.delegate() != itemAttributeModifiers.modifiers()) {
+                                context.modify(item, (DataComponentMap.Builder builder) -> {
+                                    builder.set(DataComponents.ATTRIBUTE_MODIFIERS,
+                                            new ItemAttributeModifiers(ImmutableList.copyOf(entries)));
+                                });
+                            }
+                        }
+                    };
+                });
+        INSTANCE.register(AddBlockEntityTypeBlocksCallback.class,
+                FabricLifecycleEvents.LOAD_COMPLETE,
+                (AddBlockEntityTypeBlocksCallback callback) -> {
+                    return () -> {
+                        callback.onAddBlockEntityTypeBlocks((BlockEntityType<?> blockEntityType, Block block) -> {
+                            blockEntityType.addSupportedBlock(block);
+                        });
+                    };
+                });
         INSTANCE.register(CommonSetupCallback.class, (CommonSetupCallback callback, @Nullable Object context) -> {
             callback.onCommonSetup();
         });
-        INSTANCE.register(RegisterConfigurationTasksCallback.class, ServerConfigurationConnectionEvents.CONFIGURE, (RegisterConfigurationTasksCallback callback) -> {
-            return (ServerConfigurationPacketListenerImpl handler, MinecraftServer server) -> {
-                callback.onRegisterConfigurationTasks(server, handler, handler::addTask);
-            };
-        });
+        INSTANCE.register(RegisterConfigurationTasksCallback.class,
+                ServerConfigurationConnectionEvents.CONFIGURE,
+                (RegisterConfigurationTasksCallback callback) -> {
+                    return (ServerConfigurationPacketListenerImpl handler, MinecraftServer server) -> {
+                        callback.onRegisterConfigurationTasks(server, handler, handler::addTask);
+                    };
+                });
     }
 
     @SuppressWarnings("unchecked")
@@ -145,9 +158,10 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         BiConsumer<ResourceLocation, Supplier<T>> registrar = (ResourceLocation resourceLocation, Supplier<T> supplier) -> {
             Registry.register(registry, resourceLocation, supplier.get());
         };
-        net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback.event(registry).register((int rawId, ResourceLocation id, T object) -> {
-            callback.onRegistryEntryAdded(registry, id, object, registrar);
-        });
+        net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback.event(registry)
+                .register((int rawId, ResourceLocation id, T object) -> {
+                    callback.onRegistryEntryAdded(registry, id, object, registrar);
+                });
         // do not register directly to prevent ConcurrentModificationException
         Map<ResourceLocation, Supplier<T>> toRegister = Maps.newLinkedHashMap();
         for (Map.Entry<ResourceKey<T>, T> entry : registry.entrySet()) {
@@ -157,140 +171,175 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
     }
 
     public static void registerEventHandlers() {
-        INSTANCE.register(AddDataPackReloadListenersCallback.class, FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS);
-        INSTANCE.register(TagsUpdatedCallback.class, CommonLifecycleEvents.TAGS_LOADED, (TagsUpdatedCallback callback) -> {
-            return callback::onTagsUpdated;
-        });
-        INSTANCE.register(RegisterCommandsCallback.class, CommandRegistrationCallback.EVENT, (RegisterCommandsCallback callback) -> {
-            return callback::onRegisterCommands;
-        });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting.class, ServerLifecycleEvents.SERVER_STARTING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
-            return callback::onServerStarting;
-        });
-        INSTANCE.register(PlayerInteractEvents.UseBlock.class, UseBlockCallback.EVENT, (PlayerInteractEvents.UseBlock callback) -> {
-            return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
-                EventResultHolder<InteractionResult> eventResult = callback.onUseBlock(player, level, hand, hitResult);
-                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                    if (interactionResult == InteractionResult.PASS) {
-                        // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                        // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                        interactionResult = InteractionResult.FAIL;
-                    }
+        INSTANCE.register(AddDataPackReloadListenersCallback.class,
+                FabricLifecycleEvents.ADD_DATA_PACK_RELOAD_LISTENERS);
+        INSTANCE.register(TagsUpdatedCallback.class,
+                CommonLifecycleEvents.TAGS_LOADED,
+                (TagsUpdatedCallback callback) -> {
+                    return callback::onTagsUpdated;
+                });
+        INSTANCE.register(RegisterCommandsCallback.class,
+                CommandRegistrationCallback.EVENT,
+                (RegisterCommandsCallback callback) -> {
+                    return callback::onRegisterCommands;
+                });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting.class,
+                ServerLifecycleEvents.SERVER_STARTING,
+                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Starting callback) -> {
+                    return callback::onServerStarting;
+                });
+        INSTANCE.register(PlayerInteractEvents.UseBlock.class,
+                UseBlockCallback.EVENT,
+                (PlayerInteractEvents.UseBlock callback) -> {
+                    return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
+                        EventResultHolder<InteractionResult> eventResult = callback.onUseBlock(player,
+                                level,
+                                hand,
+                                hitResult);
+                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
+                            if (interactionResult == InteractionResult.PASS) {
+                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
+                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
+                                interactionResult = InteractionResult.FAIL;
+                            }
 
-                    if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
-                        // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                        FabricProxy.get().startClientPrediction(level, (int id) -> new ServerboundUseItemOnPacket(hand, hitResult, id));
-                    }
+                            if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
+                                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                                FabricProxy.get()
+                                        .startClientPrediction(level,
+                                                (int id) -> new ServerboundUseItemOnPacket(hand, hitResult, id));
+                            }
 
-                    return interactionResult;
-                }).orElse(InteractionResult.PASS);
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.AttackBlock.class, AttackBlockCallback.EVENT, (PlayerInteractEvents.AttackBlock callback) -> {
-            return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
-                if (!level.isClientSide || player.isCreative() || FabricProxy.get().shouldStartDestroyBlock(pos)) {
-                    EventResult eventResult = callback.onAttackBlock(player, level, hand, pos, direction);
-                    // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
-                    // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
-                    return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
-                } else {
-                    return InteractionResult.PASS;
-                }
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.UseItem.class, UseItemCallback.EVENT, (PlayerInteractEvents.UseItem callback) -> {
-            return (Player player, Level level, InteractionHand hand) -> {
-                // parity with Forge, eventResult item stack does not matter for Fabric implementation when eventResult is pass
-                if (player.isSpectator()) {
-                    return InteractionResult.PASS;
-                } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand))) {
-                    return InteractionResult.PASS;
-                }
+                            return interactionResult;
+                        }).orElse(InteractionResult.PASS);
+                    };
+                });
+        INSTANCE.register(PlayerInteractEvents.AttackBlock.class,
+                AttackBlockCallback.EVENT,
+                (PlayerInteractEvents.AttackBlock callback) -> {
+                    return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
+                        if (!level.isClientSide || player.isCreative() || FabricProxy.get()
+                                .shouldStartDestroyBlock(pos)) {
+                            EventResult eventResult = callback.onAttackBlock(player, level, hand, pos, direction);
+                            // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
+                            // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
+                            return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
+                        } else {
+                            return InteractionResult.PASS;
+                        }
+                    };
+                });
+        INSTANCE.register(PlayerInteractEvents.UseItem.class,
+                UseItemCallback.EVENT,
+                (PlayerInteractEvents.UseItem callback) -> {
+                    return (Player player, Level level, InteractionHand hand) -> {
+                        // parity with Forge, eventResult item stack does not matter for Fabric implementation when eventResult is pass
+                        if (player.isSpectator()) {
+                            return InteractionResult.PASS;
+                        } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand))) {
+                            return InteractionResult.PASS;
+                        }
 
-                EventResultHolder<InteractionResult> eventResult = callback.onUseItem(player, level, hand);
-                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                    if (interactionResult == InteractionResult.PASS) {
-                        // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                        // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                        interactionResult = InteractionResult.FAIL;
-                    }
+                        EventResultHolder<InteractionResult> eventResult = callback.onUseItem(player, level, hand);
+                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
+                            if (interactionResult == InteractionResult.PASS) {
+                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
+                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
+                                interactionResult = InteractionResult.FAIL;
+                            }
 
-                    // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                    // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
-                    if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
-                        // send the move packet like vanilla to ensure the position+view vectors are accurate
-                        MessageSender.broadcast(new ServerboundMovePlayerPacket.PosRot(player.getX(),
+                            // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                            // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
+                            if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
+                                // send the move packet like vanilla to ensure the position+view vectors are accurate
+                                MessageSender.broadcast(new ServerboundMovePlayerPacket.PosRot(player.getX(),
                                         player.getY(),
                                         player.getZ(),
                                         player.getYRot(),
                                         player.getXRot(),
-                                        player.onGround(), player.horizontalCollision
-                                ));
-                        // send interaction packet to the server with a new sequentially assigned id
-                        FabricProxy.get().startClientPrediction(level,
-                                (int id) -> new ServerboundUseItemPacket(hand, id, player.getYRot(), player.getXRot())
-                        );
-                    }
+                                        player.onGround(),
+                                        player.horizontalCollision));
+                                // send interaction packet to the server with a new sequentially assigned id
+                                FabricProxy.get()
+                                        .startClientPrediction(level,
+                                                (int id) -> new ServerboundUseItemPacket(hand,
+                                                        id,
+                                                        player.getYRot(),
+                                                        player.getXRot()));
+                            }
 
-                    return interactionResult;
-                }).orElse(InteractionResult.PASS);
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.UseEntity.class, UseEntityCallback.EVENT, (PlayerInteractEvents.UseEntity callback) -> {
-            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                // Fabric handles two possible cases in one event, here we separate them again
-                if (hitResult != null) return InteractionResult.PASS;
-                EventResultHolder<InteractionResult> eventResult = callback.onUseEntity(player, level, hand, entity);
-                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                    if (interactionResult == InteractionResult.PASS) {
-                        // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                        // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                        interactionResult = InteractionResult.FAIL;
-                    }
+                            return interactionResult;
+                        }).orElse(InteractionResult.PASS);
+                    };
+                });
+        INSTANCE.register(PlayerInteractEvents.UseEntity.class,
+                UseEntityCallback.EVENT,
+                (PlayerInteractEvents.UseEntity callback) -> {
+                    return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                        // Fabric handles two possible cases in one event, here we separate them again
+                        if (hitResult != null) return InteractionResult.PASS;
+                        EventResultHolder<InteractionResult> eventResult = callback.onUseEntity(player,
+                                level,
+                                hand,
+                                entity);
+                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
+                            if (interactionResult == InteractionResult.PASS) {
+                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
+                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
+                                interactionResult = InteractionResult.FAIL;
+                            }
 
-                    if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
-                        // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                        MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand));
-                    }
+                            if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
+                                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                                MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
+                                        player.isShiftKeyDown(),
+                                        hand));
+                            }
 
-                    return interactionResult;
-                }).orElse(InteractionResult.PASS);
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class, UseEntityCallback.EVENT, (PlayerInteractEvents.UseEntityAt callback) -> {
-            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                // Fabric handles two possible cases in one event, here we separate them again
-                if (hitResult == null) return InteractionResult.PASS;
-                EventResultHolder<InteractionResult> eventResult = callback.onUseEntityAt(player,
-                        level,
-                        hand,
-                        entity,
-                        hitResult.getLocation()
-                );
-                return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                    if (interactionResult == InteractionResult.PASS) {
-                        // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                        // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                        interactionResult = InteractionResult.FAIL;
-                    }
+                            return interactionResult;
+                        }).orElse(InteractionResult.PASS);
+                    };
+                });
+        INSTANCE.register(PlayerInteractEvents.UseEntityAt.class,
+                UseEntityCallback.EVENT,
+                (PlayerInteractEvents.UseEntityAt callback) -> {
+                    return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                        // Fabric handles two possible cases in one event, here we separate them again
+                        if (hitResult == null) return InteractionResult.PASS;
+                        EventResultHolder<InteractionResult> eventResult = callback.onUseEntityAt(player,
+                                level,
+                                hand,
+                                entity,
+                                hitResult.getLocation());
+                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
+                            if (interactionResult == InteractionResult.PASS) {
+                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
+                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
+                                interactionResult = InteractionResult.FAIL;
+                            }
 
-                    if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
-                        // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                        MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity, player.isShiftKeyDown(), hand, hitResult.getLocation()));
-                    }
+                            if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
+                                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
+                                MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
+                                        player.isShiftKeyDown(),
+                                        hand,
+                                        hitResult.getLocation()));
+                            }
 
-                    return interactionResult;
-                }).orElse(InteractionResult.PASS);
-            };
-        });
-        INSTANCE.register(PlayerInteractEvents.AttackEntity.class, AttackEntityCallback.EVENT, (PlayerInteractEvents.AttackEntity callback) -> {
-            return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                EventResult eventResult = callback.onAttackEntity(player, level, hand, entity);
-                // this isn't a proper item use callback (seen with the server-side and Forge implementations), so the return looks a little odd
-                // we return InteractionResult#SUCCESS so the packet is sent to the server either way so the server may handle this on its own as Forge does
-                return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
-            };
-        });
+                            return interactionResult;
+                        }).orElse(InteractionResult.PASS);
+                    };
+                });
+        INSTANCE.register(PlayerInteractEvents.AttackEntity.class,
+                AttackEntityCallback.EVENT,
+                (PlayerInteractEvents.AttackEntity callback) -> {
+                    return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                        EventResult eventResult = callback.onAttackEntity(player, level, hand, entity);
+                        // this isn't a proper item use callback (seen with the server-side and Forge implementations), so the return looks a little odd
+                        // we return InteractionResult#SUCCESS so the packet is sent to the server either way so the server may handle this on its own as Forge does
+                        return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
+                    };
+                });
         INSTANCE.register(PickupExperienceCallback.class, FabricPlayerEvents.PICKUP_EXPERIENCE);
         INSTANCE.register(UseBoneMealCallback.class, FabricLevelEvents.USE_BONE_MEAL);
         INSTANCE.register(LivingExperienceDropCallback.class, FabricLivingEvents.EXPERIENCE_DROP);
@@ -298,7 +347,11 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
             return (Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
                 if (!(level instanceof ServerLevel serverLevel)) return true;
                 if (!(player instanceof ServerPlayer serverPlayer)) return true;
-                EventResult eventResult = callback.onBreakBlock(serverLevel, pos, state, serverPlayer, player.getMainHandItem());
+                EventResult eventResult = callback.onBreakBlock(serverLevel,
+                        pos,
+                        state,
+                        serverPlayer,
+                        player.getMainHandItem());
                 return eventResult.isPass();
             };
         });
@@ -327,83 +380,123 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(ShieldBlockCallback.class, FabricLivingEvents.SHIELD_BLOCK);
         INSTANCE.register(ExplosionEvents.Start.class, FabricLevelEvents.EXPLOSION_START);
         INSTANCE.register(ExplosionEvents.Detonate.class, FabricLevelEvents.EXPLOSION_DETONATE);
-        INSTANCE.register(SyncDataPackContentsCallback.class, ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS, (SyncDataPackContentsCallback callback) -> {
-            return callback::onSyncDataPackContents;
-        });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started.class, ServerLifecycleEvents.SERVER_STARTED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started callback) -> {
-            return callback::onServerStarted;
-        });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping.class, ServerLifecycleEvents.SERVER_STOPPING, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping callback) -> {
-            return callback::onServerStopping;
-        });
-        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped.class, ServerLifecycleEvents.SERVER_STOPPED, (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped callback) -> {
-            return callback::onServerStopped;
-        });
+        INSTANCE.register(SyncDataPackContentsCallback.class,
+                ServerLifecycleEvents.SYNC_DATA_PACK_CONTENTS,
+                (SyncDataPackContentsCallback callback) -> {
+                    return callback::onSyncDataPackContents;
+                });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started.class,
+                ServerLifecycleEvents.SERVER_STARTED,
+                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Started callback) -> {
+                    return callback::onServerStarted;
+                });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping.class,
+                ServerLifecycleEvents.SERVER_STOPPING,
+                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopping callback) -> {
+                    return callback::onServerStopping;
+                });
+        INSTANCE.register(fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped.class,
+                ServerLifecycleEvents.SERVER_STOPPED,
+                (fuzs.puzzleslib.api.event.v1.server.ServerLifecycleEvents.Stopped callback) -> {
+                    return callback::onServerStopped;
+                });
         INSTANCE.register(PlaySoundEvents.AtPosition.class, FabricLevelEvents.PLAY_SOUND_AT_POSITION);
         INSTANCE.register(PlaySoundEvents.AtEntity.class, FabricLevelEvents.PLAY_SOUND_AT_ENTITY);
         INSTANCE.register(ServerEntityLevelEvents.Load.class, FabricEntityEvents.ENTITY_LOAD);
-        INSTANCE.register(ServerEntityLevelEvents.Unload.class, ServerEntityEvents.ENTITY_UNLOAD, (ServerEntityLevelEvents.Unload callback) -> {
-            return callback::onEntityUnload;
-        });
+        INSTANCE.register(ServerEntityLevelEvents.Unload.class,
+                ServerEntityEvents.ENTITY_UNLOAD,
+                (ServerEntityLevelEvents.Unload callback) -> {
+                    return callback::onEntityUnload;
+                });
         INSTANCE.register(LivingDeathCallback.class, FabricLivingEvents.LIVING_DEATH);
-        INSTANCE.register(PlayerTrackingEvents.Start.class, EntityTrackingEvents.START_TRACKING, (PlayerTrackingEvents.Start callback) -> {
-            return callback::onStartTracking;
-        });
-        INSTANCE.register(PlayerTrackingEvents.Stop.class, EntityTrackingEvents.STOP_TRACKING, (PlayerTrackingEvents.Stop callback) -> {
-            return callback::onStopTracking;
-        });
-        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class, ServerPlayerEvents.JOIN, (PlayerNetworkEvents.LoggedIn callback) -> {
-            return callback::onLoggedIn;
-        });
-        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class, ServerPlayerEvents.LEAVE, (PlayerNetworkEvents.LoggedOut callback) -> {
-            return callback::onLoggedOut;
-        });
-        INSTANCE.register(AfterChangeDimensionCallback.class, ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD, (AfterChangeDimensionCallback callback) -> {
-            return callback::onAfterChangeDimension;
-        });
+        INSTANCE.register(PlayerTrackingEvents.Start.class,
+                EntityTrackingEvents.START_TRACKING,
+                (PlayerTrackingEvents.Start callback) -> {
+                    return callback::onStartTracking;
+                });
+        INSTANCE.register(PlayerTrackingEvents.Stop.class,
+                EntityTrackingEvents.STOP_TRACKING,
+                (PlayerTrackingEvents.Stop callback) -> {
+                    return callback::onStopTracking;
+                });
+        INSTANCE.register(PlayerNetworkEvents.LoggedIn.class,
+                ServerPlayerEvents.JOIN,
+                (PlayerNetworkEvents.LoggedIn callback) -> {
+                    return callback::onLoggedIn;
+                });
+        INSTANCE.register(PlayerNetworkEvents.LoggedOut.class,
+                ServerPlayerEvents.LEAVE,
+                (PlayerNetworkEvents.LoggedOut callback) -> {
+                    return callback::onLoggedOut;
+                });
+        INSTANCE.register(AfterChangeDimensionCallback.class,
+                ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD,
+                (AfterChangeDimensionCallback callback) -> {
+                    return callback::onAfterChangeDimension;
+                });
         INSTANCE.register(BabyEntitySpawnCallback.class, FabricLivingEvents.BABY_ENTITY_SPAWN);
         INSTANCE.register(AnimalTameCallback.class, FabricLivingEvents.ANIMAL_TAME);
-        INSTANCE.register(LivingAttackCallback.class, ServerLivingEntityEvents.ALLOW_DAMAGE, (LivingAttackCallback callback) -> {
-            return (LivingEntity entity, DamageSource source, float amount) -> {
-                return callback.onLivingAttack(entity, source, amount).isPass();
-            };
-        });
-        INSTANCE.register(PlayerCopyEvents.Copy.class, ServerPlayerEvents.COPY_FROM, (PlayerCopyEvents.Copy callback) -> {
-            return callback::onCopy;
-        });
-        INSTANCE.register(PlayerCopyEvents.Respawn.class, ServerPlayerEvents.AFTER_RESPAWN, (PlayerCopyEvents.Respawn callback) -> {
-            return (ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) -> {
-                callback.onRespawn(newPlayer, alive);
-            };
-        });
-        INSTANCE.register(ServerTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_SERVER_TICK, (ServerTickEvents.Start callback) -> {
-            return callback::onStartServerTick;
-        });
-        INSTANCE.register(ServerTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK, (ServerTickEvents.End callback) -> {
-            return callback::onEndServerTick;
-        });
-        INSTANCE.register(ServerLevelTickEvents.Start.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK, (ServerLevelTickEvents.Start callback) -> {
-            return (ServerLevel serverLevel) -> {
-                callback.onStartLevelTick(serverLevel.getServer(), serverLevel);
-            };
-        });
-        INSTANCE.register(ServerLevelTickEvents.End.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK, (ServerLevelTickEvents.End callback) -> {
-            return (ServerLevel serverLevel) -> {
-                callback.onEndLevelTick(serverLevel.getServer(), serverLevel);
-            };
-        });
+        INSTANCE.register(LivingAttackCallback.class,
+                ServerLivingEntityEvents.ALLOW_DAMAGE,
+                (LivingAttackCallback callback) -> {
+                    return (LivingEntity entity, DamageSource source, float amount) -> {
+                        return callback.onLivingAttack(entity, source, amount).isPass();
+                    };
+                });
+        INSTANCE.register(PlayerCopyEvents.Copy.class,
+                ServerPlayerEvents.COPY_FROM,
+                (PlayerCopyEvents.Copy callback) -> {
+                    return callback::onCopy;
+                });
+        INSTANCE.register(PlayerCopyEvents.Respawn.class,
+                ServerPlayerEvents.AFTER_RESPAWN,
+                (PlayerCopyEvents.Respawn callback) -> {
+                    return (ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) -> {
+                        callback.onRespawn(newPlayer, alive);
+                    };
+                });
+        INSTANCE.register(ServerTickEvents.Start.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_SERVER_TICK,
+                (ServerTickEvents.Start callback) -> {
+                    return callback::onStartServerTick;
+                });
+        INSTANCE.register(ServerTickEvents.End.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_SERVER_TICK,
+                (ServerTickEvents.End callback) -> {
+                    return callback::onEndServerTick;
+                });
+        INSTANCE.register(ServerLevelTickEvents.Start.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.START_WORLD_TICK,
+                (ServerLevelTickEvents.Start callback) -> {
+                    return (ServerLevel serverLevel) -> {
+                        callback.onStartLevelTick(serverLevel.getServer(), serverLevel);
+                    };
+                });
+        INSTANCE.register(ServerLevelTickEvents.End.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents.END_WORLD_TICK,
+                (ServerLevelTickEvents.End callback) -> {
+                    return (ServerLevel serverLevel) -> {
+                        callback.onEndLevelTick(serverLevel.getServer(), serverLevel);
+                    };
+                });
         INSTANCE.register(ServerLevelEvents.Load.class, ServerWorldEvents.LOAD, (ServerLevelEvents.Load callback) -> {
             return callback::onLevelLoad;
         });
-        INSTANCE.register(ServerLevelEvents.Unload.class, ServerWorldEvents.UNLOAD, (ServerLevelEvents.Unload callback) -> {
-            return callback::onLevelUnload;
-        });
-        INSTANCE.register(ServerChunkEvents.Load.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD, (ServerChunkEvents.Load callback) -> {
-            return callback::onChunkLoad;
-        });
-        INSTANCE.register(ServerChunkEvents.Unload.class, net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD, (ServerChunkEvents.Unload callback) -> {
-            return callback::onChunkUnload;
-        });
+        INSTANCE.register(ServerLevelEvents.Unload.class,
+                ServerWorldEvents.UNLOAD,
+                (ServerLevelEvents.Unload callback) -> {
+                    return callback::onLevelUnload;
+                });
+        INSTANCE.register(ServerChunkEvents.Load.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_LOAD,
+                (ServerChunkEvents.Load callback) -> {
+                    return callback::onChunkLoad;
+                });
+        INSTANCE.register(ServerChunkEvents.Unload.class,
+                net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents.CHUNK_UNLOAD,
+                (ServerChunkEvents.Unload callback) -> {
+                    return callback::onChunkUnload;
+                });
         INSTANCE.register(ItemEntityEvents.Toss.class, FabricPlayerEvents.ITEM_TOSS);
         INSTANCE.register(LivingKnockBackCallback.class, FabricLivingEvents.LIVING_KNOCK_BACK);
         INSTANCE.register(ProjectileImpactCallback.class, FabricEntityEvents.PROJECTILE_IMPACT);
@@ -421,42 +514,52 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(EntityRidingEvents.Stop.class, FabricEntityEvents.ENTITY_STOP_RIDING);
         INSTANCE.register(ServerChunkEvents.Watch.class, FabricLevelEvents.WATCH_CHUNK);
         INSTANCE.register(ServerChunkEvents.Unwatch.class, FabricLevelEvents.UNWATCH_CHUNK);
-        INSTANCE.register(LivingEquipmentChangeCallback.class, ServerEntityEvents.EQUIPMENT_CHANGE, (LivingEquipmentChangeCallback callback) -> {
-            return callback::onLivingEquipmentChange;
-        });
-        INSTANCE.register(LivingConversionCallback.class, ServerLivingEntityEvents.MOB_CONVERSION, (LivingConversionCallback callback) -> {
-            return (Mob previous, Mob converted, ConversionParams conversionContext) -> {
-                callback.onLivingConversion(previous, converted);
-            };
-        });
+        INSTANCE.register(LivingEquipmentChangeCallback.class,
+                ServerEntityEvents.EQUIPMENT_CHANGE,
+                (LivingEquipmentChangeCallback callback) -> {
+                    return callback::onLivingEquipmentChange;
+                });
+        INSTANCE.register(LivingConversionCallback.class,
+                ServerLivingEntityEvents.MOB_CONVERSION,
+                (LivingConversionCallback callback) -> {
+                    return (Mob previous, Mob converted, ConversionParams conversionContext) -> {
+                        callback.onLivingConversion(previous, converted);
+                    };
+                });
         INSTANCE.register(ContainerEvents.Open.class, FabricPlayerEvents.CONTAINER_OPEN);
         INSTANCE.register(ContainerEvents.Close.class, FabricPlayerEvents.CONTAINER_CLOSE);
         INSTANCE.register(LookingAtEndermanCallback.class, FabricLivingEvents.LOOKING_AT_ENDERMAN);
-        INSTANCE.register(RegisterPotionBrewingMixesCallback.class, FabricBrewingRecipeRegistryBuilder.BUILD, (RegisterPotionBrewingMixesCallback callback) -> {
-            return (PotionBrewing.Builder builder) -> {
-                callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
-            };
-        });
+        INSTANCE.register(RegisterPotionBrewingMixesCallback.class,
+                FabricBrewingRecipeRegistryBuilder.BUILD,
+                (RegisterPotionBrewingMixesCallback callback) -> {
+                    return (PotionBrewing.Builder builder) -> {
+                        callback.onRegisterPotionBrewingMixes(new FabricPotionBrewingBuilder(builder));
+                    };
+                });
         INSTANCE.register(ChangeEntitySizeCallback.class, FabricEntityEvents.CHANGE_ENTITY_SIZE);
         INSTANCE.register(PickProjectileCallback.class, FabricLivingEvents.PICK_PROJECTILE);
         INSTANCE.register(EnderPearlTeleportCallback.class, FabricEntityEvents.ENDER_PEARL_TELEPORT);
         INSTANCE.register(BuildCreativeModeTabContentsCallback.class,
-                ItemGroupEvents.ModifyEntries.class, (BuildCreativeModeTabContentsCallback callback, @Nullable Object context) -> {
-            return (FabricItemGroupEntries entries) -> {
-                Objects.requireNonNull(context, "context is null");
-                ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
-                CreativeModeTab creativeModeTab = entries.getContext()
-                        .holders()
-                        .lookupOrThrow(Registries.CREATIVE_MODE_TAB)
-                        .getOrThrow(resourceKey)
-                        .value();
-                callback.onBuildCreativeModeTabContents(creativeModeTab, entries.getContext(), entries);
-            };
-                }, (Object context, Consumer<Event<ItemGroupEvents.ModifyEntries>> applyToInvoker, Consumer<Event<ItemGroupEvents.ModifyEntries>> removeInvoker) -> {
-            Objects.requireNonNull(context, "context is null");
-            ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
-            applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
-        }, UnaryOperator.identity(), false);
+                ItemGroupEvents.ModifyEntries.class,
+                (BuildCreativeModeTabContentsCallback callback, @Nullable Object context) -> {
+                    return (FabricItemGroupEntries entries) -> {
+                        Objects.requireNonNull(context, "context is null");
+                        ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
+                        CreativeModeTab creativeModeTab = entries.getContext()
+                                .holders()
+                                .lookupOrThrow(Registries.CREATIVE_MODE_TAB)
+                                .getOrThrow(resourceKey)
+                                .value();
+                        callback.onBuildCreativeModeTabContents(creativeModeTab, entries.getContext(), entries);
+                    };
+                },
+                (Object context, Consumer<Event<ItemGroupEvents.ModifyEntries>> applyToInvoker, Consumer<Event<ItemGroupEvents.ModifyEntries>> removeInvoker) -> {
+                    Objects.requireNonNull(context, "context is null");
+                    ResourceKey<CreativeModeTab> resourceKey = (ResourceKey<CreativeModeTab>) context;
+                    applyToInvoker.accept(ItemGroupEvents.modifyEntriesEvent(resourceKey));
+                },
+                UnaryOperator.identity(),
+                false);
     }
 
     @Override
@@ -473,10 +576,15 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         Objects.requireNonNull(eventType, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
         Objects.requireNonNull(consumer, "consumer is null");
-        EventInvokerImpl.register(clazz, new FabricForwardingEventInvoker<>(converter, consumer, eventPhaseConverter), joinInvokers);
+        EventInvokerImpl.register(clazz,
+                new FabricForwardingEventInvoker<>(converter, consumer, eventPhaseConverter),
+                joinInvokers);
     }
 
-    private record FabricEventInvoker<T, E>(Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
+    private record FabricEventInvoker<T, E>(Event<E> event,
+                                            FabricEventContextConverter<T, E> converter,
+                                            UnaryOperator<EventPhase> eventPhaseConverter,
+                                            Set<EventPhase> knownEventPhases) implements EventInvoker<T>, EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricEventInvoker(Event<E> event, FabricEventContextConverter<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter) {
             this(event, converter, eventPhaseConverter, Collections.synchronizedSet(Sets.newIdentityHashSet()));
@@ -535,10 +643,14 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         }
     }
 
-    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvokerImpl.EventInvokerLike<T>> factory, FabricEventContextConsumer<E> consumer, Map<Event<E>, EventInvokerImpl.EventInvokerLike<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
+    private record FabricForwardingEventInvoker<T, E>(Function<Event<E>, EventInvokerImpl.EventInvokerLike<T>> factory,
+                                                      FabricEventContextConsumer<E> consumer,
+                                                      Map<Event<E>, EventInvokerImpl.EventInvokerLike<T>> events) implements EventInvokerImpl.EventInvokerLike<T> {
 
         public FabricForwardingEventInvoker(FabricEventContextConverter<T, E> converter, FabricEventContextConsumer<E> consumer, UnaryOperator<EventPhase> eventPhaseConverter) {
-            this((Event<E> event) -> new FabricEventInvoker<>(event, converter, eventPhaseConverter), consumer, new MapMaker().weakKeys().concurrencyLevel(1).makeMap());
+            this((Event<E> event) -> new FabricEventInvoker<>(event, converter, eventPhaseConverter),
+                    consumer,
+                    new MapMaker().weakKeys().concurrencyLevel(1).makeMap());
         }
 
         @Override

@@ -17,7 +17,9 @@ import java.util.function.Function;
 public interface PictureInPictureRendererContext {
 
     /**
+     * @param renderStateClazz                the render state class type
      * @param pictureInPictureRendererFactory the factory for the custom renderer
+     * @param <T>                             the supported render state
      */
-    void registerPictureInPictureRenderer(Function<MultiBufferSource.BufferSource, PictureInPictureRenderer<?>> pictureInPictureRendererFactory);
+    <T extends PictureInPictureRenderState> void registerPictureInPictureRenderer(Class<T> renderStateClazz, Function<MultiBufferSource.BufferSource, PictureInPictureRenderer<T>> pictureInPictureRendererFactory);
 }

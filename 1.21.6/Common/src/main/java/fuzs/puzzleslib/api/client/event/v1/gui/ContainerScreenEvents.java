@@ -16,13 +16,15 @@ public final class ContainerScreenEvents {
     public interface Background {
 
         /**
-         * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the screen background is drawn (like menu texture).
-         * <p>This event is simply for notifying the foreground has been drawn, nothing can be cancelled.
+         * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the
+         * screen background is drawn (like menu texture).
+         * <p>
+         * This event is simply for notifying the foreground has been drawn, nothing can be cancelled.
          *
-         * @param screen    the screen being drawn
+         * @param screen      the screen being drawn
          * @param guiGraphics the gui graphics component
-         * @param mouseX    mouse x position
-         * @param mouseY    mouse y position
+         * @param mouseX      the mouse x-position
+         * @param mouseY      the mouse y-position
          */
         void onDrawBackground(AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int mouseX, int mouseY);
     }
@@ -31,13 +33,15 @@ public final class ContainerScreenEvents {
     public interface Foreground {
 
         /**
-         * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the screen foreground is drawn (like text labels).
-         * <p>This event is simply for notifying the foreground has been drawn, nothing can be cancelled.
+         * Called for instance of {@link net.minecraft.client.gui.screens.inventory.AbstractContainerScreen}, after the
+         * screen foreground is drawn (like text labels).
+         * <p>
+         * This event is simply for notifying the foreground has been drawn, nothing can be cancelled.
          *
-         * @param screen    the screen being drawn
+         * @param screen      the screen being drawn
          * @param guiGraphics the gui graphics component
-         * @param mouseX    mouse x position
-         * @param mouseY    mouse y position
+         * @param mouseX      the mouse x-position
+         * @param mouseY      the mouse y-position
          */
         void onDrawForeground(AbstractContainerScreen<?> screen, GuiGraphics guiGraphics, int mouseX, int mouseY);
     }
