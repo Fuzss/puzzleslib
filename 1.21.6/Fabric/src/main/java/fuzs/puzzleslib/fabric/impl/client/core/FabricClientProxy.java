@@ -240,6 +240,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public void registerProvidedEventHandlers() {
         super.registerProvidedEventHandlers();
-        HudStatusBarHeightRegistryImpl.init();
+        ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
+            HudStatusBarHeightRegistryImpl.init();
+        });
     }
 }
