@@ -85,13 +85,15 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
     public void addLeftStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(heightProvider, "height provider is null");
-        HudStatusBarHeightRegistry.addLeft(resourceLocation, heightProvider);
+        HudStatusBarHeightRegistry.addLeft(VANILLA_GUI_LAYERS.getOrDefault(resourceLocation, resourceLocation),
+                heightProvider);
     }
 
     @Override
     public void addRightStatusBarHeightProvider(ResourceLocation resourceLocation, ToIntFunction<Player> heightProvider) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(heightProvider, "height provider is null");
-        HudStatusBarHeightRegistry.addRight(resourceLocation, heightProvider);
+        HudStatusBarHeightRegistry.addRight(VANILLA_GUI_LAYERS.getOrDefault(resourceLocation, resourceLocation),
+                heightProvider);
     }
 }
