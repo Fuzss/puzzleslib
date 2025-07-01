@@ -5,6 +5,7 @@ import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 
+@Deprecated(forRemoval = true)
 public final class RenderGuiEvents {
     public static final EventInvoker<Before> BEFORE = EventInvoker.lookup(Before.class);
     public static final EventInvoker<After> AFTER = EventInvoker.lookup(After.class);
