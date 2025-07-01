@@ -43,20 +43,22 @@ public final class LookupHelper {
      * @return the holder from the registry
      */
     public static <T> Holder<T> lookup(Entity entity, ResourceKey<? extends Registry<? extends T>> registryKey, ResourceKey<T> resourceKey) {
+        Objects.requireNonNull(entity, "entity is null");
         return lookup(entity.registryAccess(), registryKey, resourceKey);
     }
 
     /**
      * Looks up a holder in the provided registry access.
      *
-     * @param levelReader the registry access for retrieving the registry
+     * @param level       the registry access for retrieving the registry
      * @param registryKey the registry key
      * @param resourceKey the value key
      * @param <T>         registry value type
      * @return the holder from the registry
      */
-    public static <T> Holder<T> lookup(LevelReader levelReader, ResourceKey<? extends Registry<? extends T>> registryKey, ResourceKey<T> resourceKey) {
-        return lookup(levelReader.registryAccess(), registryKey, resourceKey);
+    public static <T> Holder<T> lookup(LevelReader level, ResourceKey<? extends Registry<? extends T>> registryKey, ResourceKey<T> resourceKey) {
+        Objects.requireNonNull(level, "level is null");
+        return lookup(level.registryAccess(), registryKey, resourceKey);
     }
 
     /**
@@ -69,6 +71,9 @@ public final class LookupHelper {
      * @return the holder from the registry
      */
     public static <T> Holder<T> lookup(HolderLookup.Provider registries, ResourceKey<? extends Registry<? extends T>> registryKey, ResourceKey<T> resourceKey) {
+        Objects.requireNonNull(registries, "registries is null");
+        Objects.requireNonNull(registryKey, "registry key is null");
+        Objects.requireNonNull(resourceKey, "resource key is null");
         return registries.lookupOrThrow(registryKey).getOrThrow(resourceKey);
     }
 }

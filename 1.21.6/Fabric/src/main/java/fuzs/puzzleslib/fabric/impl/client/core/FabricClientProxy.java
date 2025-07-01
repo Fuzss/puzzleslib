@@ -230,12 +230,14 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public int getLeftStatusBarHeight(ResourceLocation resourceLocation) {
-        return HudStatusBarHeightRegistry.getHeight(GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation));
+        resourceLocation = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
+        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
     }
 
     @Override
     public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
-        return HudStatusBarHeightRegistry.getHeight(GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation));
+        resourceLocation = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
+        return HudStatusBarHeightRegistry.getHeight(resourceLocation);
     }
 
     @Override

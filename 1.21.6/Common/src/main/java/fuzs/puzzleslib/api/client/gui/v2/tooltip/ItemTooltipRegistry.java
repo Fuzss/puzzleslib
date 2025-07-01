@@ -135,7 +135,7 @@ public abstract class ItemTooltipRegistry<T> {
      * @param componentExtractor the component getter from the item / block
      * @param <V>                the value type
      */
-    public <V extends T> void registerItemTooltip(V value, Function<V, Component> componentExtractor) {
+    public <V extends T> void registerItemTooltip(V value, Function<V, @Nullable Component> componentExtractor) {
         this.registerItemTooltipLines(value, (V valueX) -> {
             return Collections.singletonList(componentExtractor.apply(valueX));
         });
@@ -148,7 +148,7 @@ public abstract class ItemTooltipRegistry<T> {
      * @param componentExtractor the component getter from the item / block
      * @param <V>                the value type
      */
-    public <V extends T> void registerItemTooltip(Class<V> clazz, Function<V, Component> componentExtractor) {
+    public <V extends T> void registerItemTooltip(Class<V> clazz, Function<V, @Nullable Component> componentExtractor) {
         this.registerItemTooltipLines(clazz, (V valueX) -> {
             return Collections.singletonList(componentExtractor.apply(valueX));
         });
@@ -160,7 +160,7 @@ public abstract class ItemTooltipRegistry<T> {
      * @param tagKey             the item / block tag key
      * @param componentExtractor the component getter from the item / block
      */
-    public void registerItemTooltip(TagKey<T> tagKey, Function<T, Component> componentExtractor) {
+    public void registerItemTooltip(TagKey<T> tagKey, Function<T, @Nullable Component> componentExtractor) {
         this.registerItemTooltipLines(tagKey, (T valueX) -> {
             return Collections.singletonList(componentExtractor.apply(valueX));
         });
@@ -175,7 +175,7 @@ public abstract class ItemTooltipRegistry<T> {
      */
     public <V extends T> void registerItemTooltipLines(V value, Function<V, List<Component>> componentExtractor) {
         registerItemTooltip((ItemStack itemStack) -> this.getFromItemStack(itemStack) == value,
-                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
+                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<@Nullable Component> tooltipLineConsumer) -> {
                     componentExtractor.apply(value).forEach(tooltipLineConsumer);
                 });
     }
@@ -189,7 +189,7 @@ public abstract class ItemTooltipRegistry<T> {
      */
     public <V extends T> void registerItemTooltipLines(Class<V> clazz, Function<V, List<Component>> componentExtractor) {
         this.registerItemTooltip(clazz,
-                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
+                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<@Nullable Component> tooltipLineConsumer) -> {
                     T value = this.getFromItemStack(itemStack);
                     Objects.requireNonNull(value, "value from item stack " + itemStack + " is null");
                     componentExtractor.apply((V) value).forEach(tooltipLineConsumer);
@@ -204,7 +204,7 @@ public abstract class ItemTooltipRegistry<T> {
      */
     public void registerItemTooltipLines(TagKey<T> tagKey, Function<T, List<Component>> componentExtractor) {
         this.registerItemTooltip(tagKey,
-                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<Component> tooltipLineConsumer) -> {
+                (ItemStack itemStack, Item.TooltipContext context, TooltipFlag tooltipFlag, @Nullable Player player, Consumer<@Nullable Component> tooltipLineConsumer) -> {
                     T value = this.getFromItemStack(itemStack);
                     Objects.requireNonNull(value, "value from item stack " + itemStack + " is null");
                     componentExtractor.apply(value).forEach(tooltipLineConsumer);
@@ -251,11 +251,17 @@ public abstract class ItemTooltipRegistry<T> {
         ItemTooltipCallback.EVENT.register((ItemStack itemStack, List<Component> tooltipLines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipFlag) -> {
             if (tooltipContext != Item.TooltipContext.EMPTY && itemStackFilter.test(itemStack)) {
                 int originalSize = tooltipLines.size();
-                provider.appendHoverText(itemStack, tooltipContext, tooltipFlag, player, (Component component) -> {
-                    // add lines directly below the item name
-                    tooltipLines.addAll(tooltipLines.isEmpty() ? 0 : 1 + tooltipLines.size() - originalSize,
-                            ClientComponentSplitter.splitTooltipComponents(component));
-                });
+                provider.appendHoverText(itemStack,
+                        tooltipContext,
+                        tooltipFlag,
+                        player,
+                        (@Nullable Component component) -> {
+                            if (component != null) {
+                                // add lines directly below the item name
+                                tooltipLines.addAll(tooltipLines.isEmpty() ? 0 : 1 + tooltipLines.size() - originalSize,
+                                        ClientComponentSplitter.splitTooltipComponents(component));
+                            }
+                        });
             }
         });
     }
