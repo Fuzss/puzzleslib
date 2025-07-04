@@ -38,6 +38,7 @@ transitive-accessible   field   net/minecraft/client/gui/screens/inventory/Abstr
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  leftPos I
 transitive-accessible   field   net/minecraft/client/gui/screens/inventory/AbstractContainerScreen  topPos  I
 transitive-accessible   field   net/minecraft/client/gui/screens/Screen minecraft   Lnet/minecraft/client/Minecraft;
+# TODO remove, there is a vanilla getter now
 transitive-accessible   field   net/minecraft/client/gui/screens/Screen font    Lnet/minecraft/client/gui/Font;
 transitive-accessible   field   net/minecraft/client/renderer/ItemInHandRenderer    mainHandItem    Lnet/minecraft/world/item/ItemStack;
 transitive-accessible   field   net/minecraft/client/renderer/ItemInHandRenderer    offHandItem Lnet/minecraft/world/item/ItemStack;

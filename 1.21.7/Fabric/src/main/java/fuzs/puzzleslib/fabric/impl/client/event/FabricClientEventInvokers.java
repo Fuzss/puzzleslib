@@ -17,6 +17,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
 import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
+import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
@@ -65,6 +66,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -206,6 +208,25 @@ public final class FabricClientEventInvokers {
                 (ClientTickEvents.End callback) -> {
                     return callback::onEndClientTick;
                 });
+        AtomicInteger atomicInteger = new AtomicInteger();
+        INSTANCE.register(RenderGuiEvents.Before.class, (RenderGuiEvents.Before callback, @Nullable Object context) -> {
+            // register as late as possible, so we capture as many hud layers as possible
+            net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
+                HudElementRegistry.addFirst(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
+                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                            callback.onBeforeRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                        });
+            });
+        });
+        INSTANCE.register(RenderGuiEvents.After.class, (RenderGuiEvents.After callback, @Nullable Object context) -> {
+            // register as late as possible, so we capture as many hud layers as possible
+            net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
+                HudElementRegistry.addLast(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
+                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                            callback.onAfterRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                        });
+            });
+        });
         INSTANCE.register(ItemTooltipCallback.class,
                 net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT,
                 (ItemTooltipCallback callback) -> {

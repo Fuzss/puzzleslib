@@ -26,7 +26,7 @@ public final class ServerEntityLevelEvents {
          * just having been spawned in.
          * <p>
          * For newly spawned entities the {@link net.minecraft.world.entity.EntitySpawnReason} can be obtained via
-         * {@link fuzs.puzzleslib.api.util.v1.EntityHelper#getMobSpawnReason(Mob)} if captured in
+         * {@link fuzs.puzzleslib.api.util.v1.EntityHelper#getMobSpawnReason(Entity)} if captured in
          * {@link Mob#finalizeSpawn(ServerLevelAccessor, DifficultyInstance, EntitySpawnReason, SpawnGroupData)}.
          *
          * @param entity         the entity that is being loaded

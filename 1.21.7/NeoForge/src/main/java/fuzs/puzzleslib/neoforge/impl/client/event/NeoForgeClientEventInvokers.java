@@ -141,6 +141,16 @@ public final class NeoForgeClientEventInvokers {
                 (ClientTickEvents.End callback, ClientTickEvent.Post event) -> {
                     callback.onEndClientTick(Minecraft.getInstance());
                 });
+        INSTANCE.register(RenderGuiEvents.Before.class,
+                RenderGuiEvent.Pre.class,
+                (RenderGuiEvents.Before callback, RenderGuiEvent.Pre evt) -> {
+                    callback.onBeforeRenderGui(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
+                });
+        INSTANCE.register(RenderGuiEvents.After.class,
+                RenderGuiEvent.Post.class,
+                (RenderGuiEvents.After callback, RenderGuiEvent.Post evt) -> {
+                    callback.onAfterRenderGui(Minecraft.getInstance().gui, evt.getGuiGraphics(), evt.getPartialTick());
+                });
         INSTANCE.register(ItemTooltipCallback.class,
                 ItemTooltipEvent.class,
                 (ItemTooltipCallback callback, ItemTooltipEvent event) -> {
