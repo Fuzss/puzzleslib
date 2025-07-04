@@ -26,7 +26,7 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
             .put(CAMERA_OVERLAYS, VanillaGuiLayers.CAMERA_OVERLAYS)
             .put(CROSSHAIR, VanillaGuiLayers.CROSSHAIR)
             .put(HOTBAR, VanillaGuiLayers.HOTBAR)
-            .put(INFO_BAR, VanillaGuiLayers.CONTEXTUAL_INFO_BAR)
+            .put(INFO_BAR, VanillaGuiLayers.CONTEXTUAL_INFO_BAR_BACKGROUND)
             .put(PLAYER_HEALTH, VanillaGuiLayers.PLAYER_HEALTH)
             .put(ARMOR_LEVEL, VanillaGuiLayers.ARMOR_LEVEL)
             .put(FOOD_LEVEL, VanillaGuiLayers.FOOD_LEVEL)
