@@ -56,14 +56,14 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         });
         ScreenEvents.beforeInit(TitleScreen.class)
                 .register((Minecraft minecraft, TitleScreen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets) -> {
-                    if (minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay &&
-                            loadingOverlay.fadeOutStart != 0L) {
+                    if (minecraft.getOverlay() instanceof LoadingOverlay loadingOverlay
+                            && loadingOverlay.fadeOutStart != 0L) {
                         loadingOverlay.fadeOutStart = 0L;
                     }
                 });
         AddToastCallback.EVENT.register((ToastManager toastManager, Toast toast) -> {
-            if (toast instanceof SystemToast systemToast &&
-                    systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
+            if (toast instanceof SystemToast systemToast
+                    && systemToast.getToken() == SystemToast.SystemToastId.UNSECURE_SERVER_WARNING) {
                 // block the annoying unsecure server warning when joining a multiplayer server in offline mode
                 return EventResult.INTERRUPT;
             } else {
@@ -74,8 +74,9 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         ScreenMouseEvents.beforeMouseClick(Screen.class)
                 .register((Screen screen, double mouseX, double mouseY, int button) -> {
                     for (GuiEventListener guiEventListener : screen.children()) {
-                        if (guiEventListener instanceof EditBox &&
-                                guiEventListener.mouseClicked(mouseX, mouseY, button)) {
+                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseX,
+                                mouseY,
+                                button)) {
                             screen.setFocused(guiEventListener);
                             if (button == InputConstants.MOUSE_BUTTON_LEFT) {
                                 screen.setDragging(true);
@@ -97,10 +98,10 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 });
         ScreenMouseEvents.beforeMouseDrag(Screen.class)
                 .register((Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
-                    return screen.getFocused() instanceof EditBox && screen.isDragging() &&
-                            button == InputConstants.MOUSE_BUTTON_LEFT &&
-                            screen.getFocused().mouseDragged(mouseX, mouseY, button, dragX, dragY) ?
-                            EventResult.INTERRUPT : EventResult.PASS;
+                    return screen.getFocused() instanceof EditBox && screen.isDragging()
+                            && button == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused()
+                            .mouseDragged(mouseX, mouseY, button, dragX, dragY) ? EventResult.INTERRUPT :
+                            EventResult.PASS;
                 });
     }
 
@@ -155,6 +156,13 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         options.onboardAccessibility = false;
         options.skipMultiplayerWarning = true;
         options.damageTiltStrength().set(0.0);
+        options.keyLoadHotbarActivator.setKey(InputConstants.UNKNOWN);
+        options.keySaveHotbarActivator.setKey(InputConstants.UNKNOWN);
+        options.keyCommand.setKey(InputConstants.UNKNOWN);
+        options.keySocialInteractions.setKey(InputConstants.UNKNOWN);
+        options.keyAdvancements.setKey(InputConstants.UNKNOWN);
+        options.keyQuickActions.setKey(InputConstants.UNKNOWN);
+        options.keyFullscreen.setKey(InputConstants.UNKNOWN);
     }
 
     @Override
@@ -164,8 +172,8 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
                 Minecraft minecraft = Minecraft.getInstance();
                 Scoreboard scoreboard = minecraft.level.getScoreboard();
                 Objective objective = scoreboard.getDisplayObjective(DisplaySlot.LIST);
-                if (minecraft.options.keyPlayerList.isDown() && minecraft.isLocalServer() &&
-                        minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective == null) {
+                if (minecraft.options.keyPlayerList.isDown() && minecraft.isLocalServer()
+                        && minecraft.player.connection.getListedOnlinePlayers().size() <= 1 && objective == null) {
                     minecraft.gui.tabList.setVisible(true);
                     minecraft.gui.tabList.render(guiGraphics, guiGraphics.guiWidth(), scoreboard, null);
                 } else {
