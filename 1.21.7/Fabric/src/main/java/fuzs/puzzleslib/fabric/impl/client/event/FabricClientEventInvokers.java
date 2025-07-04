@@ -214,7 +214,17 @@ public final class FabricClientEventInvokers {
             net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
                 HudElementRegistry.addFirst(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
                         (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                            callback.onBeforeRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                            if (!minecraft.options.hideGui) {
+                                callback.onBeforeRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                            }
+                        });
+                // the sleep layer is the only layer that renders when the gui is hidden
+                HudElementRegistry.attachElementBefore(VanillaHudElements.SLEEP,
+                        PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
+                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                            if (minecraft.options.hideGui) {
+                                callback.onBeforeRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                            }
                         });
             });
         });
@@ -223,7 +233,17 @@ public final class FabricClientEventInvokers {
             net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
                 HudElementRegistry.addLast(PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
                         (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
-                            callback.onAfterRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                            if (!minecraft.options.hideGui) {
+                                callback.onAfterRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                            }
+                        });
+                // the sleep layer is the only layer that renders when the gui is hidden
+                HudElementRegistry.attachElementAfter(VanillaHudElements.SLEEP,
+                        PuzzlesLibMod.id(String.valueOf(atomicInteger.getAndIncrement())),
+                        (GuiGraphics guiGraphics, DeltaTracker deltaTracker) -> {
+                            if (minecraft.options.hideGui) {
+                                callback.onAfterRenderGui(minecraft.gui, guiGraphics, deltaTracker);
+                            }
                         });
             });
         });
