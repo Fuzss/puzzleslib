@@ -6,6 +6,9 @@ import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
 import fuzs.puzzleslib.api.event.v1.data.MutableInt;
 import net.minecraft.client.gui.screens.Screen;
 
+/**
+ * TODO rename to PrepareInventoryMobEffectsCallback
+ */
 @FunctionalInterface
 public interface InventoryMobEffectsCallback {
     EventInvoker<InventoryMobEffectsCallback> EVENT = EventInvoker.lookup(InventoryMobEffectsCallback.class);
