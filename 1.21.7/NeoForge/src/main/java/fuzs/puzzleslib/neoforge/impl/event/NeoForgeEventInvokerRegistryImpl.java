@@ -206,11 +206,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         // active mod event bus is no longer available when ModifyRegistriesEvent fires,
         // so just use the Puzzles Lib event bus for everything
         IEventBus eventBus = NeoForgeModContainerHelper.getModEventBus(PuzzlesLib.MOD_ID);
-        eventBus.addListener((final RegisterEvent eventx) -> {
-            if (eventx.getRegistryKey() != resourceKey) return;
+        eventBus.addListener((final RegisterEvent eventX) -> {
+            if (eventX.getRegistryKey() != resourceKey) return;
             Consumer<BiConsumer<ResourceLocation, Supplier<T>>> consumer;
             while ((consumer = callbacks.poll()) != null) {
-                consumer.accept(onRegistryEntryAdded((Registry<T>) eventx.getRegistry()));
+                consumer.accept(onRegistryEntryAdded((Registry<T>) eventX.getRegistry()));
             }
         });
     }

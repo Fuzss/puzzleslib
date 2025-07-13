@@ -18,7 +18,7 @@ import org.apache.commons.lang3.function.Consumers;
 import java.util.function.Supplier;
 
 /**
- * A base class for a mods main client class, contains a bunch of methods for registering various client content and
+ * A base class for a mod's main client class, containing a bunch of methods for registering various client content and
  * components.
  */
 public interface ClientModConstructor {

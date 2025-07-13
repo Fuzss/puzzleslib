@@ -45,13 +45,15 @@ public final class NeoForgeCapabilityHelper {
         register((RegisterCapabilitiesEvent registerCapabilitiesEvent, ChestBlock chestBlock) -> {
             registerCapabilitiesEvent.registerBlock(Capabilities.ItemHandler.BLOCK,
                     (level, pos, state, blockEntity, side) -> {
-                        Container container = ChestBlock.getContainer((ChestBlock) state.getBlock(), state, level, pos,
-                                true
-                        );
+                        Container container = ChestBlock.getContainer((ChestBlock) state.getBlock(),
+                                state,
+                                level,
+                                pos,
+                                true);
                         Objects.requireNonNull(container, "chest container is null");
                         return new InvWrapper(container);
-                    }, chestBlock
-            );
+                    },
+                    chestBlock);
         }, chestBlocks);
     }
 
@@ -134,11 +136,11 @@ public final class NeoForgeCapabilityHelper {
             evt.registerEntity(Capabilities.ItemHandler.ENTITY, entityType, (T entity, Void aVoid) -> {
                 return new InvWrapper(entity);
             });
-            evt.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION, entityType,
+            evt.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION,
+                    entityType,
                     (T entity, @Nullable Direction direction) -> {
                         return new InvWrapper(entity);
-                    }
-            );
+                    });
         }, entityTypes);
     }
 
@@ -168,9 +170,9 @@ public final class NeoForgeCapabilityHelper {
         Preconditions.checkState(types.length > 0, "capability provider types is empty");
         ResourceLocation resourceLocation = types[0].unwrapKey().orElseThrow().location();
         NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(eventBus -> {
-            eventBus.addListener((final RegisterCapabilitiesEvent evt) -> {
+            eventBus.addListener((final RegisterCapabilitiesEvent event) -> {
                 for (Holder<? extends T> holder : types) {
-                    consumer.accept(evt, holder.value());
+                    consumer.accept(event, holder.value());
                 }
             });
         });

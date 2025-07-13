@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.function.Supplier;
 
 /**
- * A base class for a mods main common class, contains a bunch of methods for registering various common content and
+ * A base class for a mod's main common class, containing a bunch of methods for registering various common content and
  * components.
  */
 public interface ModConstructor {
@@ -101,6 +101,8 @@ public interface ModConstructor {
     }
 
     /**
+     * TODO remove context from method name
+     *
      * @param context register built-in static registries
      */
     default void onRegisterGameRegistriesContext(GameRegistriesContext context) {
@@ -108,9 +110,18 @@ public interface ModConstructor {
     }
 
     /**
+     * TODO remove context from method name
+     *
      * @param context register data pack-driven dynamic registries
      */
     default void onRegisterDataPackRegistriesContext(DataPackRegistriesContext context) {
+        // NO-OP
+    }
+
+    /**
+     * @param context register new villager trades
+     */
+    default void onRegisterVillagerTrades(VillagerTradesContext context) {
         // NO-OP
     }
 }
