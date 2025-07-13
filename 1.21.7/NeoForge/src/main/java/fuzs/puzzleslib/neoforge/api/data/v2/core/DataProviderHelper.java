@@ -53,17 +53,17 @@ public final class DataProviderHelper {
     static <T> void registerDataProviders(String modId, RegistrySetBuilder registrySetBuilder, T[] factories, Function<T, Factory> factoryConverter) {
         if (!ModLoaderEnvironment.INSTANCE.isDataGeneration()) return;
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
-            eventBus.addListener((final GatherDataEvent.Client evt) -> {
+            eventBus.addListener((final GatherDataEvent.Client event) -> {
                 if (!registrySetBuilder.getEntryKeys().isEmpty()) {
-                    evt.createDatapackRegistryObjects(registrySetBuilder);
+                    event.createDatapackRegistryObjects(registrySetBuilder);
                 }
-                CompletableFuture<HolderLookup.Provider> registries = evt.getLookupProvider();
+                CompletableFuture<HolderLookup.Provider> registries = event.getLookupProvider();
                 for (T factory : factories) {
-                    DataProvider dataProvider = factoryConverter.apply(factory).apply(evt, registries);
+                    DataProvider dataProvider = factoryConverter.apply(factory).apply(event, registries);
                     if (dataProvider instanceof RegistriesDataProvider registriesDataProvider) {
                         registries = registriesDataProvider.getRegistries();
                     }
-                    evt.addProvider(dataProvider);
+                    event.addProvider(dataProvider);
                 }
             });
         });

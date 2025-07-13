@@ -1,21 +1,32 @@
 package fuzs.puzzleslib.api.client.data.v2.models;
 
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.*;
 import net.minecraft.client.renderer.item.ItemModel;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock;
 
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 public final class ItemModelGenerationHelper {
-    public static final ModelTemplate HORN = ModelTemplates.createItem("goat_horn", TextureSlot.LAYER0);
-    public static final ModelTemplate TOOTING_HORN = ModelTemplates.createItem("tooting_goat_horn", TextureSlot.LAYER0);
+    public static final ModelTemplate HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocationHelper.withDefaultNamespace(
+            "goat_horn"), TextureSlot.LAYER0);
+    public static final ModelTemplate TOOTING_HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocationHelper.withDefaultNamespace(
+            "tooting_goat_horn"), TextureSlot.LAYER0);
+    public static final ModelTemplate SHIELD_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(
+            ResourceLocationHelper.withDefaultNamespace("shield"),
+            TextureSlot.PARTICLE);
+    public static final ModelTemplate SHIELD_BLOCKING_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(
+            ResourceLocationHelper.withDefaultNamespace("shield_blocking"),
+            TextureSlot.PARTICLE);
 
     private ItemModelGenerationHelper() {
         // NO-OP
@@ -85,6 +96,9 @@ public final class ItemModelGenerationHelper {
                 modelOutput);
     }
 
+    /**
+     * @see ItemModelGenerators#generateBow(Item)
+     */
     public static void generateBow(Item item, ItemModelGenerators itemModelGenerators) {
         itemModelGenerators.createFlatItemModel(item, ModelTemplates.BOW);
         itemModelGenerators.generateBow(item);
@@ -108,6 +122,9 @@ public final class ItemModelGenerationHelper {
                         ItemModelUtils.constantTint(secondaryColor)));
     }
 
+    /**
+     * @see ItemModelGenerators#generateGoatHorn(Item)
+     */
     public static void generateHorn(Item item, ItemModelGenerators itemModelGenerators) {
         ItemModel.Unbaked falseModel = ItemModelUtils.plainModel(itemModelGenerators.createFlatItemModel(item, HORN));
         ItemModel.Unbaked trueModel = ItemModelUtils.plainModel(createFlatItemModel(ModelLocationHelper.getItemModel(
@@ -116,10 +133,29 @@ public final class ItemModelGenerationHelper {
         itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), trueModel, falseModel);
     }
 
+    /**
+     * TODO rename to generateHead
+     *
+     * @see BlockModelGenerators#createHead(Block, Block, SkullBlock.Type, ResourceLocation)
+     */
     public static void createHead(Block headBlock, Block wallHeadBlock, SkullBlock.Type type, BlockModelGenerators blockModelGenerators) {
         blockModelGenerators.createHead(headBlock,
                 wallHeadBlock,
                 type,
                 ModelLocationUtils.decorateItemModelLocation("template_skull"));
+    }
+
+    /**
+     * @see ItemModelGenerators#generateShield(Item)
+     */
+    public static void generateShield(Item item, Block particleBlock, Supplier<SpecialModelRenderer.Unbaked> specialModelSupplier, ItemModelGenerators itemModelGenerators) {
+        ResourceLocation resourceLocation = SHIELD_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item),
+                TextureMapping.particle(particleBlock),
+                itemModelGenerators.modelOutput);
+        ResourceLocation resourceLocation2 = SHIELD_BLOCKING_MODEL_TEMPLATE.create(ModelLocationHelper.getItemModel(item,
+                "_blocking"), TextureMapping.particle(particleBlock), itemModelGenerators.modelOutput);
+        ItemModel.Unbaked unbaked = ItemModelUtils.specialModel(resourceLocation, specialModelSupplier.get());
+        ItemModel.Unbaked unbaked2 = ItemModelUtils.specialModel(resourceLocation2, specialModelSupplier.get());
+        itemModelGenerators.generateBooleanDispatch(item, ItemModelUtils.isUsingItem(), unbaked2, unbaked);
     }
 }

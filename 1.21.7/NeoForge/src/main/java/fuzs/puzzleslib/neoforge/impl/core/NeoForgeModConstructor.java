@@ -27,7 +27,10 @@ public final class NeoForgeModConstructor implements ModConstructorImpl<ModConst
             modConstructor.onRegisterGameplayContent(new GameplayContentContextNeoForgeImpl(modId, eventBus));
             modConstructor.onRegisterBiomeModifications(new BiomeModificationsContextNeoForgeImpl(modId, eventBus));
             eventBus.addListener((final FMLCommonSetupEvent event) -> {
-                event.enqueueWork(modConstructor::onCommonSetup);
+                event.enqueueWork(() -> {
+                    modConstructor.onCommonSetup();
+                    modConstructor.onRegisterVillagerTrades(new VillagerTradesContextNeoForgeImpl());
+                });
             });
             eventBus.addListener((final RegisterPayloadHandlersEvent event) -> {
                 modConstructor.onRegisterPayloadTypes(NeoForgeProxy.get().createPayloadTypesContext(modId, event));

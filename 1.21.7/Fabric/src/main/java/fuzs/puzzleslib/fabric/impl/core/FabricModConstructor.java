@@ -18,5 +18,6 @@ public final class FabricModConstructor implements ModConstructorImpl<ModConstru
         modConstructor.onAddDataPackFinders(new DataPackSourcesContextFabricImpl());
         modConstructor.onRegisterGameRegistriesContext(new GameRegistriesContextFabricImpl());
         modConstructor.onRegisterDataPackRegistriesContext(new DataPackRegistriesContextFabricImpl());
+        modConstructor.onRegisterVillagerTrades(new VillagerTradesContextFabricImpl());
     }
 }

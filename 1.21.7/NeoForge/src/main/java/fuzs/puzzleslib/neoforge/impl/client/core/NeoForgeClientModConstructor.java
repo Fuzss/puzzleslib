@@ -30,7 +30,6 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
             });
             // let this run after other mods, some of our mods are likely going to reference what other mods have registered
             eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent event) -> {
-                // need to run this deferred as the underlying registries do not use concurrent maps
                 event.enqueueWork(() -> {
                     modConstructor.onRegisterBlockRenderTypes(new BlockRenderTypesContextNeoForgeImpl());
                     modConstructor.onRegisterFluidRenderTypes(new FluidRenderTypesContextNeoForgeImpl());

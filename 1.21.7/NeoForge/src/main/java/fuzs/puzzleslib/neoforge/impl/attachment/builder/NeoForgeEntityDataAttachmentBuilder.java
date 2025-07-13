@@ -45,13 +45,13 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
     public void registerPayloadHandlers(AttachmentTypeAdapter<Entity, V> attachmentType, CustomPacketPayload.Type<ClientboundEntityDataAttachmentMessage<V>> payloadType, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
         NeoForgeModContainerHelper.getOptionalModEventBus(attachmentType.resourceLocation().getNamespace())
                 .ifPresent((IEventBus eventBus) -> {
-                    eventBus.addListener((final RegisterPayloadHandlersEvent evt) -> {
+                    eventBus.addListener((final RegisterPayloadHandlersEvent event) -> {
                         StreamCodec<? super RegistryFriendlyByteBuf, ClientboundEntityDataAttachmentMessage<V>> messageStreamCodec = ClientboundEntityDataAttachmentMessage.streamCodec(
                                 attachmentType,
                                 payloadType,
                                 this.streamCodec);
                         NeoForgeProxy.get()
-                                .createPayloadTypesContext(attachmentType.resourceLocation().getNamespace(), evt)
+                                .createPayloadTypesContext(attachmentType.resourceLocation().getNamespace(), event)
                                 .playToClient(payloadType, messageStreamCodec);
                     });
                 });

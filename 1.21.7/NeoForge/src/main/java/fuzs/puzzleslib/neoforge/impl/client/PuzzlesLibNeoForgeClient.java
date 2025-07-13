@@ -27,9 +27,9 @@ public class PuzzlesLibNeoForgeClient {
 
     private static void registerLoadingHandlers(IEventBus eventBus) {
         if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironmentWithoutDataGeneration(PuzzlesLib.MOD_ID)) return;
-        eventBus.addListener((final RegisterKeyMappingsEvent evt) -> {
-            Options options = ((RegisterKeyMappingsEventNeoForgeAccessor) evt).puzzleslib$getOptions();
-            // hijack the event, it fires at the perfect time for us to manipulate game options before the file can be written
+        eventBus.addListener((final RegisterKeyMappingsEvent event) -> {
+            Options options = ((RegisterKeyMappingsEventNeoForgeAccessor) event).puzzleslib$getOptions();
+            // we hijack the event; it fires at the perfect time for us to manipulate game options before the file can be written
             PuzzlesLibClientDevelopment.setupGameOptions(options);
         });
     }
