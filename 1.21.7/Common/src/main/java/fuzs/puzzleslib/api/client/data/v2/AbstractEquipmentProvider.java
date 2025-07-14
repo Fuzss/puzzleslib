@@ -56,4 +56,10 @@ public abstract class AbstractEquipmentProvider extends EquipmentAssetProvider {
                         EquipmentClientInfo.Layer.leatherDyeable(resourceLocation, false))
                 .build();
     }
+
+    public static EquipmentClientInfo simple(EquipmentClientInfo.LayerType layerType, ResourceLocation resourceLocation) {
+        return EquipmentClientInfo.builder()
+                .addLayers(layerType, new EquipmentClientInfo.Layer(resourceLocation))
+                .build();
+    }
 }
