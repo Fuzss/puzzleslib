@@ -243,13 +243,16 @@ public abstract class ItemTooltipRegistry<T> {
 
     /**
      * Register an item tooltip provider.
+     * <p>
+     * TODO remove static
      *
      * @param itemStackFilter the filter for the valid item / block
      * @param provider        the tooltip provider
      */
     public static void registerItemTooltip(Predicate<ItemStack> itemStackFilter, Provider provider) {
         ItemTooltipCallback.EVENT.register((ItemStack itemStack, List<Component> tooltipLines, Item.TooltipContext tooltipContext, @Nullable Player player, TooltipFlag tooltipFlag) -> {
-            if (tooltipContext != Item.TooltipContext.EMPTY && itemStackFilter.test(itemStack)) {
+            if (tooltipContext != Item.TooltipContext.EMPTY && tooltipContext.registries() != null
+                    && itemStackFilter.test(itemStack)) {
                 int originalSize = tooltipLines.size();
                 provider.appendHoverText(itemStack,
                         tooltipContext,
