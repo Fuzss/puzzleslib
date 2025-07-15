@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.BiFunction;
@@ -26,7 +27,7 @@ public interface LivingEntityRenderLayersContext {
      * @param <S>                the entity render state
      * @param <M>                the entity model
      */
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, RenderLayer<S, M>> renderLayerFactory) {
+    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, @Nullable RenderLayer<S, M>> renderLayerFactory) {
         this.registerRenderLayer(Predicates.alwaysTrue(), renderLayerFactory);
     }
 
@@ -38,7 +39,7 @@ public interface LivingEntityRenderLayersContext {
      * @param <S>                the entity render state
      * @param <M>                the entity model
      */
-    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(EntityType<? extends LivingEntity> entityType, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, RenderLayer<S, M>> renderLayerFactory) {
+    default <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(EntityType<? extends LivingEntity> entityType, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, @Nullable RenderLayer<S, M>> renderLayerFactory) {
         Objects.requireNonNull(entityType, "entity type is null");
         this.registerRenderLayer((EntityType<? extends LivingEntity> entityTypeX) -> {
             return entityTypeX == entityType;
@@ -48,10 +49,10 @@ public interface LivingEntityRenderLayersContext {
     /**
      * Registers a render layer.
      *
-     * @param filter             the filter for controlling affected entity types
+     * @param entityTypeFilter   the filter for controlling affected entity types
      * @param renderLayerFactory the new layer factory
      * @param <S>                the entity render state
      * @param <M>                the entity model
      */
-    <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(Predicate<EntityType<? extends LivingEntity>> filter, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, RenderLayer<S, M>> renderLayerFactory);
+    <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(Predicate<EntityType<? extends LivingEntity>> entityTypeFilter, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, @Nullable RenderLayer<S, M>> renderLayerFactory);
 }
