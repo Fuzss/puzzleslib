@@ -17,16 +17,10 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
     @Override
     public void construct(String modId, ClientModConstructor modConstructor) {
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
-            SkullRenderersContextNeoForgeImpl[] skullRenderersContext = new SkullRenderersContextNeoForgeImpl[1];
             ItemModelsContextNeoForgeImpl[] itemModelsContext = new ItemModelsContextNeoForgeImpl[1];
             modConstructor.onConstructMod();
             eventBus.addListener((final FMLClientSetupEvent event) -> {
-                event.enqueueWork(() -> {
-                    modConstructor.onClientSetup();
-                    AbstractNeoForgeContext.computeIfAbsent(skullRenderersContext,
-                            SkullRenderersContextNeoForgeImpl::new,
-                            modConstructor::onRegisterSkullRenderers).registerForEvent(event);
-                });
+                event.enqueueWork(modConstructor::onClientSetup);
             });
             // let this run after other mods, some of our mods are likely going to reference what other mods have registered
             eventBus.addListener(EventPriority.LOW, (final FMLClientSetupEvent event) -> {
@@ -92,9 +86,7 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                         event));
             });
             eventBus.addListener((final EntityRenderersEvent.CreateSkullModels event) -> {
-                AbstractNeoForgeContext.computeIfAbsent(skullRenderersContext,
-                        SkullRenderersContextNeoForgeImpl::new,
-                        modConstructor::onRegisterSkullRenderers).registerForEvent(event);
+                modConstructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(event));
             });
             eventBus.addListener((final EntityRenderersEvent.AddLayers event) -> {
                 modConstructor.onRegisterLivingEntityRenderLayers(new LivingEntityRenderLayersContextNeoForgeImpl(event));

@@ -68,6 +68,11 @@ import static fuzs.puzzleslib.neoforge.api.event.v1.core.NeoForgeEventInvokerReg
 public final class NeoForgeClientEventInvokers {
 
     public static void registerLoadingHandlers() {
+        INSTANCE.register(ClientSetupCallback.class,
+                FMLClientSetupEvent.class,
+                (ClientSetupCallback callback, FMLClientSetupEvent event) -> {
+                    event.enqueueWork(callback::onClientSetup);
+                });
         INSTANCE.register(AddResourcePackReloadListenersCallback.class,
                 AddClientReloadListenersEvent.class,
                 (AddResourcePackReloadListenersCallback callback, AddClientReloadListenersEvent event) -> {
@@ -114,11 +119,6 @@ public final class NeoForgeClientEventInvokers {
                 ClientStoppingEvent.class,
                 (ClientLifecycleEvents.Stopping callback, ClientStoppingEvent event) -> {
                     callback.onClientStopping(event.getClient());
-                });
-        INSTANCE.register(ClientSetupCallback.class,
-                FMLClientSetupEvent.class,
-                (ClientSetupCallback callback, FMLClientSetupEvent event) -> {
-                    event.enqueueWork(callback::onClientSetup);
                 });
         INSTANCE.register(DrawItemStackOverlayCallback.class,
                 RegisterItemDecorationsEvent.class,
