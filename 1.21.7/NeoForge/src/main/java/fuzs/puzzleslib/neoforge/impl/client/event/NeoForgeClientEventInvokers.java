@@ -27,7 +27,9 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
@@ -35,6 +37,7 @@ import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -127,6 +130,21 @@ public final class NeoForgeClientEventInvokers {
                                 callback.onDrawItemStackOverlay(guiGraphics, font, itemStack, posX, posY);
                                 return false;
                             });
+                });
+        INSTANCE.register(AddLivingEntityRenderLayersCallback.class,
+                EntityRenderersEvent.AddLayers.class,
+                (AddLivingEntityRenderLayersCallback callback, EntityRenderersEvent.AddLayers event) -> {
+                    for (PlayerSkin.Model skinModel : event.getSkins()) {
+                        LivingEntityRenderer<? extends Player, ?, ?> entityRenderer = event.getSkin(skinModel);
+                        if (entityRenderer != null) {
+                            callback.addLivingEntityRenderLayers(EntityType.PLAYER, entityRenderer, event.getContext());
+                        }
+                    }
+                    for (EntityType<?> entityType : event.getEntityTypes()) {
+                        callback.addLivingEntityRenderLayers(entityType,
+                                event.getRenderer(entityType),
+                                event.getContext());
+                    }
                 });
     }
 
