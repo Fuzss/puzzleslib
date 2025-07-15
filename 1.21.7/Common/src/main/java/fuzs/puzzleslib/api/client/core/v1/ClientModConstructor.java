@@ -145,6 +145,7 @@ public interface ClientModConstructor {
     /**
      * @param context register additional {@link RenderLayer}s for a living entity
      */
+    @Deprecated(forRemoval = true)
     default void onRegisterLivingEntityRenderLayers(LivingEntityRenderLayersContext context) {
         // NO-OP
     }
