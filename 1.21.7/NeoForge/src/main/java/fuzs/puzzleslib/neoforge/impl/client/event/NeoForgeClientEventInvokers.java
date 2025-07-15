@@ -141,9 +141,9 @@ public final class NeoForgeClientEventInvokers {
                         }
                     }
                     for (EntityType<?> entityType : event.getEntityTypes()) {
-                        callback.addLivingEntityRenderLayers(entityType,
-                                event.getRenderer(entityType),
-                                event.getContext());
+                        LivingEntityRenderer<?, ?, ?> entityRenderer = (LivingEntityRenderer<?, ?, ?>) event.getRenderer(
+                                entityType);
+                        callback.addLivingEntityRenderLayers(entityType, entityRenderer, event.getContext());
                     }
                 });
     }
