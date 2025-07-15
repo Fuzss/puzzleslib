@@ -98,6 +98,11 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
     private static boolean frozenModBusEvents;
 
     public static void registerLoadingHandlers() {
+        INSTANCE.register(CommonSetupCallback.class,
+                FMLCommonSetupEvent.class,
+                (CommonSetupCallback callback, FMLCommonSetupEvent event) -> {
+                    event.enqueueWork(callback::onCommonSetup);
+                });
         INSTANCE.register(LoadCompleteCallback.class,
                 FMLLoadCompleteEvent.class,
                 (LoadCompleteCallback callback, FMLLoadCompleteEvent event) -> {
@@ -151,11 +156,6 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                     if (resourceKey == event.getTabKey()) {
                         callback.onBuildCreativeModeTabContents(event.getTab(), event.getParameters(), event);
                     }
-                });
-        INSTANCE.register(CommonSetupCallback.class,
-                FMLCommonSetupEvent.class,
-                (CommonSetupCallback callback, FMLCommonSetupEvent event) -> {
-                    event.enqueueWork(callback::onCommonSetup);
                 });
         INSTANCE.register(RegisterConfigurationTasksCallback.class,
                 RegisterConfigurationTasksEvent.class,
