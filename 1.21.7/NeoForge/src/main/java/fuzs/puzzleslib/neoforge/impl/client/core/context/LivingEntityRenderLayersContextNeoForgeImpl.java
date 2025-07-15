@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -25,16 +26,19 @@ import java.util.function.Predicate;
 public record LivingEntityRenderLayersContextNeoForgeImpl(EntityRenderersEvent.AddLayers event) implements LivingEntityRenderLayersContext {
 
     @Override
-    public <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(Predicate<EntityType<? extends LivingEntity>> filter, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, RenderLayer<S, M>> renderLayerFactory) {
-        Objects.requireNonNull(filter, "filter is null");
+    public <S extends LivingEntityRenderState, M extends EntityModel<? super S>> void registerRenderLayer(Predicate<EntityType<? extends LivingEntity>> entityTypeFilter, BiFunction<RenderLayerParent<S, M>, EntityRendererProvider.Context, @Nullable RenderLayer<S, M>> renderLayerFactory) {
+        Objects.requireNonNull(entityTypeFilter, "filter is null");
         Objects.requireNonNull(renderLayerFactory, "render layer factory is null");
         EntityRendererProvider.Context context = this.event.getContext();
         for (EntityType<?> entityType : this.getEntityTypes()) {
-            if (filter.test((EntityType<? extends LivingEntity>) entityType)) {
+            if (entityTypeFilter.test((EntityType<? extends LivingEntity>) entityType)) {
                 for (EntityRenderer<?, ?> entityRenderer : this.getEntityRenderer(entityType)) {
                     if (entityRenderer instanceof LivingEntityRenderer<?, ?, ?>) {
                         LivingEntityRenderer<?, S, M> livingEntityRenderer = (LivingEntityRenderer<?, S, M>) entityRenderer;
-                        livingEntityRenderer.addLayer(renderLayerFactory.apply(livingEntityRenderer, context));
+                        RenderLayer<S, M> renderLayer = renderLayerFactory.apply(livingEntityRenderer, context);
+                        if (renderLayer != null) {
+                            livingEntityRenderer.addLayer(renderLayer);
+                        }
                     }
                 }
             }
