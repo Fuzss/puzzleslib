@@ -135,15 +135,14 @@ public final class NeoForgeClientEventInvokers {
                 EntityRenderersEvent.AddLayers.class,
                 (AddLivingEntityRenderLayersCallback callback, EntityRenderersEvent.AddLayers event) -> {
                     for (PlayerSkin.Model skinModel : event.getSkins()) {
-                        LivingEntityRenderer<? extends Player, ?, ?> entityRenderer = event.getSkin(skinModel);
-                        if (entityRenderer != null) {
+                        if (event.getSkin(skinModel) instanceof LivingEntityRenderer<?, ?, ?> entityRenderer) {
                             callback.addLivingEntityRenderLayers(EntityType.PLAYER, entityRenderer, event.getContext());
                         }
                     }
                     for (EntityType<?> entityType : event.getEntityTypes()) {
-                        LivingEntityRenderer<?, ?, ?> entityRenderer = (LivingEntityRenderer<?, ?, ?>) event.getRenderer(
-                                entityType);
-                        callback.addLivingEntityRenderLayers(entityType, entityRenderer, event.getContext());
+                        if (event.getRenderer(entityType) instanceof LivingEntityRenderer<?, ?, ?> entityRenderer) {
+                            callback.addLivingEntityRenderLayers(entityType, entityRenderer, event.getContext());
+                        }
                     }
                 });
     }
