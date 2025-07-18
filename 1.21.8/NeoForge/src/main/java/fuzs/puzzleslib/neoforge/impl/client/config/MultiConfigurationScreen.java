@@ -63,10 +63,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
     @Override
     protected void init() {
         super.init();
-        this.configurationScreen.minecraft = this.minecraft;
-        this.configurationScreen.font = this.font;
-        this.configurationScreen.width = this.width;
-        this.configurationScreen.height = this.height;
+        this.configurationScreen.init(this.minecraft, this.width, this.height);
     }
 
     @Override
@@ -106,13 +103,13 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
                         tooltip.append(ConfigurationScreen.TOOLTIP_CANNOT_EDIT_NOT_LOADED)
                                 .append(Component.literal("\n\n"));
                         btn.active = false;
-                    } else if (type == ModConfig.Type.SERVER && this.minecraft.getCurrentServer() != null &&
-                            !this.minecraft.isSingleplayer()) {
+                    } else if (type == ModConfig.Type.SERVER && this.minecraft.getCurrentServer() != null
+                            && !this.minecraft.isSingleplayer()) {
                         tooltip.append(ConfigurationScreen.TOOLTIP_CANNOT_EDIT_THIS_WHILE_ONLINE)
                                 .append(Component.literal("\n\n"));
                         btn.active = false;
-                    } else if (type == ModConfig.Type.SERVER && this.minecraft.hasSingleplayerServer() &&
-                            this.minecraft.getSingleplayerServer().isPublished()) {
+                    } else if (type == ModConfig.Type.SERVER && this.minecraft.hasSingleplayerServer()
+                            && this.minecraft.getSingleplayerServer().isPublished()) {
                         tooltip.append(ConfigurationScreen.TOOLTIP_CANNOT_EDIT_THIS_WHILE_OPEN_TO_LAN)
                                 .append(Component.literal("\n\n"));
                         btn.active = false;

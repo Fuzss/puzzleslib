@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
+import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentTypeImpl;
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-public class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V> extends DataAttachmentBuilder<T, V> {
+public abstract class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
     private final Function<T, RegistryAccess> registryAccessExtractor;
 
     public NeoForgeDataAttachmentBuilder(Function<T, RegistryAccess> registryAccessExtractor) {

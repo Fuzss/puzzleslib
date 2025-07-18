@@ -15,23 +15,23 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public abstract class DataAttachmentBuilder<T, V> implements DataAttachmentRegistry.Builder<T, V> {
+public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegistry.Builder<T, V, B>> implements DataAttachmentRegistry.Builder<T, V, B> {
     protected final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues = new LinkedHashMap<>();
     @Nullable
     protected Codec<V> codec;
 
     @Override
-    public DataAttachmentRegistry.Builder<T, V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
+    public B defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
         Objects.requireNonNull(defaultValueProvider, "default value provider is null");
         this.defaultValues.put(Predicates.alwaysTrue(), defaultValueProvider);
-        return this;
+        return this.getThis();
     }
 
     @Override
-    public DataAttachmentRegistry.Builder<T, V> persistent(Codec<V> codec) {
+    public B persistent(Codec<V> codec) {
         Objects.requireNonNull(codec, "codec is null");
         this.codec = codec;
-        return this;
+        return this.getThis();
     }
 
     @Nullable

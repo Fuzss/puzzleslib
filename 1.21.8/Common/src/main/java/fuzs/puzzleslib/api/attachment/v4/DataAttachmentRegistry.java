@@ -49,7 +49,7 @@ public final class DataAttachmentRegistry {
      * @param <V> attachment value type
      * @return the level chunk attachment type builder
      */
-    public static <V> Builder<LevelChunk, V> levelChunkBuilder() {
+    public static <V> LevelChunkBuilder<V> levelChunkBuilder() {
         return DataAttachmentRegistryImpl.INSTANCE.getLevelChunkBuilder();
     }
 
@@ -57,7 +57,7 @@ public final class DataAttachmentRegistry {
      * @param <V> attachment value type
      * @return the level attachment type builder
      */
-    public static <V> Builder<Level, V> levelBuilder() {
+    public static <V> LevelBuilder<V> levelBuilder() {
         return DataAttachmentRegistryImpl.INSTANCE.getLevelBuilder();
     }
 
@@ -67,7 +67,12 @@ public final class DataAttachmentRegistry {
      * @param <T> attachment holder type
      * @param <V> attachment value type
      */
-    public interface Builder<T, V> {
+    public interface Builder<T, V, B extends Builder<T, V, B>> {
+
+        /**
+         * @return the builder instance
+         */
+        B getThis();
 
         /**
          * Set a default value for all attachment holders.
@@ -75,7 +80,7 @@ public final class DataAttachmentRegistry {
          * @param defaultValue the default value
          * @return the builder instance
          */
-        default Builder<T, V> defaultValue(V defaultValue) {
+        default B defaultValue(V defaultValue) {
             return this.defaultValue((RegistryAccess registries) -> defaultValue);
         }
 
@@ -85,7 +90,7 @@ public final class DataAttachmentRegistry {
          * @param defaultValueProvider the default value provider
          * @return the builder instance
          */
-        Builder<T, V> defaultValue(Function<RegistryAccess, V> defaultValueProvider);
+        B defaultValue(Function<RegistryAccess, V> defaultValueProvider);
 
         /**
          * Allow the attachment type to be serialized.
@@ -93,7 +98,7 @@ public final class DataAttachmentRegistry {
          * @param codec the attachment value codec
          * @return the builder instance
          */
-        Builder<T, V> persistent(Codec<V> codec);
+        B persistent(Codec<V> codec);
 
         /**
          * Build the attachment type.
@@ -112,10 +117,10 @@ public final class DataAttachmentRegistry {
      * @param <T> attachment holder type
      * @param <V> attachment value type
      */
-    public interface RegistryBuilder<T, V> extends Builder<T, V> {
+    public interface RegistryBuilder<T, V, B extends RegistryBuilder<T, V, B>> extends Builder<T, V, B> {
 
         @Override
-        default RegistryBuilder<T, V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
+        default B defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
             return this.defaultValue(Predicates.alwaysTrue(), defaultValueProvider);
         }
 
@@ -126,7 +131,7 @@ public final class DataAttachmentRegistry {
          * @param defaultValue the default value
          * @return the builder instance
          */
-        default RegistryBuilder<T, V> defaultValue(Class<? extends T> holderType, V defaultValue) {
+        default B defaultValue(Class<? extends T> holderType, V defaultValue) {
             return this.defaultValue(holderType::isInstance, defaultValue);
         }
 
@@ -137,7 +142,7 @@ public final class DataAttachmentRegistry {
          * @param defaultValue  the default value
          * @return the builder instance
          */
-        default RegistryBuilder<T, V> defaultValue(Predicate<T> defaultFilter, V defaultValue) {
+        default B defaultValue(Predicate<T> defaultFilter, V defaultValue) {
             return this.defaultValue(defaultFilter, (RegistryAccess registries) -> defaultValue);
         }
 
@@ -148,7 +153,7 @@ public final class DataAttachmentRegistry {
          * @param defaultValueProvider the default value provider
          * @return the builder instance
          */
-        RegistryBuilder<T, V> defaultValue(Predicate<T> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
+        B defaultValue(Predicate<T> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
     }
 
     /**
@@ -156,25 +161,10 @@ public final class DataAttachmentRegistry {
      *
      * @param <V> attachment value type
      */
-    public interface EntityBuilder<V> extends RegistryBuilder<Entity, V> {
+    public interface EntityBuilder<V> extends RegistryBuilder<Entity, V, EntityBuilder<V>> {
 
         @Override
         EntityBuilder<V> persistent(Codec<V> codec);
-
-        @Override
-        default EntityBuilder<V> defaultValue(V defaultValue) {
-            return (EntityBuilder<V>) RegistryBuilder.super.defaultValue(defaultValue);
-        }
-
-        @Override
-        default EntityBuilder<V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
-            return (EntityBuilder<V>) RegistryBuilder.super.defaultValue(defaultValueProvider);
-        }
-
-        @Override
-        default EntityBuilder<V> defaultValue(Class<? extends Entity> holderType, V defaultValue) {
-            return (EntityBuilder<V>) RegistryBuilder.super.defaultValue(holderType, defaultValue);
-        }
 
         /**
          * Set a default value for the provided entity type.
@@ -188,15 +178,10 @@ public final class DataAttachmentRegistry {
         }
 
         @Override
-        default EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, V defaultValue) {
-            return (EntityBuilder<V>) RegistryBuilder.super.defaultValue(defaultFilter, defaultValue);
-        }
-
-        @Override
         EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
 
         /**
-         * Automatically synchronize the attachment value with remotes.
+         * Automatically synchronise the attachment value with remotes.
          * <p>
          * The internally used player set is equivalent to {@link PlayerSet#ofPlayer(ServerPlayer)}.
          *
@@ -232,22 +217,7 @@ public final class DataAttachmentRegistry {
      *
      * @param <V> attachment value type
      */
-    public interface BlockEntityBuilder<V> extends RegistryBuilder<BlockEntity, V> {
-
-        @Override
-        default BlockEntityBuilder<V> defaultValue(V defaultValue) {
-            return (BlockEntityBuilder<V>) RegistryBuilder.super.defaultValue(defaultValue);
-        }
-
-        @Override
-        default BlockEntityBuilder<V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
-            return (BlockEntityBuilder<V>) RegistryBuilder.super.defaultValue(defaultValueProvider);
-        }
-
-        @Override
-        default BlockEntityBuilder<V> defaultValue(Class<? extends BlockEntity> holderType, V defaultValue) {
-            return (BlockEntityBuilder<V>) RegistryBuilder.super.defaultValue(holderType, defaultValue);
-        }
+    public interface BlockEntityBuilder<V> extends RegistryBuilder<BlockEntity, V, BlockEntityBuilder<V>> {
 
         /**
          * Set a default value for the provided block entity type.
@@ -257,13 +227,9 @@ public final class DataAttachmentRegistry {
          * @return the builder instance
          */
         default BlockEntityBuilder<V> defaultValue(BlockEntityType<?> blockEntityType, V defaultValue) {
-            return this.defaultValue((BlockEntity blockEntity) -> blockEntity.getType() == blockEntityType,
-                    defaultValue);
-        }
-
-        @Override
-        default BlockEntityBuilder<V> defaultValue(Predicate<BlockEntity> defaultFilter, V defaultValue) {
-            return (BlockEntityBuilder<V>) RegistryBuilder.super.defaultValue(defaultFilter, defaultValue);
+            return this.defaultValue((BlockEntity blockEntity) -> {
+                return blockEntity.getType() == blockEntityType;
+            }, defaultValue);
         }
 
         @Override
@@ -271,5 +237,23 @@ public final class DataAttachmentRegistry {
 
         @Override
         BlockEntityBuilder<V> persistent(Codec<V> codec);
+    }
+
+    /**
+     * Attachment type builder for chunks.
+     *
+     * @param <V> attachment value type
+     */
+    public interface LevelChunkBuilder<V> extends Builder<LevelChunk, V, LevelChunkBuilder<V>> {
+
+    }
+
+    /**
+     * Attachment type builder for levels.
+     *
+     * @param <V> attachment value type
+     */
+    public interface LevelBuilder<V> extends Builder<Level, V, LevelBuilder<V>> {
+
     }
 }
