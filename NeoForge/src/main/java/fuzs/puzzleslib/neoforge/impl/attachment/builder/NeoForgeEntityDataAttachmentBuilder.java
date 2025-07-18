@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.neoforge.impl.attachment.builder;
 
-import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
@@ -24,7 +23,7 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAttachmentBuilder<Entity, V> implements EntityDataAttachmentBuilder<V> {
+public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAttachmentBuilder<Entity, V, DataAttachmentRegistry.EntityBuilder<V>> implements EntityDataAttachmentBuilder<V> {
     @Nullable
     private StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
     @Nullable
@@ -33,6 +32,33 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
 
     public NeoForgeEntityDataAttachmentBuilder() {
         super(Entity::registryAccess);
+    }
+
+    @Override
+    public DataAttachmentRegistry.EntityBuilder<V> getThis() {
+        return this;
+    }
+
+    @Override
+    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider) {
+        Objects.requireNonNull(defaultFilter, "default filter is null");
+        Objects.requireNonNull(defaultValueProvider, "default value provider is null");
+        this.defaultValues.put(defaultFilter, defaultValueProvider);
+        return this;
+    }
+
+    @Override
+    public DataAttachmentRegistry.EntityBuilder<V> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
+        Objects.requireNonNull(streamCodec, "stream codec is null");
+        this.streamCodec = streamCodec;
+        this.synchronizationTargets = synchronizationTargets;
+        return this;
+    }
+
+    @Override
+    public DataAttachmentRegistry.EntityBuilder<V> copyOnDeath() {
+        this.copyOnDeath = true;
+        return this;
     }
 
     @Override
@@ -55,43 +81,6 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
                                 .playToClient(payloadType, messageStreamCodec);
                     });
                 });
-    }
-
-    @Override
-    public DataAttachmentRegistry.EntityBuilder<V> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets) {
-        Objects.requireNonNull(streamCodec, "stream codec is null");
-        this.streamCodec = streamCodec;
-        this.synchronizationTargets = synchronizationTargets;
-        return this;
-    }
-
-    @Override
-    public DataAttachmentRegistry.EntityBuilder<V> copyOnDeath() {
-        this.copyOnDeath = true;
-        return this;
-    }
-
-    @Override
-    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(V defaultValue) {
-        return EntityDataAttachmentBuilder.super.defaultValue(defaultValue);
-    }
-
-    @Override
-    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
-        return EntityDataAttachmentBuilder.super.defaultValue(defaultValueProvider);
-    }
-
-    @Override
-    public DataAttachmentRegistry.EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider) {
-        Objects.requireNonNull(defaultFilter, "default filter is null");
-        Objects.requireNonNull(defaultValueProvider, "default value provider is null");
-        this.defaultValues.put(defaultFilter, defaultValueProvider);
-        return this;
-    }
-
-    @Override
-    public DataAttachmentRegistry.EntityBuilder<V> persistent(Codec<V> codec) {
-        return (DataAttachmentRegistry.EntityBuilder<V>) super.persistent(codec);
     }
 
     @Override

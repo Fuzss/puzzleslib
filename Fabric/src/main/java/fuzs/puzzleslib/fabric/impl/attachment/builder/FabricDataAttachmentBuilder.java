@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.attachment.builder;
 
+import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentType;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricAttachmentTypeAdapter;
 import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
@@ -18,12 +19,15 @@ import java.util.function.Function;
 /**
  * We do not force the type parameter to extend {@link AttachmentTarget}, as AttachmentTarget is not injected into
  * {@link net.minecraft.world.level.Level}, only {@link net.minecraft.server.level.ServerLevel}, via interface
- * injection. But the mixin responsible for implementing the interface on all supported classes does in fact target
- * {@link net.minecraft.world.level.Level}, not just {@link net.minecraft.server.level.ServerLevel}. This also mirrors
- * the attachment implementation on NeoForge.
+ * injection.
+ * <p>
+ * But the mixin responsible for implementing the interface on all supported classes does in fact target
+ * {@link net.minecraft.world.level.Level}, not just {@link net.minecraft.server.level.ServerLevel}.
+ * <p>
+ * This also mirrors the attachment implementation on NeoForge.
  */
 @SuppressWarnings("UnstableApiUsage")
-public class FabricDataAttachmentBuilder<T, V> extends DataAttachmentBuilder<T, V> {
+public abstract class FabricDataAttachmentBuilder<T, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
     private final Function<T, RegistryAccess> registryAccessExtractor;
 
     public FabricDataAttachmentBuilder(Function<T, RegistryAccess> registryAccessExtractor) {

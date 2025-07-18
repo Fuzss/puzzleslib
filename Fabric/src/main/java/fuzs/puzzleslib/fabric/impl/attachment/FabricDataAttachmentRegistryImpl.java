@@ -2,11 +2,10 @@ package fuzs.puzzleslib.fabric.impl.attachment;
 
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
 import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricBlockEntityDataAttachmentBuilder;
-import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricDataAttachmentBuilder;
 import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricEntityDataAttachmentBuilder;
+import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricLevelChunkDataAttachmentBuilder;
+import fuzs.puzzleslib.fabric.impl.attachment.builder.FabricLevelDataAttachmentBuilder;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.chunk.LevelChunk;
 
 public final class FabricDataAttachmentRegistryImpl implements DataAttachmentRegistryImpl {
 
@@ -21,12 +20,12 @@ public final class FabricDataAttachmentRegistryImpl implements DataAttachmentReg
     }
 
     @Override
-    public <V> DataAttachmentRegistry.Builder<LevelChunk, V> getLevelChunkBuilder() {
-        return new FabricDataAttachmentBuilder<>((LevelChunk levelChunk) -> levelChunk.getLevel().registryAccess());
+    public <V> DataAttachmentRegistry.LevelChunkBuilder<V> getLevelChunkBuilder() {
+        return new FabricLevelChunkDataAttachmentBuilder<>();
     }
 
     @Override
-    public <V> DataAttachmentRegistry.Builder<Level, V> getLevelBuilder() {
-        return new FabricDataAttachmentBuilder<>(Level::registryAccess);
+    public <V> DataAttachmentRegistry.LevelBuilder<V> getLevelBuilder() {
+        return new FabricLevelDataAttachmentBuilder<>();
     }
 }
