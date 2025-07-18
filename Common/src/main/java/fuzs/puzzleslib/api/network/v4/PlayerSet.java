@@ -33,7 +33,7 @@ public interface PlayerSet {
     void apply(Consumer<ServerPlayer> serverPlayerConsumer);
 
     /**
-     * Send message from server to no player.
+     * Send a message from the server to no player.
      */
     static PlayerSet ofNone() {
         return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
@@ -42,7 +42,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to an entity.
+     * Send a message from the server to an entity.
      * <p>
      * When the entity is not a {@link ServerPlayer} no message is sent.
      *
@@ -54,7 +54,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to a player.
+     * Send a message from the server to a player.
      *
      * @param serverPlayer player to send to
      */
@@ -66,7 +66,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players on the server.
+     * Send a message from the server to all players on the server.
      *
      * @param serverPlayer player to exclude from sending to
      */
@@ -82,7 +82,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players on the server.
+     * Send a message from the server to all players on the server.
      *
      * @param minecraftServer server for retrieving the player list
      */
@@ -95,7 +95,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players in a level.
+     * Send a message from the server to all players in a level.
      *
      * @param serverLevel the level
      */
@@ -109,7 +109,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players near a given position.
+     * Send a message from the server to all players near a given position.
      *
      * @param position    source position
      * @param serverLevel the current level
@@ -120,7 +120,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players near a given position.
+     * Send a message from the server to all players near a given position.
      *
      * @param posX        source position x
      * @param posY        source position y
@@ -132,7 +132,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players near a given position.
+     * Send a message from the server to all players near a given position.
      * <p>
      * The implementation is copied from
      * {@link net.minecraft.server.players.PlayerList#broadcast(Player, double, double, double, double, ResourceKey,
@@ -162,7 +162,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players tracking a block entity at a certain block position.
+     * Send a message from the server to all players tracking a block entity at a certain block position.
      *
      * @param blockEntity the block entity a player must track to receive this message
      */
@@ -174,7 +174,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players tracking a chunk.
+     * Send a message from the server to all players tracking a chunk.
      *
      * @param levelChunk the chunk a player must track to receive this message
      */
@@ -185,7 +185,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players tracking a chunk.
+     * Send a message from the server to all players tracking a chunk.
      *
      * @param serverLevel the level containing the chunk
      * @param chunkPos    the chunk pos a player must track to receive this message
@@ -201,9 +201,9 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all players tracking a given entity.
+     * Send a message from the server to all players tracking a given entity.
      * <p>
-     * When the entity is a player it will receive the message as well, otherwise use
+     * When the entity is a player, it will receive the message as well, otherwise use
      * {@link #nearPlayer(ServerPlayer)}.
      * <p>
      * The implementation is copied from
@@ -228,7 +228,7 @@ public interface PlayerSet {
     }
 
     /**
-     * Send message from server to all other players tracking a given player.
+     * Send a message from the server to all other players tracking a given player.
      * <p>
      * The player will not receive the message, for that use {@link #nearEntity(Entity)}.
      * <p>

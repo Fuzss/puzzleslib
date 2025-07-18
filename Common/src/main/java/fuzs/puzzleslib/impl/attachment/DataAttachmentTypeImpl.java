@@ -7,7 +7,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
@@ -16,15 +15,11 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
     private final AttachmentTypeAdapter<T, V> attachmentType;
     private final Function<T, RegistryAccess> registryAccessExtractor;
     private final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues;
-    private final BiConsumer<T, V> synchronizer;
 
-    public DataAttachmentTypeImpl(AttachmentTypeAdapter<T, V> attachmentType, Function<T, RegistryAccess> registryAccessExtractor, Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues, @Nullable BiConsumer<T, V> synchronizer) {
+    public DataAttachmentTypeImpl(AttachmentTypeAdapter<T, V> attachmentType, Function<T, RegistryAccess> registryAccessExtractor, Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues) {
         this.attachmentType = attachmentType;
         this.registryAccessExtractor = registryAccessExtractor;
         this.defaultValues = ImmutableMap.copyOf(defaultValues);
-        this.synchronizer = synchronizer != null ? synchronizer : (T o1, V o2) -> {
-            // NO-OP
-        };
     }
 
     @Nullable
@@ -74,9 +69,6 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
             oldValue = this.attachmentType.setData(holder, newValue);
         } else {
             oldValue = this.attachmentType.removeData(holder);
-        }
-        if (newValue != oldValue) {
-            this.synchronizer.accept(holder, newValue);
         }
     }
 

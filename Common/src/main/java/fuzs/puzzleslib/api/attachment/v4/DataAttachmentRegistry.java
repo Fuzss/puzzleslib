@@ -8,14 +8,13 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.chunk.LevelChunk;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -93,12 +92,29 @@ public final class DataAttachmentRegistry {
         B defaultValue(Function<RegistryAccess, V> defaultValueProvider);
 
         /**
-         * Allow the attachment type to be serialized.
+         * Allow the attachment type to be serialised.
          *
          * @param codec the attachment value codec
          * @return the builder instance
          */
         B persistent(Codec<V> codec);
+
+        /**
+         * Automatically synchronise the attachment value with remotes.
+         *
+         * @param streamCodec            the attachment value stream codec
+         * @param synchronizationTargets the remotes to synchronise the attachment value with; the following are
+         *                               recommended:
+         *                               <ul>
+         *                               <li>{@link PlayerSet#ofEntity(Entity)}</li>
+         *                               <li>{@link PlayerSet#nearEntity(Entity)}</li>
+         *                               <li>{@link PlayerSet#nearBlockEntity(BlockEntity)}</li>
+         *                               <li>{@link PlayerSet#nearChunk(LevelChunk)}</li>
+         *                               <li>{@link PlayerSet#inLevel(ServerLevel)}</li>
+         *                               </ul>
+         * @return the builder instance
+         */
+        B networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, Function<T, PlayerSet> synchronizationTargets);
 
         /**
          * Build the attachment type.
@@ -163,9 +179,6 @@ public final class DataAttachmentRegistry {
      */
     public interface EntityBuilder<V> extends RegistryBuilder<Entity, V, EntityBuilder<V>> {
 
-        @Override
-        EntityBuilder<V> persistent(Codec<V> codec);
-
         /**
          * Set a default value for the provided entity type.
          *
@@ -176,31 +189,6 @@ public final class DataAttachmentRegistry {
         default EntityBuilder<V> defaultValue(EntityType<?> entityType, V defaultValue) {
             return this.defaultValue((Entity entity) -> entity.getType() == entityType, defaultValue);
         }
-
-        @Override
-        EntityBuilder<V> defaultValue(Predicate<Entity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
-
-        /**
-         * Automatically synchronise the attachment value with remotes.
-         * <p>
-         * The internally used player set is equivalent to {@link PlayerSet#ofPlayer(ServerPlayer)}.
-         *
-         * @param streamCodec the attachment value stream codec
-         * @return the builder instance
-         */
-        default EntityBuilder<V> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec) {
-            return this.networkSynchronized(streamCodec, null);
-        }
-
-        /**
-         * Automatically synchronize the attachment value with remotes.
-         *
-         * @param streamCodec            the attachment value stream codec
-         * @param synchronizationTargets the player targets to synchronize the attachment value with, usually
-         *                               {@link PlayerSet#nearEntity(Entity)}
-         * @return the builder instance
-         */
-        EntityBuilder<V> networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, @Nullable Function<Entity, PlayerSet> synchronizationTargets);
 
         /**
          * Copy the attachment value when the entity dies.
@@ -231,12 +219,6 @@ public final class DataAttachmentRegistry {
                 return blockEntity.getType() == blockEntityType;
             }, defaultValue);
         }
-
-        @Override
-        BlockEntityBuilder<V> defaultValue(Predicate<BlockEntity> defaultFilter, Function<RegistryAccess, V> defaultValueProvider);
-
-        @Override
-        BlockEntityBuilder<V> persistent(Codec<V> codec);
     }
 
     /**

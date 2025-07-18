@@ -3,15 +3,17 @@ package fuzs.puzzleslib.impl.attachment.builder;
 import com.google.common.base.Predicates;
 import com.mojang.serialization.Codec;
 import fuzs.puzzleslib.api.attachment.v4.DataAttachmentRegistry;
-import fuzs.puzzleslib.impl.attachment.AttachmentTypeAdapter;
+import fuzs.puzzleslib.api.network.v4.PlayerSet;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -19,6 +21,10 @@ public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegist
     protected final Map<Predicate<T>, Function<RegistryAccess, V>> defaultValues = new LinkedHashMap<>();
     @Nullable
     protected Codec<V> codec;
+    @Nullable
+    protected StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec;
+    @Nullable
+    private Function<T, PlayerSet> synchronizationTargets;
 
     @Override
     public B defaultValue(Function<RegistryAccess, V> defaultValueProvider) {
@@ -34,8 +40,23 @@ public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegist
         return this.getThis();
     }
 
-    @Nullable
-    public BiConsumer<T, V> getSynchronizer(ResourceLocation resourceLocation, AttachmentTypeAdapter<T, V> attachmentType) {
-        return null;
+    @Override
+    public B networkSynchronized(StreamCodec<? super RegistryFriendlyByteBuf, V> streamCodec, Function<T, PlayerSet> synchronizationTargets) {
+        Objects.requireNonNull(streamCodec, "stream codec is null");
+        Objects.requireNonNull(synchronizationTargets, "synchronization targets is null");
+        this.streamCodec = streamCodec;
+        this.synchronizationTargets = synchronizationTargets;
+        return this.getThis();
+    }
+
+    protected boolean syncWith(T holder, ServerPlayer serverPlayer) {
+        Objects.requireNonNull(this.synchronizationTargets, "synchronization targets is null");
+        MutableBoolean mutableBoolean = new MutableBoolean();
+        this.synchronizationTargets.apply(holder).apply((ServerPlayer serverPlayerX) -> {
+            if (serverPlayer == serverPlayerX) {
+                mutableBoolean.setTrue();
+            }
+        });
+        return mutableBoolean.booleanValue();
     }
 }

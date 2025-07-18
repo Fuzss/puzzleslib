@@ -10,6 +10,7 @@ import fuzs.puzzleslib.neoforge.impl.attachment.NeoForgeAttachmentTypeAdapter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -17,7 +18,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 public abstract class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
@@ -43,8 +43,7 @@ public abstract class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder,
                     return builder.build();
                 });
         AttachmentTypeAdapter<T, V> adapter = new NeoForgeAttachmentTypeAdapter<>(attachmentType);
-        BiConsumer<T, V> synchronizer = this.getSynchronizer(resourceLocation, adapter);
-        return new DataAttachmentTypeImpl<>(adapter, this.registryAccessExtractor, this.defaultValues, synchronizer);
+        return new DataAttachmentTypeImpl<>(adapter, this.registryAccessExtractor, this.defaultValues);
     }
 
     @MustBeInvokedByOverriders
@@ -54,6 +53,11 @@ public abstract class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder,
                     .copyHandler((V value, IAttachmentHolder holder, HolderLookup.Provider registries) -> {
                         return value;
                     });
+        }
+        if (this.streamCodec != null) {
+            builder.sync((IAttachmentHolder holder, ServerPlayer serverPlayer) -> {
+                return this.syncWith((T) holder, serverPlayer);
+            }, this.streamCodec);
         }
     }
 }

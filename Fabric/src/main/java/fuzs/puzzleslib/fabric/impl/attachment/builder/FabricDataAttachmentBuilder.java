@@ -11,18 +11,19 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-import java.util.function.BiConsumer;
 import java.util.function.Function;
 
 /**
  * We do not force the type parameter to extend {@link AttachmentTarget}, as AttachmentTarget is not injected into
- * {@link net.minecraft.world.level.Level}, only {@link net.minecraft.server.level.ServerLevel}, via interface
- * injection.
+ * {@link Level}, only {@link ServerLevel}, via interface injection.
  * <p>
- * But the mixin responsible for implementing the interface on all supported classes does in fact target
- * {@link net.minecraft.world.level.Level}, not just {@link net.minecraft.server.level.ServerLevel}.
+ * But the mixin responsible for implementing the interface on all supported classes does in fact target {@link Level},
+ * not just {@link ServerLevel}.
  * <p>
  * This also mirrors the attachment implementation on NeoForge.
  */
@@ -38,14 +39,18 @@ public abstract class FabricDataAttachmentBuilder<T, V, B extends DataAttachment
     public DataAttachmentType<T, V> build(ResourceLocation resourceLocation) {
         AttachmentType<V> attachmentType = AttachmentRegistry.create(resourceLocation, this::configureBuilder);
         AttachmentTypeAdapter<T, V> adapter = new FabricAttachmentTypeAdapter<>(attachmentType);
-        BiConsumer<T, V> synchronizer = this.getSynchronizer(resourceLocation, adapter);
-        return new DataAttachmentTypeImpl<>(adapter, this.registryAccessExtractor, this.defaultValues, synchronizer);
+        return new DataAttachmentTypeImpl<>(adapter, this.registryAccessExtractor, this.defaultValues);
     }
 
     @MustBeInvokedByOverriders
     void configureBuilder(AttachmentRegistry.Builder<V> builder) {
         if (this.codec != null) {
             builder.persistent(this.codec);
+        }
+        if (this.streamCodec != null) {
+            builder.syncWith(this.streamCodec, (AttachmentTarget attachmentTarget, ServerPlayer serverPlayer) -> {
+                return this.syncWith((T) attachmentTarget, serverPlayer);
+            });
         }
     }
 }
