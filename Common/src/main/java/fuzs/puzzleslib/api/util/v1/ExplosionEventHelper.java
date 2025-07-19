@@ -1,15 +1,13 @@
 package fuzs.puzzleslib.api.util.v1;
 
-import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.ServerExplosion;
 
-import java.util.Objects;
-
 /**
  * A helper class containing explosion-related methods.
  */
+@Deprecated(forRemoval = true)
 public final class ExplosionEventHelper {
 
     private ExplosionEventHelper() {
@@ -24,8 +22,6 @@ public final class ExplosionEventHelper {
      * @return <code>true</code> to mark the explosion as handled, {@link ServerExplosion#explode()} is not called
      */
     public static boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
-        Objects.requireNonNull(serverLevel, "server level is null");
-        Objects.requireNonNull(explosion, "explosion is null");
-        return ProxyImpl.get().onExplosionStart(serverLevel, explosion);
+        return CommonHelper.onExplosionStart(serverLevel, explosion);
     }
 }
