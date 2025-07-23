@@ -88,7 +88,9 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
         // register events before registering configs
         for (ConfigDataHolderImpl<?> holder : this.configsByClass.values()) {
             // this is the wrong physical side for this config, it hasn't been loaded and doesn't need any processing
-            if (holder.config != null) this.bake(holder, this.modId);
+            if (holder.config != null) {
+                this.bake(holder, this.modId);
+            }
         }
         ProxyImpl.get().registerConfigurationScreenForHolder(this.modId);
     }
