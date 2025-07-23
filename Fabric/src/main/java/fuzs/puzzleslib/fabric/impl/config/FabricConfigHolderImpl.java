@@ -9,7 +9,6 @@ import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.config.ConfigDataHolderImpl;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
 import java.util.function.Supplier;
@@ -68,8 +67,10 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
         void onModConfig(ModConfig modConfig, ModConfigEventType eventType) {
             if (modConfig.getType() == this.configType) {
                 super.onModConfig(eventType, modConfig.getFileName(), () -> {
-                    if (modConfig.getLoadedConfig() != null &&
-                            !modConfig.getLoadedConfig().config().configFormat().isInMemory()) {
+                    if (modConfig.getLoadedConfig() != null && !modConfig.getLoadedConfig()
+                            .config()
+                            .configFormat()
+                            .isInMemory()) {
                         try {
                             Path path = modConfig.getFullPath();
                             FileWatcher.defaultInstance().removeWatch(path);
@@ -83,11 +84,8 @@ public class FabricConfigHolderImpl extends ConfigHolderImpl {
             }
         }
 
-        @Override
-        protected ModConfigSpec register(String modId) {
-            ModConfigSpec modConfigSpec = super.register(modId);
-            ConfigRegistry.INSTANCE.register(modId, this.configType, modConfigSpec, this.getFileName());
-            return modConfigSpec;
+        void register(String modId) {
+            ConfigRegistry.INSTANCE.register(modId, this.configType, this.initialize(modId), this.getFileName());
         }
     }
 }

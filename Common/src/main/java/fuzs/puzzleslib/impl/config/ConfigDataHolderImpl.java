@@ -1,8 +1,6 @@
 package fuzs.puzzleslib.impl.config;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Unit;
 import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ValueCallback;
@@ -30,7 +28,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
     @Nullable
     private String fileName;
     private List<Runnable> configValueCallbacks = new ArrayList<>();
-    private boolean isAvailable;
+    private ModConfigStatus status = ModConfigStatus.CONFIG_MISSING;
     private int consecutiveConfigReloads;
 
     protected ConfigDataHolderImpl(Supplier<T> supplier) {
@@ -46,7 +44,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     private T getOrCreateDefaultConfig() {
         if (this.defaultConfig == null) {
-            this.testAvailable();
+            this.status.throwIfNecessary(this.config);
             this.defaultConfig = this.defaultConfigSupplier.get();
             Objects.requireNonNull(this.defaultConfig, "default config is null");
             this.defaultConfig.afterConfigReload();
@@ -59,7 +57,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     @Override
     public boolean isAvailable() {
-        return this.config != null && this.findErrorMessage().left().isPresent();
+        return this.config != null && this.status == ModConfigStatus.FULLY_LOADED;
     }
 
     @Override
@@ -78,62 +76,40 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         this.configValueCallbacks.add(runnable);
     }
 
-    private void testAvailable() {
-        this.findErrorMessage().ifRight(message -> {
-            PuzzlesLib.LOGGER.error(
-                    "Calling config at {} when it is not yet available. This is a harmless oversight, please report to the author. {}",
-                    this.getFileName(), message, new Exception("Config not yet available")
-            );
-        });
-    }
-
-    protected Either<Unit, String> findErrorMessage() {
-        if (this.fileName == null) {
-            return Either.right("Mod config is missing");
-        } else if (!this.isAvailable) {
-            return Either.right("Config data is missing");
-        } else {
-            return Either.left(Unit.INSTANCE);
-        }
-    }
-
     protected void onModConfig(ModConfigEventType eventType, String fileName, Runnable removeWatch) {
         if (Objects.equals(fileName, this.getFileName())) {
             PuzzlesLib.LOGGER.info("Dispatching {} event for config {}", eventType, fileName);
             Objects.requireNonNull(this.config, () -> "config is null: " + fileName);
             if (eventType.isLoading()) {
                 this.configValueCallbacks.forEach(Runnable::run);
-                // set this only after callbacks have run, to ensure nothing is null anymore when the config reports as available in case of some concurrency issues
-                this.isAvailable = true;
+                // set this only after callbacks have run, to ensure nothing is null any more when the config reports as available in case of some concurrency issues
+                this.status = ModConfigStatus.FULLY_LOADED;
                 for (Consumer<T> callback : this.additionalCallbacks) {
                     callback.accept(this.config);
                 }
             } else {
-                this.isAvailable = false;
+                this.status = ModConfigStatus.DATA_MISSING;
             }
             if (eventType != ModConfigEventType.RELOADING) {
                 this.consecutiveConfigReloads = 0;
             } else if (++this.consecutiveConfigReloads >= MAX_CONSECUTIVE_CONFIG_RELOADS) {
                 // remove file watcher for configs that reload too often consecutively,
                 // this is sometimes caused by issues with the file system and pointlessly creates new config files repeatedly
-                // this is also triggered after editing the config in-game, but if the user is doing that they are unlikely to also edit the file in the same session
+                // this is also triggered after editing the config in-game, but if the user is doing that, they are unlikely to also edit the file in the same session
                 removeWatch.run();
             }
         }
     }
 
-    protected ModConfigSpec register(String modId) {
-        this.initializeFileName(modId);
-        return this.buildConfigSpec();
-    }
-
-    private void initializeFileName(String modId) {
+    protected final ModConfigSpec initialize(String modId) {
         Objects.requireNonNull(this.config, "Attempting to register invalid config for " + modId);
-        if (this.fileName == null) {
-            this.fileName = this.fileNameFactory.apply(modId);
-        } else {
-            throw new IllegalStateException("Config has already been registered at " + this.getFileName());
+        if (this.fileName == null || this.status != ModConfigStatus.CONFIG_MISSING) {
+            throw new IllegalStateException(
+                    "Config has already been registered at " + this.fileNameFactory.apply(modId));
         }
+        this.fileName = this.fileNameFactory.apply(modId);
+        this.status = ModConfigStatus.DATA_MISSING;
+        return this.buildConfigSpec();
     }
 
     private ModConfigSpec buildConfigSpec() {
@@ -143,12 +119,12 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         return builder.build();
     }
 
-    public String getFileName() {
+    public final String getFileName() {
         Objects.requireNonNull(this.fileName, "file name is null");
         return this.fileName;
     }
 
-    public void setFileNameFactory(UnaryOperator<String> fileNameFactory) {
+    public final void setFileNameFactory(UnaryOperator<String> fileNameFactory) {
         Objects.requireNonNull(fileNameFactory, "file name factory is null");
         this.fileNameFactory = fileNameFactory;
     }
@@ -165,6 +141,29 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
         @Override
         public String toString() {
             return this.name().toLowerCase();
+        }
+    }
+
+    private enum ModConfigStatus {
+        CONFIG_MISSING("Mod config is missing"),
+        DATA_MISSING("Config data is missing"),
+        FULLY_LOADED(null);
+
+        @Nullable
+        private final String message;
+
+        ModConfigStatus(@Nullable String message) {
+            this.message = message;
+        }
+
+        public void throwIfNecessary(Object o) {
+            Objects.requireNonNull(o, "config is null");
+            Objects.requireNonNull(this.message, "message is null");
+            PuzzlesLib.LOGGER.error(
+                    "Calling config at {} when it is not yet available. This is a harmless oversight, please report to the author. {}",
+                    o.getClass(),
+                    this.message,
+                    new Exception("Config not yet available"));
         }
     }
 }

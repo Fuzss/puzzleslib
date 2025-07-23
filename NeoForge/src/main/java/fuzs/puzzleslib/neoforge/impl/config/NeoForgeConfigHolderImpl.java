@@ -11,7 +11,6 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.nio.file.Path;
 import java.util.Optional;
@@ -72,8 +71,10 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
         void onModConfig(ModConfig modConfig, ModConfigEventType eventType) {
             if (modConfig.getType() == this.configType) {
                 super.onModConfig(eventType, modConfig.getFileName(), () -> {
-                    if (modConfig.getLoadedConfig() != null &&
-                            !modConfig.getLoadedConfig().config().configFormat().isInMemory()) {
+                    if (modConfig.getLoadedConfig() != null && !modConfig.getLoadedConfig()
+                            .config()
+                            .configFormat()
+                            .isInMemory()) {
                         try {
                             Path path = modConfig.getFullPath();
                             FileWatcher.defaultInstance().removeWatch(path);
@@ -87,12 +88,9 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
             }
         }
 
-        @Override
-        protected ModConfigSpec register(String modId) {
-            ModConfigSpec modConfigSpec = super.register(modId);
+        void register(String modId) {
             ModContainer modContainer = NeoForgeModContainerHelper.getModContainer(modId);
-            modContainer.registerConfig(this.configType, modConfigSpec, this.getFileName());
-            return modConfigSpec;
+            modContainer.registerConfig(this.configType, this.initialize(modId), this.getFileName());
         }
     }
 }
