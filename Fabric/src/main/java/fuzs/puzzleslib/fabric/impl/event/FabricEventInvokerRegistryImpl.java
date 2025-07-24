@@ -191,36 +191,36 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerInteractEvents.UseBlock.class,
                 UseBlockCallback.EVENT,
                 (PlayerInteractEvents.UseBlock callback) -> {
-                    return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
+                    return (Player player, Level level, InteractionHand interactionHand, BlockHitResult hitResult) -> {
                         EventResultHolder<InteractionResult> eventResult = callback.onUseBlock(player,
                                 level,
-                                hand,
+                                interactionHand,
                                 hitResult);
-                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                            if (interactionResult == InteractionResult.PASS) {
-                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                                interactionResult = InteractionResult.FAIL;
-                            }
-
-                            if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
-                                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                                FabricProxy.get()
-                                        .startClientPrediction(level,
-                                                (int id) -> new ServerboundUseItemOnPacket(hand, hitResult, id));
-                            }
-
-                            return interactionResult;
-                        }).orElse(InteractionResult.PASS);
+                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                                level,
+                                (InteractionResult interactionResult) -> {
+                                    return interactionResult != InteractionResult.SUCCESS;
+                                },
+                                () -> {
+                                    FabricProxy.get()
+                                            .startClientPrediction(level,
+                                                    (int id) -> new ServerboundUseItemOnPacket(interactionHand,
+                                                            hitResult,
+                                                            id));
+                                });
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class,
                 AttackBlockCallback.EVENT,
                 (PlayerInteractEvents.AttackBlock callback) -> {
-                    return (Player player, Level level, InteractionHand hand, BlockPos pos, Direction direction) -> {
+                    return (Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction) -> {
                         if (!level.isClientSide || player.isCreative() || FabricProxy.get()
                                 .shouldStartDestroyBlock(pos)) {
-                            EventResult eventResult = callback.onAttackBlock(player, level, hand, pos, direction);
+                            EventResult eventResult = callback.onAttackBlock(player,
+                                    level,
+                                    interactionHand,
+                                    pos,
+                                    direction);
                             // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (achieved by returning InteractionResult#SUCCESS) since the Forge event runs after the server packet is sent
                             // returning InteractionResult#SUCCESS will return true from MultiPlayerGameMode::continueDestroyBlock which will spawn breaking particles and make the player arm swing
                             return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
@@ -232,109 +232,94 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
         INSTANCE.register(PlayerInteractEvents.UseItem.class,
                 UseItemCallback.EVENT,
                 (PlayerInteractEvents.UseItem callback) -> {
-                    return (Player player, Level level, InteractionHand hand) -> {
+                    return (Player player, Level level, InteractionHand interactionHand) -> {
                         // parity with Forge, eventResult item stack does not matter for Fabric implementation when eventResult is pass
                         if (player.isSpectator()) {
                             return InteractionResult.PASS;
-                        } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(hand))) {
+                        } else if (player.getCooldowns().isOnCooldown(player.getItemInHand(interactionHand))) {
                             return InteractionResult.PASS;
                         }
 
-                        EventResultHolder<InteractionResult> eventResult = callback.onUseItem(player, level, hand);
-                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                            if (interactionResult == InteractionResult.PASS) {
-                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                                interactionResult = InteractionResult.FAIL;
-                            }
-
-                            // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                            // the Fabric implementation already takes care of SUCCESS and PASS ignored (arbitrarily enforced on Forge)
-                            if (level.isClientSide && interactionResult != InteractionResult.SUCCESS) {
-                                // send the move packet like vanilla to ensure the position+view vectors are accurate
-                                MessageSender.broadcast(new ServerboundMovePlayerPacket.PosRot(player.getX(),
-                                        player.getY(),
-                                        player.getZ(),
-                                        player.getYRot(),
-                                        player.getXRot(),
-                                        player.onGround(),
-                                        player.horizontalCollision));
-                                // send interaction packet to the server with a new sequentially assigned id
-                                FabricProxy.get()
-                                        .startClientPrediction(level,
-                                                (int id) -> new ServerboundUseItemPacket(hand,
-                                                        id,
-                                                        player.getYRot(),
-                                                        player.getXRot()));
-                            }
-
-                            return interactionResult;
-                        }).orElse(InteractionResult.PASS);
+                        EventResultHolder<InteractionResult> eventResult = callback.onUseItem(player,
+                                level,
+                                interactionHand);
+                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                                level,
+                                (InteractionResult interactionResult) -> {
+                                    return interactionResult != InteractionResult.SUCCESS;
+                                },
+                                () -> {
+                                    // send the move packet like vanilla to ensure the position+view vectors are accurate
+                                    MessageSender.broadcast(new ServerboundMovePlayerPacket.PosRot(player.getX(),
+                                            player.getY(),
+                                            player.getZ(),
+                                            player.getYRot(),
+                                            player.getXRot(),
+                                            player.onGround(),
+                                            player.horizontalCollision));
+                                    // send the interaction packet to the server with a new sequentially assigned id
+                                    FabricProxy.get()
+                                            .startClientPrediction(level,
+                                                    (int id) -> new ServerboundUseItemPacket(interactionHand,
+                                                            id,
+                                                            player.getYRot(),
+                                                            player.getXRot()));
+                                });
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class,
                 UseEntityCallback.EVENT,
                 (PlayerInteractEvents.UseEntity callback) -> {
-                    return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                        // Fabric handles two possible cases in one event, here we separate them again
-                        if (hitResult != null) return InteractionResult.PASS;
+                    return (Player player, Level level, InteractionHand interactionHand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                        // Fabric handles two possible cases in one event on the server, here we separate them again
+                        if (level instanceof ServerLevel && hitResult != null) {
+                            return InteractionResult.PASS;
+                        }
+
                         EventResultHolder<InteractionResult> eventResult = callback.onUseEntity(player,
                                 level,
-                                hand,
+                                interactionHand,
                                 entity);
-                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                            if (interactionResult == InteractionResult.PASS) {
-                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                                interactionResult = InteractionResult.FAIL;
-                            }
-
-                            if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
-                                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                                MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
-                                        player.isShiftKeyDown(),
-                                        hand));
-                            }
-
-                            return interactionResult;
-                        }).orElse(InteractionResult.PASS);
+                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                                level,
+                                Predicate.not(InteractionResult::consumesAction),
+                                () -> {
+                                    MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
+                                            player.isShiftKeyDown(),
+                                            interactionHand));
+                                });
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class,
                 UseEntityCallback.EVENT,
                 (PlayerInteractEvents.UseEntityAt callback) -> {
-                    return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                        // Fabric handles two possible cases in one event, here we separate them again
-                        if (hitResult == null) return InteractionResult.PASS;
+                    return (Player player, Level level, InteractionHand interactionHand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                        // Fabric handles two possible cases in one event on the server, here we separate them again
+                        if (hitResult == null) {
+                            return InteractionResult.PASS;
+                        }
+
                         EventResultHolder<InteractionResult> eventResult = callback.onUseEntityAt(player,
                                 level,
-                                hand,
+                                interactionHand,
                                 entity,
                                 hitResult.getLocation());
-                        return eventResult.getInterrupt().map((InteractionResult interactionResult) -> {
-                            if (interactionResult == InteractionResult.PASS) {
-                                // this is done for parity with Forge where InteractionResult#PASS can be cancelled, while on Fabric it will mark the event as having done nothing
-                                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand), but it's the best we can do
-                                interactionResult = InteractionResult.FAIL;
-                            }
-
-                            if (level.isClientSide && interactionResult == InteractionResult.FAIL) {
-                                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult (the Forge event runs after the server packet is sent)
-                                MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
-                                        player.isShiftKeyDown(),
-                                        hand,
-                                        hitResult.getLocation()));
-                            }
-
-                            return interactionResult;
-                        }).orElse(InteractionResult.PASS);
+                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                                level,
+                                Predicate.not(InteractionResult::consumesAction),
+                                () -> {
+                                    MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
+                                            player.isShiftKeyDown(),
+                                            interactionHand,
+                                            hitResult.getLocation()));
+                                });
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class,
                 AttackEntityCallback.EVENT,
                 (PlayerInteractEvents.AttackEntity callback) -> {
-                    return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
-                        EventResult eventResult = callback.onAttackEntity(player, level, hand, entity);
+                    return (Player player, Level level, InteractionHand interactionHand, Entity entity, @Nullable EntityHitResult hitResult) -> {
+                        EventResult eventResult = callback.onAttackEntity(player, level, interactionHand, entity);
                         // this isn't a proper item use callback (seen with the server-side and Forge implementations), so the return looks a little odd
                         // we return InteractionResult#SUCCESS so the packet is sent to the server either way so the server may handle this on its own as Forge does
                         return eventResult.isInterrupt() ? InteractionResult.SUCCESS : InteractionResult.PASS;
