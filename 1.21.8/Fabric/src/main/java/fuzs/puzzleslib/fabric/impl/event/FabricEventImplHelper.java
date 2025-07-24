@@ -2,6 +2,7 @@ package fuzs.puzzleslib.fabric.impl.event;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
@@ -10,20 +11,50 @@ import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.Collection;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public final class FabricEventImplHelper {
 
     private FabricEventImplHelper() {
         // NO-OP
+    }
+
+    public static InteractionResult processInteractionResult(EventResultHolder<InteractionResult> eventResult, Level level, Predicate<InteractionResult> sendPacketPredicate, Runnable packetSender) {
+        Optional<InteractionResult> optional = eventResult.getInterrupt();
+
+        if (optional.isPresent()) {
+            InteractionResult interactionResult = optional.get();
+
+            if (interactionResult == InteractionResult.PASS) {
+                // this is done for parity with Forge where InteractionResult#PASS can be cancelled,
+                // while on Fabric it will mark the event as having done nothing
+                // unfortunately this will prevent the off-hand from being processed (if fired for the main hand),
+                // but it's the best we can do
+                interactionResult = InteractionResult.FAIL;
+            }
+
+            if (level.isClientSide && sendPacketPredicate.test(interactionResult)) {
+                // this brings parity with Forge where the server is notified regardless of the returned InteractionResult,
+                // as the Forge event runs after the server packet is sent
+                packetSender.run();
+            }
+
+            return interactionResult;
+        } else {
+            return InteractionResult.PASS;
+        }
     }
 
     public static int onAnimalTame(Animal animal, Player player, int intValue) {
