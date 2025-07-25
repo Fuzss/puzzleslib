@@ -6,6 +6,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * TODO rename to CalculateLivingVisibilityCallback
+ */
 @FunctionalInterface
 public interface LivingVisibilityCallback {
     EventInvoker<LivingVisibilityCallback> EVENT = EventInvoker.lookup(LivingVisibilityCallback.class);

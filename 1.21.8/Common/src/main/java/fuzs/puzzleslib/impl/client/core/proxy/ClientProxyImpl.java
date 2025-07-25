@@ -20,6 +20,8 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.TickTask;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -65,6 +67,15 @@ public interface ClientProxyImpl extends ProxyImpl {
     int getLeftStatusBarHeight(ResourceLocation resourceLocation);
 
     int getRightStatusBarHeight(ResourceLocation resourceLocation);
+
+    @Override
+    default BlockableEventLoop<? super TickTask> getBlockableEventLoop(Level level) {
+        if (level.isClientSide()) {
+            return Minecraft.getInstance();
+        } else {
+            return ProxyImpl.super.getBlockableEventLoop(level);
+        }
+    }
 
     @Override
     default Player getClientPlayer() {

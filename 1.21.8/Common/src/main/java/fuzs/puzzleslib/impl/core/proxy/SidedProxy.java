@@ -1,6 +1,9 @@
 package fuzs.puzzleslib.impl.core.proxy;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.TickTask;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
@@ -14,12 +17,20 @@ public interface SidedProxy {
 
     void registerEventHandlers();
 
+    default BlockableEventLoop<? super TickTask> getBlockableEventLoop(Level level) {
+        if (level instanceof ServerLevel serverLevel) {
+            return serverLevel.getServer();
+        } else {
+            throw new RuntimeException("Blockable event loop accessed for the wrong physical side!");
+        }
+    }
+
     default Player getClientPlayer() {
-        throw new RuntimeException("Client player accessed for wrong side!");
+        throw new RuntimeException("Client player accessed for the wrong physical side!");
     }
 
     default Level getClientLevel() {
-        throw new RuntimeException("Client level accessed for wrong side!");
+        throw new RuntimeException("Client level accessed for the wrong physical side!");
     }
 
     default boolean hasControlDown() {

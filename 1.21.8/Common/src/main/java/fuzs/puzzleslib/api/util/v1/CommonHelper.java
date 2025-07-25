@@ -2,7 +2,9 @@ package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -37,6 +39,13 @@ public final class CommonHelper {
         Objects.requireNonNull(serverLevel, "server level is null");
         Objects.requireNonNull(explosion, "explosion is null");
         return ProxyImpl.get().onExplosionStart(serverLevel, explosion);
+    }
+
+    /**
+     * @return the event loop for running {@link TickTask TickTasks}
+     */
+    public static BlockableEventLoop<? super TickTask> getBlockableEventLoop(Level level) {
+        return ProxyImpl.get().getBlockableEventLoop(level);
     }
 
     /**
