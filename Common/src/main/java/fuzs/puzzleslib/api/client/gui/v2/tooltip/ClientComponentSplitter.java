@@ -27,7 +27,7 @@ public final class ClientComponentSplitter {
      * @return the split components
      */
     public static List<Component> splitTooltipComponents(FormattedText... tooltipLines) {
-        return splitTooltipLines(tooltipLines).map(ComponentHelper::toComponent).toList();
+        return splitTooltipLines(tooltipLines).map(ComponentHelper::getAsComponent).toList();
     }
 
     /**
@@ -37,7 +37,7 @@ public final class ClientComponentSplitter {
      * @return the split components
      */
     public static List<Component> splitTooltipComponents(List<? extends FormattedText> tooltipLines) {
-        return splitTooltipLines(tooltipLines).map(ComponentHelper::toComponent).toList();
+        return splitTooltipLines(tooltipLines).map(ComponentHelper::getAsComponent).toList();
     }
 
     /**
