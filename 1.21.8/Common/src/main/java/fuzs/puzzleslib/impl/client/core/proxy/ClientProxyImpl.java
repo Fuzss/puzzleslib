@@ -111,6 +111,6 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     @Override
     default List<Component> splitTooltipLines(Component component) {
-        return ClientComponentSplitter.splitTooltipLines(component).map(ComponentHelper::toComponent).toList();
+        return ClientComponentSplitter.splitTooltipLines(component).map(ComponentHelper::getAsComponent).toList();
     }
 }

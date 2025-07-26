@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add `AnchorPoint`
 - Add `CommonHelper::getBlockableEventLoop`
 
+### Changed
+
+- Overhaul `ComponentHelper` implementation to properly support legacy formatting codes passed as part of a string
+
 ### Fixed
 
 - Fix some quirks with player interaction events on Fabric
