@@ -15,15 +15,15 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 public class StyleCombiningCharSink implements FormattedCharSink {
-    private final List<Map.Entry<StringBuilder, Style>> builders;
+    private final List<Map.Entry<StringBuilder, Style>> stringBuilders;
 
     public StyleCombiningCharSink() {
-        this.builders = new ArrayList<>(List.of(Map.entry(new StringBuilder(), Style.EMPTY)));
+        this.stringBuilders = new ArrayList<>(List.of(Map.entry(new StringBuilder(), Style.EMPTY)));
     }
 
     @Override
     public boolean accept(int width, Style style, int codePoint) {
-        Map.Entry<StringBuilder, Style> entry = this.builders.getLast();
+        Map.Entry<StringBuilder, Style> entry = this.stringBuilders.getLast();
         StringBuilder stringBuilder;
 
         // do not sanitise the style here already, so we can check for equality
@@ -31,7 +31,7 @@ public class StyleCombiningCharSink implements FormattedCharSink {
             stringBuilder = entry.getKey();
         } else {
             stringBuilder = new StringBuilder();
-            this.builders.add(Map.entry(stringBuilder, style));
+            this.stringBuilders.add(Map.entry(stringBuilder, style));
         }
 
         stringBuilder.appendCodePoint(codePoint);
@@ -51,7 +51,7 @@ public class StyleCombiningCharSink implements FormattedCharSink {
         StringBuilder builder = new StringBuilder();
         this.iterate((String string, Style style) -> {
             if (!style.isEmpty()) {
-                builder.append(ComponentHelper.getLegacyFormatString(style));
+                builder.append(ComponentHelper.getAsString(style));
             }
 
             builder.append(string);
@@ -65,7 +65,7 @@ public class StyleCombiningCharSink implements FormattedCharSink {
     }
 
     private void iterate(BiConsumer<String, Style> componentConsumer) {
-        for (Map.Entry<StringBuilder, Style> entry : this.builders) {
+        for (Map.Entry<StringBuilder, Style> entry : this.stringBuilders) {
             if (!entry.getKey().isEmpty() || !entry.getValue().isEmpty()) {
                 Style style = ComponentHelper.sanitizeLegacyFormat(entry.getValue());
                 componentConsumer.accept(entry.getKey().toString(), style);
