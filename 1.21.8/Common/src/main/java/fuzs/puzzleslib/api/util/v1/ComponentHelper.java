@@ -53,6 +53,7 @@ public final class ComponentHelper {
      * @return the new component
      */
     public static Component getAsComponent(String string) {
+        Objects.requireNonNull(string, "string is null");
         return getAsComponent(FormattedText.of(string));
     }
 
@@ -123,38 +124,53 @@ public final class ComponentHelper {
     }
 
     /**
-     * Reverts effects from using {@link Style#applyLegacyFormat(ChatFormatting)} to achieve the same result as
-     * {@link Style#applyFormat(ChatFormatting)} would for a more compact and versatile style object.
+     * Gets the primary (i.e. the very first) {@link Style} used by a {@link String}.
+     * <p>
+     * Useful for formatting code config options together with {@link #getAsString(Style)}.
      *
-     * @param style the style
-     * @return the sanitised style
+     * @param string the string
+     * @return the style
      */
-    public static Style sanitizeLegacyFormat(Style style) {
-        if (style.isEmpty()) {
-            return style;
-        }
+    public static Style getDefaultStyle(String string) {
+        Objects.requireNonNull(string, "string is null");
+        Component component = getAsComponent(string);
 
-        if (!style.isBold()) {
-            style = style.withBold(null);
+        // No style will have been passed when the component is empty.
+        // We could also strip formatting codes from the string and check if it is empty,
+        // but that might return false negatives with surrogates, maybe.
+        if (!string.isEmpty() && component.getString().isEmpty()) {
+            // A hack to get raw formatting without any non-formatting characters to apply.
+            // We basically check if only formatting is present (when the component is empty),
+            // then insert a temporary space and create a new component from that, which we only use the style from.
+            int index = string.indexOf(ChatFormatting.RESET.toString());
+            StringBuilder stringBuilder = new StringBuilder(string);
+            stringBuilder.insert(index != -1 ? index : string.length(), " ");
+            return getAsComponent(stringBuilder.toString()).getStyle();
+        } else {
+            return component.getStyle();
         }
+    }
 
-        if (!style.isItalic()) {
-            style = style.withItalic(null);
-        }
+    /**
+     * Gets the primary (i.e. the very first) {@link Style} used by a {@link FormattedText}.
+     *
+     * @param formattedText the text
+     * @return the style
+     */
+    public static Style getDefaultStyle(FormattedText formattedText) {
+        // pass this through our component conversion to make sure all formatting codes included in the string itself are properly applied
+        return getAsComponent(formattedText).getStyle();
+    }
 
-        if (!style.isUnderlined()) {
-            style = style.withUnderlined(null);
-        }
-
-        if (!style.isStrikethrough()) {
-            style = style.withStrikethrough(null);
-        }
-
-        if (!style.isObfuscated()) {
-            style = style.withObfuscated(null);
-        }
-
-        return style;
+    /**
+     * Gets the primary (i.e. the very first) {@link Style} used by a {@link FormattedCharSequence}.
+     *
+     * @param formattedCharSequence the text
+     * @return the style
+     */
+    public static Style getDefaultStyle(FormattedCharSequence formattedCharSequence) {
+        // pass this through our component conversion to make sure all formatting codes included in the string itself are properly applied
+        return getAsComponent(formattedCharSequence).getStyle();
     }
 
     /**
@@ -163,7 +179,9 @@ public final class ComponentHelper {
      * @param style the style
      * @return the string consisting of legacy formatting codes
      */
-    public static String getLegacyFormatString(Style style) {
+    public static String getAsString(Style style) {
+        Objects.requireNonNull(style, "style is null");
+
         if (style.isEmpty()) {
             return "";
         }
@@ -183,6 +201,8 @@ public final class ComponentHelper {
      * @param chatFormattingConsumer the chat formatting output
      */
     public static void getLegacyFormat(Style style, Consumer<ChatFormatting> chatFormattingConsumer) {
+        Objects.requireNonNull(style, "style is null");
+
         if (style.isEmpty()) {
             return;
         }
@@ -216,5 +236,42 @@ public final class ComponentHelper {
         if (style.isObfuscated()) {
             chatFormattingConsumer.accept(ChatFormatting.OBFUSCATED);
         }
+    }
+
+    /**
+     * Reverts effects from using {@link Style#applyLegacyFormat(ChatFormatting)} to achieve the same result as
+     * {@link Style#applyFormat(ChatFormatting)} would for a more compact and versatile style object.
+     *
+     * @param style the style
+     * @return the sanitised style
+     */
+    public static Style sanitizeLegacyFormat(Style style) {
+        Objects.requireNonNull(style, "style is null");
+
+        if (style.isEmpty()) {
+            return style;
+        }
+
+        if (!style.isBold()) {
+            style = style.withBold(null);
+        }
+
+        if (!style.isItalic()) {
+            style = style.withItalic(null);
+        }
+
+        if (!style.isUnderlined()) {
+            style = style.withUnderlined(null);
+        }
+
+        if (!style.isStrikethrough()) {
+            style = style.withStrikethrough(null);
+        }
+
+        if (!style.isObfuscated()) {
+            style = style.withObfuscated(null);
+        }
+
+        return style;
     }
 }
