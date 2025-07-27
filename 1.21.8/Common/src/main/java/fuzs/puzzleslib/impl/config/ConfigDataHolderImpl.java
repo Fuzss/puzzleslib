@@ -103,7 +103,7 @@ public class ConfigDataHolderImpl<T extends ConfigCore> implements ConfigDataHol
 
     protected final ModConfigSpec initialize(String modId) {
         Objects.requireNonNull(this.config, "Attempting to register invalid config for " + modId);
-        if (this.fileName == null || this.status != ModConfigStatus.CONFIG_MISSING) {
+        if (this.fileName != null || this.status != ModConfigStatus.CONFIG_MISSING) {
             throw new IllegalStateException(
                     "Config has already been registered at " + this.fileNameFactory.apply(modId));
         }
