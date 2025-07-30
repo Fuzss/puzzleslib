@@ -116,8 +116,8 @@ public final class NeoForgeCapabilityHelper {
      */
     @SafeVarargs
     public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, IItemHandler> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
-        register((RegisterCapabilitiesEvent evt, BlockEntityType<? extends T> blockEntityType) -> {
-            evt.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, capabilityProvider);
+        register((RegisterCapabilitiesEvent event, BlockEntityType<? extends T> blockEntityType) -> {
+            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, capabilityProvider);
         }, blockEntityTypes);
     }
 
@@ -132,11 +132,11 @@ public final class NeoForgeCapabilityHelper {
      */
     @SafeVarargs
     public static <T extends Entity & Container> void registerEntityContainer(Holder<? extends EntityType<? extends T>>... entityTypes) {
-        register((RegisterCapabilitiesEvent evt, EntityType<? extends T> entityType) -> {
-            evt.registerEntity(Capabilities.ItemHandler.ENTITY, entityType, (T entity, Void aVoid) -> {
+        register((RegisterCapabilitiesEvent event, EntityType<? extends T> entityType) -> {
+            event.registerEntity(Capabilities.ItemHandler.ENTITY, entityType, (T entity, Void aVoid) -> {
                 return new InvWrapper(entity);
             });
-            evt.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION,
+            event.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION,
                     entityType,
                     (T entity, @Nullable Direction direction) -> {
                         return new InvWrapper(entity);
@@ -153,8 +153,8 @@ public final class NeoForgeCapabilityHelper {
      */
     @SafeVarargs
     public static void registerItemContainer(ICapabilityProvider<ItemStack, Void, IItemHandler> capabilityProvider, Holder<? extends Item>... items) {
-        register((RegisterCapabilitiesEvent evt, Item item) -> {
-            evt.registerItem(Capabilities.ItemHandler.ITEM, capabilityProvider, item);
+        register((RegisterCapabilitiesEvent event, Item item) -> {
+            event.registerItem(Capabilities.ItemHandler.ITEM, capabilityProvider, item);
         }, items);
     }
 

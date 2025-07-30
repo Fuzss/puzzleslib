@@ -160,13 +160,13 @@ public final class NeoForgeClientEventInvokers {
                 });
         INSTANCE.register(RenderGuiEvents.Before.class,
                 RenderGuiEvent.Pre.class,
-                (RenderGuiEvents.Before callback, RenderGuiEvent.Pre evt) -> {
-                    callback.onBeforeRenderGui(evt.getGuiGraphics(), evt.getPartialTick());
+                (RenderGuiEvents.Before callback, RenderGuiEvent.Pre event) -> {
+                    callback.onBeforeRenderGui(event.getGuiGraphics(), event.getPartialTick());
                 });
         INSTANCE.register(RenderGuiEvents.After.class,
                 RenderGuiEvent.Post.class,
-                (RenderGuiEvents.After callback, RenderGuiEvent.Post evt) -> {
-                    callback.onAfterRenderGui(evt.getGuiGraphics(), evt.getPartialTick());
+                (RenderGuiEvents.After callback, RenderGuiEvent.Post event) -> {
+                    callback.onAfterRenderGui(event.getGuiGraphics(), event.getPartialTick());
                 });
         INSTANCE.register(ItemTooltipCallback.class,
                 ItemTooltipEvent.class,

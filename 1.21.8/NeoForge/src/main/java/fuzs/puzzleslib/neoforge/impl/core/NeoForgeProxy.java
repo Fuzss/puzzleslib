@@ -10,5 +10,5 @@ public interface NeoForgeProxy extends ProxyImpl {
         return (NeoForgeProxy) ProxyImpl.INSTANCE;
     }
 
-    PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent evt);
+    PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent event);
 }

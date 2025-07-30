@@ -998,13 +998,13 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
     }
 
     @Override
-    public <T, E extends Event> void register(Class<T> clazz, Class<E> event, NeoForgeEventContextConsumer<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
+    public <T, E extends Event> void register(Class<T> clazz, Class<E> eventClazz, NeoForgeEventContextConsumer<T, E> converter, UnaryOperator<EventPhase> eventPhaseConverter, boolean joinInvokers) {
         Objects.requireNonNull(clazz, "type is null");
-        Objects.requireNonNull(event, "event type is null");
+        Objects.requireNonNull(eventClazz, "event type is null");
         Objects.requireNonNull(converter, "converter is null");
-        Preconditions.checkArgument(!Modifier.isAbstract(event.getModifiers()), event + " is abstract");
+        Preconditions.checkArgument(!Modifier.isAbstract(eventClazz.getModifiers()), eventClazz + " is abstract");
         IEventBus eventBus;
-        if (IModBusEvent.class.isAssignableFrom(event)) {
+        if (IModBusEvent.class.isAssignableFrom(eventClazz)) {
             // Most events are registered during the load complete phase, where most mod bus events have already run,
             // so they will be missed silently. Check this lock to avoid that.
             Preconditions.checkState(!frozenModBusEvents, "Mod bus events already frozen");
@@ -1014,7 +1014,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
             eventBus = NeoForge.EVENT_BUS;
         }
         EventInvokerImpl.register(clazz,
-                new NeoForgeEventInvoker<>(eventBus, event, converter, eventPhaseConverter),
+                new NeoForgeEventInvoker<>(eventBus, eventClazz, converter, eventPhaseConverter),
                 joinInvokers);
     }
 

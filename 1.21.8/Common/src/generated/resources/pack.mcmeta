@@ -1,10 +1,6 @@
 {
   "pack": {
     "description": "Resources for Puzzles Lib",
-    "pack_format": 81,
-    "supported_formats": [
-      0,
-      2147483647
-    ]
+    "pack_format": 81
   }
 }

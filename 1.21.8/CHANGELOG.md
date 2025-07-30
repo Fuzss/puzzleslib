@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v21.8.3-1.21.8] - 2025-07-30
+## [v21.8.3-1.21.8] - 2025-07-31
 
 ### Added
 
+- Add `PackRepositorySourcesContext::registerBuiltInPack`
+- Support built-in packs in `DataProviderHelper`
 - Add `TransformingForwardingList`
+
+### Changed
+
+- `pack.mcmeta` is now always created during data generation for every mod
 
 ## [v21.8.2-1.21.8] - 2025-07-27
 

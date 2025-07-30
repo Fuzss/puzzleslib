@@ -38,7 +38,7 @@ public class DataProviderContext {
      * @param packOutput the pack output
      * @param registries the registry lookup provider
      */
-    protected DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+    public DataProviderContext(String modId, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
         this(modId, packOutput, () -> registries);
     }
 
