@@ -182,8 +182,8 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent evt) {
-        return new PayloadTypesContextNeoForgeImpl.ServerImpl(modId, evt);
+    public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent event) {
+        return new PayloadTypesContextNeoForgeImpl.ServerImpl(modId, event);
     }
 
     @Override

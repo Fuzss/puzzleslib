@@ -66,8 +66,8 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent evt) {
-        return new PayloadTypesContextNeoForgeImpl.ClientImpl(modId, evt);
+    public PayloadTypesContext createPayloadTypesContext(String modId, RegisterPayloadHandlersEvent event) {
+        return new PayloadTypesContextNeoForgeImpl.ClientImpl(modId, event);
     }
 
     @Override
@@ -100,9 +100,9 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     public void registerBuiltinResourcePack(ResourceLocation resourceLocation, Component displayName, boolean required) {
         NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace())
                 .ifPresent((IEventBus eventBus) -> {
-                    eventBus.addListener((final AddPackFindersEvent evt) -> {
-                        if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
-                            evt.addPackFinders(resourceLocation.withPrefix("resourcepacks/"),
+                    eventBus.addListener((final AddPackFindersEvent event) -> {
+                        if (event.getPackType() == PackType.CLIENT_RESOURCES) {
+                            event.addPackFinders(resourceLocation.withPrefix("resourcepacks/"),
                                     PackType.CLIENT_RESOURCES,
                                     displayName,
                                     PackSource.BUILT_IN,
@@ -178,8 +178,8 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     @Override
     public void registerConfigurationScreenForHolder(String modId) {
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
-            eventBus.addListener((final FMLClientSetupEvent evt) -> {
-                evt.enqueueWork(() -> {
+            eventBus.addListener((final FMLClientSetupEvent event) -> {
+                event.enqueueWork(() -> {
                     super.registerConfigurationScreenForHolder(modId);
                     ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
                         if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {

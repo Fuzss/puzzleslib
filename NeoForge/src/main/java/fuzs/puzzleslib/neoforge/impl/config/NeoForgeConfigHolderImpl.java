@@ -13,7 +13,6 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 
 import java.nio.file.Path;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
@@ -39,20 +38,25 @@ public class NeoForgeConfigHolderImpl extends ConfigHolderImpl {
 
     @Override
     protected void bake(ConfigDataHolderImpl<?> holder, String modId) {
-        Optional<IEventBus> optional = NeoForgeModContainerHelper.getOptionalModEventBus(modId);
-        optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Loading evt) -> {
-            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
-                    ConfigDataHolderImpl.ModConfigEventType.LOADING);
-        }));
-        optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Reloading evt) -> {
-            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
-                    ConfigDataHolderImpl.ModConfigEventType.RELOADING);
-        }));
-        optional.ifPresent(eventBus -> eventBus.addListener((final ModConfigEvent.Unloading evt) -> {
-            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(evt.getConfig(),
-                    ConfigDataHolderImpl.ModConfigEventType.UNLOADING);
-        }));
+        NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
+            this.registerLoadingHandlers(eventBus, holder);
+        });
         ((NeoForgeConfigDataHolderImpl<?>) holder).register(modId);
+    }
+
+    private void registerLoadingHandlers(IEventBus eventBus, ConfigDataHolderImpl<?> holder) {
+        eventBus.addListener((final ModConfigEvent.Loading event) -> {
+            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(event.getConfig(),
+                    ConfigDataHolderImpl.ModConfigEventType.LOADING);
+        });
+        eventBus.addListener((final ModConfigEvent.Reloading event) -> {
+            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(event.getConfig(),
+                    ConfigDataHolderImpl.ModConfigEventType.RELOADING);
+        });
+        eventBus.addListener((final ModConfigEvent.Unloading event) -> {
+            ((NeoForgeConfigDataHolderImpl<?>) holder).onModConfig(event.getConfig(),
+                    ConfigDataHolderImpl.ModConfigEventType.UNLOADING);
+        });
     }
 
     private static class NeoForgeConfigDataHolderImpl<T extends ConfigCore> extends ConfigDataHolderImpl<T> {

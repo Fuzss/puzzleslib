@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 /**
  * A helper for registering resource packs bundled within the {@code resources/resourcepacks} directory of a mod jar.
  */
+@Deprecated(forRemoval = true)
 public final class BuiltinResourcePackHelper {
 
     private BuiltinResourcePackHelper() {
@@ -14,7 +15,7 @@ public final class BuiltinResourcePackHelper {
     }
 
     /**
-     * Registers a built-in resource pack that is bundled in the mod jar.
+     * Registers a built-in resource pack bundled in the mod jar.
      *
      * @param resourceLocation the name of the pack in {@code resources/resourcepacks}
      */
@@ -23,19 +24,17 @@ public final class BuiltinResourcePackHelper {
     }
 
     /**
-     * Registers a built-in resource pack that is bundled in the mod jar.
+     * Registers a built-in resource pack bundled in the mod jar.
      *
      * @param resourceLocation the name of the pack in {@code resources/resourcepacks}
      * @param required         is this pack always enabled and cannot be turned off
      */
     public static void registerBuiltinResourcePack(ResourceLocation resourceLocation, boolean required) {
-        registerBuiltinResourcePack(resourceLocation,
-                Component.literal(resourceLocation.getNamespace() + "/" + resourceLocation.getPath()),
-                required);
+        registerBuiltinResourcePack(resourceLocation, Component.literal(resourceLocation.toString()), required);
     }
 
     /**
-     * Registers a built-in resource pack that is bundled in the mod jar.
+     * Registers a built-in resource pack bundled in the mod jar.
      *
      * @param resourceLocation the name of the pack in {@code resources/resourcepacks}
      * @param displayName      the name component for the created pack

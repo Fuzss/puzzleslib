@@ -20,8 +20,8 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
     public void registerItemModel(ResourceLocation resourceLocation, MapCodec<? extends ItemModel.Unbaked> codec) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(codec, "codec is null");
-        this.registerForEvent(RegisterItemModelsEvent.class, (RegisterItemModelsEvent evt) -> {
-            evt.register(resourceLocation, codec);
+        this.registerForEvent(RegisterItemModelsEvent.class, (RegisterItemModelsEvent event) -> {
+            event.register(resourceLocation, codec);
         });
     }
 
@@ -29,8 +29,8 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
     public void registerSpecialModelRenderer(ResourceLocation resourceLocation, MapCodec<? extends SpecialModelRenderer.Unbaked> codec) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(codec, "codec is null");
-        this.registerForEvent(RegisterSpecialModelRendererEvent.class, (RegisterSpecialModelRendererEvent evt) -> {
-            evt.register(resourceLocation, codec);
+        this.registerForEvent(RegisterSpecialModelRendererEvent.class, (RegisterSpecialModelRendererEvent event) -> {
+            event.register(resourceLocation, codec);
         });
     }
 
@@ -39,8 +39,8 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterColorHandlersEvent.ItemTintSources.class,
-                (RegisterColorHandlersEvent.ItemTintSources evt) -> {
-                    evt.register(resourceLocation, codec);
+                (RegisterColorHandlersEvent.ItemTintSources event) -> {
+                    event.register(resourceLocation, codec);
                 });
     }
 
@@ -49,8 +49,8 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(type, "type is null");
         this.registerForEvent(RegisterSelectItemModelPropertyEvent.class,
-                (RegisterSelectItemModelPropertyEvent evt) -> {
-                    evt.register(resourceLocation, type);
+                (RegisterSelectItemModelPropertyEvent event) -> {
+                    event.register(resourceLocation, type);
                 });
     }
 
@@ -59,8 +59,8 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterConditionalItemModelPropertyEvent.class,
-                (RegisterConditionalItemModelPropertyEvent evt) -> {
-                    evt.register(resourceLocation, codec);
+                (RegisterConditionalItemModelPropertyEvent event) -> {
+                    event.register(resourceLocation, codec);
                 });
     }
 
@@ -69,8 +69,8 @@ public final class ItemModelsContextNeoForgeImpl extends AbstractNeoForgeContext
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(codec, "codec is null");
         this.registerForEvent(RegisterRangeSelectItemModelPropertyEvent.class,
-                (RegisterRangeSelectItemModelPropertyEvent evt) -> {
-                    evt.register(resourceLocation, codec);
+                (RegisterRangeSelectItemModelPropertyEvent event) -> {
+                    event.register(resourceLocation, codec);
                 });
     }
 }

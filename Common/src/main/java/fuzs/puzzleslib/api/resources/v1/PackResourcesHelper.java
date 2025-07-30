@@ -27,8 +27,8 @@ public final class PackResourcesHelper {
     /**
      * Create a simple pack title for a {@link PackType}.
      *
-     * @param packType pack type for title
-     * @return title component
+     * @param packType the pack type
+     * @return the title component
      */
     public static Component getPackTitle(PackType packType) {
         return Component.literal(
@@ -38,8 +38,8 @@ public final class PackResourcesHelper {
     /**
      * Create a fancy pack description for dynamic resources from a mod.
      *
-     * @param modId the source mod for the dynamic pack
-     * @return description component
+     * @param modId the source mod for the pack
+     * @return the description component
      */
     public static Component getPackDescription(String modId) {
         return ModLoaderEnvironment.INSTANCE.getModContainer(modId)
@@ -48,6 +48,22 @@ public final class PackResourcesHelper {
                     return Component.literal("Resources for " + name);
                 })
                 .orElseGet(() -> Component.literal("Resources (" + modId + ")"));
+    }
+
+    /**
+     * Creates the location for a built-in pack bundled in the mod jar.
+     * <ul>
+     *     <li>Data pack path: {@code data/<modId>/datapacks/<path>}</li>
+     *     <li>Resource pack path: {@code assets/<modId>/resourcepacks/<path>}</li>
+     * </ul>
+     *
+     * @param resourceLocation the resource location for the pack
+     * @param packType         the pack type
+     * @return the pack location inside {@code resources}
+     */
+    public static ResourceLocation getBuiltInPack(ResourceLocation resourceLocation, PackType packType) {
+        return resourceLocation.withPrefix(packType.getDirectory() + "/" + resourceLocation.getNamespace() + "/" + (
+                packType == PackType.CLIENT_RESOURCES ? "resourcepacks" : "datapacks") + "/");
     }
 
     /**

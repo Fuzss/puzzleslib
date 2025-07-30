@@ -1,9 +1,11 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
+import fuzs.puzzleslib.api.data.v2.ModPackMetadataProvider;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
+import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
 import fuzs.puzzleslib.neoforge.impl.init.NeoForgeRegistryManager;
 import net.minecraft.client.Minecraft;
@@ -20,6 +22,7 @@ public final class NeoForgeModContext extends ModContext {
 
     public NeoForgeModContext(String modId) {
         super(modId);
+        DataProviderHelper.registerDataProviders(modId, ModPackMetadataProvider::new);
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
             eventBus.addListener((final RegisterPayloadHandlersEvent event) -> {
                 event.registrar(this.payloadType.id().toString())
