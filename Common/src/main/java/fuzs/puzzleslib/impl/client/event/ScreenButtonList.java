@@ -1,9 +1,10 @@
 package fuzs.puzzleslib.impl.client.event;
 
+import fuzs.puzzleslib.api.core.v1.utility.TransformingForwardingList;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.AbstractList;
 import java.util.List;
 
 /**
@@ -17,25 +18,19 @@ import java.util.List;
  * simpler as it does not need to handle additions and removals (Forge has dedicated methods in the init events for
  * that).
  */
-public final class ScreenButtonList extends AbstractList<AbstractWidget> {
-    private final List<Renderable> renderables;
+public final class ScreenButtonList extends TransformingForwardingList<AbstractWidget, Renderable> {
 
-    public ScreenButtonList(List<Renderable> renderables) {
-        this.renderables = renderables;
+    public ScreenButtonList(List<Renderable> delegate) {
+        super(delegate);
     }
 
     @Override
-    public int size() {
-        return (int) this.renderables.stream().filter(AbstractWidget.class::isInstance).count();
+    protected @Nullable AbstractWidget getAsElement(@Nullable Renderable element) {
+        return element instanceof AbstractWidget abstractWidget ? abstractWidget : null;
     }
 
     @Override
-    public AbstractWidget get(int index) {
-        return this.renderables.stream()
-                .filter(AbstractWidget.class::isInstance)
-                .skip(index)
-                .findFirst()
-                .map(AbstractWidget.class::cast)
-                .orElseThrow(() -> new IndexOutOfBoundsException(index));
+    protected @Nullable Renderable getAsListElement(@Nullable AbstractWidget abstractWidget) {
+        return abstractWidget;
     }
 }
