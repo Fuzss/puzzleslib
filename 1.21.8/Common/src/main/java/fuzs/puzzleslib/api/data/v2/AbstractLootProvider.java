@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.Util;
 import net.minecraft.core.*;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
@@ -24,9 +25,13 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.levelgen.RandomSupport;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.file.Path;
@@ -146,6 +151,19 @@ public final class AbstractLootProvider {
 
         public void dropNameable(Block block) {
             this.add(block, this::createNameableBlockEntityTable);
+        }
+
+        public LootTable.Builder createHeadDrop(Block block) {
+            // explosion condition is not applied on purpose; all vanilla heads are explosion-resistant
+            return LootTable.lootTable()
+                    .withPool(LootPool.lootPool()
+                            .setRolls(ConstantValue.exactly(1.0F))
+                            .add(LootItem.lootTableItem(block)
+                                    .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                                            .include(DataComponents.CUSTOM_NAME))
+                                    .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
+                                            .include(DataComponents.NOTE_BLOCK_SOUND)))
+                            .unwrap());
         }
 
         protected Stream<Holder.Reference<Block>> getRegistryEntries() {
