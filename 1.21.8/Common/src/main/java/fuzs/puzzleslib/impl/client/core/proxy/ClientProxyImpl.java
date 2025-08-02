@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
@@ -76,6 +77,12 @@ public interface ClientProxyImpl extends ProxyImpl {
         } else {
             return ProxyImpl.super.getBlockableEventLoop(level);
         }
+    }
+
+    @Override
+    default RegistryAccess getRegistryAccess() {
+        return Minecraft.getInstance().getConnection() != null ?
+                Minecraft.getInstance().getConnection().registryAccess() : null;
     }
 
     @Override

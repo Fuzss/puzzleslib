@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.util.v1;
 
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
@@ -35,6 +36,7 @@ public final class CommonHelper {
      * @param explosion   the explosion that is about to start
      * @return <code>true</code> to mark the explosion as handled, {@link ServerExplosion#explode()} is not called
      */
+    @Deprecated(forRemoval = true)
     public static boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
         Objects.requireNonNull(serverLevel, "server level is null");
         Objects.requireNonNull(explosion, "explosion is null");
@@ -42,10 +44,18 @@ public final class CommonHelper {
     }
 
     /**
+     * @param level the level
      * @return the event loop for running {@link TickTask TickTasks}
      */
     public static BlockableEventLoop<? super TickTask> getBlockableEventLoop(Level level) {
         return ProxyImpl.get().getBlockableEventLoop(level);
+    }
+
+    /**
+     * @return the registry access from the current client / server context, otherwise {@code null}
+     */
+    public static RegistryAccess getRegistryAccess() {
+        return ProxyImpl.get().getRegistryAccess();
     }
 
     /**

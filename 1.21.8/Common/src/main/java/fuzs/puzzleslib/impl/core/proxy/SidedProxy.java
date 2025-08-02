@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.impl.core.proxy;
 
+import fuzs.puzzleslib.api.util.v1.CommonHelper;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
@@ -23,6 +25,10 @@ public interface SidedProxy {
         } else {
             throw new RuntimeException("Blockable event loop accessed for the wrong physical side!");
         }
+    }
+
+    default RegistryAccess getRegistryAccess() {
+        return CommonHelper.getMinecraftServer() != null ? CommonHelper.getMinecraftServer().registryAccess() : null;
     }
 
     default Player getClientPlayer() {
