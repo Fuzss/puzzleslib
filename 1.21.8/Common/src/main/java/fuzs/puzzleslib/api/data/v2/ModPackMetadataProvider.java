@@ -8,6 +8,7 @@ import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.util.InclusiveRange;
 
 import java.util.Optional;
 
@@ -29,6 +30,8 @@ public final class ModPackMetadataProvider extends PackMetadataGenerator {
         super(packOutput);
         Component component = PackResourcesHelper.getPackDescription(modId);
         this.add(PackMetadataSection.TYPE,
-                new PackMetadataSection(component, DetectedVersion.BUILT_IN.packVersion(packType), Optional.empty()));
+                new PackMetadataSection(component,
+                        DetectedVersion.BUILT_IN.packVersion(packType),
+                        Optional.of(new InclusiveRange<>(0, Integer.MAX_VALUE))));
     }
 }
