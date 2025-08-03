@@ -3,6 +3,10 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog].
 
+## [v8.1.33-1.20.1] - 2025-08-03
+### Fixed
+- Fix a start-up crash on Forge caused by `java.lang.NoSuchMethodException: fuzs.puzzleslib.impl.event.LootTableModifyEvent.<init>()`
+
 ## [v8.1.32-1.20.1] - 2025-04-05
 ### Changed
 - Add a bunch of safety checks for casting in event invokers

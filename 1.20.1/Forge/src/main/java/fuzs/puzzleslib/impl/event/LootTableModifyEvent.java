@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.event;
 
 import fuzs.puzzleslib.mixin.accessor.LootTableForgeAccessor;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
 import net.minecraft.world.level.storage.loot.LootDataManager;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -11,16 +12,23 @@ import java.util.List;
 
 /**
  * A custom event very similar to Forge's {@link net.minecraftforge.event.LootTableLoadEvent}.
- * <p>Opposed to the Forge event, as this event is fired directly within {@link LootDataManager} it is able to include the relevant instance.
- * <p>The event also makes additions and removals in regard to the current {@link LootTable} more convenient, as Forge has removed the built-in methods in 1.20.
- * <p>And finally this event purposefully fires for all loot tables, even when loaded from a data pack, to allow for their modification.
- * Normally, Forge itself doesn't provide a way to modify custom loot tables, which is necessary in some scenarios though and
- * should rather be optional in the mod's config instead of not having the option at all.
+ * <p>Opposed to the Forge event, as this event is fired directly within {@link LootDataManager} it is able to include
+ * the relevant instance.
+ * <p>The event also makes additions and removals in regard to the current {@link LootTable} more convenient, as Forge
+ * has removed the built-in methods in 1.20.
+ * <p>And finally this event purposefully fires for all loot tables, even when loaded from a data pack, to allow for
+ * their modification. Normally, Forge itself doesn't provide a way to modify custom loot tables, which is necessary in
+ * some scenarios though and should rather be optional in the mod's config instead of not having the option at all.
  */
 public class LootTableModifyEvent extends Event {
     private final LootDataManager lootDataManager;
     private final ResourceLocation identifier;
     private final LootTable lootTable;
+
+    public LootTableModifyEvent() {
+        // there seems to be a bug in FML where a no-args constructor is required, hopefully we can work around it like this
+        this(new LootDataManager(), BuiltInLootTables.EMPTY, LootTable.EMPTY);
+    }
 
     public LootTableModifyEvent(LootDataManager lootDataManager, ResourceLocation identifier, LootTable lootTable) {
         this.lootDataManager = lootDataManager;
