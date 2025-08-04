@@ -28,6 +28,7 @@ import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.scores.DisplaySlot;
 import net.minecraft.world.scores.Objective;
@@ -163,6 +164,7 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         options.keyAdvancements.setKey(InputConstants.UNKNOWN);
         options.keyQuickActions.setKey(InputConstants.UNKNOWN);
         options.keyFullscreen.setKey(InputConstants.UNKNOWN);
+        options.getSoundSourceOptionInstance(SoundSource.MUSIC).set(0.0);
     }
 
     @Override
