@@ -18,7 +18,7 @@ public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     @Nullable
     private final Function<T, ResourceKey<T>> keyExtractor;
 
-    protected AbstractTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
+    public AbstractTagAppender(TagBuilder tagBuilder, @Nullable Function<T, ResourceKey<T>> keyExtractor) {
         this.tagBuilder = tagBuilder;
         this.keyExtractor = keyExtractor;
     }

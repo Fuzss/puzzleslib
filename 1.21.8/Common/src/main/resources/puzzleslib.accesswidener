@@ -300,6 +300,8 @@ transitive-accessible	method	net/minecraft/world/item/enchantment/Enchantment	ap
 accessible  field   net/minecraft/client/data/models/EquipmentAssetProvider pathProvider    Lnet/minecraft/data/PackOutput$PathProvider;
 transitive-accessible   method  net/minecraft/client/renderer/entity/LivingEntityRenderer   addLayer    (Lnet/minecraft/client/renderer/entity/layers/RenderLayer;)Z
 transitive-accessible   field   net/minecraft/client/model/PlayerModel  slim    Z
+accessible	field	net/minecraft/data/tags/TagsProvider	builders	Ljava/util/Map;
+accessible	field	net/minecraft/tags/TagEntry	id  Lnet/minecraft/resources/ResourceLocation;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

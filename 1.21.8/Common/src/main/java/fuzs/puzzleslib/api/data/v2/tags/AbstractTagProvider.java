@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.data.v2.tags;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
+import fuzs.puzzleslib.impl.data.SortingTagBuilder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
@@ -29,18 +30,15 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
         this.modId = modId;
     }
 
-    @ApiStatus.Internal
-    public static <T> AbstractTagAppender<T> tagAppender(TagBuilder tagBuilder, ResourceKey<? extends Registry<? super T>> registryKey) {
-        Optional<Registry<T>> optional = LookupHelper.getRegistry(registryKey);
-        Function<T, ResourceKey<T>> keyExtractor = optional.isPresent() ?
-                (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
-                    return new IllegalStateException("Missing value in " + registryKey + ": " + t);
-                }) : null;
-        return ProxyImpl.get().getTagAppender(tagBuilder, keyExtractor);
-    }
-
     @Override
     public abstract void addTags(HolderLookup.Provider registries);
+
+    @Override
+    protected TagBuilder getOrCreateRawBuilder(TagKey<T> tagKey) {
+        // use our own tag builder implementation
+        return this.builders.computeIfAbsent(tagKey.location(),
+                (ResourceLocation resourceLocation) -> new SortingTagBuilder());
+    }
 
     public AbstractTagAppender<T> tag(String string) {
         return this.tag(ResourceLocation.parse(string));
@@ -51,6 +49,16 @@ public abstract class AbstractTagProvider<T> extends TagsProvider<T> {
     }
 
     public AbstractTagAppender<T> tag(TagKey<T> tagKey) {
-        return tagAppender(this.getOrCreateRawBuilder(tagKey), this.registryKey);
+        return createTagAppender(this.getOrCreateRawBuilder(tagKey), this.registryKey);
+    }
+
+    @ApiStatus.Internal
+    public static <T> AbstractTagAppender<T> createTagAppender(TagBuilder tagBuilder, ResourceKey<? extends Registry<? super T>> registryKey) {
+        Optional<Registry<T>> optional = LookupHelper.getRegistry(registryKey);
+        Function<T, ResourceKey<T>> keyExtractor = optional.isPresent() ?
+                (T t) -> optional.flatMap((Registry<T> registry) -> registry.getResourceKey(t)).orElseThrow(() -> {
+                    return new IllegalStateException("Missing value in " + registryKey + ": " + t);
+                }) : null;
+        return ProxyImpl.get().getTagAppender(tagBuilder, keyExtractor);
     }
 }
