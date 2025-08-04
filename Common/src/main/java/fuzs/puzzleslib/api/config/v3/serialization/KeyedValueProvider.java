@@ -4,10 +4,10 @@ import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagProvider;
 import fuzs.puzzleslib.impl.config.serialization.EnumProvider;
 import fuzs.puzzleslib.impl.config.serialization.RegistryProvider;
+import fuzs.puzzleslib.impl.data.SortingTagBuilder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.TagBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -66,7 +66,7 @@ public interface KeyedValueProvider<T> {
      * @return the tag appender
      */
     static <T> AbstractTagAppender<T> tagAppender(ResourceKey<? extends Registry<? super T>> registryKey) {
-        return AbstractTagProvider.tagAppender(new TagBuilder(), registryKey);
+        return AbstractTagProvider.createTagAppender(new SortingTagBuilder(), registryKey);
     }
 
     /**
