@@ -528,12 +528,12 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(ShieldBlockCallback.class,
                 LivingShieldBlockEvent.class,
                 (ShieldBlockCallback callback, LivingShieldBlockEvent event) -> {
+                    if (!event.getBlocked()) return;
                     DefaultedFloat blockedDamage = DefaultedFloat.fromEvent(event::setBlockedDamage,
                             event::getBlockedDamage,
                             event::getOriginalBlockedDamage);
-                    if (event.getBlocked() && callback.onShieldBlock(event.getEntity(),
-                            event.getDamageSource(),
-                            blockedDamage).isInterrupt()) {
+                    if (callback.onShieldBlock(event.getEntity(), event.getDamageSource(), blockedDamage)
+                            .isInterrupt()) {
                         event.setBlocked(true);
                     }
                 });
