@@ -2,6 +2,7 @@ package fuzs.puzzleslib.impl.content;
 
 import net.minecraft.server.dedicated.DedicatedServerProperties;
 import net.minecraft.server.dedicated.Settings;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.level.GameType;
 import org.slf4j.Logger;
 
@@ -21,7 +22,8 @@ public final class ServerPropertiesHelper {
         return new DedicatedServerProperties(Settings.loadFromFile(path)) {
             DedicatedServerProperties setProperties() {
                 this.properties.put("online-mode", String.valueOf(false));
-                this.properties.put("gamemode", GameType.CREATIVE.getName());
+                this.properties.put("difficulty", Difficulty.HARD.getSerializedName());
+                this.properties.put("gamemode", GameType.CREATIVE.getSerializedName());
                 this.properties.put("enable-command-block", String.valueOf(true));
                 this.properties.put("max-players", String.valueOf(4));
                 this.properties.put("spawn-protection", String.valueOf(0));

@@ -90,7 +90,10 @@ public final class CommandOverrides {
             if (isFreshEntity && entity instanceof ServerPlayer serverPlayer && !serverPlayer.getTags()
                     .contains(KEY_PLAYER_JOINED_WORLD)) {
                 serverPlayer.addTag(KEY_PLAYER_JOINED_WORLD);
-                if (serverLevel.getServer().getWorldData().isAllowCommands()) {
+                // do not check if commands are enabled for the world, the option is always off on dedicated servers
+                if (serverLevel.getServer().isDedicatedServer() || serverLevel.getServer()
+                        .getWorldData()
+                        .isAllowCommands()) {
                     serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
                         String playerName = serverPlayer.getGameProfile().getName();
                         executeCommandOverrides(serverPlayer.getServer(),
