@@ -150,7 +150,6 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         options.tutorialStep = TutorialSteps.NONE;
         options.joinedFirstServer = true;
         options.operatorItemsTab().set(true);
-        options.entityShadows().set(false);
         options.realmsNotifications().set(false);
         options.showSubtitles().set(true);
         options.guiScale().set(8);
