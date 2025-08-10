@@ -6,8 +6,6 @@ import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
-import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistry;
-import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -23,6 +21,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudStatusBarHeightRegistry;
 import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
 import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
 import net.fabricmc.loader.api.FabricLoader;
@@ -238,13 +237,5 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
         resourceLocation = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
         return HudStatusBarHeightRegistry.getHeight(resourceLocation);
-    }
-
-    @Override
-    public void registerProvidedEventHandlers() {
-        super.registerProvidedEventHandlers();
-        ClientLifecycleEvents.CLIENT_STARTED.register((Minecraft minecraft) -> {
-            HudStatusBarHeightRegistryImpl.init();
-        });
     }
 }

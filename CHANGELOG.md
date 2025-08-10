@@ -7,9 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [v21.8.5-1.21.8] - 2025-08-10
 
+### Changed
+
+- Replace `HudStatusBarHeightRegistry` with implementation from Fabric
+
 ### Fixed
 
 - Fix entity interaction events not functioning properly on Fabric
+- Fix lenient validation for restricted config values
 
 ## [v21.8.4-1.21.8] - 2025-08-04
 

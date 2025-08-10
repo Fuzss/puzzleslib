@@ -1,7 +1,5 @@
 package fuzs.puzzleslib.api.config.v3;
 
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
