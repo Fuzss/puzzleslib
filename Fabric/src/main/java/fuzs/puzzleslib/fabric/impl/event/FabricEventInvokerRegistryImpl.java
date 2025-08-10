@@ -15,7 +15,6 @@ import fuzs.puzzleslib.api.event.v1.entity.player.*;
 import fuzs.puzzleslib.api.event.v1.level.*;
 import fuzs.puzzleslib.api.event.v1.server.*;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
-import fuzs.puzzleslib.api.network.v4.MessageSender;
 import fuzs.puzzleslib.fabric.api.event.v1.*;
 import fuzs.puzzleslib.fabric.api.event.v1.core.FabricEventInvokerRegistry;
 import fuzs.puzzleslib.fabric.impl.core.FabricProxy;
@@ -50,10 +49,6 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.protocol.game.ServerboundInteractPacket;
-import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
-import net.minecraft.network.protocol.game.ServerboundUseItemPacket;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -196,18 +191,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                                 level,
                                 interactionHand,
                                 hitResult);
-                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                        return FabricPlayerInteraction.USE_BLOCK.getHandledInteractionResult(eventResult,
+                                player,
                                 level,
-                                (InteractionResult interactionResult) -> {
-                                    return interactionResult != InteractionResult.SUCCESS;
-                                },
-                                () -> {
-                                    FabricProxy.get()
-                                            .startClientPrediction(level,
-                                                    (int id) -> new ServerboundUseItemOnPacket(interactionHand,
-                                                            hitResult,
-                                                            id));
-                                });
+                                interactionHand,
+                                null,
+                                hitResult);
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.AttackBlock.class,
@@ -243,28 +232,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                         EventResultHolder<InteractionResult> eventResult = callback.onUseItem(player,
                                 level,
                                 interactionHand);
-                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                        return FabricPlayerInteraction.USE_ITEM.getHandledInteractionResult(eventResult,
+                                player,
                                 level,
-                                (InteractionResult interactionResult) -> {
-                                    return interactionResult != InteractionResult.SUCCESS;
-                                },
-                                () -> {
-                                    // send the move packet like vanilla to ensure the position+view vectors are accurate
-                                    MessageSender.broadcast(new ServerboundMovePlayerPacket.PosRot(player.getX(),
-                                            player.getY(),
-                                            player.getZ(),
-                                            player.getYRot(),
-                                            player.getXRot(),
-                                            player.onGround(),
-                                            player.horizontalCollision));
-                                    // send the interaction packet to the server with a new sequentially assigned id
-                                    FabricProxy.get()
-                                            .startClientPrediction(level,
-                                                    (int id) -> new ServerboundUseItemPacket(interactionHand,
-                                                            id,
-                                                            player.getYRot(),
-                                                            player.getXRot()));
-                                });
+                                interactionHand,
+                                null,
+                                null);
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.UseEntity.class,
@@ -280,14 +253,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                                 level,
                                 interactionHand,
                                 entity);
-                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                        return FabricPlayerInteraction.USE_ENTITY.getHandledInteractionResult(eventResult,
+                                player,
                                 level,
-                                Predicate.not(InteractionResult::consumesAction),
-                                () -> {
-                                    MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
-                                            player.isShiftKeyDown(),
-                                            interactionHand));
-                                });
+                                interactionHand,
+                                entity,
+                                null);
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.UseEntityAt.class,
@@ -304,15 +275,12 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                                 interactionHand,
                                 entity,
                                 hitResult.getLocation());
-                        return FabricEventImplHelper.processInteractionResult(eventResult,
+                        return FabricPlayerInteraction.USE_ENTITY_AT.getHandledInteractionResult(eventResult,
+                                player,
                                 level,
-                                Predicate.not(InteractionResult::consumesAction),
-                                () -> {
-                                    MessageSender.broadcast(ServerboundInteractPacket.createInteractionPacket(entity,
-                                            player.isShiftKeyDown(),
-                                            interactionHand,
-                                            hitResult.getLocation()));
-                                });
+                                interactionHand,
+                                entity,
+                                hitResult);
                     };
                 });
         INSTANCE.register(PlayerInteractEvents.AttackEntity.class,
