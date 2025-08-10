@@ -2,9 +2,9 @@ package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.collect.ImmutableMap;
 import fuzs.puzzleslib.api.client.core.v1.context.GuiLayersContext;
-import fuzs.puzzleslib.fabric.api.client.gui.v2.HudStatusBarHeightRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudStatusBarHeightRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
@@ -90,7 +90,7 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(heightProvider, "height provider is null");
         resourceLocation = getVanillaGuiLayer(resourceLocation);
-        HudStatusBarHeightRegistry.addLeft(resourceLocation, heightProvider);
+        HudStatusBarHeightRegistry.addLeft(resourceLocation, heightProvider::applyAsInt);
     }
 
     @Override
@@ -98,6 +98,6 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(heightProvider, "height provider is null");
         resourceLocation = getVanillaGuiLayer(resourceLocation);
-        HudStatusBarHeightRegistry.addRight(resourceLocation, heightProvider);
+        HudStatusBarHeightRegistry.addRight(resourceLocation, heightProvider::applyAsInt);
     }
 }

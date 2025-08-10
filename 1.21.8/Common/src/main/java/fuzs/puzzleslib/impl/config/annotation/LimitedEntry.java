@@ -33,15 +33,9 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
     }
 
     public final Set<String> getAllowedValueStrings() {
-        Set<String> allowedValues = this.getAllowedValues()
-                .stream()
-                .map(this::applyStringFormatting)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<String> allowedValues = this.getAllowedValues();
         if (!allowedValues.isEmpty()) {
-            Set<String> allValues = this.getAllValues()
-                    .stream()
-                    .map(this::applyStringFormatting)
-                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            Set<String> allValues = this.getAllValues();
             if (!allValues.isEmpty()) {
                 for (String s : allowedValues) {
                     if (!allValues.contains(s)) {
@@ -80,8 +74,8 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         if (!allowedValues.isEmpty()) {
             return (Object o) -> {
                 if (o != null) {
-                    String s = o instanceof Enum<?> ? ((Enum<?>) o).name() : o.toString();
-                    return allowedValues.contains(this.applyStringFormatting(s));
+                    String string = o instanceof Enum<?> ? ((Enum<?>) o).name() : o.toString();
+                    return allowedValues.contains(string);
                 } else {
                     return false;
                 }
@@ -89,10 +83,6 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         } else {
             return this.getEmptyValidator();
         }
-    }
-
-    public String applyStringFormatting(String s) {
-        return s.toUpperCase(Locale.ROOT);
     }
 
     public Predicate<Object> getEmptyValidator() {
@@ -146,8 +136,8 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
 
         @Nullable
         public Type getListType() {
-            if (this.field.getGenericType() instanceof ParameterizedType type &&
-                    type.getActualTypeArguments().length > 0) {
+            if (this.field.getGenericType() instanceof ParameterizedType type
+                    && type.getActualTypeArguments().length > 0) {
                 return type.getActualTypeArguments()[0];
             } else {
                 return null;
@@ -157,9 +147,10 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         @Override
         public ModConfigSpec.ConfigValue<List<?>> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o) {
             Supplier<?> newElementSupplier = getNewElementSupplier(this.getListType());
-            return builder.defineList(this.getName(), this.getDefaultValue(o), (Supplier<Object>) newElementSupplier,
-                    this.getValidator()
-            );
+            return builder.defineList(this.getName(),
+                    this.getDefaultValue(o),
+                    (Supplier<Object>) newElementSupplier,
+                    this.getValidator());
         }
 
         @Override
@@ -169,11 +160,6 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
             } else {
                 return super.getAllValues();
             }
-        }
-
-        @Override
-        public String applyStringFormatting(String s) {
-            return s.toLowerCase(Locale.ROOT);
         }
 
         static Supplier<?> getNewElementSupplier(Type type) {
