@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
+import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
 import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
@@ -35,6 +36,7 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositione
 import net.minecraft.client.multiplayer.*;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.Connection;
@@ -47,6 +49,7 @@ import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -237,5 +240,11 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     public int getRightStatusBarHeight(ResourceLocation resourceLocation) {
         resourceLocation = GuiLayersContextFabricImpl.getVanillaGuiLayer(resourceLocation);
         return HudStatusBarHeightRegistry.getHeight(resourceLocation);
+    }
+
+    @Override
+    public <E extends Entity, S extends EntityRenderState> void onUpdateEntityRenderState(EntityRenderer<E, S> renderer, E entity, S renderState, float partialTick) {
+        ((EntityRenderStateExtension) renderState).puzzleslib$clearRenderProperties();
+        FabricRendererEvents.EXTRACT_RENDER_STATE.invoker().onExtractRenderState(entity, renderState, partialTick);
     }
 }
