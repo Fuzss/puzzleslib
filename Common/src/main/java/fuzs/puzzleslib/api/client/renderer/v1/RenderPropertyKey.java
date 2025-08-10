@@ -1,8 +1,10 @@
 package fuzs.puzzleslib.api.client.renderer.v1;
 
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -10,7 +12,7 @@ import java.util.Objects;
 /**
  * A key implementation for custom data attached to render states.
  * <p>
- * Implemented as a wrapper around resource location to allow for an additional type parameter.
+ * Implemented as a wrapper around {@link ResourceLocation} to allow for an additional type parameter.
  *
  * @param resourceLocation the resource location key
  * @param <T>              the stored object type
@@ -25,6 +27,20 @@ public record RenderPropertyKey<T>(ResourceLocation resourceLocation) {
      */
     public static float getPartialTick(EntityRenderState renderState) {
         return ClientProxyImpl.get().getPartialTick(renderState);
+    }
+
+    /**
+     * Runs mod-loader-specific hooks that add custom data to an entity render state.
+     *
+     * @param renderer    the entity renderer
+     * @param entity      the entity
+     * @param renderState the render state
+     * @param partialTick the partial tick time
+     * @param <E>         the entity type
+     * @param <S>         the render state type
+     */
+    public static <E extends Entity, S extends EntityRenderState> void onUpdateEntityRenderState(EntityRenderer<E, S> renderer, E entity, S renderState, float partialTick) {
+        ClientProxyImpl.get().onUpdateEntityRenderState(renderer, entity, renderState, partialTick);
     }
 
     /**
