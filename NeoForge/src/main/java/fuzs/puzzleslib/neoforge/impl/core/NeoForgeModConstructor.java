@@ -79,7 +79,7 @@ public final class NeoForgeModConstructor {
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.SERVER_DATA) {
-                constructor.onAddDataPackFinders(new DataPackSourcesContextNeoForgeImpl(evt::addRepositorySource));
+                constructor.onAddDataPackFinders(new DataPackSourcesContextNeoForgeImpl(evt));
                 if (flagsToHandle.contains(ContentRegistrationFlags.BIOME_MODIFICATIONS)) {
                     evt.addRepositorySource(NeoForgeBiomeLoadingHandler.buildPack(modId));
                 }

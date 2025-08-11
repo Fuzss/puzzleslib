@@ -50,19 +50,16 @@ public final class NeoForgeClientModConstructor {
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterRenderers evt) -> {
             constructor.onRegisterEntityRenderers(new EntityRenderersContextNeoForgeImpl(evt::registerEntityRenderer));
-            constructor.onRegisterBlockEntityRenderers(
-                    new BlockEntityRenderersContextNeoForgeImpl(evt::registerBlockEntityRenderer));
+            constructor.onRegisterBlockEntityRenderers(new BlockEntityRenderersContextNeoForgeImpl(evt::registerBlockEntityRenderer));
         });
         eventBus.addListener((final RegisterClientTooltipComponentFactoriesEvent evt) -> {
-            constructor.onRegisterClientTooltipComponents(
-                    new ClientTooltipComponentsContextNeoForgeImpl(evt::register));
+            constructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(evt::register));
         });
         eventBus.addListener((final RegisterParticleProvidersEvent evt) -> {
             constructor.onRegisterParticleProviders(new ParticleProvidersContextNeoForgeImpl(evt));
         });
         eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions evt) -> {
-            constructor.onRegisterLayerDefinitions(
-                    new LayerDefinitionsContextNeoForgeImpl(evt::registerLayerDefinition));
+            constructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(evt::registerLayerDefinition));
         });
         eventBus.addListener((final ModelEvent.RegisterAdditional evt) -> {
             constructor.onRegisterAdditionalModels(new AdditionalModelsContextNeoForgeImpl(evt::register));
@@ -74,15 +71,14 @@ public final class NeoForgeClientModConstructor {
             constructor.onRegisterEntitySpectatorShaders(new EntitySpectatorShaderContextNeoForgeImpl(evt::register));
         });
         eventBus.addListener((final EntityRenderersEvent.CreateSkullModels evt) -> {
-            constructor.onRegisterSkullRenderers(
-                    new SkullRenderersContextNeoForgeImpl(evt.getEntityModelSet(), evt::registerSkullModel));
+            constructor.onRegisterSkullRenderers(new SkullRenderersContextNeoForgeImpl(evt.getEntityModelSet(),
+                    evt::registerSkullModel));
         });
         eventBus.addListener((final RegisterClientReloadListenersEvent evt) -> {
             if (availableFlags.contains(ContentRegistrationFlags.DYNAMIC_RENDERERS)) {
                 evt.registerReloadListener(ForwardingReloadListenerHelper.fromResourceManagerReloadListeners(
                         ResourceLocationHelper.fromNamespaceAndPath(modId, "built_in_model_item_renderers"),
-                        dynamicRenderers
-                ));
+                        dynamicRenderers));
             }
         });
         eventBus.addListener((final EntityRenderersEvent.AddLayers evt) -> {
@@ -92,29 +88,29 @@ public final class NeoForgeClientModConstructor {
             constructor.onRegisterKeyMappings(new KeyMappingsContextNeoForgeImpl(evt::register));
         });
         eventBus.addListener((final RegisterColorHandlersEvent.Block evt) -> {
-            constructor.onRegisterBlockColorProviders(
-                    new BlockColorProvidersContextNeoForgeImpl(evt::register, evt.getBlockColors()));
+            constructor.onRegisterBlockColorProviders(new BlockColorProvidersContextNeoForgeImpl(evt::register,
+                    evt.getBlockColors()));
         });
         eventBus.addListener((final RegisterColorHandlersEvent.Item evt) -> {
-            constructor.onRegisterItemColorProviders(
-                    new ItemColorProvidersContextNeoForgeImpl(evt::register, evt.getItemColors()));
+            constructor.onRegisterItemColorProviders(new ItemColorProvidersContextNeoForgeImpl(evt::register,
+                    evt.getItemColors()));
         });
         eventBus.addListener((final AddPackFindersEvent evt) -> {
             if (evt.getPackType() == PackType.CLIENT_RESOURCES) {
-                constructor.onAddResourcePackFinders(
-                        new ResourcePackSourcesContextNeoForgeImpl(evt::addRepositorySource));
+                constructor.onAddResourcePackFinders(new ResourcePackSourcesContextNeoForgeImpl(evt));
             }
         });
         eventBus.addListener((final RegisterShadersEvent evt) -> {
-            constructor.onRegisterCoreShaders(
-                    new CoreShadersContextNeoForgeImpl(evt::registerShader, evt.getResourceProvider()));
+            constructor.onRegisterCoreShaders(new CoreShadersContextNeoForgeImpl(evt::registerShader,
+                    evt.getResourceProvider()));
         });
         eventBus.addListener((final RegisterRenderBuffersEvent evt) -> {
             constructor.onRegisterRenderBuffers(new RenderBuffersContextNeoForgeImpl(evt::registerRenderBuffer));
         });
         eventBus.addListener((final RegisterClientExtensionsEvent evt) -> {
-            constructor.onRegisterBuiltinModelItemRenderers(
-                    new BuiltinModelItemRendererContextNeoForgeImpl(evt::registerItem, modId, dynamicRenderers));
+            constructor.onRegisterBuiltinModelItemRenderers(new BuiltinModelItemRendererContextNeoForgeImpl(evt::registerItem,
+                    modId,
+                    dynamicRenderers));
         });
     }
 }
