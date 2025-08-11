@@ -160,7 +160,7 @@ public final class DataProviderHelper {
     }
 
     @FunctionalInterface
-    interface Factory {
+    private interface Factory {
 
         DataProvider apply(GatherDataEvent event, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider);
     }

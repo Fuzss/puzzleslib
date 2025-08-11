@@ -12,6 +12,8 @@ import java.util.function.Function;
  * Requires the additional creation of a custom gui render state, which must be registered in
  * {@link
  * net.minecraft.client.gui.render.state.GuiRenderState#submitPicturesInPictureState(PictureInPictureRenderState)}.
+ * <p>
+ * TODO rename to PictureInPictureRenderersContext
  */
 @FunctionalInterface
 public interface PictureInPictureRendererContext {
