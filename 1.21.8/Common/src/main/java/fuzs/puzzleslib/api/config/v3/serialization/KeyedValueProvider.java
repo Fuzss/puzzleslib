@@ -18,6 +18,8 @@ import java.util.stream.Stream;
 
 /**
  * A collection of certain values, usually backed by something like a {@link Registry}.
+ * <p>
+ * TODO remove enum stuff and possibly merge this back into {@link ConfigDataSet}
  *
  * @param <T> the type of value
  */
@@ -41,6 +43,7 @@ public interface KeyedValueProvider<T> {
      * @param <T>       the type of value
      * @return the provider
      */
+    @Deprecated(forRemoval = true)
     static <T extends Enum<T>> KeyedValueProvider<T> enumConstants(Class<T> enumClazz) {
         return enumConstants(enumClazz, "minecraft");
     }
@@ -53,6 +56,7 @@ public interface KeyedValueProvider<T> {
      * @param <T>       the type of value
      * @return the provider
      */
+    @Deprecated(forRemoval = true)
     static <T extends Enum<T>> KeyedValueProvider<T> enumConstants(Class<T> enumClazz, String modId) {
         return new EnumProvider<>(enumClazz, modId);
     }
@@ -90,6 +94,7 @@ public interface KeyedValueProvider<T> {
      * @param <T>       type of value
      * @return entries as string list
      */
+    @Deprecated(forRemoval = true)
     @SafeVarargs
     static <T extends Enum<T>> List<String> toString(Class<T> enumClazz, T... entries) {
         return toString(enumClazz, "minecraft", entries);
@@ -104,6 +109,7 @@ public interface KeyedValueProvider<T> {
      * @param <T>       type of value
      * @return entries as string list
      */
+    @Deprecated(forRemoval = true)
     @SafeVarargs
     static <T extends Enum<T>> List<String> toString(Class<T> enumClazz, String modId, T... entries) {
         return toString(KeyedValueProvider.enumConstants(enumClazz, modId), entries);
