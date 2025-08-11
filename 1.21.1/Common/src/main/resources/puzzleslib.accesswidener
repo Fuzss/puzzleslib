@@ -134,6 +134,7 @@ accessible  method  net/minecraft/world/entity/Entity   canRide (Lnet/minecraft/
 accessible  method  net/minecraft/world/entity/Entity   canAddPassenger (Lnet/minecraft/world/entity/Entity;)Z
 transitive-accessible	class	net/minecraft/client/model/geom/ModelPart$Vertex
 transitive-accessible	class	net/minecraft/client/model/geom/ModelPart$Polygon
+accessible	method	net/minecraft/data/DataGenerator$PackGenerator  <init>  (Lnet/minecraft/data/DataGenerator;ZLjava/lang/String;Lnet/minecraft/data/PackOutput;)V
 
 # fabric-item-group-api-v1
 transitive-accessible	field	net/minecraft/world/item/CreativeModeTabs	BUILDING_BLOCKS	Lnet/minecraft/resources/ResourceKey;
