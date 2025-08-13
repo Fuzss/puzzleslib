@@ -57,13 +57,14 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     @Override
     protected <T> Holder.Reference<T> getHolderReference(ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration) {
         Preconditions.checkState(!skipRegistration, "Skipping registration is not supported on NeoForge");
-        DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey, $ -> {
-            DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) registryKey,
-                    this.modId);
-            Objects.requireNonNull(this.eventBus, "mod event bus is null for " + this.modId);
-            deferredRegister.register(this.eventBus);
-            return deferredRegister;
-        });
+        DeferredRegister<T> registrar = (DeferredRegister<T>) this.registers.computeIfAbsent(registryKey,
+                (ResourceKey<? extends Registry<?>> resourceKey) -> {
+                    DeferredRegister<T> deferredRegister = DeferredRegister.create((ResourceKey<? extends Registry<T>>) resourceKey,
+                            this.modId);
+                    Objects.requireNonNull(this.eventBus, "mod event bus is null for " + this.modId);
+                    deferredRegister.register(this.eventBus);
+                    return deferredRegister;
+                });
         return new LazyHolder<>(registryKey, registrar.register(path, () -> {
             T value = supplier.get();
             Objects.requireNonNull(value, "value is null");
