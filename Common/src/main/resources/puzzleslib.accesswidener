@@ -302,6 +302,7 @@ transitive-accessible   method  net/minecraft/client/renderer/entity/LivingEntit
 transitive-accessible   field   net/minecraft/client/model/PlayerModel  slim    Z
 accessible	field	net/minecraft/data/tags/TagsProvider	builders	Ljava/util/Map;
 accessible	field	net/minecraft/tags/TagEntry	id  Lnet/minecraft/resources/ResourceLocation;
+transitive-accessible   method  net/minecraft/world/entity/LivingEntity shouldDropLoot  ()Z
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

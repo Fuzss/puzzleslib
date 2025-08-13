@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
+import fuzs.puzzleslib.impl.init.LazyHolder;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.command.v2.ArgumentTypeRegistry;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -16,11 +17,13 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -36,11 +39,27 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 public final class FabricRegistryManager extends RegistryManagerImpl {
-    static final ResourceKey<Registry<EntityDataSerializer<?>>> ENTITY_DATA_SERIALIZERS_REGISTRY_KEY = ResourceKey.createRegistryKey(
+    private static final ResourceKey<Registry<EntityDataSerializer<?>>> ENTITY_DATA_SERIALIZERS_REGISTRY_KEY = ResourceKey.createRegistryKey(
             ResourceLocationHelper.withDefaultNamespace("entity_data_serializers"));
 
     public FabricRegistryManager(String modId) {
         super(modId);
+    }
+
+    @Override
+    public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
+        Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
+        ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
+        return new LazyHolder<>(registryKey, resourceKey, () -> {
+            Holder.Reference<T> holder = registry.getOrThrow(resourceKey);
+            if (!holder.isBound()) {
+                T value = registry.getValue(resourceKey);
+                Objects.requireNonNull(value, "value is null");
+                holder.bindValue(value);
+            }
+
+            return holder;
+        });
     }
 
     @Override
@@ -54,9 +73,13 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
         } else {
             holder = Registry.registerForHolder(registry, this.makeKey(path), value);
         }
+
         // bind the value immediately, so we can use it
         // Fabric Api should already do this for us, but better safe than sorry ¯\_(ツ)_/¯
-        if (!holder.isBound()) holder.bindValue(value);
+        if (!holder.isBound()) {
+            holder.bindValue(value);
+        }
+
         return holder;
     }
 
@@ -109,5 +132,13 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
                 entityDataSerializerSupplier.get());
         FabricTrackedDataRegistry.register(holder.key().location(), holder.value());
         return holder;
+    }
+
+    @Override
+    public <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey) {
+        Objects.requireNonNull(registryKey, "registry key is null");
+        Objects.requireNonNull(tagKey, "tag key is null");
+        Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
+        BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(tagKey);
     }
 }
