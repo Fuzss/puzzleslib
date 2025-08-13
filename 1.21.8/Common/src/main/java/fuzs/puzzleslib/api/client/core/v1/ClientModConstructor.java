@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
-import org.apache.commons.lang3.function.Consumers;
 
 import java.util.function.Supplier;
 
@@ -41,8 +40,7 @@ public interface ClientModConstructor {
     static void construct(ResourceLocation resourceLocation, Supplier<ClientModConstructor> modConstructorSupplier) {
         ModConstructorImpl.construct(resourceLocation,
                 modConstructorSupplier,
-                ClientProxyImpl.get()::getClientModConstructorImpl,
-                Consumers.nop());
+                ClientProxyImpl.get()::getClientModConstructorImpl);
     }
 
     /**

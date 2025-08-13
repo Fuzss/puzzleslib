@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.init;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.mojang.brigadier.arguments.ArgumentType;
 import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
@@ -29,45 +30,39 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.neoforged.neoforge.registries.RegisterEvent;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Queue;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public final class NeoForgeRegistryManager extends RegistryManagerImpl {
-    @Nullable
-    private Queue<Consumer<RegisterEvent>> registrars = new ArrayDeque<>();
+    private List<Consumer<RegisterEvent>> registrars = new ArrayList<>();
 
     public NeoForgeRegistryManager(String modId) {
         super(modId);
     }
 
     private void submitRegistrar(Consumer<RegisterEvent> registrar) {
-        Objects.requireNonNull(this.registrars, "registrars is null");
         if (this.registrars.isEmpty()) {
             NeoForgeModContainerHelper.getModEventBus(this.modId).addListener(this::registerAll);
         }
 
-        this.registrars.offer(registrar);
+        this.registrars.add(registrar);
     }
 
     private void registerAll(RegisterEvent event) {
-        Objects.requireNonNull(this.registrars, "registrars is null");
-        while (!this.registrars.isEmpty()) {
-            this.registrars.poll().accept(event);
+        for (Consumer<RegisterEvent> registrar : this.registrars) {
+            registrar.accept(event);
         }
-
-        // set to null to prevent further registration after the event has run
-        this.registrars = null;
     }
 
     @Override
     public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
+        this.isWritableOrThrow();
         return new LazyHolder<>(registryKey, DeferredHolder.create(this.makeResourceKey(registryKey, path)));
     }
 
@@ -129,6 +124,7 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
 
     @Override
     public <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey) {
+        this.isWritableOrThrow();
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(tagKey, "tag key is null");
         this.submitRegistrar((RegisterEvent event) -> {
@@ -137,5 +133,16 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
                 BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(tagKey);
             }
         });
+    }
+
+    @Override
+    public void freeze() {
+        this.isWritableOrThrow();
+        this.registrars = ImmutableList.copyOf(this.registrars);
+    }
+
+    @Override
+    public boolean isFrozen() {
+        return this.registrars instanceof ImmutableList<Consumer<RegisterEvent>>;
     }
 }

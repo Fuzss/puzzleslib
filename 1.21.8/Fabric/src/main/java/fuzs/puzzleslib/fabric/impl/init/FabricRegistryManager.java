@@ -42,12 +42,15 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
     private static final ResourceKey<Registry<EntityDataSerializer<?>>> ENTITY_DATA_SERIALIZERS_REGISTRY_KEY = ResourceKey.createRegistryKey(
             ResourceLocationHelper.withDefaultNamespace("entity_data_serializers"));
 
+    private boolean isFrozen;
+
     public FabricRegistryManager(String modId) {
         super(modId);
     }
 
     @Override
     public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
+        this.isWritableOrThrow();
         Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
         ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
         return new LazyHolder<>(registryKey, resourceKey, () -> {
@@ -136,9 +139,21 @@ public final class FabricRegistryManager extends RegistryManagerImpl {
 
     @Override
     public <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey) {
+        this.isWritableOrThrow();
         Objects.requireNonNull(registryKey, "registry key is null");
         Objects.requireNonNull(tagKey, "tag key is null");
         Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
         BuiltInRegistries.acquireBootstrapRegistrationLookup(registry).getOrThrow(tagKey);
+    }
+
+    @Override
+    public void freeze() {
+        this.isWritableOrThrow();
+        this.isFrozen = true;
+    }
+
+    @Override
+    public boolean isFrozen() {
+        return this.isFrozen;
     }
 }

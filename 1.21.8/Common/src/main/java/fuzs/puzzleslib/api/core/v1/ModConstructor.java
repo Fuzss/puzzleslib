@@ -35,7 +35,7 @@ public interface ModConstructor {
         ModConstructorImpl.construct(resourceLocation,
                 modConstructorSupplier,
                 ProxyImpl.get()::getModConstructorImpl,
-                ModContext::buildAll);
+                ModContext::runBeforeConstruction);
     }
 
     /**

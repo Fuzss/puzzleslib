@@ -1,10 +1,10 @@
 package fuzs.puzzleslib.fabric.impl.core;
 
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.fabric.impl.config.FabricConfigHolderImpl;
 import fuzs.puzzleslib.fabric.impl.init.FabricRegistryManager;
+import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -37,15 +37,12 @@ public final class FabricModContext extends ModContext {
     }
 
     @Override
-    public ConfigHolder.Builder getConfigHolder() {
-        return this.addBuildable(new FabricConfigHolderImpl(this.modId));
+    protected ConfigHolderImpl createConfigHolder(String modId) {
+        return new FabricConfigHolderImpl(modId);
     }
 
     @Override
-    public RegistryManager getRegistryManager() {
-        if (this.registryManager == null) {
-            this.registryManager = new FabricRegistryManager(this.modId);
-        }
-        return this.registryManager;
+    protected RegistryManagerImpl createRegistryManager(String modId) {
+        return new FabricRegistryManager(modId);
     }
 }
