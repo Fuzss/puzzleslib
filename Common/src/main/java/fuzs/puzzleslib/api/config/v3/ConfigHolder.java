@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.config.v3;
 
-import fuzs.puzzleslib.api.core.v1.utility.Buildable;
 import fuzs.puzzleslib.impl.config.ConfigHolderRegistry;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
@@ -71,7 +70,7 @@ public interface ConfigHolder {
      * those mods is fine and will not throw an exception.
      * <p>
      * Allows for registering a config screen that collects and merges configs from multiple mods. Useful for mods that
-     * have some of their relevant configuration as part of an underlying library.
+     * have some of their relevant configurations as part of an underlying library.
      *
      * @param modId       the mod id to register the config screen for
      * @param otherModIds optional mod ids to include configs from
@@ -81,10 +80,10 @@ public interface ConfigHolder {
     }
 
     /**
-     * builder interface for registering configs, not needed anymore after initial registration is complete, but no new
+     * builder interface for registering configs, not needed any more after initial registration is complete, but no new
      * instance is created, so we only store the super type {@link ConfigHolder}
      */
-    interface Builder extends ConfigHolderRegistry, Buildable {
+    interface Builder extends ConfigHolderRegistry {
 
         /**
          * register a new client config to the holder/builder
@@ -114,11 +113,10 @@ public interface ConfigHolder {
         <T extends ConfigCore> Builder server(Class<T> clazz);
 
         /**
-         * this sets the file name on {@link ConfigDataHolder}, it's only used for storing, since actually it's only
-         * ever need in this class when calling {@link #build}
+         * This sets the file name on {@link ConfigDataHolder}.
          * <p>
-         * by default this is set to {@link #getDefaultNameFactory}, otherwise {@link #getSimpleNameFactory()} and
-         * {@link #getDirectoryNameFactory(String, String)} exist for convenience
+         * By default, this is set to {@link #getDefaultNameFactory}. Furthermore, {@link #getSimpleNameFactory()} and
+         * {@link #getDirectoryNameFactory(String, String)} exist for convenience.
          *
          * @param clazz           config main class
          * @param fileNameFactory file name operator, passed in is the modId

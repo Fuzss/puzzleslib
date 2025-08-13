@@ -21,7 +21,7 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     private static void registerEventHandlers() {
-        LoadCompleteCallback.EVENT.register(ModContext::onLoadComplete);
+        LoadCompleteCallback.EVENT.register(() -> ModContext.forEach(ModContext::runAfterConstruction));
         LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
         EventHandlerProvider.tryRegister(ProxyImpl.get());
     }

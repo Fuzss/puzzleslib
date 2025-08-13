@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.neoforge.impl.core;
 
-import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.data.v2.ModPackMetadataProvider;
-import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
+import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.impl.config.NeoForgeConfigHolderImpl;
@@ -52,15 +52,12 @@ public final class NeoForgeModContext extends ModContext {
     }
 
     @Override
-    public ConfigHolder.Builder getConfigHolder() {
-        return this.addBuildable(new NeoForgeConfigHolderImpl(this.modId));
+    protected ConfigHolderImpl createConfigHolder(String modId) {
+        return new NeoForgeConfigHolderImpl(modId);
     }
 
     @Override
-    public RegistryManager getRegistryManager() {
-        if (this.registryManager == null) {
-            this.registryManager = new NeoForgeRegistryManager(this.modId);
-        }
-        return this.registryManager;
+    protected RegistryManagerImpl createRegistryManager(String modId) {
+        return new NeoForgeRegistryManager(modId);
     }
 }

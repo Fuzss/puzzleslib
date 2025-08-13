@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
+import fuzs.puzzleslib.impl.core.Freezable;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -21,7 +22,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-public abstract class RegistryManagerImpl implements RegistryManager {
+public abstract class RegistryManagerImpl implements RegistryManager, Freezable {
     protected final String modId;
     protected Set<ModLoader> allowedModLoaders = EnumSet.allOf(ModLoader.class);
 
@@ -45,6 +46,7 @@ public abstract class RegistryManagerImpl implements RegistryManager {
 
     @Override
     public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
+        this.isWritableOrThrow();
         return this.register(registryKey, path, supplier, false);
     }
 

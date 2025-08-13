@@ -5,6 +5,7 @@ import fuzs.puzzleslib.api.config.v3.ConfigCore;
 import fuzs.puzzleslib.api.config.v3.ConfigDataHolder;
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
+import fuzs.puzzleslib.impl.core.Freezable;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 
 import java.lang.invoke.MethodHandles;
@@ -15,7 +16,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
 
-public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
+public abstract class ConfigHolderImpl implements ConfigHolder.Builder, Freezable {
     private final String modId;
     private Map<Class<?>, ConfigDataHolderImpl<?>> configsByClass = new IdentityHashMap<>();
 
@@ -46,6 +47,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     @Override
     public <T extends ConfigCore> Builder client(Class<T> clazz) {
+        this.isWritableOrThrow();
         // this is necessary to allow safely using client-only classes in the client configs (e.g. certain enums for vanilla game options)
         Supplier<T> supplier = ModLoaderEnvironment.INSTANCE.isClient() ? construct(clazz) : () -> null;
         if (this.configsByClass.put(clazz, this.client(supplier)) != null) {
@@ -56,6 +58,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     @Override
     public <T extends ConfigCore> Builder common(Class<T> clazz) {
+        this.isWritableOrThrow();
         if (this.configsByClass.put(clazz, this.common(construct(clazz))) != null) {
             throw new IllegalStateException("Duplicate registration for common config of type " + clazz);
         }
@@ -64,6 +67,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
 
     @Override
     public <T extends ConfigCore> Builder server(Class<T> clazz) {
+        this.isWritableOrThrow();
         if (this.configsByClass.put(clazz, this.server(construct(clazz))) != null) {
             throw new IllegalStateException("Duplicate registration for server config of type " + clazz);
         }
@@ -83,7 +87,8 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
     }
 
     @Override
-    public final void build() {
+    public final void freeze() {
+        this.isWritableOrThrow();
         this.configsByClass = ImmutableMap.copyOf(this.configsByClass);
         // register events before registering configs
         for (ConfigDataHolderImpl<?> holder : this.configsByClass.values()) {
@@ -93,6 +98,11 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder {
             }
         }
         ProxyImpl.get().registerConfigurationScreenForHolder(this.modId);
+    }
+
+    @Override
+    public final boolean isFrozen() {
+        return this.configsByClass instanceof ImmutableMap<Class<?>, ConfigDataHolderImpl<?>>;
     }
 
     protected abstract void bake(ConfigDataHolderImpl<?> holder, String modId);
