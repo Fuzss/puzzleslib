@@ -4,7 +4,6 @@ import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
-import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.core.Holder;
@@ -28,11 +27,12 @@ public abstract class RegistryManagerImpl implements RegistryManager {
 
     protected RegistryManagerImpl(String modId) {
         this.modId = modId;
+        Preconditions.checkArgument(StringUtils.isNotEmpty(modId), "mod id is invalid");
     }
 
     @Override
     public ResourceLocation makeKey(String path) {
-        if (StringUtils.isEmpty(path)) throw new IllegalArgumentException("path is invalid");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(path), "path is invalid");
         return ResourceLocationHelper.fromNamespaceAndPath(this.modId, path);
     }
 
@@ -44,27 +44,13 @@ public abstract class RegistryManagerImpl implements RegistryManager {
     }
 
     @Override
-    public <T> Holder.Reference<T> registerLazily(ResourceKey<? extends Registry<? super T>> registryKey, String path) {
-        Registry<T> registry = LookupHelper.getRegistry(registryKey).orElseThrow();
-        ResourceKey<T> resourceKey = this.makeResourceKey(registryKey, path);
-        return new LazyHolder<>(registryKey, resourceKey, () -> {
-            Holder.Reference<T> holder = registry.getOrThrow(resourceKey);
-            if (!holder.isBound()) {
-                T value = registry.getValue(resourceKey);
-                Objects.requireNonNull(value, "value is null");
-                holder.bindValue(value);
-            }
-            return holder;
-        });
-    }
-
-    @Override
     public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier) {
         return this.register(registryKey, path, supplier, false);
     }
 
     public final <T> Holder.Reference<T> register(final ResourceKey<? extends Registry<? super T>> registryKey, String path, Supplier<T> supplier, boolean skipRegistration) {
         Objects.requireNonNull(registryKey, "registry key is null");
+        Preconditions.checkArgument(StringUtils.isNotEmpty(path), "path is invalid");
         Objects.requireNonNull(supplier, "supplier is null");
         Holder.Reference<T> holder;
         if (!this.allowedModLoaders.contains(ModLoaderEnvironment.INSTANCE.getModLoader())) {
@@ -73,6 +59,7 @@ public abstract class RegistryManagerImpl implements RegistryManager {
             holder = this.getHolderReference(registryKey, path, supplier, skipRegistration);
         }
         this.allowedModLoaders = EnumSet.allOf(ModLoader.class);
+        Objects.requireNonNull(holder, "holder is null");
         return holder;
     }
 

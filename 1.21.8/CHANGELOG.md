@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Add `RegistryManager::prepareTag`
 - Expand methods in `CustomItemModelOutput`
 
 ## [v21.8.6-1.21.8] - 2025-08-11

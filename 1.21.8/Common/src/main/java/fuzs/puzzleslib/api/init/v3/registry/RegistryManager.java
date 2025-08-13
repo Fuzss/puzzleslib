@@ -24,6 +24,7 @@ import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -106,6 +107,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param path        the registered name
      * @return the description id
      */
+    @Deprecated(forRemoval = true)
     default String makeDescriptionId(ResourceKey<? extends Registry<?>> registryKey, String path) {
         return Util.makeDescriptionId(Registries.elementsDirPath(registryKey), this.makeKey(path));
     }
@@ -679,10 +681,9 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default Holder.Reference<Attribute> registerAttribute(String path, double defaultValue, double minValue, double maxValue, boolean syncable, Attribute.Sentiment sentiment) {
         Objects.requireNonNull(sentiment, "sentiment is null");
         return this.register(Registries.ATTRIBUTE, path, () -> {
-            return new RangedAttribute(this.makeDescriptionId(Registries.ATTRIBUTE, path),
-                    defaultValue,
-                    minValue,
-                    maxValue).setSyncable(syncable).setSentiment(sentiment);
+            String descriptionId = this.makeKey(path).toLanguageKey(Registries.elementsDirPath(Registries.ATTRIBUTE));
+            return new RangedAttribute(descriptionId, defaultValue, minValue, maxValue).setSyncable(syncable)
+                    .setSentiment(sentiment);
         });
     }
 
@@ -727,4 +728,15 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     default ResourceKey<LootTable> registerLootTable(String path) {
         return this.makeResourceKey(Registries.LOOT_TABLE, path);
     }
+
+    /**
+     * Creates an empty tag in the corresponding registry, so that the tag can be used during data generation via
+     * {@link net.minecraft.core.HolderGetter#get(TagKey)} and
+     * {@link net.minecraft.core.HolderGetter#getOrThrow(TagKey)}.
+     *
+     * @param registryKey the registry key
+     * @param tagKey      the tag key
+     * @param <T>         the registry type
+     */
+    <T> void prepareTag(ResourceKey<? extends Registry<? super T>> registryKey, TagKey<T> tagKey);
 }
