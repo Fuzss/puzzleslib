@@ -105,6 +105,12 @@ public abstract class AbstractModelProvider implements DataProvider {
     public interface CustomItemModelOutput extends ItemModelOutput {
 
         void accept(Item item, ItemModel.Unbaked model, ClientItem.Properties properties);
+
+        default void accept(ResourceLocation resourceLocation, ItemModel.Unbaked model) {
+            this.accept(resourceLocation, model, ClientItem.Properties.DEFAULT);
+        }
+
+        void accept(ResourceLocation resourceLocation, ItemModel.Unbaked model, ClientItem.Properties properties);
     }
 
     static class BlockStateOutputImpl extends ModelProvider.BlockStateGeneratorCollector {
@@ -129,6 +135,7 @@ public abstract class AbstractModelProvider implements DataProvider {
     }
 
     static class ItemModelOutputImpl extends ModelProvider.ItemInfoCollector implements CustomItemModelOutput {
+        private final Map<ResourceLocation, ClientItem> additionalItemInfos = new HashMap<>();
         private final Predicate<Holder.Reference<Item>> filter;
 
         public ItemModelOutputImpl(Predicate<Holder.Reference<Item>> filter) {
@@ -138,6 +145,14 @@ public abstract class AbstractModelProvider implements DataProvider {
         @Override
         public void accept(Item item, ItemModel.Unbaked model, ClientItem.Properties properties) {
             this.register(item, new ClientItem(model, properties));
+        }
+
+        @Override
+        public void accept(ResourceLocation resourceLocation, ItemModel.Unbaked model, ClientItem.Properties properties) {
+            ClientItem clientItem = this.additionalItemInfos.put(resourceLocation, new ClientItem(model, properties));
+            if (clientItem != null) {
+                throw new IllegalStateException("Duplicate item model definition for " + resourceLocation);
+            }
         }
 
         @Override
@@ -151,10 +166,10 @@ public abstract class AbstractModelProvider implements DataProvider {
                     }
                 }
             });
-            this.copies.forEach((Item item, Item item2) -> {
-                ClientItem clientItem = this.itemInfos.get(item2);
+            this.copies.forEach((Item item, Item other) -> {
+                ClientItem clientItem = this.itemInfos.get(other);
                 if (clientItem == null) {
-                    throw new IllegalStateException("Missing donor: " + item2 + " -> " + item);
+                    throw new IllegalStateException("Missing donor: " + other + " -> " + item);
                 } else {
                     this.register(item, clientItem);
                 }
@@ -168,6 +183,12 @@ public abstract class AbstractModelProvider implements DataProvider {
             if (!list.isEmpty()) {
                 throw new IllegalStateException("Missing item model definitions for: " + list);
             }
+        }
+
+        @Override
+        public CompletableFuture<?> save(CachedOutput output, PackOutput.PathProvider pathProvider) {
+            return CompletableFuture.allOf(super.save(output, pathProvider),
+                    DataProvider.saveAll(output, ClientItem.CODEC, pathProvider::json, this.additionalItemInfos));
         }
     }
 }
