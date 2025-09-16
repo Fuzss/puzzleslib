@@ -2,6 +2,7 @@ package fuzs.puzzleslib.api.client.gui.v2;
 
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import org.joml.Vector2i;
+import org.joml.Vector2ic;
 
 /**
  * A helper class for positioning gui elements inside an area, usually the whole window.
@@ -19,33 +20,69 @@ public enum AnchorPoint {
     BOTTOM_CENTER(0, 1),
     BOTTOM_RIGHT(1, 1);
 
-    private final int offsetX;
-    private final int offsetY;
+    public final Vector2ic normal;
 
     AnchorPoint(int offsetX, int offsetY) {
-        this.offsetX = offsetX;
-        this.offsetY = offsetY;
+        this.normal = new Vector2i(offsetX, offsetY);
+    }
+
+    /**
+     * @return the two-dimensional x-direction:
+     *         <ul>
+     *             <li>{@code -1} for left</li>
+     *             <li>{@code 0} for centre</li>
+     *             <li>{@code 1} for right</li>
+     *         </ul>
+     */
+    public int getNormalX() {
+        return this.normal.x();
+    }
+
+    /**
+     * @return the two-dimensional y-direction:
+     *         <ul>
+     *             <li>{@code -1} for up</li>
+     *             <li>{@code 0} for centre</li>
+     *             <li>{@code 1} for down</li>
+     *         </ul>
+     */
+    public int getNormalY() {
+        return this.normal.y();
     }
 
     /**
      * @return is the anchor point oriented to the left
      */
     public boolean isLeft() {
-        return this.offsetX == -1;
-    }
-
-    /**
-     * @return is the anchor point oriented in the center
-     */
-    public boolean isCenter() {
-        return this.offsetX == 0;
+        return this.getNormalX() == -1;
     }
 
     /**
      * @return is the anchor point oriented to the right
      */
     public boolean isRight() {
-        return this.offsetX == 1;
+        return this.getNormalX() == 1;
+    }
+
+    /**
+     * @return is the anchor point oriented to the top
+     */
+    public boolean isTop() {
+        return this.getNormalY() == -1;
+    }
+
+    /**
+     * @return is the anchor point oriented to the bottom
+     */
+    public boolean isBottom() {
+        return this.getNormalY() == 1;
+    }
+
+    /**
+     * @return is the anchor point oriented in the center
+     */
+    public boolean isCenter() {
+        return this.getNormalX() == 0 || this.getNormalY() == 0;
     }
 
     /**
@@ -56,7 +93,12 @@ public enum AnchorPoint {
      * @return the positioner for placing the element
      */
     public Positioner createPositioner(int guiWidth, int guiHeight, int elementWidth, int elementHeight) {
-        return new PositionerImpl(this.offsetX, this.offsetY, guiWidth, guiHeight, elementWidth, elementHeight);
+        return new PositionerImpl(this.getNormalX(),
+                this.getNormalY(),
+                guiWidth,
+                guiHeight,
+                elementWidth,
+                elementHeight);
     }
 
     /**

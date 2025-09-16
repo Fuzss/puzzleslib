@@ -43,7 +43,7 @@ public final class ConfigTranslationsManager {
         addConfigValues(modId, configSpec.getSpec(), new ArrayList<>(), configSpec::getLevelComment);
     }
 
-    static void addConfigValues(String modId, UnmodifiableConfig config, List<String> path, Function<List<String>, @Nullable String> levelCommentGetter) {
+    private static void addConfigValues(String modId, UnmodifiableConfig config, List<String> path, Function<List<String>, @Nullable String> levelCommentGetter) {
         for (UnmodifiableConfig.Entry entry : config.entrySet()) {
             addConfigValue(modId, entry.getKey());
             String comment;
@@ -101,7 +101,7 @@ public final class ConfigTranslationsManager {
         Objects.requireNonNull(valueName, "value name is null");
         addConfigValueComment(modId,
                 Collections.singletonList(valueName),
-                comment != null ? Arrays.asList(comment.split("\\R")) : Collections.emptyList());
+                comment != null ? new ArrayList<>(Arrays.asList(comment.split("\\R"))) : Collections.emptyList());
     }
 
     public static void addConfigValueComment(String modId, List<String> valuePath, List<String> comments) {
@@ -120,7 +120,7 @@ public final class ConfigTranslationsManager {
         TRANSLATIONS.put(modId + ".configuration." + valuePath.getLast() + ".button", "Edit...");
     }
 
-    static String getCapitalizedString(String s) {
+    private static String getCapitalizedString(String s) {
         String[] strings = s.toLowerCase().split("[\\s_]+");
         StringJoiner joiner = new StringJoiner(" ");
         for (String string : strings) {
@@ -129,11 +129,12 @@ public final class ConfigTranslationsManager {
         return joiner.toString().replace(" And ", " & ").replace(" Or ", " / ");
     }
 
-    static List<String> getStylizedStrings(List<String> strings) {
-        strings = new ArrayList<>(strings);
+    private static List<String> getStylizedStrings(List<String> strings) {
+        strings.removeIf((String string) -> string.matches("^ Default: .*"));
         for (int i = 0; i < strings.size(); i++) {
+            String string = strings.get(i).replaceAll("^ Range: ", "Value Range: ");
             ChatFormatting chatFormatting = i % 2 == 0 ? ChatFormatting.YELLOW : ChatFormatting.GOLD;
-            strings.set(i, chatFormatting + strings.get(i) + ChatFormatting.RESET);
+            strings.set(i, chatFormatting + string + ChatFormatting.RESET);
         }
         return strings;
     }
