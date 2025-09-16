@@ -79,10 +79,31 @@ public enum AnchorPoint {
     }
 
     /**
-     * @return is the anchor point oriented in the center
+     * @return is the anchor point oriented in any corner
+     */
+    public boolean isCorner() {
+        return this.getNormalX() != 0 && this.getNormalY() != 0;
+    }
+
+    /**
+     * @return is the anchor point oriented anywhere in the center
      */
     public boolean isCenter() {
         return this.getNormalX() == 0 || this.getNormalY() == 0;
+    }
+
+    /**
+     * @return is the anchor point oriented in the horizontal center (horizontally spread across the middle)
+     */
+    public boolean isHorizontalCenter() {
+        return this.getNormalX() == 0;
+    }
+
+    /**
+     * @return is the anchor point oriented in the vertical center (vertically spread across the middle)
+     */
+    public boolean isVerticalCenter() {
+        return this.getNormalY() == 0;
     }
 
     /**
