@@ -346,8 +346,8 @@ abstract class LivingEntityFabricMixin extends Entity {
     @ModifyVariable(method = "getVisibilityPercent", at = @At(value = "TAIL", shift = At.Shift.BEFORE), ordinal = 0)
     public double getVisibilityPercent(double value, @Nullable Entity lookingEntity) {
         DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
-        FabricLivingEvents.LIVING_VISIBILITY.invoker()
-                .onLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
+        FabricLivingEvents.CALCULATE_LIVING_VISIBILITY.invoker()
+                .onCalculateLivingVisibility(LivingEntity.class.cast(this), lookingEntity, visibilityPercentage);
         return visibilityPercentage.getAsOptionalDouble()
                 .stream()
                 .map((double visibilityPercentageValue) -> Math.max(visibilityPercentageValue, 0.0))

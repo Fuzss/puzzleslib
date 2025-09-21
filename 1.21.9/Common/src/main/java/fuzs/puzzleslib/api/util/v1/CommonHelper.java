@@ -4,14 +4,9 @@ import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.TickTask;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerExplosion;
-
-import java.util.Objects;
 
 /**
  * Provides access to common helper methods, some abstracting client-only code.
@@ -27,20 +22,6 @@ public final class CommonHelper {
      */
     public static MinecraftServer getMinecraftServer() {
         return ProxyImpl.get().getMinecraftServer();
-    }
-
-    /**
-     * Called just before an {@link Explosion} is about to be executed for a level.
-     *
-     * @param serverLevel the level the explosion is happening in
-     * @param explosion   the explosion that is about to start
-     * @return <code>true</code> to mark the explosion as handled, {@link ServerExplosion#explode()} is not called
-     */
-    @Deprecated(forRemoval = true)
-    public static boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
-        Objects.requireNonNull(serverLevel, "server level is null");
-        Objects.requireNonNull(explosion, "explosion is null");
-        return ProxyImpl.get().onExplosionStart(serverLevel, explosion);
     }
 
     /**

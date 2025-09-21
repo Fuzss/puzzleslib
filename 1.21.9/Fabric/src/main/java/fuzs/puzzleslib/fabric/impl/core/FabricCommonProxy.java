@@ -9,7 +9,6 @@ import fuzs.puzzleslib.api.init.v3.GameRulesFactory;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryFactory;
 import fuzs.puzzleslib.api.item.v2.ToolTypeHelper;
 import fuzs.puzzleslib.api.item.v2.crafting.CombinedIngredients;
-import fuzs.puzzleslib.fabric.api.event.v1.FabricLevelEvents;
 import fuzs.puzzleslib.fabric.impl.attachment.FabricDataAttachmentRegistryImpl;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.data.FabricTagAppender;
@@ -68,7 +67,6 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -125,11 +123,6 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
     @Override
     public Style getRarityStyle(Rarity rarity) {
         return Style.EMPTY.applyFormat(rarity.color());
-    }
-
-    @Override
-    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
-        return FabricLevelEvents.EXPLOSION_START.invoker().onExplosionStart(serverLevel, explosion).isInterrupt();
     }
 
     @Override

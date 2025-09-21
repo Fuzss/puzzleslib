@@ -49,9 +49,6 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     <T> void setRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key, @Nullable T t);
 
-    @Deprecated(forRemoval = true)
-    void registerBuiltinResourcePack(ResourceLocation resourceLocation, Component displayName, boolean required);
-
     float getPartialTick(EntityRenderState renderState);
 
     boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode);

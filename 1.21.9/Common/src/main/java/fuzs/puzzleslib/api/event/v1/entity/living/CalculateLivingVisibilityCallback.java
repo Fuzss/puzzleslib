@@ -6,12 +6,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * TODO rename to CalculateLivingVisibilityCallback
- */
 @FunctionalInterface
-public interface LivingVisibilityCallback {
-    EventInvoker<LivingVisibilityCallback> EVENT = EventInvoker.lookup(LivingVisibilityCallback.class);
+public interface CalculateLivingVisibilityCallback {
+    EventInvoker<CalculateLivingVisibilityCallback> EVENT = EventInvoker.lookup(CalculateLivingVisibilityCallback.class);
 
     /**
      * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another
@@ -21,5 +18,5 @@ public interface LivingVisibilityCallback {
      * @param lookingEntity        the looking entity that is trying to target the other entity
      * @param visibilityPercentage the visibility percentage multiplied with the looking entity's targeting range
      */
-    void onLivingVisibility(LivingEntity livingEntity, @Nullable Entity lookingEntity, MutableDouble visibilityPercentage);
+    void onCalculateLivingVisibility(LivingEntity livingEntity, @Nullable Entity lookingEntity, MutableDouble visibilityPercentage);
 }

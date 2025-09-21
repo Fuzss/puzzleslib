@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.config.v3.serialization;
 
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagAppender;
 import fuzs.puzzleslib.api.data.v2.tags.AbstractTagProvider;
-import fuzs.puzzleslib.impl.config.serialization.EnumProvider;
 import fuzs.puzzleslib.impl.config.serialization.RegistryProvider;
 import fuzs.puzzleslib.impl.data.SortingTagBuilder;
 import net.minecraft.core.Registry;
@@ -18,8 +17,6 @@ import java.util.stream.Stream;
 
 /**
  * A collection of certain values, usually backed by something like a {@link Registry}.
- * <p>
- * TODO remove enum stuff and possibly merge this back into {@link ConfigDataSet}
  *
  * @param <T> the type of value
  */
@@ -34,31 +31,6 @@ public interface KeyedValueProvider<T> {
      */
     static <T> KeyedValueProvider<T> registryEntries(ResourceKey<? extends Registry<? super T>> registryKey) {
         return new RegistryProvider<>(registryKey);
-    }
-
-    /**
-     * Create a new provider backed by a registry.
-     *
-     * @param enumClazz class for retrieving enum constants
-     * @param <T>       the type of value
-     * @return the provider
-     */
-    @Deprecated(forRemoval = true)
-    static <T extends Enum<T>> KeyedValueProvider<T> enumConstants(Class<T> enumClazz) {
-        return enumConstants(enumClazz, "minecraft");
-    }
-
-    /**
-     * Create a new provider backed by a registry.
-     *
-     * @param enumClazz class for retrieving enum constants
-     * @param modId     namespace for resource locations
-     * @param <T>       the type of value
-     * @return the provider
-     */
-    @Deprecated(forRemoval = true)
-    static <T extends Enum<T>> KeyedValueProvider<T> enumConstants(Class<T> enumClazz, String modId) {
-        return new EnumProvider<>(enumClazz, modId);
     }
 
     /**
@@ -82,37 +54,8 @@ public interface KeyedValueProvider<T> {
      * @return entries as string list
      */
     @SafeVarargs
-    static <T> List<String> toString(ResourceKey<? extends Registry<? super T>> registryKey, T... entries) {
-        return toString(KeyedValueProvider.registryEntries(registryKey), entries);
-    }
-
-    /**
-     * Converts a bunch of enum constants to their respective key as string.
-     *
-     * @param enumClazz class for retrieving enum constants
-     * @param entries   entries to convert to string
-     * @param <T>       type of value
-     * @return entries as string list
-     */
-    @Deprecated(forRemoval = true)
-    @SafeVarargs
-    static <T extends Enum<T>> List<String> toString(Class<T> enumClazz, T... entries) {
-        return toString(enumClazz, "minecraft", entries);
-    }
-
-    /**
-     * Converts a bunch of enum constants to their respective key as string.
-     *
-     * @param enumClazz class for retrieving enum constants
-     * @param modId     namespace for resource locations
-     * @param entries   entries to convert to string
-     * @param <T>       type of value
-     * @return entries as string list
-     */
-    @Deprecated(forRemoval = true)
-    @SafeVarargs
-    static <T extends Enum<T>> List<String> toString(Class<T> enumClazz, String modId, T... entries) {
-        return toString(KeyedValueProvider.enumConstants(enumClazz, modId), entries);
+    static <T> List<String> asString(ResourceKey<? extends Registry<? super T>> registryKey, T... entries) {
+        return asString(KeyedValueProvider.registryEntries(registryKey), entries);
     }
 
     /**
@@ -124,7 +67,7 @@ public interface KeyedValueProvider<T> {
      * @return entries as string list
      */
     @SafeVarargs
-    static <T> List<String> toString(KeyedValueProvider<T> valueProvider, T... entries) {
+    static <T> List<String> asString(KeyedValueProvider<T> valueProvider, T... entries) {
         return Stream.of(entries)
                 .peek(Objects::requireNonNull)
                 .map(valueProvider::getKey)
