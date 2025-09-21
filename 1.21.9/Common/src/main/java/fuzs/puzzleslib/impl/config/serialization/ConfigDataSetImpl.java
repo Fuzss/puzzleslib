@@ -32,7 +32,13 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     /**
      * the data types we currently are able to handle
      */
-    private static final Set<Class<?>> SUPPORTED_DATA_TYPES = ImmutableSet.of(boolean.class, Boolean.class, int.class, Integer.class, double.class, Double.class, String.class);
+    private static final Set<Class<?>> SUPPORTED_DATA_TYPES = ImmutableSet.of(boolean.class,
+            Boolean.class,
+            int.class,
+            Integer.class,
+            double.class,
+            Double.class,
+            String.class);
 
     /**
      * registry to work with
@@ -67,10 +73,12 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 throw new IllegalArgumentException("Data type of clazz %s is not supported".formatted(clazz));
             }
         }
+
         this.dataSize = types.length;
         for (String value : values) {
             this.deserialize(value, types).ifPresent(this.values::add);
         }
+
         TagsUpdatedCallback.EVENT.register((registryAccess, client) -> {
             this.dissolved = null;
         });
@@ -94,8 +102,9 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             return Double.parseDouble(source);
         } else if (clazz == String.class) {
             return source;
+        } else {
+            throw new IllegalArgumentException("Data type of clazz %s is not supported".formatted(clazz));
         }
-        throw new IllegalArgumentException("Data type of clazz %s is not supported".formatted(clazz));
     }
 
     @Override
@@ -193,8 +202,11 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
     @SuppressWarnings("unchecked")
     @Override
     public <V> Optional<V> getOptional(T entry, int index) {
-        if (index < 0 || index >= this.dataSize) return Optional.empty();
-        return Optional.ofNullable(this.get(entry)).map(data -> (V) data[index]);
+        if (index < 0 || index >= this.dataSize) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(this.get(entry)).map(data -> (V) data[index]);
+        }
     }
 
     @Override
@@ -225,13 +237,16 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
             }
             if (entries.isEmpty() && !toRemove.isEmpty()) {
                 entries = this.valueProvider.streamValues()
-                        .collect(Collectors.toMap(Function.identity(), t -> EntryHolder.EMPTY_DATA, (o1, o2) -> o1, Maps::newIdentityHashMap));
+                        .collect(Collectors.toMap(Function.identity(),
+                                t -> EntryHolder.EMPTY_DATA,
+                                (o1, o2) -> o1,
+                                Maps::newIdentityHashMap));
             }
             entries.keySet().removeIf(t -> !this.filter.test(0, t) || toRemove.contains(t));
-            this.dissolved = dissolved = Collections.unmodifiableMap(entries);
+            return this.dissolved = dissolved = Collections.unmodifiableMap(entries);
+        } else {
+            return dissolved;
         }
-
-        return dissolved;
     }
 
     /**
@@ -248,13 +263,18 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                 for (int i = 0; i < types.length; i++) {
                     if (sources.length - 1 <= i) {
                         throw new IllegalArgumentException("Data index out of bounds, index was %s, but length is %s".formatted(
-                                i + 1, sources.length));
+                                i + 1,
+                                sources.length));
                     }
                     data[i] = deserializeData(types[i], sources[i + 1].trim());
                     if (!this.filter.test(i + 1, data[i])) {
-                        throw new IllegalStateException("Data %s at index %s from source entry %s does not conform to filter".formatted(data[i], i, source));
+                        throw new IllegalStateException(
+                                "Data %s at index %s from source entry %s does not conform to filter".formatted(data[i],
+                                        i,
+                                        source));
                     }
                 }
+
                 return Optional.of(this.deserialize(newSource).withData(data));
             } else {
                 return Optional.of(this.deserialize(newSource));
@@ -273,11 +293,20 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
      */
     private EntryHolder<?, T> deserialize(String source) throws RuntimeException {
         boolean inverted = source.startsWith("!");
-        if (inverted) source = source.substring(1);
+        if (inverted) {
+            source = source.substring(1);
+        }
+
         boolean tagHolder = source.startsWith("#");
-        if (tagHolder) source = source.substring(1);
+        if (tagHolder) {
+            source = source.substring(1);
+        }
+
         // this is necessary when applying regex matching later on, since existing resource locations are converted to string, and they will contain "minecraft"
-        if (!source.contains(":")) source = "minecraft:" + source;
+        if (!source.contains(":")) {
+            source = "minecraft:" + source;
+        }
+
         if (tagHolder) {
             if (this.valueProvider instanceof RegistryProvider<T> registryProvider) {
                 return new TagEntryHolder<>(registryProvider, source, inverted);
@@ -357,10 +386,12 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                         .map(Map.Entry::getValue)
                         .forEach(matches::add);
             }
+
             // test if this is a valid entry first
             if (matches.isEmpty()) {
                 PuzzlesLib.LOGGER.warn("Unable to parse entry {}: No matches found in {}", s, this.providerName);
             }
+
             return matches;
         }
 

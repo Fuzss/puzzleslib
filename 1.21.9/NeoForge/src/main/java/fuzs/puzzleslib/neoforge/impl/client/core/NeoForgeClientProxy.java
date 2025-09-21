@@ -24,11 +24,7 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -44,7 +40,6 @@ import net.neoforged.neoforge.client.extensions.common.IClientMobEffectExtension
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.renderstate.RenderStateExtensions;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import net.neoforged.neoforge.event.AddPackFindersEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -97,23 +92,6 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     private <T> ContextKey<T> getContextKey(RenderPropertyKey<T> key) {
         return (ContextKey<T>) this.entityRenderStateKeys.computeIfAbsent(key,
                 (RenderPropertyKey<?> keyX) -> new ContextKey<>(keyX.resourceLocation()));
-    }
-
-    @Override
-    public void registerBuiltinResourcePack(ResourceLocation resourceLocation, Component displayName, boolean required) {
-        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace())
-                .ifPresent((IEventBus eventBus) -> {
-                    eventBus.addListener((final AddPackFindersEvent event) -> {
-                        if (event.getPackType() == PackType.CLIENT_RESOURCES) {
-                            event.addPackFinders(resourceLocation.withPrefix("resourcepacks/"),
-                                    PackType.CLIENT_RESOURCES,
-                                    displayName,
-                                    PackSource.BUILT_IN,
-                                    required,
-                                    Pack.Position.TOP);
-                        }
-                    });
-                });
     }
 
     @Override

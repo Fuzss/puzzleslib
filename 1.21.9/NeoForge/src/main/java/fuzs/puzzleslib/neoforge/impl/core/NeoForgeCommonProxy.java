@@ -53,7 +53,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -112,11 +111,6 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
     }
 
     @Override
-    public boolean onExplosionStart(ServerLevel serverLevel, ServerExplosion explosion) {
-        return EventHooks.onExplosionStart(serverLevel, explosion);
-    }
-
-    @Override
     public void onPlayerDestroyItem(Player player, ItemStack originalItemStack, @Nullable InteractionHand interactionHand) {
         EventHooks.onPlayerDestroyItem(player, originalItemStack, interactionHand);
     }
@@ -157,8 +151,8 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
 
     @Override
     public boolean hasChannel(PacketListener packetListener, CustomPacketPayload.Type<?> type) {
-        return packetListener instanceof ICommonPacketListener commonPacketListener &&
-                commonPacketListener.hasChannel(type);
+        return packetListener instanceof ICommonPacketListener commonPacketListener && commonPacketListener.hasChannel(
+                type);
     }
 
     @Override

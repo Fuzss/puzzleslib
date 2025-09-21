@@ -115,8 +115,8 @@ public final class FabricLivingEvents {
      * Called in {@link LivingEntity#getVisibilityPercent(Entity)} when an entity is trying to be targeted by another
      * entity for applying a given percentage to the looking entity's original visibility range.
      */
-    public static final Event<LivingVisibilityCallback> LIVING_VISIBILITY = FabricEventFactory.create(
-            LivingVisibilityCallback.class);
+    public static final Event<CalculateLivingVisibilityCallback> CALCULATE_LIVING_VISIBILITY = FabricEventFactory.create(
+            CalculateLivingVisibilityCallback.class);
     /**
      * Called when a {@link Mob} sets a new target.
      */

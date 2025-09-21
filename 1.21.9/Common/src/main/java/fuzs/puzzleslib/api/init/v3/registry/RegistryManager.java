@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
-import net.minecraft.Util;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
 import net.minecraft.core.BlockPos;
@@ -99,18 +98,6 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @return resource location for set namespace
      */
     ResourceLocation makeKey(String path);
-
-    /**
-     * Creates a new description id used in translations for a provided registry from the given path.
-     *
-     * @param registryKey key for registry to create description id for
-     * @param path        the registered name
-     * @return the description id
-     */
-    @Deprecated(forRemoval = true)
-    default String makeDescriptionId(ResourceKey<? extends Registry<?>> registryKey, String path) {
-        return Util.makeDescriptionId(Registries.elementsDirPath(registryKey), this.makeKey(path));
-    }
 
     /**
      * Creates a lazy holder reference that will update when used.

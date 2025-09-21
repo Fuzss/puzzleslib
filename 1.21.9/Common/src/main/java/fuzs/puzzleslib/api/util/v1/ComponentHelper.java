@@ -26,26 +26,6 @@ public final class ComponentHelper {
         // NO-OP
     }
 
-    @Deprecated(forRemoval = true)
-    public static Component toComponent(FormattedText formattedText) {
-        return getAsComponent(formattedText);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static Component toComponent(FormattedCharSequence formattedCharSequence) {
-        return getAsComponent(formattedCharSequence);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String toString(FormattedText formattedText) {
-        return getAsString(formattedText);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static String toString(FormattedCharSequence formattedCharSequence) {
-        return getAsString(formattedCharSequence);
-    }
-
     /**
      * Converts a string to a {@link Component}.
      *

@@ -11,11 +11,6 @@ import java.util.Objects;
  */
 public interface PackRepositorySourcesContext {
 
-    @Deprecated(forRemoval = true)
-    default void addRepositorySource(RepositorySource repositorySource) {
-        this.registerRepositorySource(repositorySource);
-    }
-
     /**
      * Register an additional {@link RepositorySource} when a new
      * {@link net.minecraft.server.packs.repository.PackRepository} is created.

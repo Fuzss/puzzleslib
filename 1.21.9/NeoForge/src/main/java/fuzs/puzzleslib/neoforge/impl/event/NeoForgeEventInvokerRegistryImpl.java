@@ -839,10 +839,10 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 (LivingJumpCallback callback, LivingEvent.LivingJumpEvent event) -> {
                     EventImplHelper.onLivingJump(callback, event.getEntity());
                 });
-        INSTANCE.register(LivingVisibilityCallback.class,
+        INSTANCE.register(CalculateLivingVisibilityCallback.class,
                 LivingEvent.LivingVisibilityEvent.class,
-                (LivingVisibilityCallback callback, LivingEvent.LivingVisibilityEvent event) -> {
-                    callback.onLivingVisibility(event.getEntity(),
+                (CalculateLivingVisibilityCallback callback, LivingEvent.LivingVisibilityEvent event) -> {
+                    callback.onCalculateLivingVisibility(event.getEntity(),
                             event.getLookingEntity(),
                             MutableDouble.fromEvent(visibilityModifier -> {
                                 event.modifyVisibility(visibilityModifier / event.getVisibilityModifier());

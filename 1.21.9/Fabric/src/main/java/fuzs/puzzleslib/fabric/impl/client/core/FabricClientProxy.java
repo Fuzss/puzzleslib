@@ -23,10 +23,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworkin
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudStatusBarHeightRegistry;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.fabric.api.resource.ResourcePackActivationType;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -41,7 +37,6 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.Connection;
 import net.minecraft.network.PacketListener;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -144,18 +139,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     @Override
     public <T> void setRenderProperty(EntityRenderState renderState, RenderPropertyKey<T> key, @Nullable T t) {
         ((EntityRenderStateExtension) renderState).puzzleslib$setRenderProperty(key, t);
-    }
-
-    @Override
-    public void registerBuiltinResourcePack(ResourceLocation resourceLocation, Component displayName, boolean required) {
-        FabricLoader.getInstance()
-                .getModContainer(resourceLocation.getNamespace())
-                .ifPresent((ModContainer modContainer) -> {
-                    ResourceManagerHelper.registerBuiltinResourcePack(resourceLocation,
-                            modContainer,
-                            displayName,
-                            required ? ResourcePackActivationType.ALWAYS_ENABLED : ResourcePackActivationType.NORMAL);
-                });
     }
 
     @Override
