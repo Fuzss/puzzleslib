@@ -111,7 +111,7 @@ public interface FabricPlayerInteraction {
         if (optional.isPresent()) {
             InteractionResult interactionResult = optional.get();
 
-            if (level.isClientSide && this.sendServerboundPacket(interactionResult)) {
+            if (level.isClientSide() && this.sendServerboundPacket(interactionResult)) {
                 // this brings parity with Forge where the server is notified regardless of the returned InteractionResult,
                 // as the Forge event runs after the server packet is sent
                 this.sendServerboundPacket(player, level, interactionHand, entity, hitResult);

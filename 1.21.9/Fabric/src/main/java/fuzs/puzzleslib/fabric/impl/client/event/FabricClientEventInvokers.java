@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompleteCallback;
 import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingEvents;
 import fuzs.puzzleslib.api.client.event.v1.model.ModelLoadingEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
@@ -174,7 +173,6 @@ public final class FabricClientEventInvokers {
                                         });
                     });
                 });
-        INSTANCE.register(ModelBakingCompleteCallback.class, FabricClientEvents.MODEL_BAKING_COMPLETE);
         INSTANCE.register(ClientLifecycleEvents.Started.class,
                 net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents.CLIENT_STARTED,
                 (ClientLifecycleEvents.Started callback) -> {

@@ -6,21 +6,21 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.state.CameraRenderState;
 
 @FunctionalInterface
 public interface RenderNameTagCallback {
     EventInvoker<RenderNameTagCallback> EVENT = EventInvoker.lookup(RenderNameTagCallback.class);
 
     /**
-     * Fires before the name tag of an entity is rendered.
+     * Fires before the name tag of an entity is rendered via
+     * {@link EntityRenderer#submitNameTag(EntityRenderState, PoseStack, SubmitNodeCollector, CameraRenderState)}.
      * <p>
-     * The name tag must be forced to render via {@link ExtractRenderStateCallback} for the callback to run.
+     * For {@link net.minecraft.client.renderer.entity.player.AvatarRenderer} this includes not only the name tag itself
+     * but also the score text value.
      *
-     * @param renderState         the entity render state
-     * @param component           the entity display name retrieved from {@link EntityRenderer#getNameTag(Entity)}
      * @param entityRenderer      the entity renderer instance
+     * @param renderState         the entity render state
      * @param poseStack           the pose stack
      * @param submitNodeCollector the submit node collector
      * @return <ul>
@@ -28,5 +28,5 @@ public interface RenderNameTagCallback {
      *         <li>{@link EventResult#PASS PASS} to allow the name tag to render if present</li>
      *         </ul>
      */
-    EventResult onRenderNameTag(EntityRenderState renderState, Component component, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, SubmitNodeCollector submitNodeCollector);
+    EventResult onRenderNameTag(EntityRenderer<?, ?> entityRenderer, EntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector);
 }

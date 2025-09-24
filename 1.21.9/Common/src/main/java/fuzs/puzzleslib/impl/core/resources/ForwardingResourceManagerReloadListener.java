@@ -12,8 +12,8 @@ import java.util.function.Supplier;
 
 public class ForwardingResourceManagerReloadListener extends ForwardingReloadListener<ResourceManagerReloadListener> implements ResourceManagerReloadListener {
 
-    public ForwardingResourceManagerReloadListener(ResourceLocation identifier, Supplier<Collection<ResourceManagerReloadListener>> supplier) {
-        super(identifier, supplier);
+    public ForwardingResourceManagerReloadListener(ResourceLocation resourceLocation, Supplier<Collection<ResourceManagerReloadListener>> supplier) {
+        super(resourceLocation, supplier);
     }
 
     @Override

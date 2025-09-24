@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.input.KeyEvent;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -18,9 +19,9 @@ abstract class KeyboardHandlerFabricMixin {
     private Minecraft minecraft;
 
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
-    public void keyPress(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo callback) {
-        if (windowPointer == this.minecraft.getWindow().getWindow()) {
-            EventResult result = FabricClientEvents.KEY_PRESS.invoker().onKeyPress(key, scanCode, action, modifiers);
+    public void keyPress(long windowPointer, int action, KeyEvent keyEvent, CallbackInfo callback) {
+        if (windowPointer == this.minecraft.getWindow().handle()) {
+            EventResult result = FabricClientEvents.KEY_PRESS.invoker().onKeyPress(keyEvent, action);
             if (result.isInterrupt()) callback.cancel();
         }
     }

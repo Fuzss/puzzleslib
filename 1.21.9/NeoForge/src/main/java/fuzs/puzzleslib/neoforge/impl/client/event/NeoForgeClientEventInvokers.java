@@ -7,7 +7,6 @@ import fuzs.puzzleslib.api.client.event.v1.gui.*;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
-import fuzs.puzzleslib.api.client.event.v1.model.ModelBakingCompleteCallback;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
 import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
@@ -98,11 +97,6 @@ public final class NeoForgeClientEventInvokers {
                         }
                     });
                 });
-        INSTANCE.register(ModelBakingCompleteCallback.class,
-                ModelEvent.BakingCompleted.class,
-                (ModelBakingCompleteCallback callback, ModelEvent.BakingCompleted event) -> {
-                    callback.onModelBakingComplete(event.getModelManager(), event.getBakingResult());
-                });
         INSTANCE.register(ExtractRenderStateCallback.class,
                 RegisterRenderStateModifiersEvent.class,
                 (ExtractRenderStateCallback callback, RegisterRenderStateModifiersEvent event) -> {
@@ -189,9 +183,8 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(RenderNameTagCallback.class,
                 RenderNameTagEvent.DoRender.class,
                 (RenderNameTagCallback callback, RenderNameTagEvent.DoRender event) -> {
-                    EventResult eventResult = callback.onRenderNameTag(event.getEntityRenderState(),
-                            event.getContent(),
-                            event.getEntityRenderer(),
+                    EventResult eventResult = callback.onRenderNameTag(event.getEntityRenderer(),
+                            event.getEntityRenderState(),
                             event.getPoseStack(),
                             event.getSubmitNodeCollector());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
@@ -386,9 +379,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(InputEvents.MouseClick.class,
                 InputEvent.MouseButton.Pre.class,
                 (InputEvents.MouseClick callback, InputEvent.MouseButton.Pre event) -> {
-                    EventResult eventResult = callback.onMouseClick(event.getButton(),
-                            event.getAction(),
-                            event.getModifiers());
+                    EventResult eventResult = callback.onMouseClick(event.getMouseButtonInfo(), event.getAction());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
         INSTANCE.register(InputEvents.MouseScroll.class,
@@ -405,7 +396,7 @@ public final class NeoForgeClientEventInvokers {
                 InputEvent.Key.class,
                 (InputEvents.KeyPress callback, InputEvent.Key event) -> {
                     // eventResult is ignored, as before event doesn't exist on NeoForge, so there is nothing to cancel the input
-                    callback.onKeyPress(event.getKey(), event.getScanCode(), event.getAction(), event.getModifiers());
+                    callback.onKeyPress(event.getKeyEvent(), event.getAction());
                 });
         INSTANCE.register(ComputeCameraAnglesCallback.class,
                 ViewportEvent.ComputeCameraAngles.class,

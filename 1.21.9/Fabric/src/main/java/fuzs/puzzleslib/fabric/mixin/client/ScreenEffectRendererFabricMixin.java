@@ -21,37 +21,28 @@ abstract class ScreenEffectRendererFabricMixin {
     @Final
     private Minecraft minecraft;
 
-    @WrapWithCondition(
-            method = "renderScreenEffect", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"
-    )
-    )
-    public boolean renderScreenEffect(TextureAtlasSprite texture, PoseStack poseStack, MultiBufferSource bufferSource, @Local BlockState blockState) {
+    @WrapWithCondition(method = "renderScreenEffect",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderTex(Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
+    public boolean renderScreenEffect(TextureAtlasSprite textureAtlasSprite, PoseStack poseStack, MultiBufferSource bufferSource, @Local BlockState blockState) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(this.minecraft.player, poseStack, bufferSource, blockState)
                 .isPass();
     }
 
-    @WrapWithCondition(
-            method = "renderScreenEffect", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"
-    )
-    )
+    @WrapWithCondition(method = "renderScreenEffect",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderWater(Lnet/minecraft/client/Minecraft;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"))
     public boolean renderScreenEffect(Minecraft minecraft, PoseStack poseStack, MultiBufferSource bufferSource) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(minecraft.player, poseStack, bufferSource, Blocks.WATER.defaultBlockState())
                 .isPass();
     }
 
-    @WrapWithCondition(
-            method = "renderScreenEffect", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;)V"
-    )
-    )
-    public boolean renderScreenEffect(PoseStack poseStack, MultiBufferSource bufferSource) {
+    @WrapWithCondition(method = "renderScreenEffect",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/ScreenEffectRenderer;renderFire(Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;Lnet/minecraft/client/renderer/texture/TextureAtlasSprite;)V"))
+    public boolean renderScreenEffect(PoseStack poseStack, MultiBufferSource bufferSource, TextureAtlasSprite textureAtlasSprite) {
         return FabricRendererEvents.RENDER_BLOCK_OVERLAY.invoker()
                 .onRenderBlockOverlay(this.minecraft.player, poseStack, bufferSource, Blocks.FIRE.defaultBlockState())
                 .isPass();

@@ -1,8 +1,11 @@
 package fuzs.puzzleslib.api.client.gui.v2;
 
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHandler;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 
@@ -29,8 +32,8 @@ public final class ScreenHelper {
      */
     public static int getMouseX() {
         Minecraft minecraft = Minecraft.getInstance();
-        return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() /
-                minecraft.getWindow().getScreenWidth());
+        return (int) (minecraft.mouseHandler.xpos() * minecraft.getWindow().getGuiScaledWidth() / minecraft.getWindow()
+                .getScreenWidth());
     }
 
     /**
@@ -38,8 +41,18 @@ public final class ScreenHelper {
      */
     public static int getMouseY() {
         Minecraft minecraft = Minecraft.getInstance();
-        return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() /
-                minecraft.getWindow().getScreenHeight());
+        return (int) (minecraft.mouseHandler.ypos() * minecraft.getWindow().getGuiScaledHeight() / minecraft.getWindow()
+                .getScreenHeight());
+    }
+
+    /**
+     * @param mouseButtonEvent the mouse button event
+     * @return is this a double click
+     */
+    public static boolean isDoubleClick(MouseButtonEvent mouseButtonEvent) {
+        MouseHandler mouseHandler = Minecraft.getInstance().mouseHandler;
+        return Util.getMillis() - mouseHandler.lastClickTime < 250L
+                && mouseHandler.lastClickButton == mouseButtonEvent.button();
     }
 
     /**

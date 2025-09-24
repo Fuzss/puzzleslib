@@ -311,6 +311,8 @@ accessible  field   net/minecraft/client/KeyMapping$Category    SORT_ORDER  Ljav
 accessible  field   net/minecraft/client/multiplayer/ClientLevel    minecraft   Lnet/minecraft/client/Minecraft;
 accessible  method  net/minecraft/client/multiplayer/ClientLevel    calculateParticleLevel  (Z)Lnet/minecraft/server/level/ParticleStatus;
 transitive-accessible	method	net/minecraft/client/gui/components/debug/DebugScreenEntries    register	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/gui/components/debug/DebugScreenEntry;)Lnet/minecraft/resources/ResourceLocation;
+accessible  field   net/minecraft/client/MouseHandler   lastClickTime   J
+accessible  field   net/minecraft/client/MouseHandler   lastClickButton I
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

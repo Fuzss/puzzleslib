@@ -7,6 +7,7 @@ import fuzs.puzzleslib.api.client.event.v1.gui.AddToastCallback;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenOpeningCallback;
+import fuzs.puzzleslib.api.client.gui.v2.ScreenHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import net.minecraft.client.DeltaTracker;
@@ -73,12 +74,11 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
             }
         });
         // required for EditBox mixin to work properly on all screens like ChatScreen
-        // TODO check which of these is still required
         ScreenMouseEvents.beforeMouseClick(Screen.class)
                 .register((Screen screen, MouseButtonEvent mouseButtonEvent) -> {
                     for (GuiEventListener guiEventListener : screen.children()) {
                         if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseButtonEvent,
-                                false)) {
+                                ScreenHelper.isDoubleClick(mouseButtonEvent))) {
                             screen.setFocused(guiEventListener);
                             if (mouseButtonEvent.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                                 screen.setDragging(true);

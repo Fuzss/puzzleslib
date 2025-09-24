@@ -9,7 +9,7 @@ public final class ClientLevelEvents {
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
     private ClientLevelEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -18,10 +18,10 @@ public final class ClientLevelEvents {
         /**
          * Fires before a client level is loaded.
          *
-         * @param minecraft minecraft singleton instance
-         * @param level  the client level that is being loaded
+         * @param minecraft   the minecraft instance
+         * @param clientLevel the client level that is being loaded
          */
-        void onLevelLoad(Minecraft minecraft, ClientLevel level);
+        void onLevelLoad(Minecraft minecraft, ClientLevel clientLevel);
     }
 
     @FunctionalInterface
@@ -30,9 +30,9 @@ public final class ClientLevelEvents {
         /**
          * Fires before a client level is unloaded.
          *
-         * @param minecraft minecraft singleton instance
-         * @param level  the client level that is being unloaded
+         * @param minecraft   the minecraft instance
+         * @param clientLevel the client level that is being unloaded
          */
-        void onLevelUnload(Minecraft minecraft, ClientLevel level);
+        void onLevelUnload(Minecraft minecraft, ClientLevel clientLevel);
     }
 }

@@ -76,7 +76,7 @@ public class MultiConfigurationScreen extends OptionsSubScreen {
                                 Button.DEFAULT_HEIGHT,
                                 Component.translatable(LANG_PREFIX + type.name().toLowerCase(Locale.ENGLISH))
                                         .withStyle(ChatFormatting.UNDERLINE),
-                                this.font).alignLeft(), null);
+                                this.font), null);
                         headerAdded = true;
                     }
                     Button btn = Button.builder(Component.translatable(SECTION,

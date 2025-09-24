@@ -5,6 +5,8 @@ import fuzs.puzzleslib.api.client.event.v1.gui.ScreenKeyboardEvents;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenMouseEvents;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 
 /**
  * Very similar to {@link ScreenMouseEvents} and {@link ScreenKeyboardEvents}, but fires when no screen is open to
@@ -25,15 +27,16 @@ public final class InputEvents {
         /**
          * Called before a mouse button is clicked or released without a screen being open.
          *
-         * @param mouseButton the button input code, see {@link InputConstants}
-         * @param action      the mouse button action, see {@link InputConstants}
-         * @param modifiers   a bit field representing the active modifier keys
+         * @param mouseButtonInfo the mouse button info; for bundled values see
+         *                        {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param action          the mouse button action; see {@link InputConstants#RELEASE},
+         *                        {@link InputConstants#PRESS}, {@link InputConstants#REPEAT}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onMouseClick(int mouseButton, int action, int modifiers);
+        EventResult onMouseClick(MouseButtonInfo mouseButtonInfo, int action);
     }
 
     @FunctionalInterface
@@ -64,15 +67,14 @@ public final class InputEvents {
          * Note that on NeoForge due to the native implementation of this event cancelling a key press is not
          * supported.
          *
-         * @param keyCode   the named key code which can be identified by the constants in {@link InputConstants}
-         * @param scanCode  the unique / platform-specific scan code of the keyboard input
-         * @param action    the key action, see {@link InputConstants}
-         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
+         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @param action   the mouse button action; see {@link InputConstants#RELEASE}, {@link InputConstants#PRESS},
+         *                 {@link InputConstants#REPEAT}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
          *         </ul>
          */
-        EventResult onKeyPress(int keyCode, int scanCode, int action, int modifiers);
+        EventResult onKeyPress(KeyEvent keyEvent, int action);
     }
 }

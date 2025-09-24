@@ -3,7 +3,6 @@ package fuzs.puzzleslib.fabric.impl.client.core;
 import fuzs.forgeconfigapiport.fabric.api.v5.client.ConfigScreenFactoryRegistry;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricGuiEvents;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
@@ -11,7 +10,6 @@ import fuzs.puzzleslib.fabric.impl.client.config.MultiConfigurationScreen;
 import fuzs.puzzleslib.fabric.impl.client.core.context.GuiLayersContextFabricImpl;
 import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
-import fuzs.puzzleslib.fabric.impl.client.util.EntityRenderStateExtension;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
 import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
@@ -21,6 +19,7 @@ import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientConfigurationNetworking;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.RenderStateDataKey;
 import net.fabricmc.fabric.api.client.rendering.v1.TooltipComponentCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudStatusBarHeightRegistry;
 import net.minecraft.client.KeyMapping;
@@ -44,6 +43,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -54,12 +54,11 @@ import net.neoforged.fml.config.ModConfigs;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.IntFunction;
 
 public class FabricClientProxy extends FabricCommonProxy implements ClientProxyImpl {
+    private final Map<ContextKey<?>, RenderStateDataKey<?>> entityRenderStateKeys = new IdentityHashMap<>();
 
     @Override
     public void registerLoadingHandlers() {
@@ -133,13 +132,19 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public <T> @Nullable T getRenderProperty(EntityRenderState renderState, RenderPropertyKey<T> key) {
-        return ((EntityRenderStateExtension) renderState).puzzleslib$getRenderProperty(key);
+    public <T> @Nullable T getRenderProperty(EntityRenderState renderState, ContextKey<T> key) {
+        return renderState.getData(this.getRenderStateDataKey(key));
     }
 
     @Override
-    public <T> void setRenderProperty(EntityRenderState renderState, RenderPropertyKey<T> key, @Nullable T t) {
-        ((EntityRenderStateExtension) renderState).puzzleslib$setRenderProperty(key, t);
+    public <T> void setRenderProperty(EntityRenderState renderState, ContextKey<T> key, @Nullable T t) {
+        renderState.setData(this.getRenderStateDataKey(key), t);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> RenderStateDataKey<T> getRenderStateDataKey(ContextKey<T> key) {
+        return (RenderStateDataKey<T>) this.entityRenderStateKeys.computeIfAbsent(key,
+                (ContextKey<?> keyX) -> RenderStateDataKey.create(keyX::toString));
     }
 
     @Override
@@ -228,7 +233,6 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
 
     @Override
     public <E extends Entity, S extends EntityRenderState> void onUpdateEntityRenderState(EntityRenderer<E, S> renderer, E entity, S renderState, float partialTick) {
-        ((EntityRenderStateExtension) renderState).puzzleslib$clearRenderProperties();
         FabricRendererEvents.EXTRACT_RENDER_STATE.invoker().onExtractRenderState(entity, renderState, partialTick);
     }
 }

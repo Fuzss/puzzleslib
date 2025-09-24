@@ -8,7 +8,11 @@ import net.minecraft.util.Mth;
  *
  * @see ARGB
  */
-public class HSV {
+public final class HSV {
+
+    private HSV() {
+        // NO-OP
+    }
 
     /**
      * @param color the packed color
