@@ -14,6 +14,7 @@ import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.SpecialBlockModelRenderer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
+import net.minecraft.client.renderer.texture.SpriteLoader;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
@@ -34,23 +35,34 @@ import java.util.stream.Collectors;
 
 public final class BlockStateResolverContextNeoForgeImpl implements BlockStateResolverContext {
     private final ResourceManager resourceManager = Minecraft.getInstance().getResourceManager();
-    private final Function<Material, TextureAtlasSprite> textureGetter;
+    private final Function<ResourceLocation, TextureAtlasSprite> textureGetter;
     private final ResolvedModel missingModel;
     private final Supplier<TextureAtlasSprite> missingSprite;
     private final Map<ResourceLocation, ResolvedModel> resolvedModels;
     private final BiConsumer<BlockState, BlockStateModel> blockStateModelOutput;
+    private final Function<Map<BlockState, BlockStateModel.UnbakedRoot>, ModelBakery> modelBakeryFactory;
 
     public BlockStateResolverContextNeoForgeImpl(ModelEvent.ModifyBakingResult event) {
         this.textureGetter = event.getTextureGetter();
         this.missingModel = event.getModelBakery().missingModel;
         this.missingSprite = Suppliers.memoize(() -> {
-            Material material = new Material(TextureAtlas.LOCATION_BLOCKS, MissingTextureAtlasSprite.getLocation());
-            TextureAtlasSprite textureAtlasSprite = event.getTextureGetter().apply(material);
+            TextureAtlasSprite textureAtlasSprite = event.getTextureGetter()
+                    .apply(MissingTextureAtlasSprite.getLocation());
             Objects.requireNonNull(textureAtlasSprite, "missing sprite is null");
             return textureAtlasSprite;
         });
         this.resolvedModels = new HashMap<>(event.getModelBakery().resolvedModels);
         this.blockStateModelOutput = event.getBakingResult().blockStateModels()::put;
+        this.modelBakeryFactory = (Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels) -> {
+            return new ModelBakery(event.getModelBakery().entityModelSet,
+                    event.getModelBakery().materials,
+                    event.getModelBakery().playerSkinRenderCache,
+                    unbakedBlockStateModels,
+                    Collections.emptyMap(),
+                    this.resolvedModels,
+                    this.missingModel,
+                    StandaloneModelLoader.LoadedModels.EMPTY);
+        };
     }
 
     @Override
@@ -80,14 +92,11 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
         this.loadModels(unbakedBlockStateModels).blockStateModels().forEach(this.blockStateModelOutput);
     }
 
-    ModelBakery.BakingResult loadModels(Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels) {
-        ModelBakery modelBakery = new ModelBakery(EntityModelSet.EMPTY,
-                unbakedBlockStateModels,
-                Collections.emptyMap(),
-                this.resolvedModels,
-                this.missingModel,
-                StandaloneModelLoader.LoadedModels.EMPTY);
-        return loadModels(Profiler.get(), this.textureGetter, modelBakery, this.missingSprite);
+    private ModelBakery.BakingResult loadModels(Map<BlockState, BlockStateModel.UnbakedRoot> unbakedBlockStateModels) {
+        return loadModels(Profiler.get(),
+                this.textureGetter,
+                this.modelBakeryFactory.apply(unbakedBlockStateModels),
+                this.missingSprite);
     }
 
     @Override
@@ -100,23 +109,25 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
 
     /**
      * Similar to
-     * {@link ModelManager#loadModels(ProfilerFiller, Map, ModelBakery, Object2IntMap, EntityModelSet,
-     * SpecialBlockModelRenderer)}.
+     * {@link ModelManager#loadModels(SpriteLoader.Preparations, ModelBakery, Object2IntMap, EntityModelSet,
+     * SpecialBlockModelRenderer, Executor)}.
      */
-    static ModelBakery.BakingResult loadModels(ProfilerFiller profiler, Function<Material, TextureAtlasSprite> textureGetter, ModelBakery modelBakery, Supplier<TextureAtlasSprite> missingSprite) {
+    private static ModelBakery.BakingResult loadModels(ProfilerFiller profiler, Function<ResourceLocation, TextureAtlasSprite> textureGetter, ModelBakery modelBakery, Supplier<TextureAtlasSprite> missingSprite) {
         profiler.push(PuzzlesLibMod.id("baking").toString());
         final Multimap<String, Material> multimap = HashMultimap.create();
         final Multimap<String, String> multimap1 = HashMultimap.create();
         ModelBakery.BakingResult bakingResult = modelBakery.bakeModels(new SpriteGetter() {
             @Override
             public TextureAtlasSprite get(Material material, ModelDebugName name) {
-                TextureAtlasSprite textureAtlasSprite = textureGetter.apply(material);
-                if (textureAtlasSprite != null) {
-                    return textureAtlasSprite;
-                } else {
-                    multimap.put(name.debugName(), material);
-                    return missingSprite.get();
+                if (material.atlasLocation().equals(TextureAtlas.LOCATION_BLOCKS)) {
+                    TextureAtlasSprite textureAtlasSprite = textureGetter.apply(material.texture());
+                    if (textureAtlasSprite != null) {
+                        return textureAtlasSprite;
+                    }
                 }
+
+                multimap.put(name.debugName(), material);
+                return missingSprite.get();
             }
 
             @Override

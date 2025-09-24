@@ -25,6 +25,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.gui.screens.worldselection.CreateWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldCreationUiState;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.tutorial.TutorialSteps;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.CommonComponents;
@@ -72,37 +73,38 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
             }
         });
         // required for EditBox mixin to work properly on all screens like ChatScreen
+        // TODO check which of these is still required
         ScreenMouseEvents.beforeMouseClick(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button) -> {
+                .register((Screen screen, MouseButtonEvent mouseButtonEvent) -> {
                     for (GuiEventListener guiEventListener : screen.children()) {
-                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseX,
-                                mouseY,
-                                button)) {
+                        if (guiEventListener instanceof EditBox && guiEventListener.mouseClicked(mouseButtonEvent,
+                                false)) {
                             screen.setFocused(guiEventListener);
-                            if (button == InputConstants.MOUSE_BUTTON_LEFT) {
+                            if (mouseButtonEvent.button() == InputConstants.MOUSE_BUTTON_LEFT) {
                                 screen.setDragging(true);
                             }
+
                             return EventResult.INTERRUPT;
                         }
                     }
+
                     return EventResult.PASS;
                 });
         ScreenMouseEvents.beforeMouseRelease(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button) -> {
+                .register((Screen screen, MouseButtonEvent mouseButtonEvent) -> {
                     screen.setDragging(false);
-                    return screen.getChildAt(mouseX, mouseY)
+                    return screen.getChildAt(mouseButtonEvent.x(), mouseButtonEvent.y())
                             .filter(EditBox.class::isInstance)
                             .filter((GuiEventListener guiEventListener) -> {
-                                return guiEventListener.mouseReleased(mouseX, mouseY, button);
+                                return guiEventListener.mouseReleased(mouseButtonEvent);
                             })
                             .isPresent() ? EventResult.INTERRUPT : EventResult.PASS;
                 });
         ScreenMouseEvents.beforeMouseDrag(Screen.class)
-                .register((Screen screen, double mouseX, double mouseY, int button, double dragX, double dragY) -> {
+                .register((Screen screen, MouseButtonEvent mouseButtonEvent, double dragX, double dragY) -> {
                     return screen.getFocused() instanceof EditBox && screen.isDragging()
-                            && button == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused()
-                            .mouseDragged(mouseX, mouseY, button, dragX, dragY) ? EventResult.INTERRUPT :
-                            EventResult.PASS;
+                            && mouseButtonEvent.button() == InputConstants.MOUSE_BUTTON_LEFT && screen.getFocused()
+                            .mouseDragged(mouseButtonEvent, dragX, dragY) ? EventResult.INTERRUPT : EventResult.PASS;
                 });
     }
 

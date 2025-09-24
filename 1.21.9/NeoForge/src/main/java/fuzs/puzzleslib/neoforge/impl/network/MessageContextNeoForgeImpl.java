@@ -82,7 +82,7 @@ public abstract class MessageContextNeoForgeImpl<T extends PacketListener> imple
 
         @Override
         public ClientLevel level() {
-            return this.player().clientLevel;
+            return this.client().level;
         }
     }
 

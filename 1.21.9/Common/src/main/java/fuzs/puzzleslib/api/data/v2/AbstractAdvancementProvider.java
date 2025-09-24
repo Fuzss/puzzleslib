@@ -55,7 +55,7 @@ public abstract class AbstractAdvancementProvider implements DataProvider, Advan
         return new DisplayInfo(itemStack,
                 advancementToken.title(),
                 advancementToken.description(),
-                Optional.ofNullable(background).map(ClientAsset::new),
+                Optional.ofNullable(background).map(ClientAsset.ResourceTexture::new),
                 advancementType,
                 true,
                 true,

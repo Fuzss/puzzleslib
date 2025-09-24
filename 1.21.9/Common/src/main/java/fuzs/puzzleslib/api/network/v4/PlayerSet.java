@@ -73,11 +73,15 @@ public interface PlayerSet {
     static PlayerSet ofOthers(ServerPlayer serverPlayer) {
         Objects.requireNonNull(serverPlayer, "server player is null");
         return (Consumer<ServerPlayer> serverPlayerConsumer) -> {
-            serverPlayer.getServer().getPlayerList().getPlayers().forEach((ServerPlayer currentServerPlayer) -> {
-                if (currentServerPlayer != serverPlayer) {
-                    ofPlayer(currentServerPlayer).apply(serverPlayerConsumer);
-                }
-            });
+            serverPlayer.level()
+                    .getServer()
+                    .getPlayerList()
+                    .getPlayers()
+                    .forEach((ServerPlayer currentServerPlayer) -> {
+                        if (currentServerPlayer != serverPlayer) {
+                            ofPlayer(currentServerPlayer).apply(serverPlayerConsumer);
+                        }
+                    });
         };
     }
 
@@ -170,7 +174,7 @@ public interface PlayerSet {
         Objects.requireNonNull(blockEntity, "block entity is null");
         Level level = blockEntity.getLevel();
         Objects.requireNonNull(level, "block entity level is null");
-        return level.isClientSide ? PlayerSet.ofNone() : nearPosition(blockEntity.getBlockPos(), (ServerLevel) level);
+        return level.isClientSide() ? PlayerSet.ofNone() : nearPosition(blockEntity.getBlockPos(), (ServerLevel) level);
     }
 
     /**
@@ -180,7 +184,7 @@ public interface PlayerSet {
      */
     static PlayerSet nearChunk(LevelChunk levelChunk) {
         Objects.requireNonNull(levelChunk, "chunk is null");
-        return levelChunk.getLevel().isClientSide ? PlayerSet.ofNone() :
+        return levelChunk.getLevel().isClientSide() ? PlayerSet.ofNone() :
                 nearChunk((ServerLevel) levelChunk.getLevel(), levelChunk.getPos());
     }
 
@@ -213,7 +217,7 @@ public interface PlayerSet {
      */
     static PlayerSet nearEntity(Entity entity) {
         Objects.requireNonNull(entity, "entity is null");
-        return entity.level().isClientSide ? PlayerSet.ofNone() : (Consumer<ServerPlayer> serverPlayerConsumer) -> {
+        return entity.level().isClientSide() ? PlayerSet.ofNone() : (Consumer<ServerPlayer> serverPlayerConsumer) -> {
             ChunkMap chunkMap = ((ServerLevel) entity.level()).getChunkSource().chunkMap;
             ChunkMap.TrackedEntity trackedEntity = chunkMap.entityMap.get(entity.getId());
             if (trackedEntity != null) {

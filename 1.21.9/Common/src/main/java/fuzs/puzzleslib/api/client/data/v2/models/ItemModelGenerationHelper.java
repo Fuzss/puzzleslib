@@ -2,7 +2,7 @@ package fuzs.puzzleslib.api.client.data.v2.models;
 
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
+import fuzs.puzzleslib.impl.init.LegacySpawnEggItem;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.*;
@@ -106,8 +106,8 @@ public final class ItemModelGenerationHelper {
 
     public static void generateSpawnEgg(Item item, ItemModelGenerators itemModelGenerators) {
         generateSpawnEgg(item,
-                ((DyedSpawnEggItem) item).backgroundColor(),
-                ((DyedSpawnEggItem) item).highlightColor(),
+                ((LegacySpawnEggItem) item).getBackgroundColor(),
+                ((LegacySpawnEggItem) item).getHighlightColor(),
                 itemModelGenerators);
     }
 

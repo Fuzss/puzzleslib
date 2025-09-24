@@ -326,7 +326,8 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addKeyCategory(String modId, String value) {
-            this.add("key.categories." + modId, value);
+            this.add(new KeyMapping.Category(ResourceLocationHelper.fromNamespaceAndPath(modId, "main")).label(),
+                    value);
         }
 
         default void add(Component component, String value) {

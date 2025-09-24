@@ -10,8 +10,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.util.InclusiveRange;
 
-import java.util.Optional;
-
 public final class ModPackMetadataProvider extends PackMetadataGenerator {
 
     public ModPackMetadataProvider(DataProviderContext context) {
@@ -29,9 +27,8 @@ public final class ModPackMetadataProvider extends PackMetadataGenerator {
     public ModPackMetadataProvider(PackType packType, String modId, PackOutput packOutput) {
         super(packOutput);
         Component component = PackResourcesHelper.getPackDescription(modId);
-        this.add(PackMetadataSection.TYPE,
+        this.add(PackMetadataSection.forPackType(packType),
                 new PackMetadataSection(component,
-                        DetectedVersion.BUILT_IN.packVersion(packType),
-                        Optional.of(new InclusiveRange<>(0, Integer.MAX_VALUE))));
+                        new InclusiveRange<>(DetectedVersion.BUILT_IN.packVersion(packType))));
     }
 }

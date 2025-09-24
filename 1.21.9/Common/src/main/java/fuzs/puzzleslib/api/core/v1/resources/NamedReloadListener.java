@@ -11,10 +11,10 @@ public interface NamedReloadListener extends PreparableReloadListener {
     /**
      * @return the resource location for this reload listener
      */
-    ResourceLocation identifier();
+    ResourceLocation resourceLocation();
 
     @Override
     default String getName() {
-        return this.identifier().toString();
+        return this.resourceLocation().toString();
     }
 }

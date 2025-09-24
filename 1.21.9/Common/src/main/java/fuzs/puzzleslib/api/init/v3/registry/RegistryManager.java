@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.init.DyedSpawnEggItem;
+import fuzs.puzzleslib.impl.init.LegacySpawnEggItem;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -35,10 +35,7 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
@@ -244,44 +241,52 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
     /**
      * Registers a spawn egg item for an entity type.
      *
-     * @param entityTypeHolder entity type holder to register a spawn egg for
-     * @param backgroundColor  background color of the spawn egg item
+     * @param entityTypeHolder the entity type holder
      * @return the holder reference
      */
-    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor) {
-        return this.registerSpawnEggItem(entityTypeHolder,
+    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder) {
+        return this.registerSpawnEggItem(entityTypeHolder, SpawnEggItem::new);
+    }
+
+    /**
+     * Registers a spawn egg item for an entity type.
+     *
+     * @param entityTypeHolder the entity type holder
+     * @param backgroundColor  the background color for the spawn egg texture
+     * @return the holder reference
+     */
+    default Holder.Reference<Item> registerLegacySpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor) {
+        return this.registerLegacySpawnEggItem(entityTypeHolder,
                 backgroundColor,
-                DyedSpawnEggItem.generateHighlightColor(backgroundColor));
+                LegacySpawnEggItem.generateHighlightColor(backgroundColor));
     }
 
     /**
      * Registers a spawn egg item for an entity type.
      *
-     * @param entityTypeHolder entity type holder to register a spawn egg for
-     * @param backgroundColor  background color of the spawn egg item
-     * @param highlightColor   spots color pf the spawn egg item
+     * @param entityTypeHolder the entity type holder
+     * @param backgroundColor  the background color for the spawn egg texture
+     * @param highlightColor   the spots color for the spawn egg texture
      * @return the holder reference
      */
-    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor) {
-        return this.registerSpawnEggItem(entityTypeHolder, backgroundColor, highlightColor, Item.Properties::new);
-    }
-
-    /**
-     * Registers a spawn egg item for an entity type.
-     *
-     * @param entityTypeHolder       entity type holder to register a spawn egg for
-     * @param backgroundColor        background color of the spawn egg item
-     * @param highlightColor         spots color pf the spawn egg item
-     * @param itemPropertiesSupplier supplier for new item properties
-     * @return the holder reference
-     */
-    default Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor, Supplier<Item.Properties> itemPropertiesSupplier) {
-        return this.registerItem(entityTypeHolder.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
-                (Item.Properties itemProperties) -> new DyedSpawnEggItem(entityTypeHolder.value(),
-                        backgroundColor,
+    default Holder.Reference<Item> registerLegacySpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor) {
+        return this.registerSpawnEggItem(entityTypeHolder,
+                (Item.Properties itemProperties) -> new LegacySpawnEggItem(backgroundColor,
                         highlightColor,
-                        itemProperties),
-                itemPropertiesSupplier);
+                        itemProperties));
+    }
+
+    /**
+     * Registers a spawn egg item for an entity type.
+     *
+     * @param entityTypeHolder the entity type holder
+     * @param itemFactory      the factory for the new item
+     * @return the holder reference
+     */
+    private Holder.Reference<Item> registerSpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, Function<Item.Properties, Item> itemFactory) {
+        return this.registerItem(entityTypeHolder.unwrapKey().orElseThrow().location().getPath() + "_spawn_egg",
+                itemFactory,
+                () -> new Item.Properties().spawnEgg(entityTypeHolder.value()));
     }
 
     /**

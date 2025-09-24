@@ -38,6 +38,11 @@ public final class ScreenEvents {
         return EventInvoker.lookup((Class<BeforeRender<T>>) (Class<?>) BeforeRender.class, screen);
     }
 
+    public static <T extends Screen> EventInvoker<AfterBackground<T>> afterBackground(Class<T> screen) {
+        Objects.requireNonNull(screen, "screen type is null");
+        return EventInvoker.lookup((Class<AfterBackground<T>>) (Class<?>) AfterBackground.class, screen);
+    }
+
     public static <T extends Screen> EventInvoker<AfterRender<T>> afterRender(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
         return EventInvoker.lookup((Class<AfterRender<T>>) (Class<?>) AfterRender.class, screen);
@@ -107,6 +112,21 @@ public final class ScreenEvents {
          * @param partialTick the partial tick time
          */
         void onBeforeRender(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
+    }
+
+    @FunctionalInterface
+    public interface AfterBackground<T extends Screen> {
+
+        /**
+         * Runs after a screen background is rendered in {@link Screen#renderBackground(GuiGraphics, int, int, float)}.
+         *
+         * @param screen      the currently displayed screen
+         * @param guiGraphics the gui graphics component
+         * @param mouseX      the x-position of the mouse
+         * @param mouseY      the y-position of the mouse
+         * @param partialTick the partial tick time
+         */
+        void onAfterBackground(T screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick);
     }
 
     @FunctionalInterface

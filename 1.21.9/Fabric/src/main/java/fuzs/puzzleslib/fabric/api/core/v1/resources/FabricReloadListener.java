@@ -18,10 +18,10 @@ import java.util.concurrent.Executor;
  * A helper class for registering a {@link PreparableReloadListener} on Fabric without the need for it to implement
  * {@link IdentifiableResourceReloadListener}.
  *
- * @param identifier     identifier for this reload listener
+ * @param resourceLocation     identifier for this reload listener
  * @param reloadListener the reload listener
  */
-public record FabricReloadListener(ResourceLocation identifier,
+public record FabricReloadListener(ResourceLocation resourceLocation,
                                    PreparableReloadListener reloadListener,
                                    Collection<ResourceLocation> dependencies) implements NamedReloadListener, IdentifiableResourceReloadListener {
 
@@ -54,7 +54,7 @@ public record FabricReloadListener(ResourceLocation identifier,
     }
 
     public FabricReloadListener(NamedReloadListener reloadListener, ResourceLocation... dependencies) {
-        this(reloadListener.identifier(), reloadListener, ImmutableSet.copyOf(dependencies));
+        this(reloadListener.resourceLocation(), reloadListener, ImmutableSet.copyOf(dependencies));
     }
 
     @Override
@@ -64,6 +64,6 @@ public record FabricReloadListener(ResourceLocation identifier,
 
     @Override
     public ResourceLocation getFabricId() {
-        return this.identifier;
+        return this.resourceLocation;
     }
 }

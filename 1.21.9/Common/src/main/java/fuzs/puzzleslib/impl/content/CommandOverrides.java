@@ -95,8 +95,8 @@ public final class CommandOverrides {
                         .getWorldData()
                         .isAllowCommands()) {
                     serverLevel.getServer().schedule(new TickTask(serverLevel.getServer().getTickCount(), () -> {
-                        String playerName = serverPlayer.getGameProfile().getName();
-                        executeCommandOverrides(serverPlayer.getServer(),
+                        String playerName = serverPlayer.getGameProfile().name();
+                        executeCommandOverrides(serverPlayer.level().getServer(),
                                 CommandEnvironment.PLAYER,
                                 CommandEnvironment.DEDICATED_PLAYER,
                                 (String s) -> s.replaceAll("@[sp]", playerName));

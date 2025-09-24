@@ -11,9 +11,9 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -51,7 +51,7 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     float getPartialTick(EntityRenderState renderState);
 
-    boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode);
+    boolean isKeyActiveAndMatches(KeyMapping keyMapping, KeyEvent keyEvent);
 
     ClientTooltipComponent createImageComponent(TooltipComponent imageComponent);
 
@@ -105,17 +105,17 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     @Override
     default boolean hasControlDown() {
-        return Screen.hasControlDown();
+        return Minecraft.getInstance().hasControlDown();
     }
 
     @Override
     default boolean hasShiftDown() {
-        return Screen.hasShiftDown();
+        return Minecraft.getInstance().hasShiftDown();
     }
 
     @Override
     default boolean hasAltDown() {
-        return Screen.hasAltDown();
+        return Minecraft.getInstance().hasAltDown();
     }
 
     @Override

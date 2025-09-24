@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.impl.content.client;
 
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fuzs.puzzleslib.api.client.event.v1.gui.ScreenEvents;
@@ -11,6 +12,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.events.ContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.util.ExtraCodecs;
@@ -27,16 +29,16 @@ import java.util.function.UnaryOperator;
  */
 public final class ScreenSkipper {
     public static final Codec<ScreenSkipper> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.STRING.optionalFieldOf(
-                    "screen_title_translation_key").forGetter(config -> getOptionalComponent(config.titleComponent)),
-            Codec.STRING.optionalFieldOf("button_translation_key")
-                    .forGetter(config -> getOptionalComponent(config.buttonComponent)),
-            Codec.STRING.optionalFieldOf("last_screen_title_translation_key")
-                    .forGetter(config -> getOptionalComponent(config.lastTitleComponent)),
-            ExtraCodecs.POSITIVE_INT.optionalFieldOf("skip_buttons")
-                    .forGetter(config -> config.skipButtons > 0 ? Optional.of(config.skipButtons) : Optional.empty()),
-            Codec.BOOL.optionalFieldOf("single_trigger")
-                    .forGetter(config -> config.singleTrigger ? Optional.of(config.singleTrigger) : Optional.empty())
-    ).apply(instance, ScreenSkipper::new));
+                            "screen_title_translation_key").forGetter(config -> getOptionalComponent(config.titleComponent)),
+                    Codec.STRING.optionalFieldOf("button_translation_key")
+                            .forGetter(config -> getOptionalComponent(config.buttonComponent)),
+                    Codec.STRING.optionalFieldOf("last_screen_title_translation_key")
+                            .forGetter(config -> getOptionalComponent(config.lastTitleComponent)),
+                    ExtraCodecs.POSITIVE_INT.optionalFieldOf("skip_buttons")
+                            .forGetter(config -> config.skipButtons > 0 ? Optional.of(config.skipButtons) : Optional.empty()),
+                    Codec.BOOL.optionalFieldOf("single_trigger")
+                            .forGetter(config -> config.singleTrigger ? Optional.of(config.singleTrigger) : Optional.empty()))
+            .apply(instance, ScreenSkipper::new));
 
     static Optional<String> getOptionalComponent(@Nullable Component component) {
         if (component != null && component.getContents() instanceof TranslatableContents contents) {
@@ -61,8 +63,7 @@ public final class ScreenSkipper {
                 buttonComponent.map(Component::translatable).orElse(null),
                 lastTitleComponent.map(Component::translatable).orElse(null),
                 skipButtons.orElse(0),
-                singleTrigger.orElse(false)
-        );
+                singleTrigger.orElse(false));
     }
 
     private ScreenSkipper() {
@@ -101,8 +102,7 @@ public final class ScreenSkipper {
                 this.buttonComponent,
                 this.lastTitleComponent,
                 this.skipButtons,
-                this.singleTrigger
-        );
+                this.singleTrigger);
     }
 
     /**
@@ -122,8 +122,7 @@ public final class ScreenSkipper {
                 buttonComponent,
                 this.lastTitleComponent,
                 this.skipButtons,
-                this.singleTrigger
-        );
+                this.singleTrigger);
     }
 
     /**
@@ -143,8 +142,7 @@ public final class ScreenSkipper {
                 this.buttonComponent,
                 lastTitleComponent,
                 this.skipButtons,
-                this.singleTrigger
-        );
+                this.singleTrigger);
     }
 
     /**
@@ -158,8 +156,7 @@ public final class ScreenSkipper {
                 this.buttonComponent,
                 this.lastTitleComponent,
                 skipButtons,
-                this.singleTrigger
-        );
+                this.singleTrigger);
     }
 
     /**
@@ -172,8 +169,7 @@ public final class ScreenSkipper {
                 this.buttonComponent,
                 this.lastTitleComponent,
                 this.skipButtons,
-                true
-        );
+                true);
     }
 
     /**
@@ -181,8 +177,7 @@ public final class ScreenSkipper {
      */
     public void build() {
         Preconditions.checkState(this.titleComponent != null || this.lastTitleComponent != null,
-                "screen not specified"
-        );
+                "screen not specified");
         this.setTriggerProperty(false);
         ScreenEvents.afterInit(Screen.class).register(this::onAfterInit);
         if (this.lastTitleComponent != null) {
@@ -203,8 +198,8 @@ public final class ScreenSkipper {
     }
 
     private void onAfterInit(Minecraft minecraft, Screen screen, int screenWidth, int screenHeight, List<AbstractWidget> widgets, UnaryOperator<AbstractWidget> addWidget, Consumer<AbstractWidget> removeWidget) {
-        if (this.trigger == EventResult.ALLOW &&
-                (this.titleComponent == null || screen.getTitle().equals(this.titleComponent))) {
+        if (this.trigger == EventResult.ALLOW && (this.titleComponent == null || screen.getTitle()
+                .equals(this.titleComponent))) {
             this.iterateAllWidgets(widgets, this.skipButtons);
         }
     }
@@ -214,7 +209,7 @@ public final class ScreenSkipper {
             if (guiEventListener instanceof Button button) {
                 if (this.buttonComponent == null || button.getMessage().equals(this.buttonComponent)) {
                     if (skipButtons-- <= 0) {
-                        button.onPress();
+                        button.onPress(new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0));
                         this.setTriggerProperty(true);
                         break;
                     }

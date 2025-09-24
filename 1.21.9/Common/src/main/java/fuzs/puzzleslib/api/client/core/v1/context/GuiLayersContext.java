@@ -79,10 +79,6 @@ public interface GuiLayersContext {
      */
     ResourceLocation DEMO_TIMER = ResourceLocationHelper.withDefaultNamespace("demo_timer");
     /**
-     * The layer for rendering the debug overlay (F3 screen).
-     */
-    ResourceLocation DEBUG_OVERLAY = ResourceLocationHelper.withDefaultNamespace("debug_overlay");
-    /**
      * The layer for rendering the scoreboard.
      */
     ResourceLocation SCOREBOARD = ResourceLocationHelper.withDefaultNamespace("scoreboard");

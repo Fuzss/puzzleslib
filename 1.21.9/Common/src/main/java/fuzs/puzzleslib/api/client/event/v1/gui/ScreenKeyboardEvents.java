@@ -3,12 +3,10 @@ package fuzs.puzzleslib.api.client.event.v1.gui;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 
 import java.util.Objects;
 
-/**
- * Some javadoc has been copied from <code>net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents</code>.
- */
 @SuppressWarnings("unchecked")
 public final class ScreenKeyboardEvents {
 
@@ -42,15 +40,14 @@ public final class ScreenKeyboardEvents {
         /**
          * Called before a key press is handled.
          *
-         * @param keyCode   the named key code which can be identified by the constants in
-         *                  {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scanCode  the unique/platform-specific scan code of the keyboard input
-         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
-         * @return {@link EventResult#INTERRUPT} for marking the press event as handled, it will not be passed to other
-         *         listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other listeners as
-         *         well as vanilla process this event
+         * @param screen   the currently displayed screen
+         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the press event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
+         *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
+         *         </ul>
          */
-        EventResult onBeforeKeyPress(T screen, int keyCode, int scanCode, int modifiers);
+        EventResult onBeforeKeyPress(T screen, KeyEvent keyEvent);
     }
 
     @FunctionalInterface
@@ -59,12 +56,10 @@ public final class ScreenKeyboardEvents {
         /**
          * Called after a key press is handled.
          *
-         * @param keyCode   the named key code which can be identified by the constants in
-         *                  {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scanCode  the unique/platform-specific scan code of the keyboard input
-         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
+         * @param screen   the currently displayed screen
+         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterKeyPress(T screen, int keyCode, int scanCode, int modifiers);
+        void onAfterKeyPress(T screen, KeyEvent keyEvent);
     }
 
     @FunctionalInterface
@@ -73,15 +68,14 @@ public final class ScreenKeyboardEvents {
         /**
          * Called before a pressed key has been released.
          *
-         * @param keyCode   the named key code which can be identified by the constants in
-         *                  {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scanCode  the unique/platform-specific scan code of the keyboard input
-         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
-         * @return {@link EventResult#INTERRUPT} for marking the release event as handled, it will not be passed to
-         *         other listeners and vanilla behavior will not run, {@link EventResult#PASS} for letting other
-         *         listeners as well as vanilla process this event
+         * @param screen   the currently displayed screen
+         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
+         * @return <ul>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the release event as handled, it will not be passed to other listeners and vanilla behaviour will not run</li>
+         *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>
+         *         </ul>
          */
-        EventResult onBeforeKeyRelease(T screen, int keyCode, int scanCode, int modifiers);
+        EventResult onBeforeKeyRelease(T screen, KeyEvent keyEvent);
     }
 
     @FunctionalInterface
@@ -90,11 +84,9 @@ public final class ScreenKeyboardEvents {
         /**
          * Called after a pressed key has been released.
          *
-         * @param keyCode   the named key code which can be identified by the constants in
-         *                  {@link org.lwjgl.glfw.GLFW GLFW}
-         * @param scanCode  the unique/platform-specific scan code of the keyboard input
-         * @param modifiers a GLFW bitfield describing the modifier keys that are held down
+         * @param screen   the currently displayed screen
+         * @param keyEvent the key event; for bundled values see {@link com.mojang.blaze3d.platform.InputConstants}
          */
-        void onAfterKeyRelease(T screen, int keyCode, int scanCode, int modifiers);
+        void onAfterKeyRelease(T screen, KeyEvent keyEvent);
     }
 }

@@ -3,25 +3,23 @@ package fuzs.puzzleslib.impl.init;
 import fuzs.puzzleslib.api.util.v1.HSV;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.item.SpawnEggItem;
 
-public class DyedSpawnEggItem extends SpawnEggItem {
+public class LegacySpawnEggItem extends SpawnEggItem {
     private final int backgroundColor;
     private final int highlightColor;
 
-    public DyedSpawnEggItem(EntityType<? extends Mob> defaultType, int backgroundColor, int highlightColor, Properties properties) {
-        super(defaultType, properties);
+    public LegacySpawnEggItem(int backgroundColor, int highlightColor, Properties properties) {
+        super(properties);
         this.backgroundColor = backgroundColor;
         this.highlightColor = highlightColor;
     }
 
-    public int backgroundColor() {
+    public int getBackgroundColor() {
         return this.backgroundColor;
     }
 
-    public int highlightColor() {
+    public int getHighlightColor() {
         return this.highlightColor;
     }
 

@@ -29,6 +29,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.multiplayer.*;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -147,8 +148,8 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     }
 
     @Override
-    public boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode) {
-        return keyMapping.matches(keyCode, scanCode);
+    public boolean isKeyActiveAndMatches(KeyMapping keyMapping, KeyEvent keyEvent) {
+        return keyMapping.matches(keyEvent);
     }
 
     @Override
