@@ -23,7 +23,7 @@ public interface NbtSerializable {
     }
 
     /**
-     * Serialize the component to a {@link CompoundTag}.
+     * Serialise the component to a {@link CompoundTag}.
      *
      * @param compoundTag tag to write to
      * @param registries  the registry access
@@ -31,7 +31,7 @@ public interface NbtSerializable {
     void write(CompoundTag compoundTag, HolderLookup.Provider registries);
 
     /**
-     * Deserialize the component from a {@link CompoundTag}.
+     * Deserialise the component from a {@link CompoundTag}.
      *
      * @param compoundTag tag to read from
      * @param registries  the registry access
@@ -39,7 +39,7 @@ public interface NbtSerializable {
     void read(CompoundTag compoundTag, HolderLookup.Provider registries);
 
     /**
-     * Encode the serializable instance to a {@link CompoundTag}.
+     * Encode the serialisable instance to a {@link CompoundTag}.
      *
      * @param registries the registry access
      * @return a tag containing the serialized instance

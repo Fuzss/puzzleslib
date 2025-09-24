@@ -49,14 +49,14 @@ import java.util.List;
 public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientProxyImpl {
 
     @Override
-    public void registerLoadingHandlers() {
-        super.registerLoadingHandlers();
+    public void registerAllLoadingHandlers() {
+        super.registerAllLoadingHandlers();
         NeoForgeClientEventInvokers.registerLoadingHandlers();
     }
 
     @Override
-    public void registerEventHandlers() {
-        super.registerEventHandlers();
+    public void registerAllEventHandlers() {
+        super.registerAllEventHandlers();
         NeoForgeClientEventInvokers.registerEventHandlers();
     }
 

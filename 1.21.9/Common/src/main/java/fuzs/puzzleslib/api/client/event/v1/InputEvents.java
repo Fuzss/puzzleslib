@@ -48,8 +48,8 @@ public final class InputEvents {
          * @param leftDown         is the left mouse button pressed
          * @param middleDown       is the middle mouse button pressed
          * @param rightDown        is the right mouse button pressed
-         * @param horizontalAmount horizontal scroll amount
-         * @param verticalAmount   vertical scroll amount
+         * @param horizontalAmount the horizontal scroll amount
+         * @param verticalAmount   the vertical scroll amount
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} for marking the event as handled, it will not be passed to other listeners and vanilla behavior will not run</li>
          *         <li>{@link EventResult#PASS PASS} for letting other listeners as well as vanilla process this event</li>

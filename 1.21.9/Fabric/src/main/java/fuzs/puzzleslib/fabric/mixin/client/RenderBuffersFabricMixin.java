@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
-import fuzs.puzzleslib.fabric.impl.client.event.RenderBuffersRegistryImpl;
+import fuzs.puzzleslib.fabric.impl.client.core.context.RenderBuffersContextFabricImpl;
 import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.client.renderer.RenderType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -15,7 +15,7 @@ abstract class RenderBuffersFabricMixin {
 
     @ModifyVariable(method = "<init>", at = @At(value = "STORE", ordinal = 0))
     public SequencedMap<RenderType, ByteBufferBuilder> init(SequencedMap<RenderType, ByteBufferBuilder> sequencedMap) {
-        RenderBuffersRegistryImpl.addAll(sequencedMap);
+        RenderBuffersContextFabricImpl.addAll(sequencedMap);
         return sequencedMap;
     }
 }

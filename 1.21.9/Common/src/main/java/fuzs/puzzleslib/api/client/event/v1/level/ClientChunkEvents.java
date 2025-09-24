@@ -9,7 +9,7 @@ public final class ClientChunkEvents {
     public static final EventInvoker<Unload> UNLOAD = EventInvoker.lookup(Unload.class);
 
     private ClientChunkEvents() {
-
+        // NO-OP
     }
 
     @FunctionalInterface
@@ -18,10 +18,10 @@ public final class ClientChunkEvents {
         /**
          * Fires before a client chunk is loaded.
          *
-         * @param level the client level the chunk is in
-         * @param chunk the chunk being loaded
+         * @param clientLevel the client level the chunk is in
+         * @param chunk       the chunk being loaded
          */
-        void onChunkLoad(ClientLevel level, LevelChunk chunk);
+        void onChunkLoad(ClientLevel clientLevel, LevelChunk chunk);
     }
 
     @FunctionalInterface
@@ -30,9 +30,9 @@ public final class ClientChunkEvents {
         /**
          * Fires before a client chunk is unloaded.
          *
-         * @param level the client level the chunk is in
-         * @param chunk the chunk being unloaded
+         * @param clientLevel the client level the chunk is in
+         * @param chunk       the chunk being unloaded
          */
-        void onChunkUnload(ClientLevel level, LevelChunk chunk);
+        void onChunkUnload(ClientLevel clientLevel, LevelChunk chunk);
     }
 }

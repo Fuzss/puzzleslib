@@ -138,13 +138,13 @@ public class NeoForgeCommonProxy implements NeoForgeProxy {
 
     @MustBeInvokedByOverriders
     @Override
-    public void registerLoadingHandlers() {
+    public void registerAllLoadingHandlers() {
         NeoForgeEventInvokerRegistryImpl.registerLoadingHandlers();
     }
 
     @MustBeInvokedByOverriders
     @Override
-    public void registerEventHandlers() {
+    public void registerAllEventHandlers() {
         NeoForgeEventInvokerRegistryImpl.freezeModBusEvents();
         NeoForgeEventInvokerRegistryImpl.registerEventHandlers();
     }

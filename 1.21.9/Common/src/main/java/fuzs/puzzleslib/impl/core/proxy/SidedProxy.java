@@ -15,9 +15,9 @@ import java.util.List;
 
 public interface SidedProxy {
 
-    void registerLoadingHandlers();
+    void registerAllLoadingHandlers();
 
-    void registerEventHandlers();
+    void registerAllEventHandlers();
 
     default BlockableEventLoop<? super TickTask> getBlockableEventLoop(Level level) {
         if (level instanceof ServerLevel serverLevel) {

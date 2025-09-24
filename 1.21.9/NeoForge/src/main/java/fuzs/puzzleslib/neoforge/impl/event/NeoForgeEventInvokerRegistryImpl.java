@@ -3,7 +3,6 @@ package fuzs.puzzleslib.neoforge.impl.event;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
-import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.*;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
@@ -41,7 +40,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
@@ -964,11 +962,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 (AddDataPackReloadListenersCallback callback, AddServerReloadListenersEvent event) -> {
                     callback.onAddDataPackReloadListeners(event.getRegistryAccess(),
                             event.getServerResources().getRegistryLookup(),
-                            (ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-                                event.addListener(resourceLocation,
-                                        ForwardingReloadListenerHelper.fromReloadListener(resourceLocation,
-                                                reloadListener));
-                            });
+                            event::addListener);
                 });
         INSTANCE.register(RefreshEntityDimensionsCallback.class,
                 EntityEvent.Size.class,

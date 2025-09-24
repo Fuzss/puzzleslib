@@ -313,6 +313,8 @@ accessible  method  net/minecraft/client/multiplayer/ClientLevel    calculatePar
 transitive-accessible	method	net/minecraft/client/gui/components/debug/DebugScreenEntries    register	(Lnet/minecraft/resources/ResourceLocation;Lnet/minecraft/client/gui/components/debug/DebugScreenEntry;)Lnet/minecraft/resources/ResourceLocation;
 accessible  field   net/minecraft/client/MouseHandler   lastClickTime   J
 accessible  field   net/minecraft/client/MouseHandler   lastClickButton I
+accessible  field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;
+mutable field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

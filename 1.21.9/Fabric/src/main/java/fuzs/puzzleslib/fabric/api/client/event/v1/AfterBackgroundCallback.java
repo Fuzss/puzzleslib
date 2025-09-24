@@ -7,6 +7,7 @@ import net.minecraft.client.gui.screens.Screen;
 
 import java.util.Objects;
 
+@Deprecated
 @FunctionalInterface
 public interface AfterBackgroundCallback {
 

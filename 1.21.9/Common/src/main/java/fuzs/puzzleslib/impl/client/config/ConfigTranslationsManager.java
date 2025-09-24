@@ -32,6 +32,7 @@ public final class ConfigTranslationsManager {
                         if (!(clientLanguage.storage instanceof HashMap<String, String>)) {
                             clientLanguage.storage = new HashMap<>(clientLanguage.storage);
                         }
+
                         TRANSLATIONS.forEach(clientLanguage.storage::putIfAbsent);
                     }
                 });
@@ -57,6 +58,7 @@ public final class ConfigTranslationsManager {
             } else {
                 comment = null;
             }
+
             addConfigValueComment(modId, entry.getKey(), comment);
             addConfigValueButton(modId, entry.getKey());
         }
@@ -126,6 +128,7 @@ public final class ConfigTranslationsManager {
         for (String string : strings) {
             joiner.add(StringUtils.capitalize(string));
         }
+
         return joiner.toString().replace(" And ", " & ").replace(" Or ", " / ");
     }
 
@@ -136,6 +139,7 @@ public final class ConfigTranslationsManager {
             ChatFormatting chatFormatting = i % 2 == 0 ? ChatFormatting.YELLOW : ChatFormatting.GOLD;
             strings.set(i, chatFormatting + string + ChatFormatting.RESET);
         }
+
         return strings;
     }
 }

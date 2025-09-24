@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl.config.serialization;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.config.v3.serialization.ConfigDataSet;
 import fuzs.puzzleslib.api.config.v3.serialization.KeyedValueProvider;
@@ -230,20 +229,23 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
                     holder.dissolve(holder.inverted ? (t, objects) -> toRemove.add(t) : entries::put);
                 }
             }
+
             for (EntryHolder<?, T> holder : this.values) {
                 if (holder instanceof ConfigDataSetImpl.RegistryEntryHolder<?>) {
                     holder.dissolve(holder.inverted ? (t, objects) -> toRemove.add(t) : entries::put);
                 }
             }
+
             if (entries.isEmpty() && !toRemove.isEmpty()) {
                 entries = this.valueProvider.streamValues()
                         .collect(Collectors.toMap(Function.identity(),
-                                t -> EntryHolder.EMPTY_DATA,
-                                (o1, o2) -> o1,
-                                Maps::newIdentityHashMap));
+                                (T t) -> EntryHolder.EMPTY_DATA,
+                                (Object[] o1, Object[] o2) -> o2,
+                                IdentityHashMap::new));
             }
+
             entries.keySet().removeIf(t -> !this.filter.test(0, t) || toRemove.contains(t));
-            return this.dissolved = dissolved = Collections.unmodifiableMap(entries);
+            return this.dissolved = Collections.unmodifiableMap(entries);
         } else {
             return dissolved;
         }
@@ -376,7 +378,7 @@ public final class ConfigDataSetImpl<T> implements ConfigDataSet<T> {
         }
 
         private Collection<D> findRegistryMatches(String s) {
-            Collection<D> matches = Sets.newHashSet();
+            Collection<D> matches = new HashSet<>();
             if (!s.contains("*")) {
                 Optional.ofNullable(ResourceLocationHelper.tryParse(s)).flatMap(this::toValue).ifPresent(matches::add);
             } else {

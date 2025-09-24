@@ -40,6 +40,10 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
         return ProxyImpl.INSTANCE;
     }
 
+    default void registerEventHandlers() {
+        // NO-OP
+    }
+
     MinecraftServer getMinecraftServer();
 
     <T> void openMenu(Player player, MenuProvider menuProvider, T data);

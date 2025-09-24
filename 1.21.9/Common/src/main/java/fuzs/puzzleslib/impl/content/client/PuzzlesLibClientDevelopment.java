@@ -37,6 +37,10 @@ import net.minecraft.world.scores.Objective;
 import net.minecraft.world.scores.Scoreboard;
 import org.jetbrains.annotations.Nullable;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
 
@@ -166,6 +170,30 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
         options.keyQuickActions.setKey(InputConstants.UNKNOWN);
         options.keyFullscreen.setKey(InputConstants.UNKNOWN);
         options.getSoundSourceOptionInstance(SoundSource.MUSIC).set(0.0);
+        options.allowCursorChanges().set(false);
+        options.lastMpIp = getHostAddress();
+    }
+
+    private static String getHostAddress() {
+        try {
+            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+            while (interfaces.hasMoreElements()) {
+                NetworkInterface networkInterface = interfaces.nextElement();
+                if (!networkInterface.isLoopback() && networkInterface.isUp()) {
+                    Enumeration<InetAddress> addresses = networkInterface.getInetAddresses();
+                    while (addresses.hasMoreElements()) {
+                        InetAddress address = addresses.nextElement();
+                        if (address instanceof Inet4Address && !Objects.equals(address.getHostAddress(), "127.0.0.1")) {
+                            return address.getHostAddress() + ":25565";
+                        }
+                    }
+                }
+            }
+        } catch (Exception exception) {
+            // NO-OP
+        }
+
+        return "";
     }
 
     @Override
