@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.core.v1.utility;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 
 import java.util.Arrays;
@@ -40,7 +39,7 @@ public interface EnvironmentAwareBuilder<T> {
      */
     default T whenNotOn(ModLoader... forbiddenModLoaders) {
         Preconditions.checkState(forbiddenModLoaders.length > 0, "mod loaders is empty");
-        return this.whenOn(EnumSet.complementOf(Sets.newEnumSet(Arrays.asList(forbiddenModLoaders), ModLoader.class))
+        return this.whenOn(EnumSet.complementOf(EnumSet.copyOf(Arrays.asList(forbiddenModLoaders)))
                 .toArray(ModLoader[]::new));
     }
 

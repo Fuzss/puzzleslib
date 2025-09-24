@@ -14,7 +14,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventPhase;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.client.event.v1.*;
-import fuzs.puzzleslib.fabric.api.core.v1.resources.FabricReloadListener;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLifecycleEvents;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.data.DefaultedInt;
@@ -31,7 +30,7 @@ import net.fabricmc.fabric.api.event.client.player.ClientPreAttackCallback;
 import net.fabricmc.fabric.api.event.player.UseBlockCallback;
 import net.fabricmc.fabric.api.event.player.UseEntityCallback;
 import net.fabricmc.fabric.api.event.player.UseItemCallback;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -85,8 +84,8 @@ public final class FabricClientEventInvokers {
                 (AddResourcePackReloadListenersCallback callback) -> {
                     return () -> {
                         callback.onAddResourcePackReloadListeners((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-                            ResourceManagerHelper.get(PackType.CLIENT_RESOURCES)
-                                    .registerReloadListener(new FabricReloadListener(resourceLocation, reloadListener));
+                            ResourceLoader.get(PackType.CLIENT_RESOURCES)
+                                    .registerReloader(resourceLocation, reloadListener);
                         });
                     };
                 });

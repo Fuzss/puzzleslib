@@ -8,7 +8,6 @@ import fuzs.puzzleslib.api.client.event.v1.level.ClientChunkEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.level.ClientLevelTickEvents;
 import fuzs.puzzleslib.api.client.event.v1.renderer.*;
-import fuzs.puzzleslib.api.core.v1.resources.ForwardingReloadListenerHelper;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.api.event.v1.data.MutableBoolean;
@@ -31,8 +30,6 @@ import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
@@ -76,10 +73,7 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(AddResourcePackReloadListenersCallback.class,
                 AddClientReloadListenersEvent.class,
                 (AddResourcePackReloadListenersCallback callback, AddClientReloadListenersEvent event) -> {
-                    callback.onAddResourcePackReloadListeners((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
-                        event.addListener(resourceLocation,
-                                ForwardingReloadListenerHelper.fromReloadListener(resourceLocation, reloadListener));
-                    });
+                    callback.onAddResourcePackReloadListeners(event::addListener);
                 });
         INSTANCE.register(ScreenOpeningCallback.class,
                 ScreenEvent.Opening.class,

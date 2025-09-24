@@ -61,14 +61,14 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     private final Map<ContextKey<?>, RenderStateDataKey<?>> entityRenderStateKeys = new IdentityHashMap<>();
 
     @Override
-    public void registerLoadingHandlers() {
-        super.registerLoadingHandlers();
+    public void registerAllLoadingHandlers() {
+        super.registerAllLoadingHandlers();
         FabricClientEventInvokers.registerLoadingHandlers();
     }
 
     @Override
-    public void registerEventHandlers() {
-        super.registerEventHandlers();
+    public void registerAllEventHandlers() {
+        super.registerAllEventHandlers();
         FabricClientEventInvokers.registerEventHandlers();
     }
 

@@ -1,9 +1,9 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricRendererEvents;
-import fuzs.puzzleslib.fabric.impl.client.event.EntitySpectatorShaderRegistryImpl;
+import fuzs.puzzleslib.fabric.impl.client.core.context.EntitySpectatorShadersContextFabricImpl;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -27,9 +27,9 @@ abstract class GameRendererFabricMixin {
 
     @Inject(method = "checkEntityPostEffect", at = @At("TAIL"))
     public void checkEntityPostEffect(@Nullable Entity entity, CallbackInfo callback) {
-        // no effect has been set by vanilla, same behavior as NeoForge
+        // vanilla has set no effect, implements the same behaviour as NeoForge
         if (this.postEffectId == null) {
-            EntitySpectatorShaderRegistryImpl.getEntityShader(entity).ifPresent(this::setPostEffect);
+            EntitySpectatorShadersContextFabricImpl.getEntityShader(entity).ifPresent(this::setPostEffect);
         }
     }
 
@@ -39,9 +39,8 @@ abstract class GameRendererFabricMixin {
     @ModifyReturnValue(method = "getFov", at = @At("TAIL"))
     private float getFov(float fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {
         DefaultedFloat fieldOfView = DefaultedFloat.fromValue(fieldOfViewValue);
-        FabricRendererEvents.COMPUTE_FIELD_OF_VIEW.invoker().onComputeFieldOfView(GameRenderer.class.cast(this),
-                this.mainCamera, partialTicks, fieldOfView
-        );
+        FabricRendererEvents.COMPUTE_FIELD_OF_VIEW.invoker()
+                .onComputeFieldOfView(GameRenderer.class.cast(this), this.mainCamera, partialTicks, fieldOfView);
         return fieldOfView.getAsOptionalFloat().orElse(fieldOfViewValue);
     }
 }

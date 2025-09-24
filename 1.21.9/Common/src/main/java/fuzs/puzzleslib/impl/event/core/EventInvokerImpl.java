@@ -22,7 +22,7 @@ public final class EventInvokerImpl {
 
     static {
         // initialize events required during start-up early, all other events are initialized when loading has completed
-        ProxyImpl.get().registerLoadingHandlers();
+        ProxyImpl.get().registerAllLoadingHandlers();
     }
 
     private EventInvokerImpl() {
@@ -33,7 +33,7 @@ public final class EventInvokerImpl {
         if (!initialized) {
             // initialize most of the events as late as possible to avoid loading many classes very early,
             // and being blamed for possible class loading errors that follow
-            ProxyImpl.get().registerEventHandlers();
+            ProxyImpl.get().registerAllEventHandlers();
             initialized = true;
             while (!DEFERRED_INVOKER_REGISTRATIONS.isEmpty()) {
                 DEFERRED_INVOKER_REGISTRATIONS.poll().run();

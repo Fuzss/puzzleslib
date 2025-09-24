@@ -19,7 +19,6 @@ import fuzs.puzzleslib.fabric.impl.init.FabricRegistryFactory;
 import fuzs.puzzleslib.fabric.impl.item.FabricToolTypeHelper;
 import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
-import fuzs.puzzleslib.impl.core.EventHandlerProvider;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -79,7 +78,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
+public class FabricCommonProxy implements FabricProxy {
     private final Set<String> hiddenPacks = new HashSet<>();
     private MinecraftServer minecraftServer;
 
@@ -111,7 +110,10 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
 
     @Override
     public Pack.Metadata createPackInfo(ResourceLocation resourceLocation, Component descriptionComponent, PackCompatibility packCompatibility, FeatureFlagSet featureFlagSet, boolean hidden) {
-        if (hidden) this.hiddenPacks.add(resourceLocation.toString());
+        if (hidden) {
+            this.hiddenPacks.add(resourceLocation.toString());
+        }
+
         return new Pack.Metadata(descriptionComponent, packCompatibility, featureFlagSet, Collections.emptyList());
     }
 
@@ -147,13 +149,13 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
 
     @MustBeInvokedByOverriders
     @Override
-    public void registerLoadingHandlers() {
+    public void registerAllLoadingHandlers() {
         FabricEventInvokerRegistryImpl.registerLoadingHandlers();
     }
 
     @MustBeInvokedByOverriders
     @Override
-    public void registerEventHandlers() {
+    public void registerAllEventHandlers() {
         FabricEventInvokerRegistryImpl.registerEventHandlers();
     }
 
@@ -275,8 +277,9 @@ public class FabricCommonProxy implements FabricProxy, EventHandlerProvider {
         return itemStack.is(PiglinAi.BARTERING_ITEM);
     }
 
+    @MustBeInvokedByOverriders
     @Override
-    public void registerProvidedEventHandlers() {
+    public void registerEventHandlers() {
         // registers for game server starting and stopping, so we can keep an instance of the server here
         ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, (MinecraftServer minecraftServer) -> {
             this.minecraftServer = minecraftServer;

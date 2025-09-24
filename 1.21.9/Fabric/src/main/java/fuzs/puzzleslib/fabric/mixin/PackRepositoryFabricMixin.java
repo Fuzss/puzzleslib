@@ -1,6 +1,6 @@
 package fuzs.puzzleslib.fabric.mixin;
 
-import fuzs.puzzleslib.fabric.impl.event.DataPackFinderRegistryImpl;
+import fuzs.puzzleslib.fabric.impl.core.context.DataPackSourcesContextFabricImpl;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.repository.ServerPacksSource;
@@ -23,9 +23,10 @@ abstract class PackRepositoryFabricMixin {
     public void init(RepositorySource[] repositorySources, CallbackInfo callback) {
         // same implementation as Fabric Api to hook into server pack repository whenever a new one is created,
         // client resource packs can be handled much simpler since the repository is only ever created once
-        for (RepositorySource source : this.sources) {
-            if (source instanceof ServerPacksSource) {
-                DataPackFinderRegistryImpl.addAllRepositorySources(PackRepository.class.cast(this));
+        for (RepositorySource repositorySource : this.sources) {
+            if (repositorySource instanceof ServerPacksSource) {
+                DataPackSourcesContextFabricImpl.addAll(PackRepository.class.cast(
+                        this));
                 return;
             }
         }

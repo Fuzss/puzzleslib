@@ -13,10 +13,10 @@ public interface ComputeFieldOfViewCallback {
      * Runs after field of view is calculated, based on the game setting, but before in-game effects such as nausea are
      * applied.
      *
-     * @param renderer    the game renderer instance
-     * @param camera      the client camera instance
-     * @param partialTick the partial tick
-     * @param fieldOfView the field of view value
+     * @param gameRenderer the game renderer instance
+     * @param camera       the client camera instance
+     * @param partialTick  the partial tick
+     * @param fieldOfView  the field of view value
      */
-    void onComputeFieldOfView(GameRenderer renderer, Camera camera, float partialTick, MutableFloat fieldOfView);
+    void onComputeFieldOfView(GameRenderer gameRenderer, Camera camera, float partialTick, MutableFloat fieldOfView);
 }

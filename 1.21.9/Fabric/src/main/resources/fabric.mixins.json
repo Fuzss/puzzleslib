@@ -42,8 +42,7 @@
     "ServerPlayerFabricMixin",
     "StartAttackingFabricMixin",
     "ThrownEnderpearlFabricMixin",
-    "WolfFabricMixin",
-    "accessor.PackRepositoryFabricAccessor"
+    "WolfFabricMixin"
   ],
   "client": [
     "client.AbstractClientPlayerFabricMixin",

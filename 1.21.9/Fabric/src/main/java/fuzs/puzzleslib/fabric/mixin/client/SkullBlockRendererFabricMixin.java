@@ -1,7 +1,7 @@
 package fuzs.puzzleslib.fabric.mixin.client;
 
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import fuzs.puzzleslib.fabric.impl.client.event.SkullRendererRegistryImpl;
+import fuzs.puzzleslib.fabric.impl.client.core.context.SkullRenderersContextFabricImpl;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
@@ -15,6 +15,6 @@ abstract class SkullBlockRendererFabricMixin {
 
     @ModifyReturnValue(method = "createModel", at = @At("RETURN"))
     private static @Nullable SkullModelBase createModel(@Nullable SkullModelBase skullModel, EntityModelSet modelSet, SkullBlock.Type type) {
-        return skullModel == null ? SkullRendererRegistryImpl.createSkullModel(type, modelSet) : skullModel;
+        return skullModel == null ? SkullRenderersContextFabricImpl.createSkullModel(type, modelSet) : skullModel;
     }
 }

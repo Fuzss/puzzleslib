@@ -1,11 +1,12 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
-import fuzs.puzzleslib.fabric.api.client.event.v1.registry.ResourcePackFinderRegistry;
 import fuzs.puzzleslib.fabric.impl.core.context.DataPackSourcesContextFabricImpl;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 
 import java.util.Objects;
@@ -15,7 +16,8 @@ public final class ResourcePackSourcesContextFabricImpl implements PackRepositor
     @Override
     public void registerRepositorySource(RepositorySource repositorySource) {
         Objects.requireNonNull(repositorySource, "repository source is null");
-        ResourcePackFinderRegistry.INSTANCE.register(repositorySource);
+        PackRepository packRepository = Minecraft.getInstance().getResourcePackRepository();
+        DataPackSourcesContextFabricImpl.getRepositorySources(packRepository).add(repositorySource);
     }
 
     @Override
