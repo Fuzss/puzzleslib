@@ -3,7 +3,6 @@ package fuzs.puzzleslib.neoforge.impl.client.core;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
 import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
@@ -45,12 +44,9 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 
 public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientProxyImpl {
-    private final Map<RenderPropertyKey<?>, ContextKey<?>> entityRenderStateKeys = new IdentityHashMap<>();
 
     @Override
     public void registerLoadingHandlers() {
@@ -80,19 +76,13 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public <T> @Nullable T getRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key) {
-        return entityRenderState.getRenderData(this.getContextKey(key));
+    public <T> @Nullable T getRenderProperty(EntityRenderState entityRenderState, ContextKey<T> key) {
+        return entityRenderState.getRenderData(key);
     }
 
     @Override
-    public <T> void setRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key, @Nullable T t) {
-        entityRenderState.setRenderData(this.getContextKey(key), t);
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> ContextKey<T> getContextKey(RenderPropertyKey<T> key) {
-        return (ContextKey<T>) this.entityRenderStateKeys.computeIfAbsent(key,
-                (RenderPropertyKey<?> keyX) -> new ContextKey<>(keyX.resourceLocation()));
+    public <T> void setRenderProperty(EntityRenderState entityRenderState, ContextKey<T> key, @Nullable T t) {
+        entityRenderState.setRenderData(key, t);
     }
 
     @Override

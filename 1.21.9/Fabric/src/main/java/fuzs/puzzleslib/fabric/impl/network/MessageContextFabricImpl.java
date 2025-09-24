@@ -91,7 +91,7 @@ public final class MessageContextFabricImpl {
 
         @Override
         public ClientLevel level() {
-            return this.player().clientLevel;
+            return this.client().level;
         }
     }
 

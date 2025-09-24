@@ -3,7 +3,6 @@ package fuzs.puzzleslib.impl.client.core.proxy;
 import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
 import fuzs.puzzleslib.api.client.gui.v2.tooltip.ClientComponentSplitter;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.api.client.renderer.v1.RenderPropertyKey;
 import fuzs.puzzleslib.api.util.v1.ComponentHelper;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
@@ -23,6 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.TickTask;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -45,9 +45,9 @@ public interface ClientProxyImpl extends ProxyImpl {
 
     KeyMappingHelper getKeyMappingActivationHelper();
 
-    @Nullable <T> T getRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key);
+    @Nullable <T> T getRenderProperty(EntityRenderState entityRenderState, ContextKey<T> key);
 
-    <T> void setRenderProperty(EntityRenderState entityRenderState, RenderPropertyKey<T> key, @Nullable T t);
+    <T> void setRenderProperty(EntityRenderState entityRenderState, ContextKey<T> key, @Nullable T t);
 
     float getPartialTick(EntityRenderState renderState);
 

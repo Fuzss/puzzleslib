@@ -4,6 +4,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.fabric.api.client.event.v1.FabricClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.MouseHandler;
+import net.minecraft.client.input.MouseButtonInfo;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -17,27 +18,23 @@ abstract class MouseHandlerFabricMixin {
     @Final
     private Minecraft minecraft;
 
-    @Inject(
-            method = "onPress", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;",
-            ordinal = 0
-    ), cancellable = true
-    )
-    private void onPress(long windowPointer, int button, int action, int modifiers, CallbackInfo callback) {
-        EventResult eventResult = FabricClientEvents.MOUSE_CLICK.invoker().onMouseClick(button, action, modifiers);
+    @Inject(method = "onButton",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/Minecraft;getOverlay()Lnet/minecraft/client/gui/screens/Overlay;",
+                    ordinal = 0),
+            cancellable = true)
+    private void onButton(long windowPointer, MouseButtonInfo mouseButtonInfo, int action, CallbackInfo callback) {
+        EventResult eventResult = FabricClientEvents.MOUSE_CLICK.invoker().onMouseClick(mouseButtonInfo, action);
         if (eventResult.isInterrupt()) {
             callback.cancel();
         }
     }
 
-    @Inject(
-            method = "onScroll", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z",
-            shift = At.Shift.BEFORE
-    ), cancellable = true
-    )
+    @Inject(method = "onScroll",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/player/LocalPlayer;isSpectator()Z",
+                    shift = At.Shift.BEFORE),
+            cancellable = true)
     private void onScroll(long windowPointer, double xOffset, double yOffset, CallbackInfo callback) {
         // just recalculate this instead of capturing local, shouldn't be able to change in the meantime
         boolean discreteMouseScroll = this.minecraft.options.discreteMouseScroll().get();

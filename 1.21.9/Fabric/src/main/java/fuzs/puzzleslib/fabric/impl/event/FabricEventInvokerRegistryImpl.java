@@ -203,7 +203,7 @@ public final class FabricEventInvokerRegistryImpl implements FabricEventInvokerR
                 AttackBlockCallback.EVENT,
                 (PlayerInteractEvents.AttackBlock callback) -> {
                     return (Player player, Level level, InteractionHand interactionHand, BlockPos pos, Direction direction) -> {
-                        if (!level.isClientSide || player.isCreative() || FabricProxy.get()
+                        if (!level.isClientSide() || player.isCreative() || FabricProxy.get()
                                 .shouldStartDestroyBlock(pos)) {
                             EventResult eventResult = callback.onAttackBlock(player,
                                     level,

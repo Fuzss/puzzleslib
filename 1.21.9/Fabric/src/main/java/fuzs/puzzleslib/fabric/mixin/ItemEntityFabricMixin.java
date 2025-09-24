@@ -35,7 +35,7 @@ abstract class ItemEntityFabricMixin extends Entity {
 
     @Inject(method = "playerTouch", at = @At("HEAD"), cancellable = true)
     public void playerTouch$0(Player player, CallbackInfo callback, @Share("originalItemStack") LocalRef<ItemStack> originalItemStack) {
-        if (!this.level().isClientSide) {
+        if (!this.level().isClientSide()) {
             originalItemStack.set(ItemStack.EMPTY);
             if (this.pickupDelay > 0) {
                 originalItemStack.set(this.getItem().copy());
@@ -44,7 +44,8 @@ abstract class ItemEntityFabricMixin extends Entity {
             ItemStack itemStack = this.getItem();
             Item item = itemStack.getItem();
             int count = itemStack.getCount();
-            EventResult result = FabricPlayerEvents.ITEM_TOUCH.invoker().onItemTouch(player, ItemEntity.class.cast(this));
+            EventResult result = FabricPlayerEvents.ITEM_TOUCH.invoker()
+                    .onItemTouch(player, ItemEntity.class.cast(this));
             if (!result.isInterrupt()) {
                 originalItemStack.set(this.getItem().copy());
                 return;
@@ -55,7 +56,8 @@ abstract class ItemEntityFabricMixin extends Entity {
                 }
             }
             if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID()))) {
-                FabricPlayerEvents.ITEM_PICKUP.invoker().onItemPickup(player, ItemEntity.class.cast(this), itemStack.copy());
+                FabricPlayerEvents.ITEM_PICKUP.invoker()
+                        .onItemPickup(player, ItemEntity.class.cast(this), itemStack.copy());
                 player.take(this, count);
                 if (itemStack.isEmpty()) {
                     this.discard();
@@ -68,7 +70,9 @@ abstract class ItemEntityFabricMixin extends Entity {
         }
     }
 
-    @Inject(method = "playerTouch", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"))
+    @Inject(method = "playerTouch",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/player/Player;take(Lnet/minecraft/world/entity/Entity;I)V"))
     public void playerTouch$1(Player player, CallbackInfo callback, @Share("originalItemStack") LocalRef<ItemStack> originalItemStack) {
         ItemStack itemStack = originalItemStack.get();
         if (!itemStack.isEmpty()) {

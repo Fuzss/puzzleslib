@@ -41,9 +41,8 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
     @Nullable
     private Collection<ItemEntity> puzzleslib$capturedDrops;
 
-    @WrapWithCondition(
-            method = "rideTick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V")
-    )
+    @WrapWithCondition(method = "rideTick",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V"))
     public boolean rideTick(Entity entity, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         // avoid using @WrapOperation, so we are not blamed for any overhead from running the entity tick
         EventResult result = FabricEntityEvents.ENTITY_TICK_START.invoker().onStartEntityTick(entity);
@@ -51,10 +50,8 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         return result.isPass();
     }
 
-    @Inject(
-            method = "rideTick",
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER)
-    )
+    @Inject(method = "rideTick",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;tick()V", shift = At.Shift.AFTER))
     public void rideTick(CallbackInfo callback, @Share("isEntityTickCancelled") LocalBooleanRef isEntityTickCancelled) {
         if (!isEntityTickCancelled.get()) {
             FabricEntityEvents.ENTITY_TICK_END.invoker().onEndEntityTick(Entity.class.cast(this));
@@ -73,13 +70,9 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         return this.puzzleslib$capturedDrops;
     }
 
-    @WrapWithCondition(
-            method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;",
-            at = @At(
-                    value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"
-            )
-    )
+    @WrapWithCondition(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
     public boolean spawnAtLocation(ServerLevel serverLevel, Entity entity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
@@ -90,12 +83,12 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         }
     }
 
-    @Inject(
-            method = "startRiding(Lnet/minecraft/world/entity/Entity;Z)Z", at = @At(
-            value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z", shift = At.Shift.BEFORE
-    ), cancellable = true
-    )
-    public void startRiding(Entity vehicle, boolean force, CallbackInfoReturnable<Boolean> callback) {
+    @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z",
+                    shift = At.Shift.BEFORE),
+            cancellable = true)
+    public void startRiding(Entity vehicle, boolean force, boolean emitEvents, CallbackInfoReturnable<Boolean> callback) {
         // runs a little later than Forge when it is actually guaranteed for the rider to start riding
         EventResult result = FabricEntityEvents.ENTITY_START_RIDING.invoker()
                 .onStartRiding(this.level, Entity.class.cast(this), vehicle);
