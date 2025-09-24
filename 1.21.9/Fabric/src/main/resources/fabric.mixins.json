@@ -81,5 +81,6 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "refmap": "${modId}.fabric.refmap.json"
 }

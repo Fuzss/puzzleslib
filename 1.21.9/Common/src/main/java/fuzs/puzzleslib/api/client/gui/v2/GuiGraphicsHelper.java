@@ -2,12 +2,13 @@ package fuzs.puzzleslib.api.client.gui.v2;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import fuzs.puzzleslib.impl.client.gui.SingleTextureAtlasSprite;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -418,7 +419,7 @@ public final class GuiGraphicsHelper {
      * @param color          the vertex color, usually {@code -1}
      */
     public static void blitNineSlicedSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int color) {
-        TextureAtlasSprite textureAtlasSprite = Minecraft.getInstance().getGuiSprites().getSprite(sprite);
+        TextureAtlasSprite textureAtlasSprite = guiGraphics.getSprite(new Material(AtlasIds.GUI, sprite));
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents().width(),
                 textureAtlasSprite.contents().height(),
                 new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom),
@@ -501,10 +502,9 @@ public final class GuiGraphicsHelper {
      * @param color          the vertex color, usually {@code -1}
      */
     public static void blitTiledSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
-        Minecraft minecraft = Minecraft.getInstance();
-        TextureAtlasSprite textureatlassprite = minecraft.getGuiSprites().getSprite(sprite);
+        TextureAtlasSprite textureAtlasSprite = guiGraphics.getSprite(new Material(AtlasIds.GUI, sprite));
         guiGraphics.blitTiledSprite(renderPipeline,
-                textureatlassprite,
+                textureAtlasSprite,
                 x,
                 y,
                 width,

@@ -12,8 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("AbstractPackResourcesNeoForgeMixin",
-            "DatagenModLoaderNeoForgeMixin",
+    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("DatagenModLoaderNeoForgeMixin",
             "client.ClientDataMainNeoForgeMixin",
             "client.ClientMainNeoForgeMixin");
 
@@ -29,8 +28,8 @@ public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(PuzzlesLib.MOD_ID) ||
-                !DEVELOPMENT_MIXINS.contains(mixinClassName.replaceAll(".+\\.mixin\\.", ""));
+        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(PuzzlesLib.MOD_ID)
+                || !DEVELOPMENT_MIXINS.contains(mixinClassName.replaceAll(".+\\.mixin\\.", ""));
     }
 
     @Override

@@ -32,7 +32,6 @@ public final class GuiLayersContextFabricImpl implements GuiLayersContext {
             .put(BOSS_BAR, VanillaHudElements.BOSS_BAR)
             .put(SLEEP_OVERLAY, VanillaHudElements.SLEEP)
             .put(DEMO_TIMER, VanillaHudElements.DEMO_TIMER)
-            .put(DEBUG_OVERLAY, VanillaHudElements.DEBUG)
             .put(SCOREBOARD, VanillaHudElements.SCOREBOARD)
             .put(OVERLAY_MESSAGE, VanillaHudElements.OVERLAY_MESSAGE)
             .put(TITLE, VanillaHudElements.TITLE_AND_SUBTITLE)

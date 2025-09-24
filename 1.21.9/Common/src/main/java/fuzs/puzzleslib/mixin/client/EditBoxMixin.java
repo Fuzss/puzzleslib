@@ -1,14 +1,12 @@
 package fuzs.puzzleslib.mixin.client;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.Util;
-import net.minecraft.client.gui.Font;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -20,33 +18,33 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(EditBox.class)
 abstract class EditBoxMixin extends AbstractWidget {
     @Shadow
-    @Final
-    private Font font;
-    @Shadow
     private String value;
-    @Shadow
-    private boolean bordered;
-    @Shadow
-    private int displayPos;
     @Shadow
     private int cursorPos;
     @Shadow
     private int highlightPos;
+    @Unique
     private long lastClickTime;
+    @Unique
     private boolean doubleClick;
+    @Unique
     private int doubleClickHighlightPos;
+    @Unique
     private int doubleClickCursorPos;
 
     public EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
     }
 
-    @Inject(method = "deleteText(I)V", at = @At("HEAD"), cancellable = true)
-    protected void deleteText(int charCount, CallbackInfo callback) {
-        // delete entire words or everything until edit box beginning / end based on held modifier key
-        if (Screen.hasControlDown()) {
-            if (charCount < 0) this.deleteChars(-this.cursorPos);
-        } else if (Screen.hasAltDown()) {
+    @Inject(method = "deleteText(IZ)V", at = @At("HEAD"), cancellable = true)
+    protected void deleteText(int charCount, boolean hasControlDown, CallbackInfo callback) {
+        // delete entire words or everything until the edit box beginning or end, based on the held modifier key
+        // the modifier keys match the behaviour on Mac
+        if (hasControlDown) {
+            if (charCount < 0) {
+                this.deleteChars(-this.cursorPos);
+            }
+        } else if (Minecraft.getInstance().hasAltDown()) {
             this.deleteWords(charCount);
         } else {
             this.deleteChars(charCount);
@@ -106,43 +104,43 @@ abstract class EditBoxMixin extends AbstractWidget {
     }
 
     @Inject(method = "keyPressed", at = @At("HEAD"), cancellable = true)
-    public void keyPressed(int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> callback) {
+    public void keyPressed(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> callback) {
         if (this.isActive() && this.isFocused()) {
-            if (keyCode == InputConstants.KEY_RIGHT) {
+            if (keyEvent.isRight()) {
                 // when text is selected and the cursor is moved without selecting new text,
                 // make it jump to either the beginning or end of the selection
                 boolean allowedToMoveRight = true;
-                if (!Screen.hasShiftDown() && this.highlightPos != this.cursorPos) {
+                if (!keyEvent.hasShiftDown() && this.highlightPos != this.cursorPos) {
                     this.setCursorPosition(Math.max(this.getCursorPosition(), this.highlightPos));
                     this.setHighlightPos(this.getCursorPosition());
                     allowedToMoveRight = false;
                 }
-                // select entire words or everything until edit box beginning / end based on held modifier key
-                if (Screen.hasControlDown()) {
-                    this.moveCursorToEnd(Screen.hasShiftDown());
-                } else if (Screen.hasAltDown()) {
-                    this.moveCursorTo(this.getWordPosition(1), Screen.hasShiftDown());
+                // select entire words or everything until the edit box beginning or end, based on the held modifier key
+                if (keyEvent.hasControlDown()) {
+                    this.moveCursorToEnd(keyEvent.hasShiftDown());
+                } else if (keyEvent.hasAltDown()) {
+                    this.moveCursorTo(this.getWordPosition(1), keyEvent.hasShiftDown());
                 } else if (allowedToMoveRight) {
-                    this.moveCursor(1, Screen.hasShiftDown());
+                    this.moveCursor(1, keyEvent.hasShiftDown());
                 }
 
                 callback.setReturnValue(true);
-            } else if (keyCode == InputConstants.KEY_LEFT) {
+            } else if (keyEvent.isLeft()) {
                 // when text is selected and the cursor is moved without selecting new text,
                 // make it jump to either the beginning or end of the selection
                 boolean allowedToMoveLeft = true;
-                if (!Screen.hasShiftDown() && this.highlightPos != this.cursorPos) {
+                if (!keyEvent.hasShiftDown() && this.highlightPos != this.cursorPos) {
                     this.setCursorPosition(Math.min(this.getCursorPosition(), this.highlightPos));
                     this.setHighlightPos(this.getCursorPosition());
                     allowedToMoveLeft = false;
                 }
                 // select entire words or everything until edit box beginning / end based on held modifier key
-                if (Screen.hasControlDown()) {
-                    this.moveCursorToStart(Screen.hasShiftDown());
-                } else if (Screen.hasAltDown()) {
-                    this.moveCursorTo(this.getWordPosition(-1), Screen.hasShiftDown());
+                if (keyEvent.hasControlDown()) {
+                    this.moveCursorToStart(keyEvent.hasShiftDown());
+                } else if (keyEvent.hasAltDown()) {
+                    this.moveCursorTo(this.getWordPosition(-1), keyEvent.hasShiftDown());
                 } else if (allowedToMoveLeft) {
-                    this.moveCursor(-1, Screen.hasShiftDown());
+                    this.moveCursor(-1, keyEvent.hasShiftDown());
                 }
 
                 callback.setReturnValue(true);
@@ -169,13 +167,10 @@ abstract class EditBoxMixin extends AbstractWidget {
     public abstract int getCursorPosition();
 
     @Shadow
-    public abstract int getInnerWidth();
-
-    @Shadow
     public abstract void setHighlightPos(int position);
 
     @Inject(method = "onClick", at = @At("TAIL"))
-    public void onClick(double mouseX, double mouseY, CallbackInfo callback) {
+    public void onClick(MouseButtonEvent mouseButtonEvent, boolean doubleClick, CallbackInfo callback) {
         long millis = Util.getMillis();
         boolean tripleClick = this.doubleClick;
         this.doubleClick = millis - this.lastClickTime < 250L;
@@ -185,57 +180,58 @@ abstract class EditBoxMixin extends AbstractWidget {
                 this.moveCursorToEnd(false);
                 this.setHighlightPos(0);
             } else {
-                // double click to select the clicked word
-                // highlight positions is right selection boundary, cursor position is left selection boundary
+                // store double click positions for dragging to select the clicked word
+                // the highlight positions is the right selection boundary
+                // the cursor position is the left selection boundary
                 this.doubleClickHighlightPos = this.getWordPosition(1, this.getCursorPosition(), false);
-                this.moveCursorTo(this.doubleClickHighlightPos, false);
                 this.doubleClickCursorPos = this.getWordPosition(-1, this.getCursorPosition(), false);
-                this.moveCursorTo(this.doubleClickCursorPos, true);
             }
         }
 
         this.lastClickTime = millis;
     }
 
-    @Override
-    protected void onDrag(double mouseX, double mouseY, double dragX, double dragY) {
-        int i = Mth.floor(mouseX) - this.getX();
-        if (this.bordered) {
-            i -= 4;
-        }
+    @Shadow
+    private int findClickedPositionInText(MouseButtonEvent mouseButtonEvent) {
+        throw new RuntimeException();
+    }
 
-        String string = this.font.plainSubstrByWidth(this.value.substring(this.displayPos), this.getInnerWidth());
-        int mousePosition = this.font.plainSubstrByWidth(string, i).length() + this.displayPos;
-
+    @Inject(method = "onDrag", at = @At("HEAD"), cancellable = true)
+    protected void onDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY, CallbackInfo callback) {
         if (this.doubleClick) {
-            // double click drag across text to select individual words
-            // dragging outside the edit box will select everything until beginning / end
-            if (this.isMouseOver(mouseX, mouseY)) {
-                int rightBoundary = this.getWordPosition(1, mousePosition, false);
+            // double-click drag across text to select individual words
+            // dragging outside the edit box will select everything until the beginning or end
+            int clickedPosition = this.findClickedPositionInText(mouseButtonEvent);
+            if (this.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y())) {
+                int rightBoundary = this.getWordPosition(1, clickedPosition, false);
                 this.moveCursorTo(Math.max(this.doubleClickHighlightPos, rightBoundary), false);
-                int leftBoundary = this.getWordPosition(-1, mousePosition, false);
+                int leftBoundary = this.getWordPosition(-1, clickedPosition, false);
                 this.moveCursorTo(Math.min(this.doubleClickCursorPos, leftBoundary), true);
             } else {
-                if (mousePosition > this.doubleClickHighlightPos) {
+                if (clickedPosition > this.doubleClickHighlightPos) {
                     this.moveCursorToEnd(false);
                 } else {
                     this.moveCursorTo(this.doubleClickHighlightPos, false);
                 }
-                if (mousePosition < this.doubleClickCursorPos) {
+                if (clickedPosition < this.doubleClickCursorPos) {
                     this.moveCursorToStart(true);
                 } else {
                     this.moveCursorTo(this.doubleClickCursorPos, true);
                 }
             }
+
+            callback.cancel();
         } else {
-            // drag across text to select individual letters
-            // dragging outside the edit box will select everything until beginning / end
-            if (this.isMouseOver(mouseX, mouseY)) {
-                this.moveCursorTo(mousePosition, true);
-            } else if (this.highlightPos < mousePosition) {
-                this.moveCursorToEnd(true);
-            } else {
-                this.moveCursorToStart(true);
+            // vanilla already allows for dragging across text to select individual letters,
+            // we additionally support dragging outside the edit box to select everything until the beginning or end
+            if (!this.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y())) {
+                if (this.highlightPos < this.findClickedPositionInText(mouseButtonEvent)) {
+                    this.moveCursorToEnd(true);
+                } else {
+                    this.moveCursorToStart(true);
+                }
+
+                callback.cancel();
             }
         }
     }

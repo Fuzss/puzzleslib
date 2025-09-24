@@ -3,9 +3,9 @@ package fuzs.puzzleslib.api.client.event.v1.renderer;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.PlayerModelType;
 
 @FunctionalInterface
 public interface AddLivingEntityRenderLayersCallback {
@@ -22,12 +22,12 @@ public interface AddLivingEntityRenderLayersCallback {
     void addLivingEntityRenderLayers(EntityType<?> entityType, LivingEntityRenderer<?, ?, ?> entityRenderer, EntityRendererProvider.Context context);
 
     /**
-     * A helper for identifying the skin model of a {@link PlayerRenderer}.
+     * A helper for identifying the model type of {@link AvatarRenderer}.
      *
-     * @param playerRenderer the player renderer
-     * @return the skin model
+     * @param avatarRenderer the avatar renderer
+     * @return the model type
      */
-    static PlayerSkin.Model getPlayerSkinModel(PlayerRenderer playerRenderer) {
-        return playerRenderer.getModel().slim ? PlayerSkin.Model.SLIM : PlayerSkin.Model.WIDE;
+    static PlayerModelType getPlayerModelType(AvatarRenderer<?> avatarRenderer) {
+        return avatarRenderer.getModel().slim ? PlayerModelType.SLIM : PlayerModelType.WIDE;
     }
 }

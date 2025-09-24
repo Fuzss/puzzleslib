@@ -5,7 +5,6 @@
   "package": "${modGroup}.neoforge.mixin",
   "plugin": "${modGroup}.neoforge.mixin.MixinConfigPluginNeoForgeImpl",
   "mixins": [
-    "AbstractPackResourcesNeoForgeMixin",
     "DatagenModLoaderNeoForgeMixin",
     "MenuProviderWithDataNeoForgeMixin",
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor",

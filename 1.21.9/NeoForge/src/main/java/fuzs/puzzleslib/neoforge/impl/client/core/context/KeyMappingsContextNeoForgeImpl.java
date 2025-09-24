@@ -22,7 +22,17 @@ public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) imp
         Objects.requireNonNull(activationHandler, "activation handler is null");
         this.event.register(keyMapping);
         keyMapping.setKeyConflictContext(NeoForgeKeyMappingHelper.KEY_CONTEXTS.get(activationHandler.getActivationContext()));
+        // TODO use future event method for registering category, add check if category is already registered, probably via boolean flag on this class
+        registerKeyCategoryIfNecessary(keyMapping);
         registerKeyActivationHandles(keyMapping, activationHandler);
+    }
+
+    private static void registerKeyCategoryIfNecessary(KeyMapping keyMapping) {
+        Objects.requireNonNull(keyMapping.getCategory(), "key category is null");
+        Objects.requireNonNull(keyMapping.getCategory().id(), "key category id is null");
+        if (!KeyMapping.Category.SORT_ORDER.contains(keyMapping.getCategory())) {
+            KeyMapping.Category.register(keyMapping.getCategory().id());
+        }
     }
 
     private static void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
@@ -36,10 +46,11 @@ public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) imp
                 }
             });
         }
+
         if (activationHandler.screenHandler() != null) {
             NeoForge.EVENT_BUS.addListener((final ScreenEvent.KeyPressed.Pre event) -> {
                 if (activationHandler.screenType().isInstance(event.getScreen())) {
-                    if (keyMapping.matches(event.getKeyCode(), event.getScanCode())) {
+                    if (keyMapping.matches(event.getKeyEvent())) {
                         ((Consumer<Screen>) activationHandler.screenHandler()).accept(event.getScreen());
                         event.setCanceled(true);
                     }

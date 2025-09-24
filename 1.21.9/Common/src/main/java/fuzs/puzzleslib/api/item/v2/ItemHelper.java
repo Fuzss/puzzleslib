@@ -35,7 +35,7 @@ public final class ItemHelper {
      * @param interactionHand the hand using the stack
      */
     public static void hurtAndBreak(ItemStack itemStack, int amount, LivingEntity livingEntity, InteractionHand interactionHand) {
-        hurtAndBreak(itemStack, amount, livingEntity, LivingEntity.getSlotForHand(interactionHand));
+        hurtAndBreak(itemStack, amount, livingEntity, interactionHand.asEquipmentSlot());
     }
 
     /**

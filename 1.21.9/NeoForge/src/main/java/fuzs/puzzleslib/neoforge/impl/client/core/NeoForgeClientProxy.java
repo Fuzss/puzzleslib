@@ -20,6 +20,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -100,8 +101,8 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
     }
 
     @Override
-    public boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode) {
-        return keyMapping.isActiveAndMatches(InputConstants.getKey(keyCode, scanCode));
+    public boolean isKeyActiveAndMatches(KeyMapping keyMapping, KeyEvent keyEvent) {
+        return keyMapping.isActiveAndMatches(InputConstants.getKey(keyEvent));
     }
 
     @Override

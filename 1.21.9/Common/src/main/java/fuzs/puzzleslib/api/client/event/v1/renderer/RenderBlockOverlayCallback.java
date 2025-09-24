@@ -26,9 +26,9 @@ public interface RenderBlockOverlayCallback {
      * @param blockState   the block state the overlay originates from, will be {@link Block#defaultBlockState()} for
      *                     fire and water overlays
      * @return <ul>
-     *                             <li>{@link EventResult#INTERRUPT} to prevent the overlay from rendering</li>
-     *                             <li>{@link EventResult#PASS} to allow the overlay to render</li>
-     *                         </ul>
+     *                                     <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the overlay from rendering</li>
+     *                                     <li>{@link EventResult#PASS PASS} to allow the overlay to render</li>
+     *                                 </ul>
      */
     EventResult onRenderBlockOverlay(LocalPlayer player, PoseStack poseStack, MultiBufferSource bufferSource, BlockState blockState);
 }

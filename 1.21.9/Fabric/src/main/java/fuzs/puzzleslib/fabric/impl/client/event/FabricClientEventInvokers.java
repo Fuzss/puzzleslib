@@ -22,10 +22,7 @@ import fuzs.puzzleslib.impl.event.data.DefaultedInt;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.fabricmc.fabric.api.client.rendering.v1.GatherDebugTextEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
@@ -42,6 +39,8 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
@@ -267,8 +266,8 @@ public final class FabricClientEventInvokers {
                     };
                 });
         INSTANCE.register(RenderNameTagCallback.class, FabricRendererEvents.RENDER_NAME_TAG);
-        INSTANCE.register(ContainerScreenEvents.Background.class, FabricGuiEvents.CONTAINER_SCREEN_BACKGROUND);
-        INSTANCE.register(ContainerScreenEvents.Foreground.class, FabricGuiEvents.CONTAINER_SCREEN_FOREGROUND);
+        INSTANCE.register(RenderContainerScreenContentsCallback.class,
+                FabricGuiEvents.RENDER_CONTAINER_SCREEN_CONTENTS);
         INSTANCE.register(PrepareInventoryMobEffectsCallback.class, FabricGuiEvents.INVENTORY_MOB_EFFECTS);
         INSTANCE.register(ComputeFovModifierCallback.class, FabricClientPlayerEvents.COMPUTE_FOV_MODIFIER);
         INSTANCE.register(ScreenEvents.BeforeInit.class,
@@ -321,32 +320,41 @@ public final class FabricClientEventInvokers {
                     return callback::onAfterRender;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterRender);
+        registerScreenEvent(ScreenEvents.AfterBackground.class, AfterBackgroundCallback.class, callback -> {
+            return callback::onAfterBackground;
+        }, AfterBackgroundCallback::afterBackground);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseClick.class,
                 callback -> {
-                    return (Screen screen, double mouseX, double mouseY, int button) -> {
-                        return callback.onBeforeMouseClick(screen, mouseX, mouseY, button).isPass();
+                    return (Screen screen, MouseButtonEvent mouseButtonEvent) -> {
+                        return callback.onBeforeMouseClick(screen, mouseButtonEvent).isPass();
                     };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseClick);
         registerScreenEvent(ScreenMouseEvents.AfterMouseClick.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseClick.class,
                 callback -> {
-                    return callback::onAfterMouseClick;
+                    return (Screen screen, MouseButtonEvent mouseButtonEvent, boolean consumed) -> {
+                        callback.onAfterMouseClick(screen, mouseButtonEvent);
+                        return false;
+                    };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseClick);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseRelease.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseRelease.class,
                 callback -> {
-                    return (Screen screen, double mouseX, double mouseY, int button) -> {
-                        return callback.onBeforeMouseRelease(screen, mouseX, mouseY, button).isPass();
+                    return (Screen screen, MouseButtonEvent mouseButtonEvent) -> {
+                        return callback.onBeforeMouseRelease(screen, mouseButtonEvent).isPass();
                     };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseRelease);
         registerScreenEvent(ScreenMouseEvents.AfterMouseRelease.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseRelease.class,
                 callback -> {
-                    return callback::onAfterMouseRelease;
+                    return (Screen screen, MouseButtonEvent mouseButtonEvent, boolean consumed) -> {
+                        callback.onAfterMouseRelease(screen, mouseButtonEvent);
+                        return false;
+                    };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseRelease);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class,
@@ -361,33 +369,35 @@ public final class FabricClientEventInvokers {
         registerScreenEvent(ScreenMouseEvents.AfterMouseScroll.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseScroll.class,
                 callback -> {
-                    return callback::onAfterMouseScroll;
+                    return (Screen screen, double mouseX, double mouseY, double horizontalAmount, double verticalAmount, boolean consumed) -> {
+                        callback.onAfterMouseScroll(screen, mouseX, mouseY, horizontalAmount, verticalAmount);
+                        return false;
+                    };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseScroll);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseDrag.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseDrag.class,
                 callback -> {
-                    return (Screen screen, double mouseX, double mouseY, int button, double horizontalAmount, double verticalAmount) -> {
-                        return callback.onBeforeMouseDrag(screen,
-                                mouseX,
-                                mouseY,
-                                button,
-                                horizontalAmount,
-                                verticalAmount).isPass();
+                    return (Screen screen, MouseButtonEvent mouseButtonEvent, double horizontalAmount, double verticalAmount) -> {
+                        return callback.onBeforeMouseDrag(screen, mouseButtonEvent, horizontalAmount, verticalAmount)
+                                .isPass();
                     };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::allowMouseDrag);
         registerScreenEvent(ScreenMouseEvents.AfterMouseDrag.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AfterMouseDrag.class,
                 callback -> {
-                    return callback::onAfterMouseDrag;
+                    return (Screen screen, MouseButtonEvent mouseButtonEvent, double horizontalAmount, double verticalAmount, boolean consumed) -> {
+                        callback.onAfterMouseDrag(screen, mouseButtonEvent, horizontalAmount, verticalAmount);
+                        return false;
+                    };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents::afterMouseDrag);
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowKeyPress.class,
                 callback -> {
-                    return (Screen screen, int key, int scancode, int modifiers) -> {
-                        return callback.onBeforeKeyPress(screen, key, scancode, modifiers).isPass();
+                    return (Screen screen, KeyEvent keyEvent) -> {
+                        return callback.onBeforeKeyPress(screen, keyEvent).isPass();
                     };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowKeyPress);
@@ -400,8 +410,8 @@ public final class FabricClientEventInvokers {
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyRelease.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.AllowKeyRelease.class,
                 callback -> {
-                    return (Screen screen, int key, int scancode, int modifiers) -> {
-                        return callback.onBeforeKeyRelease(screen, key, scancode, modifiers).isPass();
+                    return (Screen screen, KeyEvent keyEvent) -> {
+                        return callback.onBeforeKeyRelease(screen, keyEvent).isPass();
                     };
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::allowKeyRelease);
@@ -500,7 +510,7 @@ public final class FabricClientEventInvokers {
                     return (Player player, Level level, InteractionHand hand, BlockHitResult hitResult) -> {
                         // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                         // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                        if (!level.isClientSide) return InteractionResult.PASS;
+                        if (!level.isClientSide()) return InteractionResult.PASS;
                         Minecraft minecraft = Minecraft.getInstance();
                         EventResult eventResult = callback.onUseInteraction(minecraft,
                                 (LocalPlayer) player,
@@ -518,7 +528,7 @@ public final class FabricClientEventInvokers {
                     return (Player player, Level level, InteractionHand hand, Entity entity, @Nullable EntityHitResult hitResult) -> {
                         // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                         // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                        if (!level.isClientSide) return InteractionResult.PASS;
+                        if (!level.isClientSide()) return InteractionResult.PASS;
                         Minecraft minecraft = Minecraft.getInstance();
                         EventResult eventResult = callback.onUseInteraction(minecraft,
                                 (LocalPlayer) player,
@@ -536,7 +546,7 @@ public final class FabricClientEventInvokers {
                     return (Player player, Level level, InteractionHand hand) -> {
                         // this is only fired client-side to mimic InputEvent$InteractionKeyMappingTriggered on Forge
                         // proper handling of the Fabric callback with the server-side component is implemented elsewhere
-                        if (!level.isClientSide) return InteractionResult.PASS;
+                        if (!level.isClientSide()) return InteractionResult.PASS;
                         Minecraft minecraft = Minecraft.getInstance();
                         EventResult eventResult = callback.onUseInteraction(minecraft,
                                 (LocalPlayer) player,
@@ -556,90 +566,9 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(FogEvents.Setup.class, FabricRendererEvents.SETUP_FOG);
         INSTANCE.register(FogEvents.Color.class, FabricRendererEvents.FOG_COLOR);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
-        INSTANCE.register(RenderHighlightCallback.class,
-                WorldRenderEvents.BEFORE_BLOCK_OUTLINE,
-                (RenderHighlightCallback callback) -> {
-                    return (WorldRenderContext context, @Nullable HitResult hitResult) -> {
-                        if (hitResult == null || hitResult.getType() == HitResult.Type.MISS
-                                || hitResult.getType() == HitResult.Type.BLOCK && !context.blockOutlines()) {
-                            return true;
-                        }
-                        Minecraft minecraft = Minecraft.getInstance();
-                        if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return true;
-                        EventResult eventResult = callback.onRenderHighlight(context.worldRenderer(),
-                                context.camera(),
-                                context.gameRenderer(),
-                                hitResult,
-                                context.tickCounter(),
-                                context.matrixStack(),
-                                context.consumers(),
-                                context.world());
-                        return eventResult.isPass();
-                    };
-                });
-        INSTANCE.register(RenderLevelCallback.Terrain.class,
-                WorldRenderEvents.BEFORE_ENTITIES,
-                (RenderLevelCallback.Terrain callback) -> {
-                    return (WorldRenderContext context) -> {
-                        callback.onRenderLevel(context.worldRenderer(),
-                                context.camera(),
-                                context.gameRenderer(),
-                                context.tickCounter(),
-                                context.matrixStack(),
-                                context.frustum(),
-                                context.world());
-                    };
-                });
-        INSTANCE.register(RenderLevelCallback.Entities.class,
-                WorldRenderEvents.AFTER_ENTITIES,
-                (RenderLevelCallback.Entities callback) -> {
-                    return (WorldRenderContext context) -> {
-                        callback.onRenderLevel(context.worldRenderer(),
-                                context.camera(),
-                                context.gameRenderer(),
-                                context.tickCounter(),
-                                context.matrixStack(),
-                                context.frustum(),
-                                context.world());
-                    };
-                });
-        INSTANCE.register(RenderLevelCallback.Translucent.class,
-                WorldRenderEvents.AFTER_TRANSLUCENT,
-                (RenderLevelCallback.Translucent callback) -> {
-                    return (WorldRenderContext context) -> {
-                        callback.onRenderLevel(context.worldRenderer(),
-                                context.camera(),
-                                context.gameRenderer(),
-                                context.tickCounter(),
-                                context.matrixStack(),
-                                context.frustum(),
-                                context.world());
-                    };
-                });
-        INSTANCE.register(RenderLevelCallback.All.class, WorldRenderEvents.END, (RenderLevelCallback.All callback) -> {
-            return (WorldRenderContext context) -> {
-                callback.onRenderLevel(context.worldRenderer(),
-                        context.camera(),
-                        context.gameRenderer(),
-                        context.tickCounter(),
-                        context.matrixStack(),
-                        context.frustum(),
-                        context.world());
-            };
-        });
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
-        INSTANCE.register(GatherDebugInformationEvents.Game.class,
-                GatherDebugTextEvents.LEFT,
-                (GatherDebugInformationEvents.Game callback) -> {
-                    return callback::onGatherGameInformation;
-                });
-        INSTANCE.register(GatherDebugInformationEvents.System.class,
-                GatherDebugTextEvents.RIGHT,
-                (GatherDebugInformationEvents.System callback) -> {
-                    return callback::onGatherSystemInformation;
-                });
         INSTANCE.register(ComputeFieldOfViewCallback.class, FabricRendererEvents.COMPUTE_FIELD_OF_VIEW);
         INSTANCE.register(ChatMessageReceivedCallback.class, FabricClientEvents.CHAT_MESSAGE_RECEIVED);
         INSTANCE.register(GatherEffectScreenTooltipCallback.class, FabricGuiEvents.GATHER_EFFECT_SCREEN_TOOLTIP);

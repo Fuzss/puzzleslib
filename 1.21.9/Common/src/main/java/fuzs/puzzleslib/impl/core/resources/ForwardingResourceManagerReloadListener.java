@@ -17,10 +17,11 @@ public class ForwardingResourceManagerReloadListener extends ForwardingReloadLis
     }
 
     @Override
-    public CompletableFuture<Void> reload(PreparationBarrier preparationBarrier, ResourceManager resourceManager, Executor backgroundExecutor, Executor gameExecutor) {
-        return ResourceManagerReloadListener.super.reload(preparationBarrier, resourceManager, backgroundExecutor,
-                gameExecutor
-        );
+    public CompletableFuture<Void> reload(SharedState sharedState, Executor backgroundExecutor, PreparationBarrier preparationBarrier, Executor gameExecutor) {
+        return ResourceManagerReloadListener.super.reload(sharedState,
+                backgroundExecutor,
+                preparationBarrier,
+                gameExecutor);
     }
 
     @Override

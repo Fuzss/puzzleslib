@@ -28,8 +28,8 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.resources.ResourceLocation;
@@ -39,6 +39,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
@@ -134,11 +135,19 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(AddLivingEntityRenderLayersCallback.class,
                 EntityRenderersEvent.AddLayers.class,
                 (AddLivingEntityRenderLayersCallback callback, EntityRenderersEvent.AddLayers event) -> {
-                    for (PlayerSkin.Model skinModel : event.getSkins()) {
-                        if (event.getSkin(skinModel) instanceof LivingEntityRenderer<?, ?, ?> entityRenderer) {
-                            callback.addLivingEntityRenderLayers(EntityType.PLAYER, entityRenderer, event.getContext());
+                    for (PlayerModelType playerModelType : PlayerModelType.values()) {
+                        AvatarRenderer<?> avatarRenderer = event.getPlayerRenderer(playerModelType);
+                        if (avatarRenderer != null) {
+                            callback.addLivingEntityRenderLayers(EntityType.PLAYER, avatarRenderer, event.getContext());
+                        }
+                        avatarRenderer = event.getMannequinRenderer(playerModelType);
+                        if (avatarRenderer != null) {
+                            callback.addLivingEntityRenderLayers(EntityType.MANNEQUIN,
+                                    avatarRenderer,
+                                    event.getContext());
                         }
                     }
+
                     for (EntityType<?> entityType : event.getEntityTypes()) {
                         if (event.getRenderer(entityType) instanceof LivingEntityRenderer<?, ?, ?> entityRenderer) {
                             callback.addLivingEntityRenderLayers(entityType, entityRenderer, event.getContext());
@@ -184,25 +193,8 @@ public final class NeoForgeClientEventInvokers {
                             event.getContent(),
                             event.getEntityRenderer(),
                             event.getPoseStack(),
-                            event.getMultiBufferSource(),
-                            event.getPackedLight());
+                            event.getSubmitNodeCollector());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
-                });
-        INSTANCE.register(ContainerScreenEvents.Background.class,
-                ContainerScreenEvent.Render.Background.class,
-                (ContainerScreenEvents.Background callback, ContainerScreenEvent.Render.Background event) -> {
-                    callback.onDrawBackground(event.getContainerScreen(),
-                            event.getGuiGraphics(),
-                            event.getMouseX(),
-                            event.getMouseY());
-                });
-        INSTANCE.register(ContainerScreenEvents.Foreground.class,
-                ContainerScreenEvent.Render.Foreground.class,
-                (ContainerScreenEvents.Foreground callback, ContainerScreenEvent.Render.Foreground event) -> {
-                    callback.onDrawForeground(event.getContainerScreen(),
-                            event.getGuiGraphics(),
-                            event.getMouseX(),
-                            event.getMouseY());
                 });
         INSTANCE.register(PrepareInventoryMobEffectsCallback.class,
                 ScreenEvent.RenderInventoryMobEffects.class,
@@ -258,6 +250,15 @@ public final class NeoForgeClientEventInvokers {
                     event.getMouseY(),
                     event.getPartialTick());
         });
+        registerScreenEvent(ScreenEvents.AfterBackground.class,
+                ScreenEvent.Render.Background.class,
+                (callback, event) -> {
+                    callback.onAfterBackground(event.getScreen(),
+                            event.getGuiGraphics(),
+                            event.getMouseX(),
+                            event.getMouseY(),
+                            event.getPartialTick());
+                });
         registerScreenEvent(ScreenEvents.AfterRender.class, ScreenEvent.Render.Post.class, (callback, event) -> {
             callback.onAfterRender(event.getScreen(),
                     event.getGuiGraphics(),
@@ -269,35 +270,25 @@ public final class NeoForgeClientEventInvokers {
                 ScreenEvent.MouseButtonPressed.Pre.class,
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeMouseClick(event.getScreen(),
-                            event.getMouseX(),
-                            event.getMouseY(),
-                            event.getButton());
+                            event.getMouseButtonEvent());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
         registerScreenEvent(ScreenMouseEvents.AfterMouseClick.class,
                 ScreenEvent.MouseButtonPressed.Post.class,
                 (callback, event) -> {
-                    callback.onAfterMouseClick(event.getScreen(),
-                            event.getMouseX(),
-                            event.getMouseY(),
-                            event.getButton());
+                    callback.onAfterMouseClick(event.getScreen(), event.getMouseButtonEvent());
                 });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseRelease.class,
                 ScreenEvent.MouseButtonReleased.Pre.class,
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeMouseRelease(event.getScreen(),
-                            event.getMouseX(),
-                            event.getMouseY(),
-                            event.getButton());
+                            event.getMouseButtonEvent());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
         registerScreenEvent(ScreenMouseEvents.AfterMouseRelease.class,
                 ScreenEvent.MouseButtonReleased.Post.class,
                 (callback, event) -> {
-                    callback.onAfterMouseRelease(event.getScreen(),
-                            event.getMouseX(),
-                            event.getMouseY(),
-                            event.getButton());
+                    callback.onAfterMouseRelease(event.getScreen(), event.getMouseButtonEvent());
                 });
         registerScreenEvent(ScreenMouseEvents.BeforeMouseScroll.class,
                 ScreenEvent.MouseScrolled.Pre.class,
@@ -322,9 +313,7 @@ public final class NeoForgeClientEventInvokers {
                 ScreenEvent.MouseDragged.Pre.class,
                 (callback, event) -> {
                     EventResult eventResult = callback.onBeforeMouseDrag(event.getScreen(),
-                            event.getMouseX(),
-                            event.getMouseY(),
-                            event.getMouseButton(),
+                            event.getMouseButtonEvent(),
                             event.getDragX(),
                             event.getDragY());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
@@ -333,45 +322,39 @@ public final class NeoForgeClientEventInvokers {
                 ScreenEvent.MouseDragged.Post.class,
                 (callback, event) -> {
                     callback.onAfterMouseDrag(event.getScreen(),
-                            event.getMouseX(),
-                            event.getMouseY(),
-                            event.getMouseButton(),
+                            event.getMouseButtonEvent(),
                             event.getDragX(),
                             event.getDragY());
                 });
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyPress.class,
                 ScreenEvent.KeyPressed.Pre.class,
                 (callback, event) -> {
-                    EventResult eventResult = callback.onBeforeKeyPress(event.getScreen(),
-                            event.getKeyCode(),
-                            event.getScanCode(),
-                            event.getModifiers());
+                    EventResult eventResult = callback.onBeforeKeyPress(event.getScreen(), event.getKeyEvent());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyPress.class,
                 ScreenEvent.KeyPressed.Post.class,
                 (callback, event) -> {
-                    callback.onAfterKeyPress(event.getScreen(),
-                            event.getKeyCode(),
-                            event.getScanCode(),
-                            event.getModifiers());
+                    callback.onAfterKeyPress(event.getScreen(), event.getKeyEvent());
                 });
         registerScreenEvent(ScreenKeyboardEvents.BeforeKeyRelease.class,
                 ScreenEvent.KeyReleased.Pre.class,
                 (callback, event) -> {
-                    EventResult eventResult = callback.onBeforeKeyRelease(event.getScreen(),
-                            event.getKeyCode(),
-                            event.getScanCode(),
-                            event.getModifiers());
+                    EventResult eventResult = callback.onBeforeKeyRelease(event.getScreen(), event.getKeyEvent());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
         registerScreenEvent(ScreenKeyboardEvents.AfterKeyRelease.class,
                 ScreenEvent.KeyReleased.Post.class,
                 (callback, event) -> {
-                    callback.onAfterKeyRelease(event.getScreen(),
-                            event.getKeyCode(),
-                            event.getScanCode(),
-                            event.getModifiers());
+                    callback.onAfterKeyRelease(event.getScreen(), event.getKeyEvent());
+                });
+        INSTANCE.register(RenderContainerScreenContentsCallback.class,
+                ContainerScreenEvent.Render.Foreground.class,
+                (RenderContainerScreenContentsCallback callback, ContainerScreenEvent.Render.Foreground event) -> {
+                    callback.onRenderContainerScreenContents(event.getContainerScreen(),
+                            event.getGuiGraphics(),
+                            event.getMouseX(),
+                            event.getMouseY());
                 });
         INSTANCE.register(CustomizeChatPanelCallback.class,
                 CustomizeGuiOverlayEvent.Chat.class,
@@ -442,8 +425,7 @@ public final class NeoForgeClientEventInvokers {
                     event.getRenderer(),
                     event.getPartialTick(),
                     event.getPoseStack(),
-                    event.getMultiBufferSource(),
-                    event.getPackedLight());
+                    event.getSubmitNodeCollector());
             if (eventResult.isInterrupt()) event.setCanceled(true);
         });
         INSTANCE.register(RenderLivingEvents.After.class, RenderLivingEvent.Post.class, (callback, event) -> {
@@ -451,8 +433,7 @@ public final class NeoForgeClientEventInvokers {
                     event.getRenderer(),
                     event.getPartialTick(),
                     event.getPoseStack(),
-                    event.getMultiBufferSource(),
-                    event.getPackedLight());
+                    event.getSubmitNodeCollector());
         });
         INSTANCE.register(RenderHandEvents.MainHand.class,
                 RenderHandEvent.class,
@@ -467,7 +448,7 @@ public final class NeoForgeClientEventInvokers {
                             minecraft.player.getMainArm(),
                             event.getItemStack(),
                             event.getPoseStack(),
-                            event.getMultiBufferSource(),
+                            event.getSubmitNodeCollector(),
                             event.getPackedLight(),
                             event.getPartialTick(),
                             event.getInterpolatedPitch(),
@@ -488,7 +469,7 @@ public final class NeoForgeClientEventInvokers {
                             minecraft.player.getMainArm().getOpposite(),
                             event.getItemStack(),
                             event.getPoseStack(),
-                            event.getMultiBufferSource(),
+                            event.getSubmitNodeCollector(),
                             event.getPackedLight(),
                             event.getPartialTick(),
                             event.getInterpolatedPitch(),
@@ -646,83 +627,6 @@ public final class NeoForgeClientEventInvokers {
                             event.getTooltipPositioner());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
-        INSTANCE.register(RenderHighlightCallback.class,
-                RenderHighlightEvent.Block.class,
-                (RenderHighlightCallback callback, RenderHighlightEvent.Block event) -> {
-                    Minecraft minecraft = Minecraft.getInstance();
-                    if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
-                    EventResult eventResult = callback.onRenderHighlight(event.getLevelRenderer(),
-                            event.getCamera(),
-                            minecraft.gameRenderer,
-                            event.getTarget(),
-                            event.getDeltaTracker(),
-                            event.getPoseStack(),
-                            event.getMultiBufferSource(),
-                            minecraft.level);
-                    if (eventResult.isInterrupt()) event.setCanceled(true);
-                },
-                true);
-        INSTANCE.register(RenderHighlightCallback.class,
-                RenderHighlightEvent.Entity.class,
-                (RenderHighlightCallback callback, RenderHighlightEvent.Entity event) -> {
-                    Minecraft minecraft = Minecraft.getInstance();
-                    if (!(minecraft.getCameraEntity() instanceof Player) || minecraft.options.hideGui) return;
-                    callback.onRenderHighlight(event.getLevelRenderer(),
-                            event.getCamera(),
-                            minecraft.gameRenderer,
-                            event.getTarget(),
-                            event.getDeltaTracker(),
-                            event.getPoseStack(),
-                            event.getMultiBufferSource(),
-                            minecraft.level);
-                },
-                true);
-        INSTANCE.register(RenderLevelCallback.Terrain.class,
-                RenderLevelStageEvent.AfterOpaqueBlocks.class,
-                (RenderLevelCallback.Terrain callback, RenderLevelStageEvent.AfterOpaqueBlocks event) -> {
-                    // NeoForge has multiple stages here, but this is the last one which mirrors Fabric the best
-                    callback.onRenderLevel(event.getLevelRenderer(),
-                            event.getCamera(),
-                            Minecraft.getInstance().gameRenderer,
-                            event.getPartialTick(),
-                            event.getPoseStack(),
-                            event.getFrustum(),
-                            (ClientLevel) event.getLevel());
-                });
-        INSTANCE.register(RenderLevelCallback.Entities.class,
-                RenderLevelStageEvent.AfterEntities.class,
-                (RenderLevelCallback.Entities callback, RenderLevelStageEvent.AfterEntities event) -> {
-                    callback.onRenderLevel(event.getLevelRenderer(),
-                            event.getCamera(),
-                            Minecraft.getInstance().gameRenderer,
-                            event.getPartialTick(),
-                            event.getPoseStack(),
-                            event.getFrustum(),
-                            (ClientLevel) event.getLevel());
-                });
-        INSTANCE.register(RenderLevelCallback.Translucent.class,
-                RenderLevelStageEvent.AfterParticles.class,
-                (RenderLevelCallback.Translucent callback, RenderLevelStageEvent.AfterParticles event) -> {
-                    // NeoForge has multiple stages here, but this is the last one which mirrors Fabric the best
-                    callback.onRenderLevel(event.getLevelRenderer(),
-                            event.getCamera(),
-                            Minecraft.getInstance().gameRenderer,
-                            event.getPartialTick(),
-                            event.getPoseStack(),
-                            event.getFrustum(),
-                            (ClientLevel) event.getLevel());
-                });
-        INSTANCE.register(RenderLevelCallback.All.class,
-                RenderLevelStageEvent.AfterLevel.class,
-                (RenderLevelCallback.All callback, RenderLevelStageEvent.AfterLevel event) -> {
-                    callback.onRenderLevel(event.getLevelRenderer(),
-                            event.getCamera(),
-                            Minecraft.getInstance().gameRenderer,
-                            event.getPartialTick(),
-                            event.getPoseStack(),
-                            event.getFrustum(),
-                            (ClientLevel) event.getLevel());
-                });
         INSTANCE.register(GameRenderEvents.Before.class,
                 RenderFrameEvent.Pre.class,
                 (GameRenderEvents.Before callback, RenderFrameEvent.Pre event) -> {
@@ -741,19 +645,6 @@ public final class NeoForgeClientEventInvokers {
                     Minecraft minecraft = Minecraft.getInstance();
                     EventResult eventResult = callback.onAddToast(minecraft.getToastManager(), event.getToast());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
-                });
-        INSTANCE.register(GatherDebugInformationEvents.Game.class,
-                CustomizeGuiOverlayEvent.DebugText.class,
-                (GatherDebugInformationEvents.Game callback, CustomizeGuiOverlayEvent.DebugText event) -> {
-                    // to exclude non-game information lines, we insert before that
-                    int index = event.getLeft().lastIndexOf("For help: press F3 + Q");
-                    index = Math.max(0, index - 2);
-                    callback.onGatherGameInformation(event.getLeft().subList(0, index));
-                });
-        INSTANCE.register(GatherDebugInformationEvents.System.class,
-                CustomizeGuiOverlayEvent.DebugText.class,
-                (GatherDebugInformationEvents.System callback, CustomizeGuiOverlayEvent.DebugText event) -> {
-                    callback.onGatherSystemInformation(event.getRight());
                 });
         INSTANCE.register(ComputeFieldOfViewCallback.class,
                 ViewportEvent.ComputeFov.class,

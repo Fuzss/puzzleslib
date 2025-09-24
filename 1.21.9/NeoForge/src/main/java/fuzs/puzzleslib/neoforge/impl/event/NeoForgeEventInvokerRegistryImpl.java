@@ -675,8 +675,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
                 PlayerEvent.PlayerChangedDimensionEvent.class,
                 (AfterChangeDimensionCallback callback, PlayerEvent.PlayerChangedDimensionEvent event) -> {
                     if (!(event.getEntity() instanceof ServerPlayer serverPlayer)) return;
-                    ServerLevel originalLevel = serverPlayer.getServer().getLevel(event.getFrom());
-                    ServerLevel newLevel = serverPlayer.getServer().getLevel(event.getTo());
+                    ServerLevel originalLevel = serverPlayer.level().getServer().getLevel(event.getFrom());
+                    ServerLevel newLevel = serverPlayer.level().getServer().getLevel(event.getTo());
                     Objects.requireNonNull(originalLevel, "original level is null");
                     Objects.requireNonNull(newLevel, "new level is null");
                     callback.onAfterChangeDimension(serverPlayer, originalLevel, newLevel);

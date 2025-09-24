@@ -34,7 +34,7 @@ public interface TickingEntityBlock<T extends BlockEntity & TickingBlockEntity> 
     default <BE extends BlockEntity> BlockEntityTicker<BE> getTicker(Level level, BlockState state, BlockEntityType<BE> blockEntityType) {
         // due to the type bounds in TickingEntityBlock this guarantees we have a TickingBlockEntity instance
         if (this.getBlockEntityType().equals(blockEntityType)) {
-            Consumer<TickingBlockEntity> ticker = level.isClientSide ? TickingBlockEntity::clientTick : TickingBlockEntity::serverTick;
+            Consumer<TickingBlockEntity> ticker = level.isClientSide() ? TickingBlockEntity::clientTick : TickingBlockEntity::serverTick;
             return (Level $, BlockPos blockPos, BlockState blockState, BE blockEntity) -> {
                 // no need to pass on anything, the block entity instance already has all those parameters
                 ticker.accept((TickingBlockEntity) blockEntity);

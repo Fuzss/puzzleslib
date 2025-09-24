@@ -25,7 +25,7 @@ abstract class AbstractContainerScreenFabricMixin extends Screen {
     )
     )
     public void renderContents(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks, CallbackInfo callback) {
-        FabricGuiEvents.CONTAINER_SCREEN_FOREGROUND.invoker()
-                .onDrawForeground(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
+        FabricGuiEvents.RENDER_CONTAINER_SCREEN_CONTENTS.invoker()
+                .onRenderContainerScreenContents(AbstractContainerScreen.class.cast(this), guiGraphics, mouseX, mouseY);
     }
 }

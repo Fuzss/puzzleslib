@@ -38,7 +38,6 @@ public record GuiLayersContextNeoForgeImpl(RegisterGuiLayersEvent event) impleme
             .put(BOSS_BAR, VanillaGuiLayers.BOSS_OVERLAY)
             .put(SLEEP_OVERLAY, VanillaGuiLayers.SLEEP_OVERLAY)
             .put(DEMO_TIMER, VanillaGuiLayers.DEMO_OVERLAY)
-            .put(DEBUG_OVERLAY, VanillaGuiLayers.DEBUG_OVERLAY)
             .put(SCOREBOARD, VanillaGuiLayers.SCOREBOARD_SIDEBAR)
             .put(OVERLAY_MESSAGE, VanillaGuiLayers.OVERLAY_MESSAGE)
             .put(TITLE, VanillaGuiLayers.TITLE)

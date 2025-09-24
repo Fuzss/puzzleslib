@@ -3,16 +3,20 @@ package fuzs.puzzleslib.api.client.data.v2;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.client.data.AtlasProvider;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
+import net.minecraft.client.resources.model.AtlasManager;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public abstract class AbstractAtlasProvider extends AtlasProvider {
+    private final Map<ResourceLocation, AtlasManager.AtlasConfig> atlasByTexture = AtlasManager.KNOWN_ATLASES.stream()
+            .collect(Collectors.toMap(AtlasManager.AtlasConfig::textureId, Function.identity()));
     private final Map<ResourceLocation, List<SpriteSource>> values = new LinkedHashMap<>();
 
     public AbstractAtlasProvider(DataProviderContext context) {
@@ -37,7 +41,7 @@ public abstract class AbstractAtlasProvider extends AtlasProvider {
     public abstract void addAtlases();
 
     protected void addMaterial(Material material) {
-        this.add(ModelManager.VANILLA_ATLASES.get(material.atlasLocation()), forMaterial(material));
+        this.add(this.atlasByTexture.get(material.atlasLocation()).definitionLocation(), forMaterial(material));
     }
 
     protected void add(ResourceLocation resourceLocation, SpriteSource... spriteSources) {

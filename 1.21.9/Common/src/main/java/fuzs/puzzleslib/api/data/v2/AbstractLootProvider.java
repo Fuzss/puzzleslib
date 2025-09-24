@@ -31,6 +31,7 @@ import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.CopyComponentsFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import org.apache.commons.lang3.StringUtils;
 
@@ -159,10 +160,9 @@ public final class AbstractLootProvider {
                     .withPool(LootPool.lootPool()
                             .setRolls(ConstantValue.exactly(1.0F))
                             .add(LootItem.lootTableItem(block)
-                                    .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                                            .include(DataComponents.CUSTOM_NAME))
-                                    .apply(CopyComponentsFunction.copyComponents(CopyComponentsFunction.Source.BLOCK_ENTITY)
-                                            .include(DataComponents.NOTE_BLOCK_SOUND)))
+                                    .apply(CopyComponentsFunction.copyComponentsFromBlockEntity(LootContextParams.BLOCK_ENTITY)
+                                            .include(DataComponents.NOTE_BLOCK_SOUND)
+                                            .include(DataComponents.CUSTOM_NAME)))
                             .unwrap());
         }
 

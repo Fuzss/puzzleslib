@@ -9,8 +9,7 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.Pack;
-
-import java.util.Optional;
+import net.minecraft.util.InclusiveRange;
 
 public record ModPackResourcesSupplier(PackType packType,
                                        PackLocationInfo info,
@@ -19,12 +18,11 @@ public record ModPackResourcesSupplier(PackType packType,
 
     public static ModPackResourcesSupplier create(PackType packType, PackLocationInfo info, PackResourcesSupplier<AbstractModPackResources> supplier, Component description) {
         PackMetadataSection metadataSection = new PackMetadataSection(description,
-                SharedConstants.getCurrentVersion().packVersion(packType),
-                Optional.empty());
+                new InclusiveRange<>(SharedConstants.getCurrentVersion().packVersion(packType)));
         return new ModPackResourcesSupplier(packType,
                 info,
                 supplier,
-                BuiltInMetadata.of(PackMetadataSection.TYPE, metadataSection));
+                BuiltInMetadata.of(PackMetadataSection.forPackType(packType), metadataSection));
     }
 
     @Override

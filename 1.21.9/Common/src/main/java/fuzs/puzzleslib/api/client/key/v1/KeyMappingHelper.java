@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.key.v1;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.resources.ResourceLocation;
 
 /**
@@ -52,21 +53,20 @@ public interface KeyMappingHelper {
     static KeyMapping registerKeyMapping(ResourceLocation resourceLocation, int keyCode) {
         return new KeyMapping("key." + resourceLocation.toLanguageKey(),
                 keyCode,
-                "key.categories." + resourceLocation.getNamespace());
+                new KeyMapping.Category(resourceLocation.withPath("main")));
     }
 
     /**
      * Checks if a key mapping is pressed.
      * <p>
-     * NeoForge replaces the vanilla call to {@link KeyMapping#matches(int, int)} in a few places to account for key
+     * NeoForge replaces the vanilla call to {@link KeyMapping#matches(KeyEvent)} in a few places to account for key
      * activation contexts (game &amp; screen environments).
      *
      * @param keyMapping the key mapping to check if pressed
-     * @param keyCode    the current key code
-     * @param scanCode   the key scan code
+     * @param keyEvent   the key event
      * @return is the key mapping pressed
      */
-    static boolean isKeyActiveAndMatches(KeyMapping keyMapping, int keyCode, int scanCode) {
-        return ClientProxyImpl.get().isKeyActiveAndMatches(keyMapping, keyCode, scanCode);
+    static boolean isKeyActiveAndMatches(KeyMapping keyMapping, KeyEvent keyEvent) {
+        return ClientProxyImpl.get().isKeyActiveAndMatches(keyMapping, keyEvent);
     }
 }
