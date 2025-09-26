@@ -1,7 +1,9 @@
 package fuzs.puzzleslib.impl.content;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
+import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLib;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.level.GameRules;
 import org.objectweb.asm.Type;
@@ -65,5 +67,9 @@ public class PuzzlesLibDevelopment extends PuzzlesLib implements ModConstructor 
                         Type.getMethodDescriptor(method));
             }
         }
+    }
+
+    public static ResourceLocation id(String path) {
+        return ResourceLocationHelper.fromNamespaceAndPath(MOD_ID, path);
     }
 }

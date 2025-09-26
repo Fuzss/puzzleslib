@@ -18,18 +18,18 @@ public record FabricPotionBrewingBuilder(PotionBrewing.Builder builder) implemen
     }
 
     @Override
-    public void registerContainerRecipe(PotionItem from, Ingredient ingredient, PotionItem to) {
-        Objects.requireNonNull(from, "from item is null");
+    public void registerContainerRecipe(PotionItem inputItem, Ingredient ingredient, PotionItem outputItem) {
+        Objects.requireNonNull(inputItem, "input item is null");
         Objects.requireNonNull(ingredient, "ingredient is null");
-        Objects.requireNonNull(to, "to item is null");
-        this.builder.registerItemRecipe(from, ingredient, to);
+        Objects.requireNonNull(outputItem, "output item is null");
+        this.builder.registerItemRecipe(inputItem, ingredient, outputItem);
     }
 
     @Override
-    public void registerPotionRecipe(Holder<Potion> from, Ingredient ingredient, Holder<Potion> to) {
-        Objects.requireNonNull(from, "from potion is null");
+    public void registerPotionRecipe(Holder<Potion> intputPotion, Ingredient ingredient, Holder<Potion> outputPotion) {
+        Objects.requireNonNull(intputPotion, "input potion is null");
         Objects.requireNonNull(ingredient, "ingredient is null");
-        Objects.requireNonNull(to, "to potion is null");
-        this.builder.registerPotionRecipe(from, ingredient, to);
+        Objects.requireNonNull(outputPotion, "output potion is null");
+        this.builder.registerPotionRecipe(intputPotion, ingredient, outputPotion);
     }
 }

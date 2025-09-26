@@ -315,6 +315,8 @@ accessible  field   net/minecraft/client/MouseHandler   lastClickTime   J
 accessible  field   net/minecraft/client/MouseHandler   lastClickButton I
 accessible  field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;
 mutable field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;
+accessible  method  net/minecraft/client/multiplayer/MultiPlayerGameMode    sameDestroyTarget   (Lnet/minecraft/core/BlockPos;)Z
+accessible  method  net/minecraft/client/multiplayer/MultiPlayerGameMode    startPrediction (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

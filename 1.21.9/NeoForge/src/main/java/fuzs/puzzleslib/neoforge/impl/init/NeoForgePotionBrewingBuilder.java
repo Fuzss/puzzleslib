@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.impl.init;
 
 import fuzs.puzzleslib.api.event.v1.server.RegisterPotionBrewingMixesCallback;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.PotionItem;
 import net.minecraft.world.item.alchemy.Potion;
@@ -23,27 +24,26 @@ public record NeoForgePotionBrewingBuilder(PotionBrewing.Builder builder) implem
     }
 
     @Override
-    public void registerContainerRecipe(PotionItem from, Ingredient ingredient, PotionItem to) {
-        Objects.requireNonNull(from, "from item is null");
+    public void registerContainerRecipe(PotionItem inputItem, Ingredient ingredient, PotionItem outputItem) {
+        Objects.requireNonNull(inputItem, "input item is null");
         Objects.requireNonNull(ingredient, "ingredient is null");
-        Objects.requireNonNull(to, "to item is null");
-        if (from.isEnabled(this.builder.enabledFeatures) && to.isEnabled(this.builder.enabledFeatures)) {
-            PotionBrewing.Mix<Item> mix = new PotionBrewing.Mix<>(from.builtInRegistryHolder(),
+        Objects.requireNonNull(outputItem, "output item is null");
+        if (inputItem.isEnabled(this.builder.enabledFeatures) && outputItem.isEnabled(this.builder.enabledFeatures)) {
+            PotionBrewing.Mix<Item> mix = new PotionBrewing.Mix<>(BuiltInRegistries.ITEM.wrapAsHolder(inputItem),
                     ingredient,
-                    to.builtInRegistryHolder()
-            );
+                    BuiltInRegistries.ITEM.wrapAsHolder(outputItem));
             this.builder.containerMixes.add(mix);
         }
     }
 
     @Override
-    public void registerPotionRecipe(Holder<Potion> from, Ingredient ingredient, Holder<Potion> to) {
-        Objects.requireNonNull(from, "from potion is null");
+    public void registerPotionRecipe(Holder<Potion> intputPotion, Ingredient ingredient, Holder<Potion> outputPotion) {
+        Objects.requireNonNull(intputPotion, "input potion is null");
         Objects.requireNonNull(ingredient, "ingredient is null");
-        Objects.requireNonNull(to, "to potion is null");
-        if (from.value().isEnabled(this.builder.enabledFeatures) &&
-                to.value().isEnabled(this.builder.enabledFeatures)) {
-            PotionBrewing.Mix<Potion> mix = new PotionBrewing.Mix<>(from, ingredient, to);
+        Objects.requireNonNull(outputPotion, "output potion is null");
+        if (intputPotion.value().isEnabled(this.builder.enabledFeatures) && outputPotion.value()
+                .isEnabled(this.builder.enabledFeatures)) {
+            PotionBrewing.Mix<Potion> mix = new PotionBrewing.Mix<>(intputPotion, ingredient, outputPotion);
             this.builder.potionMixes.add(mix);
         }
     }

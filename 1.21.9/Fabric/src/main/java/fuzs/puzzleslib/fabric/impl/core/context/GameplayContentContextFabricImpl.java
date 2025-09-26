@@ -53,7 +53,7 @@ public final class GameplayContentContextFabricImpl implements GameplayContentCo
     public void registerStrippable(Holder<Block> unstrippedBlock, Holder<Block> strippedBlock) {
         Objects.requireNonNull(unstrippedBlock, "unstripped block is null");
         Objects.requireNonNull(strippedBlock, "stripped block is null");
-        StrippableBlockRegistry.register(unstrippedBlock.value(), strippedBlock.value());
+        StrippableBlockRegistry.registerCopyState(unstrippedBlock.value(), strippedBlock.value());
     }
 
     @Override

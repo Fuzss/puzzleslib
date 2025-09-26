@@ -960,7 +960,7 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(AddDataPackReloadListenersCallback.class,
                 AddServerReloadListenersEvent.class,
                 (AddDataPackReloadListenersCallback callback, AddServerReloadListenersEvent event) -> {
-                    callback.onAddDataPackReloadListeners(event.getRegistryAccess(),
+                    callback.onAddDataPackReloadListeners(event.getServerResources(),
                             event.getServerResources().getRegistryLookup(),
                             event::addListener);
                 });

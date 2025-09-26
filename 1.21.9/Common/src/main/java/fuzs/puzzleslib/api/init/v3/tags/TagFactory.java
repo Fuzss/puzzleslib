@@ -35,18 +35,6 @@ public interface TagFactory {
      * A built-in factory for the <code>neoforge</code> namespace.
      */
     TagFactory NEOFORGE = make("neoforge");
-    /**
-     * A built-in factory for the <code>forge</code> namespace.
-     */
-    TagFactory FORGE = make("forge");
-    /**
-     * A built-in factory for the <code>curios</code> namespace.
-     */
-    TagFactory CURIOS = make("curios");
-    /**
-     * A built-in factory for the <code>trinkets</code> namespace.
-     */
-    TagFactory TRINKETS = make("trinkets");
 
     /**
      * Construct a new factory instance backed by a provided namespace.
