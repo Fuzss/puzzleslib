@@ -12,12 +12,12 @@ import net.minecraft.client.input.MouseButtonInfo;
  * Very similar to {@link ScreenMouseEvents} and {@link ScreenKeyboardEvents}, but fires when no screen is open to
  * handle input events in the {@link net.minecraft.client.gui.Gui}.
  */
-public final class InputEvents {
+public final class ClientInputEvents {
     public static final EventInvoker<MouseClick> MOUSE_CLICK = EventInvoker.lookup(MouseClick.class);
     public static final EventInvoker<MouseScroll> MOUSE_SCROLL = EventInvoker.lookup(MouseScroll.class);
     public static final EventInvoker<KeyPress> KEY_PRESS = EventInvoker.lookup(KeyPress.class);
 
-    private InputEvents() {
+    private ClientInputEvents() {
         // NO-OP
     }
 

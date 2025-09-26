@@ -79,6 +79,7 @@ public abstract class ModContext {
             this.registryManager.freeze();
             this.registryManager.isFrozenOrThrow();
         }
+
         if (this.configHolder != null) {
             this.configHolder.isFrozenOrThrow();
         }

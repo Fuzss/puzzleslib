@@ -166,7 +166,8 @@ public final class TooltipRenderHelper {
     }
 
     /**
-     * Creates a list of {@link ClientTooltipComponent}s from text and image components to be rendered on a tooltip.
+     * Creates a list of {@link ClientTooltipComponent ClientTooltipComponents} from text and image components to be
+     * rendered on a tooltip.
      * <p><code>imageComponents</code> are inserted into <code>components</code> at index <code>1</code>, just like
      * vanilla.
      *
@@ -179,7 +180,8 @@ public final class TooltipRenderHelper {
     }
 
     /**
-     * Creates a list of {@link ClientTooltipComponent}s from text and image components to be rendered on a tooltip.
+     * Creates a list of {@link ClientTooltipComponent ClientTooltipComponents} from text and image components to be
+     * rendered on a tooltip.
      *
      * @param components      components to render on the tooltip
      * @param imageComponents image components to render on the tooltip
@@ -206,7 +208,7 @@ public final class TooltipRenderHelper {
     /**
      * Converts an image {@link TooltipComponent} into the appropriate client-side component.
      * <p>
-     * {@link ClientTooltipComponent}s must first be registered in
+     * {@link ClientTooltipComponent ClientTooltipComponents} must first be registered in
      * {@link ClientModConstructor#onRegisterClientTooltipComponents(ClientTooltipComponentsContext)}, otherwise
      * {@link IllegalArgumentException} will be thrown.
      * <p>

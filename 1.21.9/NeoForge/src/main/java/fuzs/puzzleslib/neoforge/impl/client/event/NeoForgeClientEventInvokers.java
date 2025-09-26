@@ -370,15 +370,15 @@ public final class NeoForgeClientEventInvokers {
                     if (!(event.getLevel() instanceof ClientLevel clientLevel)) return;
                     callback.onEntityUnload(event.getEntity(), clientLevel);
                 });
-        INSTANCE.register(InputEvents.MouseClick.class,
+        INSTANCE.register(ClientInputEvents.MouseClick.class,
                 InputEvent.MouseButton.Pre.class,
-                (InputEvents.MouseClick callback, InputEvent.MouseButton.Pre event) -> {
+                (ClientInputEvents.MouseClick callback, InputEvent.MouseButton.Pre event) -> {
                     EventResult eventResult = callback.onMouseClick(event.getMouseButtonInfo(), event.getAction());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
-        INSTANCE.register(InputEvents.MouseScroll.class,
+        INSTANCE.register(ClientInputEvents.MouseScroll.class,
                 InputEvent.MouseScrollingEvent.class,
-                (InputEvents.MouseScroll callback, InputEvent.MouseScrollingEvent event) -> {
+                (ClientInputEvents.MouseScroll callback, InputEvent.MouseScrollingEvent event) -> {
                     EventResult eventResult = callback.onMouseScroll(event.isLeftDown(),
                             event.isMiddleDown(),
                             event.isRightDown(),
@@ -386,9 +386,9 @@ public final class NeoForgeClientEventInvokers {
                             event.getScrollDeltaY());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
-        INSTANCE.register(InputEvents.KeyPress.class,
+        INSTANCE.register(ClientInputEvents.KeyPress.class,
                 InputEvent.Key.class,
-                (InputEvents.KeyPress callback, InputEvent.Key event) -> {
+                (ClientInputEvents.KeyPress callback, InputEvent.Key event) -> {
                     // eventResult is ignored, as before event doesn't exist on NeoForge, so there is nothing to cancel the input
                     callback.onKeyPress(event.getKeyEvent(), event.getAction());
                 });

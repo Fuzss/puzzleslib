@@ -1,5 +1,7 @@
 package fuzs.puzzleslib.api.client.event.v1;
 
+import fuzs.puzzleslib.api.client.core.v1.ClientModConstructor;
+import fuzs.puzzleslib.api.client.core.v1.context.ResourcePackReloadListenersContext;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
@@ -20,6 +22,7 @@ public interface AddResourcePackReloadListenersCallback {
      *                 <li>{@link net.minecraft.server.packs.resources.ResourceManagerReloadListener}</li>
      *                 <li>{@link net.minecraft.server.packs.resources.SimplePreparableReloadListener}</li>
      *                 </ul>
+     * @see ClientModConstructor#onAddResourcePackReloadListeners(ResourcePackReloadListenersContext)
      */
     void onAddResourcePackReloadListeners(BiConsumer<ResourceLocation, PreparableReloadListener> consumer);
 }

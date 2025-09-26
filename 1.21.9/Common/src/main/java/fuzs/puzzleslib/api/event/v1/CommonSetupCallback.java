@@ -9,8 +9,8 @@ public interface CommonSetupCallback {
 
     /**
      * Used to set various values and settings for already registered content.
-     * <p>
-     * Same as {@link ModConstructor#onCommonSetup()}, but in event form.
+     *
+     * @see ModConstructor#onCommonSetup()
      */
     void onCommonSetup();
 }

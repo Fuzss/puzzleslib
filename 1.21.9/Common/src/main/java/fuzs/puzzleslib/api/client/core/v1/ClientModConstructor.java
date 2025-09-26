@@ -44,16 +44,16 @@ public interface ClientModConstructor {
     }
 
     /**
-     * Runs when the mod is first constructed, on the client only really used for registering event callbacks.
+     * Runs when the mod is first constructed on the client.
      */
     default void onConstructMod() {
         // NO-OP
     }
 
     /**
-     * Runs after content has been registered, so it's safe to use here.
-     * <p>
-     * Used to set various values and settings for already registered content.
+     * Runs after content has been registered. Used to set various values and settings for already registered content.
+     *
+     * @see fuzs.puzzleslib.api.client.event.v1.ClientSetupCallback
      */
     default void onClientSetup() {
         // NO-OP
@@ -205,6 +205,7 @@ public interface ClientModConstructor {
 
     /**
      * @param context register client resource reload listeners
+     * @see fuzs.puzzleslib.api.client.event.v1.AddResourcePackReloadListenersCallback
      */
     default void onAddResourcePackReloadListeners(ResourcePackReloadListenersContext context) {
         // NO-OP

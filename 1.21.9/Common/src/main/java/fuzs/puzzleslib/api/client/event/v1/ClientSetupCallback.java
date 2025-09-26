@@ -9,8 +9,8 @@ public interface ClientSetupCallback {
 
     /**
      * Used to set various values and settings for already registered content.
-     * <p>
-     * Same as {@link ClientModConstructor#onClientSetup()}, but in event form.
+     *
+     * @see ClientModConstructor#onClientSetup()
      */
     void onClientSetup();
 }

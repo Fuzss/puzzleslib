@@ -39,18 +39,17 @@ public interface ModConstructor {
     }
 
     /**
-     * Runs when the mod is first constructed.
-     * <p>
-     * Mainly used for registering game content, configs, network packages, and event callbacks.
+     * Runs when the mod is first constructed. Used for registering game content, configs, network packages, and event
+     * callbacks.
      */
     default void onConstructMod() {
         // NO-OP
     }
 
     /**
-     * Runs after content has been registered, so it's safe to use here.
-     * <p>
-     * Used to set various values and settings for already registered content.
+     * Runs after content has been registered. Used to set various values and settings for already registered content.
+     *
+     * @see fuzs.puzzleslib.api.event.v1.CommonSetupCallback
      */
     default void onCommonSetup() {
         // NO-OP
@@ -118,13 +117,6 @@ public interface ModConstructor {
      * @param context register new villager trades
      */
     default void onRegisterVillagerTrades(VillagerTradesContext context) {
-        // NO-OP
-    }
-
-    /**
-     * @param context register server resource reload listeners
-     */
-    default void onAddDataPackReloadListeners(DataPackReloadListenersContext context) {
         // NO-OP
     }
 }
