@@ -72,10 +72,16 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
         // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes.
         // Also note that vanilla only represents the initial state and does not reflect any changes made while the builder is 'active', so using the fallback is not desirable (it's not a view).
         Optional<EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>>> optional = this.getFabricSpawners();
-        return optional.map((EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>> map) -> Collections.unmodifiableList(
-                map.get(mobCategory))).orElseGet(() -> this.mobSpawnSettings.getMobs(mobCategory).unwrap());
+        return optional.<List<Weighted<MobSpawnSettings.SpawnerData>>>map((EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>> map) -> {
+            if (map.containsKey(mobCategory)) {
+                return Collections.unmodifiableList(map.get(mobCategory));
+            } else {
+                return Collections.emptyList();
+            }
+        }).orElseGet(() -> this.mobSpawnSettings.getMobs(mobCategory).unwrap());
     }
 
+    @Deprecated
     private Optional<EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>>> getFabricSpawners() {
         try {
             Class<?> clazz = Class.forName(

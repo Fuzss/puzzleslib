@@ -120,4 +120,11 @@ public interface ModConstructor {
     default void onRegisterVillagerTrades(VillagerTradesContext context) {
         // NO-OP
     }
+
+    /**
+     * @param context register server resource reload listeners
+     */
+    default void onAddDataPackReloadListeners(DataPackReloadListenersContext context) {
+        // NO-OP
+    }
 }

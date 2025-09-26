@@ -9,6 +9,7 @@ import fuzs.puzzleslib.neoforge.api.data.v2.core.DataProviderHelper;
 import fuzs.puzzleslib.neoforge.api.data.v2.core.NeoForgeDataProviderContext;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.context.UseOnContext;
@@ -38,7 +39,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
     private final DataMapBuilder<Holder<? extends ItemLike>, Fraction> furnaceFuels;
     private final Map<Holder<Block>, Flammable> flammables = new LinkedHashMap<>();
     private final DataMapBuilder<Holder<? extends ItemLike>, Float> compostables;
-    private final BlockConversionBuilder strippables = new BlockConversionBuilder(ItemAbilities.AXE_STRIP);
+    private final DataMapBuilder<Holder<Block>, Holder<Block>> strippables;
     private final BlockConversionBuilder flattenables = new BlockConversionBuilder(ItemAbilities.SHOVEL_FLATTEN);
     private final BlockConversionBuilder tillables = new BlockConversionBuilder(ItemAbilities.HOE_TILL,
             HoeItem::onlyIfAirAbove);
@@ -50,14 +51,18 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
         this.eventBus = eventBus;
         this.furnaceFuels = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.FURNACE_FUELS,
-                (Holder<? extends ItemLike> holder) -> holder.value().asItem().builtInRegistryHolder(),
+                (Holder<? extends ItemLike> holder) -> BuiltInRegistries.ITEM.wrapAsHolder(holder.value().asItem()),
                 (Fraction fraction) -> {
                     Fraction fuelBaseValue = Fraction.getFraction(200, 1);
                     return new FurnaceFuel(fraction.multiplyBy(fuelBaseValue).intValue());
                 });
+        this.strippables = new DataMapBuilder<>(modId,
+                NeoForgeDataMaps.STRIPPABLES,
+                Function.identity(),
+                (Holder<Block> holder) -> new Strippable(holder.value()));
         this.compostables = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.COMPOSTABLES,
-                (Holder<? extends ItemLike> holder) -> holder.value().asItem().builtInRegistryHolder(),
+                (Holder<? extends ItemLike> holder) -> BuiltInRegistries.ITEM.wrapAsHolder(holder.value().asItem()),
                 Compostable::new);
         this.oxidizables = new DataMapBuilder<>(modId,
                 NeoForgeDataMaps.OXIDIZABLES,
@@ -157,8 +162,8 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
 
                     @Override
                     public String getName() {
-                        return super.getName() + " for " +
-                                ResourceKey.create(dataMapType.registryKey(), dataMapType.id());
+                        return super.getName() + " for " + ResourceKey.create(dataMapType.registryKey(),
+                                dataMapType.id());
                     }
                 };
             };
@@ -168,6 +173,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
             if (this.values.isEmpty()) {
                 DataProviderHelper.registerDataProviders(this.modId, this.factory);
             }
+
             this.values.put(key, value);
         }
     }

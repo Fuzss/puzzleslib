@@ -5,9 +5,15 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.data.MutableFloat;
 import fuzs.puzzleslib.api.event.v1.data.MutableValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import net.fabricmc.fabric.api.resource.v1.ResourceLoader;
+import net.fabricmc.fabric.impl.resource.v1.ResourceLoaderImpl;
 import net.minecraft.core.Holder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -16,9 +22,13 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
-import java.util.Collection;
+import java.lang.invoke.MethodHandles;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.function.BiConsumer;
 
 public final class FabricEventImplHelper {
 
@@ -80,6 +90,33 @@ public final class FabricEventImplHelper {
         MutableFloat soundPitch = MutableFloat.fromEvent((Float pitch) -> args.set(soundPitchOrdinal, pitch),
                 () -> args.get(soundPitchOrdinal));
         return eventInvoker.onPlaySound(soundEvent, soundSource, soundVolume, soundPitch);
+    }
+
+    public static BiConsumer<ResourceLocation, PreparableReloadListener> getReloadListenerConsumer(MutableObject<List<PreparableReloadListener>> mutableObject) {
+        // we do not use the proper method for registering our reload listener exposed by the api as we must create a fresh instance on every resource reload with updates registries
+        // the api method does not allow for replacing existing reload listeners; by directly accessing the field we are able to do so
+        return getRegisteredReloadListeners(PackType.SERVER_DATA).<BiConsumer<ResourceLocation, PreparableReloadListener>>map(
+                        (Map<ResourceLocation, PreparableReloadListener> registeredReloadListeners) -> registeredReloadListeners::put)
+                .orElse((ResourceLocation resourceLocation, PreparableReloadListener reloadListener) -> {
+                    if (!(mutableObject.getValue() instanceof ArrayList<PreparableReloadListener>)) {
+                        mutableObject.setValue(new ArrayList<>(mutableObject.getValue()));
+                    }
+
+                    mutableObject.getValue().add(reloadListener);
+                });
+    }
+
+    private static Optional<Map<ResourceLocation, PreparableReloadListener>> getRegisteredReloadListeners(PackType packType) {
+        try {
+            Field field = ResourceLoaderImpl.class.getDeclaredField("addedReloaders");
+            field.setAccessible(true);
+            Object o = MethodHandles.lookup().unreflectGetter(field).invoke(ResourceLoader.get(packType));
+            return Optional.of((Map<ResourceLocation, PreparableReloadListener>) o);
+        } catch (Throwable throwable) {
+            PuzzlesLib.LOGGER.warn("Unable to access Fabric registered reload listeners: {}", throwable.getMessage());
+        }
+
+        return Optional.empty();
     }
 
     @FunctionalInterface

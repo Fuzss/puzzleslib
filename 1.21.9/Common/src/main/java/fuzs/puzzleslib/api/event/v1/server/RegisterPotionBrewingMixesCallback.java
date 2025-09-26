@@ -37,73 +37,75 @@ public interface RegisterPotionBrewingMixesCallback {
          * Register a brewing stand recipe that converts a potion item container to another form, the potion inside will
          * stay the same. E.g. in vanilla convert a normal potion to a splash potion by adding gunpowder.
          *
-         * @param from the base potion container item
-         * @param item ingredient used for the conversion
-         * @param to   the output potion container item
+         * @param inputItem  the base potion container item
+         * @param item       ingredient used for the conversion
+         * @param outputItem the output potion container item
          */
-        default void registerContainerRecipe(PotionItem from, Item item, PotionItem to) {
-            this.registerContainerRecipe(from, Ingredient.of(item), to);
+        default void registerContainerRecipe(PotionItem inputItem, Item item, PotionItem outputItem) {
+            this.registerContainerRecipe(inputItem, Ingredient.of(item), outputItem);
         }
 
         /**
          * Register a brewing stand recipe that converts a potion item container to another form, the potion inside will
          * stay the same. E.g. in vanilla convert a normal potion to a splash potion by adding gunpowder.
          *
-         * @param from       the base potion container item
+         * @param inputItem  the base potion container item
          * @param ingredient ingredient used for the conversion
-         * @param to         the output potion container item
+         * @param outputItem the output potion container item
          */
-        void registerContainerRecipe(PotionItem from, Ingredient ingredient, PotionItem to);
+        void registerContainerRecipe(PotionItem inputItem, Ingredient ingredient, PotionItem outputItem);
 
         /**
-         * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay the
-         * same. E.g. in vanilla convert a night vision potion to an invisibility potion by adding fermented spider eye.
+         * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay
+         * the same. E.g. in vanilla convert a night vision potion to an invisibility potion by adding fermented spider
+         * eye.
          *
-         * @param from the base potion
-         * @param item ingredient used for the conversion
-         * @param to   the output potion
+         * @param intputPotion the base potion
+         * @param item         ingredient used for the conversion
+         * @param outputPotion the output potion
          */
-        default void registerPotionRecipe(Holder<Potion> from, Item item, Holder<Potion> to) {
-            this.registerPotionRecipe(from, Ingredient.of(item), to);
+        default void registerPotionRecipe(Holder<Potion> intputPotion, Item item, Holder<Potion> outputPotion) {
+            this.registerPotionRecipe(intputPotion, Ingredient.of(item), outputPotion);
         }
 
         /**
-         * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay the
-         * same. E.g. in vanilla convert a night vision potion to an invisibility potion by adding fermented spider eye.
+         * Register a brewing stand recipe that converts a potion to another potion, the potion item container will stay
+         * the same. E.g. in vanilla convert a night vision potion to an invisibility potion by adding fermented spider
+         * eye.
          *
-         * @param from       the base potion
-         * @param ingredient ingredient used for the conversion
-         * @param to         the output potion
+         * @param intputPotion the base potion
+         * @param ingredient   ingredient used for the conversion
+         * @param outputPotion the output potion
          */
-        void registerPotionRecipe(Holder<Potion> from, Ingredient ingredient, Holder<Potion> to);
+        void registerPotionRecipe(Holder<Potion> intputPotion, Ingredient ingredient, Holder<Potion> outputPotion);
 
         /**
          * Register a brewing stand recipe that converts an awkward potion to another potion. E.g. in vanilla convert an
          * awkward potion to a strength potion by adding blaze powder.
          * <p>
-         * Additionally, registers a recipe for converting a water potion to a mundane potion using the provided ingredient,
-         * as is possible for all vanilla ingredients.
+         * Additionally, registers a recipe for converting a water potion to a mundane potion using the provided
+         * ingredient, as is possible for all vanilla ingredients.
          *
-         * @param item ingredient used for the conversion
-         * @param to   the output potion
+         * @param item         ingredient used for the conversion
+         * @param outputPotion the output potion
          */
-        default void registerStartPotionRecipe(Item item, Holder<Potion> to) {
-            this.registerStartPotionRecipe(Ingredient.of(item), to);
+        default void registerStartPotionRecipe(Item item, Holder<Potion> outputPotion) {
+            this.registerStartPotionRecipe(Ingredient.of(item), outputPotion);
         }
 
         /**
          * Register a brewing stand recipe that converts an awkward potion to another potion. E.g. in vanilla convert an
          * awkward potion to a strength potion by adding blaze powder.
          * <p>
-         * Additionally, registers a recipe for converting a water potion to a mundane potion using the provided ingredient,
-         * as is possible for all vanilla ingredients.
+         * Additionally, registers a recipe for converting a water potion to a mundane potion using the provided
+         * ingredient, as is possible for all vanilla ingredients.
          *
-         * @param ingredient ingredient used for the conversion
-         * @param to         the output potion
+         * @param ingredient   ingredient used for the conversion
+         * @param outputPotion the output potion
          */
-        default void registerStartPotionRecipe(Ingredient ingredient, Holder<Potion> to) {
+        default void registerStartPotionRecipe(Ingredient ingredient, Holder<Potion> outputPotion) {
             this.registerPotionRecipe(Potions.WATER, ingredient, Potions.MUNDANE);
-            this.registerPotionRecipe(Potions.AWKWARD, ingredient, to);
+            this.registerPotionRecipe(Potions.AWKWARD, ingredient, outputPotion);
         }
     }
 }

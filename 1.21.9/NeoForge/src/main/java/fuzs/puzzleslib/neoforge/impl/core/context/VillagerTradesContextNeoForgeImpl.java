@@ -29,6 +29,7 @@ public final class VillagerTradesContextNeoForgeImpl implements VillagerTradesCo
                 this.villagerTrades.forEach((VillagerTrade villagerTrade) -> villagerTrade.registerTrades(event));
             });
         }
+
         this.villagerTrades.add(new VillagerTrade(profession, level, factories));
     }
 
@@ -42,6 +43,7 @@ public final class VillagerTradesContextNeoForgeImpl implements VillagerTradesCo
                 this.wanderingTrades.forEach((WanderingTrade wanderingTrade) -> wanderingTrade.registerTrades(event));
             });
         }
+
         this.wanderingTrades.add(new WanderingTrade(pool, ImmutableList.copyOf(itemListings)));
     }
 

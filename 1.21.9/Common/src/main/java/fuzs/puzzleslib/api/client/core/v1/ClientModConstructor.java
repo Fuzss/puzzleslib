@@ -202,4 +202,11 @@ public interface ClientModConstructor {
     default void onRegisterPictureInPictureRenderers(PictureInPictureRenderersContext context) {
         // NO-OP
     }
+
+    /**
+     * @param context register client resource reload listeners
+     */
+    default void onAddResourcePackReloadListeners(ResourcePackReloadListenersContext context) {
+        // NO-OP
+    }
 }

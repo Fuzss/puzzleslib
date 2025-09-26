@@ -109,7 +109,11 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 modConstructor.onRegisterGuiLayers(new GuiLayersContextNeoForgeImpl(event));
             });
             eventBus.addListener((final RegisterPictureInPictureRenderersEvent event) -> {
-                modConstructor.onRegisterPictureInPictureRenderers(new PictureInPictureRenderersContextNeoForgeImpl(event));
+                modConstructor.onRegisterPictureInPictureRenderers(new PictureInPictureRenderersContextNeoForgeImpl(
+                        event));
+            });
+            eventBus.addListener((final AddClientReloadListenersEvent event) -> {
+                modConstructor.onAddResourcePackReloadListeners(new ResourcePackReloadListenersContextNeoForgeImpl(event));
             });
         });
     }
