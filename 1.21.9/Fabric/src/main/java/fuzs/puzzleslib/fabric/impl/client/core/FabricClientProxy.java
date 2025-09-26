@@ -12,7 +12,6 @@ import fuzs.puzzleslib.fabric.impl.client.event.FabricClientEventInvokers;
 import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
 import fuzs.puzzleslib.fabric.impl.core.FabricCommonProxy;
 import fuzs.puzzleslib.fabric.impl.core.context.PayloadTypesContextFabricImpl;
-import fuzs.puzzleslib.fabric.mixin.client.accessor.MultiPlayerGameModeFabricAccessor;
 import fuzs.puzzleslib.impl.client.config.ConfigTranslationsManager;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
@@ -109,16 +108,14 @@ public class FabricClientProxy extends FabricCommonProxy implements ClientProxyI
     public boolean shouldStartDestroyBlock(BlockPos blockPos) {
         MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
         Objects.requireNonNull(gameMode, "game mode is null");
-        return !gameMode.isDestroying()
-                || !((MultiPlayerGameModeFabricAccessor) gameMode).puzzleslib$callSameDestroyTarget(blockPos);
+        return !gameMode.isDestroying() || !gameMode.sameDestroyTarget(blockPos);
     }
 
     @Override
     public void startClientPrediction(Level level, IntFunction<Packet<ServerGamePacketListener>> predictiveAction) {
         MultiPlayerGameMode gameMode = Minecraft.getInstance().gameMode;
         Objects.requireNonNull(gameMode, "game mode is null");
-        ((MultiPlayerGameModeFabricAccessor) gameMode).puzzleslib$callStartPrediction((ClientLevel) level,
-                predictiveAction::apply);
+        gameMode.startPrediction((ClientLevel) level, predictiveAction::apply);
     }
 
     @Override

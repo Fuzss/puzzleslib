@@ -441,9 +441,9 @@ public final class FabricClientEventInvokers {
                 (ClientEntityLevelEvents.Unload callback) -> {
                     return callback::onEntityUnload;
                 });
-        INSTANCE.register(InputEvents.MouseClick.class, FabricClientEvents.MOUSE_CLICK);
-        INSTANCE.register(InputEvents.MouseScroll.class, FabricClientEvents.MOUSE_SCROLL);
-        INSTANCE.register(InputEvents.KeyPress.class, FabricClientEvents.KEY_PRESS);
+        INSTANCE.register(ClientInputEvents.MouseClick.class, FabricClientEvents.MOUSE_CLICK);
+        INSTANCE.register(ClientInputEvents.MouseScroll.class, FabricClientEvents.MOUSE_SCROLL);
+        INSTANCE.register(ClientInputEvents.KeyPress.class, FabricClientEvents.KEY_PRESS);
         INSTANCE.register(RenderLivingEvents.Before.class, FabricRendererEvents.BEFORE_RENDER_LIVING);
         INSTANCE.register(RenderLivingEvents.After.class, FabricRendererEvents.AFTER_RENDER_LIVING);
         INSTANCE.register(RenderHandEvents.MainHand.class, FabricRendererEvents.RENDER_MAIN_HAND);
