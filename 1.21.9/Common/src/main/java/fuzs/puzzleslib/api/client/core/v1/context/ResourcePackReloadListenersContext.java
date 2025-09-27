@@ -123,8 +123,10 @@ public interface ResourcePackReloadListenersContext {
     /**
      * Register a {@link PreparableReloadListener}.
      *
-     * @param resourceLocation the reload listener resource location
-     * @param reloadListener   the reload listener to add
+     * @param resourceLocation      the reload listener resource location
+     * @param otherResourceLocation the other reload listener resource location, either for the new listener or for the
+     *                              existing vanilla listener
+     * @param reloadListener        the reload listener to add
      */
     void registerReloadListener(ResourceLocation resourceLocation, ResourceLocation otherResourceLocation, PreparableReloadListener reloadListener);
 
@@ -154,11 +156,9 @@ public interface ResourcePackReloadListenersContext {
     /**
      * Register a {@link SimplePreparableReloadListener}.
      *
-     * @param resourceLocation      the reload listener resource location, either for the new listener or for the
-     *                              existing vanilla listener
-     * @param otherResourceLocation the other reload listener resource location, either for the new listener or for the
-     *                              existing vanilla listener
-     * @param reloadListener        the reload listener to add
+     * @param resourceLocation the reload listener resource location, either for the new listener or for the existing
+     *                         vanilla listener
+     * @param reloadListener   the reload listener to add
      */
     default <T> void registerReloadListener(ResourceLocation resourceLocation, SimplePreparableReloadListener<T> reloadListener) {
         this.registerReloadListener(resourceLocation, (PreparableReloadListener) reloadListener);

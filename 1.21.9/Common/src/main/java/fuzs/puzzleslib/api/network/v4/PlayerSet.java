@@ -211,7 +211,7 @@ public interface PlayerSet {
      * {@link #nearPlayer(ServerPlayer)}.
      * <p>
      * The implementation is copied from
-     * {@link net.minecraft.server.level.ServerChunkCache#broadcastAndSend(Entity, Packet)}.
+     * {@link net.minecraft.server.level.ServerChunkCache#sendToTrackingPlayersAndSelf(Entity, Packet)}.
      *
      * @param entity the tracked entity
      */
@@ -236,7 +236,8 @@ public interface PlayerSet {
      * <p>
      * The player will not receive the message, for that use {@link #nearEntity(Entity)}.
      * <p>
-     * The implementation is copied from {@link net.minecraft.server.level.ServerChunkCache#broadcast(Entity, Packet)}.
+     * The implementation is copied from
+     * {@link net.minecraft.server.level.ServerChunkCache#sendToTrackingPlayers(Entity, Packet)}.
      *
      * @param serverPlayer the tracked player
      */
