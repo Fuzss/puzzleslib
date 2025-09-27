@@ -17,7 +17,7 @@ abstract class KeyMappingFabricMixin implements ActivationContextKeyMapping {
 
     @Inject(method = "isDown", at = @At("HEAD"), cancellable = true)
     public void isDown(CallbackInfoReturnable<Boolean> callback) {
-        if (!this.puzzleslib$getKeyActivationContext().isActive()) {
+        if (!this.puzzleslib$getKeyActivationContext().isSupportedEnvironment()) {
             callback.setReturnValue(false);
         }
     }
@@ -25,7 +25,7 @@ abstract class KeyMappingFabricMixin implements ActivationContextKeyMapping {
     @Inject(method = "same", at = @At("HEAD"), cancellable = true)
     public void same(KeyMapping keyMapping, CallbackInfoReturnable<Boolean> callback) {
         if (!this.puzzleslib$getKeyActivationContext()
-                .isConflictingWith(ActivationContextKeyMapping.class.cast(keyMapping)
+                .hasConflict(ActivationContextKeyMapping.class.cast(keyMapping)
                         .puzzleslib$getKeyActivationContext())) {
             callback.setReturnValue(false);
         }
@@ -33,7 +33,7 @@ abstract class KeyMappingFabricMixin implements ActivationContextKeyMapping {
 
     @Inject(method = "matches", at = @At("HEAD"), cancellable = true)
     public void matches(KeyEvent keyEvent, CallbackInfoReturnable<Boolean> callback) {
-        if (!this.puzzleslib$getKeyActivationContext().isActive()) {
+        if (!this.puzzleslib$getKeyActivationContext().isSupportedEnvironment()) {
             callback.setReturnValue(false);
         }
     }

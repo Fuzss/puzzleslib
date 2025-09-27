@@ -3,6 +3,7 @@ package fuzs.puzzleslib.api.client.key.v1;
 import fuzs.puzzleslib.impl.client.key.KeyActivationHandlerImpl;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -47,7 +48,7 @@ public interface KeyActivationHandler {
     /**
      * An activation handler for {@link KeyActivationContext#SCREEN}.
      *
-     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(int, int, int)}
+     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(KeyEvent)}
      * @return activation handler
      */
     static KeyActivationHandler forScreen(Consumer<Screen> screenHandler) {
@@ -58,7 +59,7 @@ public interface KeyActivationHandler {
      * An activation handler for {@link KeyActivationContext#SCREEN}.
      *
      * @param screenType    screen super type to register the screen handler for
-     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(int, int, int)}
+     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(KeyEvent)}
      * @param <T>           screen super type
      * @return activation handler
      */
@@ -90,7 +91,7 @@ public interface KeyActivationHandler {
     }
 
     /**
-     * @return handler for processing the key press in {@link Screen#keyPressed(int, int, int)}
+     * @return handler for processing the key press in {@link Screen#keyPressed(KeyEvent)}
      */
     @Nullable
     default Consumer<? extends Screen> screenHandler() {
@@ -106,7 +107,7 @@ public interface KeyActivationHandler {
     }
 
     /**
-     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(int, int, int)}
+     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(KeyEvent)}
      * @return builder instance
      */
     default KeyActivationHandler withScreenHandler(Consumer<Screen> screenHandler) {
@@ -115,7 +116,7 @@ public interface KeyActivationHandler {
 
     /**
      * @param screenType    screen super type to register the screen handler for
-     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(int, int, int)}
+     * @param screenHandler handler for processing the key press in {@link Screen#keyPressed(KeyEvent)}
      * @param <T>           screen super type
      * @return builder instance
      */

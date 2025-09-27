@@ -17,8 +17,8 @@ public final class EntityRidingEvents {
     public interface Start {
 
         /**
-         * Runs when an entity starts riding another entity in {@link Entity#startRiding(Entity, boolean)}, allows for
-         * preventing that.
+         * Runs when an entity starts riding another entity in {@link Entity#startRiding(Entity, boolean, boolean)},
+         * allows for preventing that.
          *
          * @param level           the level both entities are in
          * @param passengerEntity the rider trying to start riding the vehicle

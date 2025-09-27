@@ -30,7 +30,7 @@ public interface KeyMappingHelper {
      */
     default boolean isConflictingWith(KeyMapping keyMapping, KeyMapping otherKeyMapping) {
         return this.getKeyActivationContext(keyMapping)
-                .isConflictingWith(this.getKeyActivationContext(otherKeyMapping));
+                .hasConflict(this.getKeyActivationContext(otherKeyMapping));
     }
 
     /**
