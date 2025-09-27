@@ -33,6 +33,6 @@ side = "BOTH"
 modId = "minecraft"
 mandatory = true
 type = "required"
-versionRange = "[${gameVersion}]"
+versionRange = "[${minecraftVersion},${upcomingMinecraftVersion})"
 ordering = "NONE"
 side = "BOTH"
