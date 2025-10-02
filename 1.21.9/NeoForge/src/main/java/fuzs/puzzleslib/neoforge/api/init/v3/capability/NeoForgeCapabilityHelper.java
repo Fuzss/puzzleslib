@@ -2,6 +2,7 @@ package fuzs.puzzleslib.neoforge.api.init.v3.capability;
 
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.neoforge.api.core.v1.NeoForgeModContainerHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
@@ -11,15 +12,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
-import net.neoforged.neoforge.items.wrapper.SidedInvWrapper;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.VanillaContainerWrapper;
+import net.neoforged.neoforge.transfer.item.WorldlyContainerWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -43,15 +49,15 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static void registerChestBlock(Holder<? extends ChestBlock>... chestBlocks) {
         register((RegisterCapabilitiesEvent registerCapabilitiesEvent, ChestBlock chestBlock) -> {
-            registerCapabilitiesEvent.registerBlock(Capabilities.ItemHandler.BLOCK,
-                    (level, pos, state, blockEntity, side) -> {
+            registerCapabilitiesEvent.registerBlock(Capabilities.Item.BLOCK,
+                    (Level level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity, @Nullable Direction side) -> {
                         Container container = ChestBlock.getContainer((ChestBlock) state.getBlock(),
                                 state,
                                 level,
                                 pos,
                                 true);
                         Objects.requireNonNull(container, "chest container is null");
-                        return new InvWrapper(container);
+                        return VanillaContainerWrapper.of(container);
                     },
                     chestBlock);
         }, chestBlocks);
@@ -69,7 +75,7 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static <T extends BlockEntity & Container> void registerBlockEntityContainer(Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         registerBlockEntity((T blockEntity, @Nullable Direction direction) -> {
-            return new InvWrapper(blockEntity);
+            return VanillaContainerWrapper.of(blockEntity);
         }, blockEntityTypes);
     }
 
@@ -85,7 +91,8 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static <T extends BlockEntity & WorldlyContainer> void registerWorldlyBlockEntityContainer(Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         registerBlockEntity((T blockEntity, @Nullable Direction direction) -> {
-            return direction != null ? new SidedInvWrapper(blockEntity, direction) : new InvWrapper(blockEntity);
+            return direction != null ? new WorldlyContainerWrapper(blockEntity, direction) :
+                    VanillaContainerWrapper.of(blockEntity);
         }, blockEntityTypes);
     }
 
@@ -103,7 +110,7 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static <T extends BlockEntity & WorldlyContainer> void registerRestrictedBlockEntityContainer(Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         registerBlockEntity((T blockEntity, @Nullable Direction direction) -> {
-            return new SidedInvWrapper(blockEntity, null);
+            return new WorldlyContainerWrapper(blockEntity, null);
         }, blockEntityTypes);
     }
 
@@ -115,9 +122,9 @@ public final class NeoForgeCapabilityHelper {
      * @param <T>                block entity super type
      */
     @SafeVarargs
-    public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, IItemHandler> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
+    public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, ResourceHandler<ItemResource>> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         register((RegisterCapabilitiesEvent event, BlockEntityType<? extends T> blockEntityType) -> {
-            event.registerBlockEntity(Capabilities.ItemHandler.BLOCK, blockEntityType, capabilityProvider);
+            event.registerBlockEntity(Capabilities.Item.BLOCK, blockEntityType, capabilityProvider);
         }, blockEntityTypes);
     }
 
@@ -133,13 +140,13 @@ public final class NeoForgeCapabilityHelper {
     @SafeVarargs
     public static <T extends Entity & Container> void registerEntityContainer(Holder<? extends EntityType<? extends T>>... entityTypes) {
         register((RegisterCapabilitiesEvent event, EntityType<? extends T> entityType) -> {
-            event.registerEntity(Capabilities.ItemHandler.ENTITY, entityType, (T entity, Void aVoid) -> {
-                return new InvWrapper(entity);
+            event.registerEntity(Capabilities.Item.ENTITY, entityType, (T entity, Void aVoid) -> {
+                return VanillaContainerWrapper.of(entity);
             });
-            event.registerEntity(Capabilities.ItemHandler.ENTITY_AUTOMATION,
+            event.registerEntity(Capabilities.Item.ENTITY_AUTOMATION,
                     entityType,
                     (T entity, @Nullable Direction direction) -> {
-                        return new InvWrapper(entity);
+                        return VanillaContainerWrapper.of(entity);
                     });
         }, entityTypes);
     }
@@ -152,9 +159,9 @@ public final class NeoForgeCapabilityHelper {
      * @param items entity types to register
      */
     @SafeVarargs
-    public static void registerItemContainer(ICapabilityProvider<ItemStack, Void, IItemHandler> capabilityProvider, Holder<? extends Item>... items) {
+    public static void registerItemContainer(ICapabilityProvider<ItemStack, ItemAccess, ResourceHandler<ItemResource>> capabilityProvider, Holder<? extends Item>... items) {
         register((RegisterCapabilitiesEvent event, Item item) -> {
-            event.registerItem(Capabilities.ItemHandler.ITEM, capabilityProvider, item);
+            event.registerItem(Capabilities.Item.ITEM, capabilityProvider, item);
         }, items);
     }
 
@@ -169,12 +176,13 @@ public final class NeoForgeCapabilityHelper {
     public static <T> void register(BiConsumer<RegisterCapabilitiesEvent, T> consumer, Holder<? extends T>... types) {
         Preconditions.checkState(types.length > 0, "capability provider types is empty");
         ResourceLocation resourceLocation = types[0].unwrapKey().orElseThrow().location();
-        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace()).ifPresent(eventBus -> {
-            eventBus.addListener((final RegisterCapabilitiesEvent event) -> {
-                for (Holder<? extends T> holder : types) {
-                    consumer.accept(event, holder.value());
-                }
-            });
-        });
+        NeoForgeModContainerHelper.getOptionalModEventBus(resourceLocation.getNamespace())
+                .ifPresent((IEventBus eventBus) -> {
+                    eventBus.addListener((final RegisterCapabilitiesEvent event) -> {
+                        for (Holder<? extends T> holder : types) {
+                            consumer.accept(event, holder.value());
+                        }
+                    });
+                });
     }
 }

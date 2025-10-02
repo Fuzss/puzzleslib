@@ -26,11 +26,11 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
         KeyBindingHelper.registerKeyBinding(keyMapping);
         ((FabricKeyMappingHelper) KeyMappingHelper.INSTANCE).setKeyActivationContext(keyMapping,
                 activationHandler.getActivationContext());
-        registerKeyCategoryIfNecessary(keyMapping);
-        registerKeyActivationHandles(keyMapping, activationHandler);
+        this.registerKeyCategoryIfNecessary(keyMapping);
+        this.registerKeyActivationHandles(keyMapping, activationHandler);
     }
 
-    private static void registerKeyCategoryIfNecessary(KeyMapping keyMapping) {
+    private void registerKeyCategoryIfNecessary(KeyMapping keyMapping) {
         Objects.requireNonNull(keyMapping.getCategory(), "key category is null");
         Objects.requireNonNull(keyMapping.getCategory().id(), "key category id is null");
         if (!KeyMapping.Category.SORT_ORDER.contains(keyMapping.getCategory())) {
@@ -38,7 +38,7 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
         }
     }
 
-    private static void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
+    private void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
         if (activationHandler.gameHandler() != null) {
             ClientTickEvents.START_CLIENT_TICK.register((Minecraft minecraft) -> {
                 if (minecraft.player != null) {

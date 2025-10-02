@@ -5,6 +5,7 @@ import net.fabricmc.fabric.api.client.model.loading.v1.BlockStateResolver;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.PreparableModelLoadingPlugin;
 import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,11 +29,12 @@ public final class BlockStateResolverContextFabricImpl implements BlockStateReso
 
     @Override
     public <T> void registerBlockStateResolver(Block block, BiFunction<ResourceManager, Executor, CompletableFuture<T>> resourceLoader, BiConsumer<T, BiConsumer<BlockState, BlockStateModel.UnbakedRoot>> blockStateConsumer) {
-        PreparableModelLoadingPlugin.register(resourceLoader::apply,
-                (T data, ModelLoadingPlugin.Context pluginContext) -> {
-                    pluginContext.registerBlockStateResolver(block, (BlockStateResolver.Context context) -> {
-                        blockStateConsumer.accept(data, context::setModel);
-                    });
-                });
+        PreparableModelLoadingPlugin.register((PreparableReloadListener.SharedState sharedState, Executor backgroundExecutor) -> resourceLoader.apply(
+                sharedState.resourceManager(),
+                backgroundExecutor), (T data, ModelLoadingPlugin.Context pluginContext) -> {
+            pluginContext.registerBlockStateResolver(block, (BlockStateResolver.Context context) -> {
+                blockStateConsumer.accept(data, context::setModel);
+            });
+        });
     }
 }

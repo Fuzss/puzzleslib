@@ -22,7 +22,7 @@ abstract class EntityRendererFabricMixin<T extends Entity, S extends EntityRende
                     target = "Lnet/minecraft/client/renderer/entity/EntityRenderer;submitNameTag(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V"))
     protected boolean submit(EntityRenderer<T, S> entityRenderer, S renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState) {
         return FabricRendererEvents.RENDER_NAME_TAG.invoker()
-                .onRenderNameTag(entityRenderer, renderState, poseStack, submitNodeCollector)
+                .onRenderNameTag(entityRenderer, renderState, poseStack, submitNodeCollector, cameraRenderState)
                 .isPass();
     }
 

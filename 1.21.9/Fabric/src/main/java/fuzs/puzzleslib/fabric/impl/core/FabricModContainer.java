@@ -81,7 +81,11 @@ public final class FabricModContainer implements ModContainer {
         return this.parent;
     }
 
-    public void setParent(@Nullable FabricModContainer parent) {
+    public net.fabricmc.loader.api.ModContainer getFabricModContainer() {
+        return this.container;
+    }
+
+    private void setParent(@Nullable FabricModContainer parent) {
         if (parent != null && parent != this) {
             this.parent = parent;
             parent.addChild(this);
@@ -94,10 +98,6 @@ public final class FabricModContainer implements ModContainer {
             this.children.add(modContainer);
             this.children.sort(Comparator.comparing(ModContainer::getModId));
         }
-    }
-
-    public net.fabricmc.loader.api.ModContainer getFabricModContainer() {
-        return this.container;
     }
 
     public static Stream<? extends ModContainer> getFabricModContainers() {
@@ -120,6 +120,7 @@ public final class FabricModContainer implements ModContainer {
                         childModContainer.setParent(modContainer);
                     });
         }
+
         return allMods.values().stream();
     }
 }
