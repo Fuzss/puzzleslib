@@ -9,13 +9,9 @@ import net.neoforged.fml.loading.moddiscovery.ModFileInfo;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public final class NeoForgeModContainer implements ModContainer {
@@ -89,7 +85,11 @@ public final class NeoForgeModContainer implements ModContainer {
 
     @Override
     public Optional<Path> findResource(String... path) {
-        return Optional.of(this.metadata.getOwningFile().getFile().findResource(path)).filter(Files::exists);
+        if (this.metadata.getOwningFile().getFile().getContents().get(String.join("/", path)) != null) {
+            return Optional.of(this.metadata.getOwningFile().getFile().getFilePath().resolve(Path.of("", path)));
+        } else {
+            return Optional.empty();
+        }
     }
 
     @Override
@@ -103,7 +103,7 @@ public final class NeoForgeModContainer implements ModContainer {
         return this.parent;
     }
 
-    public void setParent(@Nullable NeoForgeModContainer parent) {
+    private void setParent(@Nullable NeoForgeModContainer parent) {
         if (parent != null && parent != this) {
             this.parent = parent;
             parent.addChild(this);
@@ -118,42 +118,17 @@ public final class NeoForgeModContainer implements ModContainer {
         }
     }
 
-    public URI getURI() {
-        return this.metadata.getOwningFile().getFile().getSecureJar().moduleDataProvider().uri();
-    }
-
     public static Stream<? extends ModContainer> getNeoForgeModContainers() {
-        Map<String, NeoForgeModContainer> allMods = getNeoForgeModList().stream()
-                .map(NeoForgeModContainer::new)
-                .collect(Collectors.toMap(modContainer -> {
-                    // alternatively use raw variant for escaped octets
-                    return modContainer.getURI().getSchemeSpecificPart();
-                }, Function.identity(), (NeoForgeModContainer o1, NeoForgeModContainer o2) -> {
-                    o2.setParent(o1);
-                    return o1;
-                }));
-        for (NeoForgeModContainer modContainer : allMods.values()) {
-            if (modContainer.getURI().getScheme().equals("union")) {
-                // alternatively use raw variant for escaped octets
-                String schemePart = getParentSchemePart(modContainer.getURI().getSchemeSpecificPart());
-                modContainer.setParent(allMods.get(schemePart));
-            }
-        }
-        return allMods.values().stream();
+        return getNeoForgeModList().stream().map(NeoForgeModContainer::new);
     }
 
     private static List<? extends IModInfo> getNeoForgeModList() {
         if (ModList.get() != null) {
             return ModList.get().getMods();
-        } else if (FMLLoader.getLoadingModList() != null) {
-            return FMLLoader.getLoadingModList().getMods();
+        } else if (FMLLoader.getCurrentOrNull() != null) {
+            return FMLLoader.getCurrent().getLoadingModList().getMods();
         } else {
             throw new NullPointerException("mod list is null");
         }
-    }
-
-    private static String getParentSchemePart(String schemePart) {
-        // jar-in-jar mods can also be put outside META-INF, but this is the default place for NeoGradle & Architectury Loom
-        return schemePart.replace("/jij:file:///", "file:///").replaceAll("_/META-INF/.+(#|%23)\\d+!/$", "!/");
     }
 }

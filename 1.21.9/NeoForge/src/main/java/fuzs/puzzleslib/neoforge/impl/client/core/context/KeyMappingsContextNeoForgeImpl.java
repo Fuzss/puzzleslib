@@ -11,10 +11,18 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
-public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) implements KeyMappingsContext {
+public final class KeyMappingsContextNeoForgeImpl implements KeyMappingsContext {
+    private final RegisterKeyMappingsEvent event;
+    private final Set<KeyMapping.Category> keyCategories = new HashSet<>();
+
+    public KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) {
+        this.event = event;
+    }
 
     @Override
     public void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
@@ -22,36 +30,37 @@ public record KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) imp
         Objects.requireNonNull(activationHandler, "activation handler is null");
         this.event.register(keyMapping);
         keyMapping.setKeyConflictContext(NeoForgeKeyMappingHelper.KEY_CONTEXTS.get(activationHandler.getActivationContext()));
-        // TODO use future event method for registering category, add check if category is already registered, probably via boolean flag on this class
-        registerKeyCategoryIfNecessary(keyMapping);
-        registerKeyActivationHandles(keyMapping, activationHandler);
+        this.registerKeyCategoryIfNecessary(keyMapping);
+        this.registerKeyActivationHandles(keyMapping, activationHandler);
     }
 
-    private static void registerKeyCategoryIfNecessary(KeyMapping keyMapping) {
+    private void registerKeyCategoryIfNecessary(KeyMapping keyMapping) {
         Objects.requireNonNull(keyMapping.getCategory(), "key category is null");
         Objects.requireNonNull(keyMapping.getCategory().id(), "key category id is null");
-        if (!KeyMapping.Category.SORT_ORDER.contains(keyMapping.getCategory())) {
-            KeyMapping.Category.register(keyMapping.getCategory().id());
+        if (this.keyCategories.add(keyMapping.getCategory())) {
+            this.event.registerCategory(keyMapping.getCategory());
         }
     }
 
-    private static void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
-        if (activationHandler.gameHandler() != null) {
+    private void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
+        Consumer<Minecraft> gameConsumer = activationHandler.gameHandler();
+        if (gameConsumer != null) {
             NeoForge.EVENT_BUS.addListener((final ClientTickEvent.Pre event) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 if (minecraft.player != null) {
                     while (keyMapping.consumeClick()) {
-                        activationHandler.gameHandler().accept(minecraft);
+                        gameConsumer.accept(minecraft);
                     }
                 }
             });
         }
 
-        if (activationHandler.screenHandler() != null) {
+        Consumer<Screen> screenConsumer = (Consumer<Screen>) activationHandler.screenHandler();
+        if (screenConsumer != null) {
             NeoForge.EVENT_BUS.addListener((final ScreenEvent.KeyPressed.Pre event) -> {
                 if (activationHandler.screenType().isInstance(event.getScreen())) {
                     if (keyMapping.matches(event.getKeyEvent())) {
-                        ((Consumer<Screen>) activationHandler.screenHandler()).accept(event.getScreen());
+                        screenConsumer.accept(event.getScreen());
                         event.setCanceled(true);
                     }
                 }

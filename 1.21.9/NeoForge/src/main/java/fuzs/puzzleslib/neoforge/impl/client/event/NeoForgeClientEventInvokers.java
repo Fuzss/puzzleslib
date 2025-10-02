@@ -180,7 +180,8 @@ public final class NeoForgeClientEventInvokers {
                     EventResult eventResult = callback.onRenderNameTag(event.getEntityRenderer(),
                             event.getEntityRenderState(),
                             event.getPoseStack(),
-                            event.getSubmitNodeCollector());
+                            event.getSubmitNodeCollector(),
+                            event.getCameraRenderState());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
                 });
         INSTANCE.register(PrepareInventoryMobEffectsCallback.class,

@@ -12,9 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginNeoForgeImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("DatagenModLoaderNeoForgeMixin",
-            "client.ClientDataMainNeoForgeMixin",
-            "client.ClientMainNeoForgeMixin");
+    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("DatagenModLoaderNeoForgeMixin");
 
     @Override
     public void onLoad(String mixinPackage) {

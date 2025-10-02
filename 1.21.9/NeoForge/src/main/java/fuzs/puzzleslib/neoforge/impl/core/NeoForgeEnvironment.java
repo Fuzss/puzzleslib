@@ -24,12 +24,12 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isClient() {
-        return FMLEnvironment.dist.isClient();
+        return FMLEnvironment.getDist().isClient();
     }
 
     @Override
     public boolean isServer() {
-        return FMLEnvironment.dist.isDedicatedServer();
+        return FMLEnvironment.getDist().isDedicatedServer();
     }
 
     @Override
@@ -54,7 +54,7 @@ public final class NeoForgeEnvironment implements ModLoaderEnvironment {
 
     @Override
     public boolean isDevelopmentEnvironment() {
-        return !FMLEnvironment.production;
+        return !FMLEnvironment.isProduction();
     }
 
     @Override
