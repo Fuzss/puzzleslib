@@ -5,6 +5,7 @@ import fuzs.puzzleslib.impl.client.gui.SingleTextureAtlasSprite;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.client.resources.model.Material;
@@ -502,7 +503,7 @@ public final class GuiGraphicsHelper {
      * @param color          the vertex color, usually {@code -1}
      */
     public static void blitTiledSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int spriteWidth, int spriteHeight, int uOffset, int vOffset, int color) {
-        TextureAtlasSprite textureAtlasSprite = guiGraphics.getSprite(new Material(AtlasIds.GUI, sprite));
+        TextureAtlasSprite textureAtlasSprite = guiGraphics.getSprite(new Material(Sheets.GUI_SHEET, sprite));
         guiGraphics.blitTiledSprite(renderPipeline,
                 textureAtlasSprite,
                 x,

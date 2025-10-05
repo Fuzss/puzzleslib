@@ -67,7 +67,6 @@
     "client.PackSelectionScreenFabricMixin",
     "client.RenderBuffersFabricMixin",
     "client.ScreenEffectRendererFabricMixin",
-    "client.ScreenFabricMixin",
     "client.SkullBlockRendererFabricMixin",
     "client.ToastComponentFabricMixin"
   ],

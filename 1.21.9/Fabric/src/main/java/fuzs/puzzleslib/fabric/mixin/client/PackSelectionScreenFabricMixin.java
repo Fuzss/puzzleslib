@@ -20,6 +20,8 @@ abstract class PackSelectionScreenFabricMixin extends Screen {
 
     @ModifyVariable(method = "filterEntries", at = @At("HEAD"), argsOnly = true)
     private Stream<PackSelectionModel.Entry> filterEntries(Stream<PackSelectionModel.Entry> stream) {
-        return stream.filter((PackSelectionModel.Entry entry) -> FabricProxy.get().notHidden(entry.getId()));
+        return stream.filter((PackSelectionModel.Entry entry) -> {
+            return FabricProxy.get().notHidden(entry.getId());
+        });
     }
 }

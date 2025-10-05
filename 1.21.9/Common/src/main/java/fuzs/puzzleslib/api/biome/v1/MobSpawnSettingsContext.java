@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.biome.v1;
 
+import com.google.common.collect.ImmutableSet;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -9,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Set;
 import java.util.function.BiPredicate;
+import java.util.stream.Stream;
 
 /**
  * The modification context for the biomes spawn settings.
@@ -100,7 +102,11 @@ public interface MobSpawnSettingsContext {
     /**
      * @return all {@link MobCategory}s that have any spawns registered for them
      */
-    Set<MobCategory> getMobCategoriesWithSpawns();
+    default Set<MobCategory> getMobCategoriesWithSpawns() {
+        return Stream.of(MobCategory.values())
+                .filter((MobCategory mobCategory) -> !this.getSpawnerData(mobCategory).isEmpty())
+                .collect(ImmutableSet.toImmutableSet());
+    }
 
     /**
      * @param mobCategory mob category

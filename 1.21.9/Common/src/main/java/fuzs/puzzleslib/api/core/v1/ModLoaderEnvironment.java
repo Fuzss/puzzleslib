@@ -1,8 +1,5 @@
 package fuzs.puzzleslib.api.core.v1;
 
-import fuzs.puzzleslib.impl.core.ModContext;
-import net.minecraft.server.level.ServerPlayer;
-
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
@@ -29,26 +26,26 @@ public interface ModLoaderEnvironment {
     boolean isServer();
 
     /**
-     * @return the minecraft game directory (<code>.minecraft</code> for clients, otherwise the server directory)
+     * @return the minecraft game directory ({@code .minecraft} for clients, otherwise the server directory)
      */
     Path getGameDirectory();
 
     /**
-     * @return <code>mods</code> directory for all installed mod jars inside the game directory
+     * @return {@code mods} directory for all installed mod jars inside the game directory
      */
     Path getModsDirectory();
 
     /**
-     * @return <code>config</code> directory inside the game directory
+     * @return {@code config} directory inside the game directory
      */
     Path getConfigDirectory();
 
     /**
-     * The following mapping namespaces are used in the certain situations:
+     * The following mapping namespaces are used in these certain situations:
      * <ul>
-     * <li><code>named</code> in a development environment and in production using NeoForge</li>
-     * <li><code>intermediary</code> in production using Fabric</li>
-     * <li><code>srg</code> in production using older Forge versions</li>
+     *     <li>{@code named} in a development environment and in production using NeoForge</li>
+     *     <li>{@code intermediary} in production using Fabric</li>
+     *     <li>{@code srg} in production using older Forge versions</li>
      * </ul>
      *
      * @return runtime mappings namespace
@@ -84,7 +81,7 @@ public interface ModLoaderEnvironment {
      *         {@code ${modId}.isDevelopmentEnvironment=true} set
      */
     default boolean isDevelopmentEnvironment(String modId) {
-        if (!ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment()) {
+        if (!this.isDevelopmentEnvironment()) {
             return false;
         } else {
             return Boolean.getBoolean(modId + ".isDevelopmentEnvironment");
@@ -110,38 +107,5 @@ public interface ModLoaderEnvironment {
      */
     default Optional<ModContainer> getModContainer(String modId) {
         return Optional.ofNullable(this.getModList().get(modId));
-    }
-
-    /**
-     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server; useful
-     * for altering behavior depending on the mod state.
-     * <p>
-     * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
-     * supported.
-     *
-     * @param modId the mod to check
-     * @return is the mod installed on the server
-     */
-    default boolean isModPresentServerside(String modId) {
-        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
-                .get(modId)
-                .isPresentServerside();
-    }
-
-    /**
-     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on a client; useful for
-     * altering behavior depending on the mod state.
-     * <p>
-     * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
-     * supported.
-     *
-     * @param serverPlayer the client to check
-     * @param modId        the mod to check
-     * @return is the mod installed on a client
-     */
-    default boolean isModPresentClientside(ServerPlayer serverPlayer, String modId) {
-        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
-                .get(modId)
-                .isPresentClientside(serverPlayer);
     }
 }

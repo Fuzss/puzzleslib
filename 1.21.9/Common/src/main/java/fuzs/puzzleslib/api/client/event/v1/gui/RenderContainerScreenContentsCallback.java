@@ -4,7 +4,6 @@ import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 
-@Deprecated
 @FunctionalInterface
 public interface RenderContainerScreenContentsCallback {
     EventInvoker<RenderContainerScreenContentsCallback> EVENT = EventInvoker.lookup(

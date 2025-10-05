@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.api.network.v4;
 
 import fuzs.puzzleslib.api.network.v4.message.Message;
+import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.PayloadTypesContextImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.network.Connection;
@@ -11,6 +12,7 @@ import net.minecraft.network.protocol.common.ServerCommonPacketListener;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.configuration.ServerConfigurationPacketListener;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ConfigurationTask;
 
 import java.util.Objects;
@@ -103,5 +105,38 @@ public final class NetworkingHelper {
         Connection connection = ProxyImpl.get().getConnection(packetListener);
         Objects.requireNonNull(connection, "connection is null");
         return connection;
+    }
+
+    /**
+     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on the server; useful
+     * for altering behaviour depending on the mod state.
+     * <p>
+     * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
+     * supported.
+     *
+     * @param modId the mod to check
+     * @return is the mod installed on the server
+     */
+    public static boolean isModPresentServerside(String modId) {
+        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
+                .get(modId)
+                .isPresentServerside();
+    }
+
+    /**
+     * A simple check for any mod constructed using Puzzles Lib to find if the mod is installed on a client; useful for
+     * altering behaviour depending on the mod state.
+     * <p>
+     * This method <b>CANNOT</b> be used for checking the state of any arbitrary mod, only Puzzles Lib mods are
+     * supported.
+     *
+     * @param serverPlayer the client to check
+     * @param modId        the mod to check
+     * @return is the mod installed on a client
+     */
+    public static boolean isModPresentClientside(ServerPlayer serverPlayer, String modId) {
+        return ModContext.getModContexts().containsKey(modId) && ModContext.getModContexts()
+                .get(modId)
+                .isPresentClientside(serverPlayer);
     }
 }

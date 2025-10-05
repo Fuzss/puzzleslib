@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.api.core.v1;
 
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
@@ -23,18 +24,26 @@ public enum ModLoader {
      */
     QUILT;
 
+    private static final ModLoader[] VALUES = values();
+    private static final ModLoader[] FABRIC_LIKE = Stream.of(VALUES)
+            .filter(ModLoader::isFabricLike)
+            .toArray(ModLoader[]::new);
+    private static final ModLoader[] FORGE_LIKE = Stream.of(VALUES)
+            .filter(ModLoader::isForgeLike)
+            .toArray(ModLoader[]::new);
+
     /**
      * @return array containing Fabric and Quilt
      */
     public static ModLoader[] getFabricLike() {
-        return Stream.of(ModLoader.values()).filter(ModLoader::isFabricLike).toArray(ModLoader[]::new);
+        return Arrays.copyOf(FABRIC_LIKE, FABRIC_LIKE.length);
     }
 
     /**
      * @return array containing NeoForge and Forge
      */
     public static ModLoader[] getForgeLike() {
-        return Stream.of(ModLoader.values()).filter(ModLoader::isForgeLike).toArray(ModLoader[]::new);
+        return Arrays.copyOf(FORGE_LIKE, FORGE_LIKE.length);
     }
 
     /**

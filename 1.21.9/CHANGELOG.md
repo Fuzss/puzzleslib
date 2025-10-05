@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.9.2-1.21.9] - 2025-10-05
+
+### Changed
+
+- Update `MobSpawnSettingsContext` implementations
+- Move mod presence checks from `ModLoaderEnvironment` to `NetworkingHelper`
+- Allow ip-address when starting a server to be prefilled in a development environment
+- Remove data generation shutdown workaround
+
+### Fixed
+
+- Fix `GuiGraphicsHelper::blitTiledSprite` using the wrong sprite atlas location
+
 ## [v21.9.1-1.21.9] - 2025-10-02
 
 ### Fixed
