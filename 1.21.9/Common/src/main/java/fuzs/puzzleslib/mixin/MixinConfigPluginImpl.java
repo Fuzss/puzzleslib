@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.mixin;
 
+import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.impl.PuzzlesLib;
 import org.objectweb.asm.tree.ClassNode;
@@ -11,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public class MixinConfigPluginImpl implements IMixinConfigPlugin {
-    private static final Collection<String> DEVELOPMENT_MIXINS = Set.of("DataCommandsMixin",
+    private static final Collection<String> DEVELOPMENT_MIXINS = ImmutableSet.of("DataCommandsMixin",
             "EnchantCommandMixin",
             "client.ClientSuggestionProviderMixin",
             "client.EditBoxMixin",
@@ -36,8 +37,8 @@ public class MixinConfigPluginImpl implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(PuzzlesLib.MOD_ID) ||
-                !DEVELOPMENT_MIXINS.contains(mixinClassName.replaceAll(".+\\.mixin\\.", ""));
+        return ModLoaderEnvironment.INSTANCE.isDevelopmentEnvironment(PuzzlesLib.MOD_ID)
+                || !DEVELOPMENT_MIXINS.contains(mixinClassName.replaceAll(".+\\.mixin\\.", ""));
     }
 
     @Override

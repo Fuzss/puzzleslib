@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.impl.biome;
 
 import com.google.common.collect.ImmutableSet;
 import fuzs.puzzleslib.api.biome.v1.MobSpawnSettingsContext;
-import fuzs.puzzleslib.impl.PuzzlesLib;
 import net.fabricmc.fabric.api.biome.v1.BiomeModificationContext;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.util.random.Weighted;
@@ -11,11 +10,9 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Field;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.stream.Stream;
 
 public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
                                             BiomeModificationContext.SpawnSettingsContext context) implements MobSpawnSettingsContext {
@@ -42,7 +39,7 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
 
     @Override
     public boolean clearSpawnCost(EntityType<?> entityType) {
-        if (this.mobSpawnSettings.getMobSpawnCost(entityType) != null) {
+        if (this.getSpawnCost(entityType) != null) {
             this.context.clearSpawnCost(entityType);
             return true;
         } else {
@@ -51,58 +48,14 @@ public record MobSpawnSettingsContextFabric(MobSpawnSettings mobSpawnSettings,
     }
 
     @Override
-    public Set<MobCategory> getMobCategoriesWithSpawns() {
-        // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes.
-        // Also note that vanilla only represents the initial state and does not reflect any changes made while the builder is 'active', so using the fallback is not desirable (it's not a view).
-        // The implementation based on the fabricSpawners field also does not provide a view, which is necessary to be able to filter out empty mob categories.
-        // Otherwise, the implementation would simply return MobCategory::values.
-        Optional<EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>>> optional = this.getFabricSpawners();
-        return optional.map((EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>> map) -> map.entrySet()
-                        .stream()
-                        .filter((Map.Entry<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>> entry) -> !entry.getValue()
-                                .isEmpty())
-                        .map(Map.Entry::getKey))
-                .orElseGet(() -> Stream.of(MobCategory.values())
-                        .filter(mobCategory -> !this.mobSpawnSettings.getMobs(mobCategory).isEmpty()))
-                .collect(ImmutableSet.toImmutableSet());
-    }
-
-    @Override
     public List<Weighted<MobSpawnSettings.SpawnerData>> getSpawnerData(MobCategory mobCategory) {
-        // Fabric handles MobSpawnSettings$SpawnerData in its own map, use vanilla only as a fallback in case something with the api implementation changes.
-        // Also note that vanilla only represents the initial state and does not reflect any changes made while the builder is 'active', so using the fallback is not desirable (it's not a view).
-        Optional<EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>>> optional = this.getFabricSpawners();
-        return optional.<List<Weighted<MobSpawnSettings.SpawnerData>>>map((EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>> map) -> {
-            if (map.containsKey(mobCategory)) {
-                return Collections.unmodifiableList(map.get(mobCategory));
-            } else {
-                return Collections.emptyList();
-            }
-        }).orElseGet(() -> this.mobSpawnSettings.getMobs(mobCategory).unwrap());
-    }
-
-    @Deprecated
-    private Optional<EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>>> getFabricSpawners() {
-        try {
-            Class<?> clazz = Class.forName(
-                    "net.fabricmc.fabric.impl.biome.modification.BiomeModificationContextImpl$SpawnSettingsContextImpl");
-            Field field = clazz.getDeclaredField("fabricSpawners");
-            field.setAccessible(true);
-            Object o = MethodHandles.lookup().unreflectGetter(field).invoke(this.context);
-            return Optional.of((EnumMap<MobCategory, List<Weighted<MobSpawnSettings.SpawnerData>>>) o);
-        } catch (Throwable throwable) {
-            PuzzlesLib.LOGGER.warn("Unable to access Fabric mob spawn settings spawner data: {}",
-                    throwable.getMessage());
-        }
-
-        return Optional.empty();
+        return this.context.getSpawnEntries(mobCategory);
     }
 
     @Override
     public Set<EntityType<?>> getEntityTypesWithSpawnCost() {
-        // be careful: does not provide a view, but a copy, so avoid caching this result
         return BuiltInRegistries.ENTITY_TYPE.stream()
-                .filter(entityType -> this.mobSpawnSettings.getMobSpawnCost(entityType) != null)
+                .filter((EntityType<?> entityType) -> this.getSpawnCost(entityType) != null)
                 .collect(ImmutableSet.toImmutableSet());
     }
 

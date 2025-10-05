@@ -317,9 +317,12 @@ public final class FabricClientEventInvokers {
                     return callback::onAfterRender;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterRender);
-        registerScreenEvent(ScreenEvents.AfterBackground.class, AfterBackgroundCallback.class, callback -> {
-            return callback::onAfterBackground;
-        }, AfterBackgroundCallback::afterBackground);
+        registerScreenEvent(ScreenEvents.AfterBackground.class,
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents.AfterBackground.class,
+                callback -> {
+                    return callback::onAfterBackground;
+                },
+                net.fabricmc.fabric.api.client.screen.v1.ScreenEvents::afterBackground);
         registerScreenEvent(ScreenMouseEvents.BeforeMouseClick.class,
                 net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents.AllowMouseClick.class,
                 callback -> {

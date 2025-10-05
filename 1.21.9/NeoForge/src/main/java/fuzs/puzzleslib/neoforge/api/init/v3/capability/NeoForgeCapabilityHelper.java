@@ -122,7 +122,7 @@ public final class NeoForgeCapabilityHelper {
      * @param <T>                block entity super type
      */
     @SafeVarargs
-    public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, Direction, ResourceHandler<ItemResource>> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
+    public static <T extends BlockEntity> void registerBlockEntity(ICapabilityProvider<T, @Nullable Direction, ResourceHandler<ItemResource>> capabilityProvider, Holder<? extends BlockEntityType<? extends T>>... blockEntityTypes) {
         register((RegisterCapabilitiesEvent event, BlockEntityType<? extends T> blockEntityType) -> {
             event.registerBlockEntity(Capabilities.Item.BLOCK, blockEntityType, capabilityProvider);
         }, blockEntityTypes);
