@@ -317,6 +317,9 @@ accessible  field   net/minecraft/server/packs/repository/PackRepository    sour
 mutable field   net/minecraft/server/packs/repository/PackRepository    sources Ljava/util/Set;
 accessible  method  net/minecraft/client/multiplayer/MultiPlayerGameMode    sameDestroyTarget   (Lnet/minecraft/core/BlockPos;)Z
 accessible  method  net/minecraft/client/multiplayer/MultiPlayerGameMode    startPrediction (Lnet/minecraft/client/multiplayer/ClientLevel;Lnet/minecraft/client/multiplayer/prediction/PredictiveAction;)V
+accessible  field   net/minecraft/client/model/geom/ModelLayers ALL_MODELS  Ljava/util/Set;
+accessible  field   net/minecraft/server/network/ServerCommonPacketListenerImpl server  Lnet/minecraft/server/MinecraftServer;
+accessible  field   net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl minecraft   Lnet/minecraft/client/Minecraft;
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

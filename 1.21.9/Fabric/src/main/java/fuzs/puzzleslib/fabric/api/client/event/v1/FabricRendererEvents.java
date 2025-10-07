@@ -17,6 +17,11 @@ public final class FabricRendererEvents {
     public static final Event<RenderNameTagCallback> RENDER_NAME_TAG = FabricEventFactory.createResult(
             RenderNameTagCallback.class);
     /**
+     * Called when the block highlight outline for the current hit result is about to be submitted.
+     */
+    public static final Event<SubmitBlockOutlineCallback> SUBMIT_BLOCK_OUTLINE = FabricEventFactory.createResultHolder(
+            SubmitBlockOutlineCallback.class);
+    /**
      * Called during {@link EntityRenderer#extractRenderState(Entity, EntityRenderState, float)}, for setting up the
      * render state of an entity for future rendering.
      */

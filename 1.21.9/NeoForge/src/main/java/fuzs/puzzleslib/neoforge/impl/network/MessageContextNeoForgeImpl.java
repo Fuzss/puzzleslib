@@ -6,6 +6,7 @@ import fuzs.puzzleslib.api.network.v4.message.configuration.ServerboundConfigura
 import fuzs.puzzleslib.api.network.v4.message.play.ClientboundPlayMessage;
 import fuzs.puzzleslib.api.network.v4.message.play.ServerboundPlayMessage;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientCommonPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientConfigurationPacketListenerImpl;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
@@ -16,6 +17,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerCommonPacketListenerImpl;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -54,7 +56,7 @@ public abstract class MessageContextNeoForgeImpl<T extends PacketListener> imple
 
         @Override
         public Minecraft client() {
-            Minecraft client = (Minecraft) this.context.listener().getMainThreadEventLoop();
+            Minecraft client = ((ClientCommonPacketListenerImpl) this.context.listener()).minecraft;
             Objects.requireNonNull(client, "client is null");
             return client;
         }
@@ -68,9 +70,9 @@ public abstract class MessageContextNeoForgeImpl<T extends PacketListener> imple
 
         @Override
         public Minecraft client() {
-            Minecraft client = (Minecraft) this.context.listener().getMainThreadEventLoop();
+            Minecraft client = ((ClientCommonPacketListenerImpl) this.context.listener()).minecraft;
             Objects.requireNonNull(client, "client is null");
-            return client;
+            return Minecraft.getInstance();
         }
 
         @Override
@@ -94,7 +96,7 @@ public abstract class MessageContextNeoForgeImpl<T extends PacketListener> imple
 
         @Override
         public MinecraftServer server() {
-            MinecraftServer server = (MinecraftServer) this.context.listener().getMainThreadEventLoop();
+            MinecraftServer server = ((ServerCommonPacketListenerImpl) this.context.listener()).server;
             Objects.requireNonNull(server, "server is null");
             return server;
         }
@@ -108,7 +110,7 @@ public abstract class MessageContextNeoForgeImpl<T extends PacketListener> imple
 
         @Override
         public MinecraftServer server() {
-            MinecraftServer server = (MinecraftServer) this.context.listener().getMainThreadEventLoop();
+            MinecraftServer server = ((ServerCommonPacketListenerImpl) this.context.listener()).server;
             Objects.requireNonNull(server, "server is null");
             return server;
         }

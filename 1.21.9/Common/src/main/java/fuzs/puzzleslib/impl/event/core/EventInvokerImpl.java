@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Queues;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import fuzs.puzzleslib.api.event.v1.core.EventPhase;
+import fuzs.puzzleslib.impl.PuzzlesLib;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,7 +76,9 @@ public final class EventInvokerImpl {
             }
         }
 
-        EVENT_INVOKER_LOOKUP.put(clazz, invoker);
+        if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null) {
+            PuzzlesLib.LOGGER.warn("Overriding existing event invoker for type {}", clazz);
+        }
     }
 
     private static <T> EventInvokerLike<T> join(EventInvokerLike<T> invoker, EventInvokerLike<T> other) {

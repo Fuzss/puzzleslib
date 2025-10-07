@@ -16,7 +16,7 @@ public interface ChatMessageReceivedCallback {
      * Runs in {@link net.minecraft.client.multiplayer.chat.ChatListener} when a new chat message is about to be added
      * to the client chat. Allows for filtering out or adjusting received messages.
      * <p>
-     * Does not directly  distinguish between system, player, and unsigned chat message types, although non-system chat
+     * Does not directly distinguish between system, player, and unsigned chat message types, although non-system chat
      * messages will usually have a {@link ChatType.Bound} and for player messages an additional
      * {@link PlayerChatMessage} component associated with them. Also, player messages can never be set as an overlay.
      * <p>

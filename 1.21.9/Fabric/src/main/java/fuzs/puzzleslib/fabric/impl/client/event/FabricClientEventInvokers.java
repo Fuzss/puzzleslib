@@ -566,6 +566,7 @@ public final class FabricClientEventInvokers {
         INSTANCE.register(FogEvents.Setup.class, FabricRendererEvents.SETUP_FOG);
         INSTANCE.register(FogEvents.Color.class, FabricRendererEvents.FOG_COLOR);
         INSTANCE.register(RenderTooltipCallback.class, FabricGuiEvents.RENDER_TOOLTIP);
+        INSTANCE.register(SubmitBlockOutlineCallback.class, FabricRendererEvents.SUBMIT_BLOCK_OUTLINE);
         INSTANCE.register(GameRenderEvents.Before.class, FabricRendererEvents.BEFORE_GAME_RENDER);
         INSTANCE.register(GameRenderEvents.After.class, FabricRendererEvents.AFTER_GAME_RENDER);
         INSTANCE.register(AddToastCallback.class, FabricGuiEvents.ADD_TOAST);
