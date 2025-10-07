@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 public final class LayerDefinitionsContextFabricImpl implements LayerDefinitionsContext {
 
     @Override
-    public void registerLayerDefinition(ModelLayerLocation modelLayerLocation, Supplier<LayerDefinition> layerDefinitionSupplier) {
-        Objects.requireNonNull(modelLayerLocation, "layer location is null");
+    public void registerLayerDefinition(ModelLayerLocation modelLayer, Supplier<LayerDefinition> layerDefinitionSupplier) {
+        Objects.requireNonNull(modelLayer, "layer location is null");
         Objects.requireNonNull(layerDefinitionSupplier, "layer supplier is null");
-        EntityModelLayerRegistry.registerModelLayer(modelLayerLocation, layerDefinitionSupplier::get);
+        EntityModelLayerRegistry.registerModelLayer(modelLayer, layerDefinitionSupplier::get);
     }
 }

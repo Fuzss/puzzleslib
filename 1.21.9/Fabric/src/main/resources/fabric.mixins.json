@@ -59,6 +59,7 @@
     "client.ItemInHandRendererFabricMixin",
     "client.KeyboardHandlerFabricMixin",
     "client.KeyMappingFabricMixin",
+    "client.LevelRendererMixin",
     "client.LivingEntityRendererFabricMixin",
     "client.LocalPlayerFabricMixin",
     "client.MinecraftFabricMixin",

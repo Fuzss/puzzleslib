@@ -1,13 +1,16 @@
 package fuzs.puzzleslib.api.client.gui.v2.tooltip;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.puzzleslib.api.util.v1.ComponentHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.ClientLanguage;
+import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -80,7 +83,14 @@ public final class ClientComponentSplitter {
      */
     public static Stream<FormattedCharSequence> splitTooltipLines(int maxWidth, List<? extends FormattedText> tooltipLines) {
         return tooltipLines.stream().flatMap((FormattedText formattedText) -> {
-            List<FormattedCharSequence> lines = Minecraft.getInstance().font.split(formattedText, maxWidth);
+            List<FormattedCharSequence> lines;
+            // this uses some font texture and throws if not on the render thread, like some worker or networking
+            if (RenderSystem.isOnRenderThread()) {
+                lines = Minecraft.getInstance().font.split(formattedText, maxWidth);
+            } else {
+                lines = Language.getInstance().getVisualOrder(Collections.singletonList(formattedText));
+            }
+
             if (lines.isEmpty()) {
                 // empty components yield an empty list
                 // since empty lines are desired on tooltips make sure they don't go missing

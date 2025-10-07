@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
+import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
@@ -612,6 +613,26 @@ public final class NeoForgeClientEventInvokers {
                             event.getComponents(),
                             event.getTooltipPositioner());
                     if (eventResult.isInterrupt()) event.setCanceled(true);
+                });
+        INSTANCE.register(SubmitBlockOutlineCallback.class,
+                ExtractBlockOutlineRenderStateEvent.class,
+                (SubmitBlockOutlineCallback callback, ExtractBlockOutlineRenderStateEvent event) -> {
+                    EventResultHolder<SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer> eventResult = callback.onSubmitBlockOutline(
+                            event.getLevelRenderer(),
+                            event.getLevel(),
+                            event.getBlockState(),
+                            event.getHitResult(),
+                            event.getCollisionContext(),
+                            event.getCamera());
+                    eventResult.ifDeny((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
+                        Preconditions.checkArgument(customRenderer == null,
+                                "custom block outline renderer is not null");
+                        event.setCanceled(true);
+                    });
+                    eventResult.ifAllow((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
+                        Objects.requireNonNull(customRenderer, "custom block outline renderer is null");
+                        event.addCustomRenderer(customRenderer::render);
+                    });
                 });
         INSTANCE.register(GameRenderEvents.Before.class,
                 RenderFrameEvent.Pre.class,

@@ -33,7 +33,7 @@ public interface RenderHighlightCallback {
      * @return <ul>
      *         <li>{@link EventResult#INTERRUPT} to prevent the highlight from rendering, allowing for custom rendering</li>
      *         <li>{@link EventResult#PASS} to allow vanilla outline rendering to happen</li>
-     *         </ul>>
+     *         </ul>
      */
     EventResult onRenderHighlight(LevelRenderer levelRenderer, Camera camera, GameRenderer gameRenderer, HitResult hitResult, DeltaTracker deltaTracker, PoseStack poseStack, MultiBufferSource multiBufferSource, ClientLevel level);
 }

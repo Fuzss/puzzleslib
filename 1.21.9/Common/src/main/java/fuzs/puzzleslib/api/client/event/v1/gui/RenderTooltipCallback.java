@@ -16,14 +16,16 @@ public interface RenderTooltipCallback {
     /**
      * Called just before a tooltip is drawn on a screen, allows for preventing the tooltip from drawing.
      *
-     * @param guiGraphics the gui graphics instance
-     * @param font        the font instance
-     * @param mouseX      x position of the mouse cursor
-     * @param mouseY      y position of the mouse cursor
-     * @param components  components to render in the tooltip
-     * @param positioner  positioner for placing the tooltip in relation to provided mouse coordinates
-     * @return {@link EventResult#INTERRUPT} to prevent the tooltip from rendering, allows for fully taking over
-     *         rendering, {@link EventResult#PASS} to allow the vanilla tooltip to render as usual
+     * @param guiGraphics       the gui graphics instance
+     * @param font              the font instance
+     * @param mouseX            the mouse cursor x-position
+     * @param mouseY            the mouse cursor y-position
+     * @param components        the components to render in the tooltip
+     * @param tooltipPositioner the positioner for placing the tooltip in relation to provided mouse coordinates
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the tooltip from rendering, allows for fully taking over rendering</li>
+     *         <li>{@link EventResult#PASS PASS} to allow the vanilla tooltip to render as usual</li>
+     *         </ul>
      */
-    EventResult onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner);
+    EventResult onRenderTooltip(GuiGraphics guiGraphics, Font font, int mouseX, int mouseY, List<ClientTooltipComponent> components, ClientTooltipPositioner tooltipPositioner);
 }

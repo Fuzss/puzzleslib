@@ -13,10 +13,12 @@ public interface AddToastCallback {
      * Fires when a {@link Toast} is about to be queued in
      * {@link net.minecraft.client.gui.components.toasts.ToastManager#addToast(Toast)}.
      *
-     * @param toastManager the {@link ToastManager} instance
-     * @param toast        the toast instance being queued
-     * @return {@link EventResult#INTERRUPT} to prevent the toast from being queued, it will never render,
-     *         {@link EventResult#PASS} to allow queueing the toast normally
+     * @param toastManager the toast manager
+     * @param toast        the toast being queued
+     * @return <ul>
+     *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the toast from being queued, it will never render</li>
+     *         <li>{@link EventResult#PASS PASS} to allow queueing the toast normally</li>
+     *         </ul>
      */
     EventResult onAddToast(ToastManager toastManager, Toast toast);
 }

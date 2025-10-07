@@ -18,7 +18,7 @@ public interface ItemTooltipCallback {
      * Called at the end of item tooltip gathering in
      * {@link ItemStack#getTooltipLines(Item.TooltipContext, Player, TooltipFlag)}.
      * <p>
-     * Allows for both appending additional tooltip lines, and removing / replacing existing lines.
+     * Allows for both appending additional tooltip lines and removing / replacing existing lines.
      *
      * @param itemStack      the item stack owning this tooltip
      * @param tooltipLines   the tooltip lines

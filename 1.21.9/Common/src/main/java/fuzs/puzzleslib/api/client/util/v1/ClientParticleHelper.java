@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * A helper class for particle-related methods found in {@link net.minecraft.client.multiplayer.ClientLevel} returning
  * the created particle.
  * <p>
- * Particles will only be spawned when a client level instance is provided.
+ * Particles will only be spawned when a client-level instance is provided.
  */
 public final class ClientParticleHelper {
 
@@ -94,11 +94,19 @@ public final class ClientParticleHelper {
      */
     @Nullable
     public static Particle addParticle(ClientLevel clientLevel, ParticleOptions particleOptions, boolean force, boolean decreased, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
-        if (clientLevel.isClientSide()) {
-            try {
-                Camera camera = clientLevel.minecraft.gameRenderer.getMainCamera();
-                ParticleStatus particleStatus = clientLevel.calculateParticleLevel(decreased);
-                if (force) {
+        try {
+            Camera camera = clientLevel.minecraft.gameRenderer.getMainCamera();
+            ParticleStatus particleStatus = clientLevel.calculateParticleLevel(decreased);
+            if (force) {
+                return clientLevel.minecraft.particleEngine.createParticle(particleOptions,
+                        x,
+                        y,
+                        z,
+                        xSpeed,
+                        ySpeed,
+                        zSpeed);
+            } else if (!(camera.getPosition().distanceToSqr(x, y, z) > 1024.0)) {
+                if (particleStatus != ParticleStatus.MINIMAL) {
                     return clientLevel.minecraft.particleEngine.createParticle(particleOptions,
                             x,
                             y,
@@ -106,28 +114,17 @@ public final class ClientParticleHelper {
                             xSpeed,
                             ySpeed,
                             zSpeed);
-                } else if (!(camera.getPosition().distanceToSqr(x, y, z) > 1024.0)) {
-                    if (particleStatus != ParticleStatus.MINIMAL) {
-                        return clientLevel.minecraft.particleEngine.createParticle(particleOptions,
-                                x,
-                                y,
-                                z,
-                                xSpeed,
-                                ySpeed,
-                                zSpeed);
-                    }
                 }
-            } catch (Throwable throwable) {
-                CrashReport crashReport = CrashReport.forThrowable(throwable, "Exception while adding particle");
-                CrashReportCategory crashReportCategory = crashReport.addCategory("Particle being added");
-                crashReportCategory.setDetail("ID", BuiltInRegistries.PARTICLE_TYPE.getKey(particleOptions.getType()));
-                crashReportCategory.setDetail("Parameters",
-                        () -> ParticleTypes.CODEC.encodeStart(clientLevel.registryAccess()
-                                .createSerializationContext(NbtOps.INSTANCE), particleOptions).toString());
-                crashReportCategory.setDetail("Position",
-                        () -> CrashReportCategory.formatLocation(clientLevel, x, y, z));
-                throw new ReportedException(crashReport);
             }
+        } catch (Throwable throwable) {
+            CrashReport crashReport = CrashReport.forThrowable(throwable, "Exception while adding particle");
+            CrashReportCategory crashReportCategory = crashReport.addCategory("Particle being added");
+            crashReportCategory.setDetail("ID", BuiltInRegistries.PARTICLE_TYPE.getKey(particleOptions.getType()));
+            crashReportCategory.setDetail("Parameters",
+                    () -> ParticleTypes.CODEC.encodeStart(clientLevel.registryAccess()
+                            .createSerializationContext(NbtOps.INSTANCE), particleOptions).toString());
+            crashReportCategory.setDetail("Position", () -> CrashReportCategory.formatLocation(clientLevel, x, y, z));
+            throw new ReportedException(crashReport);
         }
 
         return null;

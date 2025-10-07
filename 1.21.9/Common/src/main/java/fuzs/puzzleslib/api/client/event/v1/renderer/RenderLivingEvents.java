@@ -33,8 +33,8 @@ public final class RenderLivingEvents {
          * @param <S>                 the render state type
          * @param <M>                 the entity model type
          * @return <ul>
-         *         <li>{@link EventResult#INTERRUPT} to prevent the player model from rendering, this allows for taking over complete player rendering</li>
-         *         <li>{@link EventResult#PASS} to allow the player model to render</li>
+         *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the player model from rendering, this allows for taking over complete player rendering</li>
+         *         <li>{@link EventResult#PASS PASS} to allow the player model to render</li>
          *         </ul>
          */
         <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, SubmitNodeCollector submitNodeCollector);

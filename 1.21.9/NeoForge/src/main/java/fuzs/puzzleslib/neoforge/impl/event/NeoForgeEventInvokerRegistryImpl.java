@@ -36,7 +36,6 @@ import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
@@ -158,10 +157,8 @@ public final class NeoForgeEventInvokerRegistryImpl implements NeoForgeEventInvo
         INSTANCE.register(RegisterConfigurationTasksCallback.class,
                 RegisterConfigurationTasksEvent.class,
                 (RegisterConfigurationTasksCallback callback, RegisterConfigurationTasksEvent event) -> {
-                    callback.onRegisterConfigurationTasks((MinecraftServer) event.getListener()
-                                    .getMainThreadEventLoop(),
-                            (ServerConfigurationPacketListenerImpl) event.getListener(),
-                            event::register);
+                    ServerConfigurationPacketListenerImpl listener = (ServerConfigurationPacketListenerImpl) event.getListener();
+                    callback.onRegisterConfigurationTasks(listener.server, listener, event::register);
                 });
     }
 

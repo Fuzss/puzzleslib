@@ -11,9 +11,9 @@ import java.util.function.Supplier;
 public record LayerDefinitionsContextNeoForgeImpl(EntityRenderersEvent.RegisterLayerDefinitions event) implements LayerDefinitionsContext {
 
     @Override
-    public void registerLayerDefinition(ModelLayerLocation modelLayerLocation, Supplier<LayerDefinition> layerDefinitionSupplier) {
-        Objects.requireNonNull(modelLayerLocation, "layer location is null");
+    public void registerLayerDefinition(ModelLayerLocation modelLayer, Supplier<LayerDefinition> layerDefinitionSupplier) {
+        Objects.requireNonNull(modelLayer, "layer location is null");
         Objects.requireNonNull(layerDefinitionSupplier, "layer supplier is null");
-        this.event.registerLayerDefinition(modelLayerLocation, layerDefinitionSupplier);
+        this.event.registerLayerDefinition(modelLayer, layerDefinitionSupplier);
     }
 }
