@@ -64,20 +64,18 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
         poseStack.translate(0.5F, 0.5F, 0.5F);
         poseStack.mulPose(Axis.YP.rotationDegrees(-chestRenderState.angle));
         poseStack.translate(-0.5F, -0.5F, -0.5F);
-        this.submitModel((S) chestRenderState, poseStack, submitNodeCollector);
+        this.submitChestModel((S) chestRenderState, poseStack, submitNodeCollector);
         poseStack.popPose();
     }
 
     /**
      * Submit the single chest model after everything on the pose stack has been set up.
-     * <p>
-     * TODO rename submitChestModel
      *
      * @param chestRenderState    the chest render state
      * @param poseStack           the pose stack
      * @param submitNodeCollector the submit node collector
      */
-    protected void submitModel(S chestRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
+    protected void submitChestModel(S chestRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         Material material = chestRenderState.chestMaterial;
         RenderType renderType = material.renderType(RenderType::entityCutout);
         TextureAtlasSprite textureAtlasSprite = this.materials.get(material);

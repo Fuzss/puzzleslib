@@ -59,28 +59,6 @@ public interface ModelLayerFactory {
     }
 
     /**
-     * Creates a new {@link ModelLayerLocation}; the used layer is {@code inner_armor}.
-     *
-     * @param path the entity name
-     * @return the new model layer location
-     */
-    @Deprecated(forRemoval = true)
-    default ModelLayerLocation registerInnerArmorModelLayer(String path) {
-        return this.registerModelLayer(path, "inner_armor");
-    }
-
-    /**
-     * Creates a new {@link ModelLayerLocation}; the used layer is {@code outer_armor}.
-     *
-     * @param path the entity name
-     * @return the new model layer location
-     */
-    @Deprecated(forRemoval = true)
-    default ModelLayerLocation registerOuterArmorModelLayer(String path) {
-        return this.registerModelLayer(path, "outer_armor");
-    }
-
-    /**
      * Creates a new {@link ModelLayerLocation}; the used layer is {@code main}.
      *
      * @param path the entity name

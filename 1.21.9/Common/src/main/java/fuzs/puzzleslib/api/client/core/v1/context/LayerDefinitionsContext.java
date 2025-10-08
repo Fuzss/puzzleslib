@@ -9,8 +9,6 @@ import java.util.function.Supplier;
 
 /**
  * Register layer definitions for entity models.
- * <p>
- * TODO make this not take a supplier, it's pointless
  */
 @FunctionalInterface
 public interface LayerDefinitionsContext {
