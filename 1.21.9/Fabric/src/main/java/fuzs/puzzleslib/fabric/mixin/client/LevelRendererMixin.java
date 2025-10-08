@@ -68,7 +68,7 @@ abstract class LevelRendererMixin {
         });
     }
 
-    @Inject(method = "renderBlockOutline", at = @At("HEAD"))
+    @Inject(method = "renderBlockOutline", at = @At("HEAD"), cancellable = true)
     private void renderBlockOutline(MultiBufferSource.BufferSource bufferSource, PoseStack poseStack, boolean isTranslucentPass, LevelRenderState levelRenderState, CallbackInfo callback) {
         if (levelRenderState.blockOutlineRenderState == null) {
             return;

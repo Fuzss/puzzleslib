@@ -70,6 +70,8 @@ public abstract class SingleChestRenderer<T extends BlockEntity & LidBlockEntity
 
     /**
      * Submit the single chest model after everything on the pose stack has been set up.
+     * <p>
+     * TODO rename submitChestModel
      *
      * @param chestRenderState    the chest render state
      * @param poseStack           the pose stack
