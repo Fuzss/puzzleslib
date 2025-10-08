@@ -76,7 +76,7 @@ public final class EventInvokerImpl {
             }
         }
 
-        if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null) {
+        if (EVENT_INVOKER_LOOKUP.put(clazz, invoker) != null && !joinInvokers) {
             PuzzlesLib.LOGGER.warn("Overriding existing event invoker for type {}", clazz);
         }
     }
