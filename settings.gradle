@@ -12,4 +12,4 @@ include "Common"
 include "Fabric"
 include "NeoForge"
 
-apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v2/settings.gradle"
+apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v3/settings.gradle"
