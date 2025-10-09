@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
 import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
-import net.minecraft.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -33,6 +32,7 @@ import net.minecraft.world.item.SpawnEggItem;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -143,6 +143,24 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(resourceLocation.toLanguageKey(), additionalKey, value);
         }
 
+        default void add(Component component) {
+            Objects.requireNonNull(component, "component is null");
+            if (component.getContents() instanceof TranslatableContents contents && contents.getFallback() != null) {
+                this.add(contents.getKey(), contents.getFallback());
+            } else {
+                throw new IllegalArgumentException("Unsupported component: " + component);
+            }
+        }
+
+        default void add(Component component, String value) {
+            Objects.requireNonNull(component, "component is null");
+            if (component.getContents() instanceof TranslatableContents contents) {
+                this.add(contents.getKey(), value);
+            } else {
+                throw new IllegalArgumentException("Unsupported component: " + component);
+            }
+        }
+
         default void add(Holder<?> holder, String value) {
             this.add(holder, "", value);
         }
@@ -158,10 +176,8 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
         default void add(ResourceKey<?> resourceKey, String additionalKey, String value) {
             Objects.requireNonNull(resourceKey, "resource key is null");
-            this.add(Registries.elementsDirPath(resourceKey.registryKey()),
-                    resourceKey.location(),
-                    additionalKey,
-                    value);
+            String registry = Registries.elementsDirPath(resourceKey.registryKey());
+            this.add(registry, resourceKey.location(), additionalKey, value);
         }
 
         default void add(String registry, ResourceLocation resourceLocation, String value) {
@@ -171,14 +187,13 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(String registry, ResourceLocation resourceLocation, String additionalKey, String value) {
             Objects.requireNonNull(registry, "registry is null");
             Objects.requireNonNull(resourceLocation, "resource location is null");
-            String translationKey = Util.makeDescriptionId(registry, resourceLocation);
-            this.add(translationKey, additionalKey, value);
+            this.add(resourceLocation.toLanguageKey(registry), additionalKey, value);
         }
 
         default void add(TagKey<?> tagKey, String value) {
-            String descriptionId = Util.makeDescriptionId(Registries.elementsDirPath(tagKey.registry()),
-                    tagKey.location());
-            this.add("tag." + descriptionId, value);
+            Objects.requireNonNull(tagKey, "tag key is null");
+            String registry = Registries.elementsDirPath(tagKey.registry());
+            this.add("tag." + tagKey.location().toLanguageKey(registry), value);
         }
 
         default BlockFamilyBuilder blockFamily(String blockValue) {
@@ -190,6 +205,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addBlock(Holder<Block> block, String value) {
+            Objects.requireNonNull(block, "block is null");
             this.add(block.value(), value);
         }
 
@@ -203,6 +219,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addItem(Holder<Item> item, String value) {
+            Objects.requireNonNull(item, "item is null");
             this.add(item.value(), value);
         }
 
@@ -216,6 +233,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addSpawnEgg(Item item, String value) {
+            Objects.requireNonNull(item, "item is null");
             if (item instanceof SpawnEggItem) {
                 this.add(item, value + " Spawn Egg");
             } else {
@@ -238,6 +256,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addEntityType(Holder<? extends EntityType<?>> entityType, String value) {
+            Objects.requireNonNull(entityType, "entity type is null");
             this.add(entityType.value(), value);
         }
 
@@ -251,6 +270,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addAttribute(Holder<Attribute> attribute, String value) {
+            Objects.requireNonNull(attribute, "attribute is null");
             this.add(attribute.value(), value);
         }
 
@@ -261,6 +281,11 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         default void add(Attribute attribute, String additionalKey, String value) {
             Objects.requireNonNull(attribute, "attribute is null");
             this.add(attribute.getDescriptionId(), additionalKey, value);
+        }
+
+        default void addStatType(Holder<StatType<?>> statType, String value) {
+            Objects.requireNonNull(statType, "stat type is null");
+            this.add(statType.value(), value);
         }
 
         default void add(StatType<?> statType, String value) {
@@ -277,19 +302,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             }
         }
 
-        default void add(GameRules.Key<?> gameRule, String value) {
-            this.add(gameRule, "", value);
-        }
-
-        default void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
-            this.add(gameRule, "description", value);
-        }
-
-        default void add(GameRules.Key<?> gameRule, String additionalKey, String value) {
-            Objects.requireNonNull(gameRule, "game rule is null");
-            this.add(gameRule.getDescriptionId(), additionalKey, value);
-        }
-
         default void addPotion(Holder<Potion> potion, String value) {
             Objects.requireNonNull(potion, "potion is null");
             Function<Item, Component> potionNameGetter = (Item item) -> {
@@ -302,6 +314,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addSoundEvent(Holder<SoundEvent> soundEvent, String value) {
+            Objects.requireNonNull(soundEvent, "sound event is null");
             this.add(soundEvent.value(), value);
         }
 
@@ -320,32 +333,9 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             this.add(creativeModeTab.getDisplayName(), value);
         }
 
-        default void add(KeyMapping keyMapping, String value) {
-            Objects.requireNonNull(keyMapping, "key mapping is null");
-            this.add(keyMapping.getName(), value);
-        }
-
-        default void addKeyCategory(String modId, String value) {
-            this.add(new KeyMapping.Category(ResourceLocationHelper.fromNamespaceAndPath(modId, "main")).label(),
-                    value);
-        }
-
-        default void add(Component component, String value) {
-            Objects.requireNonNull(component, "component is null");
-            if (component.getContents() instanceof TranslatableContents contents) {
-                this.add(contents.getKey(), value);
-            } else {
-                throw new IllegalArgumentException("Unsupported component: " + component);
-            }
-        }
-
-        default void add(Component component) {
-            Objects.requireNonNull(component, "component is null");
-            if (component.getContents() instanceof TranslatableContents contents && contents.getFallback() != null) {
-                this.add(contents.getKey(), contents.getFallback());
-            } else {
-                throw new IllegalArgumentException("Unsupported component: " + component);
-            }
+        default void addBiome(ResourceKey<Biome> biome, String value) {
+            Objects.requireNonNull(biome, "biome is null");
+            this.add(biome.location().toLanguageKey("biome"), value);
         }
 
         default void addGenericDamageType(ResourceKey<DamageType> damageType, String value) {
@@ -368,6 +358,29 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             // do not use the registry name, it is "painting_variant", not "painting"
             this.add(paintingVariant.location().toLanguageKey("painting", "title"), title);
             this.add(paintingVariant.location().toLanguageKey("painting", "author"), author);
+        }
+
+        default void add(KeyMapping keyMapping, String value) {
+            Objects.requireNonNull(keyMapping, "key mapping is null");
+            this.add(keyMapping.getName(), value);
+        }
+
+        default void addKeyCategory(String modId, String value) {
+            this.add(new KeyMapping.Category(ResourceLocationHelper.fromNamespaceAndPath(modId, "main")).label(),
+                    value);
+        }
+
+        default void add(GameRules.Key<?> gameRule, String value) {
+            this.add(gameRule, "", value);
+        }
+
+        default void addGameRuleDescription(GameRules.Key<?> gameRule, String value) {
+            this.add(gameRule, "description", value);
+        }
+
+        default void add(GameRules.Key<?> gameRule, String additionalKey, String value) {
+            Objects.requireNonNull(gameRule, "game rule is null");
+            this.add(gameRule.getDescriptionId(), additionalKey, value);
         }
     }
 
