@@ -339,6 +339,15 @@ public abstract class AbstractLanguageProvider implements DataProvider {
             }
         }
 
+        default void add(Component component) {
+            Objects.requireNonNull(component, "component is null");
+            if (component.getContents() instanceof TranslatableContents contents && contents.getFallback() != null) {
+                this.add(contents.getKey(), contents.getFallback());
+            } else {
+                throw new IllegalArgumentException("Unsupported component: " + component);
+            }
+        }
+
         default void addGenericDamageType(ResourceKey<DamageType> damageType, String value) {
             Objects.requireNonNull(damageType, "damage type is null");
             this.add("death.attack." + damageType.location().getPath(), value);
