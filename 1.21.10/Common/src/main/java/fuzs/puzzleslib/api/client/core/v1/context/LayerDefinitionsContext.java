@@ -14,20 +14,34 @@ import java.util.function.Supplier;
 public interface LayerDefinitionsContext {
 
     /**
-     * @param modelLayer              the model layer location
-     * @param layerDefinitionSupplier the layer definition supplier
+     * @param modelLayer    the model layer location
+     * @param layerSupplier the layer definition supplier
      */
-    void registerLayerDefinition(ModelLayerLocation modelLayer, Supplier<LayerDefinition> layerDefinitionSupplier);
+    void registerLayerDefinition(ModelLayerLocation modelLayer, Supplier<LayerDefinition> layerSupplier);
 
     /**
-     * @param modelLayerSet      the model layer locations
+     * TODO rename to proper method with V2
+     *
+     * @param modelLayerSet    the model layer location set
+     * @param layerSupplierSet the layer definition supplier set
+     * @see ArmorModelSet#putFrom(ArmorModelSet, ImmutableMap.Builder)
+     */
+    default void registerArmorDefinitionV2(ArmorModelSet<ModelLayerLocation> modelLayerSet, ArmorModelSet<Supplier<LayerDefinition>> layerSupplierSet) {
+        this.registerLayerDefinition(modelLayerSet.head(), layerSupplierSet.head());
+        this.registerLayerDefinition(modelLayerSet.chest(), layerSupplierSet.chest());
+        this.registerLayerDefinition(modelLayerSet.legs(), layerSupplierSet.legs());
+        this.registerLayerDefinition(modelLayerSet.feet(), layerSupplierSet.feet());
+    }
+
+    /**
+     * @param modelLayerSet      the model layer location set
      * @param layerDefinitionSet the layer definitions
      * @see ArmorModelSet#putFrom(ArmorModelSet, ImmutableMap.Builder)
      */
+    @Deprecated(forRemoval = true)
     default void registerArmorDefinition(ArmorModelSet<ModelLayerLocation> modelLayerSet, ArmorModelSet<LayerDefinition> layerDefinitionSet) {
-        this.registerLayerDefinition(modelLayerSet.head(), layerDefinitionSet::head);
-        this.registerLayerDefinition(modelLayerSet.chest(), layerDefinitionSet::chest);
-        this.registerLayerDefinition(modelLayerSet.legs(), layerDefinitionSet::legs);
-        this.registerLayerDefinition(modelLayerSet.feet(), layerDefinitionSet::feet);
+        this.registerArmorDefinitionV2(modelLayerSet, layerDefinitionSet.map((LayerDefinition layerDefinition) -> {
+            return () -> layerDefinition;
+        }));
     }
 }
