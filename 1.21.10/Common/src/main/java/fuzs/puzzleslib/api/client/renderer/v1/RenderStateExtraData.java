@@ -20,6 +20,7 @@ public final class RenderStateExtraData {
      * @param renderState the render state
      * @return the partial tick time
      */
+    @Deprecated(forRemoval = true)
     public static float getPartialTick(EntityRenderState renderState) {
         return ClientProxyImpl.get().getPartialTick(renderState);
     }
@@ -34,6 +35,7 @@ public final class RenderStateExtraData {
      * @param <E>         the entity type
      * @param <S>         the render state type
      */
+    @Deprecated(forRemoval = true)
     public static <E extends Entity, S extends EntityRenderState> void onUpdateEntityRenderState(EntityRenderer<E, S> renderer, E entity, S renderState, float partialTick) {
         ClientProxyImpl.get().onUpdateEntityRenderState(renderer, entity, renderState, partialTick);
     }

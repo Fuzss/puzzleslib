@@ -13,10 +13,6 @@ import java.util.function.Predicate;
 public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttachmentBuilder<Entity, V, DataAttachmentRegistry.EntityBuilder<V>> implements DataAttachmentRegistry.EntityBuilder<V> {
     private boolean copyOnDeath;
 
-    public FabricEntityDataAttachmentBuilder() {
-        super(Entity::registryAccess);
-    }
-
     @Override
     public DataAttachmentRegistry.EntityBuilder<V> getThis() {
         return this;
@@ -44,5 +40,10 @@ public final class FabricEntityDataAttachmentBuilder<V> extends FabricDataAttach
             Objects.requireNonNull(this.codec, "codec is null");
             builder.copyOnDeath();
         }
+    }
+
+    @Override
+    protected RegistryAccess getRegistryAccess(Entity holder) {
+        return holder.registryAccess();
     }
 }

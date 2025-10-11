@@ -3,6 +3,9 @@ package fuzs.puzzleslib.api.event.v1.entity.player;
 import fuzs.puzzleslib.api.event.v1.core.EventInvoker;
 import net.minecraft.server.level.ServerPlayer;
 
+/**
+ * TODO rename to JOIN and LEAVE
+ */
 public final class PlayerNetworkEvents {
     public static final EventInvoker<LoggedIn> LOGGED_IN = EventInvoker.lookup(LoggedIn.class);
     public static final EventInvoker<LoggedOut> LOGGED_OUT = EventInvoker.lookup(LoggedOut.class);

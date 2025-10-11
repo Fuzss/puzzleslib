@@ -10,10 +10,6 @@ import java.util.function.Predicate;
 
 public final class NeoForgeBlockEntityDataAttachmentBuilder<V> extends NeoForgeDataAttachmentBuilder<BlockEntity, V, DataAttachmentRegistry.BlockEntityBuilder<V>> implements DataAttachmentRegistry.BlockEntityBuilder<V> {
 
-    public NeoForgeBlockEntityDataAttachmentBuilder() {
-        super((BlockEntity blockEntity) -> blockEntity.getLevel().registryAccess());
-    }
-
     @Override
     public DataAttachmentRegistry.BlockEntityBuilder<V> getThis() {
         return this;
@@ -25,5 +21,10 @@ public final class NeoForgeBlockEntityDataAttachmentBuilder<V> extends NeoForgeD
         Objects.requireNonNull(defaultValueProvider, "default value provider is null");
         this.defaultValues.put(defaultFilter, defaultValueProvider);
         return this;
+    }
+
+    @Override
+    protected RegistryAccess getRegistryAccess(BlockEntity holder) {
+        return holder.getLevel().registryAccess();
     }
 }

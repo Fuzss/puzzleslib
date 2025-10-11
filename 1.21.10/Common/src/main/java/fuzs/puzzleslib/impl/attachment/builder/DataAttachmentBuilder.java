@@ -49,6 +49,8 @@ public abstract class DataAttachmentBuilder<T, V, B extends DataAttachmentRegist
         return this.getThis();
     }
 
+    protected abstract RegistryAccess getRegistryAccess(T holder);
+
     protected boolean syncWith(T holder, ServerPlayer serverPlayer) {
         Objects.requireNonNull(this.synchronizationTargets, "synchronization targets is null");
         MutableBoolean mutableBoolean = new MutableBoolean();
