@@ -5,6 +5,9 @@ import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
 
+/**
+ * TODO rename to JOIN and LEAVE
+ */
 public final class ClientPlayerNetworkEvents {
     public static final EventInvoker<LoggedIn> LOGGED_IN = EventInvoker.lookup(LoggedIn.class);
     public static final EventInvoker<LoggedOut> LOGGED_OUT = EventInvoker.lookup(LoggedOut.class);

@@ -9,7 +9,6 @@ import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.gui.GuiSpriteScaling;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
@@ -420,7 +419,7 @@ public final class GuiGraphicsHelper {
      * @param color          the vertex color, usually {@code -1}
      */
     public static void blitNineSlicedSprite(GuiGraphics guiGraphics, RenderPipeline renderPipeline, ResourceLocation sprite, int x, int y, int width, int height, int borderLeft, int borderTop, int borderRight, int borderBottom, int color) {
-        TextureAtlasSprite textureAtlasSprite = guiGraphics.getSprite(new Material(AtlasIds.GUI, sprite));
+        TextureAtlasSprite textureAtlasSprite = guiGraphics.getSprite(new Material(Sheets.GUI_SHEET, sprite));
         GuiSpriteScaling.NineSlice nineSlice = new GuiSpriteScaling.NineSlice(textureAtlasSprite.contents().width(),
                 textureAtlasSprite.contents().height(),
                 new GuiSpriteScaling.NineSlice.Border(borderLeft, borderTop, borderRight, borderBottom),

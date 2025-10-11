@@ -20,10 +20,15 @@ public abstract class ValueEntry<T> extends ConfigEntry<T> {
     @Override
     public List<String> getComments(@Nullable Object o) {
         List<String> comments = super.getComments(o);
-        comments.add("Default Value: " + this.getDefaultValue(o));
+        T defaultValue = this.getDefaultValue(o);
+        comments.add("Default Value: " + (defaultValue != null ? this.getValueString(defaultValue) : null));
         if (this.requiresWorldRestart()) comments.add("Requires Restart: World");
         if (this.requiresGameRestart()) comments.add("Requires Restart: Game");
         return comments;
+    }
+
+    protected String getValueString(T value) {
+        return value.toString();
     }
 
     @Override

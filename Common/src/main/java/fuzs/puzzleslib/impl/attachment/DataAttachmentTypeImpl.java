@@ -29,6 +29,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
                 return entry.getValue().apply(this.registryAccessExtractor.apply(holder));
             }
         }
+
         return null;
     }
 
@@ -40,6 +41,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
                 this.attachmentType.setData(holder, defaultValue);
             }
         }
+
         if (this.attachmentType.hasData(holder)) {
             V value = this.attachmentType.getData(holder);
             // do not support setting null values (Fabric does not), the attachment type can still be removed though
@@ -63,12 +65,14 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
 
     @Override
     public void set(T holder, @Nullable V newValue) {
-        V oldValue;
-        // do not support setting null values (Fabric does not), the attachment type can still be removed though
-        if (newValue != null) {
-            oldValue = this.attachmentType.setData(holder, newValue);
-        } else {
-            oldValue = this.attachmentType.removeData(holder);
+        V oldValue = this.attachmentType.getData(holder);
+        if (!Objects.equals(oldValue, newValue)) {
+            // do not support setting null values (Fabric does not), the attachment type can still be removed though
+            if (newValue != null) {
+                this.attachmentType.setData(holder, newValue);
+            } else {
+                this.attachmentType.removeData(holder);
+            }
         }
     }
 

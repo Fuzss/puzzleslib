@@ -48,13 +48,6 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         return allowedValues;
     }
 
-    static <E extends Enum<E>> Set<String> getAllEnumValues(Class<?> clazz) {
-        return Arrays.stream(clazz.getEnumConstants())
-                .map(value -> (E) value)
-                .map(Enum::name)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
     @Override
     public List<String> getComments(@Nullable Object o) {
         List<String> comments = super.getComments(o);
@@ -113,13 +106,21 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
         }
 
         @Override
+        protected String getValueString(E value) {
+            return value.name();
+        }
+
+        @Override
         public ModConfigSpec.EnumValue<E> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o) {
             return builder.defineEnum(this.getName(), this.getDefaultValue(o), this.getValidator());
         }
 
         @Override
         Set<String> getAllValues() {
-            return getAllEnumValues(this.field.getType());
+            return Arrays.stream(this.field.getType().getEnumConstants())
+                    .map(value -> (E) value)
+                    .map(this::getValueString)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
         }
 
         @Override
@@ -144,25 +145,43 @@ public abstract class LimitedEntry<T> extends ValueEntry<T> {
             }
         }
 
+        private @Nullable Class<Enum<?>> getEnumType() {
+            return this.getListType() instanceof Class<?> clazz && clazz.isEnum() ? (Class<Enum<?>>) clazz : null;
+        }
+
+        @Override
+        protected String getValueString(List<?> value) {
+            Class<Enum<?>> clazz = this.getEnumType();
+            if (clazz != null) {
+                return value.stream().map(Enum.class::cast).map(Enum::name).toList().toString();
+            } else {
+                return super.getValueString(value);
+            }
+        }
+
         @Override
         public ModConfigSpec.ConfigValue<List<?>> getConfigValue(ModConfigSpec.Builder builder, @Nullable Object o) {
-            Supplier<?> newElementSupplier = getNewElementSupplier(this.getListType());
+            Supplier<?> elementSupplier = this.getElementSupplier(this.getListType());
             return builder.defineList(this.getName(),
                     this.getDefaultValue(o),
-                    (Supplier<Object>) newElementSupplier,
+                    (Supplier<Object>) elementSupplier,
                     this.getValidator());
         }
 
         @Override
         public Set<String> getAllValues() {
-            if (this.getListType() instanceof Class<?> clazz && clazz.isEnum()) {
-                return getAllEnumValues(clazz);
+            Class<Enum<?>> clazz = this.getEnumType();
+            if (clazz != null) {
+                return Arrays.stream(clazz.getEnumConstants())
+                        .map(Enum.class::cast)
+                        .map(Enum::name)
+                        .collect(Collectors.toCollection(LinkedHashSet::new));
             } else {
                 return super.getAllValues();
             }
         }
 
-        static Supplier<?> getNewElementSupplier(Type type) {
+        private Supplier<?> getElementSupplier(Type type) {
             Objects.requireNonNull(type, "type is null");
             // all the value types supported by ModConfigSpec
             return () -> switch (type) {

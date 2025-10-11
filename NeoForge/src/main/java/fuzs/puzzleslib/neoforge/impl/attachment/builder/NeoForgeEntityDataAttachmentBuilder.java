@@ -13,10 +13,6 @@ import java.util.function.Predicate;
 public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAttachmentBuilder<Entity, V, DataAttachmentRegistry.EntityBuilder<V>> implements DataAttachmentRegistry.EntityBuilder<V> {
     private boolean copyOnDeath;
 
-    public NeoForgeEntityDataAttachmentBuilder() {
-        super(Entity::registryAccess);
-    }
-
     @Override
     public DataAttachmentRegistry.EntityBuilder<V> getThis() {
         return this;
@@ -43,5 +39,10 @@ public final class NeoForgeEntityDataAttachmentBuilder<V> extends NeoForgeDataAt
             Objects.requireNonNull(this.codec, "codec is null");
             builder.copyOnDeath();
         }
+    }
+
+    @Override
+    protected RegistryAccess getRegistryAccess(Entity holder) {
+        return holder.registryAccess();
     }
 }
