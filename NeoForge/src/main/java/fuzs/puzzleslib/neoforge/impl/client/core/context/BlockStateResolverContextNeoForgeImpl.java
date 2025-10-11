@@ -25,7 +25,6 @@ import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.ModelEvent;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelLoader;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -60,8 +59,7 @@ public final class BlockStateResolverContextNeoForgeImpl implements BlockStateRe
                     unbakedBlockStateModels,
                     Collections.emptyMap(),
                     this.resolvedModels,
-                    this.missingModel,
-                    StandaloneModelLoader.LoadedModels.EMPTY);
+                    this.missingModel);
         };
     }
 

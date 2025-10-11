@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.core.context;
 
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
 import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
@@ -15,9 +16,11 @@ import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
 import net.minecraft.client.input.KeyEvent;
 
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
+    private final Set<KeyMapping.Category> keyCategories = Sets.newIdentityHashSet();
 
     @Override
     public void registerKeyMapping(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
@@ -33,7 +36,7 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
     private void registerKeyCategoryIfNecessary(KeyMapping keyMapping) {
         Objects.requireNonNull(keyMapping.getCategory(), "key category is null");
         Objects.requireNonNull(keyMapping.getCategory().id(), "key category id is null");
-        if (!KeyMapping.Category.SORT_ORDER.contains(keyMapping.getCategory())) {
+        if (this.keyCategories.add(keyMapping.getCategory())) {
             KeyMapping.Category.register(keyMapping.getCategory().id());
         }
     }

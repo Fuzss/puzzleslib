@@ -1,16 +1,25 @@
 package fuzs.puzzleslib.api.client.key.v1;
 
+import com.google.common.collect.MapMaker;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.ApiStatus;
+
+import java.util.Map;
 
 /**
  * A small helper class for retrieving the registered {@link KeyActivationContext} for a {@link KeyMapping}.
  */
 public interface KeyMappingHelper {
     KeyMappingHelper INSTANCE = ClientProxyImpl.get().getKeyMappingActivationHelper();
+    /**
+     * @see net.minecraft.resources.ResourceKey#VALUES
+     */
+    @ApiStatus.Internal
+    Map<ResourceLocation, KeyMapping.Category> KEY_CATEGORIES = new MapMaker().weakValues().makeMap();
 
     /**
      * Retrieve the registered {@link KeyActivationContext} for a {@link KeyMapping}, will default to
@@ -29,8 +38,7 @@ public interface KeyMappingHelper {
      * @return can both key mappings coexist without interfering with each other
      */
     default boolean isConflictingWith(KeyMapping keyMapping, KeyMapping otherKeyMapping) {
-        return this.getKeyActivationContext(keyMapping)
-                .hasConflict(this.getKeyActivationContext(otherKeyMapping));
+        return this.getKeyActivationContext(keyMapping).hasConflict(this.getKeyActivationContext(otherKeyMapping));
     }
 
     /**
@@ -53,7 +61,7 @@ public interface KeyMappingHelper {
     static KeyMapping registerKeyMapping(ResourceLocation resourceLocation, int keyCode) {
         return new KeyMapping("key." + resourceLocation.toLanguageKey(),
                 keyCode,
-                new KeyMapping.Category(resourceLocation.withPath("main")));
+                KEY_CATEGORIES.computeIfAbsent(resourceLocation.withPath("main"), KeyMapping.Category::new));
     }
 
     /**

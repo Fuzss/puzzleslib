@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.neoforge.impl.client.core.context;
 
+import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
@@ -11,14 +12,13 @@ import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.common.NeoForge;
 
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 
 public final class KeyMappingsContextNeoForgeImpl implements KeyMappingsContext {
     private final RegisterKeyMappingsEvent event;
-    private final Set<KeyMapping.Category> keyCategories = new HashSet<>();
+    private final Set<KeyMapping.Category> keyCategories = Sets.newIdentityHashSet();
 
     public KeyMappingsContextNeoForgeImpl(RegisterKeyMappingsEvent event) {
         this.event = event;
