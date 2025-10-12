@@ -319,6 +319,9 @@ accessible  method  net/minecraft/client/multiplayer/MultiPlayerGameMode    star
 accessible  field   net/minecraft/client/model/geom/ModelLayers ALL_MODELS  Ljava/util/Set;
 accessible  field   net/minecraft/server/network/ServerCommonPacketListenerImpl server  Lnet/minecraft/server/MinecraftServer;
 accessible  field   net/minecraft/client/multiplayer/ClientCommonPacketListenerImpl minecraft   Lnet/minecraft/client/Minecraft;
+accessible  field   net/minecraft/client/particle/ParticleEngine    RENDER_ORDER    Ljava/util/List;
+mutable field   net/minecraft/client/particle/ParticleEngine    RENDER_ORDER    Ljava/util/List;
+transitive-accessible   class   net/minecraft/client/gui/Gui$HeartType
 
 # fabric-transitive-access-wideners-v1
 transitive-accessible	method	net/minecraft/world/level/block/Blocks	litBlockEmission	(I)Ljava/util/function/ToIntFunction;

@@ -8,25 +8,28 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.state.CameraRenderState;
 
+/**
+ * TODO rename SubmitNameTagCallback
+ */
 @FunctionalInterface
 public interface RenderNameTagCallback {
     EventInvoker<RenderNameTagCallback> EVENT = EventInvoker.lookup(RenderNameTagCallback.class);
 
     /**
-     * Fires before the name tag of an entity is rendered via .
+     * Fires before the name tag of an entity is submitted.
      * <p>
      * For {@link net.minecraft.client.renderer.entity.player.AvatarRenderer} this includes not only the name tag itself
      * but also the score text value.
      *
-     * @param entityRenderer      the entity renderer instance
-     * @param renderState         the entity render state
-     * @param poseStack           the pose stack
-     * @param submitNodeCollector the submit node collector
-     * @param cameraRenderState   the camera render state
+     * @param entityRenderer    the entity renderer instance
+     * @param renderState       the entity render state
+     * @param poseStack         the pose stack
+     * @param nodeCollector     the submit node collector
+     * @param cameraRenderState the camera render state
      * @return <ul>
      *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the name tag from rendering</li>
      *         <li>{@link EventResult#PASS PASS} to allow the name tag to render if present</li>
      *         </ul>
      */
-    EventResult onRenderNameTag(EntityRenderer<?, ?> entityRenderer, EntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState);
+    EventResult onRenderNameTag(EntityRenderer<?, ?> entityRenderer, EntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState);
 }

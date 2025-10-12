@@ -33,27 +33,27 @@ public final class RenderHandEvents {
          * <p>
          * Allows for cancelling rendering of the hand.
          *
-         * @param itemInHandRenderer  the item in hand renderer instance
-         * @param interactionHand     the player hand
-         * @param player              the local player instance used for first-person rendering
-         * @param humanoidArm         the screen side the arm is rendering at
-         * @param itemStack           the {@link ItemStack} held in the hand
-         * @param poseStack           the current {@link PoseStack}
-         * @param submitNodeCollector the current {@link SubmitNodeCollector}
-         * @param combinedLight       packet light the hand is rendered with
-         * @param partialTick         current partial tick time
-         * @param interpolatedPitch   the pitch interpolated for current tick delta from {@link Player#getXRot()}
-         * @param swingProgress       the forward swing state of the hand from attacking / mining, originally retrieved
-         *                            from {@link Player#getAttackAnim(float)}
-         * @param equipProgress       the height the hand is rendered at, changes when switching between hotbar items
-         *                            and after triggering the attack cool-down, originally retrieved from
-         *                            {@link Player#getAttackStrengthScale(float)}
+         * @param itemInHandRenderer the item in hand renderer instance
+         * @param interactionHand    the player hand
+         * @param player             the local player instance used for first-person rendering
+         * @param humanoidArm        the screen side the arm is rendering at
+         * @param itemStack          the {@link ItemStack} held in the hand
+         * @param poseStack          the current {@link PoseStack}
+         * @param nodeCollector      the current {@link SubmitNodeCollector}
+         * @param combinedLight      packet light the hand is rendered with
+         * @param partialTick        current partial tick time
+         * @param interpolatedPitch  the pitch interpolated for current tick delta from {@link Player#getXRot()}
+         * @param swingProgress      the forward swing state of the hand from attacking / mining, originally retrieved
+         *                           from {@link Player#getAttackAnim(float)}
+         * @param equipProgress      the height the hand is rendered at, changes when switching between hotbar items and
+         *                           after triggering the attack cool-down, originally retrieved from
+         *                           {@link Player#getAttackStrengthScale(float)}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the hand from rendering</li>
          *         <li>{@link EventResult#PASS PASS} to allow the hand to render normally</li>
          *         </ul>
          */
-        EventResult onRenderMainHand(ItemInHandRenderer itemInHandRenderer, InteractionHand interactionHand, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
+        EventResult onRenderMainHand(ItemInHandRenderer itemInHandRenderer, InteractionHand interactionHand, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
     }
 
     @FunctionalInterface
@@ -65,26 +65,26 @@ public final class RenderHandEvents {
          * <p>
          * Allows for cancelling rendering of the hand.
          *
-         * @param itemInHandRenderer  the item in hand renderer instance
-         * @param interactionHand     the player hand
-         * @param player              the local player instance used for first-person rendering
-         * @param humanoidArm         the screen side the arm is rendering at
-         * @param itemStack           the {@link ItemStack} held in the hand
-         * @param poseStack           the current {@link PoseStack}
-         * @param submitNodeCollector the current {@link SubmitNodeCollector}
-         * @param combinedLight       packet light the hand is rendered with
-         * @param partialTick         current partial tick time
-         * @param interpolatedPitch   the pitch interpolated for current tick delta from {@link Player#getXRot()}
-         * @param swingProgress       the forward swing state of the hand from attacking / mining, originally retrieved
-         *                            from {@link Player#getAttackAnim(float)}
-         * @param equipProgress       the height the hand is rendered at, changes when switching between hotbar items
-         *                            and after triggering the attack cool-down, originally retrieved from
-         *                            {@link Player#getAttackStrengthScale(float)}
+         * @param itemInHandRenderer the item in hand renderer instance
+         * @param interactionHand    the player hand
+         * @param player             the local player instance used for first-person rendering
+         * @param humanoidArm        the screen side the arm is rendering at
+         * @param itemStack          the {@link ItemStack} held in the hand
+         * @param poseStack          the current {@link PoseStack}
+         * @param nodeCollector      the current {@link SubmitNodeCollector}
+         * @param combinedLight      packet light the hand is rendered with
+         * @param partialTick        current partial tick time
+         * @param interpolatedPitch  the pitch interpolated for current tick delta from {@link Player#getXRot()}
+         * @param swingProgress      the forward swing state of the hand from attacking / mining, originally retrieved
+         *                           from {@link Player#getAttackAnim(float)}
+         * @param equipProgress      the height the hand is rendered at, changes when switching between hotbar items and
+         *                           after triggering the attack cool-down, originally retrieved from
+         *                           {@link Player#getAttackStrengthScale(float)}
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the hand from rendering</li>
          *         <li>{@link EventResult#PASS PASS} to allow the hand to render normally</li>
          *         </ul>
          */
-        EventResult onRenderOffHand(ItemInHandRenderer itemInHandRenderer, InteractionHand interactionHand, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
+        EventResult onRenderOffHand(ItemInHandRenderer itemInHandRenderer, InteractionHand interactionHand, AbstractClientPlayer player, HumanoidArm humanoidArm, ItemStack itemStack, PoseStack poseStack, SubmitNodeCollector nodeCollector, int combinedLight, float partialTick, float interpolatedPitch, float swingProgress, float equipProgress);
     }
 }

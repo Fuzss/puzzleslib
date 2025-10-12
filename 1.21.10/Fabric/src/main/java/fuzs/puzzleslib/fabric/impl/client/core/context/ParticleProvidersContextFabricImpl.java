@@ -2,12 +2,13 @@ package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import fuzs.puzzleslib.api.client.core.v1.context.ParticleProvidersContext;
 import net.fabricmc.fabric.api.client.particle.v1.ParticleFactoryRegistry;
-import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleResources;
+import net.fabricmc.fabric.api.client.particle.v1.ParticleRendererRegistry;
+import net.minecraft.client.particle.*;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 
 import java.util.Objects;
+import java.util.function.Function;
 
 public final class ParticleProvidersContextFabricImpl implements ParticleProvidersContext {
 
@@ -23,5 +24,12 @@ public final class ParticleProvidersContextFabricImpl implements ParticleProvide
         Objects.requireNonNull(particleType, "particle type is null");
         Objects.requireNonNull(particleFactory, "particle provider factory is null");
         ParticleFactoryRegistry.getInstance().register(particleType, particleFactory::create);
+    }
+
+    @Override
+    public void registerParticleRenderType(ParticleRenderType particleRenderType, Function<ParticleEngine, ParticleGroup<?>> particleGroupFactory) {
+        Objects.requireNonNull(particleRenderType, "particle render type is null");
+        Objects.requireNonNull(particleGroupFactory, "particle group factory is null");
+        ParticleRendererRegistry.register(particleRenderType, particleGroupFactory);
     }
 }
