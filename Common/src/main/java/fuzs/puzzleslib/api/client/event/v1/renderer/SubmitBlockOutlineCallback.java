@@ -27,6 +27,8 @@ public interface SubmitBlockOutlineCallback {
 
     /**
      * Called when the block highlight outline for the current hit result is about to be submitted.
+     * <p>
+     * TODO include level render state so we can set the block outline state manually
      *
      * @param levelRenderer    the level renderer instance
      * @param clientLevel      the current client level
@@ -52,6 +54,8 @@ public interface SubmitBlockOutlineCallback {
         /**
          * Called when the block outline described by the provided {@link BlockOutlineRenderState} is about to be
          * rendered.
+         * <p>
+         * TODO only pass camera render state from level here
          *
          * @param renderState      the block outline render state
          * @param bufferSource     the buffer source
