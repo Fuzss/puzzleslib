@@ -17,6 +17,7 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
     @Override
     public void construct(String modId, ClientModConstructor modConstructor) {
         NeoForgeModContainerHelper.getOptionalModEventBus(modId).ifPresent((IEventBus eventBus) -> {
+            ParticleProvidersContextNeoForgeImpl[] particleProvidersContext = new ParticleProvidersContextNeoForgeImpl[1];
             ItemModelsContextNeoForgeImpl[] itemModelsContext = new ItemModelsContextNeoForgeImpl[1];
             modConstructor.onConstructMod();
             eventBus.addListener((final FMLClientSetupEvent event) -> {
@@ -70,7 +71,14 @@ public final class NeoForgeClientModConstructor implements ModConstructorImpl<Cl
                 modConstructor.onRegisterClientTooltipComponents(new ClientTooltipComponentsContextNeoForgeImpl(event));
             });
             eventBus.addListener((final RegisterParticleProvidersEvent event) -> {
-                modConstructor.onRegisterParticleProviders(new ParticleProvidersContextNeoForgeImpl(event));
+                AbstractNeoForgeContext.computeIfAbsent(particleProvidersContext,
+                        ParticleProvidersContextNeoForgeImpl::new,
+                        modConstructor::onRegisterParticleProviders).registerForEvent(event);
+            });
+            eventBus.addListener((final RegisterParticleGroupsEvent event) -> {
+                AbstractNeoForgeContext.computeIfAbsent(particleProvidersContext,
+                        ParticleProvidersContextNeoForgeImpl::new,
+                        modConstructor::onRegisterParticleProviders).registerForEvent(event);
             });
             eventBus.addListener((final EntityRenderersEvent.RegisterLayerDefinitions event) -> {
                 modConstructor.onRegisterLayerDefinitions(new LayerDefinitionsContextNeoForgeImpl(event));

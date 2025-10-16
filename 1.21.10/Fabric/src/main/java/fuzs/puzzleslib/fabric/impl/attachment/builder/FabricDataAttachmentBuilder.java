@@ -10,26 +10,23 @@ import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.MustBeInvokedByOverriders;
 
-/**
- * We do not force the type parameter to extend {@link AttachmentTarget}, as AttachmentTarget is not injected into
- * {@link Level}, only {@link ServerLevel}, via interface injection.
- * <p>
- * But the mixin responsible for implementing the interface on all supported classes does in fact target {@link Level},
- * not just {@link ServerLevel}.
- * <p>
- * This also mirrors the attachment implementation on NeoForge.
- */
 @SuppressWarnings("UnstableApiUsage")
-public abstract class FabricDataAttachmentBuilder<T, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
+public abstract class FabricDataAttachmentBuilder<T extends AttachmentTarget, V, B extends DataAttachmentRegistry.Builder<T, V, B>> extends DataAttachmentBuilder<T, V, B> {
 
     @Override
     public DataAttachmentType<T, V> build(ResourceLocation resourceLocation) {
-        AttachmentType<V> attachmentType = AttachmentRegistry.create(resourceLocation, this::configureBuilder);
+        AttachmentType<V> attachmentType = AttachmentRegistry.create(resourceLocation,
+                (AttachmentRegistry.Builder<V> builder) -> {
+                    builder.initializer(() -> {
+                        // we handle this ourselves later as there is no appropriate context available here
+                        throw new UnsupportedOperationException(
+                                "Attachment type " + resourceLocation + " does not support a default value!");
+                    });
+                    this.configureBuilder(builder);
+                });
         AttachmentTypeAdapter<T, V> adapter = new FabricAttachmentTypeAdapter<>(attachmentType);
         return new DataAttachmentTypeImpl<>(adapter, this::getRegistryAccess, this.defaultValues);
     }

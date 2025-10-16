@@ -9,7 +9,6 @@
     "accessor.BiomeSpecialEffectsBuilderNeoForgeAccessor"
   ],
   "client": [
-    "client.ParticleEngineNeoForgeMixin",
     "client.accessor.BlockColorsNeoForgeAccessor",
     "client.accessor.RegisterKeyMappingsEventNeoForgeAccessor"
   ],

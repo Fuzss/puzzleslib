@@ -28,6 +28,7 @@ public abstract class NeoForgeDataAttachmentBuilder<T extends IAttachmentHolder,
         DeferredHolder<AttachmentType<?>, AttachmentType<V>> attachmentType = registrar.register(resourceLocation.getPath(),
                 () -> {
                     AttachmentType.Builder<V> builder = AttachmentType.builder(() -> {
+                        // we handle this ourselves later as there is no appropriate context available here
                         throw new UnsupportedOperationException(
                                 "Attachment type " + resourceLocation + " does not support a default value!");
                     });
