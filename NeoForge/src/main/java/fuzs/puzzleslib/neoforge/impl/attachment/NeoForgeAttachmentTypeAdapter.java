@@ -5,6 +5,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.registries.DeferredHolder;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Objects;
 
 public record NeoForgeAttachmentTypeAdapter<T extends IAttachmentHolder, A>(DeferredHolder<AttachmentType<?>, AttachmentType<A>> attachmentType) implements AttachmentTypeAdapter<T, A> {
 
@@ -15,21 +18,26 @@ public record NeoForgeAttachmentTypeAdapter<T extends IAttachmentHolder, A>(Defe
 
     @Override
     public boolean hasData(T holder) {
+        Objects.requireNonNull(holder, "holder is null");
         return holder.hasData(this.attachmentType);
     }
 
     @Override
-    public A getData(T holder) {
-        return holder.getData(this.attachmentType);
+    public @Nullable A getData(T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        return holder.getExistingDataOrNull(this.attachmentType);
     }
 
     @Override
-    public A setData(T holder, A value) {
-        return holder.setData(this.attachmentType, value);
+    public void setData(T holder, A value) {
+        Objects.requireNonNull(holder, "holder is null");
+        Objects.requireNonNull(value, "value is null");
+        holder.setData(this.attachmentType, value);
     }
 
     @Override
-    public A removeData(T holder) {
-        return holder.removeData(this.attachmentType);
+    public void removeData(T holder) {
+        Objects.requireNonNull(holder, "holder is null");
+        holder.removeData(this.attachmentType);
     }
 }

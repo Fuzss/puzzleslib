@@ -65,7 +65,7 @@ public final class DataAttachmentTypeImpl<T, V> implements DataAttachmentType<T,
 
     @Override
     public void set(T holder, @Nullable V newValue) {
-        V oldValue = this.attachmentType.getData(holder);
+        V oldValue = this.attachmentType.hasData(holder) ? this.attachmentType.getData(holder) : null;
         if (!Objects.equals(oldValue, newValue)) {
             // do not support setting null values (Fabric does not), the attachment type can still be removed though
             if (newValue != null) {
