@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [v21.10.4-1.21.10] - 2025-10-20
+
+### Fixed
+
+- Fix `java.lang.UnsupportedOperationException` when joining a world when a mod is trying to remove existing mob spawns
+  on NeoForge
+
 ## [v21.10.3-1.21.10] - 2025-10-16
 
 ### Added
