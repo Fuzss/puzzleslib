@@ -1,5 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.client.event;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
@@ -259,6 +260,9 @@ public final class FabricClientEventInvokers {
                 net.fabricmc.fabric.api.client.item.v1.ItemTooltipCallback.EVENT,
                 (ItemTooltipCallback callback) -> {
                     return (ItemStack stack, Item.TooltipContext tooltipContext, TooltipFlag context, List<Component> lines) -> {
+                        // This uses some font texture when splitting text or measuring text width.
+                        // It will throw if not on the render thread, like some worker or networking.
+                        if (!RenderSystem.isOnRenderThread()) return;
                         callback.onItemTooltip(stack, lines, tooltipContext, Minecraft.getInstance().player, context);
                     };
                 });

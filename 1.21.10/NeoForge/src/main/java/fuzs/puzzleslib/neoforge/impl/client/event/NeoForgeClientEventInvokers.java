@@ -1,6 +1,7 @@
 package fuzs.puzzleslib.neoforge.impl.client.event;
 
 import com.google.common.base.Preconditions;
+import com.mojang.blaze3d.systems.RenderSystem;
 import fuzs.puzzleslib.api.client.event.v1.*;
 import fuzs.puzzleslib.api.client.event.v1.entity.ClientEntityLevelEvents;
 import fuzs.puzzleslib.api.client.event.v1.entity.player.*;
@@ -169,6 +170,9 @@ public final class NeoForgeClientEventInvokers {
         INSTANCE.register(ItemTooltipCallback.class,
                 ItemTooltipEvent.class,
                 (ItemTooltipCallback callback, ItemTooltipEvent event) -> {
+                    // This uses some font texture when splitting text or measuring text width.
+                    // It will throw if not on the render thread, like some worker or networking.
+                    if (!RenderSystem.isOnRenderThread()) return;
                     callback.onItemTooltip(event.getItemStack(),
                             event.getToolTip(),
                             event.getContext(),
