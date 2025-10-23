@@ -8,6 +8,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.neoforged.neoforge.common.world.MobSpawnSettingsBuilder;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -28,19 +29,21 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
 
     @Override
     public boolean removeSpawns(BiPredicate<MobCategory, MobSpawnSettings.SpawnerData> filter) {
-        boolean anyRemoved = false;
-
+        MutableBoolean mutableBoolean = new MutableBoolean();
         for (MobCategory mobCategory : this.context.getSpawnerTypes()) {
-            if (this.context.getSpawner(mobCategory)
-                    .getList()
-                    .removeIf((Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> {
-                        return filter.test(mobCategory, spawnerData.value());
-                    })) {
-                anyRemoved = true;
+            for (Weighted<MobSpawnSettings.SpawnerData> spawnerData : this.context.getSpawner(mobCategory).getList()) {
+                if (filter.test(mobCategory, spawnerData.value())) {
+                    mutableBoolean.setTrue();
+                    break;
+                }
             }
+
+            this.context.getSpawner(mobCategory).removeIf((Weighted<MobSpawnSettings.SpawnerData> spawnerData) -> {
+                return filter.test(mobCategory, spawnerData.value());
+            });
         }
 
-        return anyRemoved;
+        return mutableBoolean.isTrue();
     }
 
     @Override
@@ -50,8 +53,8 @@ public record MobSpawnSettingsContextNeoForge(MobSpawnSettingsBuilder context) i
 
     @Override
     public boolean clearSpawnCost(EntityType<?> entityType) {
-        return ((MobSpawnSettingsBuilderNeoForgeAccessor) this.context).puzzleslib$getMobSpawnCosts()
-                .remove(entityType) != null;
+        return ((MobSpawnSettingsBuilderNeoForgeAccessor) this.context).puzzleslib$getMobSpawnCosts().remove(entityType)
+                != null;
     }
 
     @Override
