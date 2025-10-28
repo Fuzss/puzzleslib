@@ -341,6 +341,18 @@ public final class NeoForgeClientEventInvokers {
                 (callback, event) -> {
                     callback.onAfterKeyRelease(event.getScreen(), event.getKeyEvent());
                 });
+        registerScreenEvent(ScreenKeyboardEvents.BeforeCharacterType.class,
+                ScreenEvent.CharacterTyped.Pre.class,
+                (callback, event) -> {
+                    EventResult eventResult = callback.onBeforeCharacterType(event.getScreen(),
+                            event.getCharacterEvent());
+                    if (eventResult.isInterrupt()) event.setCanceled(true);
+                });
+        registerScreenEvent(ScreenKeyboardEvents.AfterCharacterType.class,
+                ScreenEvent.CharacterTyped.Post.class,
+                (callback, event) -> {
+                    callback.onAfterCharacterType(event.getScreen(), event.getCharacterEvent());
+                });
         INSTANCE.register(RenderContainerScreenContentsCallback.class,
                 ContainerScreenEvent.Render.Foreground.class,
                 (RenderContainerScreenContentsCallback callback, ContainerScreenEvent.Render.Foreground event) -> {
