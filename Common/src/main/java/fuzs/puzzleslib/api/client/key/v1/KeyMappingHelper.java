@@ -92,7 +92,7 @@ public interface KeyMappingHelper {
      * @return is the key mapping pressed
      */
     static boolean matchesCodePoint(KeyMapping keyMapping, int codePoint) {
-        if (keyMapping.key.getType() == InputConstants.Type.KEYSYM) {
+        if (keyMapping.key.getType() == InputConstants.Type.KEYSYM && !keyMapping.isUnbound()) {
             String string = new String(Character.toChars(codePoint));
             String keyName = GLFW.glfwGetKeyName(keyMapping.key.getValue(), -1);
             return keyName != null && keyName.equalsIgnoreCase(string);
