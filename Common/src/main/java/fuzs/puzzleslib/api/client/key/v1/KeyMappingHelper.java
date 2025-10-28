@@ -4,9 +4,11 @@ import com.google.common.collect.MapMaker;
 import com.mojang.blaze3d.platform.InputConstants;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.ApiStatus;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
 
@@ -70,11 +72,32 @@ public interface KeyMappingHelper {
      * NeoForge replaces the vanilla call to {@link KeyMapping#matches(KeyEvent)} in a few places to account for key
      * activation contexts (game &amp; screen environments).
      *
-     * @param keyMapping the key mapping to check if pressed
+     * @param keyMapping the key mapping
      * @param keyEvent   the key event
      * @return is the key mapping pressed
      */
     static boolean isKeyActiveAndMatches(KeyMapping keyMapping, KeyEvent keyEvent) {
         return ClientProxyImpl.get().isKeyActiveAndMatches(keyMapping, keyEvent);
+    }
+
+    /**
+     * Checks if a key mapping is pressed.
+     * <p>
+     * Similar to {@link KeyMapping#matches(KeyEvent)}, but for code points.
+     * <p>
+     * Useful when working with {@link net.minecraft.client.KeyboardHandler#charTyped(long, CharacterEvent)}.
+     *
+     * @param keyMapping the key mapping
+     * @param codePoint  the code point
+     * @return is the key mapping pressed
+     */
+    static boolean matchesCodePoint(KeyMapping keyMapping, int codePoint) {
+        if (keyMapping.key.getType() == InputConstants.Type.KEYSYM) {
+            String string = new String(Character.toChars(codePoint));
+            String keyName = GLFW.glfwGetKeyName(keyMapping.key.getValue(), -1);
+            return keyName != null && keyName.equalsIgnoreCase(string);
+        } else {
+            return false;
+        }
     }
 }
