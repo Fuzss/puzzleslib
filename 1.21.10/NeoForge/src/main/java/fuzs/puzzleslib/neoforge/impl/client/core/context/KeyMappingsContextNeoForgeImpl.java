@@ -3,6 +3,7 @@ package fuzs.puzzleslib.neoforge.impl.client.core.context;
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
+import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
 import fuzs.puzzleslib.neoforge.impl.client.key.NeoForgeKeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -43,13 +44,12 @@ public final class KeyMappingsContextNeoForgeImpl implements KeyMappingsContext 
     }
 
     private void registerKeyActivationHandles(KeyMapping keyMapping, KeyActivationHandler activationHandler) {
-        Consumer<Minecraft> gameConsumer = activationHandler.gameHandler();
-        if (gameConsumer != null) {
+        if (activationHandler.gameHandler() != null) {
             NeoForge.EVENT_BUS.addListener((final ClientTickEvent.Pre event) -> {
                 Minecraft minecraft = Minecraft.getInstance();
                 if (minecraft.player != null) {
                     while (keyMapping.consumeClick()) {
-                        gameConsumer.accept(minecraft);
+                        activationHandler.gameHandler().accept(minecraft);
                     }
                 }
             });
@@ -60,6 +60,14 @@ public final class KeyMappingsContextNeoForgeImpl implements KeyMappingsContext 
             NeoForge.EVENT_BUS.addListener((final ScreenEvent.KeyPressed.Pre event) -> {
                 if (activationHandler.screenType().isInstance(event.getScreen())) {
                     if (keyMapping.matches(event.getKeyEvent())) {
+                        screenConsumer.accept(event.getScreen());
+                        event.setCanceled(true);
+                    }
+                }
+            });
+            NeoForge.EVENT_BUS.addListener((final ScreenEvent.CharacterTyped.Pre event) -> {
+                if (activationHandler.screenType().isInstance(event.getScreen())) {
+                    if (KeyMappingHelper.matchesCodePoint(keyMapping, event.getCodePoint())) {
                         screenConsumer.accept(event.getScreen());
                         event.setCanceled(true);
                     }

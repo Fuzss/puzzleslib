@@ -52,12 +52,13 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
             });
         }
 
-        if (activationHandler.screenHandler() != null) {
+        Consumer<Screen> screenConsumer = (Consumer<Screen>) activationHandler.screenHandler();
+        if (screenConsumer != null) {
             ScreenEvents.BEFORE_INIT.register((Minecraft minecraft, Screen screen, int scaledWidth, int scaledHeight) -> {
                 if (activationHandler.screenType().isInstance(screen)) {
                     ScreenKeyboardEvents.allowKeyPress(screen).register((Screen currentScreen, KeyEvent keyEvent) -> {
                         if (!(minecraft.screen instanceof KeyBindsScreen) && keyMapping.matches(keyEvent)) {
-                            ((Consumer<Screen>) activationHandler.screenHandler()).accept(currentScreen);
+                            screenConsumer.accept(currentScreen);
                             return false;
                         } else {
                             return true;
