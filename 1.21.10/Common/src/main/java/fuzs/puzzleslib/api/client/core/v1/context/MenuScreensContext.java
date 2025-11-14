@@ -9,7 +9,6 @@ import net.minecraft.world.inventory.MenuType;
 /**
  * Register a client-side screen factory to be constructed when opening an {@link AbstractContainerMenu}.
  */
-@FunctionalInterface
 public interface MenuScreensContext {
 
     /**

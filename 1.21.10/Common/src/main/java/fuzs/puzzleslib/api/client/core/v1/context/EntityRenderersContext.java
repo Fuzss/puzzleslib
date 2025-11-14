@@ -4,7 +4,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 
-@FunctionalInterface
 public interface EntityRenderersContext {
 
     /**

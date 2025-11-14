@@ -10,7 +10,6 @@ import java.util.function.Predicate;
 /**
  * Allows for registering modifications (including additions and removals) to biomes loaded from the current data pack.
  */
-@FunctionalInterface
 public interface BiomeModificationsContext {
 
     /**

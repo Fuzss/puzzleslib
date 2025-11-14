@@ -3,7 +3,6 @@ package fuzs.puzzleslib.api.client.core.v1.context;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.world.level.block.Block;
 
-@FunctionalInterface
 public interface SpecialBlockModelRenderersContext {
 
     /**
