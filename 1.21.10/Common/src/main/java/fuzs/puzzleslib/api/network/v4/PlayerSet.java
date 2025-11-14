@@ -101,6 +101,16 @@ public interface PlayerSet {
     /**
      * Send a message from the server to all players in a level.
      *
+     * @param level the level
+     */
+    static PlayerSet inLevel(Level level) {
+        Objects.requireNonNull(level, "level is null");
+        return level instanceof ServerLevel serverLevel ? inLevel(serverLevel) : ofNone();
+    }
+
+    /**
+     * Send a message from the server to all players in a level.
+     *
      * @param serverLevel the level
      */
     static PlayerSet inLevel(ServerLevel serverLevel) {
