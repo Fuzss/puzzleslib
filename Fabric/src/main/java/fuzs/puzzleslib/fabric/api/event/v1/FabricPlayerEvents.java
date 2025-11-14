@@ -39,7 +39,6 @@ public final class FabricPlayerEvents {
     /**
      * Called when the player picks up an {@link ItemEntity} from the ground after the {@link ItemStack} has been added
      * to the player inventory.
-     * <p>This events main purpose is to notify that the item pickup has happened.
      */
     public static final Event<ItemEntityEvents.Pickup> ITEM_PICKUP = FabricEventFactory.create(ItemEntityEvents.Pickup.class);
     /**
