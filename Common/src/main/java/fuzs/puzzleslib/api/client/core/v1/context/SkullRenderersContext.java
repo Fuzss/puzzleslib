@@ -10,7 +10,6 @@ import java.util.function.Function;
 /**
  * Register models for custom {@link net.minecraft.world.level.block.SkullBlock.Type} implementations.
  */
-@FunctionalInterface
 public interface SkullRenderersContext {
 
     /**

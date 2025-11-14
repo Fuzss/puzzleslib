@@ -8,7 +8,6 @@ import java.util.function.Function;
 /**
  * Register a client-side tooltip component factory for creating a renderer from a {@link TooltipComponent}.
  */
-@FunctionalInterface
 public interface ClientTooltipComponentsContext {
 
     /**

@@ -8,7 +8,6 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 /**
  * Register a renderer for a block entity.
  */
-@FunctionalInterface
 public interface BlockEntityRenderersContext {
 
     /**

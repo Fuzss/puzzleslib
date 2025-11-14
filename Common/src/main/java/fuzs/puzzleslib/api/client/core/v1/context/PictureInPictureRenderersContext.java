@@ -13,7 +13,6 @@ import java.util.function.Function;
  * {@link
  * net.minecraft.client.gui.render.state.GuiRenderState#submitPicturesInPictureState(PictureInPictureRenderState)}.
  */
-@FunctionalInterface
 public interface PictureInPictureRenderersContext {
 
     /**

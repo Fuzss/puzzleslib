@@ -6,7 +6,6 @@ import net.minecraft.world.entity.EntityType;
 /**
  * Register a custom shader applied when spectating an entity type.
  */
-@FunctionalInterface
 public interface EntitySpectatorShadersContext {
 
     /**

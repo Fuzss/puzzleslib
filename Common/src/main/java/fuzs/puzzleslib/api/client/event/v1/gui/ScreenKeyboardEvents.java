@@ -35,12 +35,12 @@ public final class ScreenKeyboardEvents {
         return EventInvoker.lookup((Class<AfterKeyRelease<T>>) (Class<?>) AfterKeyRelease.class, screen);
     }
 
-    public static <T extends Screen> EventInvoker<BeforeCharacterType<T>> beforeCharType(Class<T> screen) {
+    public static <T extends Screen> EventInvoker<BeforeCharacterType<T>> beforeCharacterType(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
         return EventInvoker.lookup((Class<BeforeCharacterType<T>>) (Class<?>) BeforeCharacterType.class, screen);
     }
 
-    public static <T extends Screen> EventInvoker<AfterCharacterType<T>> afterCharType(Class<T> screen) {
+    public static <T extends Screen> EventInvoker<AfterCharacterType<T>> afterCharacterType(Class<T> screen) {
         Objects.requireNonNull(screen, "screen type is null");
         return EventInvoker.lookup((Class<AfterCharacterType<T>>) (Class<?>) AfterCharacterType.class, screen);
     }
@@ -106,8 +106,6 @@ public final class ScreenKeyboardEvents {
 
         /**
          * Called before a character is typed.
-         * <p>
-         * TODO invoke this on Fabric when added
          *
          * @param screen         the currently displayed screen
          * @param characterEvent the character event; in particular {@link CharacterEvent#codepointAsString()}
@@ -124,8 +122,6 @@ public final class ScreenKeyboardEvents {
 
         /**
          * Called after a character is typed.
-         * <p>
-         * TODO invoke this on Fabric when added
          *
          * @param screen         the currently displayed screen
          * @param characterEvent the character event; in particular {@link CharacterEvent#codepointAsString()}

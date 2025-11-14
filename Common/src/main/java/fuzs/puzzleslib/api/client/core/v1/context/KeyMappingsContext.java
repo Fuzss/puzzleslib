@@ -7,7 +7,6 @@ import net.minecraft.client.KeyMapping;
 /**
  * Register a {@link KeyMapping} so it can be saved to and loaded from game options.
  */
-@FunctionalInterface
 public interface KeyMappingsContext {
 
     /**

@@ -9,7 +9,6 @@ import net.minecraft.world.level.levelgen.Heightmap;
 /**
  * Register a default spawn placement for entities.
  */
-@FunctionalInterface
 public interface SpawnPlacementsContext {
 
     /**

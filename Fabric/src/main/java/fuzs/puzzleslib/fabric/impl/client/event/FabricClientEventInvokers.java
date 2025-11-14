@@ -425,6 +425,14 @@ public final class FabricClientEventInvokers {
                     return callback::onAfterKeyRelease;
                 },
                 net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents::afterKeyRelease);
+        INSTANCE.register((Class<ScreenKeyboardEvents.BeforeCharacterType<?>>) (Class<?>) ScreenKeyboardEvents.BeforeCharacterType.class,
+                (ScreenKeyboardEvents.BeforeCharacterType<?> callback, @Nullable Object context) -> {
+                    // TODO invoke proper Fabric event when added
+                });
+        INSTANCE.register((Class<ScreenKeyboardEvents.AfterCharacterType<?>>) (Class<?>) ScreenKeyboardEvents.AfterCharacterType.class,
+                (ScreenKeyboardEvents.AfterCharacterType<?> callback, @Nullable Object context) -> {
+                    // TODO invoke proper Fabric event when added
+                });
         INSTANCE.register(CustomizeChatPanelCallback.class,
                 (CustomizeChatPanelCallback callback, @Nullable Object context) -> {
                     HudElementRegistry.replaceElement(VanillaHudElements.CHAT, (HudElement hudElement) -> {
