@@ -31,6 +31,7 @@ public interface PackRepositorySourcesContext {
      *
      * @param resourceLocation the name of the pack in the {@code resources} directory
      */
+    @Deprecated(forRemoval = true)
     default void registerBuiltInPack(ResourceLocation resourceLocation) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         this.registerBuiltInPack(resourceLocation, Component.literal(resourceLocation.toString()), false);
@@ -45,7 +46,7 @@ public interface PackRepositorySourcesContext {
      *
      * @param resourceLocation the name of the pack in the {@code resources} directory
      * @param displayName      the name component for the created pack
-     * @param isRequired       is this pack always enabled and cannot be turned off
+     * @param shouldAddAutomatically       is this pack always enabled and cannot be turned off
      */
-    void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean isRequired);
+    void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically);
 }
