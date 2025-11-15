@@ -21,12 +21,11 @@ public final class ResourcePackSourcesContextFabricImpl implements PackRepositor
     }
 
     @Override
-    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean isRequired) {
+    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(displayName, "display name is null");
         DataPackSourcesContextFabricImpl.registerBuiltInPack(resourceLocation,
-                displayName,
-                isRequired,
+                displayName, shouldAddAutomatically,
                 PackType.CLIENT_RESOURCES);
     }
 }

@@ -19,13 +19,12 @@ public record ResourcePackSourcesContextNeoForgeImpl(AddPackFindersEvent event) 
     }
 
     @Override
-    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean isRequired) {
+    public void registerBuiltInPack(ResourceLocation resourceLocation, Component displayName, boolean shouldAddAutomatically) {
         Objects.requireNonNull(resourceLocation, "resource location is null");
         Objects.requireNonNull(displayName, "display name is null");
         DataPackSourcesContextNeoForgeImpl.registerBuiltInPack(this.event,
                 resourceLocation,
-                displayName,
-                isRequired,
+                displayName, shouldAddAutomatically,
                 PackType.CLIENT_RESOURCES);
     }
 }
