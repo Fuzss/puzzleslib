@@ -2,7 +2,10 @@ package fuzs.puzzleslib.impl.core.proxy;
 
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
 import fuzs.puzzleslib.api.core.v1.ServiceProviderHelper;
+import fuzs.puzzleslib.api.event.v1.LoadCompleteCallback;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
+import fuzs.puzzleslib.impl.core.ModContext;
+import fuzs.puzzleslib.impl.event.core.EventInvokerImpl;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -23,6 +26,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
+import org.jetbrains.annotations.MustBeInvokedByOverriders;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Consumer;
@@ -40,8 +44,10 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
         return ProxyImpl.INSTANCE;
     }
 
+    @MustBeInvokedByOverriders
     default void registerEventHandlers() {
-        // NO-OP
+        LoadCompleteCallback.EVENT.register(() -> ModContext.forEach(ModContext::runAfterConstruction));
+        LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
     }
 
     MinecraftServer getMinecraftServer();

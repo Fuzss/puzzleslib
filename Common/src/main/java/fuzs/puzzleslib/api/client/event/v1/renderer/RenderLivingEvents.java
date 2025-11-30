@@ -26,21 +26,23 @@ public final class RenderLivingEvents {
         /**
          * Called before a living entity model is rendered, allows for applying transformations to the
          * {@link PoseStack}, or for completely taking over rendering as a whole.
+         * <p>
+         * TODO remove partialTick parameter
          *
-         * @param entityRenderState the entity render state
-         * @param entityRenderer    the living entity renderer
-         * @param partialTick       the partial tick time
-         * @param poseStack         the pose stack
-         * @param nodeCollector     the submit node collector
-         * @param <T>               the entity type
-         * @param <S>               the render state type
-         * @param <M>               the entity model type
+         * @param renderState    the entity render state
+         * @param entityRenderer the living entity renderer
+         * @param partialTick    the partial tick time
+         * @param poseStack      the pose stack
+         * @param nodeCollector  the submit node collector
+         * @param <T>            the entity type
+         * @param <S>            the render state type
+         * @param <M>            the entity model type
          * @return <ul>
          *         <li>{@link EventResult#INTERRUPT INTERRUPT} to prevent the player model from rendering, this allows for taking over complete player rendering</li>
          *         <li>{@link EventResult#PASS PASS} to allow the player model to render</li>
          *         </ul>
          */
-        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, SubmitNodeCollector nodeCollector);
+        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> EventResult onBeforeRenderEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, SubmitNodeCollector nodeCollector);
     }
 
     @FunctionalInterface
@@ -49,16 +51,18 @@ public final class RenderLivingEvents {
         /**
          * Called after a living entity model is rendered, allows for cleaning up transformations applied to the
          * {@link PoseStack}.
+         * <p>
+         * TODO remove partialTick parameter
          *
-         * @param entityRenderState the entity render state
-         * @param entityRenderer    the living entity renderer
-         * @param partialTick       the partial tick time
-         * @param poseStack         the pose stack
-         * @param nodeCollector     the submit node collector
-         * @param <T>               the entity type
-         * @param <S>               the render state type
-         * @param <M>               the entity model type
+         * @param renderState    the entity render state
+         * @param entityRenderer the living entity renderer
+         * @param partialTick    the partial tick time
+         * @param poseStack      the pose stack
+         * @param nodeCollector  the submit node collector
+         * @param <T>            the entity type
+         * @param <S>            the render state type
+         * @param <M>            the entity model type
          */
-        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S entityRenderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, SubmitNodeCollector nodeCollector);
+        <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> void onAfterRenderEntity(S renderState, LivingEntityRenderer<T, S, M> entityRenderer, float partialTick, PoseStack poseStack, SubmitNodeCollector nodeCollector);
     }
 }

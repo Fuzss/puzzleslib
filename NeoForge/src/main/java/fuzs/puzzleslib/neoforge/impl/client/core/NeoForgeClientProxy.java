@@ -155,7 +155,7 @@ public class NeoForgeClientProxy extends NeoForgeCommonProxy implements ClientPr
                     super.registerConfigurationScreenForHolder(modId);
                     ModConfigs.getModConfigs(modId).forEach((ModConfig modConfig) -> {
                         if (modConfig.getSpec() instanceof ModConfigSpec modConfigSpec) {
-                            ConfigTranslationsManager.addModConfig(modConfig.getModId(),
+                            ConfigTranslationsManager.INSTANCE.addModConfig(modConfig.getModId(),
                                     modConfig.getType().extension(),
                                     modConfig.getFileName(),
                                     modConfigSpec);

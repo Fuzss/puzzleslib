@@ -6,10 +6,6 @@ import net.minecraft.client.KeyMapping;
 
 public final class FabricKeyMappingHelper implements KeyMappingHelper {
 
-    public void setKeyActivationContext(KeyMapping keyMapping, KeyActivationContext activationContext) {
-        ((ActivationContextKeyMapping) keyMapping).puzzleslib$setKeyActivationContext(activationContext);
-    }
-
     @Override
     public KeyActivationContext getKeyActivationContext(KeyMapping keyMapping) {
         return ((ActivationContextKeyMapping) keyMapping).puzzleslib$getKeyActivationContext();
