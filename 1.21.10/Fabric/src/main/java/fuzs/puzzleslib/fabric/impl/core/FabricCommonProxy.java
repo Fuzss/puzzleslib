@@ -21,6 +21,7 @@ import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
+import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
@@ -280,6 +281,7 @@ public class FabricCommonProxy implements FabricProxy {
     @MustBeInvokedByOverriders
     @Override
     public void registerEventHandlers() {
+        FabricProxy.super.registerEventHandlers();
         // registers for game server starting and stopping, so we can keep an instance of the server here
         ServerLifecycleEvents.STARTING.register(EventPhase.FIRST, (MinecraftServer minecraftServer) -> {
             this.minecraftServer = minecraftServer;

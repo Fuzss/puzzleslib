@@ -9,6 +9,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+/**
+ * TODO include hand parameter
+ */
 public final class UseItemEvents {
     public static final EventInvoker<Start> START = EventInvoker.lookup(Start.class);
     public static final EventInvoker<Tick> TICK = EventInvoker.lookup(Tick.class);

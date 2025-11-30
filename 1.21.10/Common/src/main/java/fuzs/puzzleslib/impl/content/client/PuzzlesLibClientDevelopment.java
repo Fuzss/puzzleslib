@@ -12,6 +12,7 @@ import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.impl.content.ServerPropertiesHelper;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.GuiGraphics;
@@ -145,29 +146,40 @@ public class PuzzlesLibClientDevelopment implements ClientModConstructor {
     }
 
     public static void initializeGameOptions(Options options) {
-        if (options.getFile().exists()) return;
-        options.renderDistance().set(16);
-        options.framerateLimit().set(60);
-        options.narratorHotkey().set(false);
-        options.advancedItemTooltips = true;
-        options.tutorialStep = TutorialSteps.NONE;
-        options.joinedFirstServer = true;
-        options.operatorItemsTab().set(true);
-        options.realmsNotifications().set(false);
-        options.showSubtitles().set(true);
-        options.guiScale().set(8);
-        options.onboardAccessibility = false;
-        options.skipMultiplayerWarning = true;
-        options.damageTiltStrength().set(0.0);
-        options.keyLoadHotbarActivator.setKey(InputConstants.UNKNOWN);
-        options.keySaveHotbarActivator.setKey(InputConstants.UNKNOWN);
-        options.keyCommand.setKey(InputConstants.UNKNOWN);
-        options.keySocialInteractions.setKey(InputConstants.UNKNOWN);
-        options.keyAdvancements.setKey(InputConstants.UNKNOWN);
-        options.keyQuickActions.setKey(InputConstants.UNKNOWN);
-        options.keyFullscreen.setKey(InputConstants.UNKNOWN);
-        options.getSoundSourceOptionInstance(SoundSource.MUSIC).set(0.0);
-        options.lastMpIp = ServerPropertiesHelper.getHostAddress().map((String string) -> string + ":25565").orElse("");
+        boolean optionsStillMissing = !options.getFile().exists();
+        unbindKey(options.keyLoadHotbarActivator, optionsStillMissing);
+        unbindKey(options.keySaveHotbarActivator, optionsStillMissing);
+        unbindKey(options.keyCommand, optionsStillMissing);
+        unbindKey(options.keySocialInteractions, optionsStillMissing);
+        unbindKey(options.keyAdvancements, optionsStillMissing);
+        unbindKey(options.keyQuickActions, optionsStillMissing);
+        unbindKey(options.keyFullscreen, optionsStillMissing);
+        if (optionsStillMissing) {
+            options.renderDistance().set(16);
+            options.framerateLimit().set(60);
+            options.narratorHotkey().set(false);
+            options.advancedItemTooltips = true;
+            options.tutorialStep = TutorialSteps.NONE;
+            options.joinedFirstServer = true;
+            options.operatorItemsTab().set(true);
+            options.realmsNotifications().set(false);
+            options.showSubtitles().set(true);
+            options.guiScale().set(8);
+            options.onboardAccessibility = false;
+            options.skipMultiplayerWarning = true;
+            options.damageTiltStrength().set(0.0);
+            options.getSoundSourceOptionInstance(SoundSource.MUSIC).set(0.0);
+            options.lastMpIp = ServerPropertiesHelper.getHostAddress()
+                    .map((String string) -> string + ":25565")
+                    .orElse("");
+        }
+    }
+
+    private static void unbindKey(KeyMapping keyMapping, boolean optionsStillMissing) {
+        keyMapping.defaultKey = InputConstants.UNKNOWN;
+        if (optionsStillMissing) {
+            keyMapping.setKey(InputConstants.UNKNOWN);
+        }
     }
 
     @Override

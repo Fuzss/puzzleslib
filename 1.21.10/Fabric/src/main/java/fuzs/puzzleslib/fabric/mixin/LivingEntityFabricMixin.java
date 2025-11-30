@@ -2,6 +2,7 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
+import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
@@ -30,6 +31,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ProjectileWeaponItem;
@@ -48,7 +50,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.*;
 
 @Mixin(LivingEntity.class)
-abstract class LivingEntityFabricMixin extends Entity {
+abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEntity {
     @Shadow
     protected ItemStack useItem;
     @Shadow
@@ -159,7 +161,7 @@ abstract class LivingEntityFabricMixin extends Entity {
 
     @Inject(method = "dropAllDeathLoot", at = @At("HEAD"))
     protected void dropAllDeathLoot$1(ServerLevel level, DamageSource damageSource, CallbackInfo callback) {
-        ((CapturedDropsEntity) this).puzzleslib$acceptCapturedDrops(new ArrayList<>());
+        this.puzzleslib$acceptCapturedDrops(new ArrayList<>());
     }
 
     @Inject(method = "dropAllDeathLoot", at = @At("TAIL"))
@@ -180,6 +182,19 @@ abstract class LivingEntityFabricMixin extends Entity {
         FabricEventImplHelper.tryOnLivingDrops(LivingEntity.class.cast(this),
                 damageSource,
                 this.lastHurtByPlayerMemoryTime);
+    }
+
+    @WrapWithCondition(method = "drop",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
+    public boolean drop(Level level, Entity entity) {
+        Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
+        if (capturedDrops != null) {
+            capturedDrops.add((ItemEntity) entity);
+            return false;
+        } else {
+            return true;
+        }
     }
 
     @Inject(method = "dropExperience",

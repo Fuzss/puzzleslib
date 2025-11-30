@@ -2,9 +2,9 @@ package fuzs.puzzleslib.fabric.impl.client.core.context;
 
 import com.google.common.collect.Sets;
 import fuzs.puzzleslib.api.client.core.v1.context.KeyMappingsContext;
+import fuzs.puzzleslib.api.client.key.v1.KeyActivationContext;
 import fuzs.puzzleslib.api.client.key.v1.KeyActivationHandler;
-import fuzs.puzzleslib.api.client.key.v1.KeyMappingHelper;
-import fuzs.puzzleslib.fabric.impl.client.key.FabricKeyMappingHelper;
+import fuzs.puzzleslib.fabric.impl.client.key.ActivationContextKeyMapping;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -27,8 +27,8 @@ public final class KeyMappingsContextFabricImpl implements KeyMappingsContext {
         Objects.requireNonNull(keyMapping, "key mapping is null");
         Objects.requireNonNull(activationHandler, "activation handler is null");
         KeyBindingHelper.registerKeyBinding(keyMapping);
-        ((FabricKeyMappingHelper) KeyMappingHelper.INSTANCE).setKeyActivationContext(keyMapping,
-                activationHandler.getActivationContext());
+        KeyActivationContext context = activationHandler.getActivationContext();
+        ((ActivationContextKeyMapping) keyMapping).puzzleslib$setKeyActivationContext(context);
         this.registerKeyCategoryIfNecessary(keyMapping);
         this.registerKeyActivationHandles(keyMapping, activationHandler);
     }

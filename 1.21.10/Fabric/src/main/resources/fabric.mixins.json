@@ -47,7 +47,6 @@
   "client": [
     "client.AbstractClientPlayerFabricMixin",
     "client.AbstractContainerScreenFabricMixin",
-    "client.AttachmentChangeFabricMixin",
     "client.CameraFabricMixin",
     "client.ChatListenerFabricMixin",
     "client.ClientLevelFabricMixin",

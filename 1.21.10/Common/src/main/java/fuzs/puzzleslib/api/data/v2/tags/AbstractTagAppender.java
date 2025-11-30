@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * TODO maybe remove the option to add non-optional strings / resource locations to prevent accidentally breaking tags from faulty entries
+ */
 public abstract class AbstractTagAppender<T> implements TagAppender<T, T> {
     protected final TagBuilder tagBuilder;
     @Nullable
