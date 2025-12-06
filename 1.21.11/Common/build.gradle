@@ -1,0 +1,13 @@
+apply from: "https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/${libs.versions.minecraft.get()}/common.gradle"
+
+dependencies {
+    // Fabric Api
+    modApi fabricApi.module("fabric-api-base", "${libs.versions.fabricapi.version.get()}")
+    modApi fabricApi.module("fabric-transitive-access-wideners-v1", "${libs.versions.fabricapi.version.get()}")
+
+    // Forge Config Api Port
+    modApi libs.forgeconfigapiport.common
+
+    // Puzzles Lib
+//    modApi libs.puzzleslib.common
+}
