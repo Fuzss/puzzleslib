@@ -33,6 +33,7 @@ public final class EventImplHelper {
         } else {
             newJumpPower = jumpPower.getAsOptionalDouble();
         }
+
         if (newJumpPower.isPresent()) {
             entity.setDeltaMovement(deltaMovement.x, newJumpPower.getAsDouble(), deltaMovement.z);
         }
@@ -45,6 +46,7 @@ public final class EventImplHelper {
                 return inventory.player;
             }
         }
+
         MinecraftServer minecraftServer = ProxyImpl.get().getMinecraftServer();
         if (minecraftServer != null) {
             for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
@@ -53,6 +55,7 @@ public final class EventImplHelper {
                 }
             }
         }
+
         return null;
     }
 
@@ -62,13 +65,14 @@ public final class EventImplHelper {
         if (minecraftServer != null) {
             for (ServerPlayer serverPlayer : minecraftServer.getPlayerList().getPlayers()) {
                 if (serverPlayer.containerMenu instanceof GrindstoneMenu grindstoneMenu) {
-                    if (grindstoneMenu.getSlot(0).getItem() == primaryItemStack &&
-                            grindstoneMenu.getSlot(1).getItem() == secondaryItemStack) {
+                    if (grindstoneMenu.getSlot(0).getItem() == primaryItemStack
+                            && grindstoneMenu.getSlot(1).getItem() == secondaryItemStack) {
                         return Map.entry(grindstoneMenu, serverPlayer);
                     }
                 }
             }
         }
+
         return null;
     }
 }

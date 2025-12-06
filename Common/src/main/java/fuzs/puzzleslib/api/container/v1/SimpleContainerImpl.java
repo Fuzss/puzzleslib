@@ -16,6 +16,7 @@ public interface SimpleContainerImpl extends Container {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -37,7 +38,10 @@ public interface SimpleContainerImpl extends Container {
     default ItemStack removeItem(int slot, int amount) {
         if (slot >= 0 && slot < this.getContainerSize() && !this.getContainerItem(slot).isEmpty() && amount > 0) {
             ItemStack itemStack = this.removeContainerItem(slot, amount);
-            if (!itemStack.isEmpty()) this.setChanged();
+            if (!itemStack.isEmpty()) {
+                this.setChanged();
+            }
+
             return itemStack;
         } else {
             return ItemStack.EMPTY;
@@ -75,6 +79,7 @@ public interface SimpleContainerImpl extends Container {
             if (!itemStack.isEmpty() && itemStack.getCount() > this.getMaxStackSize()) {
                 itemStack.setCount(this.getMaxStackSize());
             }
+
             this.setChanged();
         }
     }
@@ -93,6 +98,7 @@ public interface SimpleContainerImpl extends Container {
         for (int i = 0; i < this.getContainerSize(); i++) {
             this.setContainerItem(i, ItemStack.EMPTY);
         }
+
         this.setChanged();
     }
 }

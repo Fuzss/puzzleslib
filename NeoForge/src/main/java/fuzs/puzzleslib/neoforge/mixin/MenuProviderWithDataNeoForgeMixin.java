@@ -19,8 +19,8 @@ public interface MenuProviderWithDataNeoForgeMixin<T> extends MenuProvider {
     T getMenuData(@Nullable ServerPlayer serverPlayer);
 
     @Override
-    default void writeClientSideData(AbstractContainerMenu containerMenu, RegistryFriendlyByteBuf buf) {
-        Player player = EventImplHelper.getPlayerFromContainerMenu(containerMenu);
-        MenuTypeWithData.encodeMenuData(containerMenu, buf, this.getMenuData((ServerPlayer) player));
+    default void writeClientSideData(AbstractContainerMenu abstractContainerMenu, RegistryFriendlyByteBuf buf) {
+        Player player = EventImplHelper.getPlayerFromContainerMenu(abstractContainerMenu);
+        MenuTypeWithData.encodeMenuData(abstractContainerMenu, buf, this.getMenuData((ServerPlayer) player));
     }
 }

@@ -49,8 +49,8 @@ public final class ContainerMenuHelper {
     public static void setSelectedSlotLocked(AbstractContainerMenu containerMenu) {
         for (int i = 0; i < containerMenu.slots.size(); i++) {
             Slot slot = containerMenu.slots.get(i);
-            if (slot.container instanceof Inventory inventory &&
-                    inventory.getSelectedSlot() == slot.getContainerSlot()) {
+            if (slot.container instanceof Inventory inventory
+                    && inventory.getSelectedSlot() == slot.getContainerSlot()) {
                 NonInteractiveResultSlot newSlot = new NonInteractiveResultSlot(slot.container,
                         slot.getContainerSlot(),
                         slot.x,
@@ -70,34 +70,26 @@ public final class ContainerMenuHelper {
     /**
      * Adds the player inventory slots to an {@link AbstractContainerMenu}.
      *
-     * @param containerMenu menu to add slots to
+     * @param abstractContainerMenu menu to add slots to
      * @param inventory     player inventory instance
      * @param offsetY       vertical offset
      */
-    public static void addInventorySlots(AbstractContainerMenu containerMenu, Inventory inventory, int offsetY) {
-        addInventorySlots(containerMenu, inventory, 8, offsetY);
+    @Deprecated(forRemoval = true)
+    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetY) {
+        addInventorySlots(abstractContainerMenu, inventory, 8, offsetY);
     }
 
     /**
      * Adds the player inventory slots to an {@link AbstractContainerMenu}.
      *
-     * @param containerMenu menu to add slots to
+     * @param abstractContainerMenu menu to add slots to
      * @param inventory     player inventory instance
      * @param offsetX       horizontal offset
      * @param offsetY       vertical offset
      */
-    public static void addInventorySlots(AbstractContainerMenu containerMenu, Inventory inventory, int offsetX, int offsetY) {
-        final int slotSize = 18;
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                containerMenu.addSlot(new Slot(inventory, j + i * 9 + 9, offsetX + j * slotSize, offsetY));
-            }
-            offsetY += slotSize;
-        }
-        offsetY += 4;
-        for (int i = 0; i < 9; ++i) {
-            containerMenu.addSlot(new Slot(inventory, i, offsetX + i * slotSize, offsetY));
-        }
+    @Deprecated(forRemoval = true)
+    public static void addInventorySlots(AbstractContainerMenu abstractContainerMenu, Inventory inventory, int offsetX, int offsetY) {
+        abstractContainerMenu.addStandardInventorySlots(inventory, offsetX, offsetY);
     }
 
     /**
@@ -108,12 +100,14 @@ public final class ContainerMenuHelper {
      * <p>
      * An example would be a slot for setting a filter item that is kept separate from the main container inventory.
      *
-     * @param items    list of items
-     * @param listener listener for changes to the item list
+     * @param items     list of items
+     * @param container listener for changes to the item list
      * @return the created container
      */
-    public static SimpleContainer createListBackedContainer(NonNullList<ItemStack> items, @Nullable Container listener) {
-        return createListBackedContainer(items, listener != null ? $ -> listener.setChanged() : null);
+    public static SimpleContainer createListBackedContainer(NonNullList<ItemStack> items, @Nullable Container container) {
+        return createListBackedContainer(items, container != null ? (Container containerX) -> {
+            container.setChanged();
+        } : null);
     }
 
     /**

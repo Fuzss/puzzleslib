@@ -114,7 +114,7 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
             }
         }
 
-        static BiomeModificationContext createModificationContext(RegistryAccess registryAccess, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+        private static BiomeModificationContext createModificationContext(RegistryAccess registryAccess, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
             ClimateSettingsContextNeoForge climateSettings = new ClimateSettingsContextNeoForge(builder.getClimateSettings());
             SpecialEffectsContextNeoForge specialEffects = new SpecialEffectsContextNeoForge(builder.getSpecialEffects());
             GenerationSettingsContextNeoForge generationSettings = new GenerationSettingsContextNeoForge(registryAccess,
