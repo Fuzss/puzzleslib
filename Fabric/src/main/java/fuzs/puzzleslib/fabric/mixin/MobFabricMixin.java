@@ -50,7 +50,7 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnReasonMob {
         this.puzzleslib$spawnReason = entitySpawnReason;
     }
 
-    @Inject(method = "setTarget", at = @At("HEAD"))
+    @Inject(method = "setTarget", at = @At("HEAD"), cancellable = true)
     public void setTarget(@Nullable LivingEntity livingEntity, CallbackInfo callback) {
         DefaultedValue<LivingEntity> target = DefaultedValue.fromValue(livingEntity);
         EventResult result = FabricLivingEvents.LIVING_CHANGE_TARGET.invoker().onLivingChangeTarget(this, target);
@@ -62,12 +62,10 @@ abstract class MobFabricMixin extends LivingEntity implements SpawnReasonMob {
         }
     }
 
-    @Inject(
-            method = "checkDespawn", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"
-    ), cancellable = true
-    )
+    @Inject(method = "checkDespawn",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/level/Level;getNearestPlayer(Lnet/minecraft/world/entity/Entity;D)Lnet/minecraft/world/entity/player/Player;"),
+            cancellable = true)
     public void checkDespawn(CallbackInfo callback) {
         EventResult result = FabricLivingEvents.CHECK_MOB_DESPAWN.invoker()
                 .onCheckMobDespawn(Mob.class.cast(this), (ServerLevel) this.level());

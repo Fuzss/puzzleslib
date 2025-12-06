@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.client.core.v1;
 
 import fuzs.puzzleslib.api.client.core.v1.context.*;
 import fuzs.puzzleslib.api.core.v1.context.PackRepositorySourcesContext;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.client.core.proxy.ClientProxyImpl;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import net.minecraft.client.KeyMapping;
@@ -28,7 +27,7 @@ public interface ClientModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ClientModConstructor> modConstructorSupplier) {
-        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "client"), modConstructorSupplier);
+        construct(ResourceLocation.fromNamespaceAndPath(modId, "client"), modConstructorSupplier);
     }
 
     /**

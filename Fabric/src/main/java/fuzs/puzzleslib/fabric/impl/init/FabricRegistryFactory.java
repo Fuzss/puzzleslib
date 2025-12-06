@@ -21,6 +21,7 @@ public final class FabricRegistryFactory implements RegistryFactory {
         } else {
             builder = FabricRegistryBuilder.createSimple(registryKey);
         }
+
         return builder.attribute(RegistryAttribute.OPTIONAL).buildAndRegister();
     }
 
@@ -33,6 +34,7 @@ public final class FabricRegistryFactory implements RegistryFactory {
         } else {
             builder = FabricRegistryBuilder.createSimple(registryKey);
         }
+
         return builder.attribute(RegistryAttribute.OPTIONAL).attribute(RegistryAttribute.SYNCED).buildAndRegister();
     }
 }

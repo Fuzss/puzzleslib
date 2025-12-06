@@ -30,22 +30,24 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         super(level, gameProfile);
     }
 
-    @Inject(
-            method = "drop(Z)Z", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/server/level/ServerPlayer;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;"
-    ), cancellable = true
-    )
-    public void drop(boolean dropStack, CallbackInfoReturnable<Boolean> callback, @Local ItemStack itemStack) {
+    @Inject(method = "drop(Z)Z",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/server/level/ServerPlayer;drop(Lnet/minecraft/world/item/ItemStack;ZZ)Lnet/minecraft/world/entity/item/ItemEntity;"),
+            cancellable = true)
+    public void drop(CallbackInfoReturnable<Boolean> callback, @Local ItemStack itemStack) {
         EventResult eventResult = FabricPlayerEvents.ITEM_TOSS.invoker()
                 .onItemToss(ServerPlayer.class.cast(this), itemStack);
-        if (eventResult.isInterrupt()) callback.setReturnValue(false);
+        if (eventResult.isInterrupt()) {
+            callback.setReturnValue(false);
+        }
     }
 
     @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
         EventResult eventResult = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
-        if (eventResult.isInterrupt()) callback.cancel();
+        if (eventResult.isInterrupt()) {
+            callback.cancel();
+        }
     }
 
     @Inject(method = "openMenu", at = @At("TAIL"))
@@ -58,13 +60,10 @@ abstract class ServerPlayerFabricMixin extends Player implements CapturedDropsEn
         FabricPlayerEvents.CONTAINER_OPEN.invoker().onContainerOpen(ServerPlayer.class.cast(this), this.containerMenu);
     }
 
-    @Inject(
-            method = "doCloseContainer", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
-            shift = At.Shift.AFTER
-    )
-    )
+    @Inject(method = "doCloseContainer",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/world/inventory/InventoryMenu;transferState(Lnet/minecraft/world/inventory/AbstractContainerMenu;)V",
+                    shift = At.Shift.AFTER))
     public void doCloseContainer(CallbackInfo callback) {
         FabricPlayerEvents.CONTAINER_CLOSE.invoker()
                 .onContainerClose(ServerPlayer.class.cast(this), this.containerMenu);

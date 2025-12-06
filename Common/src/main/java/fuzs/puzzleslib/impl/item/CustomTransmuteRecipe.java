@@ -2,12 +2,12 @@ package fuzs.puzzleslib.impl.item;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.ContentRegistrationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 
@@ -29,8 +29,7 @@ public interface CustomTransmuteRecipe {
      * Finds the mod-specific {@link RecipeSerializer} in the registry.
      * <p>
      * The serializer must manually be registered via
-     * {@link
-     * ContentRegistrationHelper#registerTransmuteRecipeSerializers(RegistryManager)}.
+     * {@link ContentRegistrationHelper#registerTransmuteRecipeSerializers(RegistryManager)}.
      *
      * @param modId              the mod id to find the serializer for
      * @param recipeSerializerId the serializer string id, either {@link #TRANSMUTE_SHAPED_RECIPE_SERIALIZER_ID} or
@@ -38,12 +37,12 @@ public interface CustomTransmuteRecipe {
      * @return the serializer
      */
     static RecipeSerializer<?> getModSerializer(String modId, String recipeSerializerId) {
-        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(ResourceLocationHelper.fromNamespaceAndPath(
+        RecipeSerializer<?> recipeSerializer = BuiltInRegistries.RECIPE_SERIALIZER.getValue(ResourceLocation.fromNamespaceAndPath(
                 modId,
                 recipeSerializerId));
         Objects.requireNonNull(recipeSerializer,
-                "recipe serializer '" + ResourceLocationHelper.fromNamespaceAndPath(modId, recipeSerializerId) +
-                        "' not registered");
+                "recipe serializer '" + ResourceLocation.fromNamespaceAndPath(modId, recipeSerializerId)
+                        + "' not registered");
         return recipeSerializer;
     }
 

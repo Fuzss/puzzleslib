@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.ArgumentType;
 import com.mojang.serialization.MapCodec;
 import fuzs.puzzleslib.api.core.v1.utility.EnvironmentAwareBuilder;
 import fuzs.puzzleslib.impl.core.ModContext;
-import fuzs.puzzleslib.impl.init.LegacySpawnEggItem;
+import fuzs.puzzleslib.impl.item.LegacySpawnEggItem;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -255,6 +255,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param backgroundColor  the background color for the spawn egg texture
      * @return the holder reference
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<Item> registerLegacySpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor) {
         return this.registerLegacySpawnEggItem(entityTypeHolder,
                 backgroundColor,
@@ -269,6 +270,7 @@ public interface RegistryManager extends EnvironmentAwareBuilder<RegistryManager
      * @param highlightColor   the spots color for the spawn egg texture
      * @return the holder reference
      */
+    @Deprecated(forRemoval = true)
     default Holder.Reference<Item> registerLegacySpawnEggItem(Holder<? extends EntityType<? extends Mob>> entityTypeHolder, int backgroundColor, int highlightColor) {
         return this.registerSpawnEggItem(entityTypeHolder,
                 (Item.Properties itemProperties) -> new LegacySpawnEggItem(backgroundColor,

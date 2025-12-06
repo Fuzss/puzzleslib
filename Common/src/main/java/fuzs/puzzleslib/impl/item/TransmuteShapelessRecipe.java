@@ -7,7 +7,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapelessRecipe;
 
-public class TransmuteShapelessRecipe extends ShapelessRecipe implements CustomTransmuteRecipe {
+public final class TransmuteShapelessRecipe extends ShapelessRecipe implements CustomTransmuteRecipe {
     private final RecipeSerializer<?> recipeSerializer;
     private final Ingredient input;
 

@@ -33,7 +33,7 @@ public final class VillagerTradesContextFabricImpl implements VillagerTradesCont
         });
     }
 
-    ResourceLocation getTradesPool(WanderingTradesPool pool) {
+    private ResourceLocation getTradesPool(WanderingTradesPool pool) {
         return switch (pool) {
             case PURCHASES -> TradeOfferHelper.WanderingTraderOffersBuilder.BUY_ITEMS_POOL;
             case COMMON_SALES -> TradeOfferHelper.WanderingTraderOffersBuilder.SELL_COMMON_ITEMS_POOL;

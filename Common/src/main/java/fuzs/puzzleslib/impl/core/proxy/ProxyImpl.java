@@ -46,8 +46,10 @@ public interface ProxyImpl extends SidedProxy, FactoriesProxy, NetworkingProxy, 
 
     @MustBeInvokedByOverriders
     default void registerEventHandlers() {
-        LoadCompleteCallback.EVENT.register(() -> ModContext.forEach(ModContext::runAfterConstruction));
-        LoadCompleteCallback.EVENT.register(EventInvokerImpl::initialize);
+        LoadCompleteCallback.EVENT.register(() -> {
+            ModContext.forEach(ModContext::runAfterConstruction);
+            EventInvokerImpl.initialize();
+        });
     }
 
     MinecraftServer getMinecraftServer();

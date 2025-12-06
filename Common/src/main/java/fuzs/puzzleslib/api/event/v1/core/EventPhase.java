@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.event.v1.core;
 
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
 import fuzs.puzzleslib.impl.event.core.EventPhaseImpl;
 import net.minecraft.resources.ResourceLocation;
@@ -17,9 +16,7 @@ public interface EventPhase {
     /**
      * Fabric's default event phase, equivalent to EventPriority#NORMAL on Forge.
      */
-    EventPhase DEFAULT = new EventPhaseImpl(ResourceLocationHelper.fromNamespaceAndPath("fabric", "default"),
-            null,
-            null);
+    EventPhase DEFAULT = new EventPhaseImpl(ResourceLocation.fromNamespaceAndPath("fabric", "default"), null, null);
     /**
      * A phase to be used directly before the default phase, equivalent to EventPriority#HIGH on Forge.
      */

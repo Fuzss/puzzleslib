@@ -21,7 +21,8 @@ abstract class AbstractClientPlayerFabricMixin extends Player {
     }
 
     @ModifyReturnValue(method = "getFieldOfViewModifier", at = @At("TAIL"))
-    public float getFieldOfViewModifier(float scaledFieldOfView, @Local(ordinal = 0) float fieldOfView) {
+    public float getFieldOfViewModifier(float scaledFieldOfView, @Local(ordinal = 0,
+            argsOnly = true) float fieldOfView) {
         float fovEffectScale = Minecraft.getInstance().options.fovEffectScale().get().floatValue();
         // if fov effects don't apply due to the option being set to 0, so no need to fire the event
         if (fovEffectScale != 0.0F) {

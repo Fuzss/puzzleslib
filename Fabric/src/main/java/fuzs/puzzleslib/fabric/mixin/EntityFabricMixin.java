@@ -1,13 +1,13 @@
 package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
+import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
 import com.llamalad7.mixinextras.sugar.ref.LocalBooleanRef;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
 import fuzs.puzzleslib.api.event.v1.core.EventResultHolder;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricEntityEvents;
 import fuzs.puzzleslib.fabric.impl.event.CapturedDropsEntity;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
@@ -70,23 +70,20 @@ abstract class EntityFabricMixin implements CapturedDropsEntity {
         return this.puzzleslib$capturedDrops;
     }
 
-    @WrapWithCondition(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;",
+    @Inject(method = "spawnAtLocation(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/entity/item/ItemEntity;",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    public boolean spawnAtLocation(ServerLevel serverLevel, Entity entity) {
+                    target = "Lnet/minecraft/server/level/ServerLevel;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            cancellable = true)
+    public void spawnAtLocation(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
-            capturedDrops.add((ItemEntity) entity);
-            return false;
-        } else {
-            return true;
+            capturedDrops.add(itemEntity);
+            callback.setReturnValue(itemEntity);
         }
     }
 
     @Inject(method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z",
-                    shift = At.Shift.BEFORE),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/Entity;isPassenger()Z"),
             cancellable = true)
     public void startRiding(Entity vehicle, boolean force, boolean emitEvents, CallbackInfoReturnable<Boolean> callback) {
         // runs a little later than Forge when it is actually guaranteed for the rider to start riding

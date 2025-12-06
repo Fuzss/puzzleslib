@@ -18,12 +18,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Objects;
@@ -44,28 +46,29 @@ abstract class LevelRendererMixin {
     @Inject(method = "extractBlockOutline",
             at = @At(value = "FIELD",
                     target = "Lnet/minecraft/client/renderer/state/LevelRenderState;blockOutlineRenderState:Lnet/minecraft/client/renderer/state/BlockOutlineRenderState;",
-                    shift = At.Shift.AFTER))
+                    shift = At.Shift.AFTER,
+                    opcode = Opcodes.PUTFIELD),
+            slice = @Slice(from = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/Options;highContrastBlockOutline()Lnet/minecraft/client/OptionInstance;")))
     private void extractBlockOutline(Camera camera, LevelRenderState levelRenderState, CallbackInfo callback, @Local BlockState blockState, @Local CollisionContext collisionContext) {
-        if (levelRenderState.blockOutlineRenderState == null) {
-            return;
+        if (levelRenderState.blockOutlineRenderState != null) {
+            EventResultHolder<SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer> eventResult = FabricRendererEvents.SUBMIT_BLOCK_OUTLINE.invoker()
+                    .onSubmitBlockOutline(LevelRenderer.class.cast(this),
+                            this.level,
+                            blockState,
+                            (BlockHitResult) this.minecraft.hitResult,
+                            collisionContext,
+                            camera);
+            eventResult.ifDeny((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
+                Preconditions.checkArgument(customRenderer == null, "custom block outline renderer is not null");
+                levelRenderState.blockOutlineRenderState = null;
+            });
+            eventResult.ifAllow((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
+                Objects.requireNonNull(customRenderer, "custom block outline renderer is null");
+                levelRenderState.blockOutlineRenderState.setData(PUZZLESLIB_$_CUSTOM_BLOCK_OUTLINE_RENDERER_KEY,
+                        customRenderer);
+            });
         }
-
-        EventResultHolder<SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer> eventResult = FabricRendererEvents.SUBMIT_BLOCK_OUTLINE.invoker()
-                .onSubmitBlockOutline(LevelRenderer.class.cast(this),
-                        this.level,
-                        blockState,
-                        (BlockHitResult) this.minecraft.hitResult,
-                        collisionContext,
-                        camera);
-        eventResult.ifDeny((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
-            Preconditions.checkArgument(customRenderer == null, "custom block outline renderer is not null");
-            levelRenderState.blockOutlineRenderState = null;
-        });
-        eventResult.ifAllow((SubmitBlockOutlineCallback.@Nullable CustomBlockOutlineRenderer customRenderer) -> {
-            Objects.requireNonNull(customRenderer, "custom block outline renderer is null");
-            levelRenderState.blockOutlineRenderState.setData(PUZZLESLIB_$_CUSTOM_BLOCK_OUTLINE_RENDERER_KEY,
-                    customRenderer);
-        });
     }
 
     @Inject(method = "renderBlockOutline", at = @At("HEAD"), cancellable = true)

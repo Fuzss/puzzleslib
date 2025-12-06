@@ -34,7 +34,7 @@ abstract class GameRendererFabricMixin {
     }
 
     @Shadow
-    public abstract void setPostEffect(ResourceLocation resourceLocation);
+    protected abstract void setPostEffect(ResourceLocation resourceLocation);
 
     @ModifyReturnValue(method = "getFov", at = @At("TAIL"))
     private float getFov(float fieldOfViewValue, Camera camera, float partialTicks, boolean useFOVSetting) {

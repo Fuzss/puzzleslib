@@ -4,7 +4,6 @@ import fuzs.puzzleslib.fabric.impl.core.context.DataPackSourcesContextFabricImpl
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.repository.ServerPacksSource;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -16,8 +15,7 @@ import java.util.Set;
 @Mixin(PackRepository.class)
 abstract class PackRepositoryFabricMixin {
     @Shadow
-    @Final
-    private Set<RepositorySource> sources;
+    public Set<RepositorySource> sources;
 
     @Inject(method = "<init>", at = @At("TAIL"))
     public void init(RepositorySource[] repositorySources, CallbackInfo callback) {
@@ -25,8 +23,7 @@ abstract class PackRepositoryFabricMixin {
         // client resource packs can be handled much simpler since the repository is only ever created once
         for (RepositorySource repositorySource : this.sources) {
             if (repositorySource instanceof ServerPacksSource) {
-                DataPackSourcesContextFabricImpl.addAll(PackRepository.class.cast(
-                        this));
+                DataPackSourcesContextFabricImpl.addAll(PackRepository.class.cast(this));
                 return;
             }
         }

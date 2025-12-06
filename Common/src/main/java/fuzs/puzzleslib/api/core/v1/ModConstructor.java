@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.core.v1;
 
 import fuzs.puzzleslib.api.core.v1.context.*;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
@@ -22,7 +21,7 @@ public interface ModConstructor {
      * @param modConstructorSupplier the mod instance for the setup
      */
     static void construct(String modId, Supplier<ModConstructor> modConstructorSupplier) {
-        construct(ResourceLocationHelper.fromNamespaceAndPath(modId, "common"), modConstructorSupplier);
+        construct(ResourceLocation.fromNamespaceAndPath(modId, "common"), modConstructorSupplier);
     }
 
     /**

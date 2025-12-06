@@ -97,6 +97,7 @@ public abstract class ConfigHolderImpl implements ConfigHolder.Builder, Freezabl
                 this.bake(holder, this.modId);
             }
         }
+
         ProxyImpl.get().registerConfigurationScreenForHolder(this.modId);
     }
 

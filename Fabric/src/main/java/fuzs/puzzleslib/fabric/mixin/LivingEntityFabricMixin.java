@@ -2,7 +2,6 @@ package fuzs.puzzleslib.fabric.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
-import com.llamalad7.mixinextras.injector.v2.WrapWithCondition;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.llamalad7.mixinextras.sugar.Share;
@@ -38,6 +37,7 @@ import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -75,7 +75,8 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     @Inject(method = "startUsingItem",
             at = @At(value = "FIELD",
                     target = "Lnet/minecraft/world/entity/LivingEntity;useItemRemaining:I",
-                    shift = At.Shift.AFTER),
+                    shift = At.Shift.AFTER,
+                    opcode = Opcodes.PUTFIELD),
             cancellable = true)
     public void startUsingItem(InteractionHand interactionHand, CallbackInfo callback) {
         // this injects after the field is already updated, so it is fine to use instead of ItemStack::getUseDuration
@@ -184,16 +185,15 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
                 this.lastHurtByPlayerMemoryTime);
     }
 
-    @WrapWithCondition(method = "drop",
+    @Inject(method = "drop",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"))
-    public boolean drop(Level level, Entity entity) {
+                    target = "Lnet/minecraft/world/level/Level;addFreshEntity(Lnet/minecraft/world/entity/Entity;)Z"),
+            cancellable = true)
+    public void drop(CallbackInfoReturnable<ItemEntity> callback, @Local ItemEntity itemEntity) {
         Collection<ItemEntity> capturedDrops = this.puzzleslib$getCapturedDrops();
         if (capturedDrops != null) {
-            capturedDrops.add((ItemEntity) entity);
-            return false;
-        } else {
-            return true;
+            capturedDrops.add(itemEntity);
+            callback.setReturnValue(itemEntity);
         }
     }
 
@@ -310,15 +310,18 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
     @Nullable
     public abstract MobEffectInstance getEffect(Holder<MobEffect> effect);
 
-    @Inject(method = "removeAllEffects", at = @At("HEAD"))
+    @Inject(method = "removeAllEffects", at = @At("HEAD"), cancellable = true)
     public void removeAllEffects(CallbackInfoReturnable<Boolean> callback) {
         if (this.level().isClientSide() || this.activeEffects.isEmpty()) return;
         Map<Holder<MobEffect>, MobEffectInstance> removedActiveEffects = new HashMap<>();
         for (Map.Entry<Holder<MobEffect>, MobEffectInstance> entry : this.activeEffects.entrySet()) {
             EventResult eventResult = FabricLivingEvents.MOB_EFFECT_REMOVE.invoker()
                     .onMobEffectRemove(LivingEntity.class.cast(this), entry.getValue());
-            if (eventResult.isPass()) removedActiveEffects.put(entry.getKey(), entry.getValue());
+            if (eventResult.isPass()) {
+                removedActiveEffects.put(entry.getKey(), entry.getValue());
+            }
         }
+
         if (removedActiveEffects.size() != this.activeEffects.size()) {
             removedActiveEffects.keySet().forEach(this.activeEffects::remove);
             this.onEffectsRemoved(removedActiveEffects.values());
@@ -343,7 +346,7 @@ abstract class LivingEntityFabricMixin extends Entity implements CapturedDropsEn
         EventImplHelper.onLivingJump(FabricLivingEvents.LIVING_JUMP.invoker(), LivingEntity.class.cast(this));
     }
 
-    @ModifyVariable(method = "getVisibilityPercent", at = @At(value = "TAIL", shift = At.Shift.BEFORE), ordinal = 0)
+    @ModifyVariable(method = "getVisibilityPercent", at = @At("TAIL"), ordinal = 0)
     public double getVisibilityPercent(double value, @Nullable Entity lookingEntity) {
         DefaultedDouble visibilityPercentage = DefaultedDouble.fromValue(value);
         FabricLivingEvents.CALCULATE_LIVING_VISIBILITY.invoker()

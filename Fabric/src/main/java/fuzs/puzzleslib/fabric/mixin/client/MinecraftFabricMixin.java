@@ -64,8 +64,7 @@ abstract class MinecraftFabricMixin {
 
     @Inject(method = "runTick",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V",
-                    shift = At.Shift.BEFORE))
+                    target = "Lnet/minecraft/client/renderer/GameRenderer;render(Lnet/minecraft/client/DeltaTracker;Z)V"))
     private void runTick$0(boolean renderLevel, CallbackInfo callback) {
         FabricRendererEvents.BEFORE_GAME_RENDER.invoker()
                 .onBeforeGameRender(Minecraft.class.cast(this), this.gameRenderer, this.deltaTracker);
@@ -84,7 +83,8 @@ abstract class MinecraftFabricMixin {
             at = @At(value = "LOAD", ordinal = 0),
             slice = @Slice(from = @At(value = "INVOKE",
                     target = "Lnet/minecraft/client/player/LocalPlayer;respawn()V")),
-            ordinal = 0)
+            ordinal = 0,
+            argsOnly = true)
     public Screen setScreen(@Nullable Screen newScreen) {
         // this implementation does not allow for cancelling a new screen being set,
         // due to vanilla's Screen::remove call happening before the new screen is properly computed (in regard to title &amp; death screens),

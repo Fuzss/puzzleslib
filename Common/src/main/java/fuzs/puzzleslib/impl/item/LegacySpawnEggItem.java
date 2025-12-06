@@ -1,10 +1,11 @@
-package fuzs.puzzleslib.impl.init;
+package fuzs.puzzleslib.impl.item;
 
 import fuzs.puzzleslib.api.util.v1.HSV;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.SpawnEggItem;
 
+@Deprecated(forRemoval = true)
 public class LegacySpawnEggItem extends SpawnEggItem {
     private final int backgroundColor;
     private final int highlightColor;

@@ -2,7 +2,6 @@ package fuzs.puzzleslib.api.client.data.v2;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.JsonObject;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.core.Holder;
@@ -61,7 +60,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
     }
 
     public AbstractLanguageProvider(String languageCode, String modId, PackOutput packOutput) {
-        this.filePath = ResourceLocationHelper.fromNamespaceAndPath(modId, languageCode);
+        this.filePath = ResourceLocation.fromNamespaceAndPath(modId, languageCode);
         this.pathProvider = packOutput.createPathProvider(PackOutput.Target.RESOURCE_PACK, "lang");
     }
 
@@ -69,7 +68,6 @@ public abstract class AbstractLanguageProvider implements DataProvider {
 
     @Override
     public CompletableFuture<?> run(CachedOutput cachedOutput) {
-
         JsonObject jsonObject = new JsonObject();
         this.addTranslations((String translationKey, String value) -> {
             Objects.requireNonNull(translationKey, "translation key is null");
@@ -366,8 +364,7 @@ public abstract class AbstractLanguageProvider implements DataProvider {
         }
 
         default void addKeyCategory(String modId, String value) {
-            this.add(new KeyMapping.Category(ResourceLocationHelper.fromNamespaceAndPath(modId, "main")).label(),
-                    value);
+            this.add(new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(modId, "main")).label(), value);
         }
 
         default void add(GameRules.Key<?> gameRule, String value) {
