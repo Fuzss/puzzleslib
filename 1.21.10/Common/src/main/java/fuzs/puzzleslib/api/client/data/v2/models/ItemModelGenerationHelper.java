@@ -1,8 +1,7 @@
 package fuzs.puzzleslib.api.client.data.v2.models;
 
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.PuzzlesLibMod;
-import fuzs.puzzleslib.impl.init.LegacySpawnEggItem;
+import fuzs.puzzleslib.impl.item.LegacySpawnEggItem;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.*;
@@ -17,15 +16,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
 public final class ItemModelGenerationHelper {
-    public static final ModelTemplate HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocationHelper.withDefaultNamespace(
+    public static final ModelTemplate HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocation.withDefaultNamespace(
             "goat_horn"), TextureSlot.LAYER0);
-    public static final ModelTemplate TOOTING_HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocationHelper.withDefaultNamespace(
+    public static final ModelTemplate TOOTING_HORN = ModelTemplateHelper.createItemModelTemplate(ResourceLocation.withDefaultNamespace(
             "tooting_goat_horn"), TextureSlot.LAYER0);
     public static final ModelTemplate SHIELD_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(
-            ResourceLocationHelper.withDefaultNamespace("shield"),
+            ResourceLocation.withDefaultNamespace("shield"),
             TextureSlot.PARTICLE);
     public static final ModelTemplate SHIELD_BLOCKING_MODEL_TEMPLATE = ModelTemplateHelper.createItemModelTemplate(
-            ResourceLocationHelper.withDefaultNamespace("shield_blocking"),
+            ResourceLocation.withDefaultNamespace("shield_blocking"),
             TextureSlot.PARTICLE);
 
     private ItemModelGenerationHelper() {
@@ -104,6 +103,7 @@ public final class ItemModelGenerationHelper {
         itemModelGenerators.generateBow(item);
     }
 
+    @Deprecated(forRemoval = true)
     public static void generateSpawnEgg(Item item, ItemModelGenerators itemModelGenerators) {
         generateSpawnEgg(item,
                 ((LegacySpawnEggItem) item).getBackgroundColor(),
@@ -111,6 +111,7 @@ public final class ItemModelGenerationHelper {
                 itemModelGenerators);
     }
 
+    @Deprecated(forRemoval = true)
     public static void generateSpawnEgg(Item item, int primaryColor, int secondaryColor, ItemModelGenerators itemModelGenerators) {
         ResourceLocation textureLocation = PuzzlesLibMod.id("spawn_egg");
         ResourceLocation resourceLocation = itemModelGenerators.generateLayeredItem(item,

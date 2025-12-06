@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 abstract class GrindstoneMenu$ResultSlotFabricMixin extends Slot {
     @Shadow
     @Final
-    private GrindstoneMenu this$0;
+    GrindstoneMenu this$0;
 
     public GrindstoneMenu$ResultSlotFabricMixin(Container container, int slot, int x, int y) {
         super(container, slot, x, y);

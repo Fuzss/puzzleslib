@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.impl;
 
 import fuzs.puzzleslib.api.core.v1.ModConstructor;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.minecraft.resources.ResourceLocation;
 
@@ -17,6 +16,6 @@ public class PuzzlesLibMod extends PuzzlesLib implements ModConstructor {
     }
 
     public static ResourceLocation id(String path) {
-        return ResourceLocationHelper.fromNamespaceAndPath(MOD_ID, path);
+        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
     }
 }

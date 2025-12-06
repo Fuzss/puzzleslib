@@ -3,11 +3,11 @@ package fuzs.puzzleslib.fabric.mixin;
 import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import com.llamalad7.mixinextras.sugar.Cancellable;
 import fuzs.puzzleslib.api.event.v1.core.EventResult;
-import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
-import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricLivingEvents;
 import fuzs.puzzleslib.fabric.api.event.v1.FabricPlayerEvents;
 import fuzs.puzzleslib.fabric.impl.event.FabricEventImplHelper;
+import fuzs.puzzleslib.impl.event.data.DefaultedFloat;
+import fuzs.puzzleslib.impl.event.data.DefaultedValue;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
@@ -44,16 +44,17 @@ abstract class PlayerFabricMixin extends LivingEntity {
         FabricPlayerEvents.PLAYER_TICK_END.invoker().onEndPlayerTick(Player.class.cast(this));
     }
 
-    @Inject(
-            method = "drop", at = @At(
-            value = "HEAD"
-    ), cancellable = true
-    )
+    @Inject(method = "drop", at = @At(value = "HEAD"), cancellable = true)
     public void drop(ItemStack itemStack, boolean includeThrowerName, CallbackInfoReturnable<ItemEntity> callback) {
-        if (!ServerPlayer.class.isInstance(this)) return;
+        if (!ServerPlayer.class.isInstance(this)) {
+            return;
+        }
+
         EventResult eventResult = FabricPlayerEvents.ITEM_TOSS.invoker()
                 .onItemToss(ServerPlayer.class.cast(this), itemStack);
-        if (eventResult.isInterrupt()) callback.setReturnValue(null);
+        if (eventResult.isInterrupt()) {
+            callback.setReturnValue(null);
+        }
     }
 
     @ModifyReturnValue(method = "getDestroySpeed", at = @At("TAIL"))
@@ -68,17 +69,15 @@ abstract class PlayerFabricMixin extends LivingEntity {
         return defaultedFloat.getAsOptionalFloat().orElse(destroySpeed);
     }
 
-    @Inject(
-            method = "die", at = @At(
-            "HEAD"
-    ), cancellable = true
-    )
+    @Inject(method = "die", at = @At("HEAD"), cancellable = true)
     public void die(DamageSource damageSource, CallbackInfo callback) {
         // this will fire twice for players, since the die method calls super on LivingEntity, where this is hooked in again
         // Forge has it implemented like this, so let's leave it for now for parity
         // can't easily filter out the second call on Forge unfortunately
         EventResult result = FabricLivingEvents.LIVING_DEATH.invoker().onLivingDeath(this, damageSource);
-        if (result.isInterrupt()) callback.cancel();
+        if (result.isInterrupt()) {
+            callback.cancel();
+        }
     }
 
     @ModifyVariable(method = "actuallyHurt", at = @At("HEAD"), ordinal = 0, argsOnly = true)
@@ -90,7 +89,9 @@ abstract class PlayerFabricMixin extends LivingEntity {
                     damageSource,
                     damageAmount,
                     cancelInjection);
-            if (cancelInjection.booleanValue()) callback.cancel();
+            if (cancelInjection.booleanValue()) {
+                callback.cancel();
+            }
         }
 
         return damageAmount;

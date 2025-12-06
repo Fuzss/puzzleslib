@@ -1,13 +1,13 @@
 package fuzs.puzzleslib.impl.core;
 
 import fuzs.puzzleslib.api.config.v3.ConfigHolder;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.impl.config.ConfigHolderImpl;
 import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import fuzs.puzzleslib.impl.init.RegistryManagerImpl;
 import net.minecraft.network.protocol.common.custom.BrandPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,8 +28,7 @@ public abstract class ModContext {
 
     public ModContext(String modId) {
         this.modId = modId;
-        this.payloadType = new CustomPacketPayload.Type<>(ResourceLocationHelper.fromNamespaceAndPath(modId,
-                "handshake"));
+        this.payloadType = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(modId, "handshake"));
     }
 
     public static void forEach(Consumer<ModContext> modContextConsumer) {
@@ -68,20 +67,20 @@ public abstract class ModContext {
 
     protected abstract RegistryManagerImpl createRegistryManager(String modId);
 
-    public void runBeforeConstruction() {
+    public final void runBeforeConstruction() {
         if (this.configHolder != null) {
             this.configHolder.freeze();
         }
     }
 
-    public void runAfterConstruction() {
+    public final void runAfterConstruction() {
+        if (this.configHolder != null) {
+            this.configHolder.isFrozenOrThrow();
+        }
+
         if (this.registryManager != null) {
             this.registryManager.freeze();
             this.registryManager.isFrozenOrThrow();
-        }
-
-        if (this.configHolder != null) {
-            this.configHolder.isFrozenOrThrow();
         }
     }
 }

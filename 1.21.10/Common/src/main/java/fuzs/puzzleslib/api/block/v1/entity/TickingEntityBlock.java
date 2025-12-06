@@ -12,7 +12,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.function.Consumer;
 
 /**
- * A simple extension to {@link EntityBlock} for a default implementation of {@link EntityBlock#getTicker(Level, BlockState, BlockEntityType)}.
+ * A simple extension to {@link EntityBlock} for a default implementation of
+ * {@link EntityBlock#getTicker(Level, BlockState, BlockEntityType)}.
+ *
  * @param <T> type of the corresponding {@link BlockEntity}
  */
 public interface TickingEntityBlock<T extends BlockEntity & TickingBlockEntity> extends EntityBlock {
@@ -33,8 +35,9 @@ public interface TickingEntityBlock<T extends BlockEntity & TickingBlockEntity> 
     @Override
     default <BE extends BlockEntity> BlockEntityTicker<BE> getTicker(Level level, BlockState state, BlockEntityType<BE> blockEntityType) {
         // due to the type bounds in TickingEntityBlock this guarantees we have a TickingBlockEntity instance
-        if (this.getBlockEntityType().equals(blockEntityType)) {
-            Consumer<TickingBlockEntity> ticker = level.isClientSide() ? TickingBlockEntity::clientTick : TickingBlockEntity::serverTick;
+        if (this.getBlockEntityType() == blockEntityType) {
+            Consumer<TickingBlockEntity> ticker =
+                    level.isClientSide() ? TickingBlockEntity::clientTick : TickingBlockEntity::serverTick;
             return (Level $, BlockPos blockPos, BlockState blockState, BE blockEntity) -> {
                 // no need to pass on anything, the block entity instance already has all those parameters
                 ticker.accept((TickingBlockEntity) blockEntity);

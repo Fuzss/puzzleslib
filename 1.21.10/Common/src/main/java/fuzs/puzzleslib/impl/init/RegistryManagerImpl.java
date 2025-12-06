@@ -3,7 +3,6 @@ package fuzs.puzzleslib.impl.init;
 import com.google.common.base.Preconditions;
 import fuzs.puzzleslib.api.core.v1.ModLoader;
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.RegistryManager;
 import fuzs.puzzleslib.impl.core.Freezable;
 import fuzs.puzzleslib.impl.item.CreativeModeTabHelper;
@@ -34,7 +33,7 @@ public abstract class RegistryManagerImpl implements RegistryManager, Freezable 
     @Override
     public ResourceLocation makeKey(String path) {
         Preconditions.checkArgument(StringUtils.isNotEmpty(path), "path is invalid");
-        return ResourceLocationHelper.fromNamespaceAndPath(this.modId, path);
+        return ResourceLocation.fromNamespaceAndPath(this.modId, path);
     }
 
     @Override

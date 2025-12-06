@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.client.data.v2;
 
 import com.mojang.serialization.Codec;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.client.particle.ParticleDescription;
 import net.minecraft.core.particles.ParticleType;
@@ -76,10 +75,13 @@ public abstract class AbstractParticleProvider implements DataProvider {
         } else {
             List<ResourceLocation> textures = IntStream.rangeClosed(Math.min(indexStart, indexEnd),
                             Math.max(indexStart, indexEnd))
-                    .mapToObj(index -> ResourceLocationHelper.fromNamespaceAndPath(resourceLocation.getNamespace(),
+                    .mapToObj((int index) -> ResourceLocation.fromNamespaceAndPath(resourceLocation.getNamespace(),
                             resourceLocation.getPath() + "_" + index))
                     .collect(Collectors.toList());
-            if (indexEnd < indexStart) Collections.reverse(textures);
+            if (indexEnd < indexStart) {
+                Collections.reverse(textures);
+            }
+
             this.add(id, new ParticleDescription(textures));
         }
     }
@@ -88,6 +90,7 @@ public abstract class AbstractParticleProvider implements DataProvider {
         if (this.clientResourceManager != null) {
             this.validate(id, particleDescription, this.clientResourceManager);
         }
+
         if (this.values.putIfAbsent(id, particleDescription) != null) {
             throw new IllegalStateException("Duplicate particle description: " + id);
         }

@@ -21,7 +21,6 @@ import fuzs.puzzleslib.fabric.impl.item.crafting.FabricCombinedIngredients;
 import fuzs.puzzleslib.impl.attachment.DataAttachmentRegistryImpl;
 import fuzs.puzzleslib.impl.core.ModContext;
 import fuzs.puzzleslib.impl.core.context.ModConstructorImpl;
-import fuzs.puzzleslib.impl.core.proxy.ProxyImpl;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.item.v1.EnchantingContext;
@@ -92,7 +91,7 @@ public class FabricCommonProxy implements FabricProxy {
     public <T> void openMenu(Player player, MenuProvider menuProvider, T data) {
         player.openMenu(new ExtendedScreenHandlerFactory<>() {
             @Override
-            public T getScreenOpeningData(ServerPlayer player) {
+            public T getScreenOpeningData(ServerPlayer serverPlayer) {
                 return data;
             }
 

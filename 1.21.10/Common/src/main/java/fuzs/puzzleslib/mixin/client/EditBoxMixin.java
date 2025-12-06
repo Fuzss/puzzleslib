@@ -24,13 +24,13 @@ abstract class EditBoxMixin extends AbstractWidget {
     @Shadow
     private int highlightPos;
     @Unique
-    private long lastClickTime;
+    private long puzzleslib$lastClickTime;
     @Unique
-    private boolean doubleClick;
+    private boolean puzzleslib$doubleClick;
     @Unique
-    private int doubleClickHighlightPos;
+    private int puzzleslib$doubleClickHighlightPos;
     @Unique
-    private int doubleClickCursorPos;
+    private int puzzleslib$doubleClickCursorPos;
 
     public EditBoxMixin(int x, int y, int width, int height, Component message) {
         super(x, y, width, height, message);
@@ -74,21 +74,21 @@ abstract class EditBoxMixin extends AbstractWidget {
         for (int k = 0; k < skippedWords; ++k) {
             if (!backwards) {
                 int l = this.value.length();
-                while (skipConsecutiveSpaces && i == pos && i < l && !isWordChar(this.value.charAt(i))) {
+                while (skipConsecutiveSpaces && i == pos && i < l && !puzzleslib$isWordChar(this.value.charAt(i))) {
                     ++i;
                     pos++;
                 }
 
-                while (i < l && isWordChar(this.value.charAt(i))) {
+                while (i < l && puzzleslib$isWordChar(this.value.charAt(i))) {
                     ++i;
                 }
             } else {
-                while (skipConsecutiveSpaces && i == pos && i > 0 && !isWordChar(this.value.charAt(i - 1))) {
+                while (skipConsecutiveSpaces && i == pos && i > 0 && !puzzleslib$isWordChar(this.value.charAt(i - 1))) {
                     --i;
                     pos--;
                 }
 
-                while (i > 0 && isWordChar(this.value.charAt(i - 1))) {
+                while (i > 0 && puzzleslib$isWordChar(this.value.charAt(i - 1))) {
                     --i;
                 }
             }
@@ -98,7 +98,7 @@ abstract class EditBoxMixin extends AbstractWidget {
     }
 
     @Unique
-    private static boolean isWordChar(char charAt) {
+    private static boolean puzzleslib$isWordChar(char charAt) {
         // break skipping on more than just spaces, from Owo Lib, thanks!
         return charAt == '_' || Character.isAlphabetic(charAt) || Character.isDigit(charAt);
     }
@@ -172,9 +172,9 @@ abstract class EditBoxMixin extends AbstractWidget {
     @Inject(method = "onClick", at = @At("TAIL"))
     public void onClick(MouseButtonEvent mouseButtonEvent, boolean doubleClick, CallbackInfo callback) {
         long millis = Util.getMillis();
-        boolean tripleClick = this.doubleClick;
-        this.doubleClick = millis - this.lastClickTime < 250L;
-        if (this.doubleClick) {
+        boolean tripleClick = this.puzzleslib$doubleClick;
+        this.puzzleslib$doubleClick = millis - this.puzzleslib$lastClickTime < 250L;
+        if (this.puzzleslib$doubleClick) {
             if (tripleClick) {
                 // triple click to select all text in the edit box
                 this.moveCursorToEnd(false);
@@ -183,12 +183,12 @@ abstract class EditBoxMixin extends AbstractWidget {
                 // store double click positions for dragging to select the clicked word
                 // the highlight positions is the right selection boundary
                 // the cursor position is the left selection boundary
-                this.doubleClickHighlightPos = this.getWordPosition(1, this.getCursorPosition(), false);
-                this.doubleClickCursorPos = this.getWordPosition(-1, this.getCursorPosition(), false);
+                this.puzzleslib$doubleClickHighlightPos = this.getWordPosition(1, this.getCursorPosition(), false);
+                this.puzzleslib$doubleClickCursorPos = this.getWordPosition(-1, this.getCursorPosition(), false);
             }
         }
 
-        this.lastClickTime = millis;
+        this.puzzleslib$lastClickTime = millis;
     }
 
     @Shadow
@@ -198,25 +198,25 @@ abstract class EditBoxMixin extends AbstractWidget {
 
     @Inject(method = "onDrag", at = @At("HEAD"), cancellable = true)
     protected void onDrag(MouseButtonEvent mouseButtonEvent, double dragX, double dragY, CallbackInfo callback) {
-        if (this.doubleClick) {
+        if (this.puzzleslib$doubleClick) {
             // double-click drag across text to select individual words
             // dragging outside the edit box will select everything until the beginning or end
             int clickedPosition = this.findClickedPositionInText(mouseButtonEvent);
             if (this.isMouseOver(mouseButtonEvent.x(), mouseButtonEvent.y())) {
                 int rightBoundary = this.getWordPosition(1, clickedPosition, false);
-                this.moveCursorTo(Math.max(this.doubleClickHighlightPos, rightBoundary), false);
+                this.moveCursorTo(Math.max(this.puzzleslib$doubleClickHighlightPos, rightBoundary), false);
                 int leftBoundary = this.getWordPosition(-1, clickedPosition, false);
-                this.moveCursorTo(Math.min(this.doubleClickCursorPos, leftBoundary), true);
+                this.moveCursorTo(Math.min(this.puzzleslib$doubleClickCursorPos, leftBoundary), true);
             } else {
-                if (clickedPosition > this.doubleClickHighlightPos) {
+                if (clickedPosition > this.puzzleslib$doubleClickHighlightPos) {
                     this.moveCursorToEnd(false);
                 } else {
-                    this.moveCursorTo(this.doubleClickHighlightPos, false);
+                    this.moveCursorTo(this.puzzleslib$doubleClickHighlightPos, false);
                 }
-                if (clickedPosition < this.doubleClickCursorPos) {
+                if (clickedPosition < this.puzzleslib$doubleClickCursorPos) {
                     this.moveCursorToStart(true);
                 } else {
-                    this.moveCursorTo(this.doubleClickCursorPos, true);
+                    this.moveCursorTo(this.puzzleslib$doubleClickCursorPos, true);
                 }
             }
 

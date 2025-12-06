@@ -1,6 +1,5 @@
 package fuzs.puzzleslib.api.client.core.v1.context;
 
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
@@ -16,92 +15,92 @@ public interface GuiLayersContext {
     /**
      * The layer for rendering camera-related overlays like pumpkin blur.
      */
-    ResourceLocation CAMERA_OVERLAYS = ResourceLocationHelper.withDefaultNamespace("camera_overlays");
+    ResourceLocation CAMERA_OVERLAYS = ResourceLocation.withDefaultNamespace("camera_overlays");
     /**
      * The layer for rendering the crosshair.
      */
-    ResourceLocation CROSSHAIR = ResourceLocationHelper.withDefaultNamespace("crosshair");
+    ResourceLocation CROSSHAIR = ResourceLocation.withDefaultNamespace("crosshair");
     /**
      * The layer for rendering the hotbar.
      */
-    ResourceLocation HOTBAR = ResourceLocationHelper.withDefaultNamespace("hotbar");
+    ResourceLocation HOTBAR = ResourceLocation.withDefaultNamespace("hotbar");
     /**
      * The layer for rendering the info bars, like the experience bar, the locator bar, or the jump meter (e.g. for
      * horses).
      */
-    ResourceLocation INFO_BAR = ResourceLocationHelper.withDefaultNamespace("info_bar");
+    ResourceLocation INFO_BAR = ResourceLocation.withDefaultNamespace("info_bar");
     /**
      * The layer for rendering the player's health hearts.
      */
-    ResourceLocation PLAYER_HEALTH = ResourceLocationHelper.withDefaultNamespace("player_health");
+    ResourceLocation PLAYER_HEALTH = ResourceLocation.withDefaultNamespace("player_health");
     /**
      * The layer for rendering the player's armor level.
      */
-    ResourceLocation ARMOR_LEVEL = ResourceLocationHelper.withDefaultNamespace("armor_level");
+    ResourceLocation ARMOR_LEVEL = ResourceLocation.withDefaultNamespace("armor_level");
     /**
      * The layer for rendering the player's food level.
      */
-    ResourceLocation FOOD_LEVEL = ResourceLocationHelper.withDefaultNamespace("food_level");
+    ResourceLocation FOOD_LEVEL = ResourceLocation.withDefaultNamespace("food_level");
     /**
      * The layer for rendering the health of the player's vehicle.
      */
-    ResourceLocation VEHICLE_HEALTH = ResourceLocationHelper.withDefaultNamespace("vehicle_health");
+    ResourceLocation VEHICLE_HEALTH = ResourceLocation.withDefaultNamespace("vehicle_health");
     /**
      * The layer for rendering the player's air level when submerged.
      */
-    ResourceLocation AIR_LEVEL = ResourceLocationHelper.withDefaultNamespace("air_level");
+    ResourceLocation AIR_LEVEL = ResourceLocation.withDefaultNamespace("air_level");
     /**
      * The layer for rendering the name of the selected item.
      */
-    ResourceLocation HELD_ITEM_TOOLTIP = ResourceLocationHelper.withDefaultNamespace("held_item_tooltip");
+    ResourceLocation HELD_ITEM_TOOLTIP = ResourceLocation.withDefaultNamespace("held_item_tooltip");
     /**
      * The layer for rendering the player's experience level number.
      */
-    ResourceLocation EXPERIENCE_LEVEL = ResourceLocationHelper.withDefaultNamespace("experience_level");
+    ResourceLocation EXPERIENCE_LEVEL = ResourceLocation.withDefaultNamespace("experience_level");
     /**
      * The layer for rendering the selected spectator menu action.
      */
-    ResourceLocation SPECTATOR_TOOLTIP = ResourceLocationHelper.withDefaultNamespace("spectator_tooltip");
+    ResourceLocation SPECTATOR_TOOLTIP = ResourceLocation.withDefaultNamespace("spectator_tooltip");
     /**
      * The layer for rendering status effect icons.
      */
-    ResourceLocation STATUS_EFFECTS = ResourceLocationHelper.withDefaultNamespace("status_effects");
+    ResourceLocation STATUS_EFFECTS = ResourceLocation.withDefaultNamespace("status_effects");
     /**
      * The layer for rendering boss bars.
      */
-    ResourceLocation BOSS_BAR = ResourceLocationHelper.withDefaultNamespace("boss_bar");
+    ResourceLocation BOSS_BAR = ResourceLocation.withDefaultNamespace("boss_bar");
     /**
      * The layer for rendering the sleep overlay.
      */
-    ResourceLocation SLEEP_OVERLAY = ResourceLocationHelper.withDefaultNamespace("sleep_overlay");
+    ResourceLocation SLEEP_OVERLAY = ResourceLocation.withDefaultNamespace("sleep_overlay");
     /**
      * The layer for rendering the demo mode timer.
      */
-    ResourceLocation DEMO_TIMER = ResourceLocationHelper.withDefaultNamespace("demo_timer");
+    ResourceLocation DEMO_TIMER = ResourceLocation.withDefaultNamespace("demo_timer");
     /**
      * The layer for rendering the scoreboard.
      */
-    ResourceLocation SCOREBOARD = ResourceLocationHelper.withDefaultNamespace("scoreboard");
+    ResourceLocation SCOREBOARD = ResourceLocation.withDefaultNamespace("scoreboard");
     /**
      * The layer for rendering overlay messages (e.g., action bar text).
      */
-    ResourceLocation OVERLAY_MESSAGE = ResourceLocationHelper.withDefaultNamespace("overlay_message");
+    ResourceLocation OVERLAY_MESSAGE = ResourceLocation.withDefaultNamespace("overlay_message");
     /**
      * The layer for rendering titles and subtitles.
      */
-    ResourceLocation TITLE = ResourceLocationHelper.withDefaultNamespace("title");
+    ResourceLocation TITLE = ResourceLocation.withDefaultNamespace("title");
     /**
      * The layer for rendering the chat interface.
      */
-    ResourceLocation CHAT = ResourceLocationHelper.withDefaultNamespace("chat");
+    ResourceLocation CHAT = ResourceLocation.withDefaultNamespace("chat");
     /**
      * The layer for rendering the player list (tab menu).
      */
-    ResourceLocation PLAYER_LIST = ResourceLocationHelper.withDefaultNamespace("player_list");
+    ResourceLocation PLAYER_LIST = ResourceLocation.withDefaultNamespace("player_list");
     /**
      * The layer for rendering subtitles.
      */
-    ResourceLocation SUBTITLES = ResourceLocationHelper.withDefaultNamespace("subtitles");
+    ResourceLocation SUBTITLES = ResourceLocation.withDefaultNamespace("subtitles");
 
     /**
      * Register a new gui layer rendered after all existing layers.

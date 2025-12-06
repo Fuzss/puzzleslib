@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.api.resources.v1;
 
 import fuzs.puzzleslib.api.core.v1.ModLoaderEnvironment;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.impl.resources.ModPackResourcesSupplier;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -121,7 +120,7 @@ public class AbstractModPackResources implements PackResources {
      * @return the namespace from the internal id
      */
     public String getNamespace() {
-        return ResourceLocationHelper.parse(this.packId()).getNamespace();
+        return ResourceLocation.parse(this.packId()).getNamespace();
     }
 
     /**

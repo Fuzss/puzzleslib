@@ -142,4 +142,3 @@ public final class HSV {
         return Mth.hsvToRgb(hue, saturation, value);
     }
 }
-

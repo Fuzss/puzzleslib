@@ -61,7 +61,6 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
                         BiomeModifier.DIRECT_CODEC,
                         context.getRegistries(),
                         context.getModId()) {
-
                     @Override
                     protected void gather() {
                         this.unconditional(holder.getKey().location(), biomeModifierImpl);
@@ -69,6 +68,7 @@ public final class BiomeModificationsContextNeoForgeImpl implements BiomeModific
                 };
             });
         }
+
         this.biomeModifications.put(biomeLoadingPhase, Map.entry(biomeSelector, biomeModifier));
     }
 

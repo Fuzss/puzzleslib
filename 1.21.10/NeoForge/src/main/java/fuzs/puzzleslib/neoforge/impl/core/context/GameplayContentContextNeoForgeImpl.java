@@ -214,6 +214,7 @@ public final class GameplayContentContextNeoForgeImpl implements GameplayContent
                     }
                 });
             }
+
             this.values.put(key, value);
         }
     }

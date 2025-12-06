@@ -26,7 +26,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
- * A helper class for rendering tooltips without a screen, additionally allows for rendering multiple image components
+ * A helper class for rendering tooltips without a screen additionally allows for rendering multiple image components,
  * whereas vanilla only supports one.
  * <p>
  * Note that the implementation is directly copied from vanilla, all caveats apply. This is done to circumvent other

@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.world.level.material.FogType;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector4f;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -36,25 +37,20 @@ abstract class FogRendererFabricMixin {
         return vector4f;
     }
 
-    @ModifyVariable(
-            method = "setupFog", at = @At(
-            value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/fog/environment/FogEnvironment;setupFog(Lnet/minecraft/client/renderer/fog/FogData;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/multiplayer/ClientLevel;FLnet/minecraft/client/DeltaTracker;)V"
-    )
-    )
+    @ModifyVariable(method = "setupFog",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/renderer/fog/environment/FogEnvironment;setupFog(Lnet/minecraft/client/renderer/fog/FogData;Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lnet/minecraft/client/multiplayer/ClientLevel;FLnet/minecraft/client/DeltaTracker;)V"))
     public FogEnvironment setupFog(FogEnvironment fogEnvironment, @Share("fogEnvironment") LocalRef<FogEnvironment> fogEnvironmentRef) {
         fogEnvironmentRef.set(fogEnvironment);
         return fogEnvironment;
     }
 
-    @Inject(
-            method = "setupFog", at = @At(
-            value = "FIELD", target = "Lnet/minecraft/client/renderer/fog/FogData;renderDistanceEnd:F", ordinal = 0
-    )
-    )
+    @Inject(method = "setupFog",
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/client/renderer/fog/FogData;renderDistanceEnd:F",
+                    opcode = Opcodes.PUTFIELD))
     public void setupFog(Camera camera, int renderDistance, boolean isFoggy, DeltaTracker deltaTracker, float darkenWorldAmount, ClientLevel clientLevel, CallbackInfoReturnable<Vector4f> callback, @Local(
-            ordinal = 1
-    ) float partialTick, @Local FogType fogType, @Local FogData fogData, @Share("fogEnvironment") LocalRef<@Nullable FogEnvironment> fogEnvironmentRef) {
+            ordinal = 1) float partialTick, @Local FogType fogType, @Local FogData fogData, @Share("fogEnvironment") LocalRef<@Nullable FogEnvironment> fogEnvironmentRef) {
         FabricRendererEvents.SETUP_FOG.invoker()
                 .onSetupFog(camera, partialTick, fogEnvironmentRef.get(), fogType, fogData);
     }

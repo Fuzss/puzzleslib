@@ -2,7 +2,6 @@ package fuzs.puzzleslib.impl.core.context;
 
 import fuzs.puzzleslib.api.core.v1.ModContainer;
 import fuzs.puzzleslib.api.core.v1.context.PayloadTypesContext;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -21,7 +20,7 @@ public abstract class PayloadTypesContextImpl implements PayloadTypesContext {
     protected final ResourceLocation channelName;
 
     protected PayloadTypesContextImpl(String modId) {
-        this.channelName = ResourceLocationHelper.fromNamespaceAndPath(modId, "main");
+        this.channelName = ResourceLocation.fromNamespaceAndPath(modId, "main");
     }
 
     @SuppressWarnings("unchecked")

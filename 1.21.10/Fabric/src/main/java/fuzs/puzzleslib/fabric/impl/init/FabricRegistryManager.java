@@ -1,7 +1,6 @@
 package fuzs.puzzleslib.fabric.impl.init;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.init.v3.registry.LookupHelper;
 import fuzs.puzzleslib.api.init.v3.registry.MenuSupplierWithData;
 import fuzs.puzzleslib.impl.init.DirectReferenceHolder;
@@ -23,6 +22,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,7 +40,7 @@ import java.util.function.Supplier;
 
 public final class FabricRegistryManager extends RegistryManagerImpl {
     private static final ResourceKey<Registry<EntityDataSerializer<?>>> ENTITY_DATA_SERIALIZERS_REGISTRY_KEY = ResourceKey.createRegistryKey(
-            ResourceLocationHelper.withDefaultNamespace("entity_data_serializers"));
+            ResourceLocation.withDefaultNamespace("entity_data_serializers"));
 
     private boolean isFrozen;
 

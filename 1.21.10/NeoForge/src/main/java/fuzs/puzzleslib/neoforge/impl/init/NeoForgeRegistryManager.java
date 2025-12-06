@@ -78,6 +78,7 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
                 });
             });
         }
+
         return this.registerLazily(registryKey, path);
     }
 
@@ -90,9 +91,7 @@ public final class NeoForgeRegistryManager extends RegistryManagerImpl {
     public <T extends BlockEntity> Holder.Reference<BlockEntityType<T>> registerBlockEntityType(String path, BiFunction<BlockPos, BlockState, T> blockEntityFactory, Supplier<Set<Block>> validBlocks) {
         return this.register((ResourceKey<Registry<BlockEntityType<T>>>) (ResourceKey<?>) Registries.BLOCK_ENTITY_TYPE,
                 path,
-                () -> {
-                    return new BlockEntityType<>(blockEntityFactory::apply, ImmutableSet.copyOf(validBlocks.get()));
-                });
+                () -> new BlockEntityType<>(blockEntityFactory::apply, ImmutableSet.copyOf(validBlocks.get())));
     }
 
     @Override

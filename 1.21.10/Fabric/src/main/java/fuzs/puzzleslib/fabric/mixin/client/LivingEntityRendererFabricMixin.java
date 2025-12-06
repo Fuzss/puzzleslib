@@ -24,7 +24,9 @@ abstract class LivingEntityRendererFabricMixin<T extends LivingEntity, S extends
         super(context);
     }
 
-    @Inject(method = "submit", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
+            at = @At("HEAD"),
+            cancellable = true)
     public void render$0(S livingEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo callback) {
         EventResult result = FabricRendererEvents.BEFORE_RENDER_LIVING.invoker()
                 .onBeforeRenderEntity(livingEntityRenderState,
@@ -37,7 +39,8 @@ abstract class LivingEntityRendererFabricMixin<T extends LivingEntity, S extends
         }
     }
 
-    @Inject(method = "submit", at = @At("TAIL"))
+    @Inject(method = "submit(Lnet/minecraft/client/renderer/entity/state/LivingEntityRenderState;Lcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;Lnet/minecraft/client/renderer/state/CameraRenderState;)V",
+            at = @At("TAIL"))
     public void render$1(S livingEntityRenderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState cameraRenderState, CallbackInfo callback) {
         FabricRendererEvents.AFTER_RENDER_LIVING.invoker()
                 .onAfterRenderEntity(livingEntityRenderState,

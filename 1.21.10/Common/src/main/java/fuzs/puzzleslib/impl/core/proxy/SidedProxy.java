@@ -51,6 +51,7 @@ public interface SidedProxy {
         return false;
     }
 
+    @Deprecated
     default List<Component> splitTooltipLines(Component component) {
         return Collections.singletonList(component);
     }

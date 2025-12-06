@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
-import fuzs.puzzleslib.api.core.v1.utility.ResourceLocationHelper;
 import fuzs.puzzleslib.api.data.v2.core.DataProviderContext;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
@@ -340,7 +339,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
             final ResourceKey<Recipe<?>> originalResourceKey = resourceKey;
             // relocate all recipes to the mod id, so they do not depend on the item namespace which would
             // place e.g. new recipes for vanilla items in 'minecraft' which is not desired
-            ResourceLocation resourceLocation = ResourceLocationHelper.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
+            ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
                     resourceKey.location().getPath());
             resourceKey = ResourceKey.create(Registries.RECIPE, resourceLocation);
             if (!this.recipes.add(resourceKey)) {
@@ -356,8 +355,7 @@ public abstract class AbstractRecipeProvider extends RecipeProvider implements D
                     JsonElement jsonElement = Advancement.CODEC.encodeStart(registryOps, advancementHolder.value())
                             .getOrThrow();
                     jsonElement = searchAndReplaceValue(jsonElement, originalResourceKey, resourceKey);
-                    ResourceLocation advancementLocation = ResourceLocationHelper.fromNamespaceAndPath(
-                            AbstractRecipeProvider.this.modId,
+                    ResourceLocation advancementLocation = ResourceLocation.fromNamespaceAndPath(AbstractRecipeProvider.this.modId,
                             advancementHolder.id().getPath());
                     this.consumer.accept(DataProvider.saveStable(this.output,
                             jsonElement,
